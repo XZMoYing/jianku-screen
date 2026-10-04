@@ -83,6 +83,6 @@ tests/           CTest 用例（纯 main() + require()，无框架）
 详见 [`docs/待验证项目交接.md`](docs/待验证项目交接.md) 与
 [`.dsh/unattended/queue.md`](.dsh/unattended/queue.md)。
 
-## 许可
+## 许可协议
 
-私有项目，未授予任何许可。
+[GNU General Public License v3.0](LICENSE)
