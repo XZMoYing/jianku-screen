@@ -35,6 +35,24 @@ cd build && ctest --output-on-failure
 cmake -B build -DJIANKU_SMOKE_PROJECT="/path/to/recording.jianku"
 ```
 
+## 打包 DMG
+
+```sh
+cmake -B build-release -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$(brew --prefix qt)"
+cmake --build build-release -j8
+./scripts/package-dmg.sh          # 产物：build-release/简库镜传 <日期>.dmg
+```
+
+脚本会把 Qt 框架、QML 模块和 **ffmpeg/ffprobe 及其整个动态库闭包**塞进 app 包，把
+install name 全部改成包内相对路径，然后 ad-hoc 签名、生成 DMG，最后**在屏蔽 Homebrew 的
+环境里真正启动一次**——只在这台机器上能跑的东西会在这一步失败，而不是在别人的机器上。
+
+两点务必知道：
+
+- **没有 Developer ID 签名和公证**（需要付费开发者账号）。首次打开会被 Gatekeeper 拦下，
+  需要右键 → 打开，或在「系统设置 → 隐私与安全性」里点「仍要打开」。
+- 打包后的 app **优先使用包内的 ffmpeg**，其次才是 PATH 上的；所以用户不需要装 ffmpeg。
+
 ## 权限
 
 应用需要**屏幕录制**、**输入监控**（指针轨迹）与**麦克风**权限。首次启动会引导开启；

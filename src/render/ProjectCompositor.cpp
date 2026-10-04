@@ -3,6 +3,7 @@
 #include "../animation/AnimationSettings.h"
 #include "../animation/AutoFocusEngine.h"
 
+#include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -679,6 +680,16 @@ QImage composeFrame(const ComposeContext &context, const QImage &source,
 // ---------------------------------------------------------------------------
 
 QString findFfmpeg() {
+    // The bundle first, so a packaged build works on a machine that has never installed
+    // Homebrew: `scripts/package-dmg.sh` copies ffmpeg and its whole dylib closure into
+    // Resources/bin and rewrites the install names to @executable_path. Preferring it also
+    // means a shipped build uses the ffmpeg it was tested against rather than whatever the
+    // user happens to have on PATH.
+    const QString bundled = QDir(QCoreApplication::applicationDirPath())
+        .filePath(QStringLiteral("../Resources/bin/ffmpeg"));
+    if (QFileInfo(bundled).isExecutable())
+        return QDir::cleanPath(bundled);
+
     QStringList candidates{
         QStringLiteral("/opt/homebrew/bin/ffmpeg"),
         QStringLiteral("/usr/local/bin/ffmpeg"),

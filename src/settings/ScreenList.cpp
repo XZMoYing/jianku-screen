@@ -33,7 +33,7 @@ QRectF ScreenList::unionGeometry() const {
     return QRectF(united);
 }
 
-void ScreenList::placeWindowOnDisplay(QObject *window, int index, bool fullscreen) {
+void ScreenList::placeWindowOnDisplay(QObject *window, int index, bool fillScreen) {
     auto *quickWindow = qobject_cast<QQuickWindow *>(window);
     if (!quickWindow) {
         if (window)
@@ -43,11 +43,35 @@ void ScreenList::placeWindowOnDisplay(QObject *window, int index, bool fullscree
     const QList<QScreen *> screens = QGuiApplication::screens();
     if (index >= 0 && index < screens.size())
         quickWindow->setScreen(screens[index]);
-    if (fullscreen) {
-        quickWindow->showFullScreen();
-    } else {
+    if (!fillScreen) {
         quickWindow->showNormal();
         quickWindow->show();
         quickWindow->raise();
+        return;
     }
+
+    QScreen *target = quickWindow->screen();
+    if (!target)
+        target = QGuiApplication::primaryScreen();
+    if (!target) {
+        quickWindow->show();
+        return;
+    }
+    // Frameless + the screen's own geometry, rather than showFullScreen(). See the header
+    // for why: a macOS full-screen window lives in its own Space, and the Space outlived
+    // the presentation — the second display stayed black after stopping.
+    quickWindow->setFlags(quickWindow->flags() | Qt::FramelessWindowHint);
+    quickWindow->setGeometry(target->geometry());
+    quickWindow->show();
+    quickWindow->raise();
+}
+
+void ScreenList::releaseWindow(QObject *window) {
+    auto *quickWindow = qobject_cast<QQuickWindow *>(window);
+    if (!quickWindow)
+        return;
+    // Order matters: hide first so the flag change is not animated on screen, then drop
+    // the frameless hint so the next show() is an ordinary window again.
+    quickWindow->hide();
+    quickWindow->setFlags(quickWindow->flags() & ~Qt::FramelessWindowHint);
 }

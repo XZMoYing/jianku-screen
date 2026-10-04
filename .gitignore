@@ -1,5 +1,6 @@
 .DS_Store
 build/
+build-release/
 cmake-build-*/
 *.app/
 CMakeFiles/

@@ -77,6 +77,9 @@ ApplicationWindow {
     }
 
     function showAudience() {
+        // 0 is the unshareable virtual window; every other entry is a real display, and
+        // the list is built from `screens.displays` in the same order, so the index maps
+        // straight through.
         const index = outputChoice.currentIndex - 1
         if (index >= 0)
             screens.placeWindowOnDisplay(audience, index, true)
@@ -84,11 +87,18 @@ ApplicationWindow {
             screens.placeWindowOnDisplay(audience, -1, false)
     }
 
+    // Every place the presentation can end has to go through this, not just hide().
+    // Hiding a window that was full-screen on a second display left that display black:
+    // the window was gone but its Space was not.
+    function endAudience() {
+        screens.releaseWindow(audience)
+    }
+
     function selectMode(next) {
         if (capture.recording || capture.busy || savingRecording)
             return
         openPresentationWhenReady = false
-        audience.hide()
+        root.endAudience()
         if (capture.running)
             capture.stop()
         mode = next
@@ -427,7 +437,7 @@ ApplicationWindow {
                             if (capture.recording) capture.stop()
                             else root.startRecording()
                         } else if (capture.running) {
-                            audience.hide()
+                            root.endAudience()
                             capture.stop()
                         } else {
                             root.openPresentationWhenReady = true
