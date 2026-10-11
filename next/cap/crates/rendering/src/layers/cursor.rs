@@ -1041,6 +1041,158 @@ impl CursorTexture {
 mod tests {
     use super::*;
 
+    #[tokio::test]
+    async fn motion_blur_cursor_kernel_matches_centroid_and_transparent_apron_on_gpu() {
+        let instance = wgpu::Instance::default();
+        let adapter = instance
+            .request_adapter(&wgpu::RequestAdapterOptions::default())
+            .await
+            .expect("Cursor kernel test requires a real GPU adapter");
+        let info = adapter.get_info();
+        assert_ne!(info.backend, wgpu::Backend::Noop);
+        eprintln!("cursor kernel adapter: {} / {:?}", info.name, info.backend);
+        let (device, queue) = adapter
+            .request_device(&wgpu::DeviceDescriptor::default())
+            .await
+            .unwrap();
+        let statics = Statics::new(&device);
+        let texture = device.create_texture(&wgpu::TextureDescriptor {
+            label: Some("Cursor kernel gradient"),
+            size: wgpu::Extent3d {
+                width: 64,
+                height: 64,
+                depth_or_array_layers: 1,
+            },
+            mip_level_count: 1,
+            sample_count: 1,
+            dimension: wgpu::TextureDimension::D2,
+            format: wgpu::TextureFormat::Rgba8Unorm,
+            usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::COPY_DST,
+            view_formats: &[],
+        });
+        let gradient: Vec<u8> = (0..64)
+            .flat_map(|y| (0..64).flat_map(move |x| [x * 3, y * 3, 37, 255]))
+            .collect();
+        queue.write_texture(
+            texture.as_image_copy(),
+            &gradient,
+            wgpu::TexelCopyBufferLayout {
+                offset: 0,
+                bytes_per_row: Some(256),
+                rows_per_image: Some(64),
+            },
+            texture.size(),
+        );
+        let bind_group = statics.create_bind_group(&device, &texture);
+        let output = device.create_texture(&wgpu::TextureDescriptor {
+            label: Some("Cursor kernel output"),
+            size: wgpu::Extent3d {
+                width: 160,
+                height: 120,
+                depth_or_array_layers: 1,
+            },
+            mip_level_count: 1,
+            sample_count: 1,
+            dimension: wgpu::TextureDimension::D2,
+            format: wgpu::TextureFormat::Rgba8Unorm,
+            usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::COPY_SRC,
+            view_formats: &[],
+        });
+        let output_view = output.create_view(&Default::default());
+        let buffer = device.create_buffer(&wgpu::BufferDescriptor {
+            label: Some("Cursor kernel readback"),
+            size: 768 * 120,
+            usage: wgpu::BufferUsages::COPY_DST | wgpu::BufferUsages::MAP_READ,
+            mapped_at_creation: false,
+        });
+        for (dx, dy) in [
+            (0.0, 0.0),
+            (20.0, 0.0),
+            (-20.0, 0.0),
+            (0.0, 20.0),
+            (0.0, -20.0),
+        ] {
+            let uniforms = CursorUniforms {
+                position_size: [32.0, 24.0, 64.0, 64.0],
+                output_size: [160.0, 120.0, 0.0, 0.0],
+                screen_bounds: [0.0, 0.0, 160.0, 120.0],
+                motion_vector_strength: [dx, dy, 1.0, 1.0],
+                ..Default::default()
+            };
+            queue.write_buffer(&statics.uniform_buffer, 0, bytemuck::bytes_of(&uniforms));
+            let mut encoder = device.create_command_encoder(&Default::default());
+            {
+                let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+                    label: Some("Cursor kernel test"),
+                    color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+                        view: &output_view,
+                        resolve_target: None,
+                        ops: wgpu::Operations {
+                            load: wgpu::LoadOp::Clear(wgpu::Color::TRANSPARENT),
+                            store: wgpu::StoreOp::Store,
+                        },
+                    })],
+                    ..Default::default()
+                });
+                pass.set_pipeline(&statics.render_pipeline);
+                pass.set_bind_group(0, &bind_group, &[]);
+                pass.draw(0..4, 0..1);
+            }
+            encoder.copy_texture_to_buffer(
+                output.as_image_copy(),
+                wgpu::TexelCopyBufferInfo {
+                    buffer: &buffer,
+                    layout: wgpu::TexelCopyBufferLayout {
+                        offset: 0,
+                        bytes_per_row: Some(768),
+                        rows_per_image: Some(120),
+                    },
+                },
+                output.size(),
+            );
+            queue.submit([encoder.finish()]);
+            let (sender, receiver) = std::sync::mpsc::channel();
+            buffer
+                .slice(..)
+                .map_async(wgpu::MapMode::Read, move |result| {
+                    sender.send(result).unwrap();
+                });
+            device.poll(wgpu::PollType::Wait).unwrap();
+            receiver.recv().unwrap().unwrap();
+            {
+                let mapped = buffer.slice(..).get_mapped_range();
+                let pixel = &mapped[56 * 768 + 64 * 4..][..4];
+                let expected = [
+                    96.0 + dx * 3.0 * (9.5 / 21.0),
+                    96.0 + dy * 3.0 * (9.5 / 21.0),
+                    37.0,
+                    255.0,
+                ];
+                for (&actual, expected) in pixel.iter().zip(expected) {
+                    assert!(
+                        (f32::from(actual) - expected).abs() <= 1.0,
+                        "motion=({dx}, {dy}), pixel={pixel:?}, expected_channel={expected}"
+                    );
+                }
+                if dx == 20.0 {
+                    let apron = &mapped[56 * 768 + 20 * 4..][..4];
+                    for (&actual, expected) in apron.iter().zip([
+                        4.0,
+                        96.0 * 8.0 / 21.0,
+                        37.0 * 8.0 / 21.0,
+                        255.0 * 8.0 / 21.0,
+                    ]) {
+                        assert!(
+                            (f32::from(actual) - expected).abs() <= 1.0,
+                            "apron={apron:?}, expected_channel={expected}"
+                        );
+                    }
+                }
+            }
+            buffer.unmap();
+        }
+    }
+
     fn alpha_coverage(level: &CursorMipLevel) -> f64 {
         let alpha_sum: u64 = level
             .rgba

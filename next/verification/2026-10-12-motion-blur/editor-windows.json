@@ -1,0 +1,61 @@
+[
+  {
+    "bundleIdentifier" : "com.jianku.screen.next",
+    "bundlePath" : "\/Users\/moyingxz\/Documents\/Zzx\/05_项目开发\/Jianku Screen Next Builds\/0.2.0-alpha.3\/Jianku Screen Next.app",
+    "name" : "简库镜传 Next",
+    "pid" : 65623,
+    "terminated" : false,
+    "windows" : [
+      {
+        "bounds" : {
+          "Height" : 24,
+          "Width" : 34,
+          "X" : 898,
+          "Y" : 0
+        },
+        "layer" : 25,
+        "number" : 43093
+      },
+      {
+        "bounds" : {
+          "Height" : 24,
+          "Width" : 34,
+          "X" : -214,
+          "Y" : -1080
+        },
+        "layer" : 25,
+        "number" : 43092
+      },
+      {
+        "bounds" : {
+          "Height" : 218,
+          "Width" : 260,
+          "X" : 830,
+          "Y" : 431
+        },
+        "layer" : 5,
+        "number" : 43097
+      },
+      {
+        "bounds" : {
+          "Height" : 480,
+          "Width" : 420,
+          "X" : 750,
+          "Y" : 300
+        },
+        "layer" : 5,
+        "number" : 43095
+      },
+      {
+        "bounds" : {
+          "Height" : 800,
+          "Width" : 1275,
+          "X" : -1030,
+          "Y" : -927
+        },
+        "layer" : 0,
+        "number" : 43094
+      }
+    ]
+  }
+]

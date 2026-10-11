@@ -109,6 +109,65 @@ fn pixels(frame: &RenderedFrame) -> Vec<u8> {
 }
 
 #[tokio::test]
+async fn motion_blur_display_kernel_matches_the_reference_centroid_on_gpu() {
+    let directory = tempfile::tempdir().unwrap();
+    let constants = constants(directory.path()).await;
+    let project = project();
+    let cursor = CursorEvents::default();
+    let zoom =
+        ZoomTransformTimeline::from_project(&project, &cursor, 3.0, constants.options.screen_size);
+    let mut decoded = frames();
+    decoded.screen_frame = Some(DecodedFrame::new(
+        (0..HEIGHT)
+            .flat_map(|y| (0..WIDTH).flat_map(move |x| [x as u8, y as u8, 37, 255]))
+            .collect(),
+        WIDTH,
+        HEIGHT,
+    ));
+    let mut layers = RendererLayers::new(&constants.device, &constants.queue);
+    for (dx, dy) in [
+        (0.0, 0.0),
+        (40.0, 0.0),
+        (-40.0, 0.0),
+        (0.0, 40.0),
+        (0.0, -40.0),
+    ] {
+        let mut uniforms = ProjectUniforms::new(
+            &constants,
+            &project,
+            0,
+            60,
+            XY::new(WIDTH, HEIGHT),
+            &cursor,
+            &decoded,
+            3.0,
+            &zoom,
+        );
+        assert_eq!(uniforms.display.target_size, [WIDTH as f32, HEIGHT as f32]);
+        uniforms.display.motion_blur_vector = [dx / WIDTH as f32, dy / HEIGHT as f32];
+        uniforms.display.motion_blur_params = [1.0, 1.0, 0.0, 0.0];
+        let frame = FrameRenderer::new(&constants)
+            .render_immediate(decoded.clone(), uniforms, &cursor, true, &mut layers)
+            .await
+            .unwrap();
+        let output = pixels(&frame);
+        let pixel = &output[(50 * WIDTH as usize + 60) * 4..][..4];
+        let expected = [
+            60.0 + dx * (9.5 / 21.0),
+            50.0 + dy * (9.5 / 21.0),
+            37.0,
+            255.0,
+        ];
+        for (&actual, expected) in pixel.iter().zip(expected) {
+            assert!(
+                (f32::from(actual) - expected).abs() <= 1.0,
+                "motion=({dx}, {dy}), pixel={pixel:?}, expected_channel={expected}"
+            );
+        }
+    }
+}
+
+#[tokio::test]
 async fn cursor_pose_matches_cached_and_direct_gpu_paths_across_resolutions() {
     use crate::{PrecomputedCursorTimeline, spring_mass_damper::SpringMassDamperSimulationConfig};
     use cap_project::{CursorClickEvent, CursorMoveEvent, CursorType};

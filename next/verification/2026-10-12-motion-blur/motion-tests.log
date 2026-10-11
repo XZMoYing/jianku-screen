@@ -1,0 +1,16 @@
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.71s
+     Running unittests src/lib.rs (target/debug/deps/cap_rendering-b077aa4d80692d35)
+
+running 6 tests
+test tests::motion_blur_keeps_camera_and_display_pivots_aligned ... ok
+test tests::display_movement_motion_blur_caps_extreme_velocity ... ok
+test tests::motion_blur_keeps_finite_fallbacks_and_synthetic_scene_transitions ... ok
+test tests::motion_blur_keeps_the_scale_pivot_during_off_center_releases ... ok
+cursor kernel adapter: Apple M1 / Metal
+{"adapter":"Apple M1","backend":"Metal","deviceType":"IntegratedGpu","software":false,"test":"overlay_native_boundary"}
+test layers::cursor::tests::motion_blur_cursor_kernel_matches_centroid_and_transparent_apron_on_gpu ... ok
+test overlay_layers::native_tests::motion_blur_display_kernel_matches_the_reference_centroid_on_gpu ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 304 filtered out; finished in 0.40s
+

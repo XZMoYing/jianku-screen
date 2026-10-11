@@ -1,0 +1,12 @@
+{
+  "disabledBlur": {
+    "frames": 360,
+    "identicalDecodedRGBAFramesAndTimestamps": 360
+  },
+  "enabledBlur": {
+    "frames": 360,
+    "changedDecodedRGBAFrames": 268
+  },
+  "frameHashParsing": "Select stream 0 after asserting its video header; complete framemd5 also includes silent AAC rows.",
+  "scope": "Fixed authored background and self-created media; no user desktop background or captured screen; not reference-application export parity."
+}

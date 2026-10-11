@@ -1,0 +1,221 @@
+2026-10-11T22:04:34.467282Z  INFO cap_desktop_lib::camera: Camera preview profile detected total_ram_mb=16384 low_spec_preview=false
+2026-10-11T22:04:34.479432Z DEBUG cap_desktop_lib: Skipping TypeScript bindings export outside source checkout
+2026-10-11T22:04:34.481409Z  INFO cap_desktop_lib::frame_ws: WebSocket server listening on port 55723
+2026-10-11T22:04:34.483826Z DEBUG cap_recording::feeds::camera: CameraFeed: Adding new sender
+2026-10-11T22:04:34.688414Z  INFO cap_desktop_lib::general_settings: Registered executable-adjacent cap-muxer binary for out-of-process muxer path=/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.3/Jianku Screen Next.app/Contents/MacOS/cap-muxer
+2026-10-11T22:04:34.692235Z TRACE cap_desktop_lib::deeplink_actions: Starting deep link action executor
+2026-10-11T22:04:34.692443Z  INFO cap_desktop_lib: Installed macOS native termination handler
+2026-10-11T22:04:34.692672Z TRACE cap_desktop_lib::deeplink_actions: Deep link action executor started
+2026-10-11T22:04:34.694556Z  INFO cap_desktop_lib: Process memory snapshot stage="periodic" rss_mb=94 virtual_mb=401978
+2026-10-11T22:04:34.778809Z TRACE cap_recording::feeds::camera: CameraFeed.RemoveInput
+2026-10-11T22:04:34.862125Z  INFO cap_desktop_lib: Startup window created label="main"
+2026-10-11T22:04:34.871117Z  INFO cap_desktop_lib::frame_ws: WebSocket server listening on port 55724
+2026-10-11T22:04:34.921830Z  INFO cap_desktop_lib::windows: Editor open: window ready window_built_and_shown_ms=143 shown_from_rust=true
+2026-10-11T22:04:34.942022Z  INFO cap_desktop_lib::gpu_context: Using hardware GPU adapter for shared context adapter_name="Apple M1" adapter_backend=Metal adapter_device_type=IntegratedGpu
+2026-10-11T22:04:34.992013Z DEBUG cap_project::meta: Checking for captions at: "/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.3/偏侧缩放与模糊验证.cap/captions.json"
+2026-10-11T22:04:34.992081Z DEBUG cap_project::meta: No captions.json found
+2026-10-11T22:04:35.001697Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.new" phase_id=1 event="start" elapsed_ms=0.055125
+2026-10-11T22:04:35.001740Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.shared_yuv" phase_id=2 event="start" elapsed_ms=0.000792
+2026-10-11T22:04:35.001876Z  INFO cap_rendering::yuv_converter: Creating shared YUV converter pipelines (shader compilation)
+2026-10-11T22:04:35.013032Z  INFO cap_rendering::yuv_converter: Shared YUV converter pipelines created successfully
+2026-10-11T22:04:35.013110Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.shared_yuv" phase_id=2 event="returned" elapsed_ms=11.36725
+2026-10-11T22:04:35.013131Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.shared_composite" phase_id=3 event="start" elapsed_ms=0.000625
+2026-10-11T22:04:35.022006Z  INFO cap_video_decode::avassetreader: Built keyframe index path=/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.3/偏侧缩放与模糊验证.cap//content/display.mp4 keyframe_count=1 fps=30.0 duration_secs=6.0 build_ms=12
+2026-10-11T22:04:35.022241Z  INFO cap_rendering::decoder::multi_position: Configured decoder pool for video duration duration_secs=6.0 optimal_pool_size=5 reposition_threshold=5.0
+2026-10-11T22:04:35.198519Z  INFO cap_rendering::decoder::avassetreader: Initialized multi-position decoder pool decoder_count=1 optimal_pool_size=5 reposition_threshold=5.0 fps=30 duration_secs=6.0 total_frames_estimate=180
+2026-10-11T22:04:35.198877Z  INFO cap_rendering::decoder: Video 'screen' using AVAssetReader (hardware) decoder (960x600)
+2026-10-11T22:04:35.650658Z  INFO cap_desktop_lib: Main window frontend ready
+2026-10-11T22:04:35.650832Z  INFO cap_desktop_lib::startup: Startup frontend ready elapsed_ms=1189
+2026-10-11T22:04:35.651424Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.instance" phase_id=4 event="start" elapsed_ms=0.002291
+2026-10-11T22:04:35.651448Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.template_lookup" phase_id=5 event="start" elapsed_ms=0.000583
+2026-10-11T22:04:35.651570Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.template_init" phase_id=6 event="start" elapsed_ms=0.000916
+2026-10-11T22:04:35.651619Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.system_scan" phase_id=7 event="start" elapsed_ms=0.002042
+2026-10-11T22:04:35.652219Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.instance" phase_id=8 event="start" elapsed_ms=0.0015409999999999998
+2026-10-11T22:04:35.652251Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.template_lookup" phase_id=9 event="start" elapsed_ms=0.0011250000000000001
+2026-10-11T22:04:35.767447Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.shared_composite" phase_id=3 event="returned" elapsed_ms=754.2435419999999
+2026-10-11T22:04:35.767509Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.background" phase_id=10 event="start" elapsed_ms=0.001209
+2026-10-11T22:04:35.789572Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.background" phase_id=10 event="returned" elapsed_ms=22.04
+2026-10-11T22:04:35.789612Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.background_blur" phase_id=11 event="start" elapsed_ms=0.000625
+2026-10-11T22:04:35.796020Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.background_blur" phase_id=11 event="returned" elapsed_ms=6.369750000000001
+2026-10-11T22:04:35.796059Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.background_color_grade" phase_id=12 event="start" elapsed_ms=0.0006659999999999999
+2026-10-11T22:04:35.805775Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.background_color_grade" phase_id=12 event="returned" elapsed_ms=9.689541
+2026-10-11T22:04:35.805884Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.frame" phase_id=13 event="start" elapsed_ms=0.003
+2026-10-11T22:04:35.806105Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.frame" phase_id=13 event="returned" elapsed_ms=0.249208
+2026-10-11T22:04:35.806127Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.notch" phase_id=14 event="start" elapsed_ms=0.000625
+2026-10-11T22:04:35.806191Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.notch" phase_id=14 event="returned" elapsed_ms=0.062084
+2026-10-11T22:04:35.806211Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.display" phase_id=15 event="start" elapsed_ms=0.000583
+2026-10-11T22:04:35.806733Z  INFO cap_rendering::yuv_converter: Initializing YUV converter textures (using shared pipelines) gpu_max_texture_size=8192
+2026-10-11T22:04:35.807385Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.display" phase_id=15 event="returned" elapsed_ms=1.125583
+2026-10-11T22:04:35.807415Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.click_ripple" phase_id=16 event="start" elapsed_ms=0.000875
+2026-10-11T22:04:35.813315Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.click_ripple" phase_id=16 event="returned" elapsed_ms=5.843083
+2026-10-11T22:04:35.813394Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.cursor" phase_id=17 event="start" elapsed_ms=0.000792
+2026-10-11T22:04:35.842460Z TRACE cap_desktop_lib::platform::macos::sc_shareable_content: ScreenCaptureKit cache warmed elapsed_ms=189.555
+2026-10-11T22:04:35.855528Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.system_scan" phase_id=7 event="returned" elapsed_ms=203.885292
+2026-10-11T22:04:35.856144Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.template_init" phase_id=6 event="returned" elapsed_ms=204.61629100000002
+2026-10-11T22:04:35.856692Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.template_lookup" phase_id=5 event="returned" elapsed_ms=205.204416
+2026-10-11T22:04:35.856725Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.clone_and_index" phase_id=18 event="start" elapsed_ms=0.000875
+2026-10-11T22:04:35.856755Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.template_lookup" phase_id=9 event="returned" elapsed_ms=204.417625
+2026-10-11T22:04:35.856801Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.clone_and_index" phase_id=19 event="start" elapsed_ms=0.001333
+2026-10-11T22:04:35.857213Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.clone_and_index" phase_id=18 event="returned" elapsed_ms=0.4895840000000001
+2026-10-11T22:04:35.857235Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.instance" phase_id=4 event="returned" elapsed_ms=205.8275
+2026-10-11T22:04:35.857299Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.clone_and_index" phase_id=19 event="returned" elapsed_ms=0.501958
+2026-10-11T22:04:35.857317Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.instance" phase_id=8 event="returned" elapsed_ms=205.129666
+2026-10-11T22:04:35.857738Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.new" phase_id=20 event="start" elapsed_ms=0.000958
+2026-10-11T22:04:35.857771Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.shared_yuv" phase_id=21 event="start" elapsed_ms=0.0006670000000000001
+2026-10-11T22:04:35.857786Z  INFO cap_rendering::yuv_converter: Creating shared YUV converter pipelines (shader compilation)
+2026-10-11T22:04:35.969139Z  INFO cap_rendering::yuv_converter: Shared YUV converter pipelines created successfully
+2026-10-11T22:04:35.969197Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.shared_yuv" phase_id=21 event="returned" elapsed_ms=111.42537499999999
+2026-10-11T22:04:35.969218Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.shared_composite" phase_id=22 event="start" elapsed_ms=0.000625
+2026-10-11T22:04:35.969302Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.cursor" phase_id=17 event="returned" elapsed_ms=155.8855
+2026-10-11T22:04:35.969351Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.camera" phase_id=23 event="start" elapsed_ms=0.000958
+2026-10-11T22:04:35.969700Z  INFO cap_rendering::yuv_converter: Initializing YUV converter textures (using shared pipelines) gpu_max_texture_size=8192
+2026-10-11T22:04:35.970129Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.camera" phase_id=23 event="returned" elapsed_ms=0.755958
+2026-10-11T22:04:35.970156Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.camera_only" phase_id=24 event="start" elapsed_ms=0.000791
+2026-10-11T22:04:35.970424Z  INFO cap_rendering::yuv_converter: Initializing YUV converter textures (using shared pipelines) gpu_max_texture_size=8192
+2026-10-11T22:04:35.970707Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.camera_only" phase_id=24 event="returned" elapsed_ms=0.546666
+2026-10-11T22:04:35.970731Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.mask" phase_id=25 event="start" elapsed_ms=0.0006659999999999999
+2026-10-11T22:04:35.986153Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.mask" phase_id=25 event="returned" elapsed_ms=15.364625
+2026-10-11T22:04:35.986202Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.text" phase_id=26 event="start" elapsed_ms=0.001375
+2026-10-11T22:04:35.986249Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.instance" phase_id=27 event="start" elapsed_ms=0.000625
+2026-10-11T22:04:35.986267Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.template_lookup" phase_id=28 event="start" elapsed_ms=0.000542
+2026-10-11T22:04:35.986284Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.template_lookup" phase_id=28 event="returned" elapsed_ms=0.017542
+2026-10-11T22:04:35.986301Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.clone_and_index" phase_id=29 event="start" elapsed_ms=0.000542
+2026-10-11T22:04:35.986932Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.clone_and_index" phase_id=29 event="returned" elapsed_ms=0.620333
+2026-10-11T22:04:35.986958Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.instance" phase_id=27 event="returned" elapsed_ms=0.709292
+2026-10-11T22:04:35.986977Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="glyph.text.gpu_resources" phase_id=30 event="start" elapsed_ms=0.000583
+2026-10-11T22:04:35.998929Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="glyph.text.gpu_resources" phase_id=30 event="returned" elapsed_ms=11.88325
+2026-10-11T22:04:35.998979Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.text" phase_id=26 event="returned" elapsed_ms=12.775958000000001
+2026-10-11T22:04:35.999000Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.images" phase_id=31 event="start" elapsed_ms=0.000709
+2026-10-11T22:04:36.005214Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.images" phase_id=31 event="returned" elapsed_ms=6.185375
+2026-10-11T22:04:36.005254Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.captions" phase_id=32 event="start" elapsed_ms=0.000625
+2026-10-11T22:04:36.005636Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.instance" phase_id=33 event="start" elapsed_ms=0.001
+2026-10-11T22:04:36.005732Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.template_lookup" phase_id=34 event="start" elapsed_ms=0.000958
+2026-10-11T22:04:36.005750Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.template_lookup" phase_id=34 event="returned" elapsed_ms=0.025666
+2026-10-11T22:04:36.005805Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.clone_and_index" phase_id=35 event="start" elapsed_ms=0.000541
+2026-10-11T22:04:36.006402Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.clone_and_index" phase_id=35 event="returned" elapsed_ms=0.628041
+2026-10-11T22:04:36.006466Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.instance" phase_id=33 event="returned" elapsed_ms=0.801291
+2026-10-11T22:04:36.006487Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="glyph.captions.gpu_resources" phase_id=36 event="start" elapsed_ms=0.000791
+2026-10-11T22:04:36.020196Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="glyph.captions.gpu_resources" phase_id=36 event="returned" elapsed_ms=13.631499999999999
+2026-10-11T22:04:36.024092Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.shared_composite" phase_id=22 event="returned" elapsed_ms=54.774083000000005
+2026-10-11T22:04:36.024180Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.background" phase_id=37 event="start" elapsed_ms=0.001375
+2026-10-11T22:04:36.026806Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.captions" phase_id=32 event="returned" elapsed_ms=21.527874999999998
+2026-10-11T22:04:36.026860Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.keyboard" phase_id=38 event="start" elapsed_ms=0.0006670000000000001
+2026-10-11T22:04:36.026958Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.instance" phase_id=39 event="start" elapsed_ms=0.001
+2026-10-11T22:04:36.026983Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.template_lookup" phase_id=40 event="start" elapsed_ms=0.0006659999999999999
+2026-10-11T22:04:36.027009Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.template_lookup" phase_id=40 event="returned" elapsed_ms=0.026791000000000002
+2026-10-11T22:04:36.027026Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.clone_and_index" phase_id=41 event="start" elapsed_ms=0.000542
+2026-10-11T22:04:36.027569Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.clone_and_index" phase_id=41 event="returned" elapsed_ms=0.532292
+2026-10-11T22:04:36.027593Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.instance" phase_id=39 event="returned" elapsed_ms=0.64425
+2026-10-11T22:04:36.027610Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="glyph.keyboard.gpu_resources" phase_id=42 event="start" elapsed_ms=0.000542
+2026-10-11T22:04:36.033416Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="glyph.keyboard.gpu_resources" phase_id=42 event="returned" elapsed_ms=5.781708
+2026-10-11T22:04:36.034313Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.background" phase_id=37 event="returned" elapsed_ms=10.154459
+2026-10-11T22:04:36.034338Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.background_blur" phase_id=43 event="start" elapsed_ms=0.0007080000000000001
+2026-10-11T22:04:36.036910Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.keyboard" phase_id=38 event="returned" elapsed_ms=10.061834000000001
+2026-10-11T22:04:36.036936Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.camera3d" phase_id=44 event="start" elapsed_ms=0.000625
+2026-10-11T22:04:36.038819Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.background_blur" phase_id=43 event="returned" elapsed_ms=4.470292
+2026-10-11T22:04:36.038848Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.background_color_grade" phase_id=45 event="start" elapsed_ms=0.0006670000000000001
+2026-10-11T22:04:36.048246Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.background_color_grade" phase_id=45 event="returned" elapsed_ms=9.369208
+2026-10-11T22:04:36.048283Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.frame" phase_id=46 event="start" elapsed_ms=0.000625
+2026-10-11T22:04:36.048402Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.frame" phase_id=46 event="returned" elapsed_ms=0.117208
+2026-10-11T22:04:36.048427Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.notch" phase_id=47 event="start" elapsed_ms=0.000583
+2026-10-11T22:04:36.048500Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.notch" phase_id=47 event="returned" elapsed_ms=0.071125
+2026-10-11T22:04:36.048522Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.display" phase_id=48 event="start" elapsed_ms=0.000583
+2026-10-11T22:04:36.049015Z  INFO cap_rendering::yuv_converter: Initializing YUV converter textures (using shared pipelines) gpu_max_texture_size=8192
+2026-10-11T22:04:36.049429Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.display" phase_id=48 event="returned" elapsed_ms=0.90425
+2026-10-11T22:04:36.049452Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.click_ripple" phase_id=49 event="start" elapsed_ms=0.000625
+2026-10-11T22:04:36.053560Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.click_ripple" phase_id=49 event="returned" elapsed_ms=4.099458
+2026-10-11T22:04:36.053587Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.cursor" phase_id=50 event="start" elapsed_ms=0.0007080000000000001
+2026-10-11T22:04:36.055459Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.camera3d" phase_id=44 event="returned" elapsed_ms=18.518041
+2026-10-11T22:04:36.055482Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.new" phase_id=1 event="returned" elapsed_ms=1053.9310420000002
+2026-10-11T22:04:36.055501Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="cursor.preload" phase_id=51 event="start" elapsed_ms=0.000625
+2026-10-11T22:04:36.073903Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.cursor" phase_id=50 event="returned" elapsed_ms=20.240125000000003
+2026-10-11T22:04:36.074029Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.camera" phase_id=52 event="start" elapsed_ms=0.004916
+2026-10-11T22:04:36.074925Z  INFO cap_rendering::yuv_converter: Initializing YUV converter textures (using shared pipelines) gpu_max_texture_size=8192
+2026-10-11T22:04:36.075451Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.camera" phase_id=52 event="returned" elapsed_ms=1.4375410000000002
+2026-10-11T22:04:36.075478Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.camera_only" phase_id=53 event="start" elapsed_ms=0.000625
+2026-10-11T22:04:36.075736Z  INFO cap_rendering::yuv_converter: Initializing YUV converter textures (using shared pipelines) gpu_max_texture_size=8192
+2026-10-11T22:04:36.076579Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.camera_only" phase_id=53 event="returned" elapsed_ms=1.089208
+2026-10-11T22:04:36.076605Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.mask" phase_id=54 event="start" elapsed_ms=0.000625
+2026-10-11T22:04:36.092046Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.mask" phase_id=54 event="returned" elapsed_ms=15.411207999999998
+2026-10-11T22:04:36.092088Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.text" phase_id=55 event="start" elapsed_ms=0.0006670000000000001
+2026-10-11T22:04:36.092107Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.instance" phase_id=56 event="start" elapsed_ms=0.000583
+2026-10-11T22:04:36.092144Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.template_lookup" phase_id=57 event="start" elapsed_ms=0.000917
+2026-10-11T22:04:36.092173Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.template_lookup" phase_id=57 event="returned" elapsed_ms=0.036458000000000004
+2026-10-11T22:04:36.092193Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.clone_and_index" phase_id=58 event="start" elapsed_ms=0.000625
+2026-10-11T22:04:36.092782Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.clone_and_index" phase_id=58 event="returned" elapsed_ms=0.586333
+2026-10-11T22:04:36.092810Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.instance" phase_id=56 event="returned" elapsed_ms=0.7036250000000001
+2026-10-11T22:04:36.092829Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="glyph.text.gpu_resources" phase_id=59 event="start" elapsed_ms=0.000542
+2026-10-11T22:04:36.102953Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="glyph.text.gpu_resources" phase_id=59 event="returned" elapsed_ms=10.105417000000001
+2026-10-11T22:04:36.103044Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.text" phase_id=55 event="returned" elapsed_ms=10.926875
+2026-10-11T22:04:36.103080Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.images" phase_id=60 event="start" elapsed_ms=0.0011250000000000001
+2026-10-11T22:04:36.109387Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.images" phase_id=60 event="returned" elapsed_ms=6.266959
+2026-10-11T22:04:36.109444Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.captions" phase_id=61 event="start" elapsed_ms=0.001167
+2026-10-11T22:04:36.109720Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.instance" phase_id=62 event="start" elapsed_ms=0.001291
+2026-10-11T22:04:36.109802Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.template_lookup" phase_id=63 event="start" elapsed_ms=0.0012920000000000002
+2026-10-11T22:04:36.109832Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.template_lookup" phase_id=63 event="returned" elapsed_ms=0.038125
+2026-10-11T22:04:36.109861Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.clone_and_index" phase_id=64 event="start" elapsed_ms=0.001083
+2026-10-11T22:04:36.110727Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.clone_and_index" phase_id=64 event="returned" elapsed_ms=0.864042
+2026-10-11T22:04:36.110753Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.instance" phase_id=62 event="returned" elapsed_ms=1.078708
+2026-10-11T22:04:36.110770Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="glyph.captions.gpu_resources" phase_id=65 event="start" elapsed_ms=0.000542
+2026-10-11T22:04:36.120171Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="glyph.captions.gpu_resources" phase_id=65 event="returned" elapsed_ms=9.340875
+2026-10-11T22:04:36.125490Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.captions" phase_id=61 event="returned" elapsed_ms=16.011999999999997
+2026-10-11T22:04:36.125609Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.keyboard" phase_id=66 event="start" elapsed_ms=0.0018750000000000001
+2026-10-11T22:04:36.125644Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.instance" phase_id=67 event="start" elapsed_ms=0.0012920000000000002
+2026-10-11T22:04:36.125673Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.template_lookup" phase_id=68 event="start" elapsed_ms=0.0012079999999999999
+2026-10-11T22:04:36.125736Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.template_lookup" phase_id=68 event="returned" elapsed_ms=0.057083
+2026-10-11T22:04:36.125760Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.clone_and_index" phase_id=69 event="start" elapsed_ms=0.000625
+2026-10-11T22:04:36.126257Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.clone_and_index" phase_id=69 event="returned" elapsed_ms=0.49425
+2026-10-11T22:04:36.126297Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="font.instance" phase_id=67 event="returned" elapsed_ms=0.659167
+2026-10-11T22:04:36.126316Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="glyph.keyboard.gpu_resources" phase_id=70 event="start" elapsed_ms=0.000584
+2026-10-11T22:04:36.132913Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="glyph.keyboard.gpu_resources" phase_id=70 event="returned" elapsed_ms=6.5745
+2026-10-11T22:04:36.136605Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.keyboard" phase_id=66 event="returned" elapsed_ms=11.014459
+2026-10-11T22:04:36.136643Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.camera3d" phase_id=71 event="start" elapsed_ms=0.0006670000000000001
+2026-10-11T22:04:36.154221Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.camera3d" phase_id=71 event="returned" elapsed_ms=17.5475
+2026-10-11T22:04:36.154259Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="layers.new" phase_id=20 event="returned" elapsed_ms=296.5175
+2026-10-11T22:04:36.154514Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="frame.rgba_first_render" phase_id=72 event="start" elapsed_ms=0.0007080000000000001
+2026-10-11T22:04:36.154571Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="frame.session" phase_id=73 event="start" elapsed_ms=0.000625
+2026-10-11T22:04:36.154971Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="frame.session" phase_id=73 event="returned" elapsed_ms=0.369458
+2026-10-11T22:04:36.158323Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="rgba.first_output" phase_id=74 event="start" elapsed_ms=0.001166
+2026-10-11T22:04:36.158520Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="rgba.first_output" phase_id=74 event="submit_start" elapsed_ms=0.21179099999999998
+2026-10-11T22:04:36.158881Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="rgba.first_output" phase_id=74 event="submit_returned" elapsed_ms=0.571541
+2026-10-11T22:04:36.158927Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="frame.rgba_first_render" phase_id=72 event="submitted" elapsed_ms=4.4135
+2026-10-11T22:04:36.162173Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="rgba.first_output" phase_id=74 event="gpu_map_observed" elapsed_ms=3.8465830000000003
+2026-10-11T22:04:36.162231Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="rgba.first_output" phase_id=74 event="frame_ready" elapsed_ms=3.923125
+2026-10-11T22:04:36.162258Z  INFO cap_desktop_lib::screenshot_editor: screenshot_editor timing: render pipeline prewarm complete elapsed_ms=304
+2026-10-11T22:04:36.215749Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="cursor.preload" phase_id=51 event="returned" elapsed_ms=160.21433299999998
+2026-10-11T22:04:36.216847Z  INFO create_editor_instance: cap_desktop_lib::editor_window: Editor open: instance served from prewarm wait_ms=609
+2026-10-11T22:04:36.221047Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="frame.rgba_first_render" phase_id=75 event="start" elapsed_ms=0.001708
+2026-10-11T22:04:36.221126Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="frame.session" phase_id=76 event="start" elapsed_ms=0.002
+2026-10-11T22:04:36.221558Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="frame.session" phase_id=76 event="returned" elapsed_ms=0.429208
+2026-10-11T22:04:36.246164Z  INFO cap_desktop_lib::frame_ws: Socket connection established
+2026-10-11T22:04:36.246222Z  INFO cap_desktop_lib::frame_ws: Editor open: socket connected before any frame was rendered
+2026-10-11T22:04:38.234915Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="rgba.first_output" phase_id=77 event="start" elapsed_ms=0.001458
+2026-10-11T22:04:38.235148Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="rgba.first_output" phase_id=77 event="submit_start" elapsed_ms=0.255791
+2026-10-11T22:04:38.235530Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="rgba.first_output" phase_id=77 event="submit_returned" elapsed_ms=0.640625
+2026-10-11T22:04:38.235572Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="frame.rgba_first_render" phase_id=75 event="submitted" elapsed_ms=2014.5757500000002
+2026-10-11T22:04:38.242014Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="rgba.first_output" phase_id=77 event="gpu_map_observed" elapsed_ms=7.087708
+2026-10-11T22:04:38.242660Z DEBUG cap_rendering::readiness: Renderer readiness phase phase="rgba.first_output" phase_id=77 event="frame_ready" elapsed_ms=7.769083
+2026-10-11T22:04:38.244498Z  INFO cap_desktop_lib::frame_ws: WS frame stats fps=0 mb_per_sec="1.6" avg_kb="3159.0" pack_avg_ms="0.002" pack_max_ms="0.002" send_avg_ms="1.589" send_max_ms="1.589" created_to_sent_avg_ms="1.743" created_to_sent_max_ms="1.743" dims="1124x702" format="RGBA"
+2026-10-11T22:04:38.263273Z  INFO load_captions{[3mvideo_id[0m[2m=[0m"/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.3/偏侧缩放与模糊验证.cap/"}: cap_desktop_lib::captions: === LOAD CAPTIONS START ===
+2026-10-11T22:04:38.263316Z  INFO load_captions{[3mvideo_id[0m[2m=[0m"/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.3/偏侧缩放与模糊验证.cap/"}: cap_desktop_lib::captions: Loading captions for video_id: /Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.3/偏侧缩放与模糊验证.cap/
+2026-10-11T22:04:38.263356Z  INFO load_captions{[3mvideo_id[0m[2m=[0m"/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.3/偏侧缩放与模糊验证.cap/"}: cap_desktop_lib::captions: Getting captions directory for video_id: /Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.3/偏侧缩放与模糊验证.cap/
+2026-10-11T22:04:38.263421Z  INFO load_captions{[3mvideo_id[0m[2m=[0m"/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.3/偏侧缩放与模糊验证.cap/"}: cap_desktop_lib::captions: Captions directory path: "/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.3/偏侧缩放与模糊验证.cap/"
+2026-10-11T22:04:38.263476Z  INFO load_captions{[3mvideo_id[0m[2m=[0m"/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.3/偏侧缩放与模糊验证.cap/"}: cap_desktop_lib::captions: No captions file found at: "/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.3/偏侧缩放与模糊验证.cap/captions.json"
+2026-10-11T22:04:38.263502Z  INFO load_captions{[3mvideo_id[0m[2m=[0m"/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.3/偏侧缩放与模糊验证.cap/"}: cap_desktop_lib::captions: === LOAD CAPTIONS END (no file) ===
+2026-10-11T22:05:06.287524Z  INFO cap_desktop_lib::frame_ws: WS frame stats fps=2 mb_per_sec="6.5" avg_kb="3159.0" pack_avg_ms="0.002" pack_max_ms="0.004" send_avg_ms="0.960" send_max_ms="1.469" created_to_sent_avg_ms="1.318" created_to_sent_max_ms="1.698" dims="1124x702" format="RGBA"
+2026-10-11T22:05:08.802676Z  INFO cap_editor::playback: No audio segments found, skipping audio playback.
+2026-10-11T22:05:08.803169Z  INFO cap_desktop_lib::frame_ws: WS frame stats fps=2 mb_per_sec="8.1" avg_kb="3159.0" pack_avg_ms="0.002" pack_max_ms="0.002" send_avg_ms="1.450" send_max_ms="1.857" created_to_sent_avg_ms="1.929" created_to_sent_max_ms="2.300" dims="1124x702" format="RGBA"
+2026-10-11T22:05:10.805902Z  INFO cap_editor::playback: Playback stats effective_fps="60.2" total_rendered=121 total_skipped=0 starved=0 cache_hits=0 prefetch_hits=120 sync_decodes=0 prefetch_buffer=89 prefetch_limit=90
+2026-10-11T22:05:10.811196Z  INFO cap_desktop_lib::frame_ws: WS frame stats fps=60 mb_per_sec="194.1" avg_kb="3159.0" pack_avg_ms="0.001" pack_max_ms="0.003" send_avg_ms="0.813" send_max_ms="1.689" created_to_sent_avg_ms="1.021" created_to_sent_max_ms="1.899" dims="1124x702" format="RGBA"
+2026-10-11T22:05:12.806546Z  INFO cap_editor::playback: Playback stats effective_fps="60.0" total_rendered=241 total_skipped=0 starved=0 cache_hits=0 prefetch_hits=240 sync_decodes=0 prefetch_buffer=89 prefetch_limit=90
+2026-10-11T22:05:12.818181Z  INFO cap_desktop_lib::frame_ws: WS frame stats fps=60 mb_per_sec="194.1" avg_kb="3159.0" pack_avg_ms="0.001" pack_max_ms="0.013" send_avg_ms="0.756" send_max_ms="1.863" created_to_sent_avg_ms="0.961" created_to_sent_max_ms="2.189" dims="1124x702" format="RGBA"
+2026-10-11T22:05:16.208939Z  INFO cap_editor::playback: No audio segments found, skipping audio playback.
+2026-10-11T22:05:16.209803Z  INFO cap_desktop_lib::frame_ws: WS frame stats fps=57 mb_per_sec="186.0" avg_kb="3159.0" pack_avg_ms="0.002" pack_max_ms="0.031" send_avg_ms="0.719" send_max_ms="1.618" created_to_sent_avg_ms="0.924" created_to_sent_max_ms="1.829" dims="1124x702" format="RGBA"
+2026-10-11T22:05:18.195752Z  INFO cap_editor::playback: Playback stats effective_fps="59.7" total_rendered=120 total_skipped=0 starved=0 cache_hits=0 prefetch_hits=119 sync_decodes=0 prefetch_buffer=89 prefetch_limit=90
+2026-10-11T22:05:18.218672Z  INFO cap_desktop_lib::frame_ws: WS frame stats fps=60 mb_per_sec="194.1" avg_kb="3159.0" pack_avg_ms="0.002" pack_max_ms="0.021" send_avg_ms="0.719" send_max_ms="1.845" created_to_sent_avg_ms="0.927" created_to_sent_max_ms="2.247" dims="1124x702" format="RGBA"
+2026-10-11T22:05:20.210331Z  INFO cap_editor::playback: Playback stats effective_fps="60.1" total_rendered=241 total_skipped=0 starved=0 cache_hits=0 prefetch_hits=240 sync_decodes=0 prefetch_buffer=89 prefetch_limit=90
+2026-10-11T22:05:20.222201Z  INFO cap_desktop_lib::frame_ws: WS frame stats fps=60 mb_per_sec="194.1" avg_kb="3159.0" pack_avg_ms="0.002" pack_max_ms="0.018" send_avg_ms="0.765" send_max_ms="2.158" created_to_sent_avg_ms="0.973" created_to_sent_max_ms="2.510" dims="1124x702" format="RGBA"
+2026-10-11T22:05:23.561708Z  INFO cap_editor::playback: No audio segments found, skipping audio playback.
+2026-10-11T22:05:23.563066Z  INFO cap_desktop_lib::frame_ws: WS frame stats fps=57 mb_per_sec="186.0" avg_kb="3159.0" pack_avg_ms="0.001" pack_max_ms="0.003" send_avg_ms="0.747" send_max_ms="1.900" created_to_sent_avg_ms="0.957" created_to_sent_max_ms="2.249" dims="1124x702" format="RGBA"
+2026-10-11T22:05:25.565654Z  INFO cap_desktop_lib::frame_ws: WS frame stats fps=13 mb_per_sec="43.7" avg_kb="3159.0" pack_avg_ms="0.001" pack_max_ms="0.002" send_avg_ms="0.669" send_max_ms="1.462" created_to_sent_avg_ms="0.902" created_to_sent_max_ms="2.009" dims="1124x702" format="RGBA"
+2026-10-11T22:05:34.696764Z  INFO cap_desktop_lib: Process memory snapshot stage="periodic" rss_mb=277 virtual_mb=403476

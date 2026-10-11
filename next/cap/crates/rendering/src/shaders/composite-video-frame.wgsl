@@ -351,13 +351,15 @@ fn fs_main(@builtin(position) frag_coord: vec4<f32>) -> @location(0) vec4<f32> {
             return composite_source_over(apply_color_grade(base_color, target_uv, p), shadow_color);
         }
 
-        // 21-tap box along [0, +v]: matches the reference directional filter
-        // (kernel 21 with offset -|v|/2, which anchors the span at the pixel).
-        var accum = vec3<f32>(0.0);
-        var alpha_sum = 0.0;
+        // The reference kernel repeats its center before offsets 0..19/20.
+        // Sample the unclamped UV so the repeated tap also preserves the apron alpha.
+        var center_tap = sample_texture(target_uv, crop_bounds_uv);
+        center_tap = apply_rounded_corners(center_tap, target_uv);
+        var accum = center_tap.rgb * center_tap.a;
+        var alpha_sum = center_tap.a;
         let k = 20.0;
 
-        for (var i = 0; i <= 20; i = i + 1) {
+        for (var i = 0; i < 20; i = i + 1) {
             let sample_uv = target_uv + velocity_uv * (f32(i) / k);
             var tap = sample_texture(sample_uv, crop_bounds_uv);
             tap = apply_rounded_corners(tap, sample_uv);

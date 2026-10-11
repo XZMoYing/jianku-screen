@@ -1,0 +1,20 @@
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.12s
+     Running unittests src/lib.rs (target/debug/deps/cap_rendering-b077aa4d80692d35)
+
+running 1 test
+cursor kernel adapter: Apple M1 / Metal
+
+thread 'layers::cursor::tests::motion_blur_cursor_kernel_matches_centroid_and_transparent_apron_on_gpu' panicked at crates/rendering/src/layers/cursor.rs:1172:21:
+motion=(20, 0), pixel=[126, 96, 37, 255], expected_channel=123.14285
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test layers::cursor::tests::motion_blur_cursor_kernel_matches_centroid_and_transparent_apron_on_gpu ... FAILED
+
+failures:
+
+failures:
+    layers::cursor::tests::motion_blur_cursor_kernel_matches_centroid_and_transparent_apron_on_gpu
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 309 filtered out; finished in 0.19s
+
+error: test failed, to rerun pass `-p cap-rendering --lib`

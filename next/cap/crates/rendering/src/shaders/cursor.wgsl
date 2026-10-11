@@ -217,7 +217,8 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
     let k = kernel_size - 1.0;
     var color = base_color;
 
-    for (var i = 1; i <= 20; i = i + 1) {
+    // The reference kernel counts the center twice and stops at 19/20.
+    for (var i = 0; i < 20; i = i + 1) {
         let bias = velocity_uv * (f32(i) / k);
         let sample_uv = input.uv + bias;
         color += sample_cursor(sample_uv);

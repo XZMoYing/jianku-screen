@@ -1,0 +1,15 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.49s
+     Running unittests src/lib.rs (target/debug/deps/cap_rendering-b077aa4d80692d35)
+
+running 4 tests
+{"adapter":"Apple M1","backend":"Metal","deviceType":"IntegratedGpu","software":false,"test":"overlay_native_boundary"}
+{"adapter":"Apple M1","backend":"Metal","deviceType":"IntegratedGpu","software":false,"test":"overlay_native_boundary"}
+{"adapter":"Apple M1","backend":"Metal","deviceType":"IntegratedGpu","software":false,"test":"overlay_native_boundary"}
+{"adapter":"Apple M1","backend":"Metal","deviceType":"IntegratedGpu","software":false,"test":"overlay_native_boundary"}
+test overlay_layers::native_tests::restricted_late_uniforms_fail_before_prepare_or_direct_render_work ... ok
+test overlay_layers::native_tests::motion_blur_display_kernel_matches_the_reference_centroid_on_gpu ... ok
+test overlay_layers::native_tests::cursor_pose_matches_cached_and_direct_gpu_paths_across_resolutions ... ok
+test overlay_layers::native_tests::ordinary_bundle_renders_each_overlay_and_preserves_empty_frame_zero ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 306 filtered out; finished in 0.65s
+

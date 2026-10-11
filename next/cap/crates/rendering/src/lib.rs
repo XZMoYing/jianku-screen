@@ -2548,13 +2548,6 @@ impl MotionBounds {
         (size.x * size.x + size.y * size.y).sqrt().max(f64::EPSILON)
     }
 
-    fn contains(&self, other: &Self) -> bool {
-        self.start.coord.x <= other.start.coord.x
-            && self.start.coord.y <= other.start.coord.y
-            && self.end.coord.x >= other.end.coord.x
-            && self.end.coord.y >= other.end.coord.y
-    }
-
     fn point_to_uv(&self, point: XY<f64>) -> XY<f32> {
         let size = self.size();
         XY::new(
@@ -2645,11 +2638,8 @@ fn analyze_motion(current: &MotionBounds, previous: &MotionBounds) -> MotionAnal
         ((curr_diag - prev_diag).abs() / prev_diag) as f32
     };
 
-    let zoom_center_point = if previous.contains(current) {
-        previous.center()
-    } else {
-        zoom_vanishing_point(current, previous).unwrap_or(previous.center())
-    };
+    // Containment during a release does not change the scale pivot.
+    let zoom_center_point = zoom_vanishing_point(current, previous).unwrap_or(previous.center());
 
     analysis.movement_px = movement_px;
     analysis.movement_uv = movement_uv;
@@ -2686,16 +2676,27 @@ fn zoom_vanishing_point(current: &MotionBounds, previous: &MotionBounds) -> Opti
 }
 
 fn line_intersection(a1: XY<f64>, a2: XY<f64>, b1: XY<f64>, b2: XY<f64>) -> Option<XY<f64>> {
-    let denom = (a1.x - a2.x) * (b1.y - b2.y) - (a1.y - a2.y) * (b1.x - b2.x);
-    if denom.abs() <= f64::EPSILON {
+    let a = a2 - a1;
+    let b = b2 - b1;
+    let a_length = a.x.hypot(a.y);
+    let b_length = b.x.hypot(b.y);
+    let coordinate_scale = [a1.x, a1.y, a2.x, a2.y, b1.x, b1.y, b2.x, b2.y]
+        .into_iter()
+        .map(f64::abs)
+        .fold(1.0, f64::max);
+    let precision = 16.0 * f64::EPSILON;
+    // A pivot corner can acquire roundoff-sized motion; use the other diagonal.
+    if a_length <= precision * coordinate_scale || b_length <= precision * coordinate_scale {
         return None;
     }
-
-    let a_det = a1.x * a2.y - a1.y * a2.x;
-    let b_det = b1.x * b2.y - b1.y * b2.x;
-    let x = (a_det * (b1.x - b2.x) - (a1.x - a2.x) * b_det) / denom;
-    let y = (a_det * (b1.y - b2.y) - (a1.y - a2.y) * b_det) / denom;
-    Some(XY::new(x, y))
+    let denominator = a.x * b.y - a.y * b.x;
+    if denominator.abs() <= precision * a_length * b_length {
+        return None;
+    }
+    let relative = b1 - a1;
+    let t = (relative.x * b.y - relative.y * b.x) / denominator;
+    let point = a1 + a * t;
+    (point.x.is_finite() && point.y.is_finite()).then_some(point)
 }
 
 fn clamp_vector(vec: XY<f32>, max_len: f32) -> XY<f32> {
@@ -5250,6 +5251,66 @@ mod tests {
         assert!(zoom_out.descriptor.zoom_amount <= MAX_ZOOM_BLUR_AMOUNT);
         assert_eq!(zoom_in.descriptor.strength, 1.0);
         assert_eq!(zoom_out.descriptor.strength, 1.0);
+    }
+
+    #[test]
+    fn motion_blur_keeps_the_scale_pivot_during_off_center_releases() {
+        for size in [XY::new(1920.0, 1080.0), XY::new(960.0, 600.0)] {
+            for offset in [XY::new(0.0, 0.0), XY::new(73.0, 41.0)] {
+                for focus in [
+                    XY::new(0.8, 0.3),
+                    XY::new(0.2, 0.8),
+                    XY::new(0.0, 0.0),
+                    XY::new(1.0, 1.0),
+                    XY::new(0.5, 0.5),
+                ] {
+                    let bounds = |scale| {
+                        let start = offset + focus * size * (1.0 - scale);
+                        motion_bounds(start, start + size * scale)
+                    };
+                    for (previous, current) in [(2.0, 1.9), (1.9, 2.0), (1.9, 1.0)] {
+                        let analysis = analyze_motion(&bounds(current), &bounds(previous));
+                        assert!(
+                            (f64::from(analysis.zoom_center_uv.x) - focus.x).abs() < 1e-6
+                                && (f64::from(analysis.zoom_center_uv.y) - focus.y).abs() < 1e-6,
+                            "focus={focus:?}, previous={previous}, current={current}, actual={:?}",
+                            analysis.zoom_center_uv
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn motion_blur_keeps_camera_and_display_pivots_aligned() {
+        let previous = motion_bounds(XY::new(-1536.0, -324.0), XY::new(2304.0, 1836.0));
+        let current = motion_bounds(XY::new(-1382.4, -291.6), XY::new(2265.6, 1760.4));
+        let display =
+            ProjectUniforms::compute_display_motion_blur(current, previous, true, 1.0, 0.0, 1.0);
+        let camera = ProjectUniforms::compute_camera_motion_blur(current, previous, true, 1.0);
+        for descriptor in [display.descriptor, camera] {
+            assert_eq!(descriptor.mode, MotionBlurMode::Zoom);
+            assert!((descriptor.zoom_center_uv[0] - 0.8).abs() < 1e-6);
+            assert!((descriptor.zoom_center_uv[1] - 0.3).abs() < 1e-6);
+        }
+    }
+
+    #[test]
+    fn motion_blur_keeps_finite_fallbacks_and_synthetic_scene_transitions() {
+        let base = motion_bounds(XY::new(0.0, 0.0), XY::new(1920.0, 1080.0));
+        let translated = motion_bounds(XY::new(200.0, 0.0), XY::new(2120.0, 1080.0));
+        for current in [base, translated] {
+            let analysis = analyze_motion(&current, &base);
+            assert!(analysis.zoom_center_uv.x.is_finite());
+            assert!(analysis.zoom_center_uv.y.is_finite());
+            let transition =
+                ProjectUniforms::compute_display_motion_blur(current, base, true, 1.0, 0.8, 1.0);
+            assert_eq!(transition.descriptor.mode, MotionBlurMode::Zoom);
+        }
+        let disabled =
+            ProjectUniforms::compute_display_motion_blur(translated, base, true, 0.0, 0.8, 1.0);
+        assert_eq!(disabled.descriptor.mode, MotionBlurMode::None);
     }
 
     #[test]

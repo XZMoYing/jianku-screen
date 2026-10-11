@@ -1,0 +1,11 @@
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+error[E0560]: struct `wgpu::RenderPassColorAttachment<'_>` has no field named `depth_slice`
+    --> crates/rendering/src/layers/cursor.rs:1130:25
+     |
+1130 |                         depth_slice: None,
+     |                         ^^^^^^^^^^^ `wgpu::RenderPassColorAttachment<'_>` does not have this field
+     |
+     = note: all struct fields are already assigned
+
+For more information about this error, try `rustc --explain E0560`.
+error: could not compile `cap-rendering` (lib test) due to 1 previous error

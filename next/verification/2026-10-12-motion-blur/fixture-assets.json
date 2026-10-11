@@ -1,0 +1,7 @@
+{
+	"base": "../2026-10-12-native-foundation/fixture.cap",
+	"assets": {
+		"content/cursor.png": "15cebf1a5e7de1801cca6237a286ca406878e12047160f31ebca4846e7f1cc02",
+		"content/display.mp4": "223e96f7b7c7a628c94ed8342e1d5477e5a45a4b5ae0218fc5f26f5af80cf5ec"
+	}
+}
