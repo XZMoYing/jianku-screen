@@ -1,4 +1,5 @@
 #import "MacCapture.h"
+#include "CaptureSurfacePolicy.h"
 #import "MicrophoneRecorder.h"
 #import "PointerEventRecorder.h"
 #import "../capture/MediaClock.h"
@@ -150,9 +151,12 @@ QString sourceLabel(SCDisplay *display, SCWindow *window) {
 // recording them is never what the user meant.
 QVariantList windowSourceList(NSArray<SCWindow *> *windows) {
     QVariantList list;
+    const auto editorIds = editorCaptureWindowIds();
     for (SCWindow *window in windows) {
         if (!window.owningApplication || !window.onScreen)
             continue;
+        if (window.owningApplication.processID == NSProcessInfo.processInfo.processIdentifier
+            && !editorIds.contains(window.windowID)) continue;
         const CGRect frame = window.frame;
         if (frame.size.width < 80.0 || frame.size.height < 60.0)
             continue;
@@ -711,10 +715,20 @@ bool MacCapture::microphoneBlocked() const {
 }
 
 void MacCapture::refreshPermissionState() {
-    // requestInputMonitoringAccess() shows the system prompt on the first call and only
-    // reports afterwards, so pressing the button twice is safe.
-    CGRequestListenEventAccess();
+    // A refresh must not request an unrelated permission.
     emit permissionStateChanged();
+    emit screenAuthorizedChanged();
+    if ((permissionIssueKind_ == "microphone" && microphoneAuthorized())
+        || (permissionIssueKind_ == "input" && inputMonitoringAuthorized())
+        || (permissionIssueKind_ == "screen" && screenAuthorized()))
+        setPermissionIssue({}, {});
+}
+
+void MacCapture::requestMicrophoneAccess() {
+    auto gate = impl_->gate;
+    [AVCaptureDevice requestAccessForMediaType:AVMediaTypeAudio completionHandler:^(BOOL) {
+        postToOwner(gate, [](MacCapture *owner) { owner->refreshPermissionState(); });
+    }];
 }
 
 bool MacCapture::requestScreenAuthorization() {
@@ -830,6 +844,12 @@ void MacCapture::setRecordingPaused(bool value) {
     emit recordingPausedChanged();
 }
 
+void MacCapture::setRecordingFinalizing(bool value) {
+    if (recordingFinalizing_ == value) return;
+    recordingFinalizing_ = value;
+    emit recordingFinalizingChanged();
+}
+
 void MacCapture::setRecordingStatus(const QString &value) {
     if (recordingStatus_ == value)
         return;
@@ -870,7 +890,8 @@ void MacCapture::refreshDisplays() {
                     owner->reportError(failure);
                     return;
                 }
-                owner->captureProbeOk_ = true;
+                // Listing our own windows does not prove access to screen pixels.
+                owner->captureProbeOk_ = CGPreflightScreenCaptureAccess();
                 emit owner->screenAuthorizedChanged();
                 owner->setPermissionIssue({}, {});
                 owner->impl_->displays = content.displays;
@@ -878,7 +899,9 @@ void MacCapture::refreshDisplays() {
                 owner->impl_->windows = content.windows;
                 QStringList names;
                 QVariantList rates;
+                QVariantList ids;
                 for (SCDisplay *display in content.displays) {
+                    ids.append(quint32(display.displayID));
                     const QSize pixels = displayPixelSize(display);
                     // Resolution and refresh rate are shown as equals: both decide
                     // what a recording can contain, and a 60 Hz panel recorded at
@@ -894,6 +917,7 @@ void MacCapture::refreshDisplays() {
                 }
                 owner->displayNames_ = names;
                 owner->displayRefreshRates_ = rates;
+                owner->displayIds_ = ids;
                 emit owner->displayNamesChanged();
                 owner->windowSources_ = windowSourceList(content.windows);
                 emit owner->windowSourcesChanged();
@@ -901,6 +925,34 @@ void MacCapture::refreshDisplays() {
                 owner->setStatus(names.isEmpty()
                     ? QStringLiteral("没有可用显示器。请检查屏幕录制权限。")
                     : QStringLiteral("选择显示器后开始预览。"));
+            });
+        }];
+}
+
+void MacCapture::updateCaptureExclusions() {
+    if (!running_ || !impl_->stream || activeSource_.kind == Capture::SourceKind::Window) return;
+    const auto editorIds = editorCaptureWindowIds();
+    const auto generation = impl_->generation;
+    const auto displayId = activeSource_.displayId;
+    auto gate = impl_->gate;
+    [SCShareableContent getShareableContentExcludingDesktopWindows:NO onScreenWindowsOnly:NO
+        completionHandler:^(SCShareableContent *content, NSError *error) {
+            postToOwner(gate, [content, error, editorIds, generation, displayId, gate](MacCapture *owner) {
+                if (error || !content || generation != owner->impl_->generation || !owner->impl_->stream) return;
+                owner->impl_->windows = content.windows;
+                owner->impl_->applications = content.applications;
+                owner->windowSources_ = windowSourceList(content.windows);
+                emit owner->windowSourcesChanged();
+                for (SCDisplay *display in content.displays) if (display.displayID == displayId) {
+                    auto *filter = displayCaptureFilter(display, content.applications, content.windows, editorIds);
+                    [owner->impl_->stream updateContentFilter:filter completionHandler:^(NSError *failure) {
+                        if (failure) postToOwner(gate, [generation](MacCapture *current) {
+                            if (generation == current->impl_->generation)
+                                current->setStatus(QStringLiteral("采集窗口排除规则更新失败，请重新开始采集"));
+                        });
+                    }];
+                    break;
+                }
             });
         }];
 }
@@ -1007,23 +1059,13 @@ void MacCapture::startSource(const Capture::CaptureSource &source) {
     setStatus(source.kind == Capture::SourceKind::Display
         ? QStringLiteral("正在启动屏幕采集…") : QStringLiteral("正在启动来源采集…"));
 
-    // Our own windows must never appear in a recording: they would show the
-    // preview of the recording inside the recording.
-    NSString *bundleId = NSBundle.mainBundle.bundleIdentifier;
-    NSMutableArray<SCRunningApplication *> *excluded = [NSMutableArray array];
-    for (SCRunningApplication *app in impl_->applications) {
-        if ([app.bundleIdentifier isEqualToString:bundleId])
-            [excluded addObject:app];
-    }
-
     SCContentFilter *filter = nil;
     if (window) {
         // A desktop-independent window keeps producing its own pixels even while
         // occluded, which is what a window recording is expected to show.
         filter = [[SCContentFilter alloc] initWithDesktopIndependentWindow:window];
     } else {
-        filter = [[SCContentFilter alloc] initWithDisplay:display
-            excludingApplications:excluded exceptingWindows:@[]];
+        filter = displayCaptureFilter(display, impl_->applications, impl_->windows, editorCaptureWindowIds());
     }
 
     SCStreamConfiguration *config = [[SCStreamConfiguration alloc] init];
@@ -1103,6 +1145,8 @@ void MacCapture::startSource(const Capture::CaptureSource &source) {
             }
             owner->setBusy(false);
             owner->setRunning(true);
+            owner->captureProbeOk_ = true;
+            emit owner->screenAuthorizedChanged();
             owner->setStatus(QStringLiteral("屏幕画面正在输出。"));
             if (owner->recordWhenReady_) {
                 owner->recordWhenReady_ = false;
@@ -1114,53 +1158,53 @@ void MacCapture::startSource(const Capture::CaptureSource &source) {
     }];
 }
 
-void MacCapture::startRecordingWindow(double windowId, const QVariantMap &settings) {
-    if (recording_ || recordingFinalizing_ || busy_)
-        return;
+void MacCapture::startRecordingSource(const Capture::CaptureSource &source, const QVariantMap &settings) {
+    if (recording_ || recordingFinalizing_ || busy_) return;
     recordingSettings_ = settings;
-    // A running stream is capturing whatever source it was started with; if that
-    // is a different one, restart it rather than silently recording the wrong
-    // thing under the new name.
-    if (running_ && activeSource_.kind == Capture::SourceKind::Window
-        && activeSource_.windowId == static_cast<std::uint32_t>(windowId)) {
-        startRecording();
+    const bool same = running_ && activeSource_.kind == source.kind
+        && (source.kind == Capture::SourceKind::Window ? activeSource_.windowId == source.windowId
+            : source.kind == Capture::SourceKind::Region ? activeSource_.regionPoints == source.regionPoints
+            : activeSource_.displayId == source.displayId);
+    if (same) { startRecording(); return; }
+    if (running_) {
+        stop();
+        pendingRecordingSource_ = source;
+        setRecordingStatus(QStringLiteral("正在切换录制来源…"));
         return;
     }
-    if (running_)
-        stop();
     recordWhenReady_ = true;
-    startWindow(windowId);
+    startSource(source);
+}
+
+void MacCapture::startRecordingWindow(double windowId, const QVariantMap &settings) {
+    Capture::CaptureSource source;
+    source.kind = Capture::SourceKind::Window;
+    source.windowId = static_cast<std::uint32_t>(windowId);
+    startRecordingSource(source, settings);
 }
 
 void MacCapture::startRecordingRegion(double x, double y, double width, double height,
     const QVariantMap &settings) {
-    if (recording_ || recordingFinalizing_ || busy_)
-        return;
-    recordingSettings_ = settings;
-    const QRectF region(x, y, width, height);
-    if (running_ && activeSource_.kind == Capture::SourceKind::Region
-        && activeSource_.regionPoints == region) {
-        startRecording();
-        return;
-    }
-    if (running_)
-        stop();
-    recordWhenReady_ = true;
-    startRegion(x, y, width, height);
+    Capture::CaptureSource source;
+    source.kind = Capture::SourceKind::Region;
+    source.regionPoints = QRectF(x, y, width, height);
+    QList<QRectF> frames;
+    for (SCDisplay *display in impl_->displays)
+        frames.append(QRectFFromCGRect(CGDisplayBounds(display.displayID)));
+    const int index = Capture::displayIndexContaining(source.regionPoints.center(), frames);
+    if (index < 0) { reportError(QStringLiteral("没有可录制的显示器")); return; }
+    source.displayId = impl_->displays[index].displayID;
+    startRecordingSource(source, settings);
 }
 
 void MacCapture::startRecordingDisplay(int index, const QVariantMap &settings) {
-    if (recording_ || recordingFinalizing_ || busy_)
-        return;
-    recordingSettings_ = settings;
-    if (running_ && activeSource_.kind == Capture::SourceKind::Display) {
-        startRecording();
-        return;
+    if (index < 0 || index >= static_cast<int>(impl_->displays.count)) {
+        reportError(QStringLiteral("请重新选择录制显示器")); return;
     }
-    if (running_)
-        stop();
-    recordWhenReady_ = true;
-    startDisplay(index);
+    Capture::CaptureSource source;
+    source.kind = Capture::SourceKind::Display;
+    source.displayId = impl_->displays[index].displayID;
+    startRecordingSource(source, settings);
 }
 
 void MacCapture::startWindow(double windowId) {
@@ -1211,6 +1255,26 @@ void MacCapture::startRecording() {
         }];
         return;
     }
+    if (!recordingSettings_.value("muteMicrophone").toBool()
+        && [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeAudio] == AVAuthorizationStatusNotDetermined) {
+        setBusy(true);
+        setRecordingStatus(QStringLiteral("请在系统提示中允许麦克风访问…"));
+        const auto generation = impl_->generation;
+        auto gate = impl_->gate;
+        [AVCaptureDevice requestAccessForMediaType:AVMediaTypeAudio completionHandler:^(BOOL granted) {
+            postToOwner(gate, [generation, granted](MacCapture *owner) {
+                if (generation != owner->impl_->generation) return;
+                owner->setBusy(false);
+                owner->refreshPermissionState();
+                if (granted) owner->startRecording();
+                else {
+                    owner->setRecordingStatus(QStringLiteral("麦克风未授权，可授权后重试或关闭麦克风录音"));
+                    owner->setPermissionIssue(QStringLiteral("microphone"), owner->recordingStatus_);
+                }
+            });
+        }];
+        return;
+    }
     QString directory = recordingSettings_.value("recordingDirectory").toString();
     if (directory.isEmpty())
         directory = QStandardPaths::writableLocation(QStandardPaths::MoviesLocation)
@@ -1251,8 +1315,8 @@ void MacCapture::startRecording() {
         {"createdAt", QDateTime::currentDateTime().toString(Qt::ISODateWithMs)},
         {"settings", QJsonObject::fromVariantMap(recordingSettings_)},
         {"source", sourceJson}};
-    lastProjectPath_ = projectDirectory;
-    emit lastRecordingPathChanged();
+    recordingProjectPath_ = projectDirectory;
+    emit recordingStatusChanged();
     if (!impl_->pointerRecorder.start(recordedSource.displayId, pixels, bounds, projectDirectory)) {
         const QString failure = impl_->pointerRecorder.error();
         impl_->projectManifest.insert("state", "failed");
@@ -1309,14 +1373,13 @@ void MacCapture::startRecording() {
                 problem = QStringLiteral("录制工程清单保存失败，原始素材仍在工程目录");
             owner->setRecording(false);
             if (problem.isEmpty()) {
-                owner->setLastRecordingPath(output);
-                owner->refreshRecentProjects();
+
                 owner->setRecordingStatus(QStringLiteral("正在生成鼠标时间轴与自动缩放区间…"));
                 const QString directory = owner->impl_->projectDirectory;
                 auto processingGate = owner->impl_->gate;
-                QThreadPool::globalInstance()->start([directory, metadata, processingGate] {
+                QThreadPool::globalInstance()->start([directory, output, metadata, processingGate] {
                     const auto processing = ProjectTimeline::build(directory, metadata);
-                    postToOwner(processingGate, [directory, processing](MacCapture *current) {
+                    postToOwner(processingGate, [directory, output, processing](MacCapture *current) {
                         current->impl_->projectManifest.insert("processing", processing);
                         const bool ok = processing.value("state") == "generated";
                         current->impl_->projectManifest.insert("state", ok ? "readyForProcessing" : "recordedUnprocessed");
@@ -1326,15 +1389,22 @@ void MacCapture::startRecording() {
                         current->impl_->projectManifest.insert("error", ok ? QString()
                             : processing.value("error").toString());
                         const bool saved = writeProject(directory, current->impl_->projectManifest);
-                        current->recordingFinalizing_ = false;
+                        current->setRecordingFinalizing(false);
                         current->setRecordingStatus(!saved ? QStringLiteral("工程清单保存失败，原始素材保留：") + directory
                             : ok ? QStringLiteral("录制工程已保存：") + directory
                             : QStringLiteral("原始录像已保存，时间轴处理失败：") + processing.value("error").toString());
+                        if (ok && saved) {
+                            current->lastProjectPath_ = directory;
+                            current->setLastRecordingPath(output);
+                            current->refreshRecentProjects();
+                            emit current->recordingReady(directory);
+                        } else emit current->recordingFailed(current->recordingStatus_);
                     });
                 });
             } else {
-                owner->recordingFinalizing_ = false;
+                owner->setRecordingFinalizing(false);
                 owner->setRecordingStatus(QStringLiteral("录制工程保存失败：") + problem);
+                emit owner->recordingFailed(owner->recordingStatus_);
                 if (owner->running_) owner->stop();
             }
         });
@@ -1361,12 +1431,12 @@ void MacCapture::startRecording() {
 void MacCapture::stopRecording() {
     if (!recording_ || !impl_->receiver)
         return;
-    recordingFinalizing_ = true;
+    setRecordingFinalizing(true);
     setRecordingPaused(false);
     impl_->projectManifest.insert("pointer", impl_->pointerRecorder.stop());
     if (impl_->micRecorder) {
-        impl_->projectManifest.insert("microphone", jsonFromDictionary([impl_->micRecorder metadata]));
         [impl_->micRecorder stop];
+        impl_->projectManifest.insert("microphone", jsonFromDictionary([impl_->micRecorder metadata]));
         impl_->micRecorder = nil;
     }
     impl_->projectManifest.insert("state", "finalizing");
@@ -1436,6 +1506,7 @@ void MacCapture::openRecordingDirectory() {
 }
 
 void MacCapture::stop() {
+    pendingRecordingSource_.reset();
     recordWhenReady_ = false;
     if (recording_)
         stopRecording();
@@ -1462,6 +1533,12 @@ void MacCapture::stop() {
             owner->setStatus(error
                 ? QStringLiteral("停止采集时出错：") + failure
                 : QStringLiteral("采集已停止。"));
+            if (owner->pendingRecordingSource_) {
+                const auto next = *owner->pendingRecordingSource_;
+                owner->pendingRecordingSource_.reset();
+                if (!error) { owner->recordWhenReady_ = true; owner->startSource(next); }
+                else owner->setRecordingStatus(QStringLiteral("无法切换录制来源：") + failure);
+            }
         });
     }];
 }

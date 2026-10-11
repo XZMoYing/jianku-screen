@@ -1,0 +1,135 @@
+{
+  "date": "2026-10-11",
+  "applicationVersion": "0.1.3",
+  "scope": "完整编辑器第二阶段：可编辑自动/手动焦点、统一历史与保存",
+  "ctest": {
+    "passed": 17,
+    "total": 17
+  },
+  "syntheticFocusGui": {
+    "appearance": true,
+    "editSave": true,
+    "error": "",
+    "firstFrame": true,
+    "focusCanvasPickGesture": true,
+    "focusKeyboardCopyPaste": true,
+    "focusMoveGesture": true,
+    "focusPositionPadAndPixels": true,
+    "focusResizeGesture": true,
+    "focusSaveForExport": true,
+    "hasFrame": true,
+    "loading": false,
+    "manualFocusCreateGesture": true,
+    "ok": true,
+    "playback": true,
+    "playerError": "",
+    "playerFound": true,
+    "rapidSeek": true,
+    "stage": 13
+  },
+  "syntheticTimelineRegression": {
+    "appearance": true,
+    "audioWaveform": true,
+    "clipReorderGesture": true,
+    "clipSelectionGesture": true,
+    "clipTrimGesture": true,
+    "editSave": true,
+    "error": "",
+    "firstFrame": true,
+    "hasFrame": true,
+    "loadedThumbnails": 6,
+    "loading": false,
+    "ok": true,
+    "playback": true,
+    "playerError": "",
+    "playerFound": true,
+    "rapidSeek": true,
+    "reorderedPreview": true,
+    "stage": 8,
+    "timelineWheelZoom": true
+  },
+  "recordingCopyGui": {
+    "appearance": true,
+    "editSave": true,
+    "error": "",
+    "firstFrame": true,
+    "hasFrame": true,
+    "loading": false,
+    "ok": true,
+    "playback": true,
+    "playerError": "",
+    "playerFound": true,
+    "rapidSeek": true,
+    "stage": 3
+  },
+  "additionalChecks": [
+    "源锚定焦点经过剪切/变速/重排、编辑单个片段时保留兄弟区间",
+    "手动焦点在关闭自动缩放后仍改变真实 H.264 成片的颜色取样",
+    "原始点击重建自动区间且保留手动区间",
+    "焦点复制/粘贴属性/分割/删除及跨类型撤销重做",
+    "空闲 1 秒自动保存、关闭前立即保存、完整旧版备份",
+    "编辑格式 /1 /2 兼容升级，损坏焦点给出错误并保持未修改状态"
+  ],
+  "referenceDogscCommit": "fa24059a9ba7e769152b3c1de047d96aca873e1c",
+  "referenceAnimationVersion": "3.7.5-4595",
+  "sourceHashes": {
+    "third_party/dogsc/LICENSE": "af8b353671e48b110269ab4b89c909ca580710044691f1c6c0da419c6e9b8ab4",
+    "third_party/dogsc/TimelineMap.swift": "d349e85283c623fc57523abad8d1868a3d1d7d2db8a3f17a71fe44b8f04c1df3",
+    "third_party/dogsc/EditorTimelineMagneticSnap.swift": "d283e8604fa19006329b0b56666334c670b7507134c11fae495e375be5629d9c",
+    "src/project/FocusTrack.h": "735c6ac2065f0182a6f7c4ac068ae082572fe989394655a40fe6fb64bb9b9081",
+    "src/project/EditSidecar.cpp": "68599b3f607a21a7d0e1c30382374d36d3c40b64cfc2cce0d99a5accffca5c4c",
+    "src/render/FocusController.cpp": "7301200868f2b2ea517c1fa0b07f513a924ee597b43822a6938163b63170c60a",
+    "src/render/TimelineController.cpp": "1a6adc37a785214a14e47a36cc2835cb0f4c648c0e1c1cb7d26ad12b2ae15d4a",
+    "src/render/ProjectCompositor.cpp": "2c0ba684cbdcc44a3660be2d7a40bb4a377cbee3ffa39b31ec2854b839fec4be",
+    "src/render/RecordingPlayer.mm": "58f421f72818ddb7359bd6dd7d2843781a54fe35805eeb3b9c2f1b6bc1f6de7c",
+    "src/render/EditorSession.cpp": "296b94412d5305583d6c396e2f8662dcc31660bd000f9d83a3b560c44147537a",
+    "ui/FocusLane.qml": "de984608b51bea00c4be3455ba24d5f319e99e9a49a6d7056c1f7ab945949347",
+    "ui/FocusInspector.qml": "0eab710283805b6cdf9da733d5cb20eec0ec4b0f27352e96b4ebdd8cd23718dc",
+    "ui/EditorTab.qml": "fb7d3a8b48acf2088b7b9647fa2f22980e3587670a8b684766b8f4f3ffa29f66",
+    "ui/TimelineStrip.qml": "a3f2099005f2d8450b439b359dd8b744c5221464fcf2b46ddfec173b81416fd1"
+  },
+  "package": {
+    "path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen/build-release/简库镜传 2026.10.11.2.dmg",
+    "sha256": "4600ebc7f5e4affd51fa42771d3131a180f0d15622cc8f107cd56ade916cf939",
+    "checks": [
+      "独立 FFmpeg/ffprobe 与 H.264 编码通过",
+      "应用及 DMG 代码签名通过",
+      "无外部 Homebrew 动态依赖",
+      "offscreen 预期停止只作为加载器检查，Cocoa 窗口通过另行记录"
+    ]
+  },
+  "launch": {
+    "applicationPath": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen/build-release/试用/0.1.3/Jianku Screen.app",
+    "projectPath": "/Users/moyingxz/Movies/Jianku Screen/试用 0.1.3/焦点编辑试用.jianku",
+    "projectIsCopy": true,
+    "manualExampleAddedOnlyToCopy": true,
+    "processRunning": true,
+    "pids": [
+      97125
+    ],
+    "nativeWindowCheck": [
+      {
+        "active": false,
+        "application": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen/build-release/试用/0.1.3/Jianku Screen.app",
+        "visibleWindowCount": 2,
+        "pid": 97125,
+        "windowNames": [
+          "10-10 21:57 · 0:03 — 简库镜传",
+          "简库镜传"
+        ]
+      }
+    ],
+    "editorVisible": true,
+    "olderTrialStillRunning": true
+  },
+  "signatureRequirement": "designated => identifier \"com.jianku.screen\" and certificate leaf = H\"ef95db66644426e05fb46fff7d413aee222fe764\"\nExecutable=/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen/build-release/试用/0.1.3/Jianku Screen.app/Contents/MacOS/Jianku Screen\n",
+  "limitations": [
+    "尚未完成摄像头、裁切、贴图/柔化、字幕、音乐、完整导入导出分享等功能，完整台账继续有效",
+    "参考动画百分之百逐帧对齐未验收",
+    "原生截图/录制/授权闭环未新增验收，沿用 P0 待验证项",
+    "长工程焦点交互/多屏与会议共享/极端变速同步仍待实机验证",
+    "本阶段焦点轨道用于录制编辑器，演示模式的实时策略保持现有实现",
+    "属性滑动按相同字段 500 毫秒合并历史，尚非显式整次手势事务"
+  ],
+  "privateEvidencePolicy": "只保存用户录制副本的结果，不提交其画面或视频；可分享截图只使用合成测试源"
+}

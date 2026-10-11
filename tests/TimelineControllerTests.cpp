@@ -10,6 +10,7 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QTemporaryDir>
@@ -485,6 +486,155 @@ int main(int argc, char **argv) {
             require(controller.load(project), "a future schema still opens the project");
             require(controller.segments().size() == 1, "and is ignored");
             require(controller.error().contains(QStringLiteral("版本")), "the reason names the schema");
+        }
+
+        {
+            QFile::remove(project + "/edit.json");
+            TimelineController controller;
+            require(controller.load(project), "load fresh selection fixture");
+            require(controller.splitAt(3000) && controller.splitAt(7000), "three selectable clips");
+            controller.selectSegment(0); controller.selectSegment(2, true);
+            require(controller.selectedCount() == 2, "command selection toggles distinct clips");
+            const auto selectedIds = controller.selectedIds();
+            require(controller.setSelectedSpeed(2), "retime both selected clips together");
+            require(close(controller.outputDurationMs(), 7000), "unselected middle clip keeps speed");
+            require(controller.selectedIds() == selectedIds, "selection survives retime");
+            require(controller.reorderSelection(3), "move selected block to timeline tail");
+            require(close(controller.timeline().sourceTimeAt(0), 3000), "reorder changes output source mapping");
+            require(close(controller.timeline().sourceTimeAt(4500), 1000), "reorder supports backward source jump");
+            require(controller.save(), "save authored clip order");
+            TimelineController reopened;
+            require(reopened.load(project) && close(reopened.timeline().sourceTimeAt(0), 3000), "sidecar reopens reordered timeline");
+            require(controller.deleteSelection(), "delete exactly selected clips");
+            require(close(controller.outputDurationMs(), 4000), "middle clip remains, not fixed two seconds");
+            controller.undo();
+            require(controller.segments().size() == 3, "one undo restores multi-delete");
+            require(controller.trimClip(0, 500, 3500), "trim one clip in output clock");
+            require(close(controller.segments()[0].toMap().value("sourceStartMs").toDouble(), 3500), "trim maps to source clock");
+            const double duration = controller.outputDurationMs();
+            require(!controller.trimClip(0, -2000, 9000), "invalid overlap trim is refused");
+            require(close(controller.outputDurationMs(), duration), "rejected gesture leaves committed timeline intact");
+            require(controller.visibleTicks(1000, 2000, 800).size() > 1, "zoomed ruler covers visible range");
+            controller.clearSelection(); controller.selectSegment(0); controller.selectSegment(2, false, true);
+            require(controller.selectedCount() == 3, "Shift selects intervening clips");
+            require(!controller.deleteSelection(), "whole timeline deletion is refused");
+            controller.reset();
+            require(controller.removeRange(3000, 5000) && controller.mergeClip(0, true), "restore retained source gap");
+            require(controller.timeline().isIdentity(), "restoring gap returns original recording");
+            QFile::remove(project + "/edit.json");
+        }
+
+        // Focus effects follow retained source material through cuts, rates and order.
+        {
+            const QString root = temp.path() + "/focus.jianku";
+            require(writeProject(root, 10000), "focus fixture");
+            TimelineController c; require(c.load(root), "focus load");
+            require(c.createFocus(2000, 8000), "manual range");
+            const QString id = c.selectedFocusId();
+            require(c.updateFocus(id, {{"zoom", 3.0}, {"focusX", .25}, {"focusY", .7}}), "manual framing");
+            require(c.removeRange(4000, 6000), "cut across focus");
+            require(c.focusSegments().size() == 2, "effect retains two separate fragments");
+            require(c.setSpeed(0, 4000, 2), "retime first retained clip");
+            auto ranges = c.focusSegments();
+            require(close(ranges[0].toMap()["outputStartMs"].toDouble(), 1000), "first fragment retimed");
+            require(close(ranges[1].toMap()["outputStartMs"].toDouble(), 2000), "second fragment ripple maps");
+            c.selectSegment(1); require(c.reorderSelection(0), "reorder with focus");
+            ranges = c.focusSegments();
+            require(close(ranges[0].toMap()["outputStartMs"].toDouble(), 0), "source 6s focus follows first clip");
+            require(close(ranges[1].toMap()["outputStartMs"].toDouble(), 5000), "source 2s focus follows later retimed clip");
+            c.selectFocus(id, 0);
+            require(c.setFocusTiming(id, 0, 0, 1500), "trim displayed fragment");
+            require(c.focusRanges().size() == 2, "editing fragment isolates retained sibling");
+            require(close(c.focusSegments()[1].toMap()["outputEndMs"].toDouble(), 1500), "edited fragment timing");
+            c.undo(); require(c.focusRanges().size() == 1, "undo reconstructs source anchored focus");
+            c.redo(); require(c.focusRanges().size() == 2, "redo isolates it again");
+            require(!c.setFocusTiming(id, 0, -100, 1500), "cross cut timing is refused");
+            require(!c.updateFocus(id, {{"zoom", 99.0}}), "invalid magnification is refused");
+            require(c.save(), "save effects"); require(c.save(), "backup save");
+            require(QFileInfo::exists(root + "/edit.previous.json"), "previous complete edit retained");
+            TimelineController reopened; require(reopened.load(root), "focus reopen");
+            require(reopened.focusRanges().size() == 2 && !reopened.dirty(), "focus round trip and clean baseline");
+            require(close(reopened.focusRanges()[0].focusX, .25), "manual position persists");
+        }
+        {
+            const QString root = temp.path() + "/clipboard.jianku";
+            require(writeProject(root, 10000), "clipboard fixture");
+            TimelineController c; require(c.load(root), "clipboard load");
+            require(c.createFocus(1000, 3000), "clipboard source range");
+            const auto id = c.selectedFocusId();
+            require(c.updateFocus(id, {{"zoom", 4.0}, {"focusX", .3}}) && c.copyFocus(), "copy focus properties and length");
+            require(c.pasteFocus(5000), "paste into empty source interval");
+            require(c.focusRanges().size() == 2 && close(c.selectedFocus()["zoom"].toDouble(), 4), "paste retains framing");
+            c.undo(); require(c.focusRanges().size() == 1, "paste is one undo step"); c.redo();
+            const auto pastedId = c.selectedFocusId();
+            c.selectFocus(pastedId); require(c.updateFocus(pastedId, {{"zoom", 2.0}}), "destination property edit");
+            require(c.pasteFocus(-1, true), "paste attributes only");
+            require(close(c.selectedFocus()["zoom"].toDouble(), 4) && close(c.selectedFocus()["outputStartMs"].toDouble(), 5000), "attribute paste preserves timing");
+            c.setPlayheadMs(6000); require(c.splitFocus(), "split selected focus");
+            require(c.focusRanges().size() == 3, "focus split creates new identifier");
+            require(c.regenerateFocus(), "regenerate empty click track");
+            require(c.focusRanges().size() == 3, "regeneration preserves manual effects");
+            c.selectFocus(id); require(c.deleteFocus(), "delete effect"); c.undo();
+            require(c.focusRanges().size() == 3, "effect deletion is undoable");
+        }
+
+        {
+            const QString root = temp.path() + "/automatic-focus.jianku";
+            require(writeProject(root, 10000), "automatic focus fixture");
+            QFile events(root + "/pointer-timeline.jsonl");
+            require(events.open(QIODevice::WriteOnly), "recorded click track");
+            for (const auto time : {2000, 4000, 9500}) {
+                events.write(QJsonDocument(QJsonObject{{"type", "mouseDown"}, {"withinVideo", true},
+                    {"mediaTimeNs", QString::number(qint64(time) * 1000000)}, {"xPx", 400}, {"yPx", 200}}).toJson(QJsonDocument::Compact) + '\n');
+            }
+            events.close();
+            TimelineController c; require(c.load(root), "automatic focus load");
+            require(c.createFocus(7500, 8500), "manual effect before regeneration");
+            const auto manualId = c.selectedFocusId();
+            require(c.regenerateFocus() && c.focusRanges().size() == 2, "nearby recorded clicks merge, final click excluded, manual retained");
+            const auto automatic = c.focusRanges().back();
+            require(automatic.system && close(automatic.startMs, 1700) && close(automatic.endMs, 6500), "regeneration uses existing verified click windows");
+            c.selectFocus(automatic.id, 0);
+            require(c.setFocusTiming(automatic.id, 0, 1800, 6000), "automatic lane timing is editable");
+            require(c.updateFocus(automatic.id, {{"zoom", 3.0}, {"enabled", false}}), "automatic lane properties are editable");
+            require(c.copyFocus() && c.pasteFocus(100), "automatic properties can create manual copy");
+            require(!c.selectedFocus()["system"].toBool() && !c.selectedFocus()["enabled"].toBool(), "copy converts lane origin and retains disabled state");
+            require(c.regenerateFocus(), "regenerate replaces customized automatic ranges");
+            int manualCount = 0, automaticCount = 0;
+            for (const auto &f : c.focusRanges()) { if (f.system) { ++automaticCount; require(f.enabled && !f.customized, "automatic defaults restored"); } else ++manualCount; }
+            require(manualCount == 2 && automaticCount == 1, "regenerate preserves both manual effects");
+            c.selectFocus(manualId); require(!c.createFocus(7600, 8000), "same-lane collision refuses partial creation");
+            require(c.focusRanges().size() == 3, "rejected overlapping creation changes nothing");
+        }
+
+        {
+            const QString root = temp.path() + "/focus-schema.jianku";
+            require(writeProject(root, 10000), "schema fixture");
+            TimelineController c; require(c.load(root) && c.splitAt(4000) && c.save(), "base edit schema");
+            QFile file(root + "/edit.json"); require(file.open(QIODevice::ReadOnly), "read saved schema");
+            const auto saved = QJsonDocument::fromJson(file.readAll()).object(); file.close();
+            for (const int version : {1, 2}) {
+                auto legacy = saved; legacy["schema"] = QString("jianku-edit/%1").arg(version); legacy["schemaVersion"] = version;
+                legacy.remove("focusTrack"); legacy.remove("appearance");
+                if (version == 1) {
+                    auto timeline = legacy["timeline"].toObject(); timeline["schemaVersion"] = 1;
+                    auto segments = timeline["segments"].toArray();
+                    for (int i = 0; i < segments.size(); ++i) { auto segment = segments[i].toObject(); segment.remove("id"); segments[i] = segment; }
+                    timeline["segments"] = segments; legacy["timeline"] = timeline;
+                }
+                require(file.open(QIODevice::WriteOnly), "write legacy edit"); file.write(QJsonDocument(legacy).toJson()); file.close();
+                TimelineController reopened;
+                require(reopened.load(root) && reopened.segments().size() == 2 && !reopened.dirty(), "legacy schema retains cuts and clean baseline");
+                require(reopened.createFocus(1000, 2000) && reopened.save(), "legacy edit upgrades with manual focus");
+            }
+            require(file.open(QIODevice::ReadOnly), "read upgraded focus edit");
+            auto malformed = QJsonDocument::fromJson(file.readAll()).object(); file.close();
+            auto track = malformed["focusTrack"].toObject(); auto clips = track["clips"].toArray();
+            auto clip = clips[0].toObject(); clip["zoom"] = 0; clips[0] = clip; track["clips"] = clips; malformed["focusTrack"] = track;
+            require(file.open(QIODevice::WriteOnly), "write malformed focus"); file.write(QJsonDocument(malformed).toJson()); file.close();
+            TimelineController reopened;
+            require(reopened.load(root) && reopened.error().contains(QStringLiteral("焦点")), "damaged focus edit reports error while opening original recording");
+            require(!reopened.dirty() && reopened.focusRanges().empty(), "damaged edit is not silently autosaved or rendered");
         }
 
         std::cout << "timeline controller checks passed\n";

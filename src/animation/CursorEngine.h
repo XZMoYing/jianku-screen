@@ -71,6 +71,7 @@ private:
     CursorSettings settings_;
     Spring x_;
     Spring y_;
+    Spring rotation_;
     Spring clickFader_;
     SpringConfig activeConfig_;
     bool hasConfig_ = false;

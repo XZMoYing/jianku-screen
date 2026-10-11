@@ -21,7 +21,16 @@ ApplicationWindow {
     property rect region: Qt.rect(0, 0, 0, 0)
     property bool regionSet: false
     property bool openPresentationWhenReady: false
-    readonly property bool savingRecording: capture.recordingStatus.indexOf("正在保存") === 0
+    property string statusKind: "capture"
+    readonly property bool savingRecording: capture.recordingFinalizing
+    readonly property var screenshotSource: ({kind: root.sourceKind,
+        displayIndex: displayChoice.currentIndex,
+        displayId: capture.displayIds[displayChoice.currentIndex] || 0,
+        windowId: root.sourceKind === "window" && windowChoice.currentIndex >= 0
+            && windowChoice.currentIndex < capture.windowSources.length
+            ? capture.windowSources[windowChoice.currentIndex].windowId : 0,
+        x: root.region.x, y: root.region.y, width: root.region.width, height: root.region.height})
+    onScreenshotSourceChanged: screenshot.setSource(screenshotSource)
     readonly property var windowLabels: {
         const list = []
         const windows = capture.windowSources
@@ -178,7 +187,7 @@ ApplicationWindow {
     }
     onActiveChanged: {
         if (active)
-            capture.refreshScreenAuthorization()
+            capture.refreshPermissionState()
     }
 
     Window {
@@ -248,11 +257,17 @@ ApplicationWindow {
     Connections {
         target: capture
         function onRunningChanged() {
+            if (capture.running) { anim.stop(); anim.start() }
             if (capture.running && root.openPresentationWhenReady) {
                 root.openPresentationWhenReady = false
                 root.showAudience()
             }
         }
+        function onRecordingReady(directory) {
+            registry.refreshRecentProjects()
+            registry.openProject(directory, false)
+        }
+        function onRecordingStatusChanged() { root.statusKind = "record" }
         function onRecordingChanged() {
             if (capture.recording) {
                 recordingHud.elapsedSeconds = 0
@@ -266,9 +281,19 @@ ApplicationWindow {
             }
         }
         function onStatusChanged() {
+            root.statusKind = "capture"
             if (capture.status.indexOf("权限") >= 0 || capture.status.indexOf("拒绝") >= 0)
                 permissionGuide.opened = true
         }
+    }
+    Connections {
+        target: screenshot
+        function onStatusChanged() { root.statusKind = "screenshot" }
+    }
+    Connections {
+        target: exporter
+        function onStatusChanged() { if (exporter.status.length > 0) root.statusKind = "export" }
+        function onErrorChanged() { if (exporter.error.length > 0) root.statusKind = "export" }
     }
 
     Item {
@@ -398,7 +423,15 @@ ApplicationWindow {
                     implicitWidth: 62
                     text: "截图"
                     tone: "quiet"
-                    onClicked: screenshot.capture(settings.current)
+                    enabled: !screenshot.busy && root.sourceReady
+                    onClicked: { screenshot.setSource(root.screenshotSource); screenshot.capture(settings.current) }
+                }
+                UiButton {
+                    implicitWidth: 90
+                    text: "查看截图"
+                    tone: "quiet"
+                    visible: screenshot.lastPath.length > 0
+                    onClicked: screenshot.revealLast()
                 }
                 UiButton {
                     // Opens the editor, which is where editing and exporting both
@@ -512,13 +545,13 @@ ApplicationWindow {
                     anchors.bottom: parent.bottom
                     anchors.margins: 16
                     text: {
-                        if (exporter.error.length > 0)
-                            return "导出失败：" + exporter.error
-                        if (exporter.status.length > 0)
-                            return exporter.status
-                        return capture.recordingStatus.length > 0 ? capture.recordingStatus : capture.status
+                        if (capture.recording || capture.recordingFinalizing) return capture.recordingStatus
+                        if (root.statusKind === "export") return exporter.error.length > 0
+                            ? "导出失败：" + exporter.error : exporter.status
+                        if (root.statusKind === "screenshot") return screenshot.status
+                        return root.statusKind === "record" ? capture.recordingStatus : capture.status
                     }
-                    color: exporter.error.length > 0 ? Theme.danger : Theme.textFaint
+                    color: text.indexOf("失败") >= 0 || text.indexOf("超时") >= 0 ? Theme.danger : Theme.textFaint
                     font.pixelSize: 11
                     elide: Text.ElideMiddle
                     width: Math.min(implicitWidth, parent.width - 40)

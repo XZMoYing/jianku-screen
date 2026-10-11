@@ -1,0 +1,93 @@
+{
+  "date": "2026-10-11",
+  "applicationVersion": "0.1.2",
+  "scope": "完整编辑器第一阶段：时间线主片段和真实媒体",
+  "ctest": {
+    "passed": 17,
+    "total": 17
+  },
+  "syntheticGui": {
+    "appearance": true,
+    "audioWaveform": true,
+    "clipReorderGesture": true,
+    "clipSelectionGesture": true,
+    "clipTrimGesture": true,
+    "editSave": true,
+    "error": "",
+    "firstFrame": true,
+    "hasFrame": true,
+    "loadedThumbnails": 6,
+    "loading": false,
+    "ok": true,
+    "playback": true,
+    "playerError": "",
+    "playerFound": true,
+    "rapidSeek": true,
+    "reorderedPreview": true,
+    "stage": 8,
+    "timelineWheelZoom": true
+  },
+  "recordingCopyGui": {
+    "appearance": true,
+    "editSave": true,
+    "error": "",
+    "firstFrame": true,
+    "hasFrame": true,
+    "loading": false,
+    "ok": true,
+    "playback": true,
+    "playerError": "",
+    "playerFound": true,
+    "rapidSeek": true,
+    "stage": 3
+  },
+  "referenceDogscCommit": "fa24059a9ba7e769152b3c1de047d96aca873e1c",
+  "referenceAnimationVersion": "3.7.5-4595",
+  "sourceHashes": {
+    "third_party/dogsc/LICENSE": "af8b353671e48b110269ab4b89c909ca580710044691f1c6c0da419c6e9b8ab4",
+    "third_party/dogsc/EditorTimelineMagneticSnap.swift": "d283e8604fa19006329b0b56666334c670b7507134c11fae495e375be5629d9c",
+    "src/render/TimelineMagnet.h": "15e8c63cdaf6432c67c24f567e1992596c5f49fdaa203a62fcfb19a0b7e0eda5",
+    "ui/TimelineStrip.qml": "9414ce71e348654336cdff0bb91ff26c652c78b25a75afd5cd589bfdf1f38bd8",
+    "src/project/EditTimeline.cpp": "01fa0d8ae7340900e22a77d0b67b69ddd43c1a2c70975a8d412c27bc4171d51d",
+    "src/render/ProjectCompositor.cpp": "053de921cdbedd76e4bf01c11bdd6e67f3ced8c8ec6c186656a3bedf4f5737c7"
+  },
+  "limitations": [
+    "原生截图、录制与新签名授权闭环待验收",
+    "参考动画逐帧百分之百一致未验收",
+    "效果/焦点/摄像头/字幕等完整范围见功能台账",
+    "触控板捏合、高倍率变速与长工程待实机验收"
+  ],
+  "privateEvidencePolicy": "只提交真实录制副本的验证结果，截图和源视频留在本机临时目录",
+  "package": {
+    "path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen/build-release/简库镜传 2026.10.11.1.dmg",
+    "sha256": "d903f7bd22e12b1bc311f40ab52b5fe1a85953a7b71c704419e922454db6b046",
+    "checks": [
+      "独立 FFmpeg/ffprobe 版本及 H.264 编码通过",
+      "应用与 DMG 代码签名通过",
+      "无 Homebrew 动态依赖",
+      "隔离 offscreen 检查仅验证加载器，不作为 Cocoa 界面通过依据"
+    ]
+  },
+  "launch": {
+    "requested": true,
+    "applicationPath": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen/build-release/试用/0.1.2/Jianku Screen.app",
+    "projectPath": "/Users/moyingxz/Movies/Jianku Screen/试用 0.1.2/时间线试用.jianku",
+    "projectIsCopy": true,
+    "pids": [],
+    "processRunning": false,
+    "nativeWindowCheck": [
+      {
+        "active": false,
+        "application": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen/build-release/试用/0.1.2/Jianku Screen.app",
+        "visibleWindowCount": 2,
+        "pid": 83857,
+        "windowNames": [
+          "10-10 21:57 · 0:03 — 简库镜传",
+          "简库镜传"
+        ]
+      }
+    ],
+    "editorVisible": true
+  },
+  "signatureRequirement": "designated => identifier \"com.jianku.screen\" and certificate leaf = H\"ef95db66644426e05fb46fff7d413aee222fe764\"\nExecutable=/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen/build-release/试用/0.1.2/Jianku Screen.app/Contents/MacOS/Jianku Screen"
+}

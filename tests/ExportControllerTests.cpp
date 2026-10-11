@@ -21,6 +21,8 @@
 #include <QTimer>
 #include <iostream>
 #include <stdexcept>
+#include <cmath>
+#include <cstring>
 
 using namespace Render;
 
@@ -178,6 +180,127 @@ int main(int argc, char **argv) {
             controller.setProjectDirectory(root + "/does-not-exist");
             require(!controller.start(QString(), true, true, false, false),
                 "a project directory without project.json is refused");
+        }
+
+        // Audio must follow the same source spans and speeds as the video. A
+        // two-tone track exposes a wrong cut even when the output length is right.
+        {
+            QProcess source;
+            source.start(ffmpegPath(), {"-v", "error", "-i", root + "/raw.mp4", "-f", "lavfi", "-i",
+                "aevalsrc=0.1*sin(2*PI*if(lt(t\\,0.5)\\,440\\,880)*t):s=48000:d=1",
+                "-c:v", "copy", "-c:a", "aac", "-y", root + "/with-audio.mp4"});
+            require(source.waitForFinished(30000) && source.exitCode() == 0, "two-tone audio fixture");
+            require(QFile::rename(root + "/raw.mp4", root + "/silent.mp4"), "retain silent source");
+            require(QFile::rename(root + "/with-audio.mp4", root + "/raw.mp4"), "use system audio source");
+            ComposeOptions options;
+            options.ffmpegPath = ffmpegPath(); options.projectDirectory = root;
+            options.outputPath = root + "/audio-edit.mp4";
+            options.timeline = Project::EditTimeline::whole(1000);
+            require(options.timeline.trimStart(500), "cut first tone");
+            require(options.timeline.setSpeed(0, 500, 2), "retime remaining audio");
+            const auto exported = composeProject(options);
+            if (!exported.ok) std::cerr << exported.error.toStdString() << '\n' << exported.encoderLog.toStdString() << '\n';
+            require(exported.ok && exported.audioMuxed, "edited system audio exports");
+            QProcess decode;
+            decode.start(ffmpegPath(), {"-v", "error", "-i", options.outputPath,
+                "-map", "0:a:0", "-ac", "1", "-ar", "48000", "-f", "f32le", "-"});
+            require(decode.waitForFinished(30000) && decode.exitCode() == 0, "decode edited audio");
+            const QByteArray pcm = decode.readAllStandardOutput();
+            const int samples = pcm.size() / 4;
+            require(samples > 10000 && samples < 14000, "audio duration follows 250 ms edit, not original one second");
+            float previous = 0; int crossings = 0;
+            for (int i = 0; i < samples; ++i) {
+                float value; std::memcpy(&value, pcm.constData() + i * 4, 4);
+                if (previous <= 0 && value > 0) ++crossings;
+                previous = value;
+            }
+            const double frequency = crossings * 48000.0 / samples;
+            require(frequency > 700 && frequency < 1000, "cut keeps second tone and speed preserves pitch");
+
+            // A muted system recording can still have a microphone track. Its
+            // export must not reference a nonexistent [1:a] input.
+            require(QFile::remove(root + "/raw.mp4") && QFile::rename(root + "/silent.mp4", root + "/raw.mp4"), "restore silent source");
+            QProcess microphone;
+            microphone.start(ffmpegPath(), {"-v", "error", "-f", "lavfi", "-i",
+                "sine=frequency=660:duration=1", "-c:a", "aac", "-y", root + "/microphone.m4a"});
+            require(microphone.waitForFinished(30000) && microphone.exitCode() == 0, "microphone fixture");
+            QFile manifestFile(root + "/project.json");
+            require(manifestFile.open(QIODevice::ReadOnly), "open microphone manifest");
+            auto manifest = QJsonDocument::fromJson(manifestFile.readAll()).object(); manifestFile.close();
+            manifest.insert("microphone", QJsonObject{{"file", "microphone.m4a"}, {"durationMs", 1000}});
+            write(root + "/project.json", QJsonDocument(manifest).toJson());
+            options.outputPath = root + "/microphone-only.mp4";
+            options.includeMicrophone = true;
+            const auto mic = composeProject(options);
+            if (!mic.ok) std::cerr << mic.error.toStdString() << '\n' << mic.encoderLog.toStdString() << '\n';
+            require(mic.ok && mic.microphoneMuxed && mic.audioMuxed, "microphone-only recording exports without a system track");
+        }
+
+        {
+            QProcess source;
+            source.start(ffmpegPath(), {"-v", "error", "-f", "lavfi", "-i", "color=c=red:s=320x180:r=30:d=0.5",
+                "-f", "lavfi", "-i", "color=c=blue:s=320x180:r=30:d=0.5",
+                "-filter_complex", "[0:v][1:v]concat=n=2:v=1:a=0[v]", "-map", "[v]",
+                "-c:v", "libx264", "-pix_fmt", "yuv420p", "-y", root + "/reorder-source.mp4"});
+            require(source.waitForFinished(30000) && source.exitCode() == 0, "two-color ordered fixture");
+            require(QFile::remove(root + "/raw.mp4") && QFile::rename(root + "/reorder-source.mp4", root + "/raw.mp4"), "use changing source frames");
+            QFile manifestFile(root + "/project.json"); require(manifestFile.open(QIODevice::ReadOnly), "read reorder manifest");
+            auto manifest = QJsonDocument::fromJson(manifestFile.readAll()).object(); manifestFile.close();
+            manifest["settings"] = QJsonObject{{"outputAspectRatio", "16:9"}, {"backgroundPaddingRatio", 0},
+                {"windowBorderRadius", 0}, {"windowInset", 0}, {"shadowIntensity", 0}, {"autoZoom", false}};
+            write(root + "/project.json", QJsonDocument(manifest).toJson());
+            ComposeOptions options;
+            options.ffmpegPath = ffmpegPath(); options.projectDirectory = root; options.outputPath = root + "/reordered.mp4";
+            options.exportHeight = 90; options.includeAudio = false; options.includeCursor = false; options.includeAutoZoom = false;
+            options.motionBlur.amount = 0;
+            options.timeline = Project::EditTimeline::whole(1000);
+            require(options.timeline.split(500) && options.timeline.moveSegment(1, 0), "reverse color clips");
+            const auto exported = composeProject(options);
+            if (!exported.ok) std::cerr << exported.error.toStdString() << '\n';
+            if (exported.height != 90 || exported.width != 160 || exported.encodedFrames != 60)
+                std::cerr << "reorder metrics " << exported.width << "x" << exported.height << " frames " << exported.encodedFrames << " duration " << exported.durationMs << '\n';
+            require(exported.ok && exported.height == 90 && exported.width == 160 && exported.encodedFrames == 60,
+                "source decode geometry stays independent of smaller output canvas");
+            QProcess decode;
+            decode.start(ffmpegPath(), {"-v", "error", "-i", options.outputPath, "-vf", "scale=1:1", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"});
+            require(decode.waitForFinished(30000) && decode.exitCode() == 0, "decode reordered color frames");
+            const auto pixels = decode.readAllStandardOutput();
+            require(pixels.size() == 60 * 3, "all output color frames present");
+            require(uchar(pixels[2]) > uchar(pixels[0]) + 100, "output begins with second blue source clip");
+            require(uchar(pixels[45 * 3]) > uchar(pixels[45 * 3 + 2]) + 100, "backward cut decodes original red source clip");
+        }
+
+        // A manual focus survives disabling auto zoom and changes real encoded
+        // pixels. Sample an off-centre source point before/after the spring settles.
+        {
+            QProcess source;
+            source.start(ffmpegPath(), {"-v", "error", "-f", "lavfi", "-i",
+                "color=c=red:s=320x180:r=30:d=2,drawbox=x=160:y=0:w=160:h=180:color=blue:t=fill",
+                "-c:v", "libx264", "-pix_fmt", "yuv420p", "-y", root + "/focus-source.mp4"});
+            require(source.waitForFinished(30000) && source.exitCode() == 0, "manual framing fixture");
+            require(QFile::remove(root + "/raw.mp4") && QFile::rename(root + "/focus-source.mp4", root + "/raw.mp4"), "replace framing source");
+            QFile mf(root + "/project.json"); require(mf.open(QIODevice::ReadOnly), "framing manifest");
+            auto manifest = QJsonDocument::fromJson(mf.readAll()).object(); mf.close();
+            auto video = manifest["video"].toObject(); video["durationNs"] = "2000000000"; video["frameCount"] = 60; manifest["video"] = video;
+            write(root + "/project.json", QJsonDocument(manifest).toJson());
+            QByteArray frameRows;
+            for (int i = 0; i < 60; ++i) frameRows += QJsonDocument(QJsonObject{{"mediaTimeNs", QString::number(qint64(i) * 1000000000 / 30)}}).toJson(QJsonDocument::Compact) + '\n';
+            write(root + "/video-frames.jsonl", frameRows);
+            Project::FocusClip manual{500, 1500, 2, 0, false};
+            manual.id = "manual-test"; manual.fixedPosition = true; manual.focusX = .8; manual.focusY = .5; manual.customized = true;
+            ComposeOptions options;
+            options.ffmpegPath = ffmpegPath(); options.projectDirectory = root; options.outputPath = root + "/manual-focus.mp4";
+            options.focusOverride = std::vector<Project::FocusClip>{manual};
+            options.exportHeight = 90; options.includeCursor = false; options.includeAudio = false; options.includeAutoZoom = false; options.motionBlur.amount = 0;
+            const auto composed = composeProject(options);
+            if (!composed.ok) std::cerr << composed.error.toStdString() << '\n';
+            require(composed.ok && composed.encodedFrames == 120, "manual focus exports while automatic zoom is disabled");
+            QProcess decode;
+            decode.start(ffmpegPath(), {"-v", "error", "-i", options.outputPath, "-vf", "crop=2:2:50:44,scale=1:1", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"});
+            require(decode.waitForFinished(30000) && decode.exitCode() == 0, "decode manual framing pixels");
+            const auto pixels = decode.readAllStandardOutput(); require(pixels.size() == 120 * 3, "all framing pixels decoded");
+            require(uchar(pixels[0]) > uchar(pixels[2]) + 100, "unzoomed sample starts on red source half");
+            require(uchar(pixels[72 * 3 + 2]) > uchar(pixels[72 * 3]) + 100, "settled manual camera focuses blue source half");
         }
 
         std::cout << "export controller checks passed\n";

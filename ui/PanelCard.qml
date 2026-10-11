@@ -5,6 +5,7 @@ Rectangle {
     id: card
     property string title: ""
     property var resetKeys: []
+    property var store: settings
     default property alias content: body.data
 
     implicitHeight: layout.implicitHeight + 28
@@ -15,7 +16,7 @@ Rectangle {
 
     function resetCard() {
         for (let i = 0; i < card.resetKeys.length; ++i)
-            settings.restoreFactory(card.resetKeys[i])
+            card.store.restoreFactory(card.resetKeys[i])
     }
 
     ColumnLayout {

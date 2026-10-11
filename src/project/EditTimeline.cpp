@@ -1,6 +1,8 @@
 #include "EditTimeline.h"
 
 #include <QJsonArray>
+#include <QSet>
+#include <QUuid>
 #include <algorithm>
 #include <cmath>
 
@@ -18,7 +20,7 @@ EditTimeline EditTimeline::whole(double durationMs) {
     EditTimeline timeline;
     timeline.sourceDurationMs_ = std::max(0.0, durationMs);
     if (timeline.sourceDurationMs_ > 0.0)
-        timeline.segments_.push_back(Segment{0.0, timeline.sourceDurationMs_, 1.0});
+        timeline.segments_.push_back(Segment{0.0, timeline.sourceDurationMs_, 1.0, QStringLiteral("full-recording")});
     timeline.revalidate();
     return timeline;
 }
@@ -30,17 +32,18 @@ void EditTimeline::revalidate() {
         error_ = QStringLiteral("时间线为空");
         return;
     }
-    if (!(sourceDurationMs_ > 0.0)) {
+    if (!std::isfinite(sourceDurationMs_) || !(sourceDurationMs_ > 0.0)) {
         error_ = QStringLiteral("录制时长无效");
         return;
     }
-    double expectedSource = 0.0;
+    QSet<QString> ids;
     for (const Segment &segment : segments_) {
-        if (!(segment.speed > 0.0)) {
+        if (!std::isfinite(segment.speed) || !(segment.speed > 0.0)) {
             error_ = QStringLiteral("播放速度必须大于 0");
             return;
         }
-        if (!(segment.sourceEndMs > segment.sourceStartMs)) {
+        if (!std::isfinite(segment.sourceStartMs) || !std::isfinite(segment.sourceEndMs)
+            || !(segment.sourceEndMs > segment.sourceStartMs)) {
             error_ = QStringLiteral("片段长度必须大于 0");
             return;
         }
@@ -48,14 +51,19 @@ void EditTimeline::revalidate() {
             error_ = QStringLiteral("片段超出录制范围");
             return;
         }
-        // Segments are laid out in recording order. A cut-away removes media, it
-        // never reorders it, so a backwards jump would mean the trim operations
-        // produced something that cannot be played.
-        if (segment.sourceStartMs < expectedSource - kEpsilon) {
-            error_ = QStringLiteral("片段顺序与录制顺序不一致");
+        if (segment.id.isEmpty() || ids.contains(segment.id)) {
+            error_ = QStringLiteral("片段标识为空或重复");
             return;
         }
-        expectedSource = segment.sourceEndMs;
+        ids.insert(segment.id);
+    }
+    auto ordered = segments_;
+    std::sort(ordered.begin(), ordered.end(), [](const auto &a, const auto &b) { return a.sourceStartMs < b.sourceStartMs; });
+    for (size_t i = 1; i < ordered.size(); ++i) {
+        if (ordered[i].sourceStartMs < ordered[i - 1].sourceEndMs - kEpsilon) {
+            error_ = QStringLiteral("片段不能重复使用同一段源素材");
+            return;
+        }
     }
     valid_ = true;
 }
@@ -114,14 +122,20 @@ int EditTimeline::segmentIndexAtOutput(double outputMs) const {
 int EditTimeline::segmentIndexAtSource(double sourceMs) const {
     if (segments_.empty())
         return -1;
+    int next = -1;
+    double nearestStart = INFINITY;
     for (size_t index = 0; index < segments_.size(); ++index) {
         const Segment &segment = segments_[index];
-        if (sourceMs < segment.sourceEndMs - kEpsilon)
+        if (sourceMs >= segment.sourceStartMs - kEpsilon && sourceMs < segment.sourceEndMs - kEpsilon)
             return static_cast<int>(index);
-        if (index + 1 == segments_.size())
-            return static_cast<int>(index);
+        if (segment.sourceStartMs >= sourceMs && segment.sourceStartMs < nearestStart) {
+            next = int(index); nearestStart = segment.sourceStartMs;
+        }
     }
-    return static_cast<int>(segments_.size()) - 1;
+    if (next >= 0) return next;
+    return int(std::max_element(segments_.begin(), segments_.end(), [](const auto &a, const auto &b) {
+        return a.sourceEndMs < b.sourceEndMs;
+    }) - segments_.begin());
 }
 
 double EditTimeline::sourceTimeAt(double outputMs) const {
@@ -180,8 +194,8 @@ bool EditTimeline::splitInternal(double outputMs) {
     if (into <= kEpsilon || into >= segment.outputLengthMs() - kEpsilon)
         return false;
     const double sourceSplit = segment.sourceStartMs + into * segment.speed;
-    Segment left{segment.sourceStartMs, sourceSplit, segment.speed};
-    Segment right{sourceSplit, segment.sourceEndMs, segment.speed};
+    Segment left{segment.sourceStartMs, sourceSplit, segment.speed, segment.id};
+    Segment right{sourceSplit, segment.sourceEndMs, segment.speed, QUuid::createUuid().toString(QUuid::WithoutBraces)};
     segments_[index] = left;
     segments_.insert(segments_.begin() + index + 1, right);
     return true;
@@ -279,7 +293,7 @@ bool EditTimeline::remove(double fromMs, double toMs, double minimumMs) {
 }
 
 bool EditTimeline::setSpeed(double fromMs, double toMs, double speed) {
-    if (!valid_ || !(speed > 0.0))
+    if (!valid_ || !std::isfinite(speed) || !(speed > 0.0))
         return false;
     const double total = outputDurationMs();
     const double from = std::clamp(std::min(fromMs, toMs), 0.0, total);
@@ -308,20 +322,78 @@ bool EditTimeline::setSpeed(double fromMs, double toMs, double speed) {
     return valid_;
 }
 
+double EditTimeline::outputStartAt(int index) const {
+    double start = 0;
+    for (int i = 0; i < index && i < int(segments_.size()); ++i) start += segments_[i].outputLengthMs();
+    return start;
+}
+
+bool EditTimeline::isSourceOrdered() const {
+    for (size_t i = 1; i < segments_.size(); ++i)
+        if (segments_[i].sourceStartMs < segments_[i - 1].sourceEndMs - kEpsilon) return false;
+    return true;
+}
+
+bool EditTimeline::moveSegment(int fromIndex, int toIndex) {
+    if (!valid_ || fromIndex < 0 || toIndex < 0 || fromIndex >= int(segments_.size()) || toIndex >= int(segments_.size())) return false;
+    const auto moved = segments_[fromIndex];
+    segments_.erase(segments_.begin() + fromIndex);
+    segments_.insert(segments_.begin() + toIndex, moved);
+    revalidate();
+    return valid_;
+}
+
+bool EditTimeline::trimSegment(int index, double start, double end, double minimumMs) {
+    if (!valid_ || index < 0 || index >= int(segments_.size()) || !std::isfinite(start) || !std::isfinite(end)) return false;
+    EditTimeline next = *this;
+    auto &segment = next.segments_[index];
+    if ((end - start) / segment.speed < minimumMs - kEpsilon) return false;
+    segment.sourceStartMs = start; segment.sourceEndMs = end;
+    next.revalidate();
+    if (!next.valid()) return false;
+    *this = next;
+    return true;
+}
+
+bool EditTimeline::removeSegments(const std::vector<int> &indices, double minimumMs) {
+    if (!valid_ || indices.empty()) return false;
+    auto next = *this;
+    std::vector<Segment> kept;
+    for (int i = 0; i < int(segments_.size()); ++i)
+        if (std::find(indices.begin(), indices.end(), i) == indices.end()) kept.push_back(segments_[i]);
+    next.segments_ = std::move(kept); next.revalidate();
+    if (!next.valid() || next.outputDurationMs() < minimumMs) return false;
+    *this = next; return true;
+}
+
+bool EditTimeline::mergeNext(int index, bool restoreGap) {
+    if (!valid_ || index < 0 || index + 1 >= int(segments_.size())) return false;
+    const auto &left = segments_[index]; const auto &right = segments_[index + 1];
+    if (std::abs(left.speed - right.speed) > kEpsilon || right.sourceStartMs < left.sourceEndMs - kEpsilon
+        || (!restoreGap && std::abs(left.sourceEndMs - right.sourceStartMs) > kEpsilon)) return false;
+    auto next = *this;
+    next.segments_[index].sourceEndMs = right.sourceEndMs;
+    next.segments_.erase(next.segments_.begin() + index + 1); next.revalidate();
+    if (!next.valid()) return false;
+    *this = next; return true;
+}
+
 QJsonObject EditTimeline::toJson() const {
     QJsonArray array;
     for (const Segment &segment : segments_) {
         array.append(QJsonObject{{QStringLiteral("sourceStartMs"), segment.sourceStartMs},
             {QStringLiteral("sourceEndMs"), segment.sourceEndMs},
-            {QStringLiteral("speed"), segment.speed}});
+            {QStringLiteral("speed"), segment.speed}, {QStringLiteral("id"), segment.id}});
     }
-    return QJsonObject{{QStringLiteral("schemaVersion"), 1},
+    return QJsonObject{{QStringLiteral("schemaVersion"), 2},
         {QStringLiteral("sourceDurationMs"), sourceDurationMs_},
         {QStringLiteral("segments"), array}};
 }
 
 EditTimeline EditTimeline::fromJson(const QJsonObject &object, double durationMs, QString *error) {
     EditTimeline timeline;
+    const int version = object.value(QStringLiteral("schemaVersion")).toInt(1);
+    if (version < 1 || version > 2) { if (error) *error = QStringLiteral("时间线版本不支持"); return timeline; }
     timeline.sourceDurationMs_ = durationMs > 0.0
         ? durationMs : object.value(QStringLiteral("sourceDurationMs")).toDouble();
     const QJsonArray array = object.value(QStringLiteral("segments")).toArray();
@@ -331,9 +403,14 @@ EditTimeline EditTimeline::fromJson(const QJsonObject &object, double durationMs
         segment.sourceStartMs = entry.value(QStringLiteral("sourceStartMs")).toDouble();
         segment.sourceEndMs = entry.value(QStringLiteral("sourceEndMs")).toDouble();
         segment.speed = entry.value(QStringLiteral("speed")).toDouble(1.0);
+        segment.id = entry.value(QStringLiteral("id")).toString();
+        if (segment.id.isEmpty()) segment.id = QStringLiteral("legacy-%1").arg(timeline.segments_.size());
         timeline.segments_.push_back(segment);
     }
     timeline.revalidate();
+    if (version == 1 && !timeline.isSourceOrdered()) {
+        timeline.valid_ = false; timeline.error_ = QStringLiteral("旧版片段顺序与录制顺序不一致");
+    }
     if (!timeline.valid_ && error)
         *error = timeline.error_;
     return timeline;

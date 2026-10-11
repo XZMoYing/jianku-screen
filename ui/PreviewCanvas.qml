@@ -18,7 +18,7 @@ Item {
     property bool showStageShadow: true
     property real stageMargin: 22
 
-    readonly property var plan: canvasPreview
+    property var plan: canvasPreview
     // `Math.max(0.05, plan.planAspect)` looked reasonable and was silently wrong: the
     // QML type of `plan` here is `var`, and reading a property that the *engine* has
     // not resolved yet yields undefined rather than an error, so the max() collapsed
@@ -47,28 +47,6 @@ Item {
         readonly property real w: Math.min(Math.max(1, width), Math.max(1, height) * root.aspect)
         readonly property real h: w / root.aspect
 
-        // Shadow backing (rendered blurred behind the canvas).
-        Rectangle {
-            id: shadowSrc
-            visible: false
-            x: canvas.x + Math.cos(root.shadowAngle * Math.PI / 180) * root.shadowDistance
-            y: canvas.y + Math.sin(root.shadowAngle * Math.PI / 180) * root.shadowDistance
-            width: canvas.width
-            height: canvas.height
-            radius: canvas.radius
-            color: "#000000"
-            opacity: Math.min(0.6, root.shadowIntensity * 0.6)
-        }
-        MultiEffect {
-            source: shadowSrc
-            anchors.fill: shadowSrc
-            visible: root.showStageShadow && root.shadowIntensity > 0.001
-            blurEnabled: true
-            blur: Math.max(0.15, root.shadowBlur)
-            blurMax: 48
-            autoPaddingEnabled: true
-        }
-
         // Canvas: the whole output frame. The camera moves the *content* inside
         // it, never the canvas itself.
         Rectangle {
@@ -77,64 +55,15 @@ Item {
             y: Math.round((stage.height - stage.h) / 2)
             width: Math.round(stage.w)
             height: Math.round(stage.h)
-            radius: Math.round(root.plan.radiusRatio * height)
+            radius: 0
             clip: true
             color: "#0c0c0e"
 
-            // Background layer, drawn through MultiEffect so it can be blurred.
-            Item {
-                id: backgroundLayer
+            Image {
                 anchors.fill: parent
-                visible: false
-                clip: true
-
-                // Colours come from the same resolved style the export uses, so a
-                // background cannot look one way in the preview and another in the
-                // finished file.
-                Rectangle {
-                    anchors.fill: parent
-                    visible: root.plan.backgroundType !== "gradient"
-                        && root.plan.backgroundType !== "image"
-                        && root.plan.backgroundType !== "system"
-                    color: root.plan.backgroundColor
-                }
-
-                Rectangle {
-                    anchors.centerIn: parent
-                    visible: root.plan.backgroundType === "gradient"
-                    width: Math.hypot(parent.width, parent.height)
-                    height: Math.hypot(parent.width, parent.height)
-                    rotation: root.plan.gradientAngle
-                    gradient: Gradient {
-                        orientation: Gradient.Horizontal
-                        GradientStop { position: 0.0; color: root.plan.gradientStart }
-                        GradientStop { position: 1.0; color: root.plan.gradientEnd }
-                    }
-                }
-
-                Image {
-                    anchors.fill: parent
-                    visible: root.plan.backgroundType === "image"
-                        || root.plan.backgroundType === "system"
-                    source: {
-                        if (root.plan.backgroundType === "system")
-                            return canvasPreview.backgroundUrl(
-                                String(root.options.backgroundSystemName || ""))
-                        const p = String(root.options.backgroundImagePath || "")
-                        return p.length > 0 ? "file://" + p : ""
-                    }
-                    fillMode: Image.PreserveAspectCrop
-                    asynchronous: true
-                    cache: true
-                }
-            }
-            MultiEffect {
-                source: backgroundLayer
-                anchors.fill: backgroundLayer
-                blurEnabled: root.plan.backgroundBlur > 0.001
-                blur: root.plan.backgroundBlur
-                blurMax: 64
-                autoPaddingEnabled: true
+                source: root.plan.backgroundSource
+                fillMode: Image.Stretch
+                smooth: true
             }
 
             // Content frame, straight from the shared layout (frameRect is the
@@ -146,6 +75,24 @@ Item {
                 width: Math.max(1, Math.round(root.plan.frameRect.width * canvas.width))
                 height: Math.max(1, Math.round(root.plan.frameRect.height * canvas.height))
 
+                // The cached sprite is also used by screenshot and export.
+                // It travels with the same camera transform as the content frame.
+                Item {
+                    x: frame.x; y: frame.y
+                    width: frame.width; height: frame.height
+                    scale: frame.camScale
+                    transformOrigin: Item.TopLeft
+                    visible: root.plan.hasShadow
+                    Image {
+                        x: root.plan.shadowRect.x * canvas.width
+                        y: root.plan.shadowRect.y * canvas.height
+                        width: root.plan.shadowRect.width * canvas.width
+                        height: root.plan.shadowRect.height * canvas.height
+                        source: root.plan.shadowSource
+                        smooth: true
+                    }
+                }
+
                 Rectangle {
                     id: frame
                     // The camera moves/scales the WHOLE frame (corners travel
@@ -154,7 +101,7 @@ Item {
                     y: frame.camOffsetY * frame.fitScale
                     width: parent.width
                     height: parent.height
-                    radius: Math.round(root.plan.radiusRatio * height)
+                    radius: root.plan.radiusRatio * canvas.height
                     clip: true
                     color: "#101013"
                     transformOrigin: Item.TopLeft
@@ -162,7 +109,10 @@ Item {
 
                     readonly property real contentW: Math.max(1, anim.contentWidth)
                     readonly property real contentH: Math.max(1, anim.contentHeight)
-                    readonly property real fitScale: Math.min(width / contentW, height / contentH)
+                    readonly property real innerX: (root.plan.contentRect.x - root.plan.frameRect.x) * canvas.width
+                    readonly property real innerY: (root.plan.contentRect.y - root.plan.frameRect.y) * canvas.height
+                    readonly property real fitScale: Math.min(root.plan.contentRect.width * canvas.width / contentW,
+                        root.plan.contentRect.height * canvas.height / contentH)
                     // `anim.cursorX/Y` are source *pixels* (the space the recorded
                     // events and the compositor use), while fitScale below maps source
                     // *points* onto this item. The driver exposes both, converted in
@@ -173,8 +123,8 @@ Item {
                     readonly property real cursorYPoints: anim.cursorYPoints
                     readonly property real layerW: contentW * fitScale
                     readonly property real layerH: contentH * fitScale
-                    readonly property real layerX: (width - layerW) / 2
-                    readonly property real layerY: (height - layerH) / 2
+                    readonly property real layerX: innerX
+                    readonly property real layerY: innerY
                     readonly property real camScale: anim.active ? anim.camScale : 1
                     readonly property real camOffsetX: anim.active ? anim.camOffsetX : 0
                     readonly property real camOffsetY: anim.active ? anim.camOffsetY : 0
@@ -182,7 +132,7 @@ Item {
                     Rectangle {
                         id: frameMask
                         anchors.fill: parent
-                        radius: Math.round(root.plan.radiusRatio * height)
+                        radius: root.plan.radiusRatio * canvas.height
                         color: "white"
                         visible: false
                         layer.enabled: true
@@ -200,14 +150,16 @@ Item {
                         }
 
                         VideoSurface {
-                            anchors.fill: parent
+                            x: frame.layerX; y: frame.layerY
+                            width: frame.layerW; height: frame.layerH
                             visible: root.live
                             frameStore: capture.frameStore
                         }
 
                     // Placeholder so padding / background are visible before capture.
                     Item {
-                        anchors.fill: parent
+                        x: frame.layerX; y: frame.layerY
+                        width: frame.layerW; height: frame.layerH
                         visible: !root.live
                         Rectangle {
                             anchors.fill: parent

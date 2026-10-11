@@ -22,9 +22,22 @@ Window {
     // this is set, and `null` when it is. The recording HUD already did this; the output
     // window was simply missed.
     transientParent: null
+    function updateCanvas() {
+        if (!visible) return
+        const dpr = screen ? screen.devicePixelRatio : 1
+        audienceCanvasPreview.updateForOutput(settings.current, anim.contentWidth, anim.contentHeight,
+            anim.sourcePixelWidth, anim.sourcePixelHeight, width * dpr, height * dpr)
+    }
+    onVisibleChanged: updateCanvas()
+    onWidthChanged: updateCanvas()
+    onHeightChanged: updateCanvas()
+    onScreenChanged: updateCanvas()
+    Connections { target: settings; function onCurrentChanged() { output.updateCanvas() } }
+    Connections { target: anim; function onContentSizeChanged() { output.updateCanvas() } }
 
     PreviewCanvas {
         anchors.fill: parent
+        plan: audienceCanvasPreview
         live: capture.running
         showStageShadow: false
         stageMargin: 0

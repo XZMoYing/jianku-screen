@@ -189,6 +189,10 @@ echo "==> 5/7 签名应用本体"
     /usr/bin/codesign --force --sign - "$binary" 2>/dev/null || true
 done
 /usr/bin/codesign --force --deep --sign - "$APP" 2>/dev/null || true
+# Keep the local development identity when available. An ad-hoc signature has
+# a different designated requirement after every build, which makes TCC grants
+# point at an obsolete binary even though System Settings shows the same name.
+/bin/sh "$REPO/scripts/sign.sh" "$APP"
 /usr/bin/codesign --verify --deep "$APP" 2>/dev/null || fail "签名校验失败，应用无法启动"
 echo "    签名有效"
 

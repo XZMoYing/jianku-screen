@@ -53,6 +53,7 @@ class EditorSessionRegistry final : public QObject {
 
 public:
     explicit EditorSessionRegistry(QQmlEngine *engine, QObject *parent = nullptr);
+    ~EditorSessionRegistry() override;
 
     QVariantList tabs() const;
     int activeWindowId() const { return activeWindowId_; }

@@ -80,8 +80,10 @@ void CursorEngine::resetAt(double t) {
     const SpringConfig config = springConfigAt(t);
     x_.reset(target.x);
     y_.reset(target.y);
+    rotation_.reset(settings_.disabled || !settings_.smoothingEnabled ? settings_.baseRotationDeg : rotationAt(t));
     x_.setConfig(config);
     y_.setConfig(config);
+    rotation_.setConfig(config);
     activeConfig_ = config;
     hasConfig_ = true;
     clickFader_.reset(1.0);
@@ -93,7 +95,7 @@ CursorPose CursorEngine::poseNow(double t) const {
     CursorPose pose;
     pose.x = x_.value();
     pose.y = y_.value();
-    pose.rotationDeg = rotationAt(t);
+    pose.rotationDeg = rotation_.value();
     pose.clickScale = clickFader_.value();
     pose.alpha = hiddenAt(t) ? 0.0 : 1.0;
     return pose;
@@ -109,6 +111,7 @@ CursorPose CursorEngine::advanceTo(double t) {
         // then update target and config for the new time (reference frame order).
         x_.advanceBy(delta);
         y_.advanceBy(delta);
+        rotation_.advanceBy(delta);
         clickFader_.advanceBy(delta);
     }
     time_ = t;
@@ -116,11 +119,17 @@ CursorPose CursorEngine::advanceTo(double t) {
     const Vec2 target = plannedTargetAt(t);
     x_.setTargetValue(target.x);
     y_.setTargetValue(target.y);
+    // rotateZ belongs to cursor-mover's numeric style, so it uses the same
+    // conditional spring as position (official 3.7.5: ok -> Nt -> C2/Cfe).
+    // The 400 ms expression is a target, not a directly displayed angle.
+    rotation_.setTargetValue(settings_.disabled || !settings_.smoothingEnabled
+        ? settings_.baseRotationDeg : rotationAt(t));
 
     const SpringConfig config = springConfigAt(t);
     if (!hasConfig_ || config != activeConfig_) {
         x_.setConfig(config);
         y_.setConfig(config);
+        rotation_.setConfig(config);
         activeConfig_ = config;
         hasConfig_ = true;
     }

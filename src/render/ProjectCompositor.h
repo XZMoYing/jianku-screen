@@ -8,6 +8,8 @@
 #include "../animation/InputEvent.h"
 #include "../animation/SpringSolver.h"
 #include "../project/EditTimeline.h"
+#include "../project/FocusTrack.h"
+#include <optional>
 
 #include <QColor>
 #include <QHash>
@@ -38,12 +40,7 @@ struct CursorObservation {
 };
 
 // A generated auto-zoom range, straight from automatic-zooms.json.
-struct ZoomRangeEntry {
-    double startMs = 0.0;
-    double endMs = 0.0;
-    double zoom = 2.0;
-    double snapToEdgesRatio = 0.25;
-};
+using ZoomRangeEntry = Project::FocusClip;
 
 // The microphone track, recorded separately as microphone.m4a.
 //
@@ -141,8 +138,7 @@ struct ComposerSettings {
 
     // Mix levels, from the project's settings. The microphone slider is stored as
     // `audioVolume` (the reference's name) and the system one as `systemAudioVolume`;
-    // the export path only uses them when the microphone is mixed in, because the
-    // system-only path is a stream copy that must not be re-encoded.
+    // These levels apply both to a mixed export and to a system-only track.
     double systemAudioVolume = 1.0;
     double microphoneVolume = 1.0;
 
@@ -235,6 +231,7 @@ public:
     CursorPose cursorAt(double mediaTimeMs);
 
     // Framing the springs are heading for, without smoothing.
+    static CameraPose cameraTargetFor(const ProjectData &project, const Project::FocusClip &focus, double mediaTimeMs);
     static CameraPose cameraTargetAt(const ProjectData &project, double mediaTimeMs,
         double snapFallback);
 
@@ -293,6 +290,8 @@ struct ComposeOptions {
     // composeProject, in a fixed order (speed, then cuts, then trims). Ignored when
     // `timeline` is already valid.
     std::vector<EditOperation> edits;
+    std::optional<std::vector<Project::FocusClip>> focusOverride;
+    QVariantMap settingsOverride;
     // Mix level overrides, applied only on the microphone path (the system-only path
     // is a stream copy and stays untouched). A negative value keeps what the project
     // saved, so the CLI can compare levels without restating them.

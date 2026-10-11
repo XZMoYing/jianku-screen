@@ -1,0 +1,21 @@
+{
+    "appearance": true,
+    "audioWaveform": true,
+    "clipReorderGesture": true,
+    "clipSelectionGesture": true,
+    "clipTrimGesture": true,
+    "editSave": true,
+    "error": "",
+    "firstFrame": true,
+    "hasFrame": true,
+    "loadedThumbnails": 6,
+    "loading": false,
+    "ok": true,
+    "playback": true,
+    "playerError": "",
+    "playerFound": true,
+    "rapidSeek": true,
+    "reorderedPreview": true,
+    "stage": 8,
+    "timelineWheelZoom": true
+}

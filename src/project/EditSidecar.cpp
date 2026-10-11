@@ -14,8 +14,8 @@ namespace {
 // Bumped when the meaning of a stored field changes. A file with a newer schema is
 // refused rather than guessed at: reading a future format with today's rules is how a
 // project gets silently mangled.
-constexpr int kSchemaVersion = 1;
-const char *const kSchemaName = "jianku-edit/1";
+constexpr int kSchemaVersion = 3;
+const char *const kSchemaName = "jianku-edit/3";
 
 } // namespace
 
@@ -44,7 +44,7 @@ EditSidecar load(const QString &projectDirectory, double durationMs) {
     }
     const QJsonObject root = document.object();
     const QString schema = root.value(QStringLiteral("schema")).toString();
-    if (schema != QLatin1String(kSchemaName)) {
+    if (schema != QLatin1String(kSchemaName) && schema != QStringLiteral("jianku-edit/1") && schema != QStringLiteral("jianku-edit/2")) {
         // An unknown schema is reported but not fatal: the recording opens, the edit is
         // ignored, and the user is told why instead of losing the whole project.
         sidecar.error = QStringLiteral("编辑记录版本不认识（%1），已忽略").arg(schema);
@@ -65,13 +65,22 @@ EditSidecar load(const QString &projectDirectory, double durationMs) {
         sidecar.error = QStringLiteral("编辑记录里的时间线无效：") + timelineError;
         return sidecar;
     }
+    if (root.contains("focusTrack")) {
+        if (!root.value("focusTrack").isObject() || !readFocusTrack(root.value("focusTrack").toObject(), durationMs, &sidecar.focusTrack, &sidecar.error)) return sidecar;
+        sidecar.hasFocusTrack = true;
+    }
+    if (root.contains("appearance") && !root.value("appearance").isObject()) {
+        sidecar.error = QStringLiteral("编辑记录的画面参数损坏"); return sidecar;
+    }
+    sidecar.appearance = root.value("appearance").toObject().toVariantMap();
     sidecar.timeline = timeline;
     sidecar.valid = true;
     return sidecar;
 }
 
 bool save(const QString &projectDirectory, const EditTimeline &timeline, double playheadMs,
-    const QString &projectCreatedAt, QString *error) {
+    const QString &projectCreatedAt, QString *error,
+    const std::vector<FocusClip> *focus, const QVariantMap *appearance) {
     const QString file = path(projectDirectory);
     if (file.isEmpty() || !QDir(projectDirectory).exists()) {
         if (error)
@@ -87,6 +96,21 @@ bool save(const QString &projectDirectory, const EditTimeline &timeline, double 
         QDateTime::currentDateTime().toString(Qt::ISODateWithMs));
     if (timeline.valid())
         root.insert(QStringLiteral("timeline"), timeline.toJson());
+
+    if (focus) root.insert("focusTrack", focusTrackJson(*focus));
+    if (appearance && !appearance->isEmpty()) root.insert("appearance", QJsonObject::fromVariantMap(*appearance));
+    // Retain the previous complete edit before atomically replacing it.
+    QFile previous(file);
+    if (previous.exists()) {
+        QSaveFile backup(QDir(projectDirectory).filePath("edit.previous.json"));
+        if (!previous.open(QIODevice::ReadOnly) || !backup.open(QIODevice::WriteOnly)) {
+            if (error) *error = QStringLiteral("无法保存上一版编辑备份"); return false;
+        }
+        const auto bytes = previous.readAll();
+        if (backup.write(bytes) != bytes.size() || !backup.commit()) {
+            if (error) *error = QStringLiteral("上一版编辑备份写入失败"); return false;
+        }
+    }
 
     // QSaveFile: the edit is either the old file or the new one, never a truncated
     // mixture. A half-written sidecar would make the project fail to open, which is a

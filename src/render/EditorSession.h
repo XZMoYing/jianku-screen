@@ -3,9 +3,12 @@
 #include "../project/RecentProjects.h"
 #include "ExportController.h"
 #include "TimelineController.h"
+#include "TimelineMedia.h"
+#include "../settings/SettingsStore.h"
 
 #include <QObject>
 #include <QString>
+#include <QTimer>
 
 namespace Render {
 
@@ -44,8 +47,11 @@ class EditorSession final : public QObject {
     // the strip rather than the missing property.
     Q_PROPERTY(QObject *timeline READ timelineObject CONSTANT)
     Q_PROPERTY(QObject *exporter READ exporterObject CONSTANT)
+    Q_PROPERTY(QObject *settings READ settingsObject CONSTANT)
+    Q_PROPERTY(QObject *media READ mediaObject CONSTANT)
 
 public:
+    ~EditorSession() override;
     explicit EditorSession(const QString &projectDirectory, QObject *parent = nullptr);
 
     QString projectDirectory() const { return projectDirectory_; }
@@ -59,6 +65,11 @@ public:
     ExportController *exporter() { return &exporter_; }
     QObject *timelineObject() { return &timeline_; }
     QObject *exporterObject() { return &exporter_; }
+    QObject *settingsObject() { return &settings_; }
+    SettingsStore *settingsStore() { return &settings_; }
+    QObject *mediaObject() { return &media_; }
+    TimelineMedia *media() { return &media_; }
+    Q_INVOKABLE void revealProject();
 
     // Loads the recording and any saved edit. Returns false when the project cannot be
     // opened at all (no manifest, no readable timeline); a sidecar that failed to load
@@ -79,8 +90,13 @@ private:
     QString projectDirectory_;
     QString title_;
     QString error_;
+    bool initializing_ = false;
+    bool restoring_ = false;
+    QTimer autosave_;
     TimelineController timeline_;
     ExportController exporter_;
+    SettingsStore settings_;
+    TimelineMedia media_;
 };
 
 } // namespace Render

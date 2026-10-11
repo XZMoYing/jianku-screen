@@ -40,7 +40,8 @@ void AnimationDriver::start() {
     lastX_ = -1.0;
     lastY_ = -1.0;
     pressed_ = false;
-    zoomUntilMs_ = -1.0;
+    liveFocus_.reset();
+    liveFocus_.setIdleMs(idleMs_);
     track_ = Animation::EventTrack{};
     cursor_ = Animation::CursorEngine{};
     cursor_.setSettings(cursorSettings_);
@@ -72,6 +73,13 @@ void AnimationDriver::setSettings(const QVariantMap &settings) {
     cursorSettings_ = resolved.cursor;
     screenSpring_ = resolved.screenSpring;
     autoZoomEnabled_ = resolved.autoZoom;
+    const QString mode = settings.value("presentationFocusMode",
+        autoZoomEnabled_ ? "auto" : "manual").toString();
+    if (mode != focusMode_ || keepZoomed_ != settings.value("alwaysKeepZoomedIn", false).toBool()) liveFocus_.reset();
+    focusMode_ = mode;
+    keepZoomed_ = settings.value("alwaysKeepZoomedIn", false).toBool();
+    idleMs_ = settings.value("presentationIdleSeconds", 3.0).toDouble() * 1000.0;
+    liveFocus_.setIdleMs(idleMs_);
     zoomLevel_ = resolved.zoomLevel;
     snapToEdgesRatio_ = resolved.snapToEdgesRatio;
     smoothingEnabled_ = cursorSettings_.smoothingEnabled;
@@ -90,8 +98,6 @@ void AnimationDriver::setSourceGeometry(double x, double y, double widthPoints,
     sourceBoundsY_ = y;
     sourceBoundsWidth_ = widthPoints;
     sourceBoundsHeight_ = heightPoints;
-    sourcePixelWidth_ = widthPixels;
-    sourcePixelHeight_ = heightPixels;
     // The preview draws in source *points* (the frame is scaled to fit anyway), so
     // the content box is the recorded rect's size. The pixel size is kept because a
     // region capture can have a different points-to-pixels scale than its display.
@@ -122,13 +128,12 @@ double AnimationDriver::cursorYPoints() const {
 }
 
 void AnimationDriver::setManualZoom(bool zoomed) {
-    if (zoomed) {
-        zoomUntilMs_ = 1.0e12;
-        zoomFocus_ = {cursorX_ / sourcePixelWidth(), cursorY_ / sourcePixelHeight()};
-    } else {
-        zoomUntilMs_ = -1.0;
-    }
+    if (focusMode_ == "off") return;
+    liveFocus_.setManual(zoomed);
+    liveFocus_.setFocus({cursorX_ / sourcePixelWidth(), cursorY_ / sourcePixelHeight()});
 }
+
+void AnimationDriver::toggleManualZoom() { setManualZoom(!liveFocus_.zoomed()); }
 
 void AnimationDriver::tick() {
     if (!active_)
@@ -175,23 +180,19 @@ void AnimationDriver::tick() {
     // Clamped against the *pixel* size, because x/y are pixels. Clamping against
     // contentWidth_ (points) pinned the pointer at the middle of the frame as soon as
     // it passed the halfway mark on a Retina display.
+    const bool inside = x >= 0 && x <= sourcePixelWidth() && y >= 0 && y <= sourcePixelHeight();
     x = std::clamp(x, 0.0, sourcePixelWidth());
     y = std::clamp(y, 0.0, sourcePixelHeight());
 
     const bool first = lastX_ < 0.0;
     const bool moved = first || std::abs(x - lastX_) > 0.01 || std::abs(y - lastY_) > 0.01;
     if (moved) {
-        track_.append({nowMs_, x, y, Animation::InputKind::Move});
+        track_.append({nowMs_, x, y, sample.pressed ? Animation::InputKind::Drag : Animation::InputKind::Move});
         lastX_ = x;
         lastY_ = y;
     }
     if (sample.pressed != pressed_) {
         track_.append({nowMs_, x, y, sample.pressed ? Animation::InputKind::Down : Animation::InputKind::Up});
-        if (sample.pressed) {
-            zoomUntilMs_ = nowMs_ + zoomHoldMs_;
-            // Normalised, so the numerator's unit has to match the denominator's.
-            zoomFocus_ = {x / sourcePixelWidth(), y / sourcePixelHeight()};
-        }
         pressed_ = sample.pressed;
     }
     track_.pruneBefore(nowMs_ - 60000.0);
@@ -201,21 +202,24 @@ void AnimationDriver::tick() {
     cursorX_ = pose.x;
     cursorY_ = pose.y;
     cursorRotation_ = pose.rotationDeg;
-    cursorAlpha_ = pose.alpha;
+    cursorAlpha_ = inside ? pose.alpha : 0.0;
     // Press shrink: hold at clickScale while any button is down, spring back on release.
-    pressSpring_.setTargetValue(pressed_ ? cursorSettings_.clickScale : 1.0);
+    pressSpring_.setTargetValue(pressed_ && cursorSettings_.clickScaleEnabled ? cursorSettings_.clickScale : 1.0);
     if (dt > 0.0)
         pressSpring_.advanceBy(dt);
     cursorScale_ = pressSpring_.value();
 
     // While zoomed, the view follows the live cursor; otherwise recenter so the
     // camera returns to identity smoothly as the zoom ends.
-    const bool zoomed = autoZoomEnabled_ && nowMs_ <= zoomUntilMs_;
-    if (zoomed) {
-        zoomFocus_ = {x / sourcePixelWidth(), y / sourcePixelHeight()};
-    } else {
-        zoomFocus_ = {0.5, 0.5};
+    if (keepZoomed_ && focusMode_ != "off" && !liveFocus_.zoomed()) {
+        liveFocus_.setManual(true);
+        liveFocus_.setFocus({x / sourcePixelWidth(), y / sourcePixelHeight()});
     }
+    liveFocus_.update(nowMs_, {x / sourcePixelWidth(), y / sourcePixelHeight()},
+        contentWidth_, contentHeight_, sample.pressed, sample.interactionActivity, inside,
+        focusMode_ == "auto", zoomLevel_);
+    const bool zoomed = focusMode_ != "off" && (liveFocus_.zoomed() || keepZoomed_);
+    zoomFocus_ = liveFocus_.focus();
     zoomTarget_ = zoomed ? zoomLevel_ : 1.0;
     const Animation::ScreenTransform transform = Animation::AutoFocusEngine::transformFor(zoomFocus_,
         zoomTarget_, contentWidth_, contentHeight_, contentWidth_, contentHeight_, snapToEdgesRatio_);

@@ -10,7 +10,7 @@ OSStatus hotkeyEvent(EventHandlerCallRef, EventRef event, void *userData) {
     EventHotKeyID identifier{};
     GetEventParameter(event, kEventParamDirectObject, typeEventHotKeyID,
                       nullptr, sizeof(identifier), nullptr, &identifier);
-    if (identifier.signature == 'JkSc' && identifier.id == 1) {
+    if (identifier.signature == 'JkSc' && identifier.id == hotkey->identifier()) {
         qInfo() << "Jianku hotkey activated";
         QMetaObject::invokeMethod(hotkey, "activated", Qt::QueuedConnection);
         return noErr;
@@ -33,6 +33,8 @@ UInt32 carbonKey(Qt::Key key) {
 } // namespace
 
 GlobalHotkey::GlobalHotkey(QObject *parent) : QObject(parent) {
+    static unsigned int nextIdentifier = 1;
+    identifier_ = nextIdentifier++;
     EventTypeSpec eventType{kEventClassKeyboard, kEventHotKeyPressed};
     EventHandlerRef handler = nullptr;
     InstallApplicationEventHandler(hotkeyEvent, 1, &eventType, this, &handler);
@@ -75,7 +77,7 @@ void GlobalHotkey::setShortcut(const QString &shortcut) {
     if (combo.keyboardModifiers() & Qt::ShiftModifier) modifiers |= shiftKey;
     if (combo.keyboardModifiers() & Qt::AltModifier) modifiers |= optionKey;
     if (combo.keyboardModifiers() & Qt::ControlModifier) modifiers |= controlKey;
-    EventHotKeyID identifier{'JkSc', 1};
+    EventHotKeyID identifier{'JkSc', identifier_};
     EventHotKeyRef reference = nullptr;
     const OSStatus result = RegisterEventHotKey(key, modifiers, identifier,
                                                GetApplicationEventTarget(), 0, &reference);

@@ -50,6 +50,9 @@ QVariantMap referenceFactory() {
         {"screenMovementSpring", QVariantMap{{"stiffness", 200.0}, {"damping", 40.0}, {"mass", 2.25}}},
         {"mouseClickSpring", QVariantMap{{"stiffness", 700.0}, {"damping", 30.0}, {"mass", 1.0}}},
         {"autoZoom", true},
+        {"presentationFocusMode", "auto"},
+        {"presentationIdleSeconds", 3.0},
+        {"presentationFocusHotkey", "Meta+Shift+8"},
         {"defaultZoomLevel", 2.0},
         {"alwaysKeepZoomedIn", false},
         {"snapToEdgesRatio", 0.25},
@@ -92,12 +95,23 @@ QVariantMap referenceFactory() {
 }
 } // namespace
 
-SettingsStore::SettingsStore(QObject *parent) : QObject(parent), factory_(referenceFactory()) {
-    storagePath_ = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)
-                   + "/settings.json";
+SettingsStore::SettingsStore(QObject *parent, const QString &storagePath) : QObject(parent), factory_(referenceFactory()) {
+    storagePath_ = storagePath.isEmpty() ? QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)
+        + "/settings.json" : storagePath;
     defaults_ = factory_;
     current_ = defaults_;
     load();
+}
+
+void SettingsStore::initializeProject(const QVariantMap &recordedSettings) {
+    current_ = factory_;
+    for (auto it = recordedSettings.constBegin(); it != recordedSettings.constEnd(); ++it) {
+        const QVariant value = normalized(it.key(), it.value());
+        if (value.isValid()) current_[it.key()] = value;
+    }
+    defaults_ = current_;
+    load(); // Project-specific overrides only; never read or change app defaults.
+    emit currentChanged();
 }
 
 QVariant SettingsStore::normalized(const QString &key, const QVariant &value) const {
@@ -134,6 +148,18 @@ QVariant SettingsStore::normalized(const QString &key, const QVariant &value) co
     return {};
 }
 
+bool SettingsStore::replaceCurrent(const QVariantMap &map) {
+    QVariantMap clean = factory_;
+    for (auto i = map.constBegin(); i != map.constEnd(); ++i) {
+        const auto value = normalized(i.key(), i.value());
+        if (!value.isValid()) return false;
+        clean[i.key()] = value;
+    }
+    if (clean == current_) return true;
+    current_ = clean; const bool written = save();
+    emit currentChanged(); return written;
+}
+
 bool SettingsStore::setCurrent(const QString &key, const QVariant &value) {
     if (!factory_.contains(key) && key.contains('.')) {
         const QString group = key.section('.', 0, 0);
@@ -151,8 +177,9 @@ bool SettingsStore::setCurrent(const QString &key, const QVariant &value) {
     if (current_.value(key) == cleaned)
         return true;
     current_.insert(key, cleaned);
+    const bool saved = save();
     emit currentChanged();
-    return save();
+    return saved;
 }
 
 bool SettingsStore::setAsDefault(const QString &key) {
@@ -184,31 +211,33 @@ bool SettingsStore::restoreFactory(const QString &key) {
         defaultSpring[component] = currentSpring.value(component);
         current_[group] = currentSpring;
         defaults_[group] = defaultSpring;
+        const bool saved = save();
         emit currentChanged();
         emit defaultsChanged();
-        return save();
+        return saved;
     }
     if (!factory_.contains(key))
         return false;
     current_.insert(key, factory_.value(key));
     defaults_.insert(key, factory_.value(key));
+    const bool saved = save();
     emit currentChanged();
     emit defaultsChanged();
-    return save();
+    return saved;
 }
 
 void SettingsStore::restoreAllFactory() {
     current_ = factory_;
     defaults_ = factory_;
+    save();
     emit currentChanged();
     emit defaultsChanged();
-    save();
 }
 
 void SettingsStore::useDefaults() {
     current_ = defaults_;
-    emit currentChanged();
     save();
+    emit currentChanged();
 }
 
 void SettingsStore::load() {

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../project/EditTimeline.h"
+#include "FocusTrack.h"
+#include <QVariantMap>
 
 #include <QString>
 #include <QStringList>
@@ -37,6 +39,9 @@ struct EditSidecar {
     QString projectCreatedAt;
     QString savedAt;
     bool valid = false;
+    bool hasFocusTrack = false;
+    std::vector<FocusClip> focusTrack;
+    QVariantMap appearance;
     // Set when a file exists but was rejected. The caller shows it; the project still
     // opens, with the edit ignored, because a broken sidecar must not make a perfectly
     // good recording unopenable.
@@ -48,7 +53,8 @@ struct EditSidecar {
 EditSidecar load(const QString &projectDirectory, double durationMs);
 // Writes `edit.json` atomically. Returns false and fills `error` on failure.
 bool save(const QString &projectDirectory, const EditTimeline &timeline, double playheadMs,
-    const QString &projectCreatedAt, QString *error = nullptr);
+    const QString &projectCreatedAt, QString *error = nullptr,
+    const std::vector<FocusClip> *focus = nullptr, const QVariantMap *appearance = nullptr);
 // Absolute path of the sidecar, whether or not it exists.
 QString path(const QString &projectDirectory);
 

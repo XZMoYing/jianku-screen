@@ -17,12 +17,13 @@ namespace Project {
 // One rule everything else follows from: the output timeline is a concatenation
 // of segments, each playing `sourceEnd - sourceStart` of media in
 // `(sourceEnd - sourceStart) / speed` of output time. Mapping is continuous and
-// strictly increasing, which is what lets the animation engines be stepped in
-// source time while the frame clock runs in output time.
+// Each segment advances source time; array order is authored output order.
+// Source ranges may be rearranged but cannot overlap.
 struct Segment {
     double sourceStartMs = 0.0;
     double sourceEndMs = 0.0;
     double speed = 1.0;
+    QString id;
 
     double sourceLengthMs() const { return sourceEndMs - sourceStartMs; }
     double outputLengthMs() const {
@@ -35,7 +36,7 @@ public:
     // The identity timeline: the whole recording, real time.
     static EditTimeline whole(double durationMs);
 
-    // Rejects out-of-range source spans, non-positive speeds, gaps and overlaps.
+    // Rejects out-of-range source spans, non-finite speeds and reused source spans.
     // A timeline that fails this must not be used for an export.
     bool valid() const { return valid_; }
     QString error() const { return error_; }
@@ -82,6 +83,12 @@ public:
     // Sets the speed of every segment overlapping the output-time span, splitting
     // segments at the boundaries first so the range is exact.
     bool setSpeed(double fromMs, double toMs, double speed);
+    bool moveSegment(int fromIndex, int toIndex);
+    bool trimSegment(int index, double sourceStartMs, double sourceEndMs, double minimumMs = 100.0);
+    bool removeSegments(const std::vector<int> &indices, double minimumMs = 100.0);
+    bool mergeNext(int index, bool restoreGap = false);
+    double outputStartAt(int index) const;
+    bool isSourceOrdered() const;
 
     QJsonObject toJson() const;
     // `durationMs` is the recording's own length, used to validate the source

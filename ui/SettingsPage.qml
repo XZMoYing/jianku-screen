@@ -7,6 +7,8 @@ import QtQuick.Effects
 Item {
     id: page
     property string section: "background"
+    property var store: settings
+    property bool editingRecording: false
 
     readonly property var gradientPresets: [
         { name: "极光", a: "#3F37C9", b: "#8C87DF", ang: 135 },
@@ -29,7 +31,7 @@ Item {
         cursor: ["光标", "大小、平滑、旋转、点击反馈"],
         motion: ["缩放与聚焦", "自动聚焦与镜头运动"],
         camera: ["摄像头", "画中画摄像头布局"],
-        audio: ["音频", "麦克风、系统声音与音乐"],
+        audio: ["音频", "麦克风与系统声音"],
         transcript: ["字幕", "自动转写字幕样式"],
         shortcuts: ["快捷键", "按键提示的显示方式"],
         shortcuts2: ["", ""],
@@ -38,7 +40,7 @@ Item {
         screenshot: ["快捷截图", "全局快捷键与输出目录"]
     })
 
-    function setSlider(key, v) { settings.setCurrent(key, v) }
+    function setSlider(key, v) { page.store.setCurrent(key, v) }
 
     Rectangle {
         anchors.fill: parent
@@ -52,19 +54,19 @@ Item {
         title: "选择背景图片"
         nameFilters: ["图片文件 (*.png *.jpg *.jpeg *.webp *.heic)", "所有文件 (*)"]
         onAccepted: {
-            settings.setCurrent("backgroundImagePath", selectedFile.toLocalFile())
-            settings.setCurrent("backgroundType", "image")
+            page.store.setCurrent("backgroundImagePath", decodeURIComponent(selectedFile.toString().replace(/^file:\/\//, "")))
+            page.store.setCurrent("backgroundType", "image")
         }
     }
     FolderDialog {
         id: outputFolderPicker
         title: "选择截图保存目录"
-        onAccepted: settings.setCurrent("screenshotDirectory", selectedFolder.toLocalFile())
+        onAccepted: page.store.setCurrent("screenshotDirectory", decodeURIComponent(selectedFolder.toString().replace(/^file:\/\//, "")))
     }
     FolderDialog {
         id: recordingFolderPicker
         title: "选择录制保存目录"
-        onAccepted: settings.setCurrent("recordingDirectory", selectedFolder.toLocalFile())
+        onAccepted: page.store.setCurrent("recordingDirectory", decodeURIComponent(selectedFolder.toString().replace(/^file:\/\//, "")))
     }
 
     ColumnLayout {
@@ -111,6 +113,7 @@ Item {
 
                 // ---------------- Background ----------------
                 PanelCard {
+                    store: page.store
                     Layout.fillWidth: true
                     visible: page.section === "background"
                     title: "背景画布"
@@ -119,14 +122,14 @@ Item {
                     UiSegmented {
                         Layout.fillWidth: true
                         options: ["图片库", "渐变", "纯色", "本地图片"]
-                        currentIndex: Math.max(0, ["system", "gradient", "color", "image"].indexOf(String(settings.current.backgroundType)))
-                        onActivated: (i) => settings.setCurrent("backgroundType", ["system", "gradient", "color", "image"][i])
+                        currentIndex: Math.max(0, ["system", "gradient", "color", "image"].indexOf(String(page.store.current.backgroundType)))
+                        onActivated: (i) => page.store.setCurrent("backgroundType", ["system", "gradient", "color", "image"][i])
                     }
 
                     GridView {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 200
-                        visible: String(settings.current.backgroundType) === "system"
+                        visible: String(page.store.current.backgroundType) === "system"
                         cellWidth: Math.floor(width / 4)
                         cellHeight: 64
                         clip: true
@@ -135,7 +138,7 @@ Item {
                             required property var modelData
                             width: GridView.view.cellWidth
                             height: GridView.view.cellHeight
-                            readonly property bool selected: String(settings.current.backgroundSystemName) === modelData.relative
+                            readonly property bool selected: String(page.store.current.backgroundSystemName) === modelData.relative
                             Rectangle {
                                 id: thumb
                                 anchors.fill: parent
@@ -178,8 +181,8 @@ Item {
                             HoverHandler { cursorShape: Qt.PointingHandCursor }
                             TapHandler {
                                 onTapped: {
-                                    settings.setCurrent("backgroundSystemName", modelData.relative)
-                                    settings.setCurrent("backgroundType", "system")
+                                    page.store.setCurrent("backgroundSystemName", modelData.relative)
+                                    page.store.setCurrent("backgroundType", "system")
                                 }
                             }
                         }
@@ -188,7 +191,7 @@ Item {
                     GridView {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 96
-                        visible: String(settings.current.backgroundType) === "gradient"
+                        visible: String(page.store.current.backgroundType) === "gradient"
                         cellWidth: Math.floor(width / 6)
                         cellHeight: 46
                         interactive: false
@@ -203,20 +206,20 @@ Item {
                                 width: parent.width - 8
                                 height: parent.height - 8
                                 radius: Theme.radiusSm
-                                border.width: selected.value ? 2 : 1
-                                border.color: selected.value ? Theme.accent : "#55000000"
+                                border.width: selected ? 2 : 1
+                                border.color: selected ? Theme.accent : "#55000000"
                                 gradient: Gradient {
                                     orientation: Gradient.Horizontal
                                     GradientStop { position: 0.0; color: modelData.a }
                                     GradientStop { position: 1.0; color: modelData.b }
                                 }
-                                readonly property bool selected: Qt.colorEqual(String(settings.current.gradientStartColor), modelData.a)
+                                readonly property bool selected: Qt.colorEqual(String(page.store.current.gradientStartColor), modelData.a)
                                 HoverHandler { cursorShape: Qt.PointingHandCursor }
                                 TapHandler {
                                     onTapped: {
-                                        settings.setCurrent("gradientStartColor", modelData.a)
-                                        settings.setCurrent("gradientEndColor", modelData.b)
-                                        settings.setCurrent("gradientAngle", modelData.ang)
+                                        page.store.setCurrent("gradientStartColor", modelData.a)
+                                        page.store.setCurrent("gradientEndColor", modelData.b)
+                                        page.store.setCurrent("gradientAngle", modelData.ang)
                                     }
                                 }
                             }
@@ -225,19 +228,19 @@ Item {
 
                     UiColorField {
                         Layout.fillWidth: true
-                        visible: String(settings.current.backgroundType) === "color"
+                        visible: String(page.store.current.backgroundType) === "color"
                         label: "背景颜色"
-                        value: String(settings.current.backgroundColor)
-                        onEdited: v => settings.setCurrent("backgroundColor", v)
+                        value: String(page.store.current.backgroundColor)
+                        onEdited: v => page.store.setCurrent("backgroundColor", v)
                     }
 
                     RowLayout {
                         Layout.fillWidth: true
-                        visible: String(settings.current.backgroundType) === "image"
+                        visible: String(page.store.current.backgroundType) === "image"
                         spacing: 8
                         Text {
                             Layout.fillWidth: true
-                            text: String(settings.current.backgroundImagePath) || "未选择图片"
+                            text: String(page.store.current.backgroundImagePath) || "未选择图片"
                             color: Theme.textDim
                             font.pixelSize: 11
                             elide: Text.ElideMiddle
@@ -245,41 +248,42 @@ Item {
                         UiButton { implicitWidth: 64; text: "选取"; tone: "quiet"; onClicked: backgroundPicker.open() }
                     }
 
-                    RowLayout {
+                    ColumnLayout {
                         Layout.fillWidth: true
-                        visible: String(settings.current.backgroundType) === "gradient"
+                        visible: String(page.store.current.backgroundType) === "gradient"
                         spacing: 8
                         UiColorField {
                             Layout.fillWidth: true
                             label: "起始"
-                            value: String(settings.current.gradientStartColor)
-                            onEdited: v => settings.setCurrent("gradientStartColor", v)
+                            value: String(page.store.current.gradientStartColor)
+                            onEdited: v => page.store.setCurrent("gradientStartColor", v)
                         }
                         UiColorField {
                             Layout.fillWidth: true
                             label: "结束"
-                            value: String(settings.current.gradientEndColor)
-                            onEdited: v => settings.setCurrent("gradientEndColor", v)
+                            value: String(page.store.current.gradientEndColor)
+                            onEdited: v => page.store.setCurrent("gradientEndColor", v)
                         }
                     }
                     UiSlider {
                         Layout.fillWidth: true
-                        visible: String(settings.current.backgroundType) === "gradient"
+                        visible: String(page.store.current.backgroundType) === "gradient"
                         label: "渐变角度"
                         from: 0; to: 360; step: 1; suffix: "°"
-                        value: Number(settings.current.gradientAngle || 0)
+                        value: Number(page.store.current.gradientAngle || 0)
                         onEdited: v => page.setSlider("gradientAngle", v)
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "背景模糊"
                         from: 0; to: 40; step: 1
-                        value: Number(settings.current.backgroundBlur || 0)
+                        value: Number(page.store.current.backgroundBlur || 0)
                         onEdited: v => page.setSlider("backgroundBlur", v)
                     }
                 }
 
                 PanelCard {
+                    store: page.store
                     Layout.fillWidth: true
                     visible: page.section === "background"
                     title: "留白与边框"
@@ -290,21 +294,21 @@ Item {
                         label: "留白"
                         detail: "画面四周留白，按画布短边百分比"
                         from: 0; to: 30; step: 0.5; decimals: 1; suffix: "%"
-                        value: Number(settings.current.backgroundPaddingRatio || 0)
+                        value: Number(page.store.current.backgroundPaddingRatio || 0)
                         onEdited: v => page.setSlider("backgroundPaddingRatio", v)
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "圆角"
                         from: 0; to: 80; step: 1; suffix: " px"
-                        value: Number(settings.current.windowBorderRadius || 0)
+                        value: Number(page.store.current.windowBorderRadius || 0)
                         onEdited: v => page.setSlider("windowBorderRadius", v)
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "内框粗细"
                         from: 0; to: 40; step: 1; suffix: " px"
-                        value: Number(settings.current.insetSize || 0)
+                        value: Number(page.store.current.insetSize || 0)
                         onEdited: v => page.setSlider("insetSize", v)
                     }
                     RowLayout {
@@ -313,20 +317,21 @@ Item {
                         UiColorField {
                             Layout.fillWidth: true
                             label: "内框颜色"
-                            value: String(settings.current.insetColor)
-                            onEdited: v => settings.setCurrent("insetColor", v)
+                            value: String(page.store.current.insetColor)
+                            onEdited: v => page.store.setCurrent("insetColor", v)
                         }
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "内框不透明度"
                         from: 0; to: 100; step: 1; suffix: "%"
-                        value: Number(settings.current.insetAlpha || 0) * 100
+                        value: Number(page.store.current.insetAlpha || 0) * 100
                         onEdited: v => page.setSlider("insetAlpha", v / 100)
                     }
                 }
 
                 PanelCard {
+                    store: page.store
                     Layout.fillWidth: true
                     visible: page.section === "background"
                     title: "阴影"
@@ -336,33 +341,34 @@ Item {
                         Layout.fillWidth: true
                         label: "强度"
                         from: 0; to: 1; step: 0.01; decimals: 2
-                        value: Number(settings.current.shadowIntensity || 0)
+                        value: Number(page.store.current.shadowIntensity || 0)
                         onEdited: v => page.setSlider("shadowIntensity", v)
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "方向"
                         from: 0; to: 360; step: 1; suffix: "°"
-                        value: Number(settings.current.shadowAngle || 0)
+                        value: Number(page.store.current.shadowAngle || 0)
                         onEdited: v => page.setSlider("shadowAngle", v)
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "距离"
                         from: 0; to: 80; step: 1; suffix: " px"
-                        value: Number(settings.current.shadowDistance || 0)
+                        value: Number(page.store.current.shadowDistance || 0)
                         onEdited: v => page.setSlider("shadowDistance", v)
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "柔化"
                         from: 0; to: 80; step: 1; suffix: " px"
-                        value: Number(settings.current.shadowBlur || 0)
+                        value: Number(page.store.current.shadowBlur || 0)
                         onEdited: v => page.setSlider("shadowBlur", v)
                     }
                 }
 
                 PanelCard {
+                    store: page.store
                     Layout.fillWidth: true
                     visible: page.section === "background"
                     title: "输出比例"
@@ -370,8 +376,8 @@ Item {
                     UiSegmented {
                         Layout.fillWidth: true
                         options: ["自动", "16:9", "16:10", "4:3", "1:1", "9:16", "21:9"]
-                        currentIndex: Math.max(0, ["auto", "16:9", "16:10", "4:3", "1:1", "9:16", "21:9"].indexOf(String(settings.current.outputAspectRatio)))
-                        onActivated: i => settings.setCurrent("outputAspectRatio", ["auto", "16:9", "16:10", "4:3", "1:1", "9:16", "21:9"][i])
+                        currentIndex: Math.max(0, ["auto", "16:9", "16:10", "4:3", "1:1", "9:16", "21:9"].indexOf(String(page.store.current.outputAspectRatio)))
+                        onActivated: i => page.store.setCurrent("outputAspectRatio", ["auto", "16:9", "16:10", "4:3", "1:1", "9:16", "21:9"][i])
                     }
                 }
 
@@ -382,6 +388,7 @@ Item {
                 // shape, so a 16:10 recording exported at 1080p is 1728x1080 rather
                 // than being letterboxed into 1920x1080.
                 PanelCard {
+                    store: page.store
                     Layout.fillWidth: true
                     visible: page.section === "speed"
                     title: "导出设置"
@@ -421,6 +428,7 @@ Item {
 
                 // ---------------- Cursor ----------------
                 PanelCard {
+                    store: page.store
                     Layout.fillWidth: true
                     visible: page.section === "cursor"
                     title: "光标外观"
@@ -430,7 +438,7 @@ Item {
                         Layout.fillWidth: true
                         label: "光标大小"
                         from: 0.5; to: 10; step: 0.1; decimals: 1
-                        value: Number(settings.current.cursorSize || 1)
+                        value: Number(page.store.current.cursorSize || 1)
                         onEdited: v => page.setSlider("cursorSize", v)
                     }
                     UiSlider {
@@ -438,39 +446,40 @@ Item {
                         label: "水平旋转比例"
                         detail: "水平移动速度→倾斜角度"
                         from: 0; to: 1; step: 0.01; decimals: 2
-                        value: Number(settings.current.cursorRotateOnXMovementRatio || 0)
+                        value: Number(page.store.current.cursorRotateOnXMovementRatio || 0)
                         onEdited: v => page.setSlider("cursorRotateOnXMovementRatio", v)
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "基础旋转"
                         from: -20; to: 20; step: 1; suffix: "°"
-                        value: Number(settings.current.cursorBaseRotation || 0)
+                        value: Number(page.store.current.cursorBaseRotation || 0)
                         onEdited: v => page.setSlider("cursorBaseRotation", v)
                     }
                     UiToggle {
                         Layout.fillWidth: true
                         label: "隐藏光标"
-                        checked: !!settings.current.hideCursor
-                        onToggled: v => settings.setCurrent("hideCursor", v)
+                        checked: !!page.store.current.hideCursor
+                        onToggled: v => page.store.setCurrent("hideCursor", v)
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "静止自动隐藏"
                         detail: "0 表示不隐藏"
                         from: 0; to: 3000; step: 50; suffix: " ms"
-                        value: Number(settings.current.hideNotMovingCursorAfterMs || 0)
+                        value: Number(page.store.current.hideNotMovingCursorAfterMs || 0)
                         onEdited: v => page.setSlider("hideNotMovingCursorAfterMs", v)
                     }
                     UiSegmented {
                         Layout.fillWidth: true
                         options: ["无点击反馈", "缩放反馈"]
-                        currentIndex: String(settings.current.clickEffect) === "scale" ? 1 : 0
-                        onActivated: i => settings.setCurrent("clickEffect", i === 1 ? "scale" : "none")
+                        currentIndex: String(page.store.current.clickEffect) === "scale" ? 1 : 0
+                        onActivated: i => page.store.setCurrent("clickEffect", i === 1 ? "scale" : "none")
                     }
                 }
 
                 PanelCard {
+                    store: page.store
                     Layout.fillWidth: true
                     visible: page.section === "cursor"
                     title: "平滑求解"
@@ -479,7 +488,7 @@ Item {
                     UiSegmented {
                         Layout.fillWidth: true
                         options: ["平滑", "中等", "快速", "无"]
-                        currentIndex: Math.max(0, ["Smooth", "Medium", "Rapid", "None"].indexOf(String(settings.current.cursorSmoothing)))
+                        currentIndex: Math.max(0, ["Smooth", "Medium", "Rapid", "None"].indexOf(String(page.store.current.cursorSmoothing)))
                         onActivated: index => {
                             const keys = ["Smooth", "Medium", "Rapid", "None"]
                             const presets = [
@@ -487,41 +496,42 @@ Item {
                                 { stiffness: 340, damping: 60, mass: 3 },
                                 { stiffness: 530, damping: 40, mass: 1 }
                             ]
-                            settings.setCurrent("cursorSmoothing", keys[index])
-                            if (index < 3) settings.setCurrent("mouseMovementSpring", presets[index])
+                            page.store.setCurrent("cursorSmoothing", keys[index])
+                            if (index < 3) page.store.setCurrent("mouseMovementSpring", presets[index])
                         }
                     }
                     UiToggle {
                         Layout.fillWidth: true
                         label: "关闭平滑"
-                        checked: !!settings.current.disableMouseMovementSpring
-                        onToggled: v => settings.setCurrent("disableMouseMovementSpring", v)
+                        checked: !!page.store.current.disableMouseMovementSpring
+                        onToggled: v => page.store.setCurrent("disableMouseMovementSpring", v)
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "刚度"
                         from: 0; to: 1000; step: 1
-                        value: Number(settings.current.mouseMovementSpring.stiffness || 0)
+                        value: Number(page.store.current.mouseMovementSpring.stiffness || 0)
                         onEdited: v => page.setSlider("mouseMovementSpring.stiffness", v)
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "阻尼"
                         from: 0; to: 200; step: 1
-                        value: Number(settings.current.mouseMovementSpring.damping || 0)
+                        value: Number(page.store.current.mouseMovementSpring.damping || 0)
                         onEdited: v => page.setSlider("mouseMovementSpring.damping", v)
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "质量"
                         from: 0; to: 10; step: 0.05; decimals: 2
-                        value: Number(settings.current.mouseMovementSpring.mass || 0)
+                        value: Number(page.store.current.mouseMovementSpring.mass || 0)
                         onEdited: v => page.setSlider("mouseMovementSpring.mass", v)
                     }
                 }
 
                 // ---------------- Motion / zoom ----------------
                 PanelCard {
+                    store: page.store
                     Layout.fillWidth: true
                     visible: page.section === "motion"
                     title: "自动聚焦"
@@ -531,39 +541,65 @@ Item {
                         Layout.fillWidth: true
                         label: "自动缩放"
                         detail: "围绕点击自动放大"
-                        checked: !!settings.current.autoZoom
-                        onToggled: v => settings.setCurrent("autoZoom", v)
+                        checked: !!page.store.current.autoZoom
+                        onToggled: v => page.store.setCurrent("autoZoom", v)
+                    }
+                    Text { visible: !page.editingRecording; text: "演示聚焦模式"; color: Theme.textDim; font.pixelSize: 12 }
+                    UiSegmented {
+                        Layout.fillWidth: true
+                        visible: !page.editingRecording
+                        options: ["自动", "手动", "关闭"]
+                        currentIndex: Math.max(0, ["auto", "manual", "off"].indexOf(page.store.current.presentationFocusMode))
+                        onActivated: i => page.store.setCurrent("presentationFocusMode", ["auto", "manual", "off"][i])
+                    }
+                    UiSlider {
+                        Layout.fillWidth: true
+                        visible: !page.editingRecording
+                        label: "操作停止后缩小"
+                        detail: "移动、拖拽、滚动与输入期间保持放大"
+                        from: 1; to: 10; step: .5; decimals: 1; suffix: "秒"
+                        value: Number(page.store.current.presentationIdleSeconds || 3)
+                        onEdited: v => page.setSlider("presentationIdleSeconds", v)
+                    }
+                    UiField {
+                        Layout.fillWidth: true
+                        visible: !page.editingRecording
+                        placeholderText: "演示聚焦快捷键"
+                        text: page.store.current.presentationFocusHotkey || "Meta+Shift+8"
+                        onEditingFinished: page.store.setCurrent("presentationFocusHotkey", text)
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "默认倍率"
                         from: 1; to: 4; step: 0.1; decimals: 1; suffix: "×"
-                        value: Number(settings.current.defaultZoomLevel || 2)
+                        value: Number(page.store.current.defaultZoomLevel || 2)
                         onEdited: v => page.setSlider("defaultZoomLevel", v)
                     }
                     UiToggle {
                         Layout.fillWidth: true
                         label: "始终保留放大"
-                        checked: !!settings.current.alwaysKeepZoomedIn
-                        onToggled: v => settings.setCurrent("alwaysKeepZoomedIn", v)
+                        checked: !!page.store.current.alwaysKeepZoomedIn
+                        onToggled: v => page.store.setCurrent("alwaysKeepZoomedIn", v)
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "边缘吸附"
                         from: 0; to: 0.5; step: 0.01; decimals: 2
-                        value: Number(settings.current.snapToEdgesRatio || 0)
+                        value: Number(page.store.current.snapToEdgesRatio || 0)
                         onEdited: v => page.setSlider("snapToEdgesRatio", v)
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "滑翔速度"
+                        visible: false // Not yet mapped by the reference renderer.
                         from: 0; to: 1; step: 0.01; decimals: 2
-                        value: Number(settings.current.glideSpeed || 0)
+                        value: Number(page.store.current.glideSpeed || 0)
                         onEdited: v => page.setSlider("glideSpeed", v)
                     }
                 }
 
                 PanelCard {
+                    store: page.store
                     Layout.fillWidth: true
                     visible: page.section === "motion"
                     title: "动态模糊"
@@ -574,14 +610,14 @@ Item {
                         label: "总强度"
                         detail: "画面与指针移动时的轻微拖影；0 关闭。观感尚未与参考逐帧对照"
                         from: 0; to: 2; step: 0.05; decimals: 2
-                        value: Number(settings.current.motionBlurAmount || 0)
+                        value: Number(page.store.current.motionBlurAmount || 0)
                         onEdited: v => page.setSlider("motionBlurAmount", v)
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "指针移动"
                         from: 0; to: 2; step: 0.05; decimals: 2
-                        value: Number(settings.current.motionBlurCursorAmount || 0)
+                        value: Number(page.store.current.motionBlurCursorAmount || 0)
                         onEdited: v => page.setSlider("motionBlurCursorAmount", v)
                     }
                     UiSlider {
@@ -589,7 +625,7 @@ Item {
                         label: "画面平移"
                         detail: "画面滑动时拖影；镜头缩放时由下一项接管"
                         from: 0; to: 2; step: 0.05; decimals: 2
-                        value: Number(settings.current.motionBlurScreenMoveAmount || 0)
+                        value: Number(page.store.current.motionBlurScreenMoveAmount || 0)
                         onEdited: v => page.setSlider("motionBlurScreenMoveAmount", v)
                     }
                     UiSlider {
@@ -597,12 +633,13 @@ Item {
                         label: "画面缩放"
                         detail: "放大或缩小时拖影"
                         from: 0; to: 2; step: 0.05; decimals: 2
-                        value: Number(settings.current.motionBlurScreenZoomAmount || 0)
+                        value: Number(page.store.current.motionBlurScreenZoomAmount || 0)
                         onEdited: v => page.setSlider("motionBlurScreenZoomAmount", v)
                     }
                 }
 
                 PanelCard {
+                    store: page.store
                     Layout.fillWidth: true
                     visible: page.section === "motion"
                     title: "画面与点击弹簧"
@@ -612,48 +649,49 @@ Item {
                         Layout.fillWidth: true
                         label: "画面刚度"
                         from: 0; to: 500; step: 1
-                        value: Number(settings.current.screenMovementSpring.stiffness || 0)
+                        value: Number(page.store.current.screenMovementSpring.stiffness || 0)
                         onEdited: v => page.setSlider("screenMovementSpring.stiffness", v)
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "画面阻尼"
                         from: 0; to: 150; step: 1
-                        value: Number(settings.current.screenMovementSpring.damping || 0)
+                        value: Number(page.store.current.screenMovementSpring.damping || 0)
                         onEdited: v => page.setSlider("screenMovementSpring.damping", v)
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "画面质量"
                         from: 0; to: 8; step: 0.05; decimals: 2
-                        value: Number(settings.current.screenMovementSpring.mass || 0)
+                        value: Number(page.store.current.screenMovementSpring.mass || 0)
                         onEdited: v => page.setSlider("screenMovementSpring.mass", v)
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "点击刚度"
                         from: 0; to: 1500; step: 1
-                        value: Number(settings.current.mouseClickSpring.stiffness || 0)
+                        value: Number(page.store.current.mouseClickSpring.stiffness || 0)
                         onEdited: v => page.setSlider("mouseClickSpring.stiffness", v)
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "点击阻尼"
                         from: 0; to: 150; step: 1
-                        value: Number(settings.current.mouseClickSpring.damping || 0)
+                        value: Number(page.store.current.mouseClickSpring.damping || 0)
                         onEdited: v => page.setSlider("mouseClickSpring.damping", v)
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "点击质量"
                         from: 0; to: 8; step: 0.05; decimals: 2
-                        value: Number(settings.current.mouseClickSpring.mass || 0)
+                        value: Number(page.store.current.mouseClickSpring.mass || 0)
                         onEdited: v => page.setSlider("mouseClickSpring.mass", v)
                     }
                 }
 
                 // ---------------- Camera ----------------
                 PanelCard {
+                    store: page.store
                     Layout.fillWidth: true
                     visible: page.section === "camera"
                     title: "摄像头"
@@ -662,46 +700,47 @@ Item {
                     UiToggle {
                         Layout.fillWidth: true
                         label: "显示摄像头"
-                        checked: !settings.current.hideCamera
-                        onToggled: v => settings.setCurrent("hideCamera", !v)
+                        checked: !page.store.current.hideCamera
+                        onToggled: v => page.store.setCurrent("hideCamera", !v)
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "大小"
                         from: 0.05; to: 1; step: 0.01; decimals: 2
-                        value: Number(settings.current.cameraSize || 0)
+                        value: Number(page.store.current.cameraSize || 0)
                         onEdited: v => page.setSlider("cameraSize", v)
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "圆角"
                         from: 0; to: 1; step: 0.01; decimals: 2
-                        value: Number(settings.current.cameraRoundness || 0)
+                        value: Number(page.store.current.cameraRoundness || 0)
                         onEdited: v => page.setSlider("cameraRoundness", v)
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "缩放时缩放比"
                         from: 0; to: 1; step: 0.01; decimals: 2
-                        value: Number(settings.current.cameraScaleDuringZoom || 0)
+                        value: Number(page.store.current.cameraScaleDuringZoom || 0)
                         onEdited: v => page.setSlider("cameraScaleDuringZoom", v)
                     }
                     UiToggle {
                         Layout.fillWidth: true
                         label: "水平镜像"
-                        checked: !!settings.current.mirrorCamera
-                        onToggled: v => settings.setCurrent("mirrorCamera", v)
+                        checked: !!page.store.current.mirrorCamera
+                        onToggled: v => page.store.setCurrent("mirrorCamera", v)
                     }
                     UiSegmented {
                         Layout.fillWidth: true
                         options: ["原始", "16:9", "4:3"]
-                        currentIndex: Math.max(0, ["original", "16:9", "4:3"].indexOf(String(settings.current.cameraAspectRatio)))
-                        onActivated: i => settings.setCurrent("cameraAspectRatio", ["original", "16:9", "4:3"][i])
+                        currentIndex: Math.max(0, ["original", "16:9", "4:3"].indexOf(String(page.store.current.cameraAspectRatio)))
+                        onActivated: i => page.store.setCurrent("cameraAspectRatio", ["original", "16:9", "4:3"][i])
                     }
                 }
 
                 // ---------------- Audio ----------------
                 PanelCard {
+                    store: page.store
                     Layout.fillWidth: true
                     visible: page.section === "audio"
                     title: "音频"
@@ -711,76 +750,80 @@ Item {
                         Layout.fillWidth: true
                         label: "麦克风音量"
                         from: 0; to: 1; step: 0.01; decimals: 2
-                        value: Number(settings.current.audioVolume || 0)
+                        value: Number(page.store.current.audioVolume || 0)
                         onEdited: v => page.setSlider("audioVolume", v)
                     }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "系统声音音量"
                         from: 0; to: 1; step: 0.01; decimals: 2
-                        value: Number(settings.current.systemAudioVolume || 0)
+                        value: Number(page.store.current.systemAudioVolume || 0)
                         onEdited: v => page.setSlider("systemAudioVolume", v)
                     }
-                    UiToggle { Layout.fillWidth: true; label: "静音麦克风"; checked: !!settings.current.muteMicrophone; onToggled: v => settings.setCurrent("muteMicrophone", v) }
-                    UiToggle { Layout.fillWidth: true; label: "静音系统声音"; checked: !!settings.current.muteSystemAudio; onToggled: v => settings.setCurrent("muteSystemAudio", v) }
-                    UiToggle { Layout.fillWidth: true; label: "静音外部设备"; checked: !!settings.current.muteExternalDeviceAudio; onToggled: v => settings.setCurrent("muteExternalDeviceAudio", v) }
-                    UiToggle { Layout.fillWidth: true; label: "增强麦克风"; checked: !!settings.current.improveMicrophoneAudio; onToggled: v => settings.setCurrent("improveMicrophoneAudio", v) }
+                    UiToggle { Layout.fillWidth: true; label: "静音麦克风"; checked: !!page.store.current.muteMicrophone; onToggled: v => page.store.setCurrent("muteMicrophone", v) }
+                    UiToggle { Layout.fillWidth: true; label: "静音系统声音"; checked: !!page.store.current.muteSystemAudio; onToggled: v => page.store.setCurrent("muteSystemAudio", v) }
+                    UiToggle { Layout.fillWidth: true; enabled: false; label: "静音外部设备（待接入）"; checked: !!page.store.current.muteExternalDeviceAudio }
+                    UiToggle { Layout.fillWidth: true; enabled: false; label: "增强麦克风（待接入）"; checked: !!page.store.current.improveMicrophoneAudio }
                 }
 
                 PanelCard {
+                    store: page.store
                     Layout.fillWidth: true
                     visible: page.section === "audio"
-                    title: "背景音乐与点击音"
+                    title: "背景音乐与点击音（待接入）"
+                    enabled: false
                     resetKeys: ["backgroundAudioVolume", "muteBackgroundAudio", "clickSoundEffectVolume"]
 
                     UiSlider {
                         Layout.fillWidth: true
                         label: "背景音乐音量"
                         from: 0; to: 1; step: 0.01; decimals: 2
-                        value: Number(settings.current.backgroundAudioVolume || 0)
+                        value: Number(page.store.current.backgroundAudioVolume || 0)
                         onEdited: v => page.setSlider("backgroundAudioVolume", v)
                     }
-                    UiToggle { Layout.fillWidth: true; label: "静音背景音乐"; checked: !!settings.current.muteBackgroundAudio; onToggled: v => settings.setCurrent("muteBackgroundAudio", v) }
+                    UiToggle { Layout.fillWidth: true; label: "静音背景音乐"; checked: !!page.store.current.muteBackgroundAudio; onToggled: v => page.store.setCurrent("muteBackgroundAudio", v) }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "点击音效音量"
                         from: 0; to: 1; step: 0.01; decimals: 2
-                        value: Number(settings.current.clickSoundEffectVolume || 0)
+                        value: Number(page.store.current.clickSoundEffectVolume || 0)
                         onEdited: v => page.setSlider("clickSoundEffectVolume", v)
                     }
                 }
 
                 // ---------------- Transcript ----------------
                 PanelCard {
+                    store: page.store
                     Layout.fillWidth: true
                     visible: page.section === "transcript"
                     title: "字幕"
                     resetKeys: ["showTranscript", "transcriptSizeRatio"]
-                    UiToggle { Layout.fillWidth: true; label: "显示字幕"; checked: !!settings.current.showTranscript; onToggled: v => settings.setCurrent("showTranscript", v) }
+                    UiToggle { Layout.fillWidth: true; label: "显示字幕"; checked: !!page.store.current.showTranscript; onToggled: v => page.store.setCurrent("showTranscript", v) }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "字号比例"
                         from: 0.5; to: 2; step: 0.05; decimals: 2
-                        value: Number(settings.current.transcriptSizeRatio || 1)
+                        value: Number(page.store.current.transcriptSizeRatio || 1)
                         onEdited: v => page.setSlider("transcriptSizeRatio", v)
                     }
                 }
 
                 // ---------------- Shortcuts ----------------
                 PanelCard {
+                    store: page.store
                     Layout.fillWidth: true
                     visible: page.section === "shortcuts"
                     title: "快捷键提示"
                     resetKeys: ["showShortcuts", "shortcutsSizeRatio", "showShortcutsWithSingleLetters"]
-                    UiToggle { Layout.fillWidth: true; label: "显示快捷键"; checked: !!settings.current.showShortcuts; onToggled: v => settings.setCurrent("showShortcuts", v) }
+                    UiToggle { Layout.fillWidth: true; label: "显示快捷键"; checked: !!page.store.current.showShortcuts; onToggled: v => page.store.setCurrent("showShortcuts", v) }
                     UiSlider {
                         Layout.fillWidth: true
                         label: "大小比例"
                         from: 0.5; to: 2; step: 0.05; decimals: 2
-                        value: Number(settings.current.shortcutsSizeRatio || 1)
+                        value: Number(page.store.current.shortcutsSizeRatio || 1)
                         onEdited: v => page.setSlider("shortcutsSizeRatio", v)
                     }
-                    UiToggle { Layout.fillWidth: true; label: "显示单字母按键"; checked: !!settings.current.showShortcutsWithSingleLetters; onToggled: v => settings.setCurrent("showShortcutsWithSingleLetters", v) }
+                    UiToggle { Layout.fillWidth: true; label: "显示单字母按键"; checked: !!page.store.current.showShortcutsWithSingleLetters; onToggled: v => page.store.setCurrent("showShortcutsWithSingleLetters", v) }
                 }
 
                 // The old "playback speed" card lived here. It wrote `playbackSpeed`,
@@ -792,6 +835,7 @@ Item {
 
                 // ---------------- Layout ----------------
                 PanelCard {
+                    store: page.store
                     Layout.fillWidth: true
                     visible: page.section === "layout"
                     title: "布局"
@@ -813,6 +857,7 @@ Item {
 
                 // ---------------- Recording ----------------
                 PanelCard {
+                    store: page.store
                     Layout.fillWidth: true
                     visible: page.section === "record"
                     title: "录制与保存"
@@ -823,7 +868,7 @@ Item {
                         spacing: 8
                         Text {
                             Layout.fillWidth: true
-                            text: String(settings.current.recordingDirectory)
+                            text: String(page.store.current.recordingDirectory)
                             color: Theme.textDim
                             font.pixelSize: 11
                             elide: Text.ElideMiddle
@@ -858,6 +903,7 @@ Item {
 
                 // ---------------- Screenshot ----------------
                 PanelCard {
+                    store: page.store
                     Layout.fillWidth: true
                     visible: page.section === "screenshot"
                     title: "快捷截图"
@@ -869,8 +915,8 @@ Item {
                         Item { Layout.fillWidth: true }
                         UiField {
                             Layout.preferredWidth: 150
-                            text: String(settings.current.screenshotHotkey)
-                            onEditingFinished: settings.setCurrent("screenshotHotkey", text)
+                            text: String(page.store.current.screenshotHotkey)
+                            onEditingFinished: page.store.setCurrent("screenshotHotkey", text)
                         }
                     }
                     RowLayout {
@@ -878,7 +924,7 @@ Item {
                         spacing: 8
                         Text {
                             Layout.fillWidth: true
-                            text: String(settings.current.screenshotDirectory)
+                            text: String(page.store.current.screenshotDirectory)
                             color: Theme.textDim
                             font.pixelSize: 11
                             elide: Text.ElideMiddle
@@ -889,7 +935,7 @@ Item {
                         Layout.fillWidth: true
                         text: "立即截图"
                         tone: "primary"
-                        onClicked: screenshot.capture(settings.current)
+                        onClicked: screenshot.capture(page.store.current)
                     }
                     Text {
                         Layout.fillWidth: true
@@ -917,16 +963,16 @@ Item {
                     text: "保存为默认"
                     tone: "quiet"
                     onClicked: {
-                        const keys = Object.keys(settings.factory)
+                        const keys = Object.keys(page.store.factory)
                         for (let i = 0; i < keys.length; ++i)
-                            settings.setAsDefault(keys[i])
+                            page.store.setAsDefault(keys[i])
                     }
                 }
                 UiButton {
                     implicitWidth: 110
                     text: "恢复参考基线"
                     tone: "ghost"
-                    onClicked: settings.restoreAllFactory()
+                    onClicked: page.store.restoreAllFactory()
                 }
                 Item { Layout.fillWidth: true }
                 Text { text: "修改即时生效"; color: Theme.textFaint; font.pixelSize: 10 }

@@ -40,6 +40,7 @@ ExportController::~ExportController() {
 void ExportController::setProjectDirectory(const QString &directory) {
     if (projectDirectory_ == directory)
         return;
+    if (!busy_) reset();
     projectDirectory_ = directory;
     const QString next = directory.isEmpty() ? QString()
         : QDir(directory).filePath(QStringLiteral("composed.mp4"));
@@ -91,6 +92,7 @@ bool ExportController::start(const QString &outputPath, bool includeCursor,
     // The edit timeline, when the UI has one. Without it the export is the whole
     // recording in real time, which is exactly an identity timeline.
     options.timeline = timeline_;
+    options.focusOverride = focus_; options.settingsOverride = editingSettings_;
     options.shouldCancel = [this] { return cancelRequested_.load(); };
 
     const QString target = options.outputPath;

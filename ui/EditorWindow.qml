@@ -28,8 +28,8 @@ Window {
 
     width: 1280
     height: 860
-    minimumWidth: 720
-    minimumHeight: 480
+    minimumWidth: 1100
+    minimumHeight: 680
     title: session ? (session.dirty ? "• " : "") + session.title + " — 简库镜传"
         : "简库镜传 编辑器"
     color: Theme.windowBg
@@ -253,7 +253,7 @@ Window {
         title: "打开录制工程"
         acceptLabel: "打开"
         rejectLabel: "取消"
-        onAccepted: registry.openProject(selectedFolder.toString().replace(/^file:\/\//, ""), false)
+        onAccepted: registry.openProject(decodeURIComponent(selectedFolder.toString().replace(/^file:\/\//, "")), false)
     }
 
     // No Shortcut items for ⌘N/⌘O/⌘S/⌘W/⌘Z here.

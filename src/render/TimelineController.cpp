@@ -5,6 +5,16 @@
 
 #include <QDir>
 #include <QFileInfo>
+#include <QDateTime>
+#include <QGuiApplication>
+#include <QClipboard>
+#include <QMimeData>
+#include <QUuid>
+#include "../animation/AutomaticZoom.h"
+#include <cmath>
+#include <QUrl>
+#include <QUrlQuery>
+#include <QJsonArray>
 #include <algorithm>
 
 namespace Render {
@@ -23,9 +33,11 @@ QVariantList TimelineController::segments() const {
     if (!timeline_.valid())
         return list;
     double outputStart = 0.0;
+    int index = 0;
     for (const Project::Segment &segment : timeline_.segments()) {
         const double outputLength = segment.outputLengthMs();
         list.append(QVariantMap{
+            {QStringLiteral("id"), segment.id}, {QStringLiteral("index"), index++},
             {QStringLiteral("outputStartMs"), outputStart},
             {QStringLiteral("outputEndMs"), outputStart + outputLength},
             {QStringLiteral("sourceStartMs"), segment.sourceStartMs},
@@ -39,6 +51,93 @@ QVariantList TimelineController::segments() const {
         outputStart += outputLength;
     }
     return list;
+}
+
+std::vector<int> TimelineController::selectedIndices() const {
+    std::vector<int> indices;
+    for (int i = 0; i < int(timeline_.segments().size()); ++i)
+        if (selectedIds_.contains(timeline_.segments()[i].id)) indices.push_back(i);
+    return indices;
+}
+void TimelineController::pruneSelection() {
+    QStringList ids;
+    for (const auto &segment : timeline_.segments()) if (selectedIds_.contains(segment.id)) ids.append(segment.id);
+    selectedIds_ = ids;
+    if (!selectedFocusId_.isEmpty()) {
+        const auto fragments = focusSegments(); bool found = false;
+        for (const auto &v : fragments) if (v.toMap().value("id").toString() == selectedFocusId_) {
+            found = true; break;
+        }
+        if (!found) { selectedFocusId_.clear(); selectedFocusClip_ = -1; }
+    }
+    emit selectionChanged();
+}
+void TimelineController::clearSelection() {
+    selectedIds_.clear(); selectionAnchor_.clear(); selectedFocusId_.clear(); selectedFocusClip_ = -1; emit selectionChanged();
+}
+void TimelineController::selectSegment(int index, bool toggle, bool range) {
+    if (index < 0 || index >= int(timeline_.segments().size())) return;
+    selectedFocusId_.clear(); selectedFocusClip_ = -1;
+    const QString id = timeline_.segments()[index].id;
+    if (range && !selectionAnchor_.isEmpty()) {
+        int anchor = index;
+        for (int i = 0; i < int(timeline_.segments().size()); ++i) if (timeline_.segments()[i].id == selectionAnchor_) anchor = i;
+        selectedIds_.clear();
+        for (int i = std::min(anchor, index); i <= std::max(anchor, index); ++i) selectedIds_.append(timeline_.segments()[i].id);
+    } else if (toggle) {
+        if (selectedIds_.contains(id)) selectedIds_.removeAll(id); else selectedIds_.append(id);
+        selectionAnchor_ = id;
+    } else { selectedIds_ = QStringList{id}; selectionAnchor_ = id; }
+    emit selectionChanged();
+}
+
+QVariantList TimelineController::visibleTicks(double start, double end, double pixels) const {
+    QVariantList result;
+    if (!loaded_ || end <= start || pixels <= 0) return result;
+    const double step = TimelineGeometry::niceTickStepMs(end - start, pixels, 80);
+    if (step <= 0) return result;
+    for (double time = std::ceil(start / step) * step; time <= end + 1e-6 && result.size() < 200; time += step)
+        result.append(QVariantMap{{"timeMs", time}, {"label", TimelineGeometry::tickLabel(time, step)}});
+    return result;
+}
+QString TimelineController::thumbnailUrl(double sourceMs) const {
+    QUrl url(QStringLiteral("image://filmstrip/frame"));
+    QUrlQuery query;
+    query.addQueryItem(QStringLiteral("file"), sourceVideoPath_);
+    query.addQueryItem(QStringLiteral("time"), QString::number(std::max(0.0, std::round(sourceMs / 100) * 100)));
+    url.setQuery(query); return url.toString(QUrl::FullyEncoded);
+}
+
+void TimelineController::beginSnap(int excludeIndex, bool scrub) {
+    std::vector<double> targets{0, outputDurationMs()}, initial;
+    for (int i = 0; i < int(timeline_.segments().size()); ++i) {
+        const double start = timeline_.outputStartAt(i), end = start + timeline_.segments()[i].outputLengthMs();
+        if (i == excludeIndex) { initial = {start, end}; continue; }
+        targets.push_back(start); targets.push_back(end);
+    }
+    for (const auto &v : focusSegments()) {
+        const auto f = v.toMap(); targets.push_back(f.value("outputStartMs").toDouble()); targets.push_back(f.value("outputEndMs").toDouble());
+    }
+    if (!scrub) targets.push_back(playheadMs_);
+    magnet_.begin(targets, initial); emit snapChanged();
+}
+double TimelineController::snapTime(double time, double pixelsPerMs, bool bypass) {
+    const double framed = std::isfinite(time) ? TimelineGeometry::snapToFrame(time, frameDurationMs_) : 0;
+    const double result = magnet_.resolve(framed, pixelsPerMs, bypass);
+    emit snapChanged(); return result;
+}
+void TimelineController::endSnap() { magnet_.reset(); emit snapChanged(); }
+
+QVariantMap TimelineController::clipSourceBounds(int index) const {
+    if (index < 0 || index >= int(timeline_.segments().size())) return {};
+    const auto &clip = timeline_.segments()[index];
+    double lower = 0, upper = sourceDurationMs();
+    for (int i = 0; i < int(timeline_.segments().size()); ++i) if (i != index) {
+        const auto &other = timeline_.segments()[i];
+        if (other.sourceEndMs <= clip.sourceStartMs + 1e-6) lower = std::max(lower, other.sourceEndMs);
+        if (other.sourceStartMs >= clip.sourceEndMs - 1e-6) upper = std::min(upper, other.sourceStartMs);
+    }
+    return {{"lower", lower}, {"upper", upper}};
 }
 
 double TimelineController::outputRatio() const {
@@ -81,6 +180,7 @@ void TimelineController::setFrameRate(double fps) {
 }
 
 void TimelineController::setPlayheadMs(double ms) {
+    if (!std::isfinite(ms)) return;
     const double clamped = std::clamp(ms, 0.0, std::max(0.0, timeline_.outputDurationMs()));
     if (std::abs(clamped - playheadMs_) <= 1e-9)
         return;
@@ -102,6 +202,7 @@ double TimelineController::snappedPlayheadMs() const {
 }
 
 bool TimelineController::splitAtPlayhead() {
+    if (!selectedFocusId_.isEmpty()) return splitFocus();
     if (!timeline_.valid())
         return false;
     const double at = snappedPlayheadMs();
@@ -225,6 +326,12 @@ bool TimelineController::load(const QString &projectDirectory) {
     }
     projectDirectory_ = projectDirectory;
     projectCreatedAt_ = project.createdAt;
+    sourceVideoPath_ = QDir(projectDirectory).filePath(project.videoFile);
+    focus_ = project.zoomRanges;
+    recordedEvents_ = project.events;
+    appearance_ = project.settings;
+    historyKey_.clear();
+    clearSelection();
     timeline_ = Project::EditTimeline::whole(project.durationMs);
     undo_.clear();
     redo_.clear();
@@ -266,10 +373,12 @@ bool TimelineController::load(const QString &projectDirectory) {
 
 void TimelineController::clear() {
     timeline_ = Project::EditTimeline();
+    focus_.clear(); recordedEvents_.clear(); appearance_.clear(); historyKey_.clear();
     undo_.clear();
     redo_.clear();
     projectDirectory_.clear();
     projectCreatedAt_.clear();
+    sourceVideoPath_.clear(); clearSelection();
     savedSnapshot_.clear();
     loaded_ = false;
     playheadMs_ = 0.0;
@@ -286,7 +395,8 @@ QByteArray TimelineController::snapshot() const {
     // Compact, and only the timeline: the playhead is deliberately excluded. Moving
     // the playhead is not an edit, and folding it in would make every scrub mark the
     // project dirty.
-    return QJsonDocument(timeline_.toJson()).toJson(QJsonDocument::Compact);
+    return QJsonDocument(QJsonObject{{"timeline", timeline_.toJson()}, {"focus", Project::focusTrackJson(focus_)},
+        {"appearance", QJsonObject::fromVariantMap(appearance_)}}).toJson(QJsonDocument::Compact);
 }
 
 bool TimelineController::dirty() const {
@@ -301,7 +411,7 @@ bool TimelineController::save() {
         return false;
     }
     QString failure;
-    if (!Project::save(projectDirectory_, timeline_, playheadMs_, projectCreatedAt_, &failure)) {
+    if (!Project::save(projectDirectory_, timeline_, playheadMs_, projectCreatedAt_, &failure, &focus_, &appearance_)) {
         setError(failure);
         return false;
     }
@@ -322,11 +432,12 @@ bool TimelineController::apply(const QString &failureMessage, Change &&change) {
         setError(failureMessage + (next.error().isEmpty() ? QString() : QStringLiteral("：") + next.error()));
         return false;
     }
-    undo_.push_back(timeline_);
-    if (undo_.size() > kMaxHistory)
-        undo_.erase(undo_.begin());
-    redo_.clear();
+    if (QJsonDocument(next.toJson()).toJson(QJsonDocument::Compact) == QJsonDocument(timeline_.toJson()).toJson(QJsonDocument::Compact)) {
+        setError({}); return true;
+    }
+    pushHistory();
     timeline_ = next;
+    pruneSelection();
     setError(QString());
     // The output length may have changed, so the playhead can now be past the end
     // and the ruler's ticks are stale.
@@ -336,6 +447,82 @@ bool TimelineController::apply(const QString &failureMessage, Change &&change) {
     emit timelineChanged();
     emit dirtyChanged();
     return true;
+}
+
+bool TimelineController::deleteSelection() {
+    if (!selectedFocusId_.isEmpty()) return deleteFocus();
+    const auto indices = selectedIndices();
+    if (indices.empty()) { setError(QStringLiteral("请先选中要删除的片段")); return false; }
+    return apply(QStringLiteral("至少保留一个片段"), [indices](auto &timeline) { return timeline.removeSegments(indices); });
+}
+bool TimelineController::setSelectedSpeed(double rate) {
+    const auto indices = selectedIndices();
+    if (indices.empty()) return setSpeedAtPlayhead(rate);
+    return apply(QStringLiteral("片段变速失败"), [indices, rate](auto &timeline) {
+        for (auto it = indices.rbegin(); it != indices.rend(); ++it) {
+            const double start = timeline.outputStartAt(*it);
+            const double end = start + timeline.segments()[*it].outputLengthMs();
+            if (!timeline.setSpeed(start, end, rate)) return false;
+        }
+        return true;
+    });
+}
+bool TimelineController::reorderSelection(int insertionIndex) {
+    const auto indices = selectedIndices();
+    if (indices.empty() || insertionIndex < 0 || insertionIndex > int(timeline_.segments().size())) return false;
+    const double source = timeline_.sourceTimeAt(playheadMs_);
+    const bool ok = apply(QStringLiteral("移动片段失败"), [indices, insertionIndex](auto &timeline) {
+        const QJsonObject original = timeline.toJson();
+        QJsonArray kept, moved;
+        const QJsonArray items = original.value("segments").toArray();
+        int before = 0;
+        for (int i = 0; i < items.size(); ++i) {
+            if (std::find(indices.begin(), indices.end(), i) != indices.end()) { moved.append(items[i]); if (i < insertionIndex) ++before; }
+            else kept.append(items[i]);
+        }
+        const int position = std::clamp(insertionIndex - before, 0, int(kept.size()));
+        QJsonArray ordered;
+        for (int i = 0; i <= kept.size(); ++i) {
+            if (i == position) for (const auto &value : moved) ordered.append(value);
+            if (i < kept.size()) ordered.append(kept[i]);
+        }
+        QJsonObject next = original; next["segments"] = ordered;
+        timeline = Project::EditTimeline::fromJson(next, timeline.sourceDurationMs(), nullptr);
+        return timeline.valid();
+    });
+    if (ok) setPlayheadMs(timeline_.outputTimeAt(source));
+    return ok;
+}
+bool TimelineController::trimClip(int index, double start, double end) {
+    if (index < 0 || index >= int(timeline_.segments().size())) return false;
+    const auto clip = timeline_.segments()[index];
+    const double origin = timeline_.outputStartAt(index);
+    const double sourceStart = clip.sourceStartMs + (start - origin) * clip.speed;
+    const double sourceEnd = clip.sourceStartMs + (end - origin) * clip.speed;
+    return apply(QStringLiteral("片段边界不能越过其他片段，且至少保留 100 毫秒"), [=](auto &timeline) {
+        return timeline.trimSegment(index, sourceStart, sourceEnd);
+    });
+}
+bool TimelineController::retimeClip(int index, double duration) {
+    if (index < 0 || index >= int(timeline_.segments().size()) || !std::isfinite(duration) || duration < 100) return false;
+    const auto &clip = timeline_.segments()[index];
+    const double rate = std::clamp(clip.sourceLengthMs() / duration, 0.1, 100.0);
+    const double start = timeline_.outputStartAt(index), end = start + clip.outputLengthMs();
+    return setSpeed(start, end, rate);
+}
+bool TimelineController::mergeClip(int index, bool restoreGap) {
+    return apply(QStringLiteral("仅能合并同速、源素材连续的相邻片段"), [=](auto &timeline) { return timeline.mergeNext(index, restoreGap); });
+}
+bool TimelineController::rippleAtPlayhead(bool before) {
+    int index = -1;
+    const double time = snappedPlayheadMs();
+    for (int i = 0; i < int(timeline_.segments().size()); ++i) {
+        const double start = timeline_.outputStartAt(i), end = start + timeline_.segments()[i].outputLengthMs();
+        if (time >= start && time < end) { index = i; break; }
+    }
+    if (index < 0) return false;
+    const double start = timeline_.outputStartAt(index), end = start + timeline_.segments()[index].outputLengthMs();
+    return trimClip(index, before ? time : start, before ? end : time);
 }
 
 bool TimelineController::splitAt(double outputMs) {
@@ -373,9 +560,9 @@ void TimelineController::reset() {
         return;
     // Reset collapses the splits too, which is what "复原" means to a user: back to
     // the recording as it was captured.
-    undo_.push_back(timeline_);
-    redo_.clear();
+    pushHistory();
     timeline_ = Project::EditTimeline::whole(timeline_.sourceDurationMs());
+    clearSelection();
     setError(QString());
     clampPlayhead();
     emit dirtyChanged();
@@ -385,31 +572,45 @@ void TimelineController::reset() {
 }
 
 void TimelineController::undo() {
-    if (undo_.empty())
-        return;
-    redo_.push_back(timeline_);
-    timeline_ = undo_.back();
-    undo_.pop_back();
-    setError(QString());
-    clampPlayhead();
-    emit changed();
-    emit rulerChanged();
-    emit timelineChanged();
-    emit dirtyChanged();
+    if (undo_.empty()) return;
+    redo_.push_back(state()); const auto previous = undo_.back(); undo_.pop_back();
+    restoreState(previous);
 }
-
 void TimelineController::redo() {
-    if (redo_.empty())
-        return;
-    undo_.push_back(timeline_);
-    timeline_ = redo_.back();
-    redo_.pop_back();
-    setError(QString());
-    clampPlayhead();
-    emit changed();
-    emit rulerChanged();
-    emit timelineChanged();
-    emit dirtyChanged();
+    if (redo_.empty()) return;
+    undo_.push_back(state()); const auto next = redo_.back(); redo_.pop_back();
+    restoreState(next);
+}
+void TimelineController::pushHistory(const QString &key) {
+    const qint64 now = QDateTime::currentMSecsSinceEpoch();
+    if (key.isEmpty() || key != historyKey_ || now - historyTime_ > 500 || !redo_.empty() || undo_.empty()) {
+        undo_.push_back(state());
+        if (undo_.size() > kMaxHistory) undo_.erase(undo_.begin());
+    }
+    historyKey_ = key; historyTime_ = now; redo_.clear();
+}
+void TimelineController::notifyEdit(bool changedFocus) {
+    pruneSelection(); setError({}); clampPlayhead();
+    emit changed(); emit rulerChanged(); emit timelineChanged(); emit dirtyChanged();
+    if (changedFocus) emit focusChanged();
+}
+void TimelineController::restoreState(const State &s) {
+    const bool changedFocus = Project::focusTrackJson(focus_) != Project::focusTrackJson(s.focus);
+    const bool changedAppearance = appearance_ != s.appearance;
+    timeline_ = s.timeline; focus_ = s.focus; appearance_ = s.appearance; historyKey_.clear();
+    selectedIds_ = s.primarySelection; selectedFocusId_ = s.focusSelection; selectedFocusClip_ = s.focusClip; selectionAnchor_ = s.anchor;
+    if (changedAppearance) emit appearanceRestored(appearance_);
+    notifyEdit(changedFocus);
+}
+void TimelineController::initializeAppearance(const QVariantMap &map) {
+    appearance_ = map; savedSnapshot_ = snapshot();
+}
+void TimelineController::recordAppearance(const QVariantMap &map) {
+    if (!loaded_ || appearance_ == map) return;
+    QStringList changedKeys;
+    for (auto i = map.constBegin(); i != map.constEnd(); ++i) if (appearance_.value(i.key()) != i.value()) changedKeys.append(i.key());
+    pushHistory("appearance:" + changedKeys.join(',')); appearance_ = map;
+    emit changed(); emit selectionChanged(); emit dirtyChanged();
 }
 
 } // namespace Render

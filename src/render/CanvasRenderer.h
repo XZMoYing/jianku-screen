@@ -47,11 +47,13 @@ struct CanvasStyle {
     double shadowAngle = 90.0;
     double shadowDistance = 0.0;
     double shadowBlur = 0.0;
+    int shadowQuality = 0; // 0 derives the pass count from the unscaled blur.
 };
 
 // Reads a settings map into a style. `backgroundRoot` is searched for a built-in
 // background name; pass an empty string when the caller resolves the path itself.
 CanvasStyle canvasStyleFromMap(const QVariantMap &settings, const QString &backgroundRoot = {});
+QString bundledBackgroundRoot();
 
 // Everything a canvas needs, computed once.
 struct CanvasPlan {

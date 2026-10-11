@@ -1,0 +1,69 @@
+{
+  "createdAt": "2026-10-10T23:04:35.475520+08:00",
+  "environment": {
+    "macOS": "14.7.4",
+    "architecture": "arm64",
+    "qt": "6.11.2"
+  },
+  "source": {
+    "baseCommit": "bb2bb57b6e702d32fe2dc66e0cdac237cdecfe80",
+    "workingTreeChanges": true,
+    "hashesFile": "source-hashes.json"
+  },
+  "package": {
+    "version": "0.1.1",
+    "file": "build-release/简库镜传 2026.10.10.1.dmg",
+    "sha256": "244172d82f24e6af348e266f75593562e22b39a51cfa183891c8e09637b9a682",
+    "designatedRequirement": "identifier \"com.jianku.screen\" and certificate leaf = H\"ef95db66644426e05fb46fff7d413aee222fe764\"",
+    "deepStrictSignatureValid": true,
+    "bundledFFmpegRuns": true,
+    "isolatedDependencyCheck": "passed; expected offscreen platform abort, not a Cocoa GUI startup test"
+  },
+  "checks": {
+    "ctest": {
+      "passed": 17,
+      "total": 17,
+      "log": "ctest.log"
+    },
+    "editorWindow": {
+      "passed": true,
+      "fixture": "synthetic video; not user footage",
+      "details": "editor-result.json"
+    },
+    "nativeCapture": {
+      "passed": false,
+      "stage": "permission prerequisite",
+      "screenPreflight": true,
+      "inputAuthorized": false,
+      "microphoneAuthorized": false,
+      "details": "native-result.json"
+    },
+    "existingRecordingComposeSmoke": {
+      "passed": true,
+      "videoFrames": 6,
+      "canvas": [
+        640,
+        360
+      ],
+      "durationSeconds": 0.1,
+      "audioPresent": true,
+      "privateMaterialStoredHere": false
+    }
+  },
+  "references": {
+    "dogscCommit": "5d8879191b9cf7f7b70239ad8b13e61235c8b045",
+    "officialVersion": "3.7.5-4595",
+    "officialDmgSha256": "ae9a1cdcd7ab1df2a84e5e9fbb7b6e55d96c106dad1c6fa5930ca78fa3e6cb2b",
+    "officialAsarSha256": "fc9e581dc133c47607206ea118792af5feff320e4e8180c97b321f950cee66bf",
+    "reaVersion": "6.3.0",
+    "reaWholePackageAnalysis": "not completed; integrity mismatch then record-and-continue parse terminated"
+  },
+  "notAcceptedAsComplete": [
+    "native screenshot/record-stop/automatic editor flow",
+    "full frame-by-frame reference equivalence",
+    "live GPU motion blur",
+    "multi-display and meeting sharing",
+    "long recording performance and audio sync",
+    "thumbnail/waveform/editable camera tracks"
+  ]
+}

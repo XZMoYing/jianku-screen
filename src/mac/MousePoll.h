@@ -7,6 +7,7 @@ struct MouseSample {
     double x = 0.0; // global points, origin bottom-left (AppKit)
     double y = 0.0;
     bool pressed = false;
+    bool interactionActivity = false; // scroll / key-down counter changed; no key contents
     unsigned long long cursorIdentity = 0; // cheap change token for the current cursor
 };
 

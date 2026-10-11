@@ -7,12 +7,14 @@
 #include <QVariantList>
 #include <QVariantMap>
 #include <memory>
+#include <optional>
 
 class VideoFrameStore;
 
 class MacCapture final : public QObject {
     Q_OBJECT
     Q_PROPERTY(QStringList displayNames READ displayNames NOTIFY displayNamesChanged)
+    Q_PROPERTY(QVariantList displayIds READ displayIds NOTIFY displayNamesChanged)
     // Refresh rate of each display, in the same order as displayNames. 0 means the
     // system did not report one. Kept separate from the label because the export
     // settings need the number, not the text.
@@ -25,6 +27,8 @@ class MacCapture final : public QObject {
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
     Q_PROPERTY(bool recording READ recording NOTIFY recordingChanged)
     Q_PROPERTY(bool recordingPaused READ recordingPaused NOTIFY recordingPausedChanged)
+    Q_PROPERTY(bool recordingFinalizing READ recordingFinalizing NOTIFY recordingFinalizingChanged)
+    Q_PROPERTY(QString recordingProjectPath READ recordingProjectPath NOTIFY recordingStatusChanged)
     Q_PROPERTY(QString recordingStatus READ recordingStatus NOTIFY recordingStatusChanged)
     Q_PROPERTY(QString lastRecordingPath READ lastRecordingPath NOTIFY lastRecordingPathChanged)
     Q_PROPERTY(QString lastProjectPath READ lastProjectPath NOTIFY lastRecordingPathChanged)
@@ -59,6 +63,8 @@ public:
     ~MacCapture() override;
 
     QStringList displayNames() const { return displayNames_; }
+    QVariantList displayIds() const { return displayIds_; }
+    void updateCaptureExclusions();
     QVariantList displayRefreshRates() const { return displayRefreshRates_; }
     QVariantList windowSources() const { return windowSources_; }
     QString status() const { return status_; }
@@ -66,6 +72,8 @@ public:
     bool busy() const { return busy_; }
     bool recording() const { return recording_; }
     bool recordingPaused() const { return recordingPaused_; }
+    bool recordingFinalizing() const { return recordingFinalizing_; }
+    QString recordingProjectPath() const { return recordingProjectPath_; }
     QString recordingStatus() const { return recordingStatus_; }
     QString lastRecordingPath() const { return lastRecordingPath_; }
     QString lastProjectPath() const { return lastProjectPath_; }
@@ -122,6 +130,7 @@ public:
     Q_INVOKABLE void openScreenRecordingSettings();
     Q_INVOKABLE void openInputMonitoringSettings();
     Q_INVOKABLE void openMicrophoneSettings();
+    Q_INVOKABLE void requestMicrophoneAccess();
     Q_INVOKABLE bool requestInputMonitoringAccess();
     Q_INVOKABLE void revealAppInFinder();
     Q_INVOKABLE QString appBundlePath() const;
@@ -138,6 +147,9 @@ signals:
     void busyChanged();
     void recordingChanged();
     void recordingPausedChanged();
+    void recordingFinalizingChanged();
+    void recordingReady(const QString &directory);
+    void recordingFailed(const QString &message);
     void recordingStatusChanged();
     void lastRecordingPathChanged();
     void screenAuthorizedChanged();
@@ -155,8 +167,10 @@ private:
     // One code path for every source kind. startDisplay/startWindow/startRegion
     // only build a CaptureSource; everything below is source-agnostic.
     void startSource(const Capture::CaptureSource &source);
+    void startRecordingSource(const Capture::CaptureSource &source, const QVariantMap &settings);
 
     QStringList displayNames_;
+    QVariantList displayIds_;
     QVariantList displayRefreshRates_;
     QVariantList windowSources_;
     QString status_ = QStringLiteral("正在准备屏幕来源…");
@@ -168,6 +182,8 @@ private:
     bool recording_ = false;
     bool recordingPaused_ = false;
     bool recordingFinalizing_ = false;
+    std::optional<Capture::CaptureSource> pendingRecordingSource_;
+    QString recordingProjectPath_;
     int activeDisplayIndex_ = -1;
     // The source the running stream is capturing. Recorded verbatim in
     // project.json so a project always states what it was made from.
@@ -187,6 +203,7 @@ private:
     void setBusy(bool value);
     void setRecording(bool value);
     void setRecordingPaused(bool value);
+    void setRecordingFinalizing(bool value);
     void setRecordingStatus(const QString &value);
     void setLastRecordingPath(const QString &value);
     void reportError(const QString &value);

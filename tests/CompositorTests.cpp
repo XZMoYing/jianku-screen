@@ -274,6 +274,11 @@ int main(int argc, char **argv) {
         require(close(context.layout().contentRect.width(), 800.0), "content keeps aspect ratio");
         require(close(context.layout().contentRect.center().x(), context.width() / 2.0),
             "content stays centred");
+        const ComposeContext smaller = makeComposeContext(project, {}, {}, 250);
+        require(smaller.valid && close(smaller.settings.canvas.radius, context.settings.canvas.radius / 2),
+            "a smaller preview scales corner radius with the canvas");
+        require(close(smaller.settings.canvas.shadowDistance, context.settings.canvas.shadowDistance / 2),
+            "a smaller export keeps shadow proportions");
 
         // --- cursor shape selection ---------------------------------------
         {

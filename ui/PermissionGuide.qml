@@ -13,7 +13,7 @@ Item {
     visible: opened
     z: 1000
 
-    onOpenedChanged: if (opened) kind = capture.permissionIssueKind || "screen"
+    onOpenedChanged: if (opened) { capture.refreshPermissionState(); kind = capture.permissionIssueKind || "screen" }
 
     readonly property var pages: [
         {
@@ -50,7 +50,7 @@ Item {
                 "3. 若不需要录讲解声，改到设置页 → 音频，打开「静音麦克风」。"
             ],
             primaryText: "打开麦克风设置",
-            primaryAction: function () { capture.openMicrophoneSettings() }
+            primaryAction: function () { capture.requestMicrophoneAccess(); capture.openMicrophoneSettings() }
         }
     ]
 
@@ -308,9 +308,11 @@ Item {
                         capture.refreshPermissionState()
                         if (guide.kind === "input") capture.requestInputMonitoringAccess()
                         capture.refreshScreenAuthorization()
-                        if (guide.kind === "screen" && capture.screenAuthorized) {
+                        const granted = guide.kind === "screen" ? capture.screenAuthorized
+                            : guide.kind === "input" ? capture.inputMonitoringAuthorized : capture.microphoneAuthorized
+                        if (granted) {
                             guide.opened = false
-                            capture.refreshDisplays()
+                            if (guide.kind === "screen") capture.refreshDisplays()
                         } else {
                             hint.text = guide.kind === "screen"
                                 ? "仍未检测到授权。请在系统设置里打开本应用右侧的开关；若已打开还是不行，点「重置并重新授权」再「重启应用」。"

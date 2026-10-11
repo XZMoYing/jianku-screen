@@ -263,6 +263,33 @@ int main() {
             }
         }
 
+        {
+            auto timeline = EditTimeline::whole(10000);
+            require(timeline.split(3000) && timeline.split(7000), "three source clips");
+            const QString movedId = timeline.segments()[2].id;
+            require(timeline.moveSegment(2, 0), "source spans may be reordered");
+            require(!timeline.isSourceOrdered(), "authored order is distinct from source order");
+            require(close(timeline.sourceTimeAt(500), 7500), "output starts with moved source clip");
+            require(close(timeline.sourceTimeAt(3500), 500), "backward cut maps to original source");
+            require(timeline.segments()[0].id == movedId, "identity survives reorder");
+            requireRoundTrip(timeline, "reordered source mapping");
+            QString error;
+            const auto reopened = EditTimeline::fromJson(timeline.toJson(), 10000, &error);
+            require(reopened.valid() && close(reopened.sourceTimeAt(3500), 500), "version two round trip retains authored order");
+            const auto before = timeline.toJson();
+            require(!timeline.trimSegment(0, 6500, 10000), "trim cannot overlap source owned by another clip");
+            require(timeline.toJson() == before, "rejected trim leaves original untouched");
+            require(timeline.trimSegment(0, 7500, 9500), "trim one reordered clip");
+            require(timeline.removeSegments({1}), "delete selected clip in authored order");
+            require(!timeline.removeSegments({0, 1}), "cannot delete entire media timeline");
+            auto legacy = before; legacy["schemaVersion"] = 1;
+            require(!EditTimeline::fromJson(legacy, 10000, &error).valid(), "legacy schema rejects reordered source as before");
+            auto gap = EditTimeline::whole(10000);
+            require(gap.remove(3000, 5000), "make removed source gap");
+            require(!gap.mergeNext(0), "merge does not silently restore deleted media");
+            require(gap.mergeNext(0, true) && gap.isIdentity(), "explicit restore repairs gap");
+        }
+
         std::cout << "edit timeline checks passed\n";
         return 0;
     } catch (const std::exception &error) {

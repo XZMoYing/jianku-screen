@@ -33,6 +33,14 @@ EditorSessionRegistry::EditorSessionRegistry(QQmlEngine *engine, QObject *parent
     refreshRecentProjects();
 }
 
+EditorSessionRegistry::~EditorSessionRegistry() {
+    // Destroy views while their session/context objects are still alive. The
+    // windows created through QQmlComponent are not engine root objects.
+    QList<QQuickWindow *> windows;
+    for (const auto &state : windows_) if (state.window) windows.append(state.window);
+    for (auto *window : windows) { disconnect(window, nullptr, this, nullptr); delete window; }
+}
+
 void EditorSessionRegistry::bump() {
     ++revision_;
     emit revisionChanged();
@@ -218,8 +226,8 @@ QQuickWindow *EditorSessionRegistry::newWindow() {
 void EditorSessionRegistry::attachWindow(QQuickWindow *window) {
     // Closing a window must not destroy the sessions it showed: a session can be open
     // in another window, and its edit may be unsaved. Only the tab list is dropped.
-    connect(window, &QObject::destroyed, this, [this, window] {
-        const int id = window->property("editorWindowId").toInt();
+    const int id = window->property("editorWindowId").toInt();
+    connect(window, &QObject::destroyed, this, [this, id] {
         windows_.remove(id);
         if (activeWindowId_ == id) {
             // QHash has no "first key": any surviving window will do, because the next

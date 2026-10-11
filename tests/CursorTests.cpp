@@ -93,6 +93,27 @@ int main(int argc, char **argv) {
             require(close(e.rotationAt(400.0), 20.0), "rotation clamp");
         }
 
+        // Fast movement and a 400 ms history-window rollover change the rotation
+        // target abruptly, but the displayed rotateZ must keep its velocity.
+        {
+            EventTrack moves;
+            moves.setEvents({{0, 0, 0, InputKind::Move}, {100, 2000, 0, InputKind::Move}});
+            CursorEngine e;
+            e.setTrack(moves);
+            e.setSettings(settings);
+            e.advanceTo(0);
+            double previous = 0;
+            double peak = 0;
+            for (int t = 10; t <= 1600; t += 10) {
+                const double angle = e.advanceTo(t).rotationDeg;
+                require(std::abs(angle - previous) < 3, "displayed angle never snaps on target rollover");
+                if (t == 500) require(angle > 10, "history-window rollover preserves displayed tilt");
+                peak = std::max(peak, angle);
+                previous = angle;
+            }
+            require(peak > 10 && std::abs(previous) < .05, "tilt rises and settles naturally");
+        }
+
         // Click scale target: within 130 ms of a mouse-down, or before a mouse-up.
         require(close(engine.clickScaleTargetAt(1900.0), 0.8), "click scale lookahead");
         require(close(engine.clickScaleTargetAt(1800.0), 1.0), "click scale outside lookahead");

@@ -1,13 +1,18 @@
 #pragma once
 
 #include "../project/EditTimeline.h"
+#include "../project/FocusTrack.h"
+#include "../animation/InputEvent.h"
+#include <QSizeF>
 
 #include "TimelineGeometry.h"
+#include "TimelineMagnet.h"
 
 #include <QByteArray>
 #include <QObject>
 #include <QVariantList>
 #include <QString>
+#include <QStringList>
 #include <vector>
 
 namespace Render {
@@ -49,6 +54,13 @@ class TimelineController final : public QObject {
     // length changes. Done here rather than in QML so the same arithmetic is tested.
     Q_PROPERTY(QVariantList rulerTicks READ rulerTicks NOTIFY rulerChanged)
     Q_PROPERTY(QString playheadLabel READ playheadLabel NOTIFY playheadChanged)
+    Q_PROPERTY(QStringList selectedIds READ selectedIds NOTIFY selectionChanged)
+    Q_PROPERTY(int selectedCount READ selectedCount NOTIFY selectionChanged)
+    Q_PROPERTY(QString sourceVideoPath READ sourceVideoPath NOTIFY changed)
+    Q_PROPERTY(QVariantList focusSegments READ focusSegments NOTIFY changed)
+    Q_PROPERTY(QString selectedFocusId READ selectedFocusId NOTIFY selectionChanged)
+    Q_PROPERTY(QVariantMap selectedFocus READ selectedFocus NOTIFY selectionChanged)
+    Q_PROPERTY(double snapTargetMs READ snapTargetMs NOTIFY snapChanged)
 
 public:
     explicit TimelineController(QObject *parent = nullptr);
@@ -71,6 +83,45 @@ public:
     double playheadRatio() const;
     QString playheadLabel() const;
     QVariantList rulerTicks() const;
+    QStringList selectedIds() const { return selectedIds_; }
+    int selectedCount() const { return selectedIds_.size(); }
+    QString sourceVideoPath() const { return sourceVideoPath_; }
+    QVariantList focusSegments() const;
+    QVariantMap selectedFocus() const;
+    QString selectedFocusId() const { return selectedFocusId_; }
+    const std::vector<Project::FocusClip> &focusRanges() const { return focus_; }
+    const QVariantMap &appearance() const { return appearance_; }
+    Q_INVOKABLE void selectFocus(const QString &id, int clipIndex = -1);
+    Q_INVOKABLE bool createFocus(double startMs, double endMs);
+    Q_INVOKABLE bool addFocusAtPlayhead();
+    Q_INVOKABLE bool updateFocus(const QString &id, const QVariantMap &properties);
+    Q_INVOKABLE bool setFocusTiming(const QString &id, int clipIndex, double startMs, double endMs);
+    Q_INVOKABLE QVariantMap focusBounds(const QString &id, int clipIndex) const;
+    Q_INVOKABLE bool deleteFocus();
+    Q_INVOKABLE bool splitFocus();
+    Q_INVOKABLE bool regenerateFocus();
+    Q_INVOKABLE bool copyFocus();
+    Q_INVOKABLE bool pasteFocus(double outputMs = -1, bool attributesOnly = false);
+    Q_INVOKABLE void beginFocusSnap(const QString &id = {}, int clipIndex = -1);
+    Q_INVOKABLE double snapFocusTime(double startMs, double pixelsPerMs, double durationMs, bool bypass = false);
+    void initializeAppearance(const QVariantMap &map);
+    void recordAppearance(const QVariantMap &map);
+    Q_INVOKABLE void selectSegment(int index, bool toggle = false, bool range = false);
+    Q_INVOKABLE void clearSelection();
+    Q_INVOKABLE bool deleteSelection();
+    Q_INVOKABLE bool setSelectedSpeed(double rate);
+    Q_INVOKABLE bool reorderSelection(int insertionIndex);
+    Q_INVOKABLE bool trimClip(int index, double outputStartMs, double outputEndMs);
+    Q_INVOKABLE bool retimeClip(int index, double outputDurationMs);
+    Q_INVOKABLE bool mergeClip(int index, bool restoreGap = false);
+    Q_INVOKABLE bool rippleAtPlayhead(bool before);
+    Q_INVOKABLE QVariantMap clipSourceBounds(int index) const;
+    Q_INVOKABLE QVariantList visibleTicks(double startMs, double endMs, double widthPixels) const;
+    Q_INVOKABLE QString thumbnailUrl(double sourceMs) const;
+    double snapTargetMs() const { return magnet_.target(); }
+    Q_INVOKABLE void beginSnap(int excludeIndex = -1, bool scrub = false);
+    Q_INVOKABLE double snapTime(double timeMs, double pixelsPerMs, bool bypass = false);
+    Q_INVOKABLE void endSnap();
 
     // Frame duration used for snapping, from the export frame rate. 0 disables
     // snapping, which is what an unknown rate should do.
@@ -122,8 +173,12 @@ signals:
     void dirtyChanged();
     void playheadChanged();
     void rulerChanged();
+    void selectionChanged();
+    void snapChanged();
     // Emitted for every successful change, so the exporter can pick the timeline up.
     void timelineChanged();
+    void focusChanged();
+    void appearanceRestored(const QVariantMap &appearance);
 
 private:
     // Applies `change` and records a history entry only when it succeeds and
@@ -137,12 +192,30 @@ private:
     QByteArray snapshot() const;
     // Clamps the playhead to the timeline and announces it only when it moved.
     void clampPlayhead();
+    std::vector<int> selectedIndices() const;
+    void pruneSelection();
 
     Project::EditTimeline timeline_;
-    std::vector<Project::EditTimeline> undo_;
-    std::vector<Project::EditTimeline> redo_;
+    struct State { Project::EditTimeline timeline; std::vector<Project::FocusClip> focus; QVariantMap appearance; QStringList primarySelection; QString focusSelection; int focusClip = -1; QString anchor; };
+    State state() const { return {timeline_, focus_, appearance_, selectedIds_, selectedFocusId_, selectedFocusClip_, selectionAnchor_}; }
+    void restoreState(const State &state);
+    void pushHistory(const QString &coalesceKey = {});
+    bool applyFocus(std::vector<Project::FocusClip> next, const QString &coalesceKey = {});
+    void notifyEdit(bool focusChanged = false);
+    std::vector<State> undo_, redo_;
+    std::vector<Project::FocusClip> focus_;
+    std::vector<Animation::InputEvent> recordedEvents_;
+    QVariantMap appearance_;
+    QString selectedFocusId_;
+    int selectedFocusClip_ = -1;
+    QString historyKey_;
+    qint64 historyTime_ = 0;
     QString projectDirectory_;
     QString projectCreatedAt_;
+    QString sourceVideoPath_;
+    QStringList selectedIds_;
+    QString selectionAnchor_;
+    TimelineMagnet magnet_;
     // The timeline as last loaded or saved, serialised. Comparing against this is what
     // makes "undo back to where I started" clean again, which a boolean flag cannot do.
     QByteArray savedSnapshot_;

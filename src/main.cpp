@@ -10,6 +10,8 @@
 #include "render/ExportController.h"
 #include "render/TimelineController.h"
 #include "render/VideoSurface.h"
+#include "render/RecordingPlayer.h"
+#include "render/FilmstripProvider.h"
 #include "settings/BackgroundLibrary.h"
 #include "settings/BrandAssets.h"
 #include "settings/ScreenList.h"
@@ -28,6 +30,9 @@
 #include <QSGRendererInterface>
 #include <QTimer>
 #include <QSystemTrayIcon>
+#ifdef JIANKU_UI_VERIFICATION
+#include "../tests/EditorVerification.h"
+#endif
 
 int main(int argc, char *argv[]) {
     QQuickWindow::setGraphicsApi(QSGRendererInterface::Metal);
@@ -41,6 +46,7 @@ int main(int argc, char *argv[]) {
     app.setQuitOnLastWindowClosed(false);
 
     qmlRegisterType<VideoSurface>("Jianku.Screen", 1, 0, "VideoSurface");
+    qmlRegisterType<Render::RecordingPlayer>("Jianku.Screen", 1, 0, "RecordingPlayer");
     MacCapture capture;
     SettingsStore settings;
     BackgroundLibrary backgrounds;
@@ -48,11 +54,14 @@ int main(int argc, char *argv[]) {
     AnimationDriver anim;
     QuickScreenshot screenshot;
     GlobalHotkey hotkey;
+    GlobalHotkey focusHotkey;
     Render::ExportController exporter;
     Render::CanvasPreview canvasPreview;
+    Render::CanvasPreview audienceCanvasPreview(nullptr, "audienceCanvas");
     BrandAssets brand;
     Render::TimelineController timeline;
     QQmlApplicationEngine engine;
+    engine.addImageProvider(QStringLiteral("filmstrip"), new Render::FilmstripProvider);
     engine.rootContext()->setContextProperty(QStringLiteral("capture"), &capture);
     engine.rootContext()->setContextProperty(QStringLiteral("settings"), &settings);
     engine.rootContext()->setContextProperty(QStringLiteral("backgrounds"), &backgrounds);
@@ -60,10 +69,13 @@ int main(int argc, char *argv[]) {
     engine.rootContext()->setContextProperty(QStringLiteral("anim"), &anim);
     // addImageProvider takes ownership; allocate on the heap.
     engine.addImageProvider(QStringLiteral("cursor"), new CursorImageProvider(&anim));
+    engine.addImageProvider(QStringLiteral("canvas"), new Render::CanvasImageProvider(&canvasPreview));
+    engine.addImageProvider(QStringLiteral("audienceCanvas"), new Render::CanvasImageProvider(&audienceCanvasPreview));
     engine.rootContext()->setContextProperty(QStringLiteral("screenshot"), &screenshot);
     engine.rootContext()->setContextProperty(QStringLiteral("hotkey"), &hotkey);
     engine.rootContext()->setContextProperty(QStringLiteral("exporter"), &exporter);
     engine.rootContext()->setContextProperty(QStringLiteral("canvasPreview"), &canvasPreview);
+    engine.rootContext()->setContextProperty(QStringLiteral("audienceCanvasPreview"), &audienceCanvasPreview);
     engine.rootContext()->setContextProperty(QStringLiteral("timeline"), &timeline);
     engine.rootContext()->setContextProperty(QStringLiteral("brand"), &brand);
     // The editor's session registry is the one new root-context object: it is shared by
@@ -72,6 +84,11 @@ int main(int argc, char *argv[]) {
     // not through the root context, so no per-window state leaks into the engine.
     Render::EditorSessionRegistry registry(&engine);
     engine.rootContext()->setContextProperty(QStringLiteral("registry"), &registry);
+    auto updateCaptureSurfaces = [&] {
+        QTimer::singleShot(200, &capture, &MacCapture::updateCaptureExclusions);
+    };
+    QObject::connect(&registry, &Render::EditorSessionRegistry::tabsChanged, &capture, updateCaptureSurfaces);
+    QObject::connect(&capture, &MacCapture::runningChanged, &capture, updateCaptureSurfaces);
     // The exporter always targets the project the user just recorded, and exports
     // the edit timeline as it stands. The two are wired together here so an export
     // started from the UI can never use a stale timeline: the controller pushes
@@ -95,6 +112,8 @@ int main(int argc, char *argv[]) {
         registry.setRecordingDirectory(settings.current().value("recordingDirectory").toString());
     };
     QObject::connect(&settings, &SettingsStore::currentChanged, &capture, refreshRecent);
+    QObject::connect(&app, &QGuiApplication::applicationStateChanged, &capture,
+        [&](Qt::ApplicationState state) { if (state == Qt::ApplicationActive) capture.refreshPermissionState(); });
     refreshRecent();
     if (capture.lastProjectPath().isEmpty())
         capture.openProject(RecentProjects::mostRecent(RecentProjects::recordingDirectory(
@@ -119,6 +138,14 @@ int main(int argc, char *argv[]) {
         hotkey.setShortcut(settings.current().value("screenshotHotkey").toString());
     });
     hotkey.setShortcut(settings.current().value("screenshotHotkey").toString());
+    auto registerFocusHotkey = [&] {
+        focusHotkey.setShortcut(settings.current().value("presentationFocusHotkey").toString());
+    };
+    registerFocusHotkey();
+    QObject::connect(&settings, &SettingsStore::currentChanged, &focusHotkey, registerFocusHotkey);
+    QObject::connect(&focusHotkey, &GlobalHotkey::activated, &anim, [&] {
+        if (capture.running() && !capture.recording()) anim.toggleManualZoom();
+    });
     QObject::connect(&hotkey, &GlobalHotkey::activated, &screenshot, [&] {
         screenshot.capture(settings.current());
     });
@@ -163,11 +190,24 @@ int main(int argc, char *argv[]) {
     tray.setIcon(trayIcon);
     tray.setToolTip(QStringLiteral("简库镜传 · 常驻截图"));
     tray.show();
+    const int openIndex = app.arguments().indexOf(QStringLiteral("--open-project"));
+    if (openIndex >= 0 && openIndex + 1 < app.arguments().size()) {
+        const QString project = app.arguments().at(openIndex + 1);
+        QTimer::singleShot(0, &registry, [&registry, project] { registry.openProject(project, false); });
+    } else if (app.arguments().contains(QStringLiteral("--open-editor"))) {
+        const QString project = capture.lastProjectPath();
+        if (!project.isEmpty()) QTimer::singleShot(0, &registry, [&registry, project] { registry.openProject(project, false); });
+    }
     QObject::connect(&screenshot, &QuickScreenshot::statusChanged, &tray, [&] {
         if (!screenshot.status().isEmpty() && screenshot.status() != QStringLiteral("正在截图…"))
             tray.showMessage(QStringLiteral("简库镜传截图"), screenshot.status());
     });
     // Probe capture access unconditionally; success is treated as authorised.
-    QTimer::singleShot(0, &capture, &MacCapture::refreshDisplays);
+#ifdef JIANKU_UI_VERIFICATION
+    if (app.arguments().contains("--verify-editor")) {
+        QTimer::singleShot(0, &app, [&] { startEditorVerification(&app, &registry, &capture, &screenshot); });
+    } else
+#endif
+        QTimer::singleShot(0, &capture, &MacCapture::refreshDisplays);
     return app.exec();
 }

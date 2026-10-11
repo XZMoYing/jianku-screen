@@ -9,6 +9,13 @@ MouseSample pollMouse() {
     sample.x = location.x;
     sample.y = location.y;
     sample.pressed = buttons != 0; // any mouse button
+    // Public event counters detect activity without retaining typed text.
+    const uint32_t scroll = CGEventSourceCounterForEventType(kCGEventSourceStateCombinedSessionState, kCGEventScrollWheel);
+    const uint32_t keys = CGEventSourceCounterForEventType(kCGEventSourceStateCombinedSessionState, kCGEventKeyDown);
+    static uint32_t previousScroll = scroll, previousKeys = keys;
+    sample.interactionActivity = scroll != previousScroll || keys != previousKeys;
+    previousScroll = scroll;
+    previousKeys = keys;
     sample.cursorIdentity =
         reinterpret_cast<unsigned long long>((__bridge void *)[NSCursor currentSystemCursor]);
     return sample;

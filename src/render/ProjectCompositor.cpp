@@ -2,6 +2,7 @@
 
 #include "../animation/AnimationSettings.h"
 #include "../animation/AutoFocusEngine.h"
+#include "../project/EditSidecar.h"
 
 #include <QCoreApplication>
 #include <QDir>
@@ -120,6 +121,16 @@ ProjectData loadProject(const QString &directory, QString *errorOut) {
         return fail(error);
     const QJsonObject manifest = manifestDocument.object();
     data.settings = manifest.value(QStringLiteral("settings")).toObject().toVariantMap();
+    // Appearance edits are a separate, atomically written project file. Both
+    // preview and export read it; the original recording manifest is immutable.
+    QFile appearance(directory + QStringLiteral("/appearance.json"));
+    if (appearance.open(QIODevice::ReadOnly)) {
+        const auto document = QJsonDocument::fromJson(appearance.readAll());
+        if (!document.isObject() || document.object().value("schemaVersion").toInt() != 1)
+            return fail(QStringLiteral("工程画面设置损坏，请检查 appearance.json"));
+        const auto values = document.object().value("current").toObject().toVariantMap();
+        for (auto it = values.constBegin(); it != values.constEnd(); ++it) data.settings[it.key()] = it.value();
+    }
     data.createdAt = manifest.value(QStringLiteral("createdAt")).toString();
 
     const QJsonObject source = manifest.value(QStringLiteral("source")).toObject();
@@ -253,6 +264,7 @@ ProjectData loadProject(const QString &directory, QString *errorOut) {
             entry.endMs = number(range, "endTimeMs");
             entry.zoom = number(range, "zoom", 2.0);
             entry.snapToEdgesRatio = number(range, "snapToEdgesRatio", 0.25);
+            entry.system = range.value("isSystem").toBool(true);
             if (entry.endMs > entry.startMs)
                 data.zoomRanges.push_back(entry);
         }
@@ -260,6 +272,13 @@ ProjectData loadProject(const QString &directory, QString *errorOut) {
             [](const ZoomRangeEntry &a, const ZoomRangeEntry &b) { return a.startMs < b.startMs; });
     }
 
+    for (int i = 0; i < int(data.zoomRanges.size()); ++i) data.zoomRanges[i].id = QStringLiteral("automatic-%1").arg(i);
+    const auto edit = Project::load(directory, data.durationMs);
+    if (edit.valid && (edit.projectCreatedAt.isEmpty() || data.createdAt.isEmpty() || edit.projectCreatedAt == data.createdAt)) {
+        if (edit.hasFocusTrack) data.zoomRanges = edit.focusTrack;
+        if (!edit.appearance.isEmpty() && QFileInfo(Project::path(directory)).lastModified() >= QFileInfo(directory + "/appearance.json").lastModified())
+            for (auto i = edit.appearance.constBegin(); i != edit.appearance.constEnd(); ++i) data.settings[i.key()] = i.value();
+    }
     data.valid = true;
     if (errorOut)
         errorOut->clear();
@@ -321,6 +340,24 @@ ComposeContext makeComposeContext(ProjectData project, const QString &background
     }
 
     const QVariantMap &map = context.project.settings;
+    if (map.contains("defaultZoomLevel")) {
+        for (auto &range : context.project.zoomRanges)
+            if (range.system && !range.customized) range.zoom = std::clamp(map.value("defaultZoomLevel").toDouble(), 1.0, 6.0);
+    }
+    if (map.contains("snapToEdgesRatio")) {
+        for (auto &range : context.project.zoomRanges)
+            if (range.system && !range.customized) range.snapToEdgesRatio = std::clamp(map.value("snapToEdgesRatio").toDouble(), 0.0, 1.0);
+    }
+    if (map.value("autoZoom", true).toBool() && map.value("alwaysKeepZoomedIn", false).toBool()) {
+        auto &ranges = context.project.zoomRanges;
+        ranges.erase(std::remove_if(ranges.begin(), ranges.end(), [](const auto &r) { return r.system; }), ranges.end());
+        ranges.push_back({0, context.project.durationMs, map.value("defaultZoomLevel", 2).toDouble(),
+            map.value("snapToEdgesRatio", .25).toDouble(), true});
+    }
+    if (!map.value("autoZoom", true).toBool()) {
+        auto &ranges = context.project.zoomRanges;
+        ranges.erase(std::remove_if(ranges.begin(), ranges.end(), [](const auto &r) { return r.system; }), ranges.end());
+    }
     ComposerSettings &settings = context.settings;
     // One settings→style mapping, shared with the preview and the screenshot.
     settings.canvas = canvasStyleFromMap(map, backgroundRoot);
@@ -337,6 +374,8 @@ ComposeContext makeComposeContext(ProjectData project, const QString &background
         map.value(QStringLiteral("systemAudioVolume"), 1.0).toDouble(), 0.0, 4.0);
     settings.microphoneVolume = std::clamp(
         map.value(QStringLiteral("audioVolume"), 1.0).toDouble(), 0.0, 4.0);
+    if (map.value("muteSystemAudio", false).toBool()) settings.systemAudioVolume = 0;
+    if (map.value("muteMicrophone", false).toBool()) settings.microphoneVolume = 0;
 
     MotionBlurSettings &blur = settings.motionBlur;
     blur.amount = map.value(QStringLiteral("motionBlurAmount"), 0.0).toDouble();
@@ -357,11 +396,19 @@ ComposeContext makeComposeContext(ProjectData project, const QString &background
 
     // The canvas is fixed for an export (the output size), so the content is
     // contained inside it; the aspect ratio setting decides that size.
-    context.canvasPlan = planCanvas(settings.canvas,
-        canvasSizeForResolution(canvasSizeForAspect(context.project.sourceSize,
-                map.value(QStringLiteral("outputAspectRatio")).toString()),
-            resolutionOverride),
-        context.project.sourceSize);
+    const QSizeF fullCanvas = canvasSizeForAspect(context.project.sourceSize,
+        map.value(QStringLiteral("outputAspectRatio")).toString());
+    const QSizeF outputCanvas = canvasSizeForResolution(fullCanvas, resolutionOverride);
+    const double outputScale = outputCanvas.height() / fullCanvas.height();
+    // Appearance is defined at the original canvas resolution. Scale pixel
+    // dimensions with a smaller preview/export to preserve the composition.
+    settings.canvas.shadowQuality = std::max(1, int(std::round(settings.canvas.shadowBlur * .625)));
+    settings.canvas.radius *= outputScale;
+    settings.canvas.insetSize *= outputScale;
+    settings.canvas.shadowDistance *= outputScale;
+    settings.canvas.shadowBlur *= outputScale;
+    settings.canvas.backgroundBlur *= outputScale;
+    context.canvasPlan = planCanvas(settings.canvas, outputCanvas, context.project.sourceSize);
     if (!context.canvasPlan.valid) {
         context.error = context.canvasPlan.error;
         return context;
@@ -390,27 +437,24 @@ CameraPose AnimationSequence::cameraTargetAt(const ProjectData &project, double 
     double snapFallback) {
     const ZoomRangeEntry *active = nullptr;
     for (const ZoomRangeEntry &range : project.zoomRanges) {
-        if (mediaTimeMs >= range.startMs && mediaTimeMs <= range.endMs) {
-            active = &range;
-            break;
-        }
+        if (range.enabled && mediaTimeMs >= range.startMs && mediaTimeMs < range.endMs
+            && (!active || !range.system)) active = &range;
     }
     if (!active || active->zoom <= 1.0)
         return CameraPose{1.0, 0.0, 0.0};
 
-    // Grouping and framing come from the shared auto-focus engine, so the offline
-    // camera lands exactly where the analysis said it would.
-    Animation::ZoomRange range;
-    range.startMs = active->startMs;
-    range.endMs = active->endMs;
-    range.zoom = active->zoom;
-    const double snap = active->snapToEdgesRatio > 0.0 ? active->snapToEdgesRatio : snapFallback;
-    const Animation::FocusPoint focus = Animation::AutoFocusEngine::focusAt(range,
-        project.events, project.sourceSize.width(), project.sourceSize.height(), mediaTimeMs, snap);
-    const Animation::ScreenTransform transform = Animation::AutoFocusEngine::transformFor(focus,
-        active->zoom, project.sourceSize.width(), project.sourceSize.height(),
-        project.sourceSize.width(), project.sourceSize.height(), snap);
-    return CameraPose{transform.scale, transform.offsetX, transform.offsetY};
+    Q_UNUSED(snapFallback);
+    return cameraTargetFor(project, *active, mediaTimeMs);
+}
+CameraPose AnimationSequence::cameraTargetFor(const ProjectData &project, const Project::FocusClip &active, double mediaTimeMs) {
+    if (active.zoom <= 1) return {};
+    Animation::ZoomRange range{active.startMs, active.endMs, active.zoom};
+    const double snap = active.snapToEdgesRatio;
+    const auto focus = active.fixedPosition ? Animation::FocusPoint{active.focusX, active.focusY}
+        : Animation::AutoFocusEngine::focusAt(range, project.events, project.sourceSize.width(), project.sourceSize.height(), mediaTimeMs, snap);
+    const auto transform = Animation::AutoFocusEngine::transformFor(focus, active.zoom,
+        project.sourceSize.width(), project.sourceSize.height(), project.sourceSize.width(), project.sourceSize.height(), snap);
+    return {transform.scale, transform.offsetX, transform.offsetY};
 }
 
 CameraPose AnimationSequence::cameraAt(double mediaTimeMs) {
@@ -735,6 +779,48 @@ qint64 frameIndexAt(const std::vector<double> &frameMediaMs, double mediaTimeMs)
     return std::distance(frameMediaMs.begin(), it) - 1;
 }
 
+QString editedAudioGraph(const Project::EditTimeline &timeline, bool system, bool microphone,
+    double systemVolume, double microphoneVolume, double micDelayMs, double startMs, double durationMs) {
+    auto seconds = [](double ms) { return QString::number(ms / 1000, 'f', 6); };
+    QStringList filters;
+    const QString pad = ",apad,atrim=duration=" + seconds(timeline.sourceDurationMs()) + ",asetpts=PTS-STARTPTS";
+    if (system) filters << QString("[1:a]volume=%1%2[sys]").arg(systemVolume, 0, 'f', 6).arg(pad);
+    if (microphone) filters << QString("[2:a]adelay=%1:all=1,volume=%2%3[mic]")
+        .arg(std::max(0LL, qint64(std::llround(micDelayMs)))).arg(microphoneVolume, 0, 'f', 6).arg(pad);
+    QString input = system ? "sys" : "mic";
+    if (system && microphone) {
+        filters << "[sys][mic]amix=inputs=2:duration=longest:dropout_transition=0:normalize=0[mix]";
+        input = "mix";
+    }
+    const auto &segments = timeline.segments();
+    if (segments.size() > 1) {
+        QString split = "[" + input + "]asplit=" + QString::number(segments.size());
+        for (size_t i = 0; i < segments.size(); ++i) split += QString("[branch%1]").arg(i);
+        filters << split;
+    }
+    QString concat;
+    for (size_t i = 0; i < segments.size(); ++i) {
+        const auto &segment = segments[i];
+        QString chain = QString("[%1]atrim=start=%2:end=%3,asetpts=PTS-STARTPTS")
+            .arg(segments.size() > 1 ? QString("branch%1").arg(i) : input)
+            .arg(seconds(segment.sourceStartMs), seconds(segment.sourceEndMs));
+        double rate = segment.speed;
+        // atempo keeps speech pitch stable; chaining also supports slow rates.
+        while (rate < .5) { chain += ",atempo=0.5"; rate /= .5; }
+        while (rate > 2) { chain += ",atempo=2"; rate /= 2; }
+        chain += ",atempo=" + QString::number(rate, 'f', 8) + QString("[clip%1]").arg(i);
+        filters << chain;
+        concat += QString("[clip%1]").arg(i);
+    }
+    if (segments.size() > 1) {
+        filters << concat + QString("concat=n=%1:v=0:a=1[edited]").arg(segments.size());
+        input = "edited";
+    } else input = "clip0";
+    filters << "[" + input + "]apad,atrim=start=" + seconds(startMs) + ":end="
+        + seconds(startMs + durationMs) + ",asetpts=PTS-STARTPTS[aout]";
+    return filters.join(';');
+}
+
 } // namespace
 
 ComposeResult composeProject(const ComposeOptions &options, const ComposeProgress &progress) {
@@ -748,14 +834,16 @@ ComposeResult composeProject(const ComposeOptions &options, const ComposeProgres
         return result;
     }
 
+    if (options.focusOverride) project.zoomRanges = *options.focusOverride;
+    if (!options.settingsOverride.isEmpty()) project.settings = options.settingsOverride;
+    if (!options.includeAutoZoom) project.zoomRanges.erase(std::remove_if(project.zoomRanges.begin(), project.zoomRanges.end(),
+        [](const auto &r) { return r.system; }), project.zoomRanges.end());
     ComposeContext context = makeComposeContext(project, options.backgroundRoot,
         options.motionBlur, options.exportHeight);
     if (!context.valid) {
         result.error = context.error;
         return result;
     }
-    if (!options.includeAutoZoom)
-        context.project.zoomRanges.clear();
 
     // The edit timeline defines the output clock. Without one the output is the
     // whole recording in real time, which is the same thing expressed as a single
@@ -821,7 +909,7 @@ ComposeResult composeProject(const ComposeOptions &options, const ComposeProgres
 
     result.width = context.width();
     result.height = context.height();
-    result.durationMs = outputDuration - startMs;
+    result.durationMs = totalFrames * 1000.0 / fps;
     result.sourceFrames = static_cast<qint64>(context.project.frameMediaMs.size());
     result.timelineSegments = static_cast<qint64>(timeline.segments().size());
     result.timelineIdentity = timeline.isIdentity();
@@ -833,13 +921,38 @@ ComposeResult composeProject(const ComposeOptions &options, const ComposeProgres
     const Animation::DriverSettings driver =
         Animation::driverSettingsFromMap(context.project.settings);
     AnimationSequence sequence(context.project, driver.screenSpring, driver.cursor);
+    std::vector<Snapshot> sourcePoses;
+    if (!timeline.isSourceOrdered()) {
+        const int count = int(std::ceil(context.project.durationMs * 60 / 1000)) + 1;
+        sourcePoses.reserve(count);
+        for (int i = 0; i < count; ++i) {
+            if (options.shouldCancel && options.shouldCancel()) { result.cancelled = true; result.error = QStringLiteral("导出已取消"); return result; }
+            const double time = i * 1000.0 / 60;
+            sourcePoses.push_back({sequence.cameraAt(time), sequence.cursorAt(time)});
+        }
+    }
+
+    bool useSystemAudio = false;
+    if (options.includeAudio) {
+        QProcess probe;
+        probe.start(findFfprobe(options.ffmpegPath), {"-v", "error", "-select_streams", "a:0",
+            "-show_entries", "stream=index", "-of", "csv=p=0", videoPath(context.project)});
+        if (!probe.waitForFinished(10000) || probe.exitCode() != 0) {
+            result.error = QStringLiteral("无法检查原始音轨：") + QString::fromUtf8(probe.readAllStandardError());
+            return result;
+        }
+        useSystemAudio = !probe.readAllStandardOutput().trimmed().isEmpty();
+    }
 
     // --- decoder -----------------------------------------------------------
+    const int sourceWidth = std::max(1, int(std::round(context.project.sourceSize.width())));
+    const int sourceHeight = std::max(1, int(std::round(context.project.sourceSize.height())));
     QProcess decoder;
     decoder.setProcessChannelMode(QProcess::SeparateChannels);
     QStringList decoderArgs{
         QStringLiteral("-v"), QStringLiteral("error"),
         QStringLiteral("-i"), videoPath(context.project),
+        QStringLiteral("-vf"), QStringLiteral("scale=%1:%2").arg(sourceWidth).arg(sourceHeight),
         QStringLiteral("-fps_mode"), QStringLiteral("passthrough"),
         QStringLiteral("-f"), QStringLiteral("rawvideo"),
         QStringLiteral("-pix_fmt"), QStringLiteral("bgra"),
@@ -892,20 +1005,9 @@ ComposeResult composeProject(const ComposeOptions &options, const ComposeProgres
         ? options.systemAudioVolume : context.settings.systemAudioVolume;
     const double microphoneVolume = options.microphoneVolume >= 0.0
         ? options.microphoneVolume : context.settings.microphoneVolume;
-    if (options.includeAudio && !useMicrophone)
-        encoderArgs << QStringLiteral("-map") << QStringLiteral("1:a:0?");
-    if (useMicrophone) {
-        // Hold the microphone back by the measured offset so it lands on the same
-        // clock as the video, then mix. normalize=0 keeps the levels as recorded
-        // instead of halving both tracks the way amix does by default.
-        const qint64 holdMs = microphoneDelayMs > 0.0 ? qint64(std::llround(microphoneDelayMs)) : 0;
-        const QString graph = QStringLiteral(
-            "[1:a]volume=%1[sys];"
-            "[2:a]adelay=%2:all=1,volume=%3[mic];"
-            "[sys][mic]amix=inputs=2:duration=longest:dropout_transition=0:normalize=0[aout]")
-            .arg(systemVolume, 0, 'f', 3)
-            .arg(holdMs)
-            .arg(microphoneVolume, 0, 'f', 3);
+    if (useSystemAudio || useMicrophone) {
+        const QString graph = editedAudioGraph(timeline, useSystemAudio, useMicrophone,
+            systemVolume, microphoneVolume, microphoneDelayMs, startMs, totalFrames * 1000.0 / fps);
         encoderArgs << QStringLiteral("-filter_complex") << graph
                     << QStringLiteral("-map") << QStringLiteral("[aout]");
     }
@@ -914,18 +1016,8 @@ ComposeResult composeProject(const ComposeOptions &options, const ComposeProgres
                 << QStringLiteral("-crf") << QStringLiteral("18")
                 << QStringLiteral("-pix_fmt") << QStringLiteral("yuv420p")
                 << QStringLiteral("-movflags") << QStringLiteral("+faststart");
-    if (options.includeAudio) {
-        if (useMicrophone) {
-            encoderArgs << QStringLiteral("-c:a") << QStringLiteral("aac")
-                        << QStringLiteral("-b:a") << QStringLiteral("192k");
-        } else {
-            // Do NOT add -shortest: the source audio is a little shorter than the
-            // video timeline (audio buffers stop when the last frame is written),
-            // and -shortest would trim the video down to the audio length,
-            // silently dropping the last frames.
-            encoderArgs << QStringLiteral("-c:a") << QStringLiteral("copy");
-        }
-    }
+    if (useSystemAudio || useMicrophone)
+        encoderArgs << QStringLiteral("-c:a") << QStringLiteral("aac") << QStringLiteral("-b:a") << QStringLiteral("192k");
     encoderArgs << QStringLiteral("-y") << temporaryPath;
 
     encoder.start(options.ffmpegPath, encoderArgs);
@@ -938,8 +1030,9 @@ ComposeResult composeProject(const ComposeOptions &options, const ComposeProgres
 
     // --- compose loop ------------------------------------------------------
     const qint64 bytesPerFrame = qint64(result.width) * result.height * 4;
+    const qint64 sourceBytesPerFrame = qint64(sourceWidth) * sourceHeight * 4;
     QByteArray buffer;
-    buffer.resize(static_cast<int>(bytesPerFrame));
+    buffer.resize(static_cast<int>(sourceBytesPerFrame));
     QImage sourceFrame;
     qint64 sourceIndex = -1;
     QString failure;
@@ -980,16 +1073,16 @@ ComposeResult composeProject(const ComposeOptions &options, const ComposeProgres
 
     auto pullSourceFrame = [&]() -> bool {
         qint64 read = 0;
-        while (read < bytesPerFrame) {
+        while (read < sourceBytesPerFrame) {
             drainStderr();
             if (!failure.isEmpty())
                 return false;
             if (!decoder.waitForReadyRead(30000) && decoder.bytesAvailable() == 0) {
                 failure = QStringLiteral("解码原始视频时中断（已读 %1/%2 字节）")
-                    .arg(read).arg(bytesPerFrame);
+                    .arg(read).arg(sourceBytesPerFrame);
                 return false;
             }
-            const qint64 got = decoder.read(buffer.data() + read, bytesPerFrame - read);
+            const qint64 got = decoder.read(buffer.data() + read, sourceBytesPerFrame - read);
             if (got <= 0) {
                 failure = QStringLiteral("原始视频帧数少于时间轴记录（第 %1 帧）").arg(sourceIndex + 2);
                 return false;
@@ -997,26 +1090,32 @@ ComposeResult composeProject(const ComposeOptions &options, const ComposeProgres
             read += got;
         }
         sourceFrame = QImage(reinterpret_cast<const uchar *>(buffer.constData()),
-            result.width, result.height, result.width * 4, QImage::Format_ARGB32_Premultiplied).copy();
+            sourceWidth, sourceHeight, sourceWidth * 4, QImage::Format_ARGB32_Premultiplied).copy();
         ++sourceIndex;
         return true;
     };
 
+    double previousMediaMs = -1;
     for (qint64 frame = 0; frame < totalFrames; ++frame) {
         if (options.shouldCancel && options.shouldCancel()) {
             result.error = QStringLiteral("导出已取消");
             result.cancelled = true;
             break;
         }
-        // Output clock → media clock. The source time is non-decreasing across the
-        // whole output timeline (segments stay in recording order), so the decoder
-        // only ever has to move forward and never seeks.
+        // Output order may differ from source order. Restart at the exact retained
+        // source frame on a backward cut; never reuse a later decoded frame.
         const double outputMs = startMs + frame * 1000.0 / fps;
         const double mediaTimeMs = timeline.sourceTimeAt(outputMs);
         const qint64 wantedSource = frameIndexAt(context.project.frameMediaMs, mediaTimeMs);
-        // A cut can skip source frames ahead; a slow-down repeats the same one. Only
-        // moving backwards is impossible, because segments stay in recording order —
-        // so the decoder never has to seek.
+        if (wantedSource < sourceIndex) {
+            decoder.kill(); decoder.waitForFinished(5000); decoder.readAll(); decoder.readAllStandardError();
+            QStringList seekArgs = decoderArgs;
+            seekArgs.insert(2, QStringLiteral("-ss"));
+            seekArgs.insert(3, QString::number(std::max(0.0, context.project.frameMediaMs[wantedSource] / 1000.0 - 0.000001), 'f', 6));
+            decoder.start(options.ffmpegPath, seekArgs);
+            if (!decoder.waitForStarted(10000)) { result.error = QStringLiteral("重排片段解码失败"); break; }
+            sourceIndex = wantedSource - 1;
+        }
         while (sourceIndex < wantedSource) {
             if (!pullSourceFrame()) {
                 result.error = failure;
@@ -1026,8 +1125,11 @@ ComposeResult composeProject(const ComposeOptions &options, const ComposeProgres
         if (!result.error.isEmpty())
             break;
 
-        const CameraPose camera = sequence.cameraAt(mediaTimeMs);
-        const CursorPose cursor = sequence.cursorAt(mediaTimeMs);
+        const int poseIndex = sourcePoses.empty() ? 0 : std::clamp(int(std::round(mediaTimeMs * 60 / 1000)), 0, int(sourcePoses.size()) - 1);
+        const CameraPose camera = sourcePoses.empty() ? sequence.cameraAt(mediaTimeMs) : sourcePoses[poseIndex].camera;
+        const CursorPose cursor = sourcePoses.empty() ? sequence.cursorAt(mediaTimeMs) : sourcePoses[poseIndex].cursor;
+        if (previousMediaMs >= 0 && (mediaTimeMs < previousMediaMs || mediaTimeMs - previousMediaMs > 250)) havePreviousPose = false;
+        previousMediaMs = mediaTimeMs;
         // Blur comes from the difference between the two poses on either side of
         // this frame, so it is planned before the frame is drawn and persists
         // across the loop rather than being recomputed from scratch each time.
@@ -1100,7 +1202,7 @@ ComposeResult composeProject(const ComposeOptions &options, const ComposeProgres
         } else if (!QFile::rename(temporaryPath, result.outputPath)) {
             result.error = QStringLiteral("无法写入输出：") + result.outputPath;
         } else {
-            result.audioMuxed = options.includeAudio;
+            result.audioMuxed = useSystemAudio || useMicrophone;
             result.ok = true;
         }
     }

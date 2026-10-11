@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QRectF>
 #include <QVariantMap>
+#include <QQuickImageProvider>
 
 namespace Render {
 
@@ -47,6 +48,9 @@ class CanvasPreview final : public QObject {
     Q_PROPERTY(QColor insetColor READ insetColor NOTIFY changed)
     Q_PROPERTY(double insetAlpha READ insetAlpha NOTIFY changed)
     Q_PROPERTY(bool hasShadow READ hasShadow NOTIFY changed)
+    Q_PROPERTY(QString backgroundSource READ backgroundSource NOTIFY changed)
+    Q_PROPERTY(QString shadowSource READ shadowSource NOTIFY changed)
+    Q_PROPERTY(QRectF shadowRect READ shadowRect NOTIFY changed)
     // Background blur as MultiEffect's 0..1 expects it. The reference's 0..40
     // slider maps onto a radius; the exact curve is not verified, so the same
     // proportional mapping the compositor uses is applied here, which at least
@@ -54,7 +58,7 @@ class CanvasPreview final : public QObject {
     Q_PROPERTY(double backgroundBlur READ backgroundBlur NOTIFY changed)
 
 public:
-    explicit CanvasPreview(QObject *parent = nullptr);
+    explicit CanvasPreview(QObject *parent = nullptr, const QString &imageProvider = "canvas");
 
     bool valid() const { return plan_.valid; }
     QRectF frameRect() const { return fraction(plan_.layout.frameRect); }
@@ -72,6 +76,11 @@ public:
     QColor insetColor() const { return style_.insetColor; }
     double insetAlpha() const { return style_.insetAlpha; }
     bool hasShadow() const { return style_.shadowIntensity > 0.001; }
+    QString backgroundSource() const { return "image://" + imageProvider_ + "/background?" + QString::number(revision_); }
+    QString shadowSource() const { return plan_.shadow.isNull() ? QString()
+        : "image://" + imageProvider_ + "/shadow?" + QString::number(revision_); }
+    QRectF shadowRect() const;
+    QImage image(const QString &id) const { return id.startsWith("shadow") ? plan_.shadow : plan_.background; }
     double backgroundBlur() const;
 
     // Settings map plus the captured source size. Both come from QML: the settings
@@ -86,6 +95,8 @@ public:
     // display — the corner radius in the preview was exactly 2x the exported one.
     Q_INVOKABLE void update(const QVariantMap &settings, double sourceWidth, double sourceHeight,
         double pixelWidth = 0.0, double pixelHeight = 0.0);
+    Q_INVOKABLE void updateForOutput(const QVariantMap &settings, double sourceWidth, double sourceHeight,
+        double pixelWidth, double pixelHeight, double outputWidth, double outputHeight);
     Q_INVOKABLE QString backgroundUrl(const QString &name) const;
 
 signals:
@@ -103,6 +114,21 @@ private:
     QString backgroundRoot_;
     CanvasStyle style_;
     CanvasPlan plan_;
+    int revision_ = 0;
+    QString imageProvider_;
+    QSizeF outputSize_;
+};
+
+class CanvasImageProvider final : public QQuickImageProvider {
+public:
+    explicit CanvasImageProvider(CanvasPreview *preview) : QQuickImageProvider(QQuickImageProvider::Image), preview_(preview) {}
+    QImage requestImage(const QString &id, QSize *size, const QSize &) override {
+        const QImage image = preview_->image(id);
+        if (size) *size = image.size();
+        return image;
+    }
+private:
+    CanvasPreview *preview_;
 };
 
 } // namespace Render

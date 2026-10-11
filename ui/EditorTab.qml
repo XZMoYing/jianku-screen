@@ -20,43 +20,73 @@ Item {
     property var session: null
     readonly property var controller: session ? session.timeline : null
     readonly property var exporter: session ? session.exporter : null
+    property string section: "background"
+    property real timelineHeight: 320
+    property bool exportDetailsExpanded: false
+    readonly property bool focusSelected: !!controller && controller.selectedFocusId.length > 0
+    readonly property bool showExportDetails: !focusSelected || exportDetailsExpanded
+    Shortcut { sequence: "Space"; context: Qt.WindowShortcut; enabled: !tab.Window.window || !tab.Window.window.activeFocusItem || tab.Window.window.activeFocusItem.cursorPosition === undefined; onActivated: player.toggle() }
+    Connections {
+        target: tab.exporter
+        function onFrameRateChanged() { if (tab.controller) tab.controller.setFrameRate(tab.exporter.frameRate) }
+        function onFinished(ok) { if (ok) tab.exporter.revealOutput() }
+    }
 
+    Connections {
+        target: tab.controller
+        function onSelectionChanged() { if (tab.controller.selectedFocusId.length > 0) player.pause() }
+    }
     RowLayout {
         anchors.fill: parent
+        anchors.bottomMargin: tab.timelineHeight
         spacing: 0
 
-        ColumnLayout {
+        Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            spacing: 0
-
-            Item {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                PreviewCanvas {
-                    anchors.fill: parent
-                    anchors.bottomMargin: timelineStrip.height
-                    // The editor shows the *recording*, not the live screen: the
-                    // preview draws the canvas appearance around a placeholder until a
-                    // decoder is wired in, which is the same picture the export will
-                    // produce.
-                    live: false
+            RecordingPlayer {
+                id: player
+                anchors.fill: parent
+                anchors.margins: 20
+                controller: tab.controller
+                options: tab.session ? tab.session.settings.current : ({})
+            }
+            MouseArea {
+                objectName: "focusCanvasPicker"
+                anchors.fill: player; enabled: !!tab.controller && tab.controller.selectedFocusId.length > 0 && player.focusPreview && !player.playing && !player.loading
+                cursorShape: Qt.CrossCursor
+                function place(x, y) {
+                    const source = player.sourcePointAt(x, y)
+                    if (source.valid) tab.controller.updateFocus(tab.controller.selectedFocusId, {fixedPosition: true, focusX: source.x, focusY: source.y})
                 }
-
-                TimelineStrip {
-                    id: timelineStrip
-                    controller: tab.controller
-                    anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
-                    height: 74
-                    visible: tab.session !== null
-                }
+                onPressed: mouse => place(mouse.x, mouse.y)
+                onPositionChanged: mouse => { if (pressed) place(mouse.x, mouse.y) }
+            }
+            Rectangle {
+                visible: player.focusPreview && !player.playing && !!tab.controller && tab.controller.selectedFocusId.length > 0
+                x: player.x + player.focusMarker.x - 8; y: player.y + player.focusMarker.y - 8; width: 16; height: 16; radius: 8; color: "transparent"; border.width: 2; border.color: "#d4b8ff"
+            }
+            Row {
+                anchors { top: parent.top; horizontalCenter: parent.horizontalCenter; topMargin: 8 }
+                spacing: 6; visible: !!tab.controller && tab.controller.selectedFocusId.length > 0
+                UiButton { objectName: "focusPreviewButton"; text: player.focusPreview ? "目标构图预览" : "动画预览"; selected: player.focusPreview; onClicked: { player.pause(); player.focusPreview = !player.focusPreview } }
+                UiButton { text: "取消选择"; onClicked: tab.controller.clearSelection() }
+            }
+            Text {
+                anchors.centerIn: player
+                visible: player.loading || !player.hasFrame || player.error.length > 0
+                text: player.error.length > 0 ? player.error
+                    : player.loading ? "正在准备视频与动画预览…" : "正在载入录制画面…"
+                color: player.error.length > 0 ? Theme.danger : Theme.textDim
+                wrapMode: Text.Wrap
+                width: Math.min(440, player.width - 40)
+                horizontalAlignment: Text.AlignHCenter
             }
         }
 
         // --- right-hand settings and export -----------------------------------
         Rectangle {
-            Layout.preferredWidth: 300
+            Layout.preferredWidth: tab.width < 1150 ? 320 : 370
             Layout.fillHeight: true
             color: Theme.panelBg
             border.width: 1
@@ -91,33 +121,66 @@ Item {
                     wrapMode: Text.WordWrap
                 }
 
-                Item { Layout.fillHeight: true }
+                RowLayout {
+                    Layout.fillWidth: true
+                    UiButton { Layout.fillWidth: true; text: "在访达中打开工程"; onClicked: if (tab.session) tab.session.revealProject() }
+                    UiButton { text: "保存工程"; enabled: !!tab.session && tab.session.dirty; onClicked: tab.session.save() }
+                }
+                UiSegmented {
+                    Layout.fillWidth: true
+                    visible: !tab.controller || tab.controller.selectedFocusId.length === 0
+                    options: ["背景", "光标", "缩放", "音频"]
+                    currentIndex: Math.max(0, ["background", "cursor", "motion", "audio"].indexOf(tab.section))
+                    onActivated: i => tab.section = ["background", "cursor", "motion", "audio"][i]
+                }
+                FocusInspector {
+                    Layout.fillWidth: true; Layout.fillHeight: true
+                    visible: !!tab.controller && tab.controller.selectedFocusId.length > 0
+                    controller: tab.controller
+                    onPreviewRequested: { player.pause(); player.focusPreview = true }
+                }
+                SettingsPage {
+                    visible: !tab.controller || tab.controller.selectedFocusId.length === 0
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    section: tab.section
+                    store: tab.session ? tab.session.settings : settings
+                    editingRecording: true
+                }
+                Text {
+                    Layout.fillWidth: true
+                    text: "编辑自动保存 · 预览 540p，导出使用所选分辨率"
+                    color: Theme.textFaint; font.pixelSize: 10
+                }
 
                 // Export lives here, at the bottom of the settings column, the way
                 // Screen Studio puts it: the whole point of opening the editor is to
                 // produce the file, so the action that does it should not be somewhere
                 // the user has to go looking.
-                Text {
+                UiButton {
                     Layout.fillWidth: true
-                    text: "导出设置"
-                    color: Theme.textDim
-                    font.pixelSize: 12
+                    implicitHeight: 26
+                    text: tab.focusSelected ? (tab.showExportDetails ? "收起导出设置" : "展开导出设置") : "导出设置"
+                    enabled: tab.focusSelected
+                    onClicked: tab.exportDetailsExpanded = !tab.exportDetailsExpanded
                 }
                 UiSegmented {
                     Layout.fillWidth: true
-                    options: ["原始", "1080p", "720p"]
+                    visible: tab.showExportDetails
+                    options: ["原始", "4K", "1440p", "1080p", "720p"]
                     currentIndex: {
-                        const heights = [0, 1080, 720]
+                        const heights = [0, 2160, 1440, 1080, 720]
                         const i = heights.indexOf(Number(tab.exporter ? tab.exporter.exportHeight : 0))
                         return i >= 0 ? i : 0
                     }
                     onActivated: (i) => {
                         if (tab.exporter)
-                            tab.exporter.exportHeight = [0, 1080, 720][i]
+                            tab.exporter.exportHeight = [0, 2160, 1440, 1080, 720][i]
                     }
                 }
                 UiSegmented {
                     Layout.fillWidth: true
+                    visible: tab.showExportDetails
                     options: ["24", "30", "60", "120"]
                     currentIndex: {
                         const rates = [24, 30, 60, 120]
@@ -149,7 +212,7 @@ Item {
                         if (tab.exporter.busy)
                             tab.exporter.cancel()
                         else
-                            tab.exporter.start(tab.exporter.defaultOutputPath, true, true, true, true)
+                            { if (tab.session.save()) tab.exporter.start(tab.exporter.defaultOutputPath, true, true, true, true) }
                     }
                 }
                 // A drawn bar rather than QtQuick.Controls' ProgressBar: the rest of
@@ -180,4 +243,25 @@ Item {
             }
         }
     }
+    TimelineStrip {
+        id: timelineStrip
+        anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+        height: tab.timelineHeight
+        controller: tab.controller
+        media: tab.session ? tab.session.media : null
+        playing: player.playing
+        canPlay: player.hasFrame && !player.loading
+        frameRate: tab.exporter ? tab.exporter.frameRate : 60
+        onPlaybackRequested: player.toggle()
+    }
+    MouseArea {
+        anchors { left: timelineStrip.left; right: timelineStrip.right; top: timelineStrip.top; topMargin: -5 }
+        height: 10; cursorShape: Qt.SplitVCursor
+        property real initial: 320
+        property real pressY: 0
+        onPressed: mouse => { initial = tab.timelineHeight; pressY = mapToItem(tab, mouse.x, mouse.y).y }
+        onPositionChanged: mouse => { if (pressed) tab.timelineHeight = Math.max(180, Math.min(tab.height * 0.55, initial + pressY - mapToItem(tab, mouse.x, mouse.y).y)) }
+        onDoubleClicked: tab.timelineHeight = 320
+    }
+
 }

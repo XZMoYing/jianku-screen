@@ -11,7 +11,9 @@ class SettingsStore final : public QObject {
     Q_PROPERTY(QString storagePath READ storagePath CONSTANT)
 
 public:
-    explicit SettingsStore(QObject *parent = nullptr);
+    explicit SettingsStore(QObject *parent = nullptr, const QString &storagePath = {});
+    bool replaceCurrent(const QVariantMap &map);
+    void initializeProject(const QVariantMap &recordedSettings);
 
     QVariantMap current() const { return current_; }
     QVariantMap defaults() const { return defaults_; }

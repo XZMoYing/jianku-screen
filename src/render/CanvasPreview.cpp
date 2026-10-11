@@ -4,10 +4,11 @@
 #include <QDir>
 #include <QFileInfo>
 #include <algorithm>
+#include <cmath>
 
 namespace Render {
 
-CanvasPreview::CanvasPreview(QObject *parent) : QObject(parent) {
+CanvasPreview::CanvasPreview(QObject *parent, const QString &imageProvider) : QObject(parent), imageProvider_(imageProvider) {
     // Built-in backgrounds: the bundle when running from one, else the source tree.
     const QString bundled = QDir(QCoreApplication::applicationDirPath())
         .filePath(QStringLiteral("../Resources/backgrounds"));
@@ -39,6 +40,15 @@ double CanvasPreview::insetRatio() const {
     if (!plan_.valid || plan_.height() <= 0)
         return 0.0;
     return style_.insetSize / plan_.height();
+}
+
+QRectF CanvasPreview::shadowRect() const {
+    if (!plan_.valid || plan_.shadow.isNull()) return {};
+    const double angle = style_.shadowAngle * M_PI / 180;
+    const QRectF frame = plan_.layout.frameRect;
+    const double x = std::cos(angle) * style_.shadowDistance - (plan_.shadow.width() - frame.width()) / 2;
+    const double y = std::sin(angle) * style_.shadowDistance - (plan_.shadow.height() - frame.height()) / 2;
+    return fraction(QRectF(x, y, plan_.shadow.width(), plan_.shadow.height()));
 }
 
 double CanvasPreview::planAspect() const {
@@ -82,11 +92,18 @@ void CanvasPreview::update(const QVariantMap &settings, double sourceWidth, doub
     // absolute values in the style (radius, inset, shadow distance) mean the same
     // thing here as in the exported file; the preview scales the resulting fractions
     // down onto its own stage.
-    const QSizeF canvas = canvasSizeForAspect(QSizeF(pixelWidth_, pixelHeight_),
+    const QSizeF canvas = outputSize_.isValid() ? outputSize_ : canvasSizeForAspect(QSizeF(pixelWidth_, pixelHeight_),
         settings.value(QStringLiteral("outputAspectRatio"),
             QStringLiteral("auto")).toString());
     plan_ = planCanvas(style_, canvas, QSizeF(pixelWidth_, pixelHeight_));
+    ++revision_;
     emit changed();
+}
+
+void CanvasPreview::updateForOutput(const QVariantMap &settings, double sourceWidth, double sourceHeight,
+    double pixelWidth, double pixelHeight, double outputWidth, double outputHeight) {
+    outputSize_ = QSizeF(std::max(2.0, outputWidth), std::max(2.0, outputHeight));
+    update(settings, sourceWidth, sourceHeight, pixelWidth, pixelHeight);
 }
 
 } // namespace Render

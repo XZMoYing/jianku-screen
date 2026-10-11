@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(JiankuScreen VERSION 0.1.0 LANGUAGES CXX OBJCXX)
+project(JiankuScreen VERSION 0.1.3 LANGUAGES CXX OBJCXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -43,7 +43,7 @@ qt_add_executable(jianku-screen MACOSX_BUNDLE
     src/render/CanvasRenderer.h
     src/render/CanvasPreview.cpp
     src/render/CanvasPreview.h
-    src/render/TimelineController.cpp
+    src/render/FocusController.cpp src/render/TimelineController.cpp
     src/render/TimelineController.h
     src/render/TimelineGeometry.cpp
     src/render/TimelineGeometry.h
@@ -85,6 +85,12 @@ qt_add_executable(jianku-screen MACOSX_BUNDLE
     src/mac/PointerEventRecorder.h
     src/render/VideoSurface.mm
     src/render/VideoSurface.h
+    src/render/RecordingPlayer.h
+    src/render/RecordingPlayer.mm
+    src/render/TimelineMedia.h
+    src/render/TimelineMedia.cpp
+    src/render/FilmstripProvider.h
+    src/render/FilmstripProvider.mm
 )
 
 include(CTest)
@@ -94,6 +100,12 @@ include(CTest)
 set(JIANKU_SMOKE_PROJECT "" CACHE PATH
     "Recorded .jianku project used by the compositor smoke test (optional)")
 if(BUILD_TESTING)
+    target_sources(jianku-screen PRIVATE tests/EditorVerification.mm)
+    target_compile_definitions(jianku-screen PRIVATE JIANKU_UI_VERIFICATION)
+    set_source_files_properties(tests/EditorVerification.mm PROPERTIES COMPILE_FLAGS "-fobjc-arc")
+    add_executable(live-focus-tests tests/LiveFocusTests.cpp)
+    target_link_libraries(live-focus-tests PRIVATE Qt6::Core)
+    add_test(NAME live-focus COMMAND live-focus-tests)
     add_executable(timeline-tests tests/TimelineTests.cpp
         src/animation/AutomaticZoom.cpp src/project/ProjectTimeline.cpp)
     target_link_libraries(timeline-tests PRIVATE Qt6::Core)
@@ -149,6 +161,7 @@ if(BUILD_TESTING)
     # land under `ui/…` while the generated qmldir points at the bare names and
     # every type fails to resolve. The app block below sets the same properties.
     qt_add_executable(timeline-strip-tests tests/TimelineStripTests.cpp)
+    set_source_files_properties(ui/FocusLane.qml PROPERTIES QT_RESOURCE_ALIAS FocusLane.qml)
     set_source_files_properties(ui/TimelineStrip.qml PROPERTIES QT_RESOURCE_ALIAS TimelineStrip.qml)
     set_source_files_properties(ui/UiButton.qml PROPERTIES QT_RESOURCE_ALIAS UiButton.qml)
     set_source_files_properties(ui/Theme.qml PROPERTIES
@@ -162,12 +175,13 @@ if(BUILD_TESTING)
         OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/qml-test-module/Jianku/Screen"
         QML_FILES
             ui/Theme.qml
+            ui/FocusLane.qml
             ui/TimelineStrip.qml
             ui/UiButton.qml
     )
 
     target_sources(timeline-strip-tests PRIVATE
-        src/render/TimelineController.cpp src/render/TimelineGeometry.cpp
+        src/render/FocusController.cpp src/render/TimelineController.cpp src/render/TimelineGeometry.cpp
         src/render/ProjectCompositor.cpp src/project/EditTimeline.cpp
         src/project/EditSidecar.cpp
         src/render/CanvasLayout.cpp src/render/CanvasRenderer.cpp
@@ -188,7 +202,7 @@ if(BUILD_TESTING)
     # The editor's central invariant: two open recordings share no state. Worth its own
     # test rather than a UI demonstration, because the failure mode is silent.
     add_executable(editor-session-tests tests/EditorSessionTests.cpp
-        src/render/EditorSession.cpp src/render/TimelineController.cpp
+        src/render/EditorSession.cpp src/render/FocusController.cpp src/render/TimelineController.cpp
         src/render/TimelineGeometry.cpp src/render/ExportController.cpp
         src/render/ProjectCompositor.cpp src/project/EditTimeline.cpp
         src/project/EditSidecar.cpp src/project/RecentProjects.cpp
@@ -196,6 +210,7 @@ if(BUILD_TESTING)
         src/render/MotionBlur.cpp src/animation/AnimationSettings.cpp
         src/animation/AutoFocusEngine.cpp src/animation/AutomaticZoom.cpp
         src/animation/CursorEngine.cpp src/animation/SpringSolver.cpp)
+    target_sources(editor-session-tests PRIVATE src/settings/SettingsStore.cpp src/render/TimelineMedia.cpp)
     target_link_libraries(editor-session-tests PRIVATE Qt6::Core Qt6::Gui)
     target_compile_definitions(editor-session-tests PRIVATE
         JIANKU_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
@@ -220,7 +235,7 @@ if(BUILD_TESTING)
     add_test(NAME compositor COMMAND compositor-tests)
 
     add_executable(timeline-controller-tests tests/TimelineControllerTests.cpp
-        src/render/TimelineController.cpp src/render/TimelineGeometry.cpp src/render/ProjectCompositor.cpp
+        src/render/FocusController.cpp src/render/TimelineController.cpp src/render/TimelineGeometry.cpp src/render/ProjectCompositor.cpp
         src/project/EditTimeline.cpp src/project/EditSidecar.cpp src/render/CanvasLayout.cpp
         src/render/CanvasRenderer.cpp src/render/MotionBlur.cpp
         src/animation/AnimationSettings.cpp src/animation/AutoFocusEngine.cpp
@@ -249,6 +264,7 @@ endif()
 # Offline compositor: replays a recorded project through the shared animation
 # engine and canvas layout and writes a composited MP4.
 qt_add_executable(jianku-compose
+    src/project/EditSidecar.cpp
     src/render/ComposeMain.cpp
     src/render/ProjectCompositor.cpp
     src/render/ProjectCompositor.h
@@ -275,7 +291,7 @@ set_source_files_properties(src/mac/MacCapture.mm src/mac/QuickScreenshot.mm
     src/mac/PointerEventRecorder.mm src/mac/MicrophoneRecorder.mm
     src/mac/MousePoll.mm
     src/mac/MacWindowStyle.mm
-    src/mac/GlobalHotkey.mm src/render/VideoSurface.mm
+    src/mac/GlobalHotkey.mm src/render/VideoSurface.mm src/render/RecordingPlayer.mm src/render/FilmstripProvider.mm
     PROPERTIES COMPILE_FLAGS "-fobjc-arc")
 
 set_source_files_properties(ui/Theme.qml PROPERTIES QT_RESOURCE_ALIAS Theme.qml QT_QML_SINGLETON_TYPE TRUE)
@@ -301,6 +317,8 @@ set_source_files_properties(ui/UiColorField.qml PROPERTIES QT_RESOURCE_ALIAS UiC
 # this produced.
 set_source_files_properties(ui/EditorWindow.qml PROPERTIES QT_RESOURCE_ALIAS EditorWindow.qml)
 set_source_files_properties(ui/EditorTab.qml PROPERTIES QT_RESOURCE_ALIAS EditorTab.qml)
+set_source_files_properties(ui/FocusLane.qml PROPERTIES QT_RESOURCE_ALIAS FocusLane.qml)
+set_source_files_properties(ui/FocusInspector.qml PROPERTIES QT_RESOURCE_ALIAS FocusInspector.qml)
 
 qt_add_qml_module(jianku-screen
     URI Jianku.Screen
@@ -325,6 +343,8 @@ qt_add_qml_module(jianku-screen
         ui/UiColorField.qml
         ui/EditorWindow.qml
         ui/EditorTab.qml
+        ui/FocusLane.qml
+        ui/FocusInspector.qml
 )
 
 target_link_libraries(jianku-screen PRIVATE
@@ -379,6 +399,12 @@ add_custom_command(TARGET jianku-screen POST_BUILD
         "${CMAKE_CURRENT_SOURCE_DIR}/assets/branding/jianku-mark-128.png"
         "$<TARGET_BUNDLE_CONTENT_DIR:jianku-screen>/Resources/branding/"
     COMMENT "Bundling icon assets")
+
+add_custom_command(TARGET jianku-screen POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_BUNDLE_CONTENT_DIR:jianku-screen>/Resources/Licenses"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/third_party/dogsc/LICENSE"
+        "$<TARGET_BUNDLE_CONTENT_DIR:jianku-screen>/Resources/Licenses/DogSC-MIT.txt"
+    COMMENT "Bundling third-party notices")
 
 # Re-sign with a stable identity so TCC permissions survive rebuilds.
 add_custom_command(TARGET jianku-screen POST_BUILD

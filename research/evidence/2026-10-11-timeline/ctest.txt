@@ -1,0 +1,39 @@
+Test project /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen/build
+      Start  1: live-focus
+ 1/17 Test  #1: live-focus .......................   Passed    0.01 sec
+      Start  2: timeline-boundaries
+ 2/17 Test  #2: timeline-boundaries ..............   Passed    0.02 sec
+      Start  3: spring-solver
+ 3/17 Test  #3: spring-solver ....................   Passed    0.01 sec
+      Start  4: cursor-engine
+ 4/17 Test  #4: cursor-engine ....................   Passed    0.01 sec
+      Start  5: auto-focus
+ 5/17 Test  #5: auto-focus .......................   Passed    0.01 sec
+      Start  6: media-clock
+ 6/17 Test  #6: media-clock ......................   Passed    0.01 sec
+      Start  7: canvas-layout
+ 7/17 Test  #7: canvas-layout ....................   Passed    0.02 sec
+      Start  8: capture-source
+ 8/17 Test  #8: capture-source ...................   Passed    0.01 sec
+      Start  9: canvas-renderer
+ 9/17 Test  #9: canvas-renderer ..................   Passed    0.85 sec
+      Start 10: edit-timeline
+10/17 Test #10: edit-timeline ....................   Passed    0.01 sec
+      Start 11: timeline-strip
+11/17 Test #11: timeline-strip ...................   Passed    0.87 sec
+      Start 12: timeline-geometry
+12/17 Test #12: timeline-geometry ................   Passed    0.02 sec
+      Start 13: editor-session
+13/17 Test #13: editor-session ...................   Passed    0.09 sec
+      Start 14: motion-blur
+14/17 Test #14: motion-blur ......................   Passed    0.03 sec
+      Start 15: compositor
+15/17 Test #15: compositor .......................   Passed    3.59 sec
+      Start 16: timeline-controller
+16/17 Test #16: timeline-controller ..............   Passed    0.03 sec
+      Start 17: export-controller
+17/17 Test #17: export-controller ................   Passed    0.62 sec
+
+100% tests passed out of 17
+
+Total Test time (real) =   6.23 sec

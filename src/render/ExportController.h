@@ -38,6 +38,8 @@ class ExportController final : public QObject {
     Q_PROPERTY(QString outputSizeLabel READ outputSizeLabel NOTIFY outputSizeLabelChanged)
 
 public:
+    void setFocusRanges(const std::vector<Project::FocusClip> &ranges) { focus_ = ranges; }
+    void setEditingSettings(const QVariantMap &settings) { editingSettings_ = settings; }
     explicit ExportController(QObject *parent = nullptr);
     ~ExportController() override;
 
@@ -57,6 +59,7 @@ public:
     void setExportHeight(int height);
     // "<w> × <h>" for the chosen settings, or empty when there is no project yet.
     QString outputSizeLabel() const;
+    void refreshOutputSize() { emit outputSizeLabelChanged(); }
 
     // Records the project the UI is looking at. Called whenever a recording
     // finishes; an empty path disables exporting.
@@ -94,6 +97,8 @@ private:
 
     QString projectDirectory_;
     Project::EditTimeline timeline_;
+    std::optional<std::vector<Project::FocusClip>> focus_;
+    QVariantMap editingSettings_;
     int frameRate_ = 60;
     int exportHeight_ = 0;
     QString defaultOutputPath_;

@@ -6,11 +6,14 @@
 // were not looking at. That failure is silent, which is why it is pinned here rather than
 // left to the UI to demonstrate.
 #include "../src/render/EditorSession.h"
+#include "../src/project/EditSidecar.h"
 
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QEventLoop>
+#include <QTimer>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QTemporaryDir>
@@ -94,6 +97,16 @@ int main(int argc, char **argv) {
         require(a.defaultExportPath() != b.defaultExportPath(),
             "the two sessions do not export to the same file");
 
+        require(a.settingsStore()->setCurrent("outputAspectRatio", "1:1"), "a saves its own appearance");
+        require(a.settingsStore()->setCurrent("backgroundPaddingRatio", 15.0), "a changes padding");
+        require(b.settingsStore()->current().value("outputAspectRatio") == "auto",
+            "a's appearance leaves the other tab unchanged");
+        require(loadProject(first).settings.value("outputAspectRatio") == "1:1",
+            "the exporter reads the saved per-project appearance");
+        require(a.exporter()->outputSizeLabel() == "500 × 500",
+            "the output size refresh sees the newly saved settings");
+        require(!QFileInfo::exists(second + "/appearance.json"), "opening a tab does not write appearance");
+
         // --- editing one leaves the other alone -----------------------------------
         require(a.timeline()->splitAt(4000.0), "split in a");
         require(a.timeline()->setSpeed(0.0, 4000.0, 2.0), "speed change in a");
@@ -120,11 +133,45 @@ int main(int argc, char **argv) {
 
         EditorSession reopened(first);
         require(reopened.open(), "reopen a");
+        require(reopened.settingsStore()->current().value("backgroundPaddingRatio").toDouble() == 15.0,
+            "appearance survives reopening the project");
         require(std::abs(reopened.timeline()->outputDurationMs() - aDuration) < 0.5,
             "a's saved edit comes back");
         require(!reopened.dirty(), "and a freshly opened session is clean");
         require(reopened.title().contains(QStringLiteral(":")),
             "the tab title carries the recording's time and length");
+
+        // One history orders appearance, effect edits, and primary cuts.
+        {
+            EditorSession history(second); require(history.open(), "history session");
+            const auto original = history.settingsStore()->current();
+            require(history.settingsStore()->setCurrent("backgroundPaddingRatio", 18.0), "appearance history first");
+            require(history.timeline()->createFocus(1000, 3000), "effect history second");
+            require(history.timeline()->splitAt(4000), "primary history third");
+            history.timeline()->undo(); require(history.timeline()->segments().size() == 1, "undo primary edit first");
+            history.timeline()->undo(); require(history.timeline()->focusRanges().empty(), "then undo effect");
+            history.timeline()->undo(); require(history.settingsStore()->current() == original, "then restore appearance and disk settings");
+            history.timeline()->redo(); history.timeline()->redo();
+            require(history.timeline()->focusRanges().size() == 1, "redo crosses edit types");
+            require(history.save(), "save unified edits");
+            EditorSession copy(second); require(copy.open(), "unified edit reopen");
+            require(copy.timeline()->focusRanges().size() == 1 && copy.settingsStore()->current()["backgroundPaddingRatio"].toDouble() == 18, "effects and appearance reopen together");
+        }
+
+        // Idle autosave and immediate close must both retain complete effects.
+        const QString autosaveProject = temp.path() + "/autosave.jianku";
+        require(writeProject(autosaveProject, 10000, "2026-10-11T10:00:00.000"), "autosave fixture");
+        {
+            EditorSession session(autosaveProject); require(session.open(), "autosave session");
+            require(session.timeline()->createFocus(1000, 3000), "dirty effect before idle");
+            QEventLoop loop; QTimer::singleShot(1600, &loop, &QEventLoop::quit); loop.exec();
+            require(!session.dirty() && loadProject(autosaveProject).zoomRanges.size() == 1, "idle timer saves complete effects and clears dirty state");
+            require(session.timeline()->updateFocus(session.timeline()->selectedFocusId(), {{"zoom", 4.0}}), "dirty effect before immediate close");
+        }
+        const auto closed = loadProject(autosaveProject);
+        require(closed.zoomRanges.size() == 1 && closed.zoomRanges[0].zoom == 4, "immediate session destruction flushes pending edit");
+        const auto backup = Project::load(autosaveProject, 10000);
+        require(backup.valid && QFileInfo::exists(autosaveProject + "/edit.previous.json"), "close retains backup and valid edit schema");
 
         std::cout << "editor session checks passed\n";
         return 0;

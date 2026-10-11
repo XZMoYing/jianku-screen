@@ -1,0 +1,20 @@
+==> 1/7 打包 ffmpeg
+    ffmpeg + 19 个依赖库， 37M
+==> 2/7 签名打包好的 ffmpeg（ad-hoc）
+    完成
+==> 3/7 自检：断掉 Homebrew 的 ffmpeg 还能跑吗
+    通过（版本查询 + 一次真实 H.264 编码）
+==> 4/7 部署 Qt 框架与 QML 模块
+    ERROR: Cannot resolve rpath "@rpath/QtSvg.framework/Versions/A/QtSvg"
+    Qt 框架 + QML 模块就位（224M），无外部引用
+==> 5/7 签名应用本体
+    签名有效
+==> 6/7 生成 DMG
+    133M  /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen/build-release/简库镜传 2026.10.11.1.dmg
+==> 7/7 复查：挂载 DMG，用看不见 Homebrew 的环境启动一次
+    DMG 内的 ffmpeg 可用
+    DMG 内签名有效
+scripts/package-dmg.sh: line 240: 83790 Abort trap: 6           env -i HOME="$HOME" PATH=/usr/bin:/bin DYLD_LIBRARY_PATH=/nonexistent DYLD_FALLBACK_LIBRARY_PATH=/nonexistent QT_QPA_PLATFORM=offscreen DYLD_PRINT_LIBRARIES=1 "$MOUNTED_APP/Contents/MacOS/Jianku Screen" > "$LOG" 2>&1
+    应用从 DMG 内部启动，未加载任何外部库
+
+完成：/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen/build-release/简库镜传 2026.10.11.1.dmg

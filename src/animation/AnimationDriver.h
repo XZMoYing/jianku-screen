@@ -2,6 +2,7 @@
 
 #include "AutoFocusEngine.h"
 #include "CursorEngine.h"
+#include "LiveFocus.h"
 #include "SpringSolver.h"
 
 #include <QElapsedTimer>
@@ -102,6 +103,7 @@ public:
     Q_INVOKABLE void stop();
     Q_INVOKABLE void setSettings(const QVariantMap &settings);
     Q_INVOKABLE void setManualZoom(bool zoomed);
+    Q_INVOKABLE void toggleManualZoom();
     // Tells the driver what is actually being captured. Without this the pointer is
     // mapped through the primary display's size whatever the source is, so a window
     // or region capture — or a second display — puts the smooth pointer in the wrong
@@ -157,13 +159,15 @@ private:
     bool smoothingEnabled_ = true;
     bool autoZoomEnabled_ = true;
     double zoomLevel_ = 2.0;
-    double zoomHoldMs_ = 2000.0;
+    QString focusMode_ = QStringLiteral("auto");
+    bool keepZoomed_ = false;
+    double idleMs_ = 3000.0;
+    Animation::LiveFocus liveFocus_;
     double snapToEdgesRatio_ = 0.25;
 
     bool pressed_ = false;
     double lastX_ = -1.0;
     double lastY_ = -1.0;
-    double zoomUntilMs_ = -1.0;
     double zoomTarget_ = 1.0;
     Animation::FocusPoint zoomFocus_{0.5, 0.5};
 

@@ -6,6 +6,7 @@
 // between frames, a ruler that switches to unreadable labels — so the properties
 // are pinned here instead of being eyeballed in the UI.
 #include "../src/render/TimelineGeometry.h"
+#include "../src/render/TimelineMagnet.h"
 
 #include <cmath>
 #include <iostream>
@@ -156,6 +157,21 @@ int main() {
                 "minutes past a minute, with the seconds padded");
             require(TimelineGeometry::tickLabel(600000.0, 30000.0) == QStringLiteral("10:00"),
                 "ten minutes");
+        }
+
+        {
+            Render::TimelineMagnet magnet;
+            magnet.begin({0, 1000, 2000}, {0});
+            require(close(magnet.resolve(955, .1, false), 1000), "magnet captures within seven pixels");
+            require(close(magnet.resolve(1100, .1, false), 1000), "magnet holds within fourteen pixels");
+            require(close(magnet.resolve(1150, .1, false), 1150), "magnet releases beyond escape threshold");
+            require(close(magnet.resolve(990, .1, true), 990) && magnet.target() < 0, "Shift bypass releases guide");
+            magnet.begin({0, 1000}, {0});
+            require(close(magnet.resolve(20, .1, false), 20), "original edge cannot trap new drag");
+            magnet.resolve(200, .1, false);
+            require(close(magnet.resolve(30, .1, false), 0), "edge may recapture after leaving suppression range");
+            magnet.begin({1000});
+            require(close(magnet.resolve(480, .1, false, {0, 500}), 500), "moving range can align trailing edge");
         }
 
         std::cout << "timeline geometry checks passed\n";

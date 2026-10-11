@@ -1,0 +1,18 @@
+{
+    "appearance": true,
+    "editSave": true,
+    "error": "native capture requires authorization for the new stable application signature",
+    "firstFrame": true,
+    "hasFrame": true,
+    "inputAuthorized": false,
+    "loading": false,
+    "microphoneAuthorized": false,
+    "ok": false,
+    "playback": true,
+    "playerError": "",
+    "playerFound": true,
+    "rapidSeek": true,
+    "screenAuthorized": true,
+    "screenPreflight": true,
+    "stage": 4
+}
