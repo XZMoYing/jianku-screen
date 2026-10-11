@@ -1,5 +1,7 @@
 #![recursion_limit = "256"]
 
+pub const APPLICATION_IDENTIFIER: &str = "com.jianku.screen.next";
+
 mod api;
 mod audio;
 mod audio_library;

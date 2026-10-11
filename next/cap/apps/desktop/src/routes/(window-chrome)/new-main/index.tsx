@@ -25,13 +25,11 @@ import {
 	createEffect,
 	createMemo,
 	createSignal,
-	ErrorBoundary,
 	For,
 	on,
 	onCleanup,
 	onMount,
 	Show,
-	Suspense,
 } from "solid-js";
 import { createStore, produce, reconcile } from "solid-js/store";
 import toast from "solid-toast";
@@ -40,11 +38,7 @@ import Mode from "~/components/Mode";
 import { RecoveryToast } from "~/components/RecoveryToast";
 import Tooltip from "~/components/Tooltip";
 import { Input } from "~/routes/editor/ui";
-import {
-	authStore,
-	generalSettingsStore,
-	recordingSettingsStore,
-} from "~/store";
+import { generalSettingsStore, recordingSettingsStore } from "~/store";
 import { createSignInMutation } from "~/utils/auth";
 import { createTauriEventListener } from "~/utils/createEventListener";
 import {
@@ -52,7 +46,6 @@ import {
 	createStableDevicesQuery,
 	type MicrophoneWithDetails,
 } from "~/utils/devices";
-import { clientEnv } from "~/utils/env";
 import { hideCurrentWindow } from "~/utils/hide-window";
 import {
 	importImageFromPicker,
@@ -63,7 +56,6 @@ import {
 	createCameraMutation,
 	createCleanCaptureQuery,
 	createCurrentRecordingQuery,
-	createLicenseQuery,
 	createMicrophoneMutation,
 	getEditorRecordingTarget,
 	getPermissions,
@@ -96,8 +88,6 @@ import {
 } from "~/utils/tauri";
 import { openTeleprompter } from "~/utils/teleprompter";
 import { restartAfterUpdate } from "~/utils/updater";
-import IconCapLogoFull from "~icons/cap/logo-full";
-import IconCapLogoFullDark from "~icons/cap/logo-full-dark";
 import IconLucideAppWindowMac from "~icons/lucide/app-window-mac";
 import IconLucideArrowLeft from "~icons/lucide/arrow-left";
 import IconLucideBug from "~icons/lucide/bug";
@@ -128,7 +118,7 @@ import TargetTypeButton from "./TargetTypeButton";
 import useRequestPermission from "./useRequestPermission";
 import { getPostResizeWindowPosition } from "./window-geometry";
 
-const MAIN_WINDOW_SIZE = { width: 330, height: 395 } as const;
+const MAIN_WINDOW_SIZE = { width: 420, height: 480 } as const;
 const MAIN_WINDOW_SCREEN_PADDING = 12;
 const CAPTURE_LIST_STALE_TIME = 5_000;
 const CAPTURE_LIST_GC_TIME = 60_000;
@@ -1706,7 +1696,7 @@ function createUpdateReadyToast() {
 	createTauriEventListener(events.updateReady, (update) => {
 		toast.custom(
 			(t) => (
-				// The main window is only 330px wide, so the toast must fit inside it
+				// Keep the toast inside the compact main window.
 				// (never exceed the viewport) and stack its actions below the message
 				// rather than racing them on one line — otherwise the card overflows
 				// the window edge and gets clipped.
@@ -1846,12 +1836,8 @@ function Page() {
 	const isRecording = () => !!currentRecording.data;
 	const isActivelyRecording = () =>
 		currentRecording.data?.status === "recording";
-	const auth = authStore.createQuery();
 	const recordingSettingsQuery = recordingDeviceSettingsStore.createQuery();
 	const generalSettings = generalSettingsStore.createQuery();
-	const serverUrl = createMemo(
-		() => generalSettings.data?.serverUrl ?? clientEnv.VITE_SERVER_URL,
-	);
 	const deviceSettings = createMemo(
 		() => recordingSettingsQuery.data as RecordingDeviceSettingsStore | null,
 	);
@@ -2703,8 +2689,6 @@ function Page() {
 		}
 	});
 
-	const license = createLicenseQuery();
-
 	const signIn = createSignInMutation();
 	const stopRecording = createMutation(() => ({
 		mutationFn: async () => {
@@ -3012,7 +2996,7 @@ function Page() {
 	return (
 		<div
 			onMouseEnter={handleMouseEnter}
-			class="flex relative flex-col px-[13px] gap-2 pb-[8px] h-full min-h-0 text-(--text-primary)"
+			class="flex relative flex-col px-[18px] gap-3 pb-[12px] h-full min-h-0 text-(--text-primary)"
 		>
 			<Show when={cleanCapture.data?.phase === "awaitingShortcut"}>
 				<div
@@ -3144,43 +3128,13 @@ function Page() {
 					<Show
 						when={editorRecordingFlow()}
 						fallback={
-							<div class="flex items-center space-x-1">
-								<a
-									class="*:w-[92px] *:h-auto text-(--text-primary)"
-									target="_blank"
-									href={
-										auth.data
-											? new URL("/dashboard", serverUrl()).toString()
-											: serverUrl()
-									}
-								>
-									<IconCapLogoFullDark class="hidden dark:block" />
-									<IconCapLogoFull class="block dark:hidden" />
-								</a>
-								<ErrorBoundary fallback={null}>
-									<Suspense>
-										<Show
-											when={license.data?.type !== "pro"}
-											fallback={
-												<span class="text-[0.6rem] ml-2 rounded-lg border border-gray-5 px-1 py-0.5 bg-(--blue-400) text-gray-1 dark:text-gray-12">
-													{license.data?.type === "commercial"
-														? "Commercial"
-														: "Pro"}
-												</span>
-											}
-										>
-											<button
-												type="button"
-												onClick={() => {
-													void commands.showWindow("Upgrade");
-												}}
-												class="text-[0.6rem] ml-2 rounded-lg border border-gray-5 px-1 py-0.5 bg-gray-3 hover:bg-gray-5"
-											>
-												Personal
-											</button>
-										</Show>
-									</Suspense>
-								</ErrorBoundary>
+							<div class="flex items-center gap-2.5">
+								<span class="text-base font-semibold tracking-tight">
+									简库镜传
+								</span>
+								<span class="rounded-md border border-gray-5 bg-gray-3 px-1.5 py-0.5 text-[10px] text-gray-11">
+									新版预览
+								</span>
 							</div>
 						}
 					>

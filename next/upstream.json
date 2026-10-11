@@ -1,0 +1,14 @@
+{
+  "repository": "https://github.com/CapSoftware/Cap.git",
+  "tag": "cap-v0.6.0",
+  "commit": "6cfdd172cd53b1d6861852288c2192a8ab743687",
+  "tree": "fda8d5654fc21ec63f15dc7f28ce401c7c323084",
+  "importCommit": "44e5cf40a1dfa526399835345bdf4ebcf0556f08",
+  "sourceDirectory": "next/cap",
+  "legacyBackupTag": "backup-qt-0.1.6-20261011",
+  "legacyBackupCommit": "df7dd69d8b209f1f21a641a1b4d9236476e5c028",
+  "forkBranch": "rewrite/cap-foundation",
+  "applicationIdentifier": "com.jianku.screen.next",
+  "animationPolicy": "Prefer the Cap rendering core and measured reference behavior; use DogSC for selected interactions and functions, not cursor or camera animation.",
+  "license": "AGPL-3.0 with upstream exceptions; see next/cap/LICENSE"
+}

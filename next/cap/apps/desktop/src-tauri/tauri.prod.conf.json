@@ -1,29 +1,40 @@
 {
 	"$schema": "https://schema.tauri.app/config/2",
-	"productName": "Cap",
-	"mainBinaryName": "Cap",
-	"identifier": "so.cap.desktop",
+	"productName": "Jianku Screen Next",
+	"mainBinaryName": "Jianku Screen Next",
+	"identifier": "com.jianku.screen.next",
+	"version": "0.2.0-alpha.1",
 	"build": {
-		"beforeBundleCommand": "node scripts/prodBeforeBundle.js"
+		"beforeBuildCommand": "bun run build"
 	},
 	"plugins": {
 		"updater": {
-			"active": true,
-			"endpoints": [
-				"https://cdn.crabnebula.app/update/cap/cap/{{target}}/{{current_version}}"
-			],
-			"dialog": true,
-			"pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEUyOTAzOTdFNzJFQkRFOTMKUldTVDN1dHlmam1RNHFXb1VYTXlrQk1iMFFkcjN0YitqZlA5WnZNY0ZtQ1dvM1dxK211M3VIYUQK"
+			"active": false,
+			"endpoints": [],
+			"pubkey": ""
+		},
+		"deep-link": {
+			"desktop": {
+				"schemes": ["jianku-screen-next"]
+			}
 		}
 	},
 	"bundle": {
-		"macOS": {
-			"entitlements": "Entitlements.plist"
+		"createUpdaterArtifacts": false,
+		"fileAssociations": [],
+		"icon": [
+			"icons/jianku/128x128.png",
+			"icons/jianku/icon.icns",
+			"icons/jianku/icon.ico"
+		],
+		"resources": {
+			"../../../LICENSE": "licenses/Cap-LICENSE.txt",
+			"../../../JIANKU-NOTICE.md": "licenses/JIANKU-NOTICE.md"
 		},
-		"windows": {
-			"wix": {
-				"upgradeCode": "a765d9de-0ecc-55d0-b8a0-61e9d3276664"
-			}
+		"macOS": {
+			"bundleName": "简库镜传 Next",
+			"bundleVersion": "2026.10.11.1",
+			"entitlements": "Entitlements.plist"
 		}
 	}
 }

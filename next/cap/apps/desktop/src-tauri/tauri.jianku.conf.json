@@ -1,0 +1,40 @@
+{
+	"$schema": "https://schema.tauri.app/config/2",
+	"productName": "Jianku Screen Next",
+	"mainBinaryName": "Jianku Screen Next",
+	"identifier": "com.jianku.screen.next",
+	"version": "0.2.0-alpha.1",
+	"build": {
+		"beforeBuildCommand": "bun run build"
+	},
+	"plugins": {
+		"updater": {
+			"active": false,
+			"endpoints": [],
+			"pubkey": ""
+		},
+		"deep-link": {
+			"desktop": {
+				"schemes": ["jianku-screen-next"]
+			}
+		}
+	},
+	"bundle": {
+		"createUpdaterArtifacts": false,
+		"fileAssociations": [],
+		"icon": [
+			"icons/jianku/128x128.png",
+			"icons/jianku/icon.icns",
+			"icons/jianku/icon.ico"
+		],
+		"resources": {
+			"../../../LICENSE": "licenses/Cap-LICENSE.txt",
+			"../../../JIANKU-NOTICE.md": "licenses/JIANKU-NOTICE.md"
+		},
+		"macOS": {
+			"bundleName": "简库镜传 Next",
+			"bundleVersion": "2026.10.11.1",
+			"entitlements": "Entitlements.plist"
+		}
+	}
+}

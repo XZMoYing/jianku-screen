@@ -1,0 +1,2 @@
+$ node scripts/jianku.mjs check
+原生构建需要完整 Xcode。macOS 14.7 可安装 Xcode 16.2；安装后可使用 DEVELOPER_DIR 指定其 Contents/Developer 目录。苹果下载需要本人登录 Apple 账户。已有 Qt 版本不受影响。

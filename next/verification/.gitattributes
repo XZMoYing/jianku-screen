@@ -1,0 +1,2 @@
+# Keep captured tool output verbatim, including the test runner's final blank line.
+*.log whitespace=-blank-at-eof

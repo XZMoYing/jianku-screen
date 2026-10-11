@@ -1961,7 +1961,8 @@ impl ShowCapWindow {
                         None => tauri::Position::Logical(tauri::LogicalPosition::new(pos.x, pos.y)),
                     }
                 } else {
-                    let (pos_x, pos_y) = cursor_monitor.center_position(330.0, 395.0);
+                    let (width, height) = crate::main_window_geometry::SIZE;
+                    let (pos_x, pos_y) = cursor_monitor.center_position(width, height);
                     cursor_monitor.position(pos_x, pos_y)
                 };
 
@@ -2018,7 +2019,8 @@ impl ShowCapWindow {
 
                     #[cfg(windows)]
                     {
-                        if let Err(e) = window.set_size(LogicalSize::new(330.0, 395.0)) {
+                        let (width, height) = crate::main_window_geometry::SIZE;
+                        if let Err(e) = window.set_size(LogicalSize::new(width, height)) {
                             warn!("Failed to set Main window size on Windows: {}", e);
                         }
                         if let Err(e) = window.set_position(main_position) {

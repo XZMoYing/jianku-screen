@@ -92,12 +92,12 @@ fn main() {
         let path = dirs::home_dir()
             .unwrap()
             .join("Library/Logs")
-            .join("so.cap.desktop");
+            .join(cap_desktop_lib::APPLICATION_IDENTIFIER);
 
         #[cfg(not(target_os = "macos"))]
         let path = dirs::data_local_dir()
             .unwrap()
-            .join("so.cap.desktop")
+            .join(cap_desktop_lib::APPLICATION_IDENTIFIER)
             .join("logs");
 
         #[cfg(debug_assertions)]

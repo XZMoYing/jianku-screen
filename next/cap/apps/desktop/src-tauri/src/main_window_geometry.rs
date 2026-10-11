@@ -1,4 +1,4 @@
-pub(crate) const SIZE: (f64, f64) = (330.0, 395.0);
+pub(crate) const SIZE: (f64, f64) = (420.0, 480.0);
 const PADDING: f64 = 12.0;
 
 pub(crate) fn restored_position(

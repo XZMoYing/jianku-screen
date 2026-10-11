@@ -1,0 +1,30 @@
+    Checking objc2-core-image v0.3.1
+    Checking objc2-quartz-core v0.3.1
+   Compiling tauri v2.8.5
+    Checking objc2-core-data v0.3.1
+    Checking objc2-cloud-kit v0.3.1
+   Compiling workspace-hack v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/workspace-hack)
+    Checking image v0.25.8
+   Compiling tauri-macros v2.4.0
+   Compiling coreaudio-sys v0.2.17
+   Compiling cidre v0.11.0 (https://github.com/CapSoftware/cidre?rev=bf84b67079a8#bf84b670)
+    Checking hex v0.4.3
+    Checking objc2-app-kit v0.3.1
+    Checking sentry-types v0.42.0
+error: failed to run custom build command for `cidre v0.11.0 (https://github.com/CapSoftware/cidre?rev=bf84b67079a8#bf84b670)`
+
+Caused by:
+  process didn't exit successfully: `/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/debug/build/cidre-23904ff00708e988/build-script-build` (exit status: 101)
+  --- stdout
+  cargo:rustc-link-lib=clang_rt.osx
+  cargo:rustc-link-search=/Library/Developer/CommandLineTools/usr/lib/clang/16/lib/darwin
+  cargo:rerun-if-changed=./pomace/
+  cargo:rustc-link-search=native=/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/debug/build/cidre-0b1e68229ff66bbe/out/Debug
+
+  --- stderr
+  xcode-select: error: tool 'xcodebuild' requires Xcode, but active developer directory '/Library/Developer/CommandLineTools' is a command line tools instance
+
+  thread 'main' panicked at /Users/moyingxz/.cargo/git/checkouts/cidre-4fcea89888fe326d/bf84b67/cidre/build.rs:145:5:
+  assertion failed: status.success()
+  note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+warning: build failed, waiting for other jobs to finish...

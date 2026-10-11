@@ -29,6 +29,9 @@ use tracing::{info, warn};
 
 use crate::general_settings::GeneralSettingsStore;
 
+// The upstream GPUI binary still owns Cap's store; do not hand a fork session to it.
+const GPUI_HANDOFF_SUPPORTED: bool = false;
+
 #[cfg(windows)]
 const BINARY_NAME: &str = "cap-gpui.exe";
 #[cfg(not(windows))]
@@ -90,6 +93,10 @@ fn existing_file(path: PathBuf) -> Option<PathBuf> {
 }
 
 fn binary_path(app: &AppHandle) -> Option<PathBuf> {
+    if !GPUI_HANDOFF_SUPPORTED {
+        return None;
+    }
+
     if let Some(path) = std::env::var_os("CAP_GPUI_BIN").map(PathBuf::from)
         && path.is_file()
     {
@@ -133,18 +140,17 @@ fn binary_path(app: &AppHandle) -> Option<PathBuf> {
     None
 }
 
-/// Mirror of `store::app_data_dir` in `apps/desktop-gpui`: the pidfile and the
-/// handoff marker live under the shared production identifier
-/// (`so.cap.desktop`), not this app's possibly-`.dev` one.
+/// Keep handoff state under the fork identifier, outside an installed Cap's store.
 fn shared_data_dir() -> PathBuf {
     #[cfg(target_os = "macos")]
     let base = PathBuf::from(std::env::var("HOME").unwrap_or_else(|_| ".".into()))
-        .join("Library/Application Support/so.cap.desktop");
+        .join("Library/Application Support")
+        .join(crate::APPLICATION_IDENTIFIER);
     #[cfg(target_os = "windows")]
     let base = std::env::var_os("APPDATA")
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from("."))
-        .join("so.cap.desktop");
+        .join(crate::APPLICATION_IDENTIFIER);
     #[cfg(all(not(target_os = "macos"), not(target_os = "windows")))]
     let base = std::env::var_os("XDG_DATA_HOME")
         .map(PathBuf::from)
@@ -152,7 +158,7 @@ fn shared_data_dir() -> PathBuf {
             PathBuf::from(std::env::var_os("HOME").unwrap_or_else(|| ".".into()))
                 .join(".local/share")
         })
-        .join("so.cap.desktop");
+        .join(crate::APPLICATION_IDENTIFIER);
     base
 }
 
@@ -160,12 +166,7 @@ fn gpui_pidfile() -> PathBuf {
     shared_data_dir().join("cap-gpui.pid")
 }
 
-/// Whether this app's own store IS the shared one. It is for the production
-/// bundle (`so.cap.desktop`), but a dev build stores under a `.dev` identifier
-/// while `cap-gpui` always reads and writes the shared file -- two stores that
-/// silently disagree. The handoff flag therefore lives in the shared store,
-/// and this app's own copy of the setting is just what its settings page
-/// displays.
+/// Check before writing directly so a live store plugin cannot overwrite a handoff change.
 fn own_store_is_shared(app: &AppHandle) -> bool {
     app.path()
         .app_data_dir()
@@ -668,6 +669,10 @@ fn forward_deep_links_to_gpui(pid: u32, args: &[String]) -> bool {
 
 #[cfg(any(target_os = "macos", windows))]
 pub(crate) fn forward_deep_links_to_active_gpui(app: &AppHandle, args: &[String]) -> bool {
+    if !GPUI_HANDOFF_SUPPORTED {
+        return false;
+    }
+
     let own = GeneralSettingsStore::get(app)
         .ok()
         .flatten()
@@ -694,6 +699,10 @@ pub(crate) fn forward_deep_links_to_active_gpui(app: &AppHandle, args: &[String]
 
 #[cfg(target_os = "macos")]
 pub(crate) fn forward_deep_links_to_gpui_when_ready(args: &[String]) -> Option<u32> {
+    if !GPUI_HANDOFF_SUPPORTED {
+        return None;
+    }
+
     if !args
         .iter()
         .any(|argument| forwarded_gpui_argument(argument).is_some())
@@ -964,6 +973,10 @@ pub async fn switch_to_gpui_app(app: AppHandle) -> Result<(), String> {
 ///
 /// `true` means the caller must exit before any window is created.
 pub fn redirect_at_startup_if_enabled(app: &AppHandle) -> Result<bool, String> {
+    if !GPUI_HANDOFF_SUPPORTED {
+        return Ok(false);
+    }
+
     #[cfg(debug_assertions)]
     if crate::stop_editor_benchmark::enabled() {
         return Ok(false);

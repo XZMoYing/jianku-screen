@@ -1,0 +1,6 @@
+
+running 1 test
+test tests::preserves_top_left_and_clamps_on_scaled_negative_coordinate_screens ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

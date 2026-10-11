@@ -1,0 +1,272 @@
+{
+  "recordedAt": "2026-10-11T23:42:54.231707+08:00",
+  "stage": "Cap foundation source integration; native application build pending",
+  "branch": "rewrite/cap-foundation",
+  "legacyBackup": {
+    "date": "2026-10-11",
+    "sourceCommit": "df7dd69d8b209f1f21a641a1b4d9236476e5c028",
+    "tag": "backup-qt-0.1.6-20261011",
+    "remoteBranch": "backup/qt-0.1.6-2026-10-11",
+    "remote": "https://github.com/XZMoYing/jianku-screen.git",
+    "bundle": {
+      "name": "qt-0.1.6-20261011.bundle",
+      "sha256": "78d79c37128c55baa30c47ec68c0348856b77445f6c00710d0383314c8306280",
+      "verified": true
+    },
+    "restore": "git clone qt-0.1.6-20261011.bundle restored-project; git -C restored-project switch --detach backup-qt-0.1.6-20261011",
+    "scope": "Source, research and verification history; user recordings remain in their original locations.",
+    "installer": {
+      "name": "简库镜传 2026.10.11.5.dmg",
+      "sha256": "9d8fc589536bc627f902b7cb4a75aa8c38f4f01d9ced06c59c1887bea256a33b",
+      "bytes": 138592745
+    }
+  },
+  "upstream": {
+    "repository": "https://github.com/CapSoftware/Cap.git",
+    "tag": "cap-v0.6.0",
+    "commit": "6cfdd172cd53b1d6861852288c2192a8ab743687",
+    "tree": "fda8d5654fc21ec63f15dc7f28ce401c7c323084",
+    "importCommit": "44e5cf40a1dfa526399835345bdf4ebcf0556f08",
+    "sourceDirectory": "next/cap",
+    "legacyBackupTag": "backup-qt-0.1.6-20261011",
+    "legacyBackupCommit": "df7dd69d8b209f1f21a641a1b4d9236476e5c028",
+    "forkBranch": "rewrite/cap-foundation",
+    "applicationIdentifier": "com.jianku.screen.next",
+    "animationPolicy": "Prefer the Cap rendering core and measured reference behavior; use DogSC for selected interactions and functions, not cursor or camera animation.",
+    "license": "AGPL-3.0 with upstream exceptions; see next/cap/LICENSE"
+  },
+  "originalImportTree": "fda8d5654fc21ec63f15dc7f28ce401c7c323084",
+  "originalImportMatchesUpstreamTree": true,
+  "coreAudit": {
+    "unchangedDirectories": [
+      "next/cap/crates/recording",
+      "next/cap/crates/rendering",
+      "next/cap/crates/editor",
+      "next/cap/crates/project",
+      "next/cap/crates/export"
+    ],
+    "diffAgainstImport": "",
+    "passed": true
+  },
+  "environment": {
+    "macOS": "14.7.4",
+    "architecture": "aarch64-apple-darwin",
+    "node": "24.21.0",
+    "bun": "1.4.0",
+    "rust": "1.88.0",
+    "activeDeveloperDirectory": "/Library/Developer/CommandLineTools",
+    "fullXcodeInstalled": false,
+    "userResponse": "User will install Xcode 16.2 and report completion."
+  },
+  "checks": [
+    {
+      "name": "frozen-dependencies",
+      "command": "bun install --frozen-lockfile",
+      "status": "passed",
+      "exitCode": 0,
+      "installedPackages": 2792,
+      "lockfileChanged": false
+    },
+    {
+      "name": "native-dependency-setup",
+      "command": "node scripts/setup.js",
+      "status": "passed",
+      "exitCode": 0,
+      "note": "Prepared media libraries only; not proof of native application compilation."
+    },
+    {
+      "name": "frontend-production-build",
+      "command": "bun run jianku:frontend",
+      "status": "passed",
+      "exitCode": 0,
+      "log": "frontend-build.log"
+    },
+    {
+      "name": "desktop-types",
+      "command": "bun run tsc -p apps/desktop/tsconfig.json --noEmit",
+      "status": "passed",
+      "exitCode": 0,
+      "log": "desktop-types.log"
+    },
+    {
+      "name": "existing-frontend-tests",
+      "command": "bun run vitest run src/routes/(window-chrome)/new-main/window-geometry.test.ts src/routes/(window-chrome)/new-main/use-request-permission.test.ts",
+      "workingDirectory": "next/cap/apps/desktop",
+      "status": "passed",
+      "exitCode": 0,
+      "testsPassed": 30,
+      "suites": [
+        {
+          "path": "src/routes/(window-chrome)/new-main/window-geometry.test.ts",
+          "testsPassed": 3
+        },
+        {
+          "path": "src/routes/(window-chrome)/new-main/use-request-permission.test.ts",
+          "testsPassed": 27
+        }
+      ],
+      "evidence": "Captured successful tool result; no separate full test log retained."
+    },
+    {
+      "name": "existing-native-geometry-test",
+      "command": "rustc --edition 2024 --test apps/desktop/src-tauri/src/main_window_geometry.rs -o /tmp/jianku-cap-toolchain/main-window-geometry-test; /tmp/jianku-cap-toolchain/main-window-geometry-test",
+      "status": "passed",
+      "exitCode": 0,
+      "testsPassed": 1,
+      "log": "native-window-geometry.log",
+      "note": "Standalone pure geometry test; does not compile the application. Unused SIZE warning is expected in the standalone test module."
+    },
+    {
+      "name": "tauri-config-schema",
+      "status": "passed",
+      "exitCode": 0,
+      "schema": "Installed @tauri-apps/cli 2.8.4 config.schema.json",
+      "configurations": [
+        "tauri.conf.json",
+        "tauri.prod.conf.json",
+        "tauri.jianku.conf.json"
+      ],
+      "log": "config-validation.log"
+    },
+    {
+      "name": "scoped-biome",
+      "status": "passed",
+      "exitCode": 0,
+      "log": "biome.log",
+      "filesChecked": 7
+    },
+    {
+      "name": "rustfmt",
+      "command": "cargo fmt --all --check",
+      "status": "passed",
+      "exitCode": 0,
+      "log": "rustfmt.log"
+    },
+    {
+      "name": "script-syntax",
+      "command": "node --check scripts/jianku.mjs",
+      "status": "passed",
+      "exitCode": 0
+    },
+    {
+      "name": "permission-plist",
+      "command": "plutil -lint apps/desktop/src-tauri/Info.plist",
+      "status": "passed",
+      "exitCode": 0
+    },
+    {
+      "name": "native-desktop-check",
+      "command": "cargo check --locked -p cap-desktop",
+      "status": "blocked",
+      "exitCode": 101,
+      "dependency": "cidre 0.11.0 / bf84b67079a8",
+      "reason": "xcodebuild requires full Xcode; active directory is CommandLineTools",
+      "log": "native-check.log"
+    },
+    {
+      "name": "native-build-preflight",
+      "command": "bun run jianku:check",
+      "status": "blocked",
+      "exitCode": 2,
+      "log": "build-preflight.log"
+    },
+    {
+      "name": "git-diff-whitespace",
+      "command": "git diff --check",
+      "status": "passed",
+      "exitCode": 0
+    }
+  ],
+  "notValidated": [
+    "Native application build, signing and launch",
+    "Recording and screenshot permissions and stop/save/editor flow",
+    "Full editor and export runtime behavior",
+    "Actual isolated data writes",
+    "Frame-by-frame reference animation parity",
+    "Realtime presentation",
+    "Windows",
+    "Old project migration"
+  ],
+  "newApplicationProduced": false,
+  "applicationOpenedForTrial": false,
+  "handoffDocument": "docs/待验证项目交接.md",
+  "changedSourceSHA256": {
+    "README.md": "4f633df29d170982f2d3e76d0eb0cd7b7b9f597ff7e75f73b83e4bf2166ce467",
+    "next/cap/apps/desktop/package.json": "b90ec35783995a6c4b008954325417f90453d66f4d69042ee7f27a647bcd9ab7",
+    "next/cap/apps/desktop/src-tauri/Info.plist": "c8384b572c5e52cfdc597b454f679b75838a5a6f57efc985824f79fbdbce83a8",
+    "next/cap/apps/desktop/src-tauri/src/gpui_app.rs": "8bfcbffae16ce2ac3a4a0735aa370125328870719d064d49bb9a3dfb987d298c",
+    "next/cap/apps/desktop/src-tauri/src/lib.rs": "780ffc8dae6e6121126065b254321b1d591577fcba3e1a54b99e11596ec0096c",
+    "next/cap/apps/desktop/src-tauri/src/main.rs": "70a7d86654f59d85d2d714a08d6c5d16c3da83a7ca18a812d09f789102e60694",
+    "next/cap/apps/desktop/src-tauri/src/main_window_geometry.rs": "99d0aa2bfb24339ec1cffb37f5e478da357069aba31d990eb34a4a0b701a9ab6",
+    "next/cap/apps/desktop/src-tauri/src/windows.rs": "d7886b2926bd10f3ee8db17d06db09bcd02272a6c72173e6d7355a775b46b982",
+    "next/cap/apps/desktop/src-tauri/tauri.conf.json": "b64f5b190fb913dd89468374604ed126a319df5f98297d1b7e07b774f8cfccb1",
+    "next/cap/apps/desktop/src-tauri/tauri.prod.conf.json": "c1b5777d8b36767052e9fe5824dab995e2b7aca2c2544c9083d7f82043f27036",
+    "next/cap/apps/desktop/src/routes/(window-chrome)/new-main/index.tsx": "8ac0b94fa9464ff97ca4630dd51571bbe880d384827f606eb0f9390b84af9c53",
+    "next/cap/package.json": "7f753c18a708a3d9166576337b27b941b4d22bb237306184614ef1bb0c8cf5bd",
+    "next/README.md": "222fb8073a9a3d24474f9f1858794dda8f958520207bcb6b00124a7ae8770c50",
+    "next/cap/JIANKU-NOTICE.md": "97a169bf64f62c08102478e3b28d0ec75561b269408bb14f431fddd921bc9078",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/128x128.png": "452a4679762210506a9a7bf4a529612d27fc42c61808a304a017c98a3921c80a",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/128x128@2x.png": "8c32f03f01ba956a0f25d2c891e2685e38829a0fe209e8215dc39661a3440747",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/32x32.png": "47d2852c94e709d55282aac5037b8554e0f97d768ac5a8f425fc4dddee109c1d",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/64x64.png": "950de267bf8837bb1fe7fbf6e5db300bb9523c9f0ae0aab624d36552a5a17da8",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/Square107x107Logo.png": "1b3f4e0779f7d45708d259f8c53d31c46e76bc68a89cfe80d88b0a0cf84a7b6b",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/Square142x142Logo.png": "e89fe6cafbc99e4fd03b7e046bffb3564b8bca2a3e0c00ad05af24bb6b80899f",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/Square150x150Logo.png": "16f23d3a10b6c42a72f5194a39a2103ca23bf167e011cb91ad893708a2e61773",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/Square284x284Logo.png": "94832e67826054057104eef2e631d16c93e696fa5963352ac1e72542314916ab",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/Square30x30Logo.png": "48feb9291ff275c7d643c46cb609c6a55f507572be76d752c84aed33d26ca49f",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/Square310x310Logo.png": "0dc9ddcebf32ecfa603bca64687691222b7eb97c0f8a7f71b66c6a9ea8f2bdcf",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/Square44x44Logo.png": "2fa8d2e19c9ab20bed103ce289334ca7be360a4c690731bfb382145e2cde2864",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/Square71x71Logo.png": "be306629653175921416b167debb4ac8e786ebaa1cce5a57aa9e93a830d759f6",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/Square89x89Logo.png": "8924093cc28b4174a5737b3512a1e624c6bd10febed203b9d03ea4cab80de98d",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/StoreLogo.png": "01f7e809dac34e416712be4f56ad124d3425bfa283ddb2d05a26c8e51561478d",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/android/mipmap-hdpi/ic_launcher.png": "d40449c8b98b54bd551a6f33a57bd393fc76a50da0c4fd9c4fa3be6c129ddfa2",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/android/mipmap-hdpi/ic_launcher_foreground.png": "6f90fa91218bf90b3493fdf824a990f4f6c56d8300b2484f5026fe4d7fcea966",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/android/mipmap-hdpi/ic_launcher_round.png": "d40449c8b98b54bd551a6f33a57bd393fc76a50da0c4fd9c4fa3be6c129ddfa2",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/android/mipmap-mdpi/ic_launcher.png": "30edbe6445d24b937cc13a1af7eff50eac582cc937ab8b4fe18b23bd6085fa0f",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/android/mipmap-mdpi/ic_launcher_foreground.png": "1070b9e648e3a4a31d7a55ef5cabed80a865d47533ad8eb0eaf866eb54d3bc03",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/android/mipmap-mdpi/ic_launcher_round.png": "30edbe6445d24b937cc13a1af7eff50eac582cc937ab8b4fe18b23bd6085fa0f",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/android/mipmap-xhdpi/ic_launcher.png": "93f4bce2fd48b8dff3ac36de419215820adc2b1c2b47c4270cc1f53407d54af6",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/android/mipmap-xhdpi/ic_launcher_foreground.png": "65ca1ebfd43fbee7b622bf843434c603bad956b68847b98453974287d24a1146",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/android/mipmap-xhdpi/ic_launcher_round.png": "93f4bce2fd48b8dff3ac36de419215820adc2b1c2b47c4270cc1f53407d54af6",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/android/mipmap-xxhdpi/ic_launcher.png": "c639e4081f24f469c80edbbb43cb744b5b98cf14e180149a4d5ba9c9cc0fa172",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/android/mipmap-xxhdpi/ic_launcher_foreground.png": "a288621e35bc13e47473efef7c9c77b4d82cf27321c4685012f76f05ae1b927c",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/android/mipmap-xxhdpi/ic_launcher_round.png": "c639e4081f24f469c80edbbb43cb744b5b98cf14e180149a4d5ba9c9cc0fa172",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/android/mipmap-xxxhdpi/ic_launcher.png": "bf2d46af85aaf91dff1ac0a10e01d61f5869fde90601f236eaf779350523a6e5",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/android/mipmap-xxxhdpi/ic_launcher_foreground.png": "c1f72cbd0600a99132092cf65a731e8845292f02382fd98ea00dcbddaf6e2bb0",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/android/mipmap-xxxhdpi/ic_launcher_round.png": "bf2d46af85aaf91dff1ac0a10e01d61f5869fde90601f236eaf779350523a6e5",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/icon.icns": "5fd9d6b89ab252f0e032f1781643b877f9d015a245732be28a13eee27e758553",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/icon.ico": "50ba104edd30c538cb0cb7e3943ecaaa27bb76eb51705ee8a4be778686fc2919",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/icon.png": "696d34ce331dc7fa89895332845d2d6b52d324bedd572410dab970f3ff40cd59",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/ios/AppIcon-20x20@1x.png": "e6537d46cad62fa2ec17319bfbfb3c30ea4c951f03652ff1917c0970a6fbdf34",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/ios/AppIcon-20x20@2x-1.png": "1e58e6b36233920704b6711bec55a284dae9acb87ec249882d1e246dfb2e9dbc",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/ios/AppIcon-20x20@2x.png": "1e58e6b36233920704b6711bec55a284dae9acb87ec249882d1e246dfb2e9dbc",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/ios/AppIcon-20x20@3x.png": "e5929b9befb9aa425f8a43a72e70989619c7e8352d4f1da0df4c2a533ab13719",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/ios/AppIcon-29x29@1x.png": "42f1e8f39ddbf3e5d7c1299203583bac71946e2e09418edb4bebb40802e34153",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/ios/AppIcon-29x29@2x-1.png": "9e929d62726c3c33ce1a19fa5855b4d0273e7ab4a79a8fa6fcf1db57dec5dfbc",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/ios/AppIcon-29x29@2x.png": "9e929d62726c3c33ce1a19fa5855b4d0273e7ab4a79a8fa6fcf1db57dec5dfbc",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/ios/AppIcon-29x29@3x.png": "e763f2474d7ac092f5b5624d6d9bdb355dd02f038aefad46514dd974ee4c1406",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/ios/AppIcon-40x40@1x.png": "1e58e6b36233920704b6711bec55a284dae9acb87ec249882d1e246dfb2e9dbc",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/ios/AppIcon-40x40@2x-1.png": "f6a0d015ac1e0920eba1684b225c867bfabf683b882408a55ca62c197b00570c",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/ios/AppIcon-40x40@2x.png": "f6a0d015ac1e0920eba1684b225c867bfabf683b882408a55ca62c197b00570c",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/ios/AppIcon-40x40@3x.png": "9b6b54fca1801289f016f66f0d7dbe6248ff848d28279a2e6dc0727c81329fb9",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/ios/AppIcon-512@2x.png": "fa3a544061ef1e3bf06fdb59aaa4fdfed06af060ad052c9dc355e2e05a3d4c53",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/ios/AppIcon-60x60@2x.png": "9b6b54fca1801289f016f66f0d7dbe6248ff848d28279a2e6dc0727c81329fb9",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/ios/AppIcon-60x60@3x.png": "ff4e6ef8fb8ed8e773dc74178813217f2ccdbf4067fe7d1b88e62c29df4ec889",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/ios/AppIcon-76x76@1x.png": "cf544f4dd4faa5cd8cf1914702c69ef27e2c8c954b5f2ae969998637d820a1a7",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/ios/AppIcon-76x76@2x.png": "c050977bc6235b5586fdaa78b4d87ac846c4dd8576686bbc2a31607c4e0a843d",
+    "next/cap/apps/desktop/src-tauri/icons/jianku/ios/AppIcon-83.5x83.5@2x.png": "00f4d21b539946975fe000caf93445f391bbdb535a0839a311a510f488204a10",
+    "next/cap/apps/desktop/src-tauri/tauri.jianku.conf.json": "c1b5777d8b36767052e9fe5824dab995e2b7aca2c2544c9083d7f82043f27036",
+    "next/cap/scripts/jianku.mjs": "05e8a2699268e5b640eeedc3245b4638d9087f7effb017e3ed957aadf97895b7",
+    "next/upstream.json": "56c7b3944696d5532694276eff18619a9236c624810b6f1dfe6c2eceed780e39"
+  },
+  "logsSHA256": {
+    "frontend-build.log": "d87035f84035fb45faf30d83d671dd6559577a3d1d582e6b97617bdf4a31c355",
+    "desktop-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-check.log": "e5c36baf8fec5147db8bfb04a1faf5f4d78c7e00f600ab7537dbe0c5510316f6",
+    "native-window-geometry.log": "b72f4a460f9196d07ed0db590f3072bb76dc35160fc555243dcabc60e5472956",
+    "build-preflight.log": "a8a32aba1360f926942be432c0f735bfe36792b4fe4a5ba76c1468ea12524492",
+    "config-validation.log": "6b5619b3d3fb55e08d03eadb6b1ffec1b9f62e45b33c5a5015b7db467cbd8015",
+    "biome.log": "a86a3761819c1723f1006c54fb2f949209b9ca866dac1c416813d717f414f693",
+    "rustfmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}
