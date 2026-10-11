@@ -63,21 +63,15 @@ const ModeSelect = (props: { onClose?: () => void; standalone?: boolean }) => {
 
 	const modeOptions = [
 		{
-			mode: "instant" as const,
-			title: "Instant",
-			description: "Share instantly with a link. Uploads as you record.",
-			icon: IconCapInstant,
-		},
-		{
 			mode: "studio" as const,
-			title: "Studio",
-			description: "Highest quality local recording for editing later.",
+			title: "录制模式",
+			description: "录制保存在本机，停止后进入编辑器。",
 			icon: IconCapFilmCut,
 		},
 		{
 			mode: "screenshot" as const,
-			title: "Screenshot",
-			description: "Capture and annotate screenshots instantly.",
+			title: "截图",
+			description: "截图、标注并保存到本机或剪贴板。",
 			icon: IconCapScreenshot,
 		},
 	];
@@ -102,7 +96,7 @@ const ModeSelect = (props: { onClose?: () => void; standalone?: boolean }) => {
 				</div>
 			</Show>
 
-			<div class="grid grid-cols-3 gap-4">
+			<div class="grid grid-cols-2 gap-4">
 				{modeOptions.map((option) => (
 					<ModeOption
 						mode={option.mode}

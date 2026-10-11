@@ -49,6 +49,7 @@ import IconLucideSave from "~icons/lucide/save";
 import IconLucideShield from "~icons/lucide/shield";
 import IconLucideVolume2 from "~icons/lucide/volume-2";
 import IconLucideVolumeX from "~icons/lucide/volume-x";
+import brandIcon from "../../../src-tauri/icons/jianku/128x128.png";
 import cloud1 from "../../assets/illustrations/cloud-1.png";
 import cloud2 from "../../assets/illustrations/cloud-2.png";
 import cloud3 from "../../assets/illustrations/cloud-3.png";
@@ -83,8 +84,8 @@ const modes: ModeDetail[] = [
 	},
 	{
 		id: "studio",
-		title: "Studio Mode",
-		tagline: "Professional editing tools",
+		title: "录制模式",
+		tagline: "本地录制与编辑",
 		description:
 			"Record in full quality locally, then use the built-in editor to add backgrounds, padding, cursor effects, and more.",
 		icon: IconCapFilmCut,
@@ -97,8 +98,8 @@ const modes: ModeDetail[] = [
 	},
 	{
 		id: "screenshot",
-		title: "Screenshot Mode",
-		tagline: "Capture & beautify instantly",
+		title: "截图",
+		tagline: "截图、标注与保存",
 		description:
 			"Take screenshots with a single hotkey, add annotations and beautiful backgrounds, then share or copy instantly.",
 		icon: IconCapScreenshot,
@@ -121,31 +122,30 @@ type SetupPermission = {
 
 const setupPermissions: readonly SetupPermission[] = [
 	{
-		name: "Screen Recording",
+		name: "屏幕录制",
 		key: "screenRecording",
 		description:
-			"Click Grant to allow when macOS asks, or pick Cap in System Settings if needed. Restart the app after allowing screen recording.",
+			"点击授权并在 macOS 提示中允许，或在系统设置中开启「简库镜传 Next」的屏幕录制权限。授权后按系统提示重启应用。",
 		requiresManualGrant: false,
 	},
 	{
-		name: "Accessibility",
+		name: "辅助功能",
 		key: "accessibility",
 		description:
-			"During recording, Cap collects mouse activity locally to generate automatic zoom in segments.",
+			"在本机记录鼠标操作，用于生成自动缩放区间。请在系统设置中为「简库镜传 Next」开启辅助功能。",
 		requiresManualGrant: false,
 	},
 	{
-		name: "Microphone",
+		name: "麦克风",
 		key: "microphone",
-		description: "This permission is required to record audio in your Caps.",
+		description: "录制麦克风声音时需要，可以稍后开启。",
 		requiresManualGrant: false,
 		optional: true,
 	},
 	{
-		name: "Camera",
+		name: "摄像头",
 		key: "camera",
-		description:
-			"This permission is required to record your camera in your Caps.",
+		description: "录制摄像头画面时需要，可以稍后开启。",
 		requiresManualGrant: false,
 		optional: true,
 	},
@@ -344,7 +344,7 @@ export default function OnboardingPage() {
 
 	const totalSteps = createMemo(() => {
 		if (permissionsOnly()) return 1;
-		return 8;
+		return 2;
 	});
 
 	createEffect(() => {
@@ -412,9 +412,9 @@ export default function OnboardingPage() {
 	});
 
 	const nextLabel = () => {
-		if (permissionsOnly()) return "Continue to Cap";
-		if (step() === totalSteps() - 1) return "Start Using Cap";
-		return "Continue";
+		if (permissionsOnly()) return "继续使用";
+		if (step() === totalSteps() - 1) return "开始使用";
+		return "继续";
 	};
 
 	const nextDisabled = () => isMacOS() && step() === 0 && !permsGranted();
@@ -696,16 +696,15 @@ function ModesOverviewStep(props: { active: boolean }) {
 				)}
 			>
 				<h2 class="text-2xl font-bold text-gray-12 tracking-tight">
-					One app, every workflow
+					本地录制与截图
 				</h2>
 				<p class="text-[14px] text-gray-10 leading-relaxed">
-					Whether you need speed, studio quality, or a quick screenshot — Cap
-					has a mode for it.
+					录制结束后进入编辑器，调整画面并导出视频；截图支持标注与保存。
 				</p>
 			</div>
 
 			<div class="flex gap-4 w-full max-w-[540px]">
-				<For each={modes}>
+				<For each={modes.filter((mode) => mode.id !== "instant")}>
 					{(mode, index) => (
 						<div
 							class="flex-1 flex flex-col items-center gap-3 p-5 rounded-2xl border border-gray-4 bg-white dark:bg-gray-2 transition-all duration-500 ease-out shadow-xs"
@@ -1912,7 +1911,9 @@ function StartupOverlay(props: {
 			>
 				<div class="text-center">
 					<div onClick={handleLogoClick} class="inline-block">
-						<IconCapLogo
+						<img
+							src={brandIcon}
+							alt="简库镜传"
 							class={cx(
 								"w-20 h-24 mx-auto drop-shadow-[0_0_100px_rgba(0,0,0,0.2)]",
 								isLogoAnimating() && "startup-logo-bounce",
@@ -1920,10 +1921,10 @@ function StartupOverlay(props: {
 						/>
 					</div>
 					<h1 class="text-5xl md:text-5xl font-bold mb-4 mt-8 drop-shadow-[0_0_20px_rgba(0,0,0,0.2)]">
-						Welcome to Cap
+						简库镜传 Next
 					</h1>
 					<p class="text-xl md:text-2xl opacity-80 mx-auto drop-shadow-[0_0_20px_rgba(0,0,0,0.2)] whitespace-nowrap">
-						Beautiful screen recordings, owned by you.
+						录制、编辑与导出，保存在你的电脑。
 					</p>
 				</div>
 
@@ -1933,9 +1934,9 @@ function StartupOverlay(props: {
 					size="lg"
 					onClick={handleGetStarted}
 				>
-					<span>Get Started</span>
+					<span>开始设置</span>
 					<span class="text-[11px] font-normal text-[rgba(22,27,38,0.58)] leading-tight inline-flex items-center justify-center gap-1">
-						<span>Click here, or press</span>
+						<span>点击或按</span>
 						<kbd class="rounded border border-gray-6 bg-white dark:bg-gray-3 px-1 py-px text-[10px] font-medium text-gray-11 shadow-[0_1px_0_rgba(0,0,0,0.04)]">
 							Space
 						</kbd>

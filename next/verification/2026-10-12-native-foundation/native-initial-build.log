@@ -1,0 +1,1235 @@
+$ node scripts/jianku.mjs build
+ Downloading crates ...
+  Downloaded rtoolbox v0.0.5
+  Downloaded include_dir_macros v0.7.4
+  Downloaded darling_macro v0.23.0
+  Downloaded cursor-icon v1.2.0
+  Downloaded include_dir v0.7.4
+  Downloaded schemars_derive v1.0.4
+  Downloaded pastey v0.2.3
+  Downloaded rmcp-macros v2.2.0
+  Downloaded rpassword v7.5.4
+  Downloaded objc2-core-data v0.2.2
+  Downloaded apple-native-keyring-store v1.0.1
+  Downloaded objc-sys v0.3.5
+  Downloaded objc2-core-image v0.2.2
+  Downloaded objc2-quartz-core v0.2.2
+  Downloaded keyring-core v1.0.0
+  Downloaded core-graphics v0.23.2
+  Downloaded darling v0.23.0
+  Downloaded block2 v0.5.1
+  Downloaded clap_complete v4.6.5
+  Downloaded keyring v4.1.5
+  Downloaded softbuffer v0.4.6
+  Downloaded toml_edit v0.23.10+spec-1.0.0
+  Downloaded darling_core v0.23.0
+  Downloaded objc2-metal v0.2.2
+  Downloaded security-framework v3.7.0
+  Downloaded objc2 v0.5.2
+  Downloaded objc2-foundation v0.2.2
+  Downloaded objc2-app-kit v0.2.2
+  Downloaded rmcp v2.2.0
+  Downloaded winit v0.30.13
+   Compiling smallvec v1.15.1
+   Compiling libm v0.2.15
+   Compiling pin-project-lite v0.2.16
+   Compiling bytemuck v1.23.2
+   Compiling futures-core v0.3.31
+   Compiling objc2-encode v4.1.0
+   Compiling getrandom v0.3.3
+   Compiling futures-sink v0.3.31
+   Compiling serde_json v1.0.145
+   Compiling signal-hook-registry v1.4.6
+   Compiling tracing-core v0.1.34
+   Compiling foldhash v0.1.5
+   Compiling allocator-api2 v0.2.21
+   Compiling arrayvec v0.7.6
+   Compiling slab v0.4.11
+   Compiling objc2-exception-helper v0.1.1
+   Compiling futures-channel v0.3.31
+   Compiling pin-utils v0.1.0
+   Compiling objc2 v0.6.2
+   Compiling icu_normalizer v2.0.0
+   Compiling socket2 v0.6.0
+   Compiling mio v1.0.4
+   Compiling hashbrown v0.15.5
+   Compiling tracing v0.1.41
+   Compiling futures-io v0.3.31
+   Compiling num-traits v0.2.19
+   Compiling futures-task v0.3.31
+   Compiling futures-util v0.3.31
+   Compiling indexmap v2.11.4
+   Compiling tokio v1.47.1
+   Compiling idna_adapter v1.2.1
+   Compiling idna v1.1.0
+   Compiling parking_lot_core v0.9.11
+   Compiling getrandom v0.2.16
+   Compiling parking_lot v0.12.4
+   Compiling uuid v1.18.1
+   Compiling objc2-core-foundation v0.3.1
+   Compiling url v2.5.7
+   Compiling aho-corasick v1.1.4
+   Compiling num-integer v0.1.46
+   Compiling block2 v0.6.1
+   Compiling http-body v1.0.1
+   Compiling httparse v1.10.1
+   Compiling rgb v0.8.52
+   Compiling tower-service v0.3.3
+   Compiling profiling v1.0.17
+   Compiling weezl v0.1.10
+   Compiling atomic-waker v1.1.2
+   Compiling try-lock v0.2.5
+   Compiling system-configuration-sys v0.6.0
+   Compiling want v0.3.1
+   Compiling thread_local v1.1.9
+   Compiling httpdate v1.0.3
+   Compiling untrusted v0.9.0
+   Compiling lazy_static v1.5.0
+   Compiling regex-automata v0.4.10
+   Compiling ring v0.17.14
+   Compiling system-configuration v0.6.1
+   Compiling rustix v1.1.2
+   Compiling crossbeam-utils v0.8.21
+   Compiling num-bigint v0.4.6
+   Compiling sync_wrapper v1.0.2
+   Compiling tower-layer v0.3.3
+   Compiling utf8parse v0.2.2
+   Compiling ipnet v2.11.0
+   Compiling color_quant v1.1.0
+   Compiling gif v0.13.3
+   Compiling futures-executor v0.3.31
+   Compiling anstyle-parse v0.2.7
+   Compiling http-body-util v0.1.3
+   Compiling num-rational v0.4.2
+   Compiling rustls-webpki v0.103.6
+   Compiling rand_core v0.6.4
+   Compiling tempfile v3.23.0
+   Compiling is_terminal_polyfill v1.70.1
+   Compiling anstyle-query v1.1.4
+   Compiling mime v0.3.17
+   Compiling subtle v2.6.1
+   Compiling colorchoice v1.0.4
+   Compiling anstyle v1.0.11
+   Compiling native-tls v0.2.14
+   Compiling rand_chacha v0.3.1
+   Compiling string_cache v0.8.9
+   Compiling iana-time-zone v0.1.64
+   Compiling rustls v0.23.31
+   Compiling anstream v0.6.20
+   Compiling psl-types v2.0.11
+   Compiling rawpointer v0.2.1
+   Compiling clap_lex v0.7.5
+   Compiling matrixmultiply v0.3.10
+   Compiling clap_builder v4.5.47
+   Compiling publicsuffix v2.3.0
+   Compiling rand v0.8.5
+   Compiling markup5ever v0.14.1
+   Compiling chrono v0.4.42
+   Compiling cookie v0.18.1
+   Compiling tokio-util v0.7.16
+   Compiling regex v1.11.2
+   Compiling tower v0.5.2
+   Compiling h2 v0.4.12
+   Compiling matchers v0.2.0
+   Compiling tokio-native-tls v0.3.1
+   Compiling sharded-slab v0.1.7
+   Compiling cssparser v0.29.6
+   Compiling num-complex v0.4.6
+   Compiling webpki-roots v1.0.2
+   Compiling tracing-log v0.2.0
+   Compiling serde_urlencoded v0.7.1
+   Compiling nu-ansi-term v0.50.1
+   Compiling smol_str v0.2.2
+   Compiling iri-string v0.7.8
+   Compiling selectors v0.24.0
+   Compiling tracing-subscriber v0.3.20
+   Compiling clap v4.5.47
+   Compiling mime_guess v2.0.5
+   Compiling html5ever v0.29.1
+   Compiling cookie_store v0.21.1
+   Compiling objc2-core-graphics v0.3.1
+   Compiling cfb v0.7.3
+   Compiling tokio-rustls v0.26.3
+   Compiling jsonptr v0.6.3
+   Compiling encoding_rs v0.8.35
+   Compiling kuchikiki v0.8.8-speedreader
+   Compiling json-patch v3.0.1
+   Compiling tower-http v0.6.6
+   Compiling infer v0.19.0
+   Compiling ndarray v0.17.2
+   Compiling ort-sys v2.0.0-rc.12
+   Compiling urlpattern v0.3.0
+   Compiling swift-rs v1.0.7
+   Compiling cargo_metadata v0.19.2
+   Compiling schemars v0.8.22
+   Compiling dispatch2 v0.3.0
+   Compiling dpi v0.1.2
+   Compiling libloading v0.9.0
+   Compiling specta v2.0.0-rc.20
+   Compiling open v5.4.0
+   Compiling crossbeam-epoch v0.9.18
+   Compiling foreign-types-shared v0.3.1
+   Compiling foreign-types v0.5.0
+   Compiling hyper v1.7.0
+   Compiling core-foundation v0.10.1
+   Compiling crossbeam-deque v0.8.6
+   Compiling rayon-core v1.13.0
+   Compiling objc_exception v0.1.2
+   Compiling tauri-utils v2.7.0
+   Compiling half v2.6.0
+   Compiling rayon v1.11.0
+   Compiling malloc_buf v0.0.6
+   Compiling cidre v0.11.0 (https://github.com/CapSoftware/cidre?rev=bf84b67079a8#bf84b670)
+   Compiling objc v0.2.7
+   Compiling ffmpeg-sys-next v7.1.3
+   Compiling coreaudio-sys v0.2.17
+   Compiling hyper-util v0.1.17
+   Compiling block v0.1.6
+   Compiling rand_core v0.9.3
+   Compiling mach2 v0.4.3
+   Compiling dasp_sample v0.11.0
+   Compiling ffmpeg-next v7.1.0 (https://github.com/CapSoftware/rust-ffmpeg?rev=49db1fede112#49db1fed)
+   Compiling coreaudio-rs v0.11.3
+   Compiling rand_chacha v0.9.0
+   Compiling ort v2.0.0-rc.12
+   Compiling cpal v0.15.3 (https://github.com/CapSoftware/cpal?rev=6013cb5f8bd3#6013cb5f)
+   Compiling hyper-rustls v0.27.7
+   Compiling hyper-tls v0.6.0
+   Compiling core-graphics-types v0.1.3
+   Compiling reqwest v0.12.24 (https://github.com/CapSoftware/reqwest?rev=9b5ecbd5210a9510fde766015cabb724c1e70d2e#9b5ecbd5)
+   Compiling rand v0.9.2
+   Compiling objc2-foundation v0.3.1
+   Compiling unicode-width v0.2.1
+   Compiling termcolor v1.4.1
+   Compiling raw-window-handle v0.6.2
+   Compiling bit-vec v0.8.0
+   Compiling bit-set v0.8.0
+   Compiling codespan-reporting v0.12.0
+   Compiling strum v0.26.3
+   Compiling slotmap v1.0.7
+   Compiling core-graphics-types v0.2.0
+   Compiling futures v0.3.31
+   Compiling hexf-parse v0.2.1
+   Compiling tinyvec_macros v0.1.1
+   Compiling quick-error v2.0.1
+   Compiling hex v0.4.3
+   Compiling tinyvec v1.10.0
+   Compiling naga v25.0.1
+   Compiling equator v0.4.2
+   Compiling metal v0.31.0
+   Compiling debugid v0.8.0
+   Compiling wgpu-types v25.0.0
+   Compiling memmap2 v0.9.8
+   Compiling unicode-properties v0.1.3
+   Compiling imgref v1.11.0
+   Compiling unicode-script v0.5.7
+   Compiling sentry-types v0.42.0
+   Compiling aligned-vec v0.6.4
+   Compiling core_maths v0.1.1
+   Compiling font-types v0.9.0
+   Compiling zune-inflate v0.2.54
+   Compiling bit_field v0.10.3
+   Compiling object v0.36.7
+   Compiling lebe v0.5.3
+   Compiling workspace-hack v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/workspace-hack)
+   Compiling cap-media-info v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/media-info)
+   Compiling objc-sys v0.3.5
+   Compiling float-cmp v0.9.0
+   Compiling strict-num v0.1.1
+   Compiling exr v1.73.0
+   Compiling read-fonts v0.29.3
+   Compiling sentry-core v0.42.0
+   Compiling wgpu-hal v25.0.2 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/vendor/wgpu-hal)
+   Compiling ttf-parser v0.25.1
+   Compiling v_frame v0.3.9
+   Compiling loop9 v0.1.5
+   Compiling core-graphics v0.24.0
+   Compiling concurrent-queue v2.5.0
+   Compiling crossbeam-channel v0.5.15
+   Compiling qoi v0.4.1
+   Compiling wgpu-core-deps-apple v25.0.0
+   Compiling unicode-bidi v0.3.18
+   Compiling arrayref v0.3.9
+   Compiling parking v2.2.1
+   Compiling zune-core v0.4.12
+   Compiling gimli v0.31.1
+   Compiling unicode-segmentation v1.12.0
+   Compiling zune-jpeg v0.4.21
+   Compiling event-listener v5.4.1
+   Compiling tiny-skia-path v0.11.4
+   Compiling skrifa v0.31.3
+   Compiling wgpu-core v25.0.2
+   Compiling strum v0.27.2
+   Compiling av1-grain v0.2.4
+   Compiling objc2-core-image v0.3.1
+   Compiling objc2-quartz-core v0.3.1
+   Compiling addr2line v0.24.2
+   Compiling dirs-sys v0.4.1
+   Compiling sysinfo v0.32.1
+   Compiling maybe-rayon v0.1.1
+   Compiling kurbo v0.11.3
+   Compiling itertools v0.12.1
+   Compiling ttf-parser v0.21.1
+   Compiling unicode-bidi-mirroring v0.4.0
+   Compiling rustc-demangle v0.1.26
+   Compiling bitstream-io v2.6.0
+   Compiling unicode-ccc v0.4.0
+   Compiling ttf-parser v0.20.0
+   Compiling yazi v0.2.1
+   Compiling unty v0.0.4
+   Compiling byteorder-lite v0.1.0
+   Compiling unicode-bidi-mirroring v0.2.0
+   Compiling core-video-rs v0.3.5
+   Compiling dispatch v0.2.0
+   Compiling zeno v0.3.3
+   Compiling unicode-ccc v0.2.0
+   Compiling static_assertions v1.1.0
+   Compiling image-webp v0.2.4
+   Compiling bincode v2.0.1
+   Compiling backtrace v0.3.75
+   Compiling swash v0.2.5
+   Compiling wgpu v25.0.2
+   Compiling fontdb v0.16.2
+   Compiling rustybuzz v0.14.1
+   Compiling rav1e v0.7.1
+   Compiling rustybuzz v0.20.1
+   Compiling fax v0.2.6
+   Compiling svgtypes v0.15.3
+   Compiling cap-enc-ffmpeg v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/enc-ffmpeg)
+   Compiling cap-cursor-info v0.0.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/cursor-info)
+   Compiling objc2 v0.5.2
+   Compiling event-listener-strategy v0.5.4
+   Compiling fontdb v0.23.0
+   Compiling nix v0.29.0
+   Compiling euclid v0.22.11
+   Compiling pxfm v0.1.23
+   Compiling nanorand v0.7.0
+   Compiling avif-serialize v0.8.6
+   Compiling spin v0.9.8
+   Compiling relative-path v1.9.3
+   Compiling cap-rnnoise v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rnnoise)
+   Compiling findshlibs v0.10.2
+   Compiling simplecss v0.2.2
+   Compiling pico-args v0.5.0
+   Compiling leak v0.1.2
+   Compiling roxmltree v0.20.0
+   Compiling unicode-vo v0.1.0
+   Compiling data-url v0.3.2
+   Compiling rangemap v1.6.0
+   Compiling self_cell v1.2.0
+   Compiling imagesize v0.13.0
+   Compiling xmlwriter v0.1.0
+   Compiling sys-locale v0.3.2
+   Compiling unicode-linebreak v0.1.5
+   Compiling signal-hook v0.3.18
+   Compiling svg_fmt v0.4.5
+   Compiling usvg v0.45.1
+   Compiling cosmic-text v0.14.2
+   Compiling etagere v0.2.15
+   Compiling leaky-cow v0.1.1
+   Compiling cap-project v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/project)
+   Compiling ravif v0.11.20
+   Compiling moxcms v0.7.5
+   Compiling flume v0.11.1
+   Compiling sentry-contexts v0.42.0
+   Compiling async-lock v3.4.1
+   Compiling block2 v0.5.1
+   Compiling tiff v0.10.3
+   Compiling sentry-backtrace v0.42.0
+   Compiling tiny-skia v0.11.4
+   Compiling ffmpeg-hw-device v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/ffmpeg-hw-device)
+   Compiling any_spawner v0.2.0
+   Compiling sha1 v0.10.6
+   Compiling png v0.18.0
+   Compiling jpeg-decoder v0.3.2
+   Compiling ndarray v0.16.1
+   Compiling lru v0.12.5
+   Compiling send_wrapper v0.6.0
+   Compiling async-trait v0.1.89
+   Compiling cgl v0.3.2
+   Compiling guardian v1.3.0
+   Compiling data-encoding v2.9.0
+   Compiling macos-accessibility-client v0.0.1
+   Compiling core-media-rs v0.3.5
+   Compiling four-char-code v2.3.0
+   Compiling or_poisoned v0.1.0
+   Compiling reactive_graph v0.1.8
+   Compiling core-utils-rs v0.3.5
+   Compiling tungstenite v0.24.0
+   Compiling io-surface v0.16.1
+   Compiling glyphon v0.9.0
+   Compiling tiff v0.9.1
+   Compiling resvg v0.45.1
+   Compiling cap-video-decode v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/video-decode)
+   Compiling image v0.25.8
+   Compiling cap-camera-effects v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/camera-effects)
+   Compiling objc2-foundation v0.2.2
+   Compiling dirs v5.0.1
+   Compiling directories v5.0.1
+   Compiling objc2-cloud-kit v0.3.1
+   Compiling objc2-avf-audio v0.3.1
+   Compiling objc2-core-data v0.3.1
+   Compiling cap-flags v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/flags)
+   Compiling cocoa-foundation v0.2.1
+   Compiling device_query v4.0.1
+   Compiling objc2-core-video v0.3.1
+   Compiling objc2-core-media v0.3.1
+   Compiling darling_core v0.23.0
+   Compiling futures-intrusive v0.5.0
+   Compiling uname v0.1.1
+   Compiling hostname v0.4.1
+   Compiling mio v0.8.11
+   Compiling ref-cast v1.0.24
+   Compiling bezier_easing v0.1.1
+   Compiling signal-hook-mio v0.2.4
+   Compiling objc2-av-foundation v0.3.1
+   Compiling cocoa v0.26.1
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+   Compiling darling_macro v0.23.0
+   Compiling objc2-app-kit v0.3.1
+   Compiling cap-utils v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/utils)
+   Compiling sentry-debug-images v0.42.0
+   Compiling image v0.24.9
+   Compiling tokio-tungstenite v0.24.0
+   Compiling cap-audio v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/audio)
+   Compiling axum-core v0.4.5
+   Compiling sentry-panic v0.42.0
+   Compiling sentry-anyhow v0.42.0
+   Compiling cap-camera-avfoundation v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/camera-avfoundation)
+   Compiling pbr v1.1.1
+   Compiling ordered-channel v1.2.0
+   Compiling cap-media v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/media)
+   Compiling gif-dispose v5.0.1
+   Compiling imagequant v4.4.1
+   Compiling resize v0.8.8
+   Compiling core-audio-types-rs v0.3.5
+   Compiling ringbuf v0.4.8
+   Compiling yuv v0.1.9
+   Compiling lodepng v3.12.1
+   Compiling ref-cast-impl v1.0.24
+   Compiling blake3 v1.8.7
+   Compiling serde_path_to_error v0.1.20
+   Compiling readmouse v0.2.1
+   Compiling y4m v0.8.0
+   Compiling wild v2.2.1
+   Compiling readkey v0.2.2
+   Compiling matchit v0.7.3
+   Compiling natord v1.0.9
+   Compiling cap-frame-converter v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/frame-converter)
+   Compiling screencapturekit v0.3.6
+   Compiling axum v0.7.9
+   Compiling gifski v1.34.0
+   Compiling scap-targets v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/scap-targets)
+   Compiling cap-camera v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/camera)
+   Compiling sentry v0.42.0
+   Compiling darling v0.23.0
+   Compiling crossterm v0.25.0
+   Compiling newline-converter v0.3.0
+   Compiling core-graphics v0.25.0
+   Compiling security-framework v3.7.0
+   Compiling winit v0.30.13
+   Compiling softbuffer v0.4.6
+   Compiling fuzzy-matcher v0.3.7
+   Compiling objc2-io-kit v0.3.1
+   Compiling kameo_macros v0.17.0
+   Compiling schemars_derive v1.0.4
+   Compiling cap-muxer-protocol v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/cap-muxer-protocol)
+   Compiling keyring-core v1.0.0
+   Compiling inventory v0.3.21
+   Compiling downcast-rs v2.0.2
+   Compiling constant_time_eq v0.4.2
+   Compiling rmcp v2.2.0
+   Compiling unicode-width v0.1.14
+   Compiling inquire v0.7.5
+   Compiling kameo v0.17.2
+   Compiling apple-native-keyring-store v1.0.1
+   Compiling cap-fail v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/fail)
+   Compiling sysinfo v0.35.2
+   Compiling cap-editor v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/editor)
+   Compiling schemars v1.0.4
+   Compiling rmcp-macros v2.2.0
+   Compiling cap-enc-gif v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/enc-gif)
+   Compiling cap-camera-ffmpeg v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/camera-ffmpeg)
+   Compiling cap-cursor-capture v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/cursor-capture)
+   Compiling objc2-quartz-core v0.2.2
+   Compiling objc2-app-kit v0.2.2
+   Compiling cap-enc-avfoundation v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/enc-avfoundation)
+   Compiling cap-timestamp v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/timestamp)
+   Compiling retry v2.1.0
+   Compiling core-graphics v0.23.2
+   Compiling mp4 v0.14.0
+   Compiling include_dir_macros v0.7.4
+   Compiling rtoolbox v0.0.5
+   Compiling pastey v0.2.3
+   Compiling cursor-icon v1.2.0
+   Compiling cap v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/apps/cli)
+   Compiling replace_with v0.1.8
+   Compiling include_dir v0.7.4
+   Compiling rpassword v7.5.4
+   Compiling cap-cli-install v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/cli-install)
+   Compiling keyring v4.1.5
+   Compiling cap-automation v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/automation)
+   Compiling tracing-appender v0.2.3
+   Compiling clap_complete v4.6.5
+   Compiling toml_edit v0.23.10+spec-1.0.0
+   Compiling cap-muxer v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/cap-muxer)
+   Compiling cap-export v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/export)
+   Compiling scap-screencapturekit v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/scap-screencapturekit)
+   Compiling scap-ffmpeg v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/scap-ffmpeg)
+   Compiling cap-recording v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/recording)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2m 17s
+--- Preparing sidecars and configs...
+Updating Platform (darwin) Tauri config...
+--- Preparation finished
+$ tauri build --debug --bundles app --config src-tauri/tauri.jianku.conf.json
+        Info Looking up installed tauri packages to check mismatched versions...
+     Running beforeBuildCommand `bun run build`
+$ vinxi build
+vinxi v0.5.11
+
+
+⚙  Building your app...
+removing /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/apps/desktop/.vinxi/build/ssr
+removing /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/apps/desktop/.vinxi/build/client
+removing /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/apps/desktop/.vinxi/build/server-fns
+vinxi v0.5.11
+
+
+⚙ Building your router ssr...
+
+
+📦 Compiling ssr router...
+vinxi building router ssr in http mode
+vite v6.4.3 building SSR bundle for production...
+transforming...
+✓ 20 modules transformed.
+rendering chunks...
+.vinxi/build/ssr/.vite/manifest.json   0.14 kB
+.vinxi/build/ssr/ssr.js               18.65 kB
+✓ built in 273ms
+✔ build done
+⚙ Built your router ssr successfully
+vinxi v0.5.11
+
+
+⚙ Building your router client...
+
+
+📦 Compiling client router...
+vinxi building router client in client mode
+vite v6.4.3 building for production...
+transforming...
+[BABEL] Note: The code generator has deoptimised the styling of /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/node_modules/rrweb/dist/rrweb.js as it exceeds the max of 500KB.
+ virtual:$vinxi/handler/client (1:143): "default" is not exported by "src/entry-client.tsx", imported by " virtual:$vinxi/handler/client".
+✓ 1569 modules transformed.
+rendering chunks...
+computing gzip size...
+.vinxi/build/client/_build/assets/stride-correction-worker-BsaaXY3G.js                                  0.49 kB
+.vinxi/build/client/_build/assets/frame-worker-D3yL4pap.js                                             21.12 kB
+.vinxi/build/client/_build/assets/geist-sans-latin-400-normal-gapTbOY8.woff2                           33.40 kB
+.vinxi/build/client/_build/assets/geist-sans-latin-500-normal-uokXdC-Q.woff2                           34.72 kB
+.vinxi/build/client/_build/assets/dark-B8-Zfy6_.jpg                                                    35.26 kB
+.vinxi/build/client/_build/assets/geist-sans-latin-700-normal-BmN9tIp5.woff2                           35.48 kB
+.vinxi/build/client/_build/assets/light-BcegqCvt.jpg                                                   35.87 kB
+.vinxi/build/client/_build/assets/geist-sans-latin-400-normal-BOaIZNA2.woff                            38.91 kB
+.vinxi/build/client/_build/assets/geist-sans-latin-500-normal-CN2lyvyL.woff                            40.52 kB
+.vinxi/build/client/_build/assets/geist-sans-latin-700-normal-CjScfYeH.woff                            41.40 kB
+.vinxi/build/client/_build/assets/auto-CPKoGbmb.jpg                                                    44.56 kB
+.vinxi/build/client/_build/.vite/manifest.json                                                        182.08 kB │ gzip:  15.51 kB
+.vinxi/build/client/_build/assets/cloud-2-C48ZYBEu.png                                                449.73 kB
+.vinxi/build/client/_build/assets/cloud-1-0EtYTpJQ.png                                                555.95 kB
+.vinxi/build/client/_build/assets/cloud-3-SWvz_Fyk.png                                                729.92 kB
+.vinxi/build/client/_build/assets/lofi-hip-hop-leberch-CVaw0mUt.mp3                                   937.00 kB
+.vinxi/build/client/_build/assets/ambient-trap-empty-streets-dreamstate-openmindaudio-BZQRh1Vo.mp3  1,104.81 kB
+.vinxi/build/client/_build/assets/lofi-smooth-pulsebox-C35WoCin.mp3                                 1,198.70 kB
+.vinxi/build/client/_build/assets/sunday-mood-lofi-cafe-upbeat-bluelike-zE7SfvGL.mp3                1,221.16 kB
+.vinxi/build/client/_build/assets/tears-and-fireflies-adi-goldstein-CggkdS0h.mp3                    1,269.18 kB
+.vinxi/build/client/_build/assets/lofi-beats-mirostar-D5hw-SpR.mp3                                  1,336.05 kB
+.vinxi/build/client/_build/assets/raindrops-lofi-sleep-bluelike-BsyCqd7Y.mp3                        1,644.52 kB
+.vinxi/build/client/_build/assets/good-night-lofi-cozy-chill-fassounds-D5_R4EjB.mp3                 1,766.13 kB
+.vinxi/build/client/_build/assets/lofi-study-calm-peaceful-chill-hop-fassounds-BpGZ1cIl.mp3         1,767.38 kB
+.vinxi/build/client/_build/assets/lofi-cinematic-pulsebox-Bg98IMYb.mp3                              1,773.26 kB
+.vinxi/build/client/_build/assets/cassette-retrositive-jzqg1AFX.mp3                                 2,264.59 kB
+.vinxi/build/client/_build/assets/Cropper-DHBTHkFk.css                                                  1.02 kB │ gzip:   0.42 kB
+.vinxi/build/client/_build/assets/play-circle-Dkoz5m07.css                                              1.71 kB │ gzip:   0.52 kB
+.vinxi/build/client/_build/assets/Editor-UoGPRlYu.css                                                   9.21 kB │ gzip:   2.45 kB
+.vinxi/build/client/_build/assets/client-DQqeARgn.css                                                 443.42 kB │ gzip:  64.06 kB
+.vinxi/build/client/_build/assets/JNCCF6MP-4sxnBYeu.js                                                  0.06 kB │ gzip:   0.08 kB
+.vinxi/build/client/_build/assets/playback-intent-routing-Nd0l107r.js                                   0.09 kB │ gzip:   0.11 kB
+.vinxi/build/client/_build/assets/index-VXTHg9fP.js                                                     0.14 kB │ gzip:   0.15 kB
+.vinxi/build/client/_build/assets/index-CLj-PBkz.js                                                     0.16 kB │ gzip:   0.16 kB
+.vinxi/build/client/_build/assets/createEventListener-CYOheshh.js                                       0.18 kB │ gzip:   0.17 kB
+.vinxi/build/client/_build/assets/index-ByjUEr-v.js                                                     0.18 kB │ gzip:   0.16 kB
+.vinxi/build/client/_build/assets/hide-window-CVffWPMC.js                                               0.18 kB │ gzip:   0.17 kB
+.vinxi/build/client/_build/assets/updater-Ce5BiMf6.js                                                   0.21 kB │ gzip:   0.17 kB
+.vinxi/build/client/_build/assets/index-B7S42WZk.js                                                     0.21 kB │ gzip:   0.18 kB
+.vinxi/build/client/_build/assets/app-i5REdmXw.js                                                       0.22 kB │ gzip:   0.19 kB
+.vinxi/build/client/_build/assets/pricing-CRZ87Rsp.js                                                   0.23 kB │ gzip:   0.20 kB
+.vinxi/build/client/_build/assets/FLVHQV4A-BT0g28aL.js                                                  0.25 kB │ gzip:   0.21 kB
+.vinxi/build/client/_build/assets/combineProps-oHjLfPsP.js                                              0.27 kB │ gzip:   0.20 kB
+.vinxi/build/client/_build/assets/minus-DD9fuBN9.js                                                     0.29 kB │ gzip:   0.23 kB
+.vinxi/build/client/_build/assets/chevron-down-DtmkhnFu.js                                              0.29 kB │ gzip:   0.24 kB
+.vinxi/build/client/_build/assets/Loader-Dfpv00qg.js                                                    0.29 kB │ gzip:   0.23 kB
+.vinxi/build/client/_build/assets/check--Dv84YNa.js                                                     0.29 kB │ gzip:   0.24 kB
+.vinxi/build/client/_build/assets/plus-ChnrNnL4.js                                                      0.30 kB │ gzip:   0.24 kB
+.vinxi/build/client/_build/assets/x-DlRMz_lP.js                                                         0.30 kB │ gzip:   0.25 kB
+.vinxi/build/client/_build/assets/arrow-left-BXeOKwnf.js                                                0.30 kB │ gzip:   0.24 kB
+.vinxi/build/client/_build/assets/loader2-CUoBIIUd.js                                                   0.31 kB │ gzip:   0.25 kB
+.vinxi/build/client/_build/assets/monitor-Bxksqmwe.js                                                   0.31 kB │ gzip:   0.26 kB
+.vinxi/build/client/_build/assets/maximize2-CxzVb93-.js                                                 0.32 kB │ gzip:   0.26 kB
+.vinxi/build/client/_build/assets/gauge-Bd40QFCe.js                                                     0.32 kB │ gzip:   0.26 kB
+.vinxi/build/client/_build/assets/camera-window-CXpW58db.js                                             0.33 kB │ gzip:   0.25 kB
+.vinxi/build/client/_build/assets/search-zOQLsUrN.js                                                    0.33 kB │ gzip:   0.26 kB
+.vinxi/build/client/_build/assets/eventListener-CYS2nzkO.js                                             0.34 kB │ gzip:   0.24 kB
+.vinxi/build/client/_build/assets/index-Dti6-CSm.js                                                     0.34 kB │ gzip:   0.18 kB
+.vinxi/build/client/_build/assets/sliders-horizontal-Dseel-AN.js                                        0.34 kB │ gzip:   0.28 kB
+.vinxi/build/client/_build/assets/app-window-mac-DVjM0VtA.js                                            0.35 kB │ gzip:   0.27 kB
+.vinxi/build/client/_build/assets/ratio--YPIzb8J.js                                                     0.35 kB │ gzip:   0.26 kB
+.vinxi/build/client/_build/assets/circle-off-DWQiuYH4.js                                                0.36 kB │ gzip:   0.28 kB
+.vinxi/build/client/_build/assets/external-link-iXuuvj8J.js                                             0.36 kB │ gzip:   0.27 kB
+.vinxi/build/client/_build/assets/rotate-ccw-_DJ-i8uV.js                                                0.36 kB │ gzip:   0.28 kB
+.vinxi/build/client/_build/assets/lock-Dg5oMPR2.js                                                      0.36 kB │ gzip:   0.28 kB
+.vinxi/build/client/_build/assets/record-fill-DfkE9n18.js                                               0.36 kB │ gzip:   0.27 kB
+.vinxi/build/client/_build/assets/alert-triangle-BJ1xaNXY.js                                            0.37 kB │ gzip:   0.28 kB
+.vinxi/build/client/_build/assets/chevron-down-BvTSUEUo.js                                              0.38 kB │ gzip:   0.29 kB
+.vinxi/build/client/_build/assets/trash-2-CzBOmWki.js                                                   0.38 kB │ gzip:   0.28 kB
+.vinxi/build/client/_build/assets/database-DZJ-_frQ.js                                                  0.38 kB │ gzip:   0.29 kB
+.vinxi/build/client/_build/assets/screenshot-CA7k-jUn.js                                                0.39 kB │ gzip:   0.30 kB
+.vinxi/build/client/_build/assets/copy-D7Hqw40o.js                                                      0.39 kB │ gzip:   0.29 kB
+.vinxi/build/client/_build/assets/index-UH-cKAho.js                                                     0.39 kB │ gzip:   0.27 kB
+.vinxi/build/client/_build/assets/scan-text-Bkzis7ex.js                                                 0.39 kB │ gzip:   0.29 kB
+.vinxi/build/client/_build/assets/import-BTLRxxSF.js                                                    0.39 kB │ gzip:   0.29 kB
+.vinxi/build/client/_build/assets/folder-DsFTbeQz.js                                                    0.40 kB │ gzip:   0.29 kB
+.vinxi/build/client/_build/assets/move-left-BlXSLugG.js                                                 0.40 kB │ gzip:   0.30 kB
+.vinxi/build/client/_build/assets/image-Aw8kE-1R.js                                                     0.41 kB │ gzip:   0.30 kB
+.vinxi/build/client/_build/assets/square-play-B5ksGyz4.js                                               0.42 kB │ gzip:   0.30 kB
+.vinxi/build/client/_build/assets/link-szSiOszu.js                                                      0.42 kB │ gzip:   0.29 kB
+.vinxi/build/client/_build/assets/bell-CLP5uJjd.js                                                      0.43 kB │ gzip:   0.32 kB
+.vinxi/build/client/_build/assets/zap-BK4tAuAD.js                                                       0.43 kB │ gzip:   0.31 kB
+.vinxi/build/client/_build/assets/clapperboard-DL_BP3ff.js                                              0.44 kB │ gzip:   0.33 kB
+.vinxi/build/client/_build/assets/monitor-bold-CfYwjfqN.js                                              0.44 kB │ gzip:   0.30 kB
+.vinxi/build/client/_build/assets/expand-DGcbBYF1.js                                                    0.45 kB │ gzip:   0.35 kB
+.vinxi/build/client/_build/assets/save-CKaFehdX.js                                                      0.46 kB │ gzip:   0.32 kB
+.vinxi/build/client/_build/assets/link-BDLvaFOZ.js                                                      0.47 kB │ gzip:   0.33 kB
+.vinxi/build/client/_build/assets/edit-xyuyErtY.js                                                      0.48 kB │ gzip:   0.33 kB
+.vinxi/build/client/_build/assets/analytics-Cpkji2gk.js                                                 0.48 kB │ gzip:   0.28 kB
+.vinxi/build/client/_build/assets/circle-x-CvRL1-mp.js                                                  0.49 kB │ gzip:   0.32 kB
+.vinxi/build/client/_build/assets/circle-check-Y60Oez53.js                                              0.49 kB │ gzip:   0.33 kB
+.vinxi/build/client/_build/assets/Context-BDX-68fK.js                                                   0.50 kB │ gzip:   0.30 kB
+.vinxi/build/client/_build/assets/SignInButton-CAKyS0gX.js                                              0.51 kB │ gzip:   0.35 kB
+.vinxi/build/client/_build/assets/eye-off-CeCI4B_5.js                                                   0.53 kB │ gzip:   0.35 kB
+.vinxi/build/client/_build/assets/index-CJAAGXSk.js                                                     0.55 kB │ gzip:   0.34 kB
+.vinxi/build/client/_build/assets/TargetSelectInfoPill-Bd1CkFo6.js                                      0.56 kB │ gzip:   0.33 kB
+.vinxi/build/client/_build/assets/VI7QYH27-C5bh5yj5.js                                                  0.57 kB │ gzip:   0.35 kB
+.vinxi/build/client/_build/assets/trash-BqPAhEUs.js                                                     0.57 kB │ gzip:   0.38 kB
+.vinxi/build/client/_build/assets/layers-BLHS9mOR.js                                                    0.57 kB │ gzip:   0.33 kB
+.vinxi/build/client/_build/assets/index-YCZkgb2G.js                                                     0.60 kB │ gzip:   0.34 kB
+.vinxi/build/client/_build/assets/config-header-DhZIQyn3.js                                             0.61 kB │ gzip:   0.42 kB
+.vinxi/build/client/_build/assets/os-permissions-BT8FbMEJ.js                                            0.62 kB │ gzip:   0.30 kB
+.vinxi/build/client/_build/assets/microphone-Bu-2jEAN.js                                                0.63 kB │ gzip:   0.40 kB
+.vinxi/build/client/_build/assets/settings-BNIcM3mF.js                                                  0.64 kB │ gzip:   0.35 kB
+.vinxi/build/client/_build/assets/InfoPill-C1zGr0vL.js                                                  0.71 kB │ gzip:   0.40 kB
+.vinxi/build/client/_build/assets/volume-x-C8dp9-AJ.js                                                  0.71 kB │ gzip:   0.37 kB
+.vinxi/build/client/_build/assets/hex-color-FibQUnRC.js                                                 0.73 kB │ gzip:   0.34 kB
+.vinxi/build/client/_build/assets/index-BZs8QjhE.js                                                     0.75 kB │ gzip:   0.37 kB
+.vinxi/build/client/_build/assets/camera-DelsfcUG.js                                                    0.79 kB │ gzip:   0.46 kB
+.vinxi/build/client/_build/assets/index-BUsJwFa3.js                                                     0.82 kB │ gzip:   0.47 kB
+.vinxi/build/client/_build/assets/logo-unSdZHuq.js                                                      0.83 kB │ gzip:   0.45 kB
+.vinxi/build/client/_build/assets/light-BVuvbAmG.js                                                     0.85 kB │ gzip:   0.48 kB
+.vinxi/build/client/_build/assets/caret-down-CfVpArk2.js                                                0.89 kB │ gzip:   0.54 kB
+.vinxi/build/client/_build/assets/stop-circle-CXrP-GSq.js                                               0.93 kB │ gzip:   0.46 kB
+.vinxi/build/client/_build/assets/flip-horizontal-2-BRmYvAfC.js                                         0.94 kB │ gzip:   0.38 kB
+.vinxi/build/client/_build/assets/persisted-BRNQJf2z.js                                                 0.95 kB │ gzip:   0.51 kB
+.vinxi/build/client/_build/assets/components-B1eFxsNB.js                                                0.98 kB │ gzip:   0.59 kB
+.vinxi/build/client/_build/assets/clapperboard-DlSSBBpv.js                                              0.99 kB │ gzip:   0.51 kB
+.vinxi/build/client/_build/assets/TargetDropdownButton-BptYQr80.js                                      1.00 kB │ gzip:   0.52 kB
+.vinxi/build/client/_build/assets/macos-window-material-DSsJQRc3.js                                     1.01 kB │ gzip:   0.62 kB
+.vinxi/build/client/_build/assets/path-B654c37J.js                                                      1.02 kB │ gzip:   0.46 kB
+.vinxi/build/client/_build/assets/index-M33yfidE.js                                                     1.02 kB │ gzip:   0.56 kB
+.vinxi/build/client/_build/assets/index-Cw3f6Wdg.js                                                     1.03 kB │ gzip:   0.48 kB
+.vinxi/build/client/_build/assets/importMedia-Cm_OGvvs.js                                               1.04 kB │ gzip:   0.55 kB
+.vinxi/build/client/_build/assets/export-CZpMFJOG.js                                                    1.05 kB │ gzip:   0.55 kB
+.vinxi/build/client/_build/assets/tears-and-fireflies-adi-goldstein-DPXrhFV3.js                         1.09 kB │ gzip:   0.57 kB
+.vinxi/build/client/_build/assets/upload-DrljkbSR.js                                                    1.11 kB │ gzip:   0.48 kB
+.vinxi/build/client/_build/assets/preload-helper-ug3pwPZ1.js                                            1.12 kB │ gzip:   0.65 kB
+.vinxi/build/client/_build/assets/upgrade-DgaD9B7W.js                                                   1.13 kB │ gzip:   0.67 kB
+.vinxi/build/client/_build/assets/upgrade-DDXUzhUs.js                                                   1.13 kB │ gzip:   0.67 kB
+.vinxi/build/client/_build/assets/UKTBL2JL-B0v6H5y5.js                                                  1.14 kB │ gzip:   0.62 kB
+.vinxi/build/client/_build/assets/x-Bn0E2ZmY.js                                                         1.17 kB │ gzip:   0.63 kB
+.vinxi/build/client/_build/assets/style-Dr5B_04b.js                                                     1.19 kB │ gzip:   0.65 kB
+.vinxi/build/client/_build/assets/camera-presentation-M_7Jlrbq.js                                       1.20 kB │ gzip:   0.60 kB
+.vinxi/build/client/_build/assets/index-D84wyIhj.js                                                     1.26 kB │ gzip:   0.43 kB
+.vinxi/build/client/_build/assets/event-DXTNzND5.js                                                     1.29 kB │ gzip:   0.63 kB
+.vinxi/build/client/_build/assets/play-circle-CNIHOGis.js                                               1.29 kB │ gzip:   0.63 kB
+.vinxi/build/client/_build/assets/square-Dsu0VDMB.js                                                    1.31 kB │ gzip:   0.52 kB
+.vinxi/build/client/_build/assets/index-ClyVk_15.js                                                     1.43 kB │ gzip:   0.75 kB
+.vinxi/build/client/_build/assets/teleprompter-utils-Cax-Ke2O.js                                        1.51 kB │ gzip:   0.58 kB
+.vinxi/build/client/_build/assets/notifications-BZjdMt0n.js                                             1.57 kB │ gzip:   0.86 kB
+.vinxi/build/client/_build/assets/notifications-CY7xZxCn.js                                             1.57 kB │ gzip:   0.86 kB
+.vinxi/build/client/_build/assets/TargetTypeButton-G6DnJiBA.js                                          1.58 kB │ gzip:   0.77 kB
+.vinxi/build/client/_build/assets/InfoPill-DgxNXHak.js                                                  1.60 kB │ gzip:   0.66 kB
+.vinxi/build/client/_build/assets/SystemAudio-B8Nidt90.js                                               1.60 kB │ gzip:   0.84 kB
+.vinxi/build/client/_build/assets/captions-BIq9O0X_.js                                                  1.60 kB │ gzip:   0.89 kB
+.vinxi/build/client/_build/assets/mode-select-BIZ4OLIh.js                                               1.65 kB │ gzip:   0.89 kB
+.vinxi/build/client/_build/assets/mode-select-C9MucOIA.js                                               1.65 kB │ gzip:   0.89 kB
+.vinxi/build/client/_build/assets/hard-drive-CqWwiYIf.js                                                1.67 kB │ gzip:   0.67 kB
+.vinxi/build/client/_build/assets/core-D3xSnbfC.js                                                      1.71 kB │ gzip:   0.75 kB
+.vinxi/build/client/_build/assets/recording-D2AYTr0K.js                                                 1.78 kB │ gzip:   0.92 kB
+.vinxi/build/client/_build/assets/settings-ChfTPfXi.js                                                  1.82 kB │ gzip:   0.78 kB
+.vinxi/build/client/_build/assets/window-capture-occluder-BnzHZRZQ.js                                   1.93 kB │ gzip:   0.86 kB
+.vinxi/build/client/_build/assets/window-capture-occluder-BtipVv_Z.js                                   1.93 kB │ gzip:   0.86 kB
+.vinxi/build/client/_build/assets/ChangeLogButton-DoVJTNsF.js                                           1.95 kB │ gzip:   1.04 kB
+.vinxi/build/client/_build/assets/index-DAB6Mo3I.js                                                     2.08 kB │ gzip:   1.10 kB
+.vinxi/build/client/_build/assets/devices-C47tpdC-.js                                                   2.13 kB │ gzip:   0.88 kB
+.vinxi/build/client/_build/assets/Setting-CG1qp1wY.js                                                   2.22 kB │ gzip:   0.90 kB
+.vinxi/build/client/_build/assets/Button-DedD5VrF.js                                                    2.24 kB │ gzip:   0.97 kB
+.vinxi/build/client/_build/assets/film-cut-BCOH9MSE.js                                                  2.39 kB │ gzip:   1.23 kB
+.vinxi/build/client/_build/assets/ShadowSettings-BrRuZpDp.js                                            2.48 kB │ gzip:   1.15 kB
+.vinxi/build/client/_build/assets/(window-chrome)-DHdftBxp.js                                           2.56 kB │ gzip:   1.21 kB
+.vinxi/build/client/_build/assets/image-CNjWPoji.js                                                     2.56 kB │ gzip:   0.69 kB
+.vinxi/build/client/_build/assets/UGE6PPGT-BMptp8rS.js                                                  2.65 kB │ gzip:   1.31 kB
+.vinxi/build/client/_build/assets/restart-B_AHv7Qh.js                                                   2.67 kB │ gzip:   0.85 kB
+.vinxi/build/client/_build/assets/changelog-DMg3J1yv.js                                                 2.68 kB │ gzip:   1.30 kB
+.vinxi/build/client/_build/assets/changelog-CPsB5D8B.js                                                 2.68 kB │ gzip:   1.30 kB
+.vinxi/build/client/_build/assets/ModeSelect-BGfwh5nr.js                                                2.85 kB │ gzip:   1.32 kB
+.vinxi/build/client/_build/assets/index-AoIOe6vM.js                                                     2.90 kB │ gzip:   1.38 kB
+.vinxi/build/client/_build/assets/index-B-ldJTJa.js                                                     2.90 kB │ gzip:   1.38 kB
+.vinxi/build/client/_build/assets/circle-plus-Dgx1yKNw.js                                               2.97 kB │ gzip:   1.21 kB
+.vinxi/build/client/_build/assets/ZZYKR3VO-BecgD3oZ.js                                                  3.00 kB │ gzip:   1.34 kB
+.vinxi/build/client/_build/assets/useRequestPermission-BrAgq_Dr.js                                      3.01 kB │ gzip:   1.23 kB
+.vinxi/build/client/_build/assets/cursor-windows-wSIUCAoq.js                                            3.02 kB │ gzip:   1.11 kB
+.vinxi/build/client/_build/assets/ShadowSettings-CheHWmEA.js                                            3.15 kB │ gzip:   1.37 kB
+.vinxi/build/client/_build/assets/debug-BrHInz6T.js                                                     3.16 kB │ gzip:   1.44 kB
+.vinxi/build/client/_build/assets/debug-Cf1e2AKR.js                                                     3.16 kB │ gzip:   1.44 kB
+.vinxi/build/client/_build/assets/CaptionControlsMacOS-0BQwfbBP.js                                      3.21 kB │ gzip:   1.38 kB
+.vinxi/build/client/_build/assets/AspectRatioSelect-D0hBs7E-.js                                         3.24 kB │ gzip:   1.51 kB
+.vinxi/build/client/_build/assets/useRequestPermission-xdVoi97r.js                                      3.45 kB │ gzip:   1.40 kB
+.vinxi/build/client/_build/assets/color-utils-DJBPzDdx.js                                               3.46 kB │ gzip:   1.47 kB
+.vinxi/build/client/_build/assets/warning-bold-wjnK-QXp.js                                              3.49 kB │ gzip:   1.75 kB
+.vinxi/build/client/_build/assets/ModeInfoPanel-Ffzgp0pr.js                                             3.80 kB │ gzip:   1.73 kB
+.vinxi/build/client/_build/assets/update-14MOb3Yx.js                                                    3.88 kB │ gzip:   1.70 kB
+.vinxi/build/client/_build/assets/update-CYM83_4N.js                                                    3.88 kB │ gzip:   1.70 kB
+.vinxi/build/client/_build/assets/index-DE9iULfq.js                                                     3.97 kB │ gzip:   1.85 kB
+.vinxi/build/client/_build/assets/index-B1pVakQx.js                                                     3.97 kB │ gzip:   1.85 kB
+.vinxi/build/client/_build/assets/layout-BDf2BCqg.js                                                    4.00 kB │ gzip:   1.49 kB
+.vinxi/build/client/_build/assets/action-BvpMaYxR.js                                                    4.03 kB │ gzip:   1.99 kB
+.vinxi/build/client/_build/assets/selection-hint-CE6clnEP.js                                            4.03 kB │ gzip:   1.39 kB
+.vinxi/build/client/_build/assets/index-DEKkFY9Z.js                                                     4.04 kB │ gzip:   1.62 kB
+.vinxi/build/client/_build/assets/index-BPfoR3dS.js                                                     4.14 kB │ gzip:   2.11 kB
+.vinxi/build/client/_build/assets/index-D98Uz63M.js                                                     4.14 kB │ gzip:   2.11 kB
+.vinxi/build/client/_build/assets/toast-BV6jc4bG.js                                                     4.21 kB │ gzip:   1.83 kB
+.vinxi/build/client/_build/assets/organization-branding-BsDHpNrh.js                                     4.38 kB │ gzip:   1.84 kB
+.vinxi/build/client/_build/assets/message-square-plus-jsGMyvx_.js                                       4.48 kB │ gzip:   1.78 kB
+.vinxi/build/client/_build/assets/Toggle-CUN6bL3m.js                                                    4.66 kB │ gzip:   1.91 kB
+.vinxi/build/client/_build/assets/experimental-Cw_v-YYf.js                                              4.67 kB │ gzip:   2.16 kB
+.vinxi/build/client/_build/assets/experimental-lrf5b4OY.js                                              4.67 kB │ gzip:   2.16 kB
+.vinxi/build/client/_build/assets/PresetsDropdown-C7-8n4I6.js                                           4.70 kB │ gzip:   1.81 kB
+.vinxi/build/client/_build/assets/cli-74yPt80d.js                                                       4.78 kB │ gzip:   1.92 kB
+.vinxi/build/client/_build/assets/cli-DvV07Q8O.js                                                       4.78 kB │ gzip:   1.92 kB
+.vinxi/build/client/_build/assets/webviewWindow-Cdlrf6yZ.js                                             4.83 kB │ gzip:   1.44 kB
+.vinxi/build/client/_build/assets/MicrophoneSelect-SPtYRs2Q.js                                          4.83 kB │ gzip:   2.00 kB
+.vinxi/build/client/_build/assets/gear-Cfsz2Wvb.js                                                      4.94 kB │ gzip:   2.25 kB
+.vinxi/build/client/_build/assets/DeviceSelectOverlay-DGLUNiwZ.js                                       4.95 kB │ gzip:   2.05 kB
+.vinxi/build/client/_build/assets/transcription-BLgKUPM-.js                                             5.05 kB │ gzip:   2.30 kB
+.vinxi/build/client/_build/assets/transcription-BwRxmnNr.js                                             5.06 kB │ gzip:   2.30 kB
+.vinxi/build/client/_build/assets/ShareButton-DsxudlA-.js                                               5.06 kB │ gzip:   2.29 kB
+.vinxi/build/client/_build/assets/V2VBQZ5V-AHZzo5qY.js                                                  5.07 kB │ gzip:   2.05 kB
+.vinxi/build/client/_build/assets/hotkeys-CQtv4KSs.js                                                   5.19 kB │ gzip:   2.14 kB
+.vinxi/build/client/_build/assets/hotkeys-BvwfWkPb.js                                                   5.19 kB │ gzip:   2.14 kB
+.vinxi/build/client/_build/assets/store-BXlGbOEM.js                                                     5.29 kB │ gzip:   2.33 kB
+.vinxi/build/client/_build/assets/CameraSelect-BIFgv90N.js                                              5.47 kB │ gzip:   2.06 kB
+.vinxi/build/client/_build/assets/store-DDOvhKkm.js                                                     5.56 kB │ gzip:   2.22 kB
+.vinxi/build/client/_build/assets/index-IXl1Kbw8.js                                                     5.60 kB │ gzip:   2.28 kB
+.vinxi/build/client/_build/assets/queries-p-c0xVkO.js                                                   6.15 kB │ gzip:   2.41 kB
+.vinxi/build/client/_build/assets/index-DiRg2cmv.js                                                     6.25 kB │ gzip:   1.62 kB
+.vinxi/build/client/_build/assets/webhook-IMF1wiqO.js                                                   6.27 kB │ gzip:   2.14 kB
+.vinxi/build/client/_build/assets/LoaderIcon-PnoycXRW.js                                                6.28 kB │ gzip:   2.35 kB
+.vinxi/build/client/_build/assets/s3-config-Hr7d_kae.js                                                 6.94 kB │ gzip:   3.02 kB
+.vinxi/build/client/_build/assets/s3-config-Isvtf3JQ.js                                                 6.94 kB │ gzip:   3.02 kB
+.vinxi/build/client/_build/assets/screenshotExport-Bs8tD8ih.js                                          6.99 kB │ gzip:   2.92 kB
+.vinxi/build/client/_build/assets/Tooltip-V1YXgJOe.js                                                   7.01 kB │ gzip:   2.92 kB
+.vinxi/build/client/_build/assets/license-B3SkTUEj.js                                                   7.02 kB │ gzip:   2.79 kB
+.vinxi/build/client/_build/assets/license-DP2UE3s9.js                                                   7.02 kB │ gzip:   2.79 kB
+.vinxi/build/client/_build/assets/auth-DWDzP24x.js                                                      7.57 kB │ gzip:   3.37 kB
+.vinxi/build/client/_build/assets/capture-area-Ch4rfJoU.js                                              7.71 kB │ gzip:   2.89 kB
+.vinxi/build/client/_build/assets/capture-area-C5i1vZvw.js                                              7.71 kB │ gzip:   2.89 kB
+.vinxi/build/client/_build/assets/quality-BPLy7eJR.js                                                   7.79 kB │ gzip:   3.14 kB
+.vinxi/build/client/_build/assets/quality-BKn52z23.js                                                   7.79 kB │ gzip:   3.14 kB
+.vinxi/build/client/_build/assets/routing-z-nIGaTV.js                                                   7.92 kB │ gzip:   3.68 kB
+.vinxi/build/client/_build/assets/index-hGrgdA0u.js                                                     8.01 kB │ gzip:   3.22 kB
+.vinxi/build/client/_build/assets/CameraPreviewChrome-DqNRV4mf.js                                       8.01 kB │ gzip:   3.19 kB
+.vinxi/build/client/_build/assets/5WXHJDCZ-D3pBmO7O.js                                                  8.30 kB │ gzip:   3.54 kB
+.vinxi/build/client/_build/assets/screenshots-CBTobpWI.js                                               8.31 kB │ gzip:   3.40 kB
+.vinxi/build/client/_build/assets/screenshots-DuPIJ1aV.js                                               8.31 kB │ gzip:   3.40 kB
+.vinxi/build/client/_build/assets/TargetMenuGrid-BVIc4Kgl.js                                            8.44 kB │ gzip:   2.70 kB
+.vinxi/build/client/_build/assets/google-drive-config-nr7YkuYk.js                                       8.50 kB │ gzip:   3.15 kB
+.vinxi/build/client/_build/assets/google-drive-config-CTU_G_bk.js                                       8.50 kB │ gzip:   3.15 kB
+.vinxi/build/client/_build/assets/menu-B6GI2f2B.js                                                      8.58 kB │ gzip:   1.93 kB
+.vinxi/build/client/_build/assets/OrganizationDropdown-DL8ROApc.js                                      9.22 kB │ gzip:   3.58 kB
+.vinxi/build/client/_build/assets/E53DB7BS-DZ7szup0.js                                                 10.03 kB │ gzip:   4.13 kB
+.vinxi/build/client/_build/assets/CaptionControlsWindows11-DVCjs4WE.js                                 10.09 kB │ gzip:   3.99 kB
+.vinxi/build/client/_build/assets/MicrophoneSelect-DQ9SHGb9.js                                         10.54 kB │ gzip:   3.77 kB
+.vinxi/build/client/_build/assets/TargetCard-B4lg5ZKr.js                                               10.73 kB │ gzip:   3.73 kB
+.vinxi/build/client/_build/assets/window-nBczjIBT.js                                                   10.80 kB │ gzip:   2.76 kB
+.vinxi/build/client/_build/assets/TargetCard-wWLVY1SQ.js                                               11.28 kB │ gzip:   3.98 kB
+.vinxi/build/client/_build/assets/settings-Ccy3dT43.js                                                 11.30 kB │ gzip:   4.16 kB
+.vinxi/build/client/_build/assets/feedback-C2UYuy48.js                                                 11.40 kB │ gzip:   4.46 kB
+.vinxi/build/client/_build/assets/feedback-BG5DonYa.js                                                 11.40 kB │ gzip:   4.46 kB
+.vinxi/build/client/_build/assets/ui-BN8kaTkf.js                                                       11.55 kB │ gzip:   3.65 kB
+.vinxi/build/client/_build/assets/teleprompter-BGQeykAs.js                                             12.38 kB │ gzip:   4.70 kB
+.vinxi/build/client/_build/assets/teleprompter-DslSVwgy.js                                             12.38 kB │ gzip:   4.70 kB
+.vinxi/build/client/_build/assets/recordings-CZKo8P1B.js                                               12.40 kB │ gzip:   4.61 kB
+.vinxi/build/client/_build/assets/recordings-fZ9HTtKw.js                                               12.40 kB │ gzip:   4.61 kB
+.vinxi/build/client/_build/assets/ClipsSidebar-DgtTZg7s.js                                             13.55 kB │ gzip:   5.76 kB
+.vinxi/build/client/_build/assets/camera-LYgLrADf.js                                                   14.45 kB │ gzip:   5.85 kB
+.vinxi/build/client/_build/assets/camera-gCw9kvq8.js                                                   14.45 kB │ gzip:   5.85 kB
+.vinxi/build/client/_build/assets/recordings-overlay-Bo9i3yMe.js                                       14.71 kB │ gzip:   5.54 kB
+.vinxi/build/client/_build/assets/recordings-overlay-DO5B7StL.js                                       14.71 kB │ gzip:   5.54 kB
+.vinxi/build/client/_build/assets/ui-wzqG90mA.js                                                       15.24 kB │ gzip:   5.91 kB
+.vinxi/build/client/_build/assets/tauri-bZ-fDA21.js                                                    17.66 kB │ gzip:   4.73 kB
+.vinxi/build/client/_build/assets/TranscriptPage-GDhmsHWa.js                                           18.16 kB │ gzip:   6.90 kB
+.vinxi/build/client/_build/assets/index-PHzotpBQ.js                                                    20.53 kB │ gzip:   6.40 kB
+.vinxi/build/client/_build/assets/JL7SEB2K-D2ytCqxT.js                                                 20.65 kB │ gzip:   6.73 kB
+.vinxi/build/client/_build/assets/in-progress-recording-D1E-l802.js                                    21.03 kB │ gzip:   7.37 kB
+.vinxi/build/client/_build/assets/in-progress-recording-DWv0i_pq.js                                    21.03 kB │ gzip:   7.37 kB
+.vinxi/build/client/_build/assets/floating-ui.dom-DmfZhyyb.js                                          21.39 kB │ gzip:   8.31 kB
+.vinxi/build/client/_build/assets/Cropper-3sqpNVS9.js                                                  21.56 kB │ gzip:   8.15 kB
+.vinxi/build/client/_build/assets/type-LEOSgp8o.js                                                     22.40 kB │ gzip:   7.43 kB
+.vinxi/build/client/_build/assets/socket-BfaClEIi.js                                                   22.56 kB │ gzip:   7.47 kB
+.vinxi/build/client/_build/assets/SwitchTab-D3Xa3K_2.js                                                25.08 kB │ gzip:   7.92 kB
+.vinxi/build/client/_build/assets/general-4k3TZIf_.js                                                  26.45 kB │ gzip:   9.21 kB
+.vinxi/build/client/_build/assets/general-B3yqi8Va.js                                                  26.45 kB │ gzip:   9.21 kB
+.vinxi/build/client/_build/assets/automations-B0Cu7P2J.js                                              27.58 kB │ gzip:   8.18 kB
+.vinxi/build/client/_build/assets/automations-f2F9HFqW.js                                              27.58 kB │ gzip:   8.18 kB
+.vinxi/build/client/_build/assets/CaptionsTab-Bcss7WyF.js                                              28.64 kB │ gzip:   8.70 kB
+.vinxi/build/client/_build/assets/window-geometry-BurTqCC0.js                                          28.91 kB │ gzip:   9.75 kB
+.vinxi/build/client/_build/assets/web-kpSiynse.js                                                      29.03 kB │ gzip:  11.17 kB
+.vinxi/build/client/_build/assets/index-DUqiUVd8.js                                                    37.26 kB │ gzip:  11.22 kB
+.vinxi/build/client/_build/assets/target-select-overlay-DyOpH7Fe.js                                    37.77 kB │ gzip:  12.52 kB
+.vinxi/build/client/_build/assets/target-select-overlay-osv6dXZB.js                                    37.77 kB │ gzip:  12.52 kB
+.vinxi/build/client/_build/assets/client-4w1Iq9WW.js                                                   38.66 kB │ gzip:  13.90 kB
+.vinxi/build/client/_build/assets/ExportPage-YmdIW4Cb.js                                               39.24 kB │ gzip:  12.97 kB
+.vinxi/build/client/_build/assets/65CAYJLE-DpjNXs6R.js                                                 40.17 kB │ gzip:  11.49 kB
+.vinxi/build/client/_build/assets/index-kODI_Xbe.js                                                    55.77 kB │ gzip:  15.78 kB
+.vinxi/build/client/_build/assets/index-vccGdAQP.js                                                    55.77 kB │ gzip:  15.78 kB
+.vinxi/build/client/_build/assets/onboarding-BbUjRz9T.js                                               56.14 kB │ gzip:  14.87 kB
+.vinxi/build/client/_build/assets/onboarding-CA26J13Y.js                                               56.14 kB │ gzip:  14.87 kB
+.vinxi/build/client/_build/assets/web-api-BUKi8D_p.js                                                  68.89 kB │ gzip:  17.43 kB
+.vinxi/build/client/_build/assets/Editor-BokYEYPV.js                                                   86.45 kB │ gzip:  26.44 kB
+.vinxi/build/client/_build/assets/context-qcWSmdrg.js                                                  86.94 kB │ gzip:  30.55 kB
+.vinxi/build/client/_build/assets/index-DMjAvhaE.js                                                   111.75 kB │ gzip:  33.97 kB
+.vinxi/build/client/_build/assets/Editor-DcrKJLmG.js                                                  519.67 kB │ gzip: 148.79 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 20.33s
+✔ build done
+⚙ Built your router client successfully
+vinxi v0.5.11
+
+
+⚙ Building your router server-fns...
+
+
+📦 Compiling server-fns router...
+vinxi building router server-fns in http mode
+vite v6.4.3 building SSR bundle for production...
+transforming...
+✓ 613 modules transformed.
+rendering chunks...
+.vinxi/build/server-fns/_server/assets/stride-correction-worker-BsaaXY3G.js                                  0.49 kB
+.vinxi/build/server-fns/_server/assets/frame-worker-D3yL4pap.js                                             21.12 kB
+.vinxi/build/server-fns/_server/assets/geist-sans-latin-400-normal-gapTbOY8.woff2                           33.40 kB
+.vinxi/build/server-fns/_server/assets/geist-sans-latin-500-normal-uokXdC-Q.woff2                           34.72 kB
+.vinxi/build/server-fns/_server/assets/dark-B8-Zfy6_.jpg                                                    35.26 kB
+.vinxi/build/server-fns/_server/assets/geist-sans-latin-700-normal-BmN9tIp5.woff2                           35.48 kB
+.vinxi/build/server-fns/_server/assets/light-BcegqCvt.jpg                                                   35.87 kB
+.vinxi/build/server-fns/_server/assets/geist-sans-latin-400-normal-BOaIZNA2.woff                            38.91 kB
+.vinxi/build/server-fns/_server/assets/geist-sans-latin-500-normal-CN2lyvyL.woff                            40.52 kB
+.vinxi/build/server-fns/_server/assets/geist-sans-latin-700-normal-CjScfYeH.woff                            41.40 kB
+.vinxi/build/server-fns/_server/assets/auto-CPKoGbmb.jpg                                                    44.56 kB
+.vinxi/build/server-fns/_server/.vite/manifest.json                                                         47.09 kB
+.vinxi/build/server-fns/_server/assets/cloud-2-C48ZYBEu.png                                                449.73 kB
+.vinxi/build/server-fns/_server/assets/cloud-1-0EtYTpJQ.png                                                555.95 kB
+.vinxi/build/server-fns/_server/assets/cloud-3-SWvz_Fyk.png                                                729.92 kB
+.vinxi/build/server-fns/_server/assets/lofi-hip-hop-leberch-CVaw0mUt.mp3                                   937.00 kB
+.vinxi/build/server-fns/_server/assets/ambient-trap-empty-streets-dreamstate-openmindaudio-BZQRh1Vo.mp3  1,104.81 kB
+.vinxi/build/server-fns/_server/assets/lofi-smooth-pulsebox-C35WoCin.mp3                                 1,198.70 kB
+.vinxi/build/server-fns/_server/assets/sunday-mood-lofi-cafe-upbeat-bluelike-zE7SfvGL.mp3                1,221.16 kB
+.vinxi/build/server-fns/_server/assets/tears-and-fireflies-adi-goldstein-CggkdS0h.mp3                    1,269.18 kB
+.vinxi/build/server-fns/_server/assets/lofi-beats-mirostar-D5hw-SpR.mp3                                  1,336.05 kB
+.vinxi/build/server-fns/_server/assets/raindrops-lofi-sleep-bluelike-BsyCqd7Y.mp3                        1,644.52 kB
+.vinxi/build/server-fns/_server/assets/good-night-lofi-cozy-chill-fassounds-D5_R4EjB.mp3                 1,766.13 kB
+.vinxi/build/server-fns/_server/assets/lofi-study-calm-peaceful-chill-hop-fassounds-BpGZ1cIl.mp3         1,767.38 kB
+.vinxi/build/server-fns/_server/assets/lofi-cinematic-pulsebox-Bg98IMYb.mp3                              1,773.26 kB
+.vinxi/build/server-fns/_server/assets/cassette-retrositive-jzqg1AFX.mp3                                 2,264.59 kB
+.vinxi/build/server-fns/_server/assets/Cropper-DHBTHkFk.css                                                  1.02 kB
+.vinxi/build/server-fns/_server/assets/in-progress-recording-Dkoz5m07.css                                    1.71 kB
+.vinxi/build/server-fns/_server/assets/index-UoGPRlYu.css                                                    9.21 kB
+.vinxi/build/server-fns/_server/assets/app-C-nCVk5k.css                                                    443.42 kB
+.vinxi/build/server-fns/_server/assets/JNCCF6MP-4sxnBYeu.js                                                  0.06 kB
+.vinxi/build/server-fns/_server/assets/playback-intent-routing-Nd0l107r.js                                   0.08 kB
+.vinxi/build/server-fns/_server/assets/createEventListener-eFZdy95s.js                                       0.17 kB
+.vinxi/build/server-fns/_server/assets/pricing-BNBJx0sm.js                                                   0.20 kB
+.vinxi/build/server-fns/_server/assets/minus-CYbUyAHI.js                                                     0.31 kB
+.vinxi/build/server-fns/_server/assets/chevron-down-BBh1rqlA.js                                              0.31 kB
+.vinxi/build/server-fns/_server/assets/check-BB8ycQUG.js                                                     0.32 kB
+.vinxi/build/server-fns/_server/assets/plus-Dah5zJVc.js                                                      0.32 kB
+.vinxi/build/server-fns/_server/assets/x-Db_z3b9H.js                                                         0.32 kB
+.vinxi/build/server-fns/_server/assets/arrow-left-DDT4eSTx.js                                                0.32 kB
+.vinxi/build/server-fns/_server/assets/loader2-d4patYAe.js                                                   0.33 kB
+.vinxi/build/server-fns/_server/assets/maximize2-CFgFLHy8.js                                                 0.34 kB
+.vinxi/build/server-fns/_server/assets/gauge-lHPGBTEz.js                                                     0.34 kB
+.vinxi/build/server-fns/_server/assets/camera-window-CuqEy4LE.js                                             0.34 kB
+.vinxi/build/server-fns/_server/assets/search-B9wIiQUk.js                                                    0.36 kB
+.vinxi/build/server-fns/_server/assets/external-link-BXo1bFEX.js                                             0.38 kB
+.vinxi/build/server-fns/_server/assets/rotate-ccw-mC53qVGI.js                                                0.38 kB
+.vinxi/build/server-fns/_server/assets/alert-triangle-DK1crKEW.js                                            0.39 kB
+.vinxi/build/server-fns/_server/assets/lock-DreP-xQ3.js                                                      0.40 kB
+.vinxi/build/server-fns/_server/assets/ratio-BR4Jl7ev.js                                                     0.40 kB
+.vinxi/build/server-fns/_server/assets/screenshot-DGUPvGmG.js                                                0.40 kB
+.vinxi/build/server-fns/_server/assets/chevron-down-DU_cIWrD.js                                              0.40 kB
+.vinxi/build/server-fns/_server/assets/scan-text-P6EQF5Kq.js                                                 0.42 kB
+.vinxi/build/server-fns/_server/assets/folder-44LSiim4.js                                                    0.42 kB
+.vinxi/build/server-fns/_server/assets/import-BZZ6Utoz.js                                                    0.42 kB
+.vinxi/build/server-fns/_server/assets/copy-Bk_eTroK.js                                                      0.43 kB
+.vinxi/build/server-fns/_server/assets/move-left-B3wmgvXm.js                                                 0.44 kB
+.vinxi/build/server-fns/_server/assets/link-Comr-yEh.js                                                      0.45 kB
+.vinxi/build/server-fns/_server/assets/save-BwSHc3Nm.js                                                      0.49 kB
+.vinxi/build/server-fns/_server/assets/circle-x--fFxi5dp.js                                                  0.51 kB
+.vinxi/build/server-fns/_server/assets/link-DPdD5YC7.js                                                      0.51 kB
+.vinxi/build/server-fns/_server/assets/circle-check-PSg_Cb5e.js                                              0.51 kB
+.vinxi/build/server-fns/_server/assets/eye-off-C6NfcUPW.js                                                   0.55 kB
+.vinxi/build/server-fns/_server/assets/config-header-D-KLkliy.js                                             0.56 kB
+.vinxi/build/server-fns/_server/assets/VI7QYH27-DLXa97Hy.js                                                  0.58 kB
+.vinxi/build/server-fns/_server/assets/trash-Ci92Etui.js                                                     0.60 kB
+.vinxi/build/server-fns/_server/assets/layers-CXDSIWZe.js                                                    0.60 kB
+.vinxi/build/server-fns/_server/assets/os-permissions-BT8FbMEJ.js                                            0.62 kB
+.vinxi/build/server-fns/_server/assets/microphone-DmbtriI6.js                                                0.66 kB
+.vinxi/build/server-fns/_server/assets/settings-CsUq8vUD.js                                                  0.67 kB
+.vinxi/build/server-fns/_server/assets/volume-x-DrRabbss.js                                                  0.73 kB
+.vinxi/build/server-fns/_server/assets/trash-2-CYcL50DN.js                                                   0.78 kB
+.vinxi/build/server-fns/_server/assets/camera-C12aO46d.js                                                    0.84 kB
+.vinxi/build/server-fns/_server/assets/caret-down-CEBuRFco.js                                                0.91 kB
+.vinxi/build/server-fns/_server/assets/stop-circle-Dyvd2qJV.js                                               0.97 kB
+.vinxi/build/server-fns/_server/assets/flip-horizontal-2-DD5HCzGb.js                                         0.99 kB
+.vinxi/build/server-fns/_server/assets/UKTBL2JL-BqQ65rWI.js                                                  1.03 kB
+.vinxi/build/server-fns/_server/assets/export-BtHxQsz9.js                                                    1.04 kB
+.vinxi/build/server-fns/_server/assets/copy-BZBpvPmP.js                                                      1.13 kB
+.vinxi/build/server-fns/_server/assets/x-23Nk1y3s.js                                                         1.19 kB
+.vinxi/build/server-fns/_server/assets/style-n7FQ3Yhy.js                                                     1.20 kB
+.vinxi/build/server-fns/_server/assets/square-BCnmkQse.js                                                    1.34 kB
+.vinxi/build/server-fns/_server/assets/clapperboard-Db072FGL.js                                              1.34 kB
+.vinxi/build/server-fns/_server/assets/upgrade-BRTtXhWy.js                                                   1.53 kB
+.vinxi/build/server-fns/_server/assets/warning-bold-Dny3tJCR.js                                              1.56 kB
+.vinxi/build/server-fns/_server/assets/recording-C7V3aNn2.js                                                 1.69 kB
+.vinxi/build/server-fns/_server/assets/edit-D72GN8wn.js                                                      1.70 kB
+.vinxi/build/server-fns/_server/assets/mode-select-CnX5U5sM.js                                               2.02 kB
+.vinxi/build/server-fns/_server/assets/Setting-CgkQ_oWV.js                                                   2.22 kB
+.vinxi/build/server-fns/_server/assets/notifications-m3sUfqZf.js                                             2.25 kB
+.vinxi/build/server-fns/_server/assets/window-capture-occluder-BlnTy4xE.js                                   2.25 kB
+.vinxi/build/server-fns/_server/assets/film-cut-BsgI5rO7.js                                                  2.41 kB
+.vinxi/build/server-fns/_server/assets/UGE6PPGT-CgXJ2fOC.js                                                  2.60 kB
+.vinxi/build/server-fns/_server/assets/ModeSelect-Q0CQ_Yoq.js                                                2.70 kB
+.vinxi/build/server-fns/_server/assets/restart-DRIv3F_T.js                                                   2.76 kB
+.vinxi/build/server-fns/_server/assets/debug-DwvCVsHd.js                                                     2.82 kB
+.vinxi/build/server-fns/_server/assets/ZZYKR3VO-D-NY_Hq2.js                                                  2.99 kB
+.vinxi/build/server-fns/_server/assets/cursor-windows-BHft4eJG.js                                            3.22 kB
+.vinxi/build/server-fns/_server/assets/update-CEPPAtH-.js                                                    4.27 kB
+.vinxi/build/server-fns/_server/assets/organization-branding-BpCoRjuP.js                                     4.31 kB
+.vinxi/build/server-fns/_server/assets/selection-hint-B36NT0pz.js                                            4.33 kB
+.vinxi/build/server-fns/_server/assets/Toggle-D9MXowib.js                                                    4.55 kB
+.vinxi/build/server-fns/_server/assets/index-YFQcapgS.js                                                     4.74 kB
+.vinxi/build/server-fns/_server/assets/V2VBQZ5V-BHKXuUI3.js                                                  4.83 kB
+.vinxi/build/server-fns/_server/assets/experimental-B-eTzdTl.js                                              5.06 kB
+.vinxi/build/server-fns/_server/assets/cli-BUgzW3XX.js                                                       5.08 kB
+.vinxi/build/server-fns/_server/assets/transcription-Dh2EXeqN.js                                             5.12 kB
+.vinxi/build/server-fns/_server/assets/hotkeys-CCyOHxSh.js                                                   5.40 kB
+.vinxi/build/server-fns/_server/assets/OptionsContext-sHNDaEqp.js                                            6.38 kB
+.vinxi/build/server-fns/_server/assets/Tooltip-B6LutNSS.js                                                   6.88 kB
+.vinxi/build/server-fns/_server/assets/screenshotExport-DRIJ6ymO.js                                          6.99 kB
+.vinxi/build/server-fns/_server/assets/s3-config-COA7J_MY.js                                                 7.04 kB
+.vinxi/build/server-fns/_server/assets/license-Dc2jYxks.js                                                   7.12 kB
+.vinxi/build/server-fns/_server/assets/quality-C7Cz0vlH.js                                                   7.62 kB
+.vinxi/build/server-fns/_server/assets/capture-area-lSkmiN5M.js                                              7.67 kB
+.vinxi/build/server-fns/_server/assets/CameraPreviewChrome-61iSZ2tm.js                                       7.98 kB
+.vinxi/build/server-fns/_server/assets/index-CcHw9e-l.js                                                     8.10 kB
+.vinxi/build/server-fns/_server/assets/screenshots-BdqjqIvv.js                                               8.40 kB
+.vinxi/build/server-fns/_server/assets/google-drive-config-B0oTLT68.js                                       8.64 kB
+.vinxi/build/server-fns/_server/assets/changelog-DuEhwZGK.js                                                 8.74 kB
+.vinxi/build/server-fns/_server/assets/E53DB7BS-DJw5ASVB.js                                                  9.27 kB
+.vinxi/build/server-fns/_server/assets/Cropper-B0RwOu77.js                                                  10.83 kB
+.vinxi/build/server-fns/_server/assets/feedback-boR2xE_k.js                                                 10.86 kB
+.vinxi/build/server-fns/_server/assets/teleprompter-BftA3UiO.js                                             12.22 kB
+.vinxi/build/server-fns/_server/assets/ClipsSidebar-CMKg-PAq.js                                             12.27 kB
+.vinxi/build/server-fns/_server/assets/recordings-1Jlu4IrG.js                                               12.57 kB
+.vinxi/build/server-fns/_server/assets/MicrophoneSelect-DF4yyKyi.js                                         15.09 kB
+.vinxi/build/server-fns/_server/assets/TranscriptPage-Cu_MO9zR.js                                           15.14 kB
+.vinxi/build/server-fns/_server/assets/camera-dZNha_ET.js                                                   15.35 kB
+.vinxi/build/server-fns/_server/assets/recordings-overlay-BbJhH4zO.js                                       16.49 kB
+.vinxi/build/server-fns/_server/assets/index-Usa8qYJt.js                                                    20.44 kB
+.vinxi/build/server-fns/_server/assets/in-progress-recording-97TN-5Ee.js                                    21.65 kB
+.vinxi/build/server-fns/_server/assets/socket-JoJrEcP2.js                                                   22.38 kB
+.vinxi/build/server-fns/_server/server-fns.js                                                               22.49 kB
+.vinxi/build/server-fns/_server/assets/general-CbTjIfYM.js                                                  26.06 kB
+.vinxi/build/server-fns/_server/assets/CaptionsTab-SZONNhB4.js                                              28.00 kB
+.vinxi/build/server-fns/_server/assets/automations-651_KhhO.js                                              32.96 kB
+.vinxi/build/server-fns/_server/assets/ExportPage-Ba3HLnSj.js                                               37.41 kB
+.vinxi/build/server-fns/_server/assets/target-select-overlay-J82qcPmy.js                                    38.28 kB
+.vinxi/build/server-fns/_server/assets/type-CfiCqBvL.js                                                     39.54 kB
+.vinxi/build/server-fns/_server/assets/ui-DEo1vT04.js                                                       50.13 kB
+.vinxi/build/server-fns/_server/assets/onboarding-D_Gqk9eC.js                                               51.63 kB
+.vinxi/build/server-fns/_server/assets/index-CtAG_UPb.js                                                    84.06 kB
+.vinxi/build/server-fns/_server/assets/context-CMvFk5zD.js                                                  85.49 kB
+.vinxi/build/server-fns/_server/assets/index-Bk6q56kT.js                                                    89.67 kB
+.vinxi/build/server-fns/_server/assets/app-Co63DXQO.js                                                     144.08 kB
+.vinxi/build/server-fns/_server/assets/index-CDiyz1V8.js                                                   471.87 kB
+✓ built in 10.28s
+✔ build done
+⚙ Built your router server-fns successfully
+
+
+⚙  Preparing app for static...
+[vinxi] ✔ Generated public .output/public
+[vinxi] ℹ Initializing prerenderer
+[vinxi] ℹ Building Nitro Server (preset: nitro-prerender, compatibility date: 2024-12-01)
+[vinxi] ✔ Nitro Server built
+[vinxi] ✔ You can preview this build using npx serve ./public
+[vinxi] ℹ Prerendering 1 initial routes with crawler
+[vinxi]   ├─ / (17ms)
+[vinxi] ℹ Prerendered 1 routes in 7.412 seconds
+[vinxi] ✔ You can preview this build using npx serve .output/public
+   Compiling objc2-exception-helper v0.1.1
+   Compiling ring v0.17.14
+   Compiling tauri v2.8.5
+   Compiling keyboard-types v0.7.0
+   Compiling plist v1.8.0
+   Compiling objc_exception v0.1.2
+   Compiling serialize-to-javascript v0.1.2
+   Compiling tauri-macros v2.4.0
+   Compiling http-range v0.1.5
+   Compiling objc2 v0.6.2
+   Compiling embed_plist v1.2.2
+   Compiling ffmpeg-sys-next v7.1.3
+   Compiling objc v0.2.7
+   Compiling itertools v0.14.0
+   Compiling metal v0.31.0
+   Compiling scroll_derive v0.12.1
+   Compiling rustix v0.38.44
+   Compiling prettyplease v0.2.37
+   Compiling scroll v0.12.0
+   Compiling tauri-plugin-fs v2.4.2
+   Compiling objc2-core-foundation v0.3.1
+   Compiling block2 v0.6.1
+   Compiling dispatch2 v0.3.0
+   Compiling objc2-javascript-core v0.3.1
+   Compiling rustls v0.23.31
+   Compiling memoffset v0.9.1
+   Compiling crash-context v0.6.3
+   Compiling tokio-stream v0.1.17
+   Compiling range-map v0.2.0
+   Compiling objc2-core-graphics v0.3.1
+   Compiling objc2-foundation v0.3.1
+   Compiling objc2-security v0.3.1
+   Compiling pin-project-internal v1.1.10
+   Compiling smart-default v0.7.1
+   Compiling plain v0.2.3
+   Compiling minidump-writer v0.8.9
+   Compiling rustls-webpki v0.103.6
+   Compiling home v0.5.11
+   Compiling bindgen v0.69.5
+   Compiling which v4.4.2
+   Compiling minidump-common v0.21.2
+   Compiling goblin v0.8.2
+   Compiling pin-project v1.1.10
+   Compiling cap-rnnoise v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rnnoise)
+   Compiling wgpu-hal v25.0.2 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/vendor/wgpu-hal)
+   Compiling ffmpeg-next v7.1.0 (https://github.com/CapSoftware/rust-ffmpeg?rev=49db1fede112#49db1fed)
+   Compiling wgpu-core-deps-apple v25.0.0
+   Compiling wgpu-core v25.0.2
+   Compiling tokio-rustls v0.26.3
+   Compiling hyper-rustls v0.27.7
+   Compiling cocoa-foundation v0.2.1
+   Compiling onig_sys v69.9.1
+   Compiling reqwest v0.12.24 (https://github.com/CapSoftware/reqwest?rev=9b5ecbd5210a9510fde766015cabb724c1e70d2e#9b5ecbd5)
+   Compiling opentelemetry v0.31.0
+   Compiling itertools v0.12.1
+   Compiling lazycell v1.3.0
+   Compiling cocoa v0.26.1
+   Compiling objc2-core-video v0.3.1
+   Compiling objc2-core-media v0.3.1
+   Compiling prost-derive v0.14.1
+   Compiling polling v3.11.0
+   Compiling tauri-plugin-deep-link v2.4.3
+   Compiling workspace-hack v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/workspace-hack)
+   Compiling cap-media-info v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/media-info)
+   Compiling cap-enc-ffmpeg v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/enc-ffmpeg)
+   Compiling cap-cursor-info v0.0.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/cursor-info)
+   Compiling wgpu v25.0.2
+   Compiling cap-project v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/project)
+   Compiling ffmpeg-hw-device v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/ffmpeg-hw-device)
+   Compiling cap-video-decode v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/video-decode)
+   Compiling cap-flags v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/flags)
+   Compiling sentry v0.42.0
+   Compiling symphonia-core v0.5.4
+   Compiling ahash v0.8.12
+   Compiling derive_builder_core v0.20.2
+   Compiling cap-camera-effects v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/camera-effects)
+   Compiling glyphon v0.9.0
+   Compiling cmake v0.1.54
+   Compiling mac-notification-sys v0.6.6
+   Compiling strength_reduce v0.2.4
+   Compiling esaxx-rs v0.1.10
+   Compiling fs_extra v1.3.0
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+   Compiling transpose v0.2.3
+   Compiling derive_builder_macro v0.20.2
+   Compiling symphonia-metadata v0.5.4
+   Compiling cap-audio v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/audio)
+   Compiling cap-media v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/media)
+   Compiling whisper-rs-sys v0.9.0
+   Compiling cap-camera-avfoundation v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/camera-avfoundation)
+   Compiling cap-utils v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/utils)
+   Compiling prost v0.14.1
+   Compiling minidumper v0.8.3
+   Compiling opentelemetry_sdk v0.31.0
+   Compiling tonic v0.14.2
+   Compiling crash-handler v0.6.3
+   Compiling castaway v0.2.4
+   Compiling tauri-plugin-os v2.3.1
+   Compiling tauri-plugin-shell v2.3.1
+   Compiling tauri-plugin-oauth v2.0.0 (https://github.com/FabianLars/tauri-plugin-oauth?branch=v2#f941c99c)
+   Compiling tauri-plugin-global-shortcut v2.3.0
+   Compiling tauri-plugin-process v2.3.0
+   Compiling tauri-plugin-sentry v0.5.0
+   Compiling objc2-quartz-core v0.3.1
+   Compiling objc2-core-image v0.3.1
+   Compiling objc2-cloud-kit v0.3.1
+   Compiling objc2-core-data v0.3.1
+   Compiling objc2-avf-audio v0.3.1
+   Compiling objc2-av-foundation v0.3.1
+   Compiling tauri-plugin-opener v2.5.0
+   Compiling tauri-plugin-positioner v2.3.0
+   Compiling objc2-app-kit v0.3.1
+   Compiling tauri-plugin-dialog v2.4.0
+   Compiling tauri-plugin-window-state v2.4.0
+   Compiling tauri-plugin-http v2.5.2
+   Compiling tauri-plugin-clipboard-manager v2.3.0
+   Compiling tauri-plugin-notification v2.3.1
+   Compiling tauri-plugin-updater v2.9.0
+   Compiling tauri-plugin-store v2.4.0
+   Compiling primal-check v0.3.4
+   Compiling monostate-impl v0.1.18
+   Compiling os_pipe v1.2.2
+   Compiling base64 v0.13.1
+   Compiling rfd v0.15.4
+   Compiling macro_rules_attribute-proc_macro v0.2.2
+   Compiling cpal v0.15.3
+   Compiling eyre v0.6.12
+   Compiling spm_precompiled v0.1.4
+   Compiling monostate v0.1.18
+   Compiling macro_rules_attribute v0.2.2
+   Compiling sigchld v0.2.4
+   Compiling rustfft v6.4.1
+   Compiling tonic-prost v0.14.2
+   Compiling compact_str v0.9.0
+   Compiling minidumper-child v0.2.2
+   Compiling scap-targets v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/scap-targets)
+   Compiling onig v6.5.1
+   Compiling symphonia-bundle-mp3 v0.5.4
+   Compiling derive_builder v0.20.2
+   Compiling objc2-io-kit v0.3.1
+   Compiling rayon-cond v0.4.0
+   Compiling tungstenite v0.29.0
+   Compiling objc_id v0.1.1
+   Compiling futures-lite v2.6.1
+   Compiling xattr v1.5.1
+   Compiling specta-serde v0.0.7
+   Compiling unicode-normalization-alignments v0.1.12
+   Compiling dary_heap v0.3.8
+   Compiling ogg v0.8.0
+   Compiling filetime v0.2.26
+   Compiling hound v3.5.1
+   Compiling indenter v0.3.4
+   Compiling unicode_categories v0.1.1
+   Compiling tokenizers v0.22.2
+   Compiling notify-rust v4.11.7
+   Compiling tokio-tungstenite v0.29.0
+   Compiling cap-fail v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/fail)
+   Compiling tar v0.4.44
+   Compiling lewton v0.10.2
+   Compiling specta-typescript v0.0.7
+   Compiling cap-camera v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/camera)
+   Compiling cap-camera-ffmpeg v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/camera-ffmpeg)
+   Compiling objc-foundation v0.1.1
+   Compiling sysinfo v0.35.2
+   Compiling symphonia v0.5.4
+   Compiling cap-cursor-capture v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/cursor-capture)
+   Compiling sentry-rust-minidump v0.13.0
+   Compiling screencapturekit v0.3.6
+   Compiling opentelemetry-proto v0.31.0
+   Compiling realfft v3.5.0
+   Compiling shared_child v1.1.1
+   Compiling cap-frame-converter v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/frame-converter)
+   Compiling cap-editor v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/editor)
+   Compiling cap-enc-gif v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/enc-gif)
+   Compiling cap-enc-avfoundation v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/enc-avfoundation)
+   Compiling cap-timestamp v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/timestamp)
+   Compiling opentelemetry-http v0.31.0
+   Compiling os_info v3.12.0
+   Compiling cap-desktop v0.6.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/apps/desktop/src-tauri)
+   Compiling axum-core v0.5.6
+   Compiling gethostname v1.0.2
+   Compiling tauri-specta-macros v2.0.0-rc.16
+   Compiling async-stream-impl v0.3.6
+   Compiling axum-macros v0.5.1
+   Compiling claxon v0.4.3
+   Compiling minisign-verify v0.2.4
+   Compiling twox-hash v2.1.2
+   Compiling matchit v0.8.4
+   Compiling dotenvy v0.15.7
+   Compiling dotenvy_macro v0.15.7
+   Compiling parakeet-rs v0.3.4
+   Compiling cap-export v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/export)
+   Compiling lz4_flex v0.11.5
+   Compiling rodio v0.19.0
+   Compiling axum v0.8.9
+   Compiling async-stream v0.3.6
+   Compiling opentelemetry-otlp v0.31.0
+   Compiling tracing-opentelemetry v0.32.0
+   Compiling cap-automation v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/automation)
+   Compiling cap-cli-install v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/cli-install)
+   Compiling scap-direct3d v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/scap-direct3d)
+   Compiling tracing-futures v0.2.5
+   Compiling sanitize-filename v0.6.0
+   Compiling keyed_priority_queue v0.4.2
+   Compiling pollster v0.4.0
+   Compiling md5 v0.7.0
+   Compiling objc2-web-kit v0.3.1
+   Compiling tao v0.34.3 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/vendor/tao)
+   Compiling muda v0.17.1
+   Compiling window-vibrancy v0.6.0
+   Compiling objc2-osa-kit v0.3.1
+   Compiling scap-screencapturekit v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/scap-screencapturekit)
+   Compiling scap-ffmpeg v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/scap-ffmpeg)
+   Compiling osakit v0.3.1
+   Compiling arboard v3.6.1
+   Compiling global-hotkey v0.7.0
+   Compiling tray-icon v0.21.1
+   Compiling cap-recording v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/recording)
+   Compiling clipboard-rs v0.2.4
+   Compiling whisper-rs v0.11.1
+   Compiling tauri-runtime v2.8.0
+   Compiling wry v0.53.3
+   Compiling tauri-runtime-wry v2.8.1
+   Compiling tauri-specta v2.0.0-rc.20
+   Compiling tauri-plugin-single-instance v2.3.4
+   Compiling tauri-nspanel v2.0.1 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/vendor/tauri-nspanel)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3m 04s
+       Built application at: /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/debug/Jianku Screen Next
+    Bundling Jianku Screen Next.app (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/debug/bundle/macos/Jianku Screen Next.app)
+    Finished 1 bundle at:
+        /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/debug/bundle/macos/Jianku Screen Next.app
+

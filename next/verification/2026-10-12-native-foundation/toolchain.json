@@ -1,0 +1,22 @@
+{
+  "xcodeVersion": {
+    "exitCode": 0,
+    "stdout": "Xcode 16.2\nBuild version 16C5032a",
+    "stderr": ""
+  },
+  "xcodeInitialized": {
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "developerDirectory": {
+    "exitCode": 0,
+    "stdout": "/Applications/Xcode.app/Contents/Developer",
+    "stderr": ""
+  },
+  "macOS": {
+    "exitCode": 0,
+    "stdout": "14.7.4",
+    "stderr": ""
+  }
+}

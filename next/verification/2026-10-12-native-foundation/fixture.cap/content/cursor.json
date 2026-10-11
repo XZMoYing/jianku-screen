@@ -1,0 +1,2141 @@
+{
+  "moves": [
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 0.0,
+      "x": 0.5,
+      "y": 0.6799999999999999
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 20.0,
+      "x": 0.509562204060067,
+      "y": 0.6798929951457804
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 40.0,
+      "x": 0.5191063349673521,
+      "y": 0.6795721078057755
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 60.0,
+      "x": 0.5286143537284419,
+      "y": 0.6790377194966853
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 80.0,
+      "x": 0.5380682896040963,
+      "y": 0.6782904655756559
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 100.0,
+      "x": 0.5474502740750493,
+      "y": 0.6773312344848746
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 120.0,
+      "x": 0.5567425746146081,
+      "y": 0.6761611666952643
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 140.0,
+      "x": 0.5659276282042159,
+      "y": 0.6747816533505275
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 160.0,
+      "x": 0.5749880745286369,
+      "y": 0.673194334613157
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 180.0,
+      "x": 0.5839067887880166,
+      "y": 0.6714010977143763
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 200.0,
+      "x": 0.5926669140648061,
+      "y": 0.6694040747103289
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 220.0,
+      "x": 0.6012518931843706,
+      "y": 0.6672056399471862
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 240.0,
+      "x": 0.609645500009066,
+      "y": 0.6648084072381854
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 260.0,
+      "x": 0.617831870106636,
+      "y": 0.6622152267559547
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 280.0,
+      "x": 0.6257955307349623,
+      "y": 0.6594291816438217
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 300.0,
+      "x": 0.6335214300864977,
+      "y": 0.6564535843501316
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 320.0,
+      "x": 0.6409949657371066,
+      "y": 0.6532919726899358
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 340.0,
+      "x": 0.6482020122455425,
+      "y": 0.6499481056387321
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 360.0,
+      "x": 0.6551289478514003,
+      "y": 0.6464259588632575
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 380.0,
+      "x": 0.6617626802210789,
+      "y": 0.6427297199946483
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 400.0,
+      "x": 0.668090671193096,
+      "y": 0.6388637836495855
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 420.0,
+      "x": 0.674100960475983,
+      "y": 0.6348327462053471
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 440.0,
+      "x": 0.6797821882539705,
+      "y": 0.6306414003349785
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 460.0,
+      "x": 0.6851236166577372,
+      "y": 0.6262947293090779
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 480.0,
+      "x": 0.6901151500596424,
+      "y": 0.6217979010709727
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 500.0,
+      "x": 0.6947473541550819,
+      "y": 0.6171562620923301
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 520.0,
+      "x": 0.6990114737939035,
+      "y": 0.6123753310165089
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 540.0,
+      "x": 0.7028994495281775,
+      "y": 0.6074607920972065
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 560.0,
+      "x": 0.7064039328450491,
+      "y": 0.6024184884402076
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 580.0,
+      "x": 0.709518300055878,
+      "y": 0.5972544150562652
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 600.0,
+      "x": 0.7122366648154171,
+      "y": 0.5919747117333748
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 620.0,
+      "x": 0.7145538892473666,
+      "y": 0.5865856557369188
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 640.0,
+      "x": 0.7164655936552751,
+      "y": 0.5810936543463557
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 660.0,
+      "x": 0.717968164800435,
+      "y": 0.5755052372373319
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 680.0,
+      "x": 0.719058762731126,
+      "y": 0.5698270487182705
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 700.0,
+      "x": 0.7197353261502976,
+      "y": 0.5640658398306682
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 720.0,
+      "x": 0.7199965763115472,
+      "y": 0.5582284603224932
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 740.0,
+      "x": 0.7198420194360298,
+      "y": 0.5523218505042267
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 760.0,
+      "x": 0.7192719476457295,
+      "y": 0.5463530329972301
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 780.0,
+      "x": 0.718287438411332,
+      "y": 0.5403291043842503
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 800.0,
+      "x": 0.716890352515738,
+      "y": 0.5342572267719877
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 820.0,
+      "x": 0.7150833305370693,
+      "y": 0.5281446192757618
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 840.0,
+      "x": 0.7128697878578151,
+      "y": 0.5219985494363951
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 860.0,
+      "x": 0.7102539082095479,
+      "y": 0.5158263245795232
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 880.0,
+      "x": 0.7072406357654151,
+      "y": 0.5096352831276015
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 900.0,
+      "x": 0.7038356657953476,
+      "y": 0.5034327858749417
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 920.0,
+      "x": 0.70004543390165,
+      "y": 0.4972262072361473
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 940.0,
+      "x": 0.6958771038553173,
+      "y": 0.49102292647835666
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 960.0,
+      "x": 0.6913385540560678,
+      "y": 0.48483031894771594
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 980.0,
+      "x": 0.6864383626416839,
+      "y": 0.47865574730051474
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1000.0,
+      "x": 0.6811857912748048,
+      "y": 0.47250655274940845
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1020.0,
+      "x": 0.6755907676378159,
+      "y": 0.46639004633513587
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1040.0,
+      "x": 0.6696638666689192,
+      "y": 0.4603135002341104
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1060.0,
+      "x": 0.6634162905748507,
+      "y": 0.45428413911221743
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1080.0,
+      "x": 0.6568598476580224,
+      "y": 0.4483091315351003
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1100.0,
+      "x": 0.650006929998105,
+      "y": 0.44239558144514507
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1120.0,
+      "x": 0.6428704900302372,
+      "y": 0.4365505197152994
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1140.0,
+      "x": 0.6354640160641276,
+      "y": 0.43078089578976675
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1160.0,
+      "x": 0.627801506790321,
+      "y": 0.4250935694215144
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1180.0,
+      "x": 0.6198974448218143,
+      "y": 0.4194953025164193
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1200.0,
+      "x": 0.6117667693210282,
+      "y": 0.41399275109374883
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1220.0,
+      "x": 0.6034248477638737,
+      "y": 0.40859245737253447
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1240.0,
+      "x": 0.594887446894278,
+      "y": 0.4033008419932469
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1260.0,
+      "x": 0.5861707029240711,
+      "y": 0.39812419638402224
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1280.0,
+      "x": 0.5772910910345553,
+      "y": 0.3930686752805136
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1300.0,
+      "x": 0.5682653942373995,
+      "y": 0.3881402894082616
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1320.0,
+      "x": 0.559110671653718,
+      "y": 0.38334489833628643
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1340.0,
+      "x": 0.549844226271283,
+      "y": 0.37868820351039456
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1360.0,
+      "x": 0.5404835722408171,
+      "y": 0.37417574147448585
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1380.0,
+      "x": 0.5310464017731708,
+      "y": 0.36981287728791934
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1400.0,
+      "x": 0.5215505516999596,
+      "y": 0.3656047981467647
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1420.0,
+      "x": 0.5120139697608563,
+      "y": 0.3615565072165225
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1440.0,
+      "x": 0.502454680681261,
+      "y": 0.3576728176836462
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1460.0,
+      "x": 0.4928907521044636,
+      "y": 0.3539583470329394
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1480.0,
+      "x": 0.4833402604426883,
+      "y": 0.3504175115576294
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1500.0,
+      "x": 0.4738212567115654,
+      "y": 0.34705452110864804
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1520.0,
+      "x": 0.46435173241260247,
+      "y": 0.34387337408935903
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1540.0,
+      "x": 0.4549495855281426,
+      "y": 0.340877852701685
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1560.0,
+      "x": 0.44563258669307854,
+      "y": 0.3380715184492862
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1580.0,
+      "x": 0.4364183456072615,
+      "y": 0.33545770790313545
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1600.0,
+      "x": 0.42732427775208776,
+      "y": 0.3330395287345266
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1620.0,
+      "x": 0.41836757147416875,
+      "y": 0.330819856020231
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1640.0,
+      "x": 0.4095651554983014,
+      "y": 0.32880132882419544
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1660.0,
+      "x": 0.4009336669311383,
+      "y": 0.32698634705984586
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1680.0,
+      "x": 0.39248941981603497,
+      "y": 0.325377068636728
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1700.0,
+      "x": 0.384248374298506,
+      "y": 0.323975406894876
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1720.0,
+      "x": 0.3762261064605703,
+      "y": 0.3227830283299602
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1740.0,
+      "x": 0.3684377788809998,
+      "y": 0.32180135061191983
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1760.0,
+      "x": 0.36089811197711413,
+      "y": 0.3210315408994338
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1780.0,
+      "x": 0.3536213561822886,
+      "y": 0.3204745144522362
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1800.0,
+      "x": 0.34662126501176,
+      "y": 0.32013093354292443
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1820.0,
+      "x": 0.3399110690676382,
+      "y": 0.32000120666955545
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1840.0,
+      "x": 0.33350345103225576,
+      "y": 0.3200854880699645
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1860.0,
+      "x": 0.3274105216971202,
+      "y": 0.3203836775383852
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1880.0,
+      "x": 0.3216437970727737,
+      "y": 0.32089542054458875
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1900.0,
+      "x": 0.3162141766228268,
+      "y": 0.3216201086553999
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1920.0,
+      "x": 0.31113192266330203,
+      "y": 0.32255688025808915
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1940.0,
+      "x": 0.3064066409662277,
+      "y": 0.3237046215847812
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1960.0,
+      "x": 0.3020472626041381,
+      "y": 0.32506196803666093
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 1980.0,
+      "x": 0.29806202706979856,
+      "y": 0.3266273058064039
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2000.0,
+      "x": 0.2944584667030577,
+      "y": 0.3283987737969007
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2020.0,
+      "x": 0.29124339245426323,
+      "y": 0.33037426583399476
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2040.0,
+      "x": 0.28842288101114727,
+      "y": 0.3325514331706035
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2060.0,
+      "x": 0.28600226331351347,
+      "y": 0.33492768727924394
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2080.0,
+      "x": 0.28398611447743355,
+      "y": 0.337500202929644
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2100.0,
+      "x": 0.2823782451479969,
+      "y": 0.3402659215477798
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2120.0,
+      "x": 0.2811816942969575,
+      "y": 0.3432215548523454
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2140.0,
+      "x": 0.2803987234788906,
+      "y": 0.3463635887643308
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2160.0,
+      "x": 0.280030812556716,
+      "y": 0.34968828758506176
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2180.0,
+      "x": 0.2800786569046658,
+      "y": 0.353191698437731
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2200.0,
+      "x": 0.28054216609398486,
+      "y": 0.3568696559671435
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2220.0,
+      "x": 0.28142046406384646,
+      "y": 0.3607177872920852
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2240.0,
+      "x": 0.28271189077716097,
+      "y": 0.364731517204429
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2260.0,
+      "x": 0.2844140053581481,
+      "y": 0.36890607360879546
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2280.0,
+      "x": 0.28652359070574196,
+      "y": 0.3732364931963014
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2300.0,
+      "x": 0.2890366595741095,
+      "y": 0.3777176273456507
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2320.0,
+      "x": 0.29194846210878994,
+      "y": 0.3823441482445499
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2340.0,
+      "x": 0.2952534948242113,
+      "y": 0.38711055522417315
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2360.0,
+      "x": 0.29894551100561617,
+      "y": 0.3920111812991427
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2380.0,
+      "x": 0.3030175325157363,
+      "y": 0.3970401999052504
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2400.0,
+      "x": 0.30746186298390005,
+      "y": 0.4021916318269093
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2420.0,
+      "x": 0.3122701023526457,
+      "y": 0.4074593523060995
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2440.0,
+      "x": 0.31743316275434585,
+      "y": 0.4128370983243548
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2460.0,
+      "x": 0.3229412856878354,
+      "y": 0.4183184760491341
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2480.0,
+      "x": 0.3287840604625777,
+      "y": 0.4238969684357222
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2500.0,
+      "x": 0.33495044387550865,
+      "y": 0.42956594297562384
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2520.0,
+      "x": 0.341428781083369,
+      "y": 0.43531865958223626
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2540.0,
+      "x": 0.34820682763107313,
+      "y": 0.44114827860442785
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2560.0,
+      "x": 0.35527177259448195,
+      "y": 0.4470478689584917
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2580.0,
+      "x": 0.36261026279383496,
+      "y": 0.4530104163688079
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2600.0,
+      "x": 0.37020842803208037,
+      "y": 0.45902883170741626
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2620.0,
+      "x": 0.3780519073103993,
+      "y": 0.46509595942258425
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2640.0,
+      "x": 0.38612587597137493,
+      "y": 0.4712045860463483
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2660.0,
+      "x": 0.3944150737185058,
+      "y": 0.47734744877091567
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2680.0,
+      "x": 0.4029038334591025,
+      "y": 0.4835172440837272
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2700.0,
+      "x": 0.41157611091605517,
+      "y": 0.489706636450916
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2720.0,
+      "x": 0.42041551495250196,
+      "y": 0.4959082670388381
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2740.0,
+      "x": 0.42940533855208507,
+      "y": 0.502114762463305
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2760.0,
+      "x": 0.4385285903962363,
+      "y": 0.5083187435561152
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2780.0,
+      "x": 0.4477680269788129,
+      "y": 0.5145128341384639
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2800.0,
+      "x": 0.457106185197383,
+      "y": 0.5206896697907984
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2820.0,
+      "x": 0.46652541535956105,
+      "y": 0.5268419066086905
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2840.0,
+      "x": 0.4760079145420109,
+      "y": 0.5329622299343199
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2860.0,
+      "x": 0.48553576023906303,
+      "y": 0.5390433630531842
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2880.0,
+      "x": 0.4950909442373511,
+      "y": 0.5450780758456956
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2900.0,
+      "x": 0.5046554066524408,
+      "y": 0.5510591933833807
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2920.0,
+      "x": 0.514211070063121,
+      "y": 0.5569796044594597
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2940.0,
+      "x": 0.5237398736788382,
+      "y": 0.5628322700436644
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2960.0,
+      "x": 0.5332238074757015,
+      "y": 0.5686102316512438
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 2980.0,
+      "x": 0.5426449462365319,
+      "y": 0.5743066196162028
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3000.0,
+      "x": 0.5519854834306241,
+      "y": 0.5799146612589443
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3020.0,
+      "x": 0.5612277648691834,
+      "y": 0.5854276889385968
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3040.0,
+      "x": 0.5703543220728251,
+      "y": 0.5908391479804582
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3060.0,
+      "x": 0.5793479052880742,
+      "y": 0.5961426044691298
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3080.0,
+      "x": 0.5881915160904583,
+      "y": 0.6013317528980738
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3100.0,
+      "x": 0.5968684395125728,
+      "y": 0.606400423666499
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3120.0,
+      "x": 0.6053622756363974,
+      "y": 0.6113425904146651
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3140.0,
+      "x": 0.6136569705901459,
+      "y": 0.6161523771888784
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3160.0,
+      "x": 0.621736846891071,
+      "y": 0.6208240654276656
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3180.0,
+      "x": 0.6295866330768685,
+      "y": 0.625352100760816
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3200.0,
+      "x": 0.6371914925696798,
+      "y": 0.6297310996132108
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3220.0,
+      "x": 0.6445370517181336,
+      "y": 0.6339558556055849
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3240.0,
+      "x": 0.6516094269644304,
+      "y": 0.6380213457446152
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3260.0,
+      "x": 0.6583952510851189,
+      "y": 0.6419227363949723
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3280.0,
+      "x": 0.664881698455969,
+      "y": 0.6456553890262364
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3300.0,
+      "x": 0.6710565092931897,
+      "y": 0.6492148657278443
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3320.0,
+      "x": 0.6769080128251722,
+      "y": 0.6525969344855124
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3340.0,
+      "x": 0.6824251493509653,
+      "y": 0.6557975742128584
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3360.0,
+      "x": 0.6875974911437894,
+      "y": 0.6588129795322444
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3380.0,
+      "x": 0.6924152621600803,
+      "y": 0.6616395652991524
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3400.0,
+      "x": 0.6968693565168116,
+      "y": 0.6642739708647165
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3420.0,
+      "x": 0.7009513557021727,
+      "y": 0.6667130640713423
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3440.0,
+      "x": 0.7046535444870731,
+      "y": 0.6689539449766633
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3460.0,
+      "x": 0.7079689255073992,
+      "y": 0.6709939493014058
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3480.0,
+      "x": 0.7108912324894621,
+      "y": 0.6728306515970659
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3500.0,
+      "x": 0.7134149420936393,
+      "y": 0.674461868129628
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3520.0,
+      "x": 0.7155352843538262,
+      "y": 0.6758856594759004
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3540.0,
+      "x": 0.7172482516929641,
+      "y": 0.677100332829378
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3560.0,
+      "x": 0.7185506064976082,
+      "y": 0.6781044440128929
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3580.0,
+      "x": 0.7194398872372143,
+      "y": 0.6788967991956584
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3600.0,
+      "x": 0.7199144131165838,
+      "y": 0.6794764563126652
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3620.0,
+      "x": 0.7199732872526695,
+      "y": 0.6798427261847433
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3640.0,
+      "x": 0.7196163983697392,
+      "y": 0.6799951733379566
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3660.0,
+      "x": 0.7188444210096945,
+      "y": 0.6799336165213559
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3680.0,
+      "x": 0.7176588142571441,
+      "y": 0.6796581289224767
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3700.0,
+      "x": 0.7160618189816452,
+      "y": 0.679169038080323
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3720.0,
+      "x": 0.7140564536023224,
+      "y": 0.6784669254959421
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3740.0,
+      "x": 0.7116465083828697,
+      "y": 0.6775526259410535
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3760.0,
+      "x": 0.7088365382677195,
+      "y": 0.6764272264655523
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3780.0,
+      "x": 0.705631854272919,
+      "y": 0.67509206510507
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3800.0,
+      "x": 0.7020385134479816,
+      "y": 0.6735487292901259
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3820.0,
+      "x": 0.6980633074276938,
+      "y": 0.671799053958763
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3840.0,
+      "x": 0.6937137495955071,
+      "y": 0.6698451193749122
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3860.0,
+      "x": 0.688998060882782,
+      "y": 0.6676892486550768
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3880.0,
+      "x": 0.6839251542307238,
+      "y": 0.6653340050062801
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3900.0,
+      "x": 0.6785046177443752,
+      "y": 0.6627821886785585
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3920.0,
+      "x": 0.6727466965705101,
+      "y": 0.6600368336356249
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3940.0,
+      "x": 0.6666622735336772,
+      "y": 0.6571012039476587
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3960.0,
+      "x": 0.6602628485669928,
+      "y": 0.6539787899105132
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 3980.0,
+      "x": 0.6535605169765607,
+      "y": 0.6506733038959533
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4000.0,
+      "x": 0.6465679465806029,
+      "y": 0.6471886759378584
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4020.0,
+      "x": 0.6392983537665032,
+      "y": 0.6435290490596357
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4040.0,
+      "x": 0.6317654785110255,
+      "y": 0.639698774348403
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4060.0,
+      "x": 0.6239835584109121,
+      "y": 0.6357024057817948
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4080.0,
+      "x": 0.615967301772953,
+      "y": 0.631544694813543
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4100.0,
+      "x": 0.6077318598143837,
+      "y": 0.6272305847242703
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4120.0,
+      "x": 0.5992927980261518,
+      "y": 0.6227652047442122
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4140.0,
+      "x": 0.5906660667531864,
+      "y": 0.6181538639548553
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4160.0,
+      "x": 0.5818679710472647,
+      "y": 0.6134020449767432
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4180.0,
+      "x": 0.5729151398494636,
+      "y": 0.6085153974509541
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4200.0,
+      "x": 0.563824494560441,
+      "y": 0.6034997313220004
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4220.0,
+      "x": 0.554613217057948,
+      "y": 0.598361009930137
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4240.0,
+      "x": 0.5452987172220265,
+      "y": 0.5931053429212905
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4260.0,
+      "x": 0.535898600029266,
+      "y": 0.5877389789830402
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4280.0,
+      "x": 0.5264306322783169,
+      "y": 0.5822682984152849
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4300.0,
+      "x": 0.5169127090095516,
+      "y": 0.5766998055444317
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4320.0,
+      "x": 0.5073628196823367,
+      "y": 0.5710401209901234
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4340.0,
+      "x": 0.4977990141738539,
+      "y": 0.5652959737937008
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4360.0,
+      "x": 0.48823936866372053,
+      "y": 0.5594741934177567
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4380.0,
+      "x": 0.4787019514689017,
+      "y": 0.5535817016262963
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4400.0,
+      "x": 0.4692047888934828,
+      "y": 0.547625504255154
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4420.0,
+      "x": 0.459765831157846,
+      "y": 0.5416126828824567
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4440.0,
+      "x": 0.45040291847165254,
+      "y": 0.5355503864090314
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4460.0,
+      "x": 0.4411337473147521,
+      "y": 0.5294458225587712
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4480.0,
+      "x": 0.43197583698974695,
+      "y": 0.5233062493090632
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4500.0,
+      "x": 0.42294649650943744,
+      "y": 0.5171389662614696
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4520.0,
+      "x": 0.4140627918817221,
+      "y": 0.5109513059629174
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4540.0,
+      "x": 0.40534151385379635,
+      "y": 0.5047506251877197
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4560.0,
+      "x": 0.39679914617661005,
+      "y": 0.4985442961907926
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4580.0,
+      "x": 0.3884518344495641,
+      "y": 0.49233969794246424
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4600.0,
+      "x": 0.38031535560433866,
+      "y": 0.4861442073553018
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4620.0,
+      "x": 0.3724050880855213,
+      "y": 0.4799651905133844
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4640.0,
+      "x": 0.3647359827844038,
+      "y": 0.47380999391444956
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4660.0,
+      "x": 0.35732253478088005,
+      "y": 0.46768593573532785
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4680.0,
+      "x": 0.3501787559468534,
+      "y": 0.46160029713104955
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4700.0,
+      "x": 0.34331814846294056,
+      "y": 0.45556031357796617
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4720.0,
+      "x": 0.3367536792985194,
+      "y": 0.44957316627118477
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4740.0,
+      "x": 0.33049775570336115,
+      "y": 0.44364597358653535
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4760.0,
+      "x": 0.32456220175716793,
+      "y": 0.437785782617231
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4780.0,
+      "x": 0.3189582360213336,
+      "y": 0.4319995607952761
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4800.0,
+      "x": 0.31369645033517657,
+      "y": 0.4262941876075873
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4820.0,
+      "x": 0.30878678979671104,
+      "y": 0.42067644641667856
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4840.0,
+      "x": 0.30423853396580197,
+      "y": 0.41515301639562907
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4860.0,
+      "x": 0.30006027932522794,
+      "y": 0.4097304645869305
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4880.0,
+      "x": 0.2962599230327996,
+      "y": 0.4044152380946466
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4900.0,
+      "x": 0.2928446479952468,
+      "y": 0.399213656419177
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4920.0,
+      "x": 0.289820909292085,
+      "y": 0.394131903943732
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4940.0,
+      "x": 0.2871944219751169,
+      "y": 0.3891760225814534
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4960.0,
+      "x": 0.2849701502666352,
+      "y": 0.3843519045919273
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 4980.0,
+      "x": 0.28315229817673643,
+      "y": 0.37966528557562224
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5000.0,
+      "x": 0.28174430155748464,
+      "y": 0.3751217376545897
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5020.0,
+      "x": 0.28074882160893955,
+      "y": 0.3707266628475292
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5040.0,
+      "x": 0.2801677398493253,
+      "y": 0.366485286647096
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5060.0,
+      "x": 0.28000215455884525,
+      "y": 0.3624026518070907
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5080.0,
+      "x": 0.2802523787038652,
+      "y": 0.3584836123469116
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5100.0,
+      "x": 0.28091793934538756,
+      "y": 0.35473282778040494
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5120.0,
+      "x": 0.2819975785329353,
+      "y": 0.35115475757596737
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5140.0,
+      "x": 0.2834892556821552,
+      "y": 0.347753655854495
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5160.0,
+      "x": 0.285390151431648,
+      "y": 0.34453356633147547
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5180.0,
+      "x": 0.2876966729717343,
+      "y": 0.34149831750924176
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5200.0,
+      "x": 0.2904044608350857,
+      "y": 0.3386515181251024
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5220.0,
+      "x": 0.2935083971363852,
+      "y": 0.33599655286075814
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5240.0,
+      "x": 0.2970026152454454,
+      "y": 0.33353657831810984
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5260.0,
+      "x": 0.30088051087549894,
+      "y": 0.33127451926623896
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5280.0,
+      "x": 0.30513475456570677,
+      "y": 0.32921306516402404
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5300.0,
+      "x": 0.30975730553428893,
+      "y": 0.32735466696252835
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5320.0,
+      "x": 0.314739426876095,
+      "y": 0.32570153419095876
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5340.0,
+      "x": 0.32007170207589264,
+      "y": 0.3242556323296624
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5360.0,
+      "x": 0.32574405280615887,
+      "y": 0.3230186804732825
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5380.0,
+      "x": 0.3317457579757372,
+      "y": 0.321992149286853
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5400.0,
+      "x": 0.33806547399335973,
+      "y": 0.32117725925726237
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5420.0,
+      "x": 0.34469125620772934,
+      "y": 0.32057497924216405
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5440.0,
+      "x": 0.35161058148364566,
+      "y": 0.3201860253180606
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5460.0,
+      "x": 0.3588103718714988,
+      "y": 0.3200108599289292
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5480.0,
+      "x": 0.3662770193253963,
+      "y": 0.32004969133640226
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5500.0,
+      "x": 0.3739964114232073,
+      "y": 0.32030247337215656
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5520.0,
+      "x": 0.3819539580399043,
+      "y": 0.3207689054928045
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5540.0,
+      "x": 0.39013461892379797,
+      "y": 0.32144843313722304
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5560.0,
+      "x": 0.3985229321235348,
+      "y": 0.32234024838589515
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5580.0,
+      "x": 0.40710304321213375,
+      "y": 0.3234432909214801
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5600.0,
+      "x": 0.41585873525282907,
+      "y": 0.3247562492894698
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5620.0,
+      "x": 0.42477345945007366,
+      "y": 0.32627756245743356
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5640.0,
+      "x": 0.4338303664277812,
+      "y": 0.3280054216709962
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5660.0,
+      "x": 0.44301233807568047,
+      "y": 0.329937772604344
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5680.0,
+      "x": 0.4523020199035936,
+      "y": 0.33207231780269975
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5700.0,
+      "x": 0.4616818538424908,
+      "y": 0.3344065194138661
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5720.0,
+      "x": 0.47113411143031564,
+      "y": 0.3369376022055861
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5740.0,
+      "x": 0.48064092731986974,
+      "y": 0.3396625568651358
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5760.0,
+      "x": 0.49018433304541464,
+      "y": 0.3425781435772254
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5780.0,
+      "x": 0.49974629098417406,
+      "y": 0.34568089587595363
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5800.0,
+      "x": 0.5093087284485508,
+      "y": 0.3489671247662386
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5820.0,
+      "x": 0.5188535718446149,
+      "y": 0.35243292310982066
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5840.0,
+      "x": 0.5283627808323045,
+      "y": 0.3560741702706275
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5860.0,
+      "x": 0.5378183824227791,
+      "y": 0.3598865370139747
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5880.0,
+      "x": 0.5472025049484689,
+      "y": 0.3638654906537775
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5900.0,
+      "x": 0.5564974118416262,
+      "y": 0.3680063004416565
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5920.0,
+      "x": 0.5656855351575267,
+      "y": 0.37230404319152594
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5940.0,
+      "x": 0.5747495087789624,
+      "y": 0.3767536091329809
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5960.0,
+      "x": 0.5836722012392717,
+      "y": 0.3813497079865229
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 5980.0,
+      "x": 0.592436748101861,
+      "y": 0.386086875253398
+    },
+    {
+      "active_modifiers": [],
+      "cursor_id": "default",
+      "time_ms": 6000.0,
+      "x": 0.6010265838350272,
+      "y": 0.39095947871257575
+    }
+  ],
+  "clicks": [
+    {
+      "active_modifiers": [],
+      "cursor_num": 0,
+      "cursor_id": "default",
+      "time_ms": 1000,
+      "down": true
+    },
+    {
+      "active_modifiers": [],
+      "cursor_num": 0,
+      "cursor_id": "default",
+      "time_ms": 1100,
+      "down": false
+    },
+    {
+      "active_modifiers": [],
+      "cursor_num": 0,
+      "cursor_id": "default",
+      "time_ms": 2250,
+      "down": true
+    },
+    {
+      "active_modifiers": [],
+      "cursor_num": 0,
+      "cursor_id": "default",
+      "time_ms": 2350,
+      "down": false
+    }
+  ]
+}

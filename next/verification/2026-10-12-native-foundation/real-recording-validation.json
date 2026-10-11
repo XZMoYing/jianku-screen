@@ -1,0 +1,33 @@
+{
+  "userConfirmation": "停止后能自动打开编辑器",
+  "projectSavedInOwnDefaultDirectory": true,
+  "metadataExists": true,
+  "projectConfigExists": true,
+  "status": {
+    "status": "Complete"
+  },
+  "segments": 1,
+  "video": {
+    "codec_name": "h264",
+    "width": 1920,
+    "height": 1080,
+    "avg_frame_rate": "30870000/689797",
+    "duration": "15.328822",
+    "nb_read_frames": "686"
+  },
+  "completeDecodeExitCode": 0,
+  "decodeErrors": "[null @ 0x14fe11990] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 336 >= 336\n[null @ 0x14fe11990] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 415 >= 415\n[null @ 0x14fe11990] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 785 >= 785\n[null @ 0x14fe11990] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 917 >= 917\n",
+  "cursorTracks": [
+    {
+      "relativePath": "content/segments/segment-0/cursor.json",
+      "eventCounts": {
+        "clicks": 13,
+        "moves": 140
+      }
+    }
+  ],
+  "timelineExists": true,
+  "clips": 1,
+  "microphoneSelected": false,
+  "note": "Read-only inspection of user trial project. No screen content or raw project has been copied into repository evidence; audio and other capture paths are not validated by this test."
+}

@@ -21,27 +21,17 @@ type ModeButtonConfig = {
 
 const MODE_BUTTONS: ModeButtonConfig[] = [
 	{
-		mode: "instant",
-		label: "Instant mode",
-		description:
-			"No rendering required — uploads on the fly so you can share the link the moment you stop.",
-		settingsSection: "instant-quality",
-		icon: (p) => <IconCapInstant {...p} />,
-		iconClass: "size-4 invert dark:invert-0",
-	},
-	{
 		mode: "studio",
-		label: "Studio mode",
-		description:
-			"Saves to your computer and opens the editor when you stop. Choose recording quality in settings.",
+		label: "录制模式",
+		description: "录制保存在本机，停止后打开编辑器。可在设置中选择录制质量。",
 		settingsSection: "studio-quality",
 		icon: (p) => <IconCapFilmCut {...p} />,
 		iconClass: "size-[0.9rem] invert dark:invert-0",
 	},
 	{
 		mode: "screenshot",
-		label: "Screenshot mode",
-		description: "Capture and annotate stills.",
+		label: "截图",
+		description: "截图后添加标注，保存或复制到剪贴板。",
 		settingsSection: null,
 		icon: (p) => <IconCapScreenshot {...p} />,
 		iconClass: "size-[0.9rem] invert dark:invert-0",

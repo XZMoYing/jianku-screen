@@ -14,6 +14,7 @@ research/evidence/screen-studio-home.html
 research/evidence/2026-09-30-round2/
 *.mp4
 *.m4a
+!next/verification/2026-10-12-native-foundation/fixture.cap/content/display.mp4
 
 # Regenerable build output of scripts/build-branding.py: the .icns next to it is
 # committed, so a build never depends on the script having been run.

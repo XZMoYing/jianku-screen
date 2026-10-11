@@ -1,0 +1,25 @@
+Executable=/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/debug/bundle/macos/Jianku Screen Next.app/Contents/MacOS/Jianku Screen Next
+Identifier=com.jianku.screen.next
+Format=app bundle with Mach-O thin (arm64)
+CodeDirectory v=20400 size=2230767 flags=0x0(none) hashes=69701+7 location=embedded
+VersionPlatform=1
+VersionMin=787200
+VersionSDK=983552
+Hash type=sha256 size=32
+CandidateCDHash sha256=6957e53ea37dd22571b7f9a581f5fab9d4d14e40
+CandidateCDHashFull sha256=6957e53ea37dd22571b7f9a581f5fab9d4d14e40280659469fb5b539821e7599
+Hash choices=sha256
+CMSDigest=6957e53ea37dd22571b7f9a581f5fab9d4d14e40280659469fb5b539821e7599
+CMSDigestType=2
+Executable Segment base=0
+Executable Segment limit=166641664
+Executable Segment flags=0x1
+Page size=4096
+CDHash=6957e53ea37dd22571b7f9a581f5fab9d4d14e40
+Signature size=1699
+Authority=JiankuDev
+Signed Time=Oct 12, 2026 at 00:10:22
+Info.plist entries=20
+TeamIdentifier=not set
+Sealed Resources version=2 rules=13 files=125
+Internal requirements count=1 size=100

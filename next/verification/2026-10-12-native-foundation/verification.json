@@ -1,0 +1,275 @@
+{
+  "recordedAt": "2026-10-12T00:41:49.349518+08:00",
+  "stage": "Native Cap foundation built, independently signed and opened for user trial; basic recording stop/save/editor flow confirmed",
+  "version": "0.2.0-alpha.1",
+  "branch": "rewrite/cap-foundation",
+  "sourceBaseCommit": "01c5bd2",
+  "upstream": {
+    "repository": "https://github.com/CapSoftware/Cap.git",
+    "tag": "cap-v0.6.0",
+    "commit": "6cfdd172cd53b1d6861852288c2192a8ab743687",
+    "tree": "fda8d5654fc21ec63f15dc7f28ce401c7c323084",
+    "importCommit": "44e5cf40a1dfa526399835345bdf4ebcf0556f08",
+    "sourceDirectory": "next/cap",
+    "legacyBackupTag": "backup-qt-0.1.6-20261011",
+    "legacyBackupCommit": "df7dd69d8b209f1f21a641a1b4d9236476e5c028",
+    "forkBranch": "rewrite/cap-foundation",
+    "applicationIdentifier": "com.jianku.screen.next",
+    "animationPolicy": "Prefer the Cap rendering core and measured reference behavior; use DogSC for selected interactions and functions, not cursor or camera animation.",
+    "license": "AGPL-3.0 with upstream exceptions; see next/cap/LICENSE"
+  },
+  "environment": {
+    "xcodeVersion": {
+      "exitCode": 0,
+      "stdout": "Xcode 16.2\nBuild version 16C5032a",
+      "stderr": ""
+    },
+    "xcodeInitialized": {
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "developerDirectory": {
+      "exitCode": 0,
+      "stdout": "/Applications/Xcode.app/Contents/Developer",
+      "stderr": ""
+    },
+    "macOS": {
+      "exitCode": 0,
+      "stdout": "14.7.4",
+      "stderr": ""
+    }
+  },
+  "checks": [
+    {
+      "name": "full-Xcode-initialization",
+      "status": "passed",
+      "log": "toolchain.json"
+    },
+    {
+      "name": "native-desktop-check",
+      "status": "passed",
+      "command": "bun run jianku:check",
+      "exitCode": 0,
+      "log": "native-check.log"
+    },
+    {
+      "name": "native-application-build",
+      "status": "passed",
+      "command": "bun run jianku:build",
+      "exitCode": 0,
+      "profile": "debug",
+      "log": "native-final-build.log"
+    },
+    {
+      "name": "scoped-source-Biome",
+      "status": "passed",
+      "log": "local-ui-biome.log",
+      "signingScriptLog": "signing-biome.log"
+    },
+    {
+      "name": "desktop-types",
+      "status": "passed",
+      "exitCode": 0,
+      "log": "desktop-types.log"
+    },
+    {
+      "name": "signing-script-syntax",
+      "status": "passed",
+      "command": "node --check scripts/jianku.mjs",
+      "exitCode": 0
+    },
+    {
+      "name": "relocated-application-signature",
+      "status": "passed",
+      "command": "codesign --verify --deep --strict",
+      "exitCode": 0,
+      "log": "final-signature.log",
+      "identity": "JiankuDev",
+      "developerIDNotarized": false
+    },
+    {
+      "name": "bundle-absolute-dependencies",
+      "status": "passed",
+      "log": "bundle-dependencies.json",
+      "machoFilesChecked": 13,
+      "nonSystemAbsoluteDependencies": 0
+    },
+    {
+      "name": "application-startup-and-editor",
+      "status": "passed",
+      "initialPID": 46391,
+      "PIDAfterUserPermissionRestart": 47871,
+      "bundleIdentifier": "com.jianku.screen.next",
+      "startupWindows": "startup-windows.json",
+      "editorWindows": "editor-windows.json",
+      "userRecordingWindows": "user-recording-windows.json",
+      "firstFrameDelivered": true,
+      "log": "desktop-startup-editor.log"
+    },
+    {
+      "name": "native-editor-instance-preview",
+      "status": "passed",
+      "exitCode": 0,
+      "fixture": "fixture.cap",
+      "previewTimeSeconds": 1.7,
+      "previewFrame": 102,
+      "deadlineSeconds": 10,
+      "runs": 1,
+      "startupMs": 2614.1,
+      "previewMs": 55.3,
+      "log": "editor-native-preview.log",
+      "scope": "Single synthetic preview frame from unoptimized debug code, not continuous playback or release performance."
+    },
+    {
+      "name": "synthetic-bundled-export",
+      "status": "passed",
+      "exitCode": 0,
+      "fixture": "fixture.cap",
+      "width": 1280,
+      "height": 800,
+      "fps": 60,
+      "frames": 360,
+      "durationSeconds": 6,
+      "codec": "h264",
+      "audio": "aac silence",
+      "log": "bundled-export.jsonl",
+      "stderr": "bundled-export.stderr",
+      "probe": "export-probe.json",
+      "decode": "export-decode.log",
+      "frameInspection": [
+        "export-unzoomed.png",
+        "export-zoomed.png"
+      ],
+      "scope": "Bundled exporter from initial signed native build; the final source media core remains unchanged."
+    },
+    {
+      "name": "user-recording-stop-save-editor",
+      "status": "passed-basic-path",
+      "confirmedBy": "User: 能自动打开编辑器",
+      "durationSeconds": 15.328822,
+      "width": 1920,
+      "height": 1080,
+      "frames": 686,
+      "statusComplete": true,
+      "metadataAndProjectSaved": true,
+      "cursorMoveEvents": 140,
+      "cursorClickEvents": 13,
+      "microphoneSelected": false,
+      "log": "real-recording-validation.json",
+      "timebaseVerification": "real-recording-timebase.json",
+      "scope": "One display recording without a microphone. No user screen content has been copied into repository evidence."
+    },
+    {
+      "name": "new-application-data-directories",
+      "status": "passed-observed-paths",
+      "applicationSupport": "~/Library/Application Support/com.jianku.screen.next",
+      "subdirectories": [
+        "recordings",
+        "screenshots"
+      ],
+      "settingsFile": "store",
+      "logs": "~/Library/Logs/com.jianku.screen.next",
+      "scope": "Startup and one display recording; all later/custom write paths still pending."
+    },
+    {
+      "name": "unchanged-upstream-media-core",
+      "status": "passed",
+      "relativeTo": "44e5cf40a1dfa526399835345bdf4ebcf0556f08",
+      "directories": [
+        "crates/recording",
+        "crates/rendering",
+        "crates/editor",
+        "crates/project",
+        "crates/export"
+      ]
+    },
+    {
+      "name": "final-scoped-Biome",
+      "status": "passed",
+      "exitCode": 0,
+      "filesChecked": 6,
+      "log": "final-scoped-biome.log",
+      "scope": "Biome-supported TS/JS; Markdown structure and whitespace reviewed separately."
+    },
+    {
+      "name": "git-diff-whitespace",
+      "status": "passed",
+      "command": "git diff --check",
+      "exitCode": 0
+    }
+  ],
+  "resolvedIssues": [
+    "Full Xcode was missing; now initialized.",
+    "The first debug bundle had a linker-generated signature without a resource seal; build pipeline now re-signs and strictly verifies bundles.",
+    "A rebuild signing attempt stalled on the existing dedicated development keychain; stopped only this task signing process, unlocked that keychain and enabled trusted signing-tool access for JiankuDev. Final build passed; no passwords added to source or evidence.",
+    "The first synthetic export input lacked a cursor map. Corrected the owned fixture metadata and exported with a valid SVG arrow cursor; not treated as a product cursor failure.",
+    "Default null-muxer decode of user VFR recording emitted output DTS warnings. Original frame PTS are strictly increasing; repeating decode with passthrough and demux timebase produced no errors. Original capture was not changed."
+  ],
+  "limitations": [
+    "Optimized release build, signing/notarization and clean-machine install pending.",
+    "One actual display recording stop/save/editor path confirmed; screenshot, microphone, system audio, camera, pause/resume, windows/regions and error recovery remain pending.",
+    "Full editor interactions, sustained performance and preview/export equivalence pending.",
+    "Incomplete product menus, translations, upstream account/commercial/share and auxiliary Instant paths remain to be ported; no own cloud service is available.",
+    "Animation reference parity, realtime presentation, mobile devices, Windows and legacy project migration pending."
+  ],
+  "application": {
+    "path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.1/Jianku Screen Next.app",
+    "openedForTrial": true,
+    "workingSyntheticProject": "~/Movies/Jianku Screen Next/试用/底座验证.cap",
+    "bundleMainSHA256": "6423404f64c1a0bbacf78deb9b53bb0cc433843bbb1018ec817d9289e6d91d0a",
+    "licenseNoticeMatchesSource": true
+  },
+  "handoffDocument": "docs/待验证项目交接.md",
+  "changedSourceSHA256": {
+    ".gitignore": "6040f8ced408a2716853d804d2aad8675d53ca02fef8cace0816e1df738a890d",
+    "README.md": "43b8ea2bb446fbcc08b25a3cda67efef866bd78000e96428d3e9dd6f62891333",
+    "docs/开发进度.md": "471a2082d9547fe6cbc933ae94a018fab15b0cf00b457f74e2e276d72f5a1b33",
+    "docs/待验证项目交接.md": "536622299853d2f71ad49b5926edc1d518b586ea341c5efd13724470569e9cb1",
+    "next/README.md": "bd8fb8c10df9a082ef8aae39a3b180fec2b6ed1481daaf180fe52ffa2932d54c",
+    "next/cap/JIANKU-NOTICE.md": "1dc924104a5ecb46f99bbf7cdfc4742db688cab7c03fd0a91e9c149d6e00fa0d",
+    "next/cap/apps/desktop/src/components/Mode.tsx": "6032817e40e0c1845b031d132e8d5bebe8f20090f909ee3a8289717faa6e2efd",
+    "next/cap/apps/desktop/src/components/ModeSelect.tsx": "e5b10e721ec89538f246a39f852dcab8b2d43241c01fe4d00096265e07b3daf4",
+    "next/cap/apps/desktop/src/routes/(window-chrome)/new-main/ModeInfoPanel.tsx": "6c146b8da613a541708f7159f4017d6a2d137289f2a021c0fe757efa9049d136",
+    "next/cap/apps/desktop/src/routes/(window-chrome)/onboarding.tsx": "66888972dfb47c3b553b4f1ab3531fdd9499c9f4e12939b8cbb1789a2124c72f",
+    "next/cap/apps/desktop/src/store.ts": "24528f787a1f56790bf890e580dcf8b15d63c63973f228f778d4683779046ee5",
+    "next/cap/scripts/jianku.mjs": "3e2786229a05dbbe39256d0c8359b6fd34b1204016e45a5f1dc67e87c6a22f65"
+  },
+  "evidenceSHA256": {
+    "native-final-build.log": "cee34fbd279a2f6980b297ae4d3b2fafcedeeae9b8da5a122f3340cf2480d611",
+    "editor-native-preview.log": "ad2077ff3a810ae8cba55d37ff61e1ed946345184668250c1b8d52e62c2cff69",
+    "editor-windows.json": "ab1332f7a9256a0f325e1fa94ca1ba898ef1de8da372dcf2ea64104d9bccf1fe",
+    "export-probe.json": "4653564ef519ca5dd865f267ee35fe252ea5038a721e1ae4c1f118a49af26f41",
+    "export-decode.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "desktop-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bundle-dependencies.json": "a54f6091246fd5f7ddf1444cdb3ab3f5b81833c3b4eb98ce87b7c5de39815f2a",
+    "real-recording-validation.json": "a326495f2aa132f9c235a900aa53d683ae6ad28c7c2439f925cbccca17afe3e6",
+    "local-ui-biome.log": "0bd46eeb7cb96af1fdc038dead180118b2cbc96d91b70cdda75c82123800d016",
+    "initial-signature-validation.log": "0bd41f53d93815df6f3996ec49c66eaeef773fffff8e720a3cd753cc0c86fd87",
+    "initial-resign.log": "5a9befeeb5c3f002241dfa95d1155285ce08c8c60357869e89a792765e8f7449",
+    "README.md": "e5f4132f8bb7c4636147d0c41a981274f7b2c19992c627aa9819f200c9ae837b",
+    "fixture-validation.json": "129e8ba62515b49ee97c76c36735f9b10c0a22697399a6aba77cc66047f71a6b",
+    "desktop-startup-editor.log": "c329418b6f31e9b9045876d68324b067488d4940b360d036c89812c14e7c5dec",
+    "bundled-export.stderr": "e1f503477f8d397ab83ea6a65dfd7c9e252fa64a53cab542ada12d152d691ee7",
+    "native-signing-interrupted.log": "a1196756e1f1b13104354851c4824a6f9c28f10dd8bc921c8ddfa71645b6e713",
+    "native-initial-build.log": "5351136c1d90bf5a35b0049afc18e476c91467723d25087ce1a7db0fd6facff5",
+    "window-check.swift": "0968ce1d5dc6bed860c0b0b522f57cb2027e32413f741308ae8ec89337b51560",
+    "final-scoped-biome.log": "a3039d7157ef2f019be4649a9572aba87d3c0e5a53dd38fbcca38f99b7805e73",
+    "export-zoomed.png": "65cc625d881e8a15f1fd8ad02febd591a0e2636bea173371e39fd9caafafbc23",
+    "bundled-export.jsonl": "0f483ba21f66f72a9dd5526ef5c74b2856e98f77ae626e1e2fb4694997aad1c7",
+    "fixture-sha256.json": "e71139c44bc86599e81b7eb597cb5732597d7ab50fd7a70f907be01311ca801f",
+    "native-check.log": "e1c244e99b61a3093693724c5eef064e2a421802209e1ccfc8cc8ea48616bbbb",
+    "signing-biome.log": "18f87a70f77f61c8a54d5b48ec6d72e3bfb3df119327ac01aa0256c5acba3866",
+    "toolchain.json": "863faa131a55cd43d9ee389183fa07b3f9273115f568931632cf1319a20fa58e",
+    "final-signature.log": "a1ef8975e038b7a2681836c117719ad84cd772bc80b53f383f3f019c92290a66",
+    "user-recording-windows.json": "0a9d9413054518fe36df2fdd3292991c42bba44a176685dae8c0a99e7d0b01a7",
+    "export-unzoomed.png": "c1e5860c9afd350d2ee9aa2e2a2c1f7e8710ebd3f052b10e563ba7a7ff6a25c8",
+    "startup-windows.json": "e236ec0716d53a2987c80846647976b62e1fb940561512cc72dea3abbd1afc1d",
+    "real-recording-timebase.json": "c2aee50dcdcacd35024594e3a9db437422771101a524eb9ec23d5c9d4e6a5c6f",
+    "fixture.cap/recording-meta.json": "784f46280bdf620f3b80815a9282c28b4a80e06a2d6e40956fd179f0c3b9c6ae",
+    "fixture.cap/project-config.json": "d4c97df38acb85bf675e243aa4faaba349105aa5e7c1ae9580a7132c759682a3",
+    "fixture.cap/content/cursor.json": "0217099c383876b1955288a7b05c4d62314c09d89d96f955bebe9a276fba1039",
+    "fixture.cap/content/cursor.png": "15cebf1a5e7de1801cca6237a286ca406878e12047160f31ebca4846e7f1cc02",
+    "fixture.cap/content/display.mp4": "223e96f7b7c7a628c94ed8342e1d5477e5a45a4b5ae0218fc5f26f5af80cf5ec"
+  }
+}

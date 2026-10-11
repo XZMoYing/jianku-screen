@@ -30,11 +30,12 @@ for (const key of [
 	delete environment[key];
 }
 
-function run(command, args, cwd = root) {
+function run(command, args, cwd = root, timeout) {
 	const result = spawnSync(command, args, {
 		cwd,
 		env: environment,
 		stdio: "inherit",
+		timeout,
 	});
 	if (result.error) throw result.error;
 	if (result.status !== 0) process.exit(result.status ?? 1);
@@ -106,6 +107,57 @@ function buildSidecars() {
 	run("node", ["scripts/prepare.js"], desktop);
 }
 
+function signMacBundle() {
+	if (process.platform !== "darwin") return;
+	const available = spawnSync(
+		"security",
+		["find-identity", "-v", "-p", "codesigning"],
+		{
+			env: environment,
+			encoding: "utf8",
+		},
+	);
+	const identity =
+		environment.APPLE_SIGNING_IDENTITY ??
+		(available.status === 0 && available.stdout.includes('"JiankuDev"')
+			? "JiankuDev"
+			: "-");
+	const localKeychain = path.join(
+		homedir(),
+		"Library/Keychains/jianku-dev.keychain-db",
+	);
+	const keychain =
+		environment.JIANKU_SIGNING_KEYCHAIN ??
+		(identity === "JiankuDev" && existsSync(localKeychain)
+			? localKeychain
+			: undefined);
+	const app = path.join(
+		root,
+		"target",
+		profile,
+		"bundle/macos/Jianku Screen Next.app",
+	);
+	// A debug bundle may keep the linker's signature without a resource seal.
+	run(
+		"codesign",
+		[
+			"--force",
+			"--deep",
+			"--sign",
+			identity,
+			...(keychain ? ["--keychain", keychain] : []),
+			"--identifier",
+			"com.jianku.screen.next",
+			"--entitlements",
+			path.join(desktop, "src-tauri/Entitlements.plist"),
+			app,
+		],
+		root,
+		60_000,
+	);
+	run("codesign", ["--verify", "--deep", "--strict", app]);
+}
+
 function main() {
 	const command = process.argv[2];
 	if (!["setup", "frontend", "check", "build", "release"].includes(command)) {
@@ -148,6 +200,7 @@ function main() {
 				],
 				desktop,
 			);
+			signMacBundle();
 		}
 	}
 }

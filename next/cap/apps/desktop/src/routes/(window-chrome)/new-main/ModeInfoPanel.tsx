@@ -11,24 +11,16 @@ interface ModeInfoPanelProps {
 
 const modeOptions = [
 	{
-		mode: "instant" as RecordingMode,
-		title: "Instant",
-		description:
-			"Share instantly with a link. Your recording uploads as you record, so you can share it immediately when you're done.",
-		icon: IconCapInstant,
-	},
-	{
 		mode: "studio" as RecordingMode,
-		title: "Studio",
+		title: "录制模式",
 		description:
-			"Record locally in the highest quality for editing later. Perfect for creating polished content with effects and transitions.",
+			"录制保存在本机，停止后进入编辑器，可调整画面、光标和镜头效果。",
 		icon: IconCapFilmCut,
 	},
 	{
 		mode: "screenshot" as RecordingMode,
-		title: "Screenshot",
-		description:
-			"Capture and annotate screenshots instantly. Great for quick captures, bug reports, and visual communication.",
+		title: "截图",
+		description: "截图后添加标注，保存或复制到剪贴板。",
 		icon: IconCapScreenshot,
 	},
 ];

@@ -1,0 +1,84 @@
+   Compiling serde_json v1.0.145
+   Compiling tokio v1.47.1
+   Compiling ring v0.17.14
+   Compiling objc2-exception-helper v0.1.1
+   Compiling ffmpeg-sys-next v7.1.3
+   Compiling objc v0.2.7
+   Compiling coreaudio-sys v0.2.17
+   Compiling cap-rnnoise v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rnnoise)
+   Compiling objc2 v0.6.2
+   Compiling metal v0.31.0
+   Compiling coreaudio-rs v0.11.3
+   Compiling rustls v0.23.31
+   Compiling cookie_store v0.21.1
+   Compiling jsonptr v0.6.3
+   Compiling block2 v0.6.1
+   Compiling objc2-core-foundation v0.3.1
+   Compiling schemars v0.8.22
+   Compiling json-patch v3.0.1
+   Compiling cargo_metadata v0.19.2
+   Compiling swift-rs v1.0.7
+   Compiling rustls-webpki v0.103.6
+   Compiling objc2-core-graphics v0.3.1
+   Compiling dispatch2 v0.3.0
+   Compiling tauri-utils v2.7.0
+   Compiling specta v2.0.0-rc.20
+   Compiling sentry-types v0.42.0
+   Compiling wgpu-hal v25.0.2 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/vendor/wgpu-hal)
+   Compiling tokio-util v0.7.16
+   Compiling h2 v0.4.12
+   Compiling tower v0.5.2
+   Compiling tokio-native-tls v0.3.1
+   Compiling ffmpeg-next v7.1.0 (https://github.com/CapSoftware/rust-ffmpeg?rev=49db1fede112#49db1fed)
+   Compiling tower-http v0.6.6
+   Compiling cpal v0.15.3 (https://github.com/CapSoftware/cpal?rev=6013cb5f8bd3#6013cb5f)
+   Compiling wgpu-core-deps-apple v25.0.0
+   Compiling wgpu-core v25.0.2
+   Compiling tokio-tungstenite v0.24.0
+   Compiling tokio-rustls v0.26.3
+   Compiling sentry-core v0.42.0
+   Compiling sentry-backtrace v0.42.0
+   Compiling sentry-panic v0.42.0
+   Compiling sentry-anyhow v0.42.0
+   Compiling sentry-debug-images v0.42.0
+   Compiling sentry-contexts v0.42.0
+   Compiling hyper v1.7.0
+   Compiling hyper-util v0.1.17
+   Compiling wgpu v25.0.2
+   Compiling hyper-rustls v0.27.7
+   Compiling hyper-tls v0.6.0
+   Compiling axum v0.7.9
+   Compiling reqwest v0.12.24 (https://github.com/CapSoftware/reqwest?rev=9b5ecbd5210a9510fde766015cabb724c1e70d2e#9b5ecbd5)
+   Compiling glyphon v0.9.0
+   Compiling workspace-hack v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/workspace-hack)
+   Compiling sentry v0.42.0
+   Compiling cap-media-info v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/media-info)
+   Compiling cap-cursor-info v0.0.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/cursor-info)
+   Compiling ffmpeg-hw-device v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/ffmpeg-hw-device)
+   Compiling cap-camera-effects v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/camera-effects)
+   Compiling cap-enc-ffmpeg v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/enc-ffmpeg)
+   Compiling cap-project v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/project)
+   Compiling cap-flags v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/flags)
+   Compiling cap-media v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/media)
+   Compiling cap-utils v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/utils)
+   Compiling cap-video-decode v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/video-decode)
+   Compiling cap-audio v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/audio)
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+   Compiling cap-editor v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/editor)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1m 02s
+     Running `target/debug/examples/editor-startup-benchmark --recording-path '/Users/moyingxz/Movies/Jianku Screen Next/试用/底座验证.cap' --runs 1 --preview-time 1.7`
+================================================================
+  CAP EDITOR STARTUP BENCHMARK
+================================================================
+Recording: /Users/moyingxz/Movies/Jianku Screen Next/试用/底座验证.cap
+Runs: 1
+Preview frame: 102
+Profile stages: false
+Profile stages only: false
+Run 1: 2614.1ms preview=55.3ms meta_loaded=true timeline true->true clips 0->1
+
+================================================================
+  RESULTS
+================================================================
+Startup: avg=2614.1ms p50=2614.1ms p95=2614.1ms max=2614.1ms samples=1
+First preview: avg=55.3ms p50=55.3ms p95=55.3ms max=55.3ms samples=1
