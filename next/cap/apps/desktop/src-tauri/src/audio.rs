@@ -1,0 +1,57 @@
+use cap_audio::DecodedAudio;
+
+#[path = "recording_start_sound.rs"]
+mod recording_start_sound;
+
+pub use recording_start_sound::StartCue;
+
+pub fn prime_recording_start_sound() -> StartCue {
+    recording_start_sound::prime(AppSounds::StartRecording.get_sound_bytes())
+}
+
+pub async fn play_recording_start_sound(cue: StartCue, gate: cap_recording::RecordingStartGate) {
+    recording_start_sound::play(cue, gate).await;
+}
+
+fn play_audio(bytes: &'static [u8]) {
+    use rodio::{Decoder, OutputStream, Sink};
+    use std::io::Cursor;
+
+    std::thread::spawn(move || {
+        if let Ok((_, stream)) = OutputStream::try_default() {
+            let file = Cursor::new(bytes);
+            let source = Decoder::new(file).unwrap();
+            let sink = Sink::try_new(&stream).unwrap();
+            sink.append(source);
+            sink.sleep_until_end();
+        }
+    });
+}
+
+#[allow(dead_code)]
+pub enum AppSounds {
+    StartRecording,
+    StopRecording,
+    Screenshot,
+    Notification,
+}
+
+impl AppSounds {
+    pub fn play(&self) {
+        let bytes = self.get_sound_bytes();
+        play_audio(bytes);
+    }
+
+    fn get_sound_bytes(&self) -> &'static [u8] {
+        match self {
+            AppSounds::StartRecording => include_bytes!("../sounds/start-recording.ogg"),
+            AppSounds::StopRecording => include_bytes!("../sounds/stop-recording.ogg"),
+            AppSounds::Screenshot => include_bytes!("../sounds/screenshot.ogg"),
+            AppSounds::Notification => include_bytes!("../sounds/action.ogg"),
+        }
+    }
+}
+
+pub fn get_waveform(audio: &DecodedAudio) -> Vec<f32> {
+    cap_audio::waveform_peaks(audio.sample_slices().flatten(), audio.channels())
+}
