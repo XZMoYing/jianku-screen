@@ -99,6 +99,8 @@ private:
     Project::EditTimeline timeline_;
     std::optional<std::vector<Project::FocusClip>> focus_;
     QVariantMap editingSettings_;
+    QSizeF sourceSize_;
+    QVariantMap recordedSettings_;
     int frameRate_ = 60;
     int exportHeight_ = 0;
     QString defaultOutputPath_;

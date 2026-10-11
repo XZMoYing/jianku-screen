@@ -47,6 +47,7 @@ Item {
 
         Slider {
             id: slider
+            objectName: "parameterControl_" + root.label
             Layout.fillWidth: true
             Layout.preferredHeight: 18
             from: root.from

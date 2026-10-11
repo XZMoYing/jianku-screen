@@ -10,6 +10,7 @@
 // The parameter rules being pinned here come from the static research on the
 // reference's renderer (research/桌面动画处理链-官方3.7.5静态.md §6).
 #include "../src/render/MotionBlur.h"
+#include "BlurReference.h"
 
 #include <QImage>
 #include <cmath>
@@ -17,6 +18,7 @@
 #include <set>
 #include <stdexcept>
 #include <vector>
+#include <future>
 
 using namespace Render::MotionBlur;
 
@@ -414,6 +416,28 @@ int main() {
             require(close(at120, at60, 1e-9), "120 fps produces the same smear as 60 fps");
         }
 
+        // Exact comparison against the previous scratch-buffer renderer, across
+        // alpha, fractional/negative motion, off-canvas centres and odd sizes.
+        {
+            QImage input(57, 43, QImage::Format_ARGB32_Premultiplied);
+            for (int y = 0; y < input.height(); ++y) for (int x = 0; x < input.width(); ++x)
+                input.setPixelColor(x, y, QColor(x * 17 % 256, y * 23 % 256,
+                    (x * 3 + y * 7) % 256, (x * 11 + y * 13) % 256));
+            for (const QPointF vector : {QPointF(.05, .1), QPointF(.51, -.49), QPointF(-8.33, 5.17), QPointF(140, -100)})
+                require(applyMove(input, vector) == BlurReference::move(input, vector), "move bytes changed");
+            for (const QPointF centre : {QPointF(0, 0), QPointF(23.5, 12.9), QPointF(-40, 90), QPointF(800, 800)})
+                for (const double strength : {.0001, .05, .3, 1.0, 2.0})
+                    for (const int kernel : {1, 13, 17})
+                        require(applyZoom(input, centre, strength, kernel) == BlurReference::zoom(input, centre, strength, kernel), "zoom bytes changed");
+            // Independent composition workers share the persistent blur pool.
+            const QImage large = input.scaled(240, 135);
+            const auto expected = BlurReference::zoom(large, {123.5, 60.1}, .03, 13);
+            std::vector<std::future<QImage>> jobs;
+            for (int i = 0; i < 4; ++i) jobs.push_back(std::async(std::launch::async, [large] {
+                return applyZoom(large, {123.5, 60.1}, .03);
+            }));
+            for (auto &job : jobs) require(job.get() == expected, "concurrent blur changed pixels");
+        }
         std::cout << "motion blur checks passed\n";
         return 0;
     } catch (const std::exception &error) {

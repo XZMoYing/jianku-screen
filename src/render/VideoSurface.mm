@@ -1,4 +1,5 @@
 #import "VideoSurface.h"
+#include "SourceCrop.h"
 #import "../capture/VideoFrameStore.h"
 
 #import <CoreVideo/CVMetalTextureCache.h>
@@ -48,6 +49,11 @@ VideoSurface::VideoSurface(QQuickItem *parent) : QQuickItem(parent) {
 }
 
 QObject *VideoSurface::frameStore() const { return store_; }
+void VideoSurface::setSourceCropRect(const QRectF &rect) {
+    const auto safe = Render::SourceCrop{rect.x(), rect.y(), rect.width(), rect.height()}.clamped().normalizedRect();
+    if (sourceCropRect_ == safe) return;
+    sourceCropRect_ = safe; emit sourceCropRectChanged(); update();
+}
 
 void VideoSurface::setFrameStore(QObject *store) {
     auto *typed = qobject_cast<VideoFrameStore *>(store);
@@ -127,8 +133,9 @@ QSGNode *VideoSurface::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *) 
         delete node;
         return nullptr;
     }
-    const qreal sw = node->sourceSize.width();
-    const qreal sh = node->sourceSize.height();
+    const qreal sw = node->sourceSize.width() * sourceCropRect_.width();
+    const qreal sh = node->sourceSize.height() * sourceCropRect_.height();
+    node->setSourceRect(sourceCropRect_.x() * node->sourceSize.width(), sourceCropRect_.y() * node->sourceSize.height(), sw, sh);
     const qreal factor = std::min(width() / sw, height() / sh);
     const qreal drawWidth = sw * factor;
     const qreal drawHeight = sh * factor;

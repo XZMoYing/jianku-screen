@@ -107,8 +107,8 @@ Item {
                     transformOrigin: Item.TopLeft
                     scale: frame.camScale
 
-                    readonly property real contentW: Math.max(1, anim.contentWidth)
-                    readonly property real contentH: Math.max(1, anim.contentHeight)
+                    readonly property real contentW: Math.max(1, anim.contentWidth * root.plan.sourceCropRect.width)
+                    readonly property real contentH: Math.max(1, anim.contentHeight * root.plan.sourceCropRect.height)
                     readonly property real innerX: (root.plan.contentRect.x - root.plan.frameRect.x) * canvas.width
                     readonly property real innerY: (root.plan.contentRect.y - root.plan.frameRect.y) * canvas.height
                     readonly property real fitScale: Math.min(root.plan.contentRect.width * canvas.width / contentW,
@@ -119,8 +119,8 @@ Item {
                     // one place, because reading the pixel one here put the pointer at
                     // twice its distance from the top-left corner on a Retina display
                     // and the error grew the further it was dragged.
-                    readonly property real cursorXPoints: anim.cursorXPoints
-                    readonly property real cursorYPoints: anim.cursorYPoints
+                    readonly property real cursorXPoints: anim.cursorXPoints - anim.contentWidth * root.plan.sourceCropRect.x
+                    readonly property real cursorYPoints: anim.cursorYPoints - anim.contentHeight * root.plan.sourceCropRect.y
                     readonly property real layerW: contentW * fitScale
                     readonly property real layerH: contentH * fitScale
                     readonly property real layerX: innerX
@@ -154,6 +154,7 @@ Item {
                             width: frame.layerW; height: frame.layerH
                             visible: root.live
                             frameStore: capture.frameStore
+                            sourceCropRect: root.plan.sourceCropRect
                         }
 
                     // Placeholder so padding / background are visible before capture.
@@ -204,7 +205,7 @@ Item {
                     // The reference renders the cursor inside the zoomed screen
                     // layer, so its size follows the camera scale.
                     readonly property real uniformScale: frame.fitScale * cursorScaleFactor * frame.camScale
-                    visible: anim.active && anim.cursorAvailable
+                    visible: anim.active && anim.cursorAvailable && frame.cursorXPoints >= 0 && frame.cursorXPoints <= frame.contentW && frame.cursorYPoints >= 0 && frame.cursorYPoints <= frame.contentH
                     width: Math.max(6, anim.cursorPointWidth * uniformScale)
                     height: Math.max(8, anim.cursorPointHeight * uniformScale)
                     x: frame.camOffsetX * frame.fitScale

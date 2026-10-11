@@ -1,0 +1,94 @@
+[  0%] Copying jianku-screen qml sources into build dir
+[  0%] Built target jianku-screen_copy_res
+[  0%] Built target generate_qmlls_build_ini_file
+[  0%] Running qmlimportscanner for jianku-screen
+[  0%] Built target source-crop-tests_autogen_timestamp_deps
+[  0%] Built target live-focus-tests_autogen_timestamp_deps
+[  0%] Built target jianku-screen_copy_qml
+[  0%] Built target spring-tests_autogen_timestamp_deps
+[  0%] Built target timeline-tests_autogen_timestamp_deps
+Detected locale "C" with character encoding "US-ASCII", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+[  0%] Built target cursor-tests_autogen_timestamp_deps
+[  0%] Built target autofocus-tests_autogen_timestamp_deps
+[  0%] Built target media-clock-tests_autogen_timestamp_deps
+[  0%] Built target canvas-layout-tests_autogen_timestamp_deps
+[  0%] Built target canvas-renderer-tests_autogen_timestamp_deps
+[  0%] Built target capture-source-tests_autogen_timestamp_deps
+[  0%] Built target edit-timeline-tests_autogen_timestamp_deps
+[  1%] Built target timeline-strip-tests_copy_qml
+[  1%] Built target timeline-strip-tests_qmlimportscan
+[  1%] Built target timeline-strip-tests_copy_res
+[  1%] Built target timeline-geometry-tests_autogen_timestamp_deps
+[  1%] Built target editor-session-tests_autogen_timestamp_deps
+[  1%] Built target motion-blur-tests_autogen_timestamp_deps
+[  1%] Built target timeline-controller-tests_autogen_timestamp_deps
+[  1%] Built target compositor-tests_autogen_timestamp_deps
+[  1%] Built target export-controller-tests_autogen_timestamp_deps
+[  1%] Built target jianku-compose_autogen_timestamp_deps
+[  1%] Built target live-focus-tests_autogen
+[  2%] Built target source-crop-tests_autogen
+[  3%] Built target timeline-tests_autogen
+[  3%] Built target spring-tests_autogen
+[  3%] Built target cursor-tests_autogen
+[  4%] Built target autofocus-tests_autogen
+[  4%] Built target media-clock-tests_autogen
+[  4%] Built target canvas-layout-tests_autogen
+[  4%] Built target capture-source-tests_autogen
+[  4%] Built target timeline-strip-tests_autogen_timestamp_deps
+[  4%] Built target canvas-renderer-tests_autogen
+[  4%] Built target edit-timeline-tests_autogen
+[  4%] Built target timeline-geometry-tests_autogen
+[  4%] Built target motion-blur-tests_autogen
+[  4%] Built target editor-session-tests_autogen
+[  4%] Built target compositor-tests_autogen
+[  4%] Built target timeline-controller-tests_autogen
+[  5%] Built target export-controller-tests_autogen
+[  5%] Built target jianku-compose_autogen
+[  7%] Built target live-focus-tests
+[  8%] Built target source-crop-tests
+[  9%] Built target timeline-tests
+[ 10%] Built target spring-tests
+[ 11%] Built target autofocus-tests
+[ 14%] Built target cursor-tests
+[ 15%] Built target media-clock-tests
+[ 16%] Built target capture-source-tests
+[ 17%] Built target canvas-layout-tests
+[ 20%] Built target canvas-renderer-tests
+[ 21%] Built target edit-timeline-tests
+[ 21%] Built target timeline-strip-tests_autogen
+[ 23%] Built target timeline-geometry-tests
+[ 24%] Built target motion-blur-tests
+[ 29%] Built target compositor-tests
+[ 37%] Built target editor-session-tests
+[ 43%] Built target timeline-controller-tests
+[ 52%] Built target export-controller-tests
+[ 52%] Built target jianku-compose
+[ 64%] Built target timeline-strip-tests
+[ 64%] Built target jianku-screen_qmlimportscan
+[ 64%] Built target jianku-screen_autogen_timestamp_deps
+[ 65%] Automatic MOC and UIC for target jianku-screen
+[ 65%] Built target jianku-screen_autogen
+[ 65%] Running rcc for resource jianku-screen_raw_qml_0
+[ 67%] Running AUTOMOC file extraction for target jianku-screen
+Detected locale "C" with character encoding "US-ASCII", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+[ 67%] Generating .rcc/qmlcache/jianku-screen_ui_CropInspector_qml.cpp, .rcc/qmlcache/jianku-screen_ui_CropInspector_qml.cpp.aotstats
+Detected locale "C" with character encoding "US-ASCII", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+[ 67%] Building OBJCXX object CMakeFiles/jianku-screen.dir/tests/EditorVerification.mm.o
+[ 67%] Running AUTOMOC file extraction for target jianku-screen
+[ 67%] Building CXX object CMakeFiles/jianku-screen.dir/build/.qt/rcc/qrc_jianku-screen_raw_qml_0.cpp.o
+[ 68%] Building CXX object CMakeFiles/jianku-screen.dir/build/.rcc/qmlcache/jianku-screen_ui_CropInspector_qml.cpp.o
+[ 68%] Linking CXX executable "Jianku Screen.app/Contents/MacOS/Jianku Screen"
+Bundling background assets
+Bundling icon assets
+Bundling third-party notices
+Signing app with stable JiankuDev identity
+[100%] Built target jianku-screen

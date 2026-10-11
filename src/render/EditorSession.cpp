@@ -11,6 +11,9 @@ namespace Render {
 EditorSession::EditorSession(const QString &projectDirectory, QObject *parent)
     : QObject(parent), projectDirectory_(projectDirectory), settings_(this, projectDirectory + "/appearance.json") {
     autosave_.setSingleShot(true); autosave_.setInterval(1000);
+    connect(&crop_, &CropController::committing, this, [this] { timeline_.historyBoundary(); });
+    connect(&crop_, &CropController::committed, this, [this] { timeline_.historyBoundary(); });
+    connect(&timeline_, &TimelineController::timelineChanged, this, [this] { if (crop_.active()) crop_.cancel(); });
     connect(&autosave_, &QTimer::timeout, this, [this] { if (dirty()) save(); });
     connect(&timeline_, &TimelineController::dirtyChanged, this, [this] { if (!initializing_ && dirty()) autosave_.start(); });
     connect(&timeline_, &TimelineController::focusChanged, this, [this] { exporter_.setFocusRanges(timeline_.focusRanges()); });
@@ -47,7 +50,7 @@ EditorSession::EditorSession(const QString &projectDirectory, QObject *parent)
     });
 }
 
-EditorSession::~EditorSession() { autosave_.stop(); if (dirty()) timeline_.save(); }
+EditorSession::~EditorSession() { autosave_.stop(); settings_.flush(); if (dirty()) timeline_.save(); }
 
 bool EditorSession::open() {
     initializing_ = true; autosave_.stop();
@@ -58,6 +61,7 @@ bool EditorSession::open() {
     exporter_.setProjectDirectory(projectDirectory_);
     exporter_.setTimeline(timeline_.timeline());
     const auto project = loadProject(projectDirectory_);
+    crop_.setSourceSize(project.sourceSize);
     settings_.initializeProject(project.settings);
     const auto saved = Project::load(projectDirectory_, project.durationMs);
     if (saved.valid && !saved.appearance.isEmpty()
@@ -78,6 +82,7 @@ void EditorSession::revealProject() { QDesktopServices::openUrl(QUrl::fromLocalF
 
 bool EditorSession::save() {
     autosave_.stop();
+    if (!settings_.flush()) return false;
     const bool ok = timeline_.save();
     if (!ok)
         error_ = timeline_.error();

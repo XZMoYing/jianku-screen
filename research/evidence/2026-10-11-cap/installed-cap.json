@@ -1,0 +1,16 @@
+{
+  "observed_at": "2026-10-11",
+  "method": "read_only_installed_bundle_metadata",
+  "app_path": "/Applications/Cap.app",
+  "bundle_identifier": "so.cap.desktop",
+  "version": "0.6.0",
+  "build": "0.6.0",
+  "info_plist_sha256": "c406c97e38526db050e7297456e123d281ef706eed6aa2235e99202e49bd71a0",
+  "user_observation": {
+    "source": "direct_user_reply",
+    "editor_preview_feels_odd": true,
+    "exported_video_feels_odd": true,
+    "specific_visual_cause": "unknown"
+  },
+  "limits": "Version metadata matches the researched release; build provenance and individual project settings were not verified. User observation is not an agent-run frame measurement."
+}

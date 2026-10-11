@@ -1,0 +1,21 @@
+{
+    "appearance": true,
+    "editSave": true,
+    "error": "",
+    "firstFrame": true,
+    "focusCanvasPickGesture": true,
+    "focusKeyboardCopyPaste": true,
+    "focusMoveGesture": true,
+    "focusPositionPadAndPixels": true,
+    "focusResizeGesture": true,
+    "focusSaveForExport": true,
+    "hasFrame": true,
+    "loading": false,
+    "manualFocusCreateGesture": true,
+    "ok": true,
+    "playback": true,
+    "playerError": "",
+    "playerFound": true,
+    "rapidSeek": true,
+    "stage": 13
+}

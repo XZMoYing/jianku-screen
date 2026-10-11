@@ -279,6 +279,9 @@ ProjectData loadProject(const QString &directory, QString *errorOut) {
         if (!edit.appearance.isEmpty() && QFileInfo(Project::path(directory)).lastModified() >= QFileInfo(directory + "/appearance.json").lastModified())
             for (auto i = edit.appearance.constBegin(); i != edit.appearance.constEnd(); ++i) data.settings[i.key()] = i.value();
     }
+    SourceCrop crop;
+    if (data.settings.contains("screenCrop") && !readSourceCrop(data.settings.value("screenCrop"), &crop))
+        return fail(QStringLiteral("工程中的裁切参数损坏，无法打开合成画面"));
     data.valid = true;
     if (errorOut)
         errorOut->clear();
@@ -331,7 +334,7 @@ void applyMotionBlurOverrides(MotionBlurSettings &settings, const MotionBlurSett
 }
 
 ComposeContext makeComposeContext(ProjectData project, const QString &backgroundRoot,
-    const MotionBlurSettings &blurOverride, int resolutionOverride) {
+    const MotionBlurSettings &blurOverride, int resolutionOverride, const CanvasPlan *previousCanvas) {
     ComposeContext context;
     context.project = std::move(project);
     if (!context.project.valid) {
@@ -340,6 +343,11 @@ ComposeContext makeComposeContext(ProjectData project, const QString &background
     }
 
     const QVariantMap &map = context.project.settings;
+    SourceCrop crop;
+    if (map.contains("screenCrop") && !readSourceCrop(map.value("screenCrop"), &crop)) {
+        context.error = QStringLiteral("裁切参数无效，无法合成画面"); return context;
+    }
+    context.sourceRect = crop.pixels(context.project.sourceSize);
     if (map.contains("defaultZoomLevel")) {
         for (auto &range : context.project.zoomRanges)
             if (range.system && !range.customized) range.zoom = std::clamp(map.value("defaultZoomLevel").toDouble(), 1.0, 6.0);
@@ -396,7 +404,7 @@ ComposeContext makeComposeContext(ProjectData project, const QString &background
 
     // The canvas is fixed for an export (the output size), so the content is
     // contained inside it; the aspect ratio setting decides that size.
-    const QSizeF fullCanvas = canvasSizeForAspect(context.project.sourceSize,
+    const QSizeF fullCanvas = canvasSizeForAspect(context.sourceRect.size(),
         map.value(QStringLiteral("outputAspectRatio")).toString());
     const QSizeF outputCanvas = canvasSizeForResolution(fullCanvas, resolutionOverride);
     const double outputScale = outputCanvas.height() / fullCanvas.height();
@@ -408,7 +416,7 @@ ComposeContext makeComposeContext(ProjectData project, const QString &background
     settings.canvas.shadowDistance *= outputScale;
     settings.canvas.shadowBlur *= outputScale;
     settings.canvas.backgroundBlur *= outputScale;
-    context.canvasPlan = planCanvas(settings.canvas, outputCanvas, context.project.sourceSize);
+    context.canvasPlan = planCanvas(settings.canvas, outputCanvas, context.sourceRect.size(), previousCanvas);
     if (!context.canvasPlan.valid) {
         context.error = context.canvasPlan.error;
         return context;
@@ -452,8 +460,11 @@ CameraPose AnimationSequence::cameraTargetFor(const ProjectData &project, const 
     const double snap = active.snapToEdgesRatio;
     const auto focus = active.fixedPosition ? Animation::FocusPoint{active.focusX, active.focusY}
         : Animation::AutoFocusEngine::focusAt(range, project.events, project.sourceSize.width(), project.sourceSize.height(), mediaTimeMs, snap);
-    const auto transform = Animation::AutoFocusEngine::transformFor(focus, active.zoom,
-        project.sourceSize.width(), project.sourceSize.height(), project.sourceSize.width(), project.sourceSize.height(), snap);
+    const auto crop = sourceCropFromSettings(project.settings);
+    const auto visibleSize = crop.pixels(project.sourceSize).size();
+    const Animation::FocusPoint visibleFocus{(focus.x - crop.x) / crop.width, (focus.y - crop.y) / crop.height};
+    const auto transform = Animation::AutoFocusEngine::transformFor(visibleFocus, active.zoom,
+        visibleSize.width(), visibleSize.height(), visibleSize.width(), visibleSize.height(), snap);
     return {transform.scale, transform.offsetX, transform.offsetY};
 }
 
@@ -527,8 +538,8 @@ MotionBlur::LayerMotion cursorMotion(const ComposeContext &context, const Cursor
     auto centreAt = [&](const CameraPose &cam, const CursorPose &pose) {
         // Matches how composeFrame places the pointer: inside the frame, then
         // carried by the camera transform.
-        const QPointF inFrame(layout.contentRect.x() - frame.x() + pose.x * fit,
-            layout.contentRect.y() - frame.y() + pose.y * fit);
+        const QPointF inFrame(layout.contentRect.x() - frame.x() + (pose.x - context.sourceRect.x()) * fit,
+            layout.contentRect.y() - frame.y() + (pose.y - context.sourceRect.y()) * fit);
         return frame.topLeft() + QPointF(cam.offsetX * fit, cam.offsetY * fit)
             + (inFrame + QPointF(size / 2.0, size / 2.0)) * cam.scale;
     };
@@ -565,7 +576,8 @@ BlurPlan planBlur(const ComposeContext &context, const CameraPose &previousCamer
 
     // The pointer only blurs when it is actually drawn: a hidden or fading
     // pointer leaving a smear would be visible motion for something invisible.
-    const bool cursorVisible = includeCursor && !settings.hideCursor && cursor.alpha > 0.01;
+    const bool cursorVisible = includeCursor && !settings.hideCursor && cursor.alpha > 0.01
+        && (sourceCropFromSettings(context.project.settings).full() || context.sourceRect.contains(QPointF(cursor.x, cursor.y)));
     const CursorDefinition *shape = cursorAt(context.project, mediaTimeMs);
     if (!cursorVisible || !shape)
         return plan;
@@ -656,7 +668,8 @@ QImage composeFrame(const ComposeContext &context, const QImage &source,
     const QRectF contentRect(layout.contentRect.x() - frameRect.x(),
         layout.contentRect.y() - frameRect.y(),
         layout.contentRect.width(), layout.contentRect.height());
-    screenPainter.drawImage(contentRect, source);
+    const QRectF sampleRect = sourceCropFromSettings(context.project.settings).pixels(source.size());
+    screenPainter.drawImage(contentRect, source, sampleRect);
 
     // Inset border: drawn on the frame edge, inside the rounded corners. Same
     // helper the screenshot path uses, so the two cannot drift.
@@ -674,7 +687,8 @@ QImage composeFrame(const ComposeContext &context, const QImage &source,
     // preview, so the pointer grows with the zoom instead of staying a fixed size.
     const CursorDefinition *definition = cursorAt(context.project, mediaTimeMs);
     if (includeCursor && !settings.hideCursor && definition && !definition->image.isNull()
-        && cursor.alpha > 0.001) {
+        && cursor.alpha > 0.001 && (sourceCropFromSettings(context.project.settings).full()
+            || context.sourceRect.contains(QPointF(cursor.x, cursor.y)))) {
         // The preview sizes the pointer in screen points and stretches the image
         // to that box; here everything is in source pixels, so use the pixel
         // metrics and let the canvas scale handle the rest.
@@ -692,8 +706,9 @@ QImage composeFrame(const ComposeContext &context, const QImage &source,
         cursorPainter.setRenderHint(QPainter::SmoothPixmapTransform);
         cursorPainter.translate(frameRect.topLeft() + QPointF(cameraX, cameraY));
         cursorPainter.scale(camera.scale, camera.scale);
-        cursorPainter.translate(contentRect.x() + cursor.x * fitScale,
-            contentRect.y() + cursor.y * fitScale);
+        if (!sourceCropFromSettings(context.project.settings).full()) cursorPainter.setClipPath(framePath);
+        cursorPainter.translate(contentRect.x() + (cursor.x - context.sourceRect.x()) * fitScale,
+            contentRect.y() + (cursor.y - context.sourceRect.y()) * fitScale);
         // Rotation and the click feedback both pivot on the hotspot.
         cursorPainter.translate(-hotspotX * baseWidth, -hotspotY * baseHeight);
         if (std::abs(cursor.rotationDeg) > 0.001)

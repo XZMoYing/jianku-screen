@@ -14,8 +14,8 @@ namespace {
 // Bumped when the meaning of a stored field changes. A file with a newer schema is
 // refused rather than guessed at: reading a future format with today's rules is how a
 // project gets silently mangled.
-constexpr int kSchemaVersion = 3;
-const char *const kSchemaName = "jianku-edit/3";
+constexpr int kSchemaVersion = 4;
+const char *const kSchemaName = "jianku-edit/4";
 
 } // namespace
 
@@ -44,7 +44,7 @@ EditSidecar load(const QString &projectDirectory, double durationMs) {
     }
     const QJsonObject root = document.object();
     const QString schema = root.value(QStringLiteral("schema")).toString();
-    if (schema != QLatin1String(kSchemaName) && schema != QStringLiteral("jianku-edit/1") && schema != QStringLiteral("jianku-edit/2")) {
+    if (schema != QLatin1String(kSchemaName) && schema != QStringLiteral("jianku-edit/1") && schema != QStringLiteral("jianku-edit/2") && schema != QStringLiteral("jianku-edit/3")) {
         // An unknown schema is reported but not fatal: the recording opens, the edit is
         // ignored, and the user is told why instead of losing the whole project.
         sidecar.error = QStringLiteral("编辑记录版本不认识（%1），已忽略").arg(schema);

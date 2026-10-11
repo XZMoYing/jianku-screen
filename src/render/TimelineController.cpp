@@ -610,7 +610,7 @@ void TimelineController::recordAppearance(const QVariantMap &map) {
     QStringList changedKeys;
     for (auto i = map.constBegin(); i != map.constEnd(); ++i) if (appearance_.value(i.key()) != i.value()) changedKeys.append(i.key());
     pushHistory("appearance:" + changedKeys.join(',')); appearance_ = map;
-    emit changed(); emit selectionChanged(); emit dirtyChanged();
+    emit changed(); emit dirtyChanged();
 }
 
 } // namespace Render

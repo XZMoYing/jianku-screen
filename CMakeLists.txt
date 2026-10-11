@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(JiankuScreen VERSION 0.1.3 LANGUAGES CXX OBJCXX)
+project(JiankuScreen VERSION 0.1.6 LANGUAGES CXX OBJCXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -49,7 +49,7 @@ qt_add_executable(jianku-screen MACOSX_BUNDLE
     src/render/TimelineGeometry.h
     src/render/ExportController.cpp
     src/render/ExportController.h
-    src/render/EditorSession.cpp
+    src/render/CropController.cpp src/render/EditorSession.cpp
     src/render/EditorSession.h
     src/render/EditorSessionRegistry.cpp
     src/render/EditorSessionRegistry.h
@@ -100,6 +100,10 @@ include(CTest)
 set(JIANKU_SMOKE_PROJECT "" CACHE PATH
     "Recorded .jianku project used by the compositor smoke test (optional)")
 if(BUILD_TESTING)
+    add_executable(source-crop-tests tests/SourceCropTests.cpp
+        src/render/CropController.cpp src/settings/SettingsStore.cpp)
+    target_link_libraries(source-crop-tests PRIVATE Qt6::Core)
+    add_test(NAME source-crop COMMAND source-crop-tests)
     target_sources(jianku-screen PRIVATE tests/EditorVerification.mm)
     target_compile_definitions(jianku-screen PRIVATE JIANKU_UI_VERIFICATION)
     set_source_files_properties(tests/EditorVerification.mm PROPERTIES COMPILE_FLAGS "-fobjc-arc")
@@ -202,7 +206,7 @@ if(BUILD_TESTING)
     # The editor's central invariant: two open recordings share no state. Worth its own
     # test rather than a UI demonstration, because the failure mode is silent.
     add_executable(editor-session-tests tests/EditorSessionTests.cpp
-        src/render/EditorSession.cpp src/render/FocusController.cpp src/render/TimelineController.cpp
+        src/render/CropController.cpp src/render/EditorSession.cpp src/render/FocusController.cpp src/render/TimelineController.cpp
         src/render/TimelineGeometry.cpp src/render/ExportController.cpp
         src/render/ProjectCompositor.cpp src/project/EditTimeline.cpp
         src/project/EditSidecar.cpp src/project/RecentProjects.cpp
@@ -233,6 +237,14 @@ if(BUILD_TESTING)
         JIANKU_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
         JIANKU_SMOKE_PROJECT="${JIANKU_SMOKE_PROJECT}")
     add_test(NAME compositor COMMAND compositor-tests)
+    add_executable(preview-render-tests tests/PreviewRenderTests.cpp
+        src/render/ProjectCompositor.cpp src/project/EditTimeline.cpp src/project/EditSidecar.cpp
+        src/render/CanvasLayout.cpp src/render/CanvasRenderer.cpp src/render/MotionBlur.cpp
+        src/animation/AnimationSettings.cpp src/animation/AutoFocusEngine.cpp
+        src/animation/AutomaticZoom.cpp src/animation/CursorEngine.cpp src/animation/SpringSolver.cpp)
+    target_link_libraries(preview-render-tests PRIVATE Qt6::Core Qt6::Gui)
+    target_compile_definitions(preview-render-tests PRIVATE JIANKU_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+    add_test(NAME preview-render COMMAND preview-render-tests)
 
     add_executable(timeline-controller-tests tests/TimelineControllerTests.cpp
         src/render/FocusController.cpp src/render/TimelineController.cpp src/render/TimelineGeometry.cpp src/render/ProjectCompositor.cpp
@@ -319,6 +331,8 @@ set_source_files_properties(ui/EditorWindow.qml PROPERTIES QT_RESOURCE_ALIAS Edi
 set_source_files_properties(ui/EditorTab.qml PROPERTIES QT_RESOURCE_ALIAS EditorTab.qml)
 set_source_files_properties(ui/FocusLane.qml PROPERTIES QT_RESOURCE_ALIAS FocusLane.qml)
 set_source_files_properties(ui/FocusInspector.qml PROPERTIES QT_RESOURCE_ALIAS FocusInspector.qml)
+set_source_files_properties(ui/CropCanvas.qml PROPERTIES QT_RESOURCE_ALIAS CropCanvas.qml)
+set_source_files_properties(ui/CropInspector.qml PROPERTIES QT_RESOURCE_ALIAS CropInspector.qml)
 
 qt_add_qml_module(jianku-screen
     URI Jianku.Screen
@@ -345,6 +359,8 @@ qt_add_qml_module(jianku-screen
         ui/EditorTab.qml
         ui/FocusLane.qml
         ui/FocusInspector.qml
+        ui/CropCanvas.qml
+        ui/CropInspector.qml
 )
 
 target_link_libraries(jianku-screen PRIVATE

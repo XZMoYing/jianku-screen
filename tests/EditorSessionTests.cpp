@@ -158,6 +158,28 @@ int main(int argc, char **argv) {
             require(copy.timeline()->focusRanges().size() == 1 && copy.settingsStore()->current()["backgroundPaddingRatio"].toDouble() == 18, "effects and appearance reopen together");
         }
 
+        // A continuous drag updates the session before any file write, and an
+        // immediate save/close must still retain its final value and undo step.
+        {
+            const QString interactive = temp.path() + "/interactive.jianku";
+            require(writeProject(interactive, 10000, "2026-10-11T14:00:00"), "interactive fixture");
+            {
+                EditorSession session(interactive); require(session.open(), "interactive session");
+                for (int i = 0; i < 60; ++i)
+                    require(session.settingsStore()->setInteractiveCurrent("backgroundPaddingRatio", 12.0 + i * .1), "interactive change");
+                require(!QFileInfo::exists(interactive + "/appearance.json"), "drag does not synchronously write each move");
+                require(session.settingsStore()->current()["backgroundPaddingRatio"].toDouble() == 17.9 && session.dirty(), "drag updates live state and history immediately");
+                require(session.save() && QFileInfo::exists(interactive + "/appearance.json"), "explicit save flushes pending appearance");
+                session.timeline()->undo();
+                require(session.settingsStore()->current()["backgroundPaddingRatio"].toDouble() == 10, "continuous drag is one undo step");
+                session.timeline()->redo();
+                session.settingsStore()->setInteractiveCurrent("insetSize", 8.0);
+            }
+            EditorSession reopened(interactive); require(reopened.open(), "reopen interactive session");
+            require(reopened.settingsStore()->current()["backgroundPaddingRatio"].toDouble() == 17.9
+                && reopened.settingsStore()->current()["insetSize"].toDouble() == 8, "immediate close flushes final interactive edit");
+        }
+
         // Idle autosave and immediate close must both retain complete effects.
         const QString autosaveProject = temp.path() + "/autosave.jianku";
         require(writeProject(autosaveProject, 10000, "2026-10-11T10:00:00.000"), "autosave fixture");
@@ -173,6 +195,29 @@ int main(int argc, char **argv) {
         const auto backup = Project::load(autosaveProject, 10000);
         require(backup.valid && QFileInfo::exists(autosaveProject + "/edit.previous.json"), "close retains backup and valid edit schema");
 
+        const QString cropProject = temp.path() + "/crop.jianku";
+        require(writeProject(cropProject, 10000, "2026-10-11T11:00:00.000"), "crop fixture");
+        {
+            EditorSession session(cropProject); require(session.open(), "crop session");
+            auto *crop = session.cropController();
+            crop->begin(); crop->dragDraft(crop->draft(), 0, .2, .2); crop->cancel();
+            require(!session.dirty() && !session.timeline()->canUndo(), "cancelled draft creates no dirty state or history");
+            crop->begin(); const auto origin = crop->draft();
+            for (int i = 1; i <= 20; ++i) crop->dragDraft(origin, 0, i * .01, i * .01);
+            require(crop->apply() && session.dirty(), "first confirmed crop");
+            const auto firstCrop = session.settingsStore()->current()["screenCrop"];
+            crop->begin(); require(crop->setDraftPixels({{"x", 100}, {"y", 50}, {"width", 500}, {"height", 300}}) && crop->apply(), "second crop confirmed immediately");
+            const auto secondCrop = session.settingsStore()->current()["screenCrop"];
+            session.timeline()->undo(); require(session.settingsStore()->current()["screenCrop"] == firstCrop, "separate confirmations stay separate undo steps");
+            session.timeline()->undo(); require(sourceCropFromSettings(session.settingsStore()->current()).full() && !session.timeline()->canUndo(), "many gesture updates commit one undo entry");
+            session.timeline()->redo(); session.timeline()->redo();
+            require(session.settingsStore()->current()["screenCrop"] == secondCrop && session.save(), "redo and save crop");
+            EditorSession reopened(cropProject); require(reopened.open(), "crop reopens");
+            require(reopened.settingsStore()->current()["screenCrop"] == secondCrop && !reopened.dirty(), "saved crop restored in clean session");
+            require(sourceCropFromSettings(b.settingsStore()->current()).full(), "other project retains its own crop");
+            QFile sidecar(cropProject + "/edit.json"); require(sidecar.open(QIODevice::ReadOnly), "read crop schema");
+            require(QJsonDocument::fromJson(sidecar.readAll()).object()["schema"].toString() == "jianku-edit/4", "crop edit uses schema four");
+        }
         std::cout << "editor session checks passed\n";
         return 0;
     } catch (const std::exception &error) {

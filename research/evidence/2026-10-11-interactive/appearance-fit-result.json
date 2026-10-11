@@ -1,0 +1,100 @@
+{
+    "appearanceLatencyP95Ms": 14.6345,
+    "dragFps": 22.333333333333332,
+    "dragMetrics": {
+        "clockSamples": [
+        ],
+        "coalescedFrames": 0,
+        "composeMaxMs": 4.42725,
+        "composeTotalMs": 166.36612599999998,
+        "decodedFrames": 0,
+        "discardedFrames": 0,
+        "frames": 68,
+        "preparations": 0,
+        "scaleTotalMs": 0,
+        "seeks": 0
+    },
+    "dragMoves": 94,
+    "error": "",
+    "framesWhileDragging": 67,
+    "guiHeartbeatP95Ms": 9.002791,
+    "hasFrame": true,
+    "initialAspect": "auto",
+    "initialPreviewHeight": 540,
+    "initialPreviewWidth": 864,
+    "interactiveSave": true,
+    "loading": false,
+    "ok": true,
+    "playbackDuringAppearance": {
+        "clockSamples": [
+            {
+                "nativeMs": 100.19879800000001,
+                "outputMs": 100.19879800000001,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 403.055631,
+                "outputMs": 403.055631,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 731.103381,
+                "outputMs": 731.103381,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 1074.173547,
+                "outputMs": 1074.173547,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 1363.3221310000001,
+                "outputMs": 1363.3221310000001,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 1634.568798,
+                "outputMs": 1634.568798,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 1980.296547,
+                "outputMs": 1980.296547,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 2331.698797,
+                "outputMs": 2331.698797,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 2709.4083809999997,
+                "outputMs": 2709.4083809999997,
+                "rate": 1,
+                "timeControlStatus": 2
+            }
+        ],
+        "coalescedFrames": 453,
+        "composeMaxMs": 29.634459,
+        "composeTotalMs": 939.7067520000002,
+        "decodedFrames": 83,
+        "discardedFrames": 0,
+        "frames": 87,
+        "preparations": 0,
+        "scaleTotalMs": 317.9878310000001,
+        "seeks": 0
+    },
+    "playerError": "",
+    "playerFound": true,
+    "releaseToFinalFrameMs": 29,
+    "restoredFramePixelIdentical": true,
+    "stage": 32
+}

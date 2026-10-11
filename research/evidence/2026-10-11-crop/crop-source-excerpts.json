@@ -1,0 +1,22 @@
+{
+  "commit": "fa24059a9ba7e769152b3c1de047d96aca873e1c",
+  "license": "MIT",
+  "excerpts": [
+    {
+      "saved": "third_party/dogsc/NormalizedCrop.swift",
+      "upstream": "Sources/RecorderCore/ProjectModel.swift",
+      "start": 760,
+      "end": 811,
+      "sha256": "9ef65af83f9343dc4a328c3c41c08421567b952028825b6285d53598e36405f8",
+      "exactExcerpt": true
+    },
+    {
+      "saved": "third_party/dogsc/CropGestures.swift",
+      "upstream": "Sources/DogSCApp/EditorCanvasPreview.swift",
+      "start": 748,
+      "end": 815,
+      "sha256": "d2b5b0b57fc9dab798787a81cf7f573541210eccb140f73ca670b274d1922f19",
+      "exactExcerpt": true
+    }
+  ]
+}

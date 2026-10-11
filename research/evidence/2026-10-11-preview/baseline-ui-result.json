@@ -1,0 +1,35 @@
+{
+    "error": "",
+    "hasFrame": true,
+    "loading": false,
+    "ok": true,
+    "performance": {
+        "canvasHeight": 540,
+        "canvasWidth": 960,
+        "clockSamples": [
+            {
+                "desiredMs": 7089,
+                "nativeMs": 6747,
+                "rate": 1,
+                "timeControlStatus": 2
+            }
+        ],
+        "composeMaxMs": 15.425708,
+        "composeTotalMs": 52.223957,
+        "deliveredFps": 0.49975012493753124,
+        "deliveredFrames": 4,
+        "deliveryMaxMs": 4840.382042,
+        "deliveryMedianMs": 1013.566458,
+        "deliveryP95Ms": 1013.566458,
+        "elapsedMs": 8004,
+        "frames": 4,
+        "guiHeartbeatMaxMs": 27.1055,
+        "guiHeartbeatP95Ms": 9.017583,
+        "scaleTotalMs": 21.282417,
+        "seeks": 14,
+        "swapP95Ms": 769.77875
+    },
+    "playerError": "",
+    "playerFound": true,
+    "stage": 23
+}

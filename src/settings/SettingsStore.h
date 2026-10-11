@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QVariantMap>
+#include <QTimer>
 
 class SettingsStore final : public QObject {
     Q_OBJECT
@@ -12,6 +13,7 @@ class SettingsStore final : public QObject {
 
 public:
     explicit SettingsStore(QObject *parent = nullptr, const QString &storagePath = {});
+    ~SettingsStore() override;
     bool replaceCurrent(const QVariantMap &map);
     void initializeProject(const QVariantMap &recordedSettings);
 
@@ -21,6 +23,9 @@ public:
     QString storagePath() const { return storagePath_; }
 
     Q_INVOKABLE bool setCurrent(const QString &key, const QVariant &value);
+    // Interactive edits notify immediately; only their atomic disk writes coalesce.
+    Q_INVOKABLE bool setInteractiveCurrent(const QString &key, const QVariant &value);
+    Q_INVOKABLE bool flush();
     Q_INVOKABLE bool setAsDefault(const QString &key);
     Q_INVOKABLE bool restoreFactory(const QString &key);
     Q_INVOKABLE void restoreAllFactory();
@@ -36,6 +41,7 @@ private:
     QVariantMap defaults_;
     QVariantMap current_;
     QString storagePath_;
+    QTimer saveTimer_;
 
     bool save();
     void load();

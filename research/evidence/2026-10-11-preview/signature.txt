@@ -1,0 +1,11 @@
+Executable=/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen/build-release/试用/0.1.5/Jianku Screen.app/Contents/MacOS/Jianku Screen
+Identifier=com.jianku.screen
+Format=app bundle with Mach-O thin (arm64)
+CodeDirectory v=20400 size=19754 flags=0x0(none) hashes=611+3 location=embedded
+Signature size=1699
+Authority=JiankuDev
+Signed Time=Oct 11, 2026 at 13:22:31
+Info.plist entries=12
+TeamIdentifier=not set
+Sealed Resources version=2 rules=13 files=1952
+designated => identifier "com.jianku.screen" and certificate leaf = H"ef95db66644426e05fb46fff7d413aee222fe764"

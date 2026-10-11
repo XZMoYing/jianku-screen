@@ -1,4 +1,6 @@
 #include "CanvasRenderer.h"
+#include "ParallelRows.h"
+#include <QDateTime>
 
 #include <QDir>
 #include <QCoreApplication>
@@ -127,6 +129,11 @@ CanvasStyle canvasStyleFromMap(const QVariantMap &settings, const QString &backg
         style.backgroundImagePath = findBackground(backgroundRoot,
             settings.value(QStringLiteral("backgroundSystemName")).toString());
     }
+    if (!style.backgroundImagePath.isEmpty()) {
+        const QFileInfo image(style.backgroundImagePath);
+        style.backgroundImageModifiedMs = image.lastModified().toMSecsSinceEpoch();
+        style.backgroundImageBytes = image.size();
+    }
     return style;
 }
 
@@ -199,34 +206,68 @@ QImage buildShadowSprite(const QSizeF &frameSize, const CanvasStyle &style) {
             const auto *row = reinterpret_cast<const QRgb *>(image.constScanLine(y));
             for (int x = 0; x < width; ++x) alpha[y * width + x] = qAlpha(row[x]);
         }
+        // This inner rectangle is fully opaque even with fractional frame sizes
+        // and antialiased corners. Shrink it by each filter's support. Sampling
+        // 255 throughout still yields exactly 255, so fill it instead of doing
+        // identical taps across millions of interior pixels on a large display.
+        int solidLeft = std::clamp(int(std::ceil(pad + std::max(0.0, style.radius))) + 1, 0, width);
+        int solidRight = std::clamp(int(std::floor(pad + frameSize.width() - std::max(0.0, style.radius))) - 1, 0, width);
+        int solidTop = std::clamp(int(std::ceil(pad + std::max(0.0, style.radius))) + 1, 0, height);
+        int solidBottom = std::clamp(int(std::floor(pad + frameSize.height() - std::max(0.0, style.radius))) - 1, 0, height);
         for (int pass = 0; pass < quality; ++pass) {
             const double offset = style.shadowBlur * (1.0 - double(pass) / quality) + .5;
             const int whole = int(std::floor(offset));
             const float fraction = float(offset - whole);
-            for (int y = 0; y < height; ++y) {
-                const float *row = alpha.data() + y * width;
-                for (int x = 0; x < width; ++x) {
-                    const float left = std::lerp(row[std::clamp(x - whole, 0, width - 1)],
-                        row[std::clamp(x - whole - 1, 0, width - 1)], fraction);
-                    const float right = std::lerp(row[std::clamp(x + whole, 0, width - 1)],
-                        row[std::clamp(x + whole + 1, 0, width - 1)], fraction);
-                    horizontal[y * width + x] = (left + right) * .5f;
+            const int left = std::min(width, solidLeft + whole + 1), right = std::max(0, solidRight - whole - 1);
+            const int topRow = std::min(height, solidTop + whole + 1), bottomRow = std::max(0, solidBottom - whole - 1);
+            Detail::parallelRows(height, [&](int begin, int end) {
+                for (int y = begin; y < end; ++y) {
+                    const float *row = alpha.data() + y * width;
+                    float *dst = horizontal.data() + y * width;
+                    const bool solid = y >= solidTop && y < solidBottom && left < right;
+                    const int a = solid ? left : 0, b = solid ? right : 0;
+                    auto sample = [&](int x) {
+                        const float lo = std::lerp(row[std::clamp(x - whole, 0, width - 1)],
+                            row[std::clamp(x - whole - 1, 0, width - 1)], fraction);
+                        const float hi = std::lerp(row[std::clamp(x + whole, 0, width - 1)],
+                            row[std::clamp(x + whole + 1, 0, width - 1)], fraction);
+                        dst[x] = (lo + hi) * .5f;
+                    };
+                    for (int x = 0; x < a; ++x) sample(x);
+                    std::fill(dst + a, dst + b, 255.0f);
+                    for (int x = b; x < width; ++x) sample(x);
                 }
-            }
-            for (int y = 0; y < height; ++y) {
-                const float *top = horizontal.data() + std::clamp(y - whole, 0, height - 1) * width;
-                const float *topNext = horizontal.data() + std::clamp(y - whole - 1, 0, height - 1) * width;
-                const float *bottom = horizontal.data() + std::clamp(y + whole, 0, height - 1) * width;
-                const float *bottomNext = horizontal.data() + std::clamp(y + whole + 1, 0, height - 1) * width;
-                for (int x = 0; x < width; ++x) next[y * width + x] = std::round(
-                    (std::lerp(top[x], topNext[x], fraction) + std::lerp(bottom[x], bottomNext[x], fraction)) * .5f);
-            }
+            }, 4);
+            Detail::parallelRows(height, [&](int begin, int end) {
+                for (int y = begin; y < end; ++y) {
+                    const float *top = horizontal.data() + std::clamp(y - whole, 0, height - 1) * width;
+                    const float *topNext = horizontal.data() + std::clamp(y - whole - 1, 0, height - 1) * width;
+                    const float *bottom = horizontal.data() + std::clamp(y + whole, 0, height - 1) * width;
+                    const float *bottomNext = horizontal.data() + std::clamp(y + whole + 1, 0, height - 1) * width;
+                    float *dst = next.data() + y * width;
+                    const bool solid = y >= topRow && y < bottomRow && left < right;
+                    const int a = solid ? left : 0, b = solid ? right : 0;
+                    auto sample = [&](int x) { dst[x] = std::round(
+                        (std::lerp(top[x], topNext[x], fraction) + std::lerp(bottom[x], bottomNext[x], fraction)) * .5f); };
+                    for (int x = 0; x < a; ++x) sample(x);
+                    std::fill(dst + a, dst + b, 255.0f);
+                    for (int x = b; x < width; ++x) sample(x);
+                }
+            }, 4);
             alpha.swap(next);
+            solidLeft = left; solidRight = right; solidTop = topRow; solidBottom = bottomRow;
         }
-        for (int y = 0; y < height; ++y) {
-            auto *row = reinterpret_cast<QRgb *>(image.scanLine(y));
-            for (int x = 0; x < width; ++x) row[x] = qRgba(0, 0, 0, int(alpha[y * width + x]));
-        }
+        // Apply the same post-filter opacity while writing the final image;
+        // avoid writing/reading that full image once more just for opacity.
+        const double intensity = std::clamp(style.shadowIntensity, 0.0, 1.0);
+        auto *pixels = reinterpret_cast<QRgb *>(image.bits()); const int stride = image.bytesPerLine() / sizeof(QRgb);
+        Detail::parallelRows(height, [&](int begin, int end) {
+            for (int y = begin; y < end; ++y) {
+                auto *row = pixels + y * stride;
+                for (int x = 0; x < width; ++x) row[x] = qRgba(0, 0, 0, int(std::round(int(alpha[y * width + x]) * intensity)));
+            }
+        }, 4);
+        return image;
     }
     // Opacity belongs to the cached sprite, after filtering, not to the mask.
     const double intensity = std::clamp(style.shadowIntensity, 0.0, 1.0);
@@ -237,7 +278,8 @@ QImage buildShadowSprite(const QSizeF &frameSize, const CanvasStyle &style) {
     return image;
 }
 
-CanvasPlan planCanvas(const CanvasStyle &style, const QSizeF &canvasSize, const QSizeF &contentSize) {
+CanvasPlan planCanvas(const CanvasStyle &style, const QSizeF &canvasSize, const QSizeF &contentSize,
+    const CanvasPlan *previous) {
     CanvasPlan plan;
     plan.style = style;
     if (contentSize.width() <= 0.0 || contentSize.height() <= 0.0) {
@@ -271,9 +313,22 @@ CanvasPlan planCanvas(const CanvasStyle &style, const QSizeF &canvasSize, const 
         plan.error = QStringLiteral("画布尺寸过小");
         return plan;
     }
-    plan.background = buildBackground(style, size);
-    if (style.shadowIntensity > 0.001)
-        plan.shadow = buildShadowSprite(plan.layout.frameRect.size(), style);
+    const CanvasStyle old = previous ? previous->style : CanvasStyle{};
+    const bool sameBackground = previous && previous->valid && previous->background.size() == size
+        && old.backgroundType == style.backgroundType && old.backgroundImagePath == style.backgroundImagePath
+        && old.backgroundImageModifiedMs == style.backgroundImageModifiedMs && old.backgroundImageBytes == style.backgroundImageBytes
+        && old.backgroundColor == style.backgroundColor && old.gradientStart == style.gradientStart
+        && old.gradientEnd == style.gradientEnd && old.gradientAngle == style.gradientAngle
+        && old.backgroundBlur == style.backgroundBlur;
+    plan.background = sameBackground ? previous->background : buildBackground(style, size);
+    if (style.shadowIntensity > 0.001) {
+        const bool sameShadow = previous && previous->valid && !previous->shadow.isNull()
+            && previous->layout.frameRect.size() == plan.layout.frameRect.size()
+            && old.radius == style.radius && old.shadowIntensity == style.shadowIntensity
+            && old.shadowDistance == style.shadowDistance && old.shadowBlur == style.shadowBlur
+            && old.shadowQuality == style.shadowQuality;
+        plan.shadow = sameShadow ? previous->shadow : buildShadowSprite(plan.layout.frameRect.size(), style);
+    }
     plan.valid = true;
     return plan;
 }

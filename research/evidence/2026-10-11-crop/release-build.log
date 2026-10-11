@@ -1,0 +1,35 @@
+[  0%] Running qmlimportscanner for jianku-screen
+[  1%] Built target jianku-screen_copy_res
+[  2%] Built target generate_qmlls_build_ini_file
+[  3%] Copying jianku-screen qml sources into build dir
+[  3%] Built target jianku-compose_autogen_timestamp_deps
+Detected locale "C" with character encoding "US-ASCII", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+[  3%] Built target jianku-screen_copy_qml
+[  5%] Built target jianku-compose_autogen
+[ 16%] Built target jianku-compose
+[ 16%] Built target jianku-screen_qmlimportscan
+[ 16%] Built target jianku-screen_autogen_timestamp_deps
+[ 16%] Built target jianku-screen_autogen
+[ 16%] Running rcc for resource jianku-screen_raw_qml_0
+[ 17%] Running AUTOMOC file extraction for target jianku-screen
+Detected locale "C" with character encoding "US-ASCII", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+[ 18%] Generating .rcc/qmlcache/jianku-screen_ui_CropInspector_qml.cpp, .rcc/qmlcache/jianku-screen_ui_CropInspector_qml.cpp.aotstats
+Detected locale "C" with character encoding "US-ASCII", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+[ 18%] Running AUTOMOC file extraction for target jianku-screen
+[ 20%] Building CXX object CMakeFiles/jianku-screen.dir/build-release/.qt/rcc/qrc_jianku-screen_raw_qml_0.cpp.o
+[ 20%] Building CXX object CMakeFiles/jianku-screen.dir/build-release/.rcc/qmlcache/jianku-screen_ui_CropInspector_qml.cpp.o
+[ 21%] Linking CXX executable "Jianku Screen.app/Contents/MacOS/Jianku Screen"
+Bundling background assets
+Bundling icon assets
+Bundling third-party notices
+Signing app with stable JiankuDev identity
+[100%] Built target jianku-screen

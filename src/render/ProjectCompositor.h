@@ -3,6 +3,7 @@
 #include "CanvasLayout.h"
 #include "CanvasRenderer.h"
 #include "MotionBlur.h"
+#include "SourceCrop.h"
 
 #include "../animation/CursorEngine.h"
 #include "../animation/InputEvent.h"
@@ -180,6 +181,7 @@ struct ComposeContext {
     // Background, layout, shadow and the resolved canvas size. Shared with the
     // preview and the screenshot, so all three draw the same packaging.
     CanvasPlan canvasPlan;
+    QRectF sourceRect; // crop in original recording pixels; sourceSize stays raw
     bool valid = false;
     QString error;
 
@@ -192,7 +194,8 @@ struct ComposeContext {
 // to the canvas the aspect-ratio setting produced, so the two settings compose: the
 // shape comes from one, the pixel count from the other.
 ComposeContext makeComposeContext(ProjectData project, const QString &backgroundRoot,
-    const MotionBlurSettings &blurOverride = {}, int resolutionOverride = 0);
+    const MotionBlurSettings &blurOverride = {}, int resolutionOverride = 0,
+    const CanvasPlan *previousCanvas = nullptr);
 
 // Applies caller overrides on top of the project's own values. Any field left
 // negative in `overrides` keeps what `settings` already holds.

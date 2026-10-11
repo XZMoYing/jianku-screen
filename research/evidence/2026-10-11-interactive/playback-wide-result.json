@@ -1,0 +1,209 @@
+{
+    "error": "preview missed the explicit smooth-playback acceptance thresholds",
+    "hasFrame": true,
+    "loading": false,
+    "ok": false,
+    "performance": {
+        "canvasHeight": 540,
+        "canvasWidth": 960,
+        "clockSamples": [
+            {
+                "nativeMs": 15.601035,
+                "outputMs": 15.601035,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 255.896285,
+                "outputMs": 255.896285,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 496.163701,
+                "outputMs": 496.163701,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 738.6664509999999,
+                "outputMs": 738.6664509999999,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 975.963201,
+                "outputMs": 975.963201,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 1216.032451,
+                "outputMs": 1216.032451,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 1455.351785,
+                "outputMs": 1455.351785,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 1777.365785,
+                "outputMs": 1777.365785,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 2016.6255350000001,
+                "outputMs": 2016.6255350000001,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 2281.616618,
+                "outputMs": 2281.616618,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 2731.899826,
+                "outputMs": 2731.899826,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 3031.6309929999998,
+                "outputMs": 3031.6309929999998,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 3278.939243,
+                "outputMs": 3278.939243,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 3536.952451,
+                "outputMs": 3536.952451,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 3781.6704090000003,
+                "outputMs": 3781.6704090000003,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 4074.489034,
+                "outputMs": 4074.489034,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 4331.958993,
+                "outputMs": 4331.958993,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 4598.748576,
+                "outputMs": 4598.748576,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 4839.0106590000005,
+                "outputMs": 4839.0106590000005,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 5105.733826,
+                "outputMs": 5105.733826,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 5344.206827,
+                "outputMs": 5344.206827,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 5584.553202,
+                "outputMs": 5584.553202,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 5826.373202,
+                "outputMs": 5826.373202,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 6064.480077,
+                "outputMs": 6064.480077,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 6308.0262840000005,
+                "outputMs": 6308.0262840000005,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 6793.635201,
+                "outputMs": 6793.635201,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 7058.074243,
+                "outputMs": 7058.074243,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 7298.661535,
+                "outputMs": 7298.661535,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 7814.175618,
+                "outputMs": 7814.175618,
+                "rate": 1,
+                "timeControlStatus": 2
+            }
+        ],
+        "coalescedFrames": 112,
+        "composeMaxMs": 329.92,
+        "composeTotalMs": 5398.644286000001,
+        "decodedFrames": 219,
+        "deliveredFps": 39.04797322424693,
+        "deliveredFrames": 315,
+        "deliveryMaxMs": 336.544667,
+        "deliveryMedianMs": 20.128125,
+        "deliveryP95Ms": 43.46,
+        "discardedFrames": 0,
+        "elapsedMs": 8067,
+        "finalSourceMs": 7785.788743,
+        "frames": 327,
+        "guiHeartbeatMaxMs": 229.569917,
+        "guiHeartbeatP95Ms": 15.174166,
+        "preparations": 0,
+        "scaleTotalMs": 1232.0224599999985,
+        "seeks": 0,
+        "steadyDeliveredFps": 38.48875053063535,
+        "swapP95Ms": 17.929791
+    },
+    "playerError": "",
+    "playerFound": true,
+    "stage": 23
+}

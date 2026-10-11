@@ -20,12 +20,16 @@ Item {
     property var session: null
     readonly property var controller: session ? session.timeline : null
     readonly property var exporter: session ? session.exporter : null
+    readonly property var crop: session ? session.crop : null
+    readonly property bool cropActive: !!crop && crop.active
     property string section: "background"
     property real timelineHeight: 320
     property bool exportDetailsExpanded: false
     readonly property bool focusSelected: !!controller && controller.selectedFocusId.length > 0
-    readonly property bool showExportDetails: !focusSelected || exportDetailsExpanded
-    Shortcut { sequence: "Space"; context: Qt.WindowShortcut; enabled: !tab.Window.window || !tab.Window.window.activeFocusItem || tab.Window.window.activeFocusItem.cursorPosition === undefined; onActivated: player.toggle() }
+    readonly property bool showExportDetails: !cropActive && (!focusSelected || exportDetailsExpanded)
+    Shortcut { sequence: "Space"; context: Qt.WindowShortcut; enabled: !tab.cropActive && (!tab.Window.window || !tab.Window.window.activeFocusItem || tab.Window.window.activeFocusItem.cursorPosition === undefined); onActivated: player.toggle() }
+    Shortcut { sequence: "Escape"; context: Qt.WindowShortcut; enabled: tab.cropActive; onActivated: tab.crop.cancel() }
+    Component.onDestruction: { if (tab.cropActive) tab.crop.cancel() }
     Connections {
         target: tab.exporter
         function onFrameRateChanged() { if (tab.controller) tab.controller.setFrameRate(tab.exporter.frameRate) }
@@ -49,11 +53,12 @@ Item {
                 anchors.fill: parent
                 anchors.margins: 20
                 controller: tab.controller
+                cropEditing: tab.cropActive
                 options: tab.session ? tab.session.settings.current : ({})
             }
             MouseArea {
                 objectName: "focusCanvasPicker"
-                anchors.fill: player; enabled: !!tab.controller && tab.controller.selectedFocusId.length > 0 && player.focusPreview && !player.playing && !player.loading
+                anchors.fill: player; enabled: !tab.cropActive && !!tab.controller && tab.controller.selectedFocusId.length > 0 && player.focusPreview && !player.playing && !player.loading
                 cursorShape: Qt.CrossCursor
                 function place(x, y) {
                     const source = player.sourcePointAt(x, y)
@@ -63,14 +68,25 @@ Item {
                 onPositionChanged: mouse => { if (pressed) place(mouse.x, mouse.y) }
             }
             Rectangle {
-                visible: player.focusPreview && !player.playing && !!tab.controller && tab.controller.selectedFocusId.length > 0
+                visible: !tab.cropActive && player.focusPreview && !player.playing && !!tab.controller && tab.controller.selectedFocusId.length > 0
                 x: player.x + player.focusMarker.x - 8; y: player.y + player.focusMarker.y - 8; width: 16; height: 16; radius: 8; color: "transparent"; border.width: 2; border.color: "#d4b8ff"
             }
             Row {
                 anchors { top: parent.top; horizontalCenter: parent.horizontalCenter; topMargin: 8 }
-                spacing: 6; visible: !!tab.controller && tab.controller.selectedFocusId.length > 0
+                spacing: 6; visible: !tab.cropActive && !!tab.controller && tab.controller.selectedFocusId.length > 0
                 UiButton { objectName: "focusPreviewButton"; text: player.focusPreview ? "目标构图预览" : "动画预览"; selected: player.focusPreview; onClicked: { player.pause(); player.focusPreview = !player.focusPreview } }
                 UiButton { text: "取消选择"; onClicked: tab.controller.clearSelection() }
+            }
+            CropCanvas {
+                anchors.fill: player; visible: tab.cropActive
+                controller: tab.crop; player: player
+            }
+            UiButton {
+                objectName: "beginCropButton"
+                anchors { left: parent.left; top: parent.top; leftMargin: 20; topMargin: 8 }
+                text: "裁切画面"; visible: !tab.cropActive
+                enabled: !!tab.crop && player.hasFrame && !player.loading && !tab.exporter.busy
+                onClicked: { player.pause(); tab.controller.clearSelection(); tab.crop.begin() }
             }
             Text {
                 anchors.centerIn: player
@@ -124,32 +140,38 @@ Item {
                 RowLayout {
                     Layout.fillWidth: true
                     UiButton { Layout.fillWidth: true; text: "在访达中打开工程"; onClicked: if (tab.session) tab.session.revealProject() }
-                    UiButton { text: "保存工程"; enabled: !!tab.session && tab.session.dirty; onClicked: tab.session.save() }
+                    UiButton { text: "保存工程"; enabled: !tab.cropActive && !!tab.session && tab.session.dirty; onClicked: tab.session.save() }
                 }
                 UiSegmented {
                     Layout.fillWidth: true
-                    visible: !tab.controller || tab.controller.selectedFocusId.length === 0
+                    visible: !tab.cropActive && (!tab.controller || tab.controller.selectedFocusId.length === 0)
                     options: ["背景", "光标", "缩放", "音频"]
                     currentIndex: Math.max(0, ["background", "cursor", "motion", "audio"].indexOf(tab.section))
                     onActivated: i => tab.section = ["background", "cursor", "motion", "audio"][i]
                 }
                 FocusInspector {
                     Layout.fillWidth: true; Layout.fillHeight: true
-                    visible: !!tab.controller && tab.controller.selectedFocusId.length > 0
+                    visible: !tab.cropActive && !!tab.controller && tab.controller.selectedFocusId.length > 0
                     controller: tab.controller
                     onPreviewRequested: { player.pause(); player.focusPreview = true }
                 }
                 SettingsPage {
-                    visible: !tab.controller || tab.controller.selectedFocusId.length === 0
+                    visible: !tab.cropActive && (!tab.controller || tab.controller.selectedFocusId.length === 0)
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     section: tab.section
                     store: tab.session ? tab.session.settings : settings
                     editingRecording: true
                 }
+                CropInspector {
+                    Layout.fillWidth: true; Layout.fillHeight: true
+                    visible: tab.cropActive
+                    controller: tab.crop
+                }
                 Text {
                     Layout.fillWidth: true
                     text: "编辑自动保存 · 预览 540p，导出使用所选分辨率"
+                    visible: !tab.cropActive
                     color: Theme.textFaint; font.pixelSize: 10
                 }
 
@@ -160,6 +182,7 @@ Item {
                 UiButton {
                     Layout.fillWidth: true
                     implicitHeight: 26
+                    visible: !tab.cropActive
                     text: tab.focusSelected ? (tab.showExportDetails ? "收起导出设置" : "展开导出设置") : "导出设置"
                     enabled: tab.focusSelected
                     onClicked: tab.exportDetailsExpanded = !tab.exportDetailsExpanded
@@ -194,6 +217,7 @@ Item {
                 }
                 Text {
                     Layout.fillWidth: true
+                    visible: !tab.cropActive
                     text: tab.exporter && tab.exporter.outputSizeLabel.length > 0
                         ? "成片 " + tab.exporter.outputSizeLabel + " · " + tab.exporter.frameRate + " fps"
                         : "—"
@@ -205,7 +229,8 @@ Item {
                     implicitHeight: 34
                     text: tab.exporter && tab.exporter.busy ? "取消导出" : "导出成片"
                     tone: "primary"
-                    enabled: !!tab.exporter && (tab.exporter.busy || tab.exporter.defaultOutputPath.length > 0)
+                    enabled: !tab.cropActive && !!tab.exporter && (tab.exporter.busy || tab.exporter.defaultOutputPath.length > 0)
+                    visible: !tab.cropActive
                     onClicked: {
                         if (!tab.exporter)
                             return
@@ -234,7 +259,7 @@ Item {
                 }
                 Text {
                     Layout.fillWidth: true
-                    visible: !!tab.exporter && tab.exporter.status.length > 0
+                    visible: !tab.cropActive && !!tab.exporter && tab.exporter.status.length > 0
                     text: tab.exporter ? tab.exporter.status : ""
                     color: tab.exporter && tab.exporter.error.length > 0 ? Theme.danger : Theme.textFaint
                     font.pixelSize: 10
@@ -248,6 +273,7 @@ Item {
         anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
         height: tab.timelineHeight
         controller: tab.controller
+        enabled: !tab.cropActive
         media: tab.session ? tab.session.media : null
         playing: player.playing
         canPlay: player.hasFrame && !player.loading

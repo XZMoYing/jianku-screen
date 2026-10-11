@@ -40,7 +40,7 @@ Item {
         screenshot: ["快捷截图", "全局快捷键与输出目录"]
     })
 
-    function setSlider(key, v) { page.store.setCurrent(key, v) }
+    function setSlider(key, v) { page.store.setInteractiveCurrent(key, v) }
 
     Rectangle {
         anchors.fill: parent
@@ -375,7 +375,7 @@ Item {
                     resetKeys: ["outputAspectRatio"]
                     UiSegmented {
                         Layout.fillWidth: true
-                        options: ["自动", "16:9", "16:10", "4:3", "1:1", "9:16", "21:9"]
+                        options: ["适合屏幕", "16:9", "16:10", "4:3", "1:1", "9:16", "21:9"]
                         currentIndex: Math.max(0, ["auto", "16:9", "16:10", "4:3", "1:1", "9:16", "21:9"].indexOf(String(page.store.current.outputAspectRatio)))
                         onActivated: i => page.store.setCurrent("outputAspectRatio", ["auto", "16:9", "16:10", "4:3", "1:1", "9:16", "21:9"][i])
                     }

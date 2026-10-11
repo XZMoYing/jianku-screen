@@ -1,0 +1,18 @@
+Detected locale "C" with character encoding "US-ASCII", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+Jianku hotkey registered "Meta+Shift+7"
+Jianku hotkey registered "Meta+Shift+8"
+Editor verification stage 1
+Editor verification stage 2
+Editor verification stage 3
+Editor verification stage 15
+Editor verification stage 16
+Editor verification stage 17
+Editor verification stage 18
+Editor verification stage 19
+Editor verification stage 20
+Editor verification stage 21
+Editor verification stage 22
+qt.core.qobject.connect: QObject::disconnect: Unexpected nullptr parameter

@@ -4,6 +4,7 @@
 #include "ExportController.h"
 #include "TimelineController.h"
 #include "TimelineMedia.h"
+#include "CropController.h"
 #include "../settings/SettingsStore.h"
 
 #include <QObject>
@@ -49,6 +50,7 @@ class EditorSession final : public QObject {
     Q_PROPERTY(QObject *exporter READ exporterObject CONSTANT)
     Q_PROPERTY(QObject *settings READ settingsObject CONSTANT)
     Q_PROPERTY(QObject *media READ mediaObject CONSTANT)
+    Q_PROPERTY(QObject *crop READ cropObject CONSTANT)
 
 public:
     ~EditorSession() override;
@@ -69,6 +71,8 @@ public:
     SettingsStore *settingsStore() { return &settings_; }
     QObject *mediaObject() { return &media_; }
     TimelineMedia *media() { return &media_; }
+    CropController *cropController() { return &crop_; }
+    QObject *cropObject() { return &crop_; }
     Q_INVOKABLE void revealProject();
 
     // Loads the recording and any saved edit. Returns false when the project cannot be
@@ -96,6 +100,7 @@ private:
     TimelineController timeline_;
     ExportController exporter_;
     SettingsStore settings_;
+    CropController crop_{&settings_};
     TimelineMedia media_;
 };
 

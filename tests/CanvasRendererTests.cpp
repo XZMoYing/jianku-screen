@@ -300,6 +300,26 @@ int main(int argc, char **argv) {
                 "planning from points instead of pixels doubles the radius ratio");
         }
 
+        // Cache hits may only reuse layers whose exact rendering inputs match.
+        {
+            auto style = canvasStyleFromMap(baseSettings()); style.shadowIntensity = .75; style.shadowBlur = 20;
+            const QSizeF size(320, 200);
+            auto previous = planCanvas(style, size, size);
+            for (int i = 0; i < 7; ++i) {
+                if (i == 0) style.paddingPercent = 18;
+                if (i == 1) style.radius = 24;
+                if (i == 2) style.insetSize = 8;
+                if (i == 3) style.shadowAngle = 30;
+                if (i == 4) style.shadowDistance = 15;
+                if (i == 5) style.shadowIntensity = .25;
+                if (i == 6) style.backgroundColor = QColor("#665544");
+                const auto cached = planCanvas(style, size, size, &previous);
+                const auto fresh = planCanvas(style, size, size);
+                require(cached.background == fresh.background && cached.shadow == fresh.shadow
+                    && renderCanvas(cached, Qt::blue) == renderCanvas(fresh, Qt::blue), "cached canvas is pixel-identical after every style change");
+                previous = cached;
+            }
+        }
         std::cout << "canvas renderer checks passed\n";
         return 0;
     } catch (const std::exception &error) {

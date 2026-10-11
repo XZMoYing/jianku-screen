@@ -63,6 +63,7 @@ class TimelineController final : public QObject {
     Q_PROPERTY(double snapTargetMs READ snapTargetMs NOTIFY snapChanged)
 
 public:
+    void historyBoundary() { historyKey_.clear(); }
     explicit TimelineController(QObject *parent = nullptr);
 
     bool loaded() const { return loaded_; }

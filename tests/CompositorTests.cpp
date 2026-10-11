@@ -335,6 +335,39 @@ int main(int argc, char **argv) {
             require(zoomedFrame != canvas, "the camera transform changes the frame");
         }
 
+        // Cropping samples original pixels even when the decoder hands us a
+        // smaller preview. Pointer events and manual targets remain in source space.
+        {
+            auto croppedProject = project;
+            croppedProject.settings["screenCrop"] = SourceCrop{.5, 0, .5, 1}.map();
+            croppedProject.settings["backgroundPaddingRatio"] = 0;
+            croppedProject.settings["windowBorderRadius"] = 0;
+            const auto cropped = makeComposeContext(croppedProject, {});
+            require(cropped.valid && cropped.width() == 500 && cropped.height() == 500, "automatic canvas uses cropped aspect");
+            require(cropped.project.sourceSize == project.sourceSize && cropped.sourceRect == QRectF(500, 0, 500, 500), "source decoder geometry stays unchanged");
+            QImage source(1000, 500, QImage::Format_ARGB32_Premultiplied); source.fill(Qt::blue);
+            for (int y = 0; y < 500; ++y) for (int x = 0; x < 500; ++x) source.setPixelColor(x, y, Qt::green);
+            const CursorPose in{750, 250, 1, 0, 1};
+            const auto without = composeFrame(cropped, source, {}, in, 1000, false);
+            require(without.pixelColor(100, 100) == QColor(Qt::blue), "cropped source draws right blue half");
+            const auto with = composeFrame(cropped, source, {}, in, 1000, true);
+            require(with.pixelColor(252, 252).red() > 200 && with != without, "cursor hotspot remapped into cropped pixels");
+            require(composeFrame(cropped, source, {}, {250, 250, 1, 0, 1}, 1000, true) == without, "cursor outside crop is hidden");
+            const auto half = makeComposeContext(croppedProject, {}, {}, 250);
+            const auto thumbnail = source.scaled(500, 250);
+            require(composeFrame(half, thumbnail, {}, in, 1000, false).pixelColor(50, 50) == QColor(Qt::blue), "downscaled preview samples same normalized crop");
+            Project::FocusClip focus{500, 1500, 2, 0, false}; focus.fixedPosition = true; focus.focusX = .75; focus.focusY = .5;
+            const auto target = AnimationSequence::cameraTargetFor(croppedProject, focus, 1000);
+            require(close(target.scale, 2) && close(target.offsetX, -250, .1) && close(target.offsetY, -250, .1), "manual focus translates original coordinates to crop centre");
+            focus.focusX = .1; const auto outside = AnimationSequence::cameraTargetFor(croppedProject, focus, 1000);
+            require(close(outside.offsetX, 0) && outside.offsetY >= -500 && outside.offsetY <= 0, "out-of-crop target clamps to retained edge");
+            croppedProject.settings["screenCrop"] = SourceCrop{.9, 0, .5, 1}.map();
+            require(!makeComposeContext(croppedProject, {}).valid, "invalid crop fails composition");
+            auto fullProject = project; fullProject.settings["screenCrop"] = SourceCrop{}.map();
+            require(composeFrame(makeComposeContext(fullProject, {}), source, {}, in, 1000, true)
+                == composeFrame(makeComposeContext(project, {}), source, {}, in, 1000, true), "full crop preserves existing pixel output");
+        }
+
         // --- animation sequence --------------------------------------------
         // Stepped at 60 fps like the real loop: the springs are causal, so
         // jumping straight to a later time would only show the old target.

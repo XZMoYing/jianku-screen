@@ -1,0 +1,9 @@
+Test project /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen/build
+    Start 14: editor-session
+1/2 Test #14: editor-session ...................   Passed    1.98 sec
+    Start 18: export-controller
+2/2 Test #18: export-controller ................   Passed    1.34 sec
+
+100% tests passed out of 2
+
+Total Test time (real) =   3.33 sec

@@ -28,10 +28,12 @@ Item {
                 required property var modelData
                 required property int index
                 Layout.fillWidth: true
+                Layout.preferredWidth: optionText.implicitWidth + 12
                 Layout.fillHeight: true
                 radius: Theme.radiusSm - 1
                 color: root.currentIndex === index ? Theme.cardBgHover : "transparent"
                 Text {
+                    id: optionText
                     anchors.centerIn: parent
                     text: modelData
                     color: root.currentIndex === index ? Theme.text : Theme.textDim

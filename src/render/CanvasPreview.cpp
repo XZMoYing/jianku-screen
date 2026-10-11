@@ -3,12 +3,14 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QFileInfo>
+#include <QPointer>
 #include <algorithm>
 #include <cmath>
 
 namespace Render {
 
 CanvasPreview::CanvasPreview(QObject *parent, const QString &imageProvider) : QObject(parent), imageProvider_(imageProvider) {
+    canvasPool_.setMaxThreadCount(1);
     // Built-in backgrounds: the bundle when running from one, else the source tree.
     const QString bundled = QDir(QCoreApplication::applicationDirPath())
         .filePath(QStringLiteral("../Resources/backgrounds"));
@@ -17,6 +19,29 @@ CanvasPreview::CanvasPreview(QObject *parent, const QString &imageProvider) : QO
     else
         backgroundRoot_ = QStringLiteral(JIANKU_SOURCE_DIR "/assets/backgrounds");
     update({}, sourceWidth_, sourceHeight_);
+}
+
+CanvasPreview::~CanvasPreview() { canvasPool_.waitForDone(); }
+
+void CanvasPreview::startCanvasBuild() {
+    if (building_ || !pending_) return;
+    building_ = true; pending_ = false;
+    const auto style = pendingStyle_; const auto crop = pendingCrop_;
+    const auto canvas = pendingCanvas_, content = pendingContent_;
+    const auto previous = plan_;
+    QPointer<CanvasPreview> self(this);
+    canvasPool_.start([self, style, crop, canvas, content, previous] {
+        const auto ready = planCanvas(style, canvas, content, &previous);
+        QMetaObject::invokeMethod(qApp, [self, ready, crop] {
+            if (!self) return;
+            self->building_ = false;
+            if (self->plan_.background.cacheKey() != ready.background.cacheKey()) ++self->backgroundRevision_;
+            if (self->plan_.shadow.cacheKey() != ready.shadow.cacheKey()) ++self->shadowRevision_;
+            self->plan_ = ready; self->style_ = ready.style; self->crop_ = crop;
+            emit self->changed();
+            self->startCanvasBuild();
+        }, Qt::QueuedConnection);
+    });
 }
 
 QRectF CanvasPreview::fraction(const QRectF &rect) const {
@@ -85,19 +110,25 @@ void CanvasPreview::update(const QVariantMap &settings, double sourceWidth, doub
     // a 1x display and is only a fallback: every real capture path passes both.
     pixelWidth_ = pixelWidth > 0.0 ? pixelWidth : sourceWidth_;
     pixelHeight_ = pixelHeight > 0.0 ? pixelHeight : sourceHeight_;
-    style_ = canvasStyleFromMap(settings, backgroundRoot_);
+    const auto style = canvasStyleFromMap(settings, backgroundRoot_);
+    const auto crop = sourceCropFromSettings(settings);
+    const auto contentSize = crop.pixels(QSizeF(pixelWidth_, pixelHeight_)).size();
 
     // Aspect ratio: the export picks its canvas from the source and the requested
     // ratio, and the preview has to show that same canvas. Built in *pixels* so the
     // absolute values in the style (radius, inset, shadow distance) mean the same
     // thing here as in the exported file; the preview scales the resulting fractions
     // down onto its own stage.
-    const QSizeF canvas = outputSize_.isValid() ? outputSize_ : canvasSizeForAspect(QSizeF(pixelWidth_, pixelHeight_),
+    const QSizeF canvas = outputSize_.isValid() ? outputSize_ : canvasSizeForAspect(contentSize,
         settings.value(QStringLiteral("outputAspectRatio"),
             QStringLiteral("auto")).toString());
-    plan_ = planCanvas(style_, canvas, QSizeF(pixelWidth_, pixelHeight_));
-    ++revision_;
-    emit changed();
+    if (!plan_.valid && !building_) {
+        style_ = style; crop_ = crop;
+        plan_ = planCanvas(style, canvas, contentSize);
+        ++backgroundRevision_; ++shadowRevision_; emit changed(); return;
+    }
+    pendingStyle_ = style; pendingCrop_ = crop; pendingCanvas_ = canvas; pendingContent_ = contentSize;
+    pending_ = true; startCanvasBuild();
 }
 
 void CanvasPreview::updateForOutput(const QVariantMap &settings, double sourceWidth, double sourceHeight,

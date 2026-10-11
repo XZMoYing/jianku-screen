@@ -4,6 +4,7 @@
 #include "CursorEngine.h"
 #include "LiveFocus.h"
 #include "SpringSolver.h"
+#include "../render/SourceCrop.h"
 
 #include <QElapsedTimer>
 #include <QImage>
@@ -163,6 +164,7 @@ private:
     bool keepZoomed_ = false;
     double idleMs_ = 3000.0;
     Animation::LiveFocus liveFocus_;
+    Render::SourceCrop crop_;
     double snapToEdgesRatio_ = 0.25;
 
     bool pressed_ = false;

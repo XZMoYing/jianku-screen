@@ -1,0 +1,88 @@
+{
+    "appearanceLatencyP95Ms": 16.172833,
+    "dragFps": 22.333333333333332,
+    "dragMetrics": {
+        "clockSamples": [
+        ],
+        "coalescedFrames": 0,
+        "composeMaxMs": 5.010209,
+        "composeTotalMs": 182.45062299999998,
+        "decodedFrames": 0,
+        "discardedFrames": 0,
+        "frames": 68,
+        "preparations": 0,
+        "scaleTotalMs": 0,
+        "seeks": 0
+    },
+    "dragMoves": 94,
+    "error": "",
+    "framesWhileDragging": 67,
+    "guiHeartbeatP95Ms": 10.324625,
+    "hasFrame": true,
+    "initialAspect": "16:9",
+    "initialPreviewHeight": 540,
+    "initialPreviewWidth": 960,
+    "interactiveSave": true,
+    "loading": false,
+    "ok": true,
+    "playbackDuringAppearance": {
+        "clockSamples": [
+            {
+                "nativeMs": 85.96248700000001,
+                "outputMs": 85.96248700000001,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 406.055362,
+                "outputMs": 406.055362,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 728.9203210000001,
+                "outputMs": 728.9203210000001,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 1221.004529,
+                "outputMs": 1221.004529,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 1603.97632,
+                "outputMs": 1603.97632,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 2050.2676530000003,
+                "outputMs": 2050.2676530000003,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 2444.517862,
+                "outputMs": 2444.517862,
+                "rate": 1,
+                "timeControlStatus": 2
+            }
+        ],
+        "coalescedFrames": 441,
+        "composeMaxMs": 43.912416,
+        "composeTotalMs": 946.9834989999999,
+        "decodedFrames": 82,
+        "discardedFrames": 0,
+        "frames": 79,
+        "preparations": 0,
+        "scaleTotalMs": 296.134877,
+        "seeks": 0
+    },
+    "playerError": "",
+    "playerFound": true,
+    "releaseToFinalFrameMs": 31,
+    "restoredFramePixelIdentical": true,
+    "stage": 32
+}

@@ -135,6 +135,9 @@ int main(int argc, char **argv) {
                 &app, [&](bool) { app.quit(); });
 
             controller.setProjectDirectory(root);
+            controller.setEditingSettings({{"outputAspectRatio", "auto"}, {"screenCrop", SourceCrop{0, 0, .5625, 1}.map()}});
+            require(controller.outputSizeLabel() == "180 × 180", "size label reads current crop and aspect together");
+            controller.setEditingSettings({});
             require(controller.defaultOutputPath() == root + "/composed.mp4",
                 "default output is composed.mp4 next to the project");
             require(controller.start(QString(), true, true, false, false), "export starts");
@@ -301,6 +304,22 @@ int main(int argc, char **argv) {
             const auto pixels = decode.readAllStandardOutput(); require(pixels.size() == 120 * 3, "all framing pixels decoded");
             require(uchar(pixels[0]) > uchar(pixels[2]) + 100, "unzoomed sample starts on red source half");
             require(uchar(pixels[72 * 3 + 2]) > uchar(pixels[72 * 3]) + 100, "settled manual camera focuses blue source half");
+
+            // The crop changes composition dimensions, never the byte size read
+            // from FFmpeg. Every frame should retain only the original blue half.
+            options.outputPath = root + "/cropped.mp4";
+            options.focusOverride = std::vector<Project::FocusClip>{};
+            options.settingsOverride = QVariantMap{{"screenCrop", SourceCrop{.5, 0, .5, 1}.map()},
+                {"outputAspectRatio", "auto"}, {"backgroundPaddingRatio", 0}, {"windowBorderRadius", 0},
+                {"shadowIntensity", 0}, {"windowInset", 0}, {"autoZoom", false}};
+            const auto cropped = composeProject(options);
+            if (!cropped.ok) std::cerr << cropped.error.toStdString() << '\n';
+            require(cropped.ok && cropped.width == 80 && cropped.height == 90 && cropped.encodedFrames == 120, "cropped export aspect and full frame count");
+            QProcess cropDecode;
+            cropDecode.start(ffmpegPath(), {"-v", "error", "-i", options.outputPath, "-vf", "scale=1:1", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"});
+            require(cropDecode.waitForFinished(30000) && cropDecode.exitCode() == 0, "decode real cropped video");
+            const auto cropPixels = cropDecode.readAllStandardOutput(); require(cropPixels.size() == 120 * 3, "all cropped frames decode");
+            for (int i = 0; i < 120; ++i) require(uchar(cropPixels[i * 3 + 2]) > uchar(cropPixels[i * 3]) + 100, "every cropped frame retains only source blue half");
         }
 
         std::cout << "export controller checks passed\n";

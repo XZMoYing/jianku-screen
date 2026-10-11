@@ -1,0 +1,22 @@
+{
+    "appearance": true,
+    "cropCancelGesture": true,
+    "cropConfirmationAtMinimumWindow": true,
+    "cropCornerAndMoveGestures": true,
+    "cropPixelInput": true,
+    "cropUndo": true,
+    "croppedFocusCanvasPickAndSave": true,
+    "croppedPreviewAndSourceInverse": true,
+    "editSave": true,
+    "error": "",
+    "firstFrame": true,
+    "hasFrame": true,
+    "loading": false,
+    "metalCropAndSameFrameUpdate": true,
+    "ok": true,
+    "playback": true,
+    "playerError": "",
+    "playerFound": true,
+    "rapidSeek": true,
+    "stage": 22
+}

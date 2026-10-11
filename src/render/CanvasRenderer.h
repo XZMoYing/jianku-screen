@@ -35,6 +35,7 @@ struct CanvasStyle {
     QColor gradientEnd;
     double gradientAngle = 135.0;
     QString backgroundImagePath;      // already resolved to a real file
+    qint64 backgroundImageModifiedMs = 0, backgroundImageBytes = 0;
     double backgroundBlur = 0.0;
 
     double paddingPercent = 0.0;
@@ -78,7 +79,8 @@ struct CanvasPlan {
 // `canvasSize` empty means "grow the canvas from the content" (quick screenshot);
 // otherwise the canvas is fixed and the content is contained inside it (preview,
 // export).
-CanvasPlan planCanvas(const CanvasStyle &style, const QSizeF &canvasSize, const QSizeF &contentSize);
+CanvasPlan planCanvas(const CanvasStyle &style, const QSizeF &canvasSize, const QSizeF &contentSize,
+    const CanvasPlan *previous = nullptr);
 
 // Draws the background and the shadow into `painter`, in canvas coordinates. The
 // caller draws the content and the per-frame layers on top.

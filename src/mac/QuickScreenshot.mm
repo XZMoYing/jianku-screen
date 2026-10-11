@@ -7,6 +7,7 @@
 #include "../capture/CaptureSource.h"
 
 #include "../render/CanvasRenderer.h"
+#include "../render/SourceCrop.h"
 
 #include <QDateTime>
 #include <QDir>
@@ -47,11 +48,13 @@ QImage imageFromCG(CGImageRef source) {
 QString saveComposed(const QImage &source, const QVariantMap &options, const QString &backgroundRoot) {
     if (source.isNull()) return QStringLiteral("截图为空");
     const Render::CanvasStyle style = Render::canvasStyleFromMap(options, backgroundRoot);
+    Render::SourceCrop crop;
+    if (options.contains("screenCrop") && !Render::readSourceCrop(options.value("screenCrop"), &crop)) return QStringLiteral("裁切参数无效");
+    const auto sample = crop.pixels(source.size());
     // No canvas size: the image grows to make room for the padding, which is the
     // one place the layout rule is solved from the content instead of the canvas.
     const Render::CanvasPlan plan = Render::planCanvas(style,
-        Render::canvasSizeForAspect(source.size(), options.value("outputAspectRatio", "auto").toString()),
-        QSizeF(source.width(), source.height()));
+        Render::canvasSizeForAspect(sample.size(), options.value("outputAspectRatio", "auto").toString()), sample.size());
     if (!plan.valid) return QStringLiteral("截图合成失败：") + plan.error;
 
     QImage result(plan.width(), plan.height(), QImage::Format_ARGB32_Premultiplied);
@@ -62,7 +65,7 @@ QString saveComposed(const QImage &source, const QVariantMap &options, const QSt
     Render::drawCanvasBackdrop(painter, plan);
     Render::beginFrame(painter, plan, QColor(QString::fromLatin1(Render::kFrameColor)));
     const QRectF content = plan.layout.contentRect.translated(-plan.layout.frameRect.topLeft());
-    painter.drawImage(content, source);
+    painter.drawImage(content, source, sample);
     Render::drawInsetBorder(painter, plan);
     Render::endFrame(painter, plan);
     painter.end();

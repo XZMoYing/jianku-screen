@@ -613,7 +613,7 @@ int main(int argc, char **argv) {
             TimelineController c; require(c.load(root) && c.splitAt(4000) && c.save(), "base edit schema");
             QFile file(root + "/edit.json"); require(file.open(QIODevice::ReadOnly), "read saved schema");
             const auto saved = QJsonDocument::fromJson(file.readAll()).object(); file.close();
-            for (const int version : {1, 2}) {
+            for (const int version : {1, 2, 3}) {
                 auto legacy = saved; legacy["schema"] = QString("jianku-edit/%1").arg(version); legacy["schemaVersion"] = version;
                 legacy.remove("focusTrack"); legacy.remove("appearance");
                 if (version == 1) {

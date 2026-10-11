@@ -1,11 +1,13 @@
 #pragma once
 
 #include "CanvasRenderer.h"
+#include "SourceCrop.h"
 
 #include <QObject>
 #include <QRectF>
 #include <QVariantMap>
 #include <QQuickImageProvider>
+#include <QThreadPool>
 
 namespace Render {
 
@@ -27,6 +29,7 @@ class CanvasPreview final : public QObject {
     // Stage fractions, all relative to the canvas (the output frame), 0..1.
     Q_PROPERTY(QRectF frameRect READ frameRect NOTIFY changed)
     Q_PROPERTY(QRectF contentRect READ contentRect NOTIFY changed)
+    Q_PROPERTY(QRectF sourceCropRect READ sourceCropRect NOTIFY changed)
     Q_PROPERTY(double radiusRatio READ radiusRatio NOTIFY changed)
     Q_PROPERTY(double insetRatio READ insetRatio NOTIFY changed)
     // Canvas aspect ratio (width / height) for the requested output ratio. This is the
@@ -59,10 +62,12 @@ class CanvasPreview final : public QObject {
 
 public:
     explicit CanvasPreview(QObject *parent = nullptr, const QString &imageProvider = "canvas");
+    ~CanvasPreview() override;
 
     bool valid() const { return plan_.valid; }
     QRectF frameRect() const { return fraction(plan_.layout.frameRect); }
     QRectF contentRect() const { return fraction(plan_.layout.contentRect); }
+    QRectF sourceCropRect() const { return crop_.normalizedRect(); }
     double radiusRatio() const;
     double insetRatio() const;
     double planAspect() const;
@@ -76,9 +81,9 @@ public:
     QColor insetColor() const { return style_.insetColor; }
     double insetAlpha() const { return style_.insetAlpha; }
     bool hasShadow() const { return style_.shadowIntensity > 0.001; }
-    QString backgroundSource() const { return "image://" + imageProvider_ + "/background?" + QString::number(revision_); }
+    QString backgroundSource() const { return "image://" + imageProvider_ + "/background?" + QString::number(backgroundRevision_); }
     QString shadowSource() const { return plan_.shadow.isNull() ? QString()
-        : "image://" + imageProvider_ + "/shadow?" + QString::number(revision_); }
+        : "image://" + imageProvider_ + "/shadow?" + QString::number(shadowRevision_); }
     QRectF shadowRect() const;
     QImage image(const QString &id) const { return id.startsWith("shadow") ? plan_.shadow : plan_.background; }
     double backgroundBlur() const;
@@ -114,9 +119,16 @@ private:
     QString backgroundRoot_;
     CanvasStyle style_;
     CanvasPlan plan_;
-    int revision_ = 0;
+    SourceCrop crop_;
+    int backgroundRevision_ = 0, shadowRevision_ = 0;
     QString imageProvider_;
     QSizeF outputSize_;
+    QThreadPool canvasPool_;
+    bool building_ = false, pending_ = false;
+    CanvasStyle pendingStyle_;
+    SourceCrop pendingCrop_;
+    QSizeF pendingCanvas_, pendingContent_;
+    void startCanvasBuild();
 };
 
 class CanvasImageProvider final : public QQuickImageProvider {

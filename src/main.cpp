@@ -106,10 +106,15 @@ int main(int argc, char *argv[]) {
     // recorder's own copy of them is only filled in when a recording starts, so a
     // fresh launch would otherwise search the default directory even after the user
     // changed it.
+    QString recentDirectory;
     auto refreshRecent = [&] {
         capture.setRecordingSettings(settings.current());
-        capture.refreshRecentProjects();
-        registry.setRecordingDirectory(settings.current().value("recordingDirectory").toString());
+        const QString directory = settings.current().value("recordingDirectory").toString();
+        if (directory != recentDirectory) {
+            recentDirectory = directory;
+            capture.refreshRecentProjects();
+            registry.setRecordingDirectory(directory);
+        }
     };
     QObject::connect(&settings, &SettingsStore::currentChanged, &capture, refreshRecent);
     QObject::connect(&app, &QGuiApplication::applicationStateChanged, &capture,

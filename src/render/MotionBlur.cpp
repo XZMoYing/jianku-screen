@@ -1,10 +1,10 @@
 #include "MotionBlur.h"
+#include "ParallelRows.h"
 
 #include <QtMath>
 #include <algorithm>
-#include <atomic>
 #include <cmath>
-#include <thread>
+
 #include <vector>
 
 namespace Render::MotionBlur {
@@ -23,35 +23,7 @@ double hashNoise(int x, int y) {
     return (h & 0xFFFFFFu) / double(0x1000000);
 }
 
-// Splits [0, height) into one contiguous range per worker and runs `body` on each.
-// The blur passes are pure per-pixel work over an 8 MP canvas, so they parallelise
-// trivially and this is the difference between a minute and ten for a long export.
-void parallelRows(int height, const std::function<void(int, int)> &body) {
-    const unsigned hardware = std::max(1u, std::thread::hardware_concurrency());
-    const int workers = static_cast<int>(std::min<unsigned>(hardware, static_cast<unsigned>(height)));
-    if (workers <= 1) {
-        body(0, height);
-        return;
-    }
-    // Rows are handed out in blocks rather than split once, so a machine with
-    // fewer free cores than advertised still finishes evenly.
-    const int block = std::max(1, height / (workers * 4));
-    std::atomic<int> next{0};
-    std::vector<std::thread> pool;
-    pool.reserve(static_cast<size_t>(workers));
-    for (int i = 0; i < workers; ++i) {
-        pool.emplace_back([&] {
-            while (true) {
-                const int begin = next.fetch_add(block);
-                if (begin >= height)
-                    return;
-                body(begin, std::min(height, begin + block));
-            }
-        });
-    }
-    for (std::thread &thread : pool)
-        thread.join();
-}
+using Detail::parallelRows;
 
 } // namespace
 
@@ -152,52 +124,30 @@ QPointF subtractParentMotion(const QPointF &child, const QPointF &parent) {
 double pixelNoise(int x, int y) { return hashNoise(x, y); }
 
 QImage accumulate(const QImage &layer, const std::vector<Sample> &samples) {
-    if (layer.isNull() || samples.empty())
-        return layer;
+    if (layer.isNull() || samples.empty()) return layer;
     const QImage source = layer.format() == QImage::Format_ARGB32_Premultiplied
         ? layer : layer.convertToFormat(QImage::Format_ARGB32_Premultiplied);
     QImage result(source.size(), QImage::Format_ARGB32_Premultiplied);
-    result.fill(Qt::transparent);
-
-    // Accumulate in floating point: summing premultiplied bytes with integer
-    // rounding loses the low bits of every partial sample, which shows up as a
-    // dark halo exactly where the blur is strongest.
     const int width = source.width(), height = source.height();
-    std::vector<double> sums(static_cast<size_t>(width) * height * 4, 0.0);
-    for (const Sample &sample : samples) {
-        if (sample.weight <= 0.0)
-            continue;
-        parallelRows(height, [&](int begin, int end) {
-            for (int y = begin; y < end; ++y) {
-                const int sy = y + sample.dy;
-                if (sy < 0 || sy >= height)
-                    continue;
-                const QRgb *row = reinterpret_cast<const QRgb *>(source.constScanLine(sy));
-                double *out = sums.data() + (static_cast<size_t>(y) * width) * 4;
-                for (int x = 0; x < width; ++x) {
-                    const int sx = x + sample.dx;
-                    if (sx < 0 || sx >= width)
-                        continue;
-                    const QRgb pixel = row[sx];
-                    double *cell = out + static_cast<size_t>(x) * 4;
-                    cell[0] += qAlpha(pixel) * sample.weight;
-                    cell[1] += qRed(pixel) * sample.weight;
-                    cell[2] += qGreen(pixel) * sample.weight;
-                    cell[3] += qBlue(pixel) * sample.weight;
-                }
-            }
-        });
-    }
+    const auto *input = source.constBits();
+    auto *output = result.bits(); // Detach once, before any worker touches pixels.
+    const auto inputStride = source.bytesPerLine(), outputStride = result.bytesPerLine();
     parallelRows(height, [&](int begin, int end) {
         for (int y = begin; y < end; ++y) {
-            QRgb *row = reinterpret_cast<QRgb *>(result.scanLine(y));
-            const double *in = sums.data() + (static_cast<size_t>(y) * width) * 4;
+            auto *row = reinterpret_cast<QRgb *>(output + y * outputStride);
             for (int x = 0; x < width; ++x) {
-                const double *cell = in + static_cast<size_t>(x) * 4;
-                row[x] = qRgba(static_cast<int>(std::lround(cell[1])),
-                    static_cast<int>(std::lround(cell[2])),
-                    static_cast<int>(std::lround(cell[3])),
-                    static_cast<int>(std::lround(cell[0])));
+                double alpha = 0, red = 0, green = 0, blue = 0;
+                // Preserve the former per-pixel accumulation order and doubles,
+                // including transparent out-of-bounds samples and byte rounding.
+                for (const auto &sample : samples) {
+                    const int sx = x + sample.dx, sy = y + sample.dy;
+                    if (sample.weight <= 0 || sx < 0 || sx >= width || sy < 0 || sy >= height) continue;
+                    const auto pixel = reinterpret_cast<const QRgb *>(input + sy * inputStride)[sx];
+                    alpha += qAlpha(pixel) * sample.weight; red += qRed(pixel) * sample.weight;
+                    green += qGreen(pixel) * sample.weight; blue += qBlue(pixel) * sample.weight;
+                }
+                row[x] = qRgba(int(std::lround(red)), int(std::lround(green)),
+                    int(std::lround(blue)), int(std::lround(alpha)));
             }
         }
     });
@@ -218,64 +168,35 @@ QImage applyZoom(const QImage &layer, const QPointF &centre, double strength, in
         ? layer : layer.convertToFormat(QImage::Format_ARGB32_Premultiplied);
     const int width = source.width(), height = source.height();
     QImage result(source.size(), QImage::Format_ARGB32_Premultiplied);
-    result.fill(Qt::transparent);
-
+    const auto *input = source.constBits();
+    auto *output = result.bits();
+    const auto inputStride = source.bytesPerLine(), outputStride = result.bytesPerLine();
     const double radius = std::clamp(strength, 0.0, 1.0);
-    std::vector<double> sums(static_cast<size_t>(width) * height * 4, 0.0);
-    std::vector<double> weights(static_cast<size_t>(width) * height, 0.0);
     parallelRows(height, [&](int begin, int end) {
         for (int y = begin; y < end; ++y) {
-            const QRgb *row = reinterpret_cast<const QRgb *>(source.constScanLine(y));
+            auto *row = reinterpret_cast<QRgb *>(output + y * outputStride);
             for (int x = 0; x < width; ++x) {
-                // Sample along the direction to the blur centre, with a stable
-                // per-pixel offset so the pattern does not crawl between frames.
                 const double dx = centre.x() - x, dy = centre.y() - y;
-                const double distance = std::hypot(dx, dy);
-                if (distance < 1e-6)
-                    continue;
-                const double offset = hashNoise(x, y);
-                double totalWeight = 0.0;
-                for (int t = 0; t < maxKernel; ++t) {
-                    const double percent = std::clamp((t + offset) / maxKernel, 0.0, 1.0) * radius;
-                    // 4*(p - p²): zero at both ends, peaked in the middle, so the
-                    // smear fades out instead of ending in a hard edge.
-                    const double weight = 4.0 * (percent - percent * percent);
-                    if (weight <= 0.0)
-                        continue;
-                    const int sx = static_cast<int>(std::lround(x + dx * percent));
-                    const int sy = static_cast<int>(std::lround(y + dy * percent));
-                    if (sx < 0 || sx >= width || sy < 0 || sy >= height)
-                        continue;
-                    const QRgb pixel = reinterpret_cast<const QRgb *>(source.constScanLine(sy))[sx];
-                    double *cell = sums.data() + (static_cast<size_t>(y) * width + x) * 4;
-                    cell[0] += qAlpha(pixel) * weight;
-                    cell[1] += qRed(pixel) * weight;
-                    cell[2] += qGreen(pixel) * weight;
-                    cell[3] += qBlue(pixel) * weight;
-                    totalWeight += weight;
+                double alpha = 0, red = 0, green = 0, blue = 0, totalWeight = 0;
+                if (std::hypot(dx, dy) >= 1e-6) {
+                    const double offset = hashNoise(x, y);
+                    for (int t = 0; t < maxKernel; ++t) {
+                        const double percent = std::clamp((t + offset) / maxKernel, 0.0, 1.0) * radius;
+                        const double weight = 4.0 * (percent - percent * percent);
+                        if (weight <= 0) continue;
+                        const int sx = int(std::lround(x + dx * percent));
+                        const int sy = int(std::lround(y + dy * percent));
+                        if (sx < 0 || sx >= width || sy < 0 || sy >= height) continue;
+                        const auto pixel = reinterpret_cast<const QRgb *>(input + sy * inputStride)[sx];
+                        alpha += qAlpha(pixel) * weight; red += qRed(pixel) * weight;
+                        green += qGreen(pixel) * weight; blue += qBlue(pixel) * weight;
+                        totalWeight += weight;
+                    }
                 }
-                if (totalWeight > 0.0)
-                    weights[static_cast<size_t>(y) * width + x] = totalWeight;
-            }
-        }
-    });
-    parallelRows(height, [&](int begin, int end) {
-        for (int y = begin; y < end; ++y) {
-            QRgb *row = reinterpret_cast<QRgb *>(result.scanLine(y));
-            for (int x = 0; x < width; ++x) {
-                const size_t index = static_cast<size_t>(y) * width + x;
-                const double weight = weights[index];
-                const double *cell = sums.data() + index * 4;
-                if (weight <= 0.0) {
-                    // No valid sample (a pixel sitting on the blur centre): keep
-                    // the original instead of leaving a transparent hole.
-                    row[x] = reinterpret_cast<const QRgb *>(source.constScanLine(y))[x];
-                    continue;
-                }
-                row[x] = qRgba(static_cast<int>(std::lround(cell[1] / weight)),
-                    static_cast<int>(std::lround(cell[2] / weight)),
-                    static_cast<int>(std::lround(cell[3] / weight)),
-                    static_cast<int>(std::lround(cell[0] / weight)));
+                row[x] = totalWeight > 0
+                    ? qRgba(int(std::lround(red / totalWeight)), int(std::lround(green / totalWeight)),
+                        int(std::lround(blue / totalWeight)), int(std::lround(alpha / totalWeight)))
+                    : reinterpret_cast<const QRgb *>(input + y * inputStride)[x];
             }
         }
     });

@@ -73,6 +73,9 @@ void AnimationDriver::setSettings(const QVariantMap &settings) {
     cursorSettings_ = resolved.cursor;
     screenSpring_ = resolved.screenSpring;
     autoZoomEnabled_ = resolved.autoZoom;
+    const auto crop = Render::sourceCropFromSettings(settings);
+    if (crop.normalizedRect() != crop_.normalizedRect()) liveFocus_.reset();
+    crop_ = crop;
     const QString mode = settings.value("presentationFocusMode",
         autoZoomEnabled_ ? "auto" : "manual").toString();
     if (mode != focusMode_ || keepZoomed_ != settings.value("alwaysKeepZoomedIn", false).toBool()) liveFocus_.reset();
@@ -130,7 +133,8 @@ double AnimationDriver::cursorYPoints() const {
 void AnimationDriver::setManualZoom(bool zoomed) {
     if (focusMode_ == "off") return;
     liveFocus_.setManual(zoomed);
-    liveFocus_.setFocus({cursorX_ / sourcePixelWidth(), cursorY_ / sourcePixelHeight()});
+    liveFocus_.setFocus({std::clamp((cursorX_ / sourcePixelWidth() - crop_.x) / crop_.width, 0.0, 1.0),
+        std::clamp((cursorY_ / sourcePixelHeight() - crop_.y) / crop_.height, 0.0, 1.0)});
 }
 
 void AnimationDriver::toggleManualZoom() { setManualZoom(!liveFocus_.zoomed()); }
@@ -183,6 +187,11 @@ void AnimationDriver::tick() {
     const bool inside = x >= 0 && x <= sourcePixelWidth() && y >= 0 && y <= sourcePixelHeight();
     x = std::clamp(x, 0.0, sourcePixelWidth());
     y = std::clamp(y, 0.0, sourcePixelHeight());
+    const bool insideCrop = inside && crop_.normalizedRect().contains(QPointF(x / sourcePixelWidth(), y / sourcePixelHeight()));
+    const Animation::FocusPoint croppedFocus{
+        std::clamp((x / sourcePixelWidth() - crop_.x) / crop_.width, 0.0, 1.0),
+        std::clamp((y / sourcePixelHeight() - crop_.y) / crop_.height, 0.0, 1.0)};
+    const double croppedWidth = contentWidth_ * crop_.width, croppedHeight = contentHeight_ * crop_.height;
 
     const bool first = lastX_ < 0.0;
     const bool moved = first || std::abs(x - lastX_) > 0.01 || std::abs(y - lastY_) > 0.01;
@@ -202,7 +211,7 @@ void AnimationDriver::tick() {
     cursorX_ = pose.x;
     cursorY_ = pose.y;
     cursorRotation_ = pose.rotationDeg;
-    cursorAlpha_ = inside ? pose.alpha : 0.0;
+    cursorAlpha_ = insideCrop ? pose.alpha : 0.0;
     // Press shrink: hold at clickScale while any button is down, spring back on release.
     pressSpring_.setTargetValue(pressed_ && cursorSettings_.clickScaleEnabled ? cursorSettings_.clickScale : 1.0);
     if (dt > 0.0)
@@ -213,16 +222,16 @@ void AnimationDriver::tick() {
     // camera returns to identity smoothly as the zoom ends.
     if (keepZoomed_ && focusMode_ != "off" && !liveFocus_.zoomed()) {
         liveFocus_.setManual(true);
-        liveFocus_.setFocus({x / sourcePixelWidth(), y / sourcePixelHeight()});
+        liveFocus_.setFocus(croppedFocus);
     }
-    liveFocus_.update(nowMs_, {x / sourcePixelWidth(), y / sourcePixelHeight()},
-        contentWidth_, contentHeight_, sample.pressed, sample.interactionActivity, inside,
+    liveFocus_.update(nowMs_, croppedFocus,
+        croppedWidth, croppedHeight, sample.pressed, sample.interactionActivity, insideCrop,
         focusMode_ == "auto", zoomLevel_);
     const bool zoomed = focusMode_ != "off" && (liveFocus_.zoomed() || keepZoomed_);
     zoomFocus_ = liveFocus_.focus();
     zoomTarget_ = zoomed ? zoomLevel_ : 1.0;
     const Animation::ScreenTransform transform = Animation::AutoFocusEngine::transformFor(zoomFocus_,
-        zoomTarget_, contentWidth_, contentHeight_, contentWidth_, contentHeight_, snapToEdgesRatio_);
+        zoomTarget_, croppedWidth, croppedHeight, croppedWidth, croppedHeight, snapToEdgesRatio_);
     camScaleSpring_.setTargetValue(transform.scale);
     camXSpring_.setTargetValue(transform.offsetX);
     camYSpring_.setTargetValue(transform.offsetY);

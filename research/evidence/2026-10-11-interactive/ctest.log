@@ -1,0 +1,43 @@
+Test project /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen/build-performance
+      Start  1: source-crop
+      Start  2: live-focus
+ 1/19 Test  #1: source-crop ......................   Passed    0.35 sec
+      Start  3: timeline-boundaries
+ 2/19 Test  #2: live-focus .......................   Passed    0.56 sec
+      Start  4: spring-solver
+ 3/19 Test  #3: timeline-boundaries ..............   Passed    0.47 sec
+      Start  5: cursor-engine
+ 4/19 Test  #4: spring-solver ....................   Passed    0.51 sec
+      Start  6: auto-focus
+ 5/19 Test  #5: cursor-engine ....................   Passed    0.54 sec
+      Start  7: media-clock
+ 6/19 Test  #6: auto-focus .......................   Passed    0.52 sec
+      Start  8: canvas-layout
+ 7/19 Test  #7: media-clock ......................   Passed    0.47 sec
+      Start  9: capture-source
+ 8/19 Test  #8: canvas-layout ....................   Passed    0.50 sec
+      Start 10: canvas-renderer
+ 9/19 Test  #9: capture-source ...................   Passed    0.47 sec
+      Start 11: edit-timeline
+10/19 Test #11: edit-timeline ....................   Passed    0.50 sec
+      Start 12: timeline-strip
+11/19 Test #10: canvas-renderer ..................   Passed    0.87 sec
+      Start 13: timeline-geometry
+12/19 Test #13: timeline-geometry ................   Passed    0.40 sec
+      Start 14: editor-session
+13/19 Test #12: timeline-strip ...................   Passed    1.46 sec
+      Start 15: motion-blur
+14/19 Test #15: motion-blur ......................   Passed    0.40 sec
+      Start 16: compositor
+15/19 Test #16: compositor .......................   Passed    0.34 sec
+      Start 17: preview-render
+16/19 Test #14: editor-session ...................   Passed    2.10 sec
+      Start 18: timeline-controller
+17/19 Test #18: timeline-controller ..............   Passed    0.38 sec
+      Start 19: export-controller
+18/19 Test #17: preview-render ...................   Passed    0.91 sec
+19/19 Test #19: export-controller ................   Passed    1.87 sec
+
+100% tests passed out of 19
+
+Total Test time (real) =   7.71 sec

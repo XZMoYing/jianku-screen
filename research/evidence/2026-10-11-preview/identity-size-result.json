@@ -1,0 +1,487 @@
+{
+    "asyncPlaybackRapidSeek": true,
+    "editedPlaybackReachedEnd": true,
+    "error": "",
+    "hasFrame": true,
+    "loading": false,
+    "ok": true,
+    "performance": {
+        "canvasHeight": 540,
+        "canvasWidth": 960,
+        "clockSamples": [
+            {
+                "nativeMs": 119.44206,
+                "outputMs": 119.44206,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 360.33610100000004,
+                "outputMs": 360.33610100000004,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 599.572143,
+                "outputMs": 599.572143,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 840.0902679999999,
+                "outputMs": 840.0902679999999,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 1080.351684,
+                "outputMs": 1080.351684,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 1320.071768,
+                "outputMs": 1320.071768,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 1559.6187260000002,
+                "outputMs": 1559.6187260000002,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 1799.919059,
+                "outputMs": 1799.919059,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 2039.7509349999998,
+                "outputMs": 2039.7509349999998,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 2280.091393,
+                "outputMs": 2280.091393,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 2519.729601,
+                "outputMs": 2519.729601,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 2760.093684,
+                "outputMs": 2760.093684,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 2999.9530170000003,
+                "outputMs": 2999.9530170000003,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 3240.112225,
+                "outputMs": 3240.112225,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 3484.432226,
+                "outputMs": 3484.432226,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 3720.162684,
+                "outputMs": 3720.162684,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 3960.107018,
+                "outputMs": 3960.107018,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 4200.158518,
+                "outputMs": 4200.158518,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 4439.691018,
+                "outputMs": 4439.691018,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 4680.225351,
+                "outputMs": 4680.225351,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 4919.834142,
+                "outputMs": 4919.834142,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 5159.727392,
+                "outputMs": 5159.727392,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 5400.572352,
+                "outputMs": 5400.572352,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 5639.776476999999,
+                "outputMs": 5639.776476999999,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 5879.947227,
+                "outputMs": 5879.947227,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 6119.826977,
+                "outputMs": 6119.826977,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 6360.087018,
+                "outputMs": 6360.087018,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 6600.637101,
+                "outputMs": 6600.637101,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 6840.2845179999995,
+                "outputMs": 6840.2845179999995,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 7079.739101,
+                "outputMs": 7079.739101,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 7320.257393000001,
+                "outputMs": 7320.257393000001,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 7560.274934,
+                "outputMs": 7560.274934,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 7799.8580170000005,
+                "outputMs": 7799.8580170000005,
+                "rate": 1,
+                "timeControlStatus": 2
+            }
+        ],
+        "coalescedFrames": 0,
+        "composeMaxMs": 17.260875,
+        "composeTotalMs": 3458.2312129999987,
+        "decodedFrames": 478,
+        "deliveredFps": 59.28853754940712,
+        "deliveredFrames": 480,
+        "deliveryMaxMs": 118.6575,
+        "deliveryMedianMs": 16.198042,
+        "deliveryP95Ms": 24.086334,
+        "discardedFrames": 0,
+        "elapsedMs": 8096,
+        "finalSourceMs": 7968.308809,
+        "frames": 486,
+        "guiHeartbeatMaxMs": 14.804917,
+        "guiHeartbeatP95Ms": 9.079333,
+        "scaleTotalMs": 81.445011,
+        "seeks": 0,
+        "steadyDeliveredFps": 60.174746335963924,
+        "swapP95Ms": 19.208708
+    },
+    "playerError": "",
+    "playerFound": true,
+    "reorderedAndSpeedPlayback": {
+        "clockSamples": [
+            {
+                "nativeMs": 3124.877755,
+                "outputMs": 124.87775499999998,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 3365.0282549999997,
+                "outputMs": 365.0282549999997,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 3605.037213,
+                "outputMs": 605.0372130000001,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 3849.150338,
+                "outputMs": 849.1503379999999,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 4086.0504630000005,
+                "outputMs": 1086.0504630000005,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 4326.074337999999,
+                "outputMs": 1326.0743379999994,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 4565.046630000001,
+                "outputMs": 1565.0466300000007,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 4806.162504999999,
+                "outputMs": 1806.1625049999993,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 5048.907046,
+                "outputMs": 2048.9070460000003,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 5285.773588,
+                "outputMs": 2285.773588,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 5525.252588,
+                "outputMs": 2525.2525880000003,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 5766.17463,
+                "outputMs": 2766.1746300000004,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 6006.31688,
+                "outputMs": 3006.3168800000003,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 6247.671880000001,
+                "outputMs": 3247.671880000001,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 6485.567588,
+                "outputMs": 3485.567588,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 6724.7130879999995,
+                "outputMs": 3724.7130879999995,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 6965.022796,
+                "outputMs": 3965.022796,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 7205.704672000001,
+                "outputMs": 4205.704672000001,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 7447.935172,
+                "outputMs": 4447.935172,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 7685.599464,
+                "outputMs": 4685.599464,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 7925.920006,
+                "outputMs": 4925.920006,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 8165.706588000001,
+                "outputMs": 5165.706588000001,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 8407.486213,
+                "outputMs": 5407.486213,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 8646.480922,
+                "outputMs": 5646.480922000001,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 8885.562047000001,
+                "outputMs": 5885.562047000001,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 9126.171755,
+                "outputMs": 6126.171754999999,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 9366.103547,
+                "outputMs": 6366.103547000001,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 9605.84513,
+                "outputMs": 6605.84513,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 9848.199296,
+                "outputMs": 6848.199296000001,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 0,
+                "outputMs": 7000,
+                "rate": 2,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 457.01857,
+                "outputMs": 7228.509285,
+                "rate": 2,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 938.2239020000001,
+                "outputMs": 7469.111951,
+                "rate": 2,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 1234.318008,
+                "outputMs": 7734.318008,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 1474.279008,
+                "outputMs": 7974.2790079999995,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 1714.376216,
+                "outputMs": 8214.376216,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 1955.2073830000002,
+                "outputMs": 8455.207383,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 2194.328133,
+                "outputMs": 8694.328132999999,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 2434.3127170000002,
+                "outputMs": 8934.312717,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 2674.574008,
+                "outputMs": 9174.574008,
+                "rate": 1,
+                "timeControlStatus": 2
+            },
+            {
+                "nativeMs": 2914.4235909999998,
+                "outputMs": 9414.423590999999,
+                "rate": 1,
+                "timeControlStatus": 2
+            }
+        ],
+        "coalescedFrames": 0,
+        "composeMaxMs": 17.843166,
+        "composeTotalMs": 4279.197374000003,
+        "decodedFrames": 593,
+        "discardedFrames": 1,
+        "frames": 580,
+        "scaleTotalMs": 99.61178600000004,
+        "seeks": 1
+    },
+    "restartAfterEnd": true,
+    "stage": 27
+}

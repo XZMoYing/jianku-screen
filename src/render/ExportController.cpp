@@ -42,6 +42,9 @@ void ExportController::setProjectDirectory(const QString &directory) {
         return;
     if (!busy_) reset();
     projectDirectory_ = directory;
+    const auto project = loadProject(directory);
+    sourceSize_ = project.valid ? project.sourceSize : QSizeF{};
+    recordedSettings_ = project.settings;
     const QString next = directory.isEmpty() ? QString()
         : QDir(directory).filePath(QStringLiteral("composed.mp4"));
     if (defaultOutputPath_ != next) {
@@ -186,17 +189,14 @@ void ExportController::setExportHeight(int height) {
 }
 
 QString ExportController::outputSizeLabel() const {
-    if (projectDirectory_.isEmpty())
-        return {};
-    QString loadError;
-    const ProjectData project = loadProject(projectDirectory_, &loadError);
-    if (!project.valid)
+    if (projectDirectory_.isEmpty() || !sourceSize_.isValid())
         return {};
     // The same two steps the export takes, so the label cannot disagree with the file:
     // the shape comes from the project's aspect ratio, the pixel count from here.
+    const auto &settings = editingSettings_.isEmpty() ? recordedSettings_ : editingSettings_;
     const QSizeF canvas = canvasSizeForResolution(
-        canvasSizeForAspect(project.sourceSize,
-            project.settings.value(QStringLiteral("outputAspectRatio")).toString()),
+        canvasSizeForAspect(sourceCropFromSettings(settings).pixels(sourceSize_).size(),
+            settings.value(QStringLiteral("outputAspectRatio")).toString()),
         exportHeight_);
     return QStringLiteral("%1 × %2").arg(int(canvas.width())).arg(int(canvas.height()));
 }

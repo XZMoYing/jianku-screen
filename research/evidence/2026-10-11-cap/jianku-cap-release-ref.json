@@ -1,0 +1,10 @@
+{
+  "ref": "refs/tags/cap-v0.6.0",
+  "node_id": "REF_kwDOKu2F57RyZWZzL3RhZ3MvY2FwLXYwLjYuMA",
+  "url": "https://api.github.com/repos/CapSoftware/Cap/git/refs/tags/cap-v0.6.0",
+  "object": {
+    "sha": "6cfdd172cd53b1d6861852288c2192a8ab743687",
+    "type": "commit",
+    "url": "https://api.github.com/repos/CapSoftware/Cap/git/commits/6cfdd172cd53b1d6861852288c2192a8ab743687"
+  }
+}

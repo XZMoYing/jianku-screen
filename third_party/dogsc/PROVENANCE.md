@@ -11,6 +11,10 @@ EditorTimelineMagneticSnap.swift 原样保存用于核对；src/render/TimelineM
 
 第二项算法复用：`TimelineMap.swift` 原样保存；`src/project/FocusTrack.h` 使用其 `outputStart + (sourceTime - sourceStart) / playbackRate` 公式，按保留片段求交并分别输出焦点区间。时间单位由秒转换为毫秒，返回 Qt/本项目结构，允许本项目已有的主片段重排；不复制 DogSC 的光标插值或镜头求解器。原文件来自 `Sources/RecorderCore/TimelineMap.swift`，与上述锁定提交一致。
 
+第三项算法复用：`NormalizedCrop.swift` 保存 `Sources/RecorderCore/ProjectModel.swift` 第 760–811 行的原始结构；`CropGestures.swift` 保存 `Sources/DogSCApp/EditorCanvasPreview.swift` 第 748–815 行的原始移动、八个边缘/角点缩放方法。`src/render/SourceCrop.h` 将归一化裁切、移动边界和对边锚定迁移到 C++，保留 2% 尺寸下限及拖动时的 24 源像素下限；增加非有限值/类型校验。`CropController` 将选框边缘对齐到原始像素，维护确认/取消草稿，使用本项目统一历史。原始片段与上述提交一致，适用同一 MIT 许可。
+
+裁切工作流参考 `EditorCropPresentation.swift` 与 `EditorViewCropAndPreset.swift`：暂停、独立草稿、复位、确认和取消。Qt 界面与源坐标/画布坐标映射由本项目实现；采集不裁掉原始录制，预览、导出和截图按同一归一化范围取样。既有弹簧、光标姿态与点击反馈未替换。
+
 编辑器迁移依据（界面与工作流参考，相关 Qt 实现见功能台账）：
 
 - `EditorTimelinePrimaryEditing.swift`：主片段分割、裁剪、重排、变速与剪切恢复。

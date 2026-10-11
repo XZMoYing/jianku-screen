@@ -1,0 +1,2 @@
+designated => identifier "com.jianku.screen" and certificate leaf = H"ef95db66644426e05fb46fff7d413aee222fe764"
+Executable=/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen/build-release/试用/0.1.4/Jianku Screen.app/Contents/MacOS/Jianku Screen

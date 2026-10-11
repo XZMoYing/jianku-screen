@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "retrieved_at": "2026-10-11",
+  "repository": "https://github.com/CapSoftware/Cap",
+  "release": "cap-v0.6.0",
+  "commit": "6cfdd172cd53b1d6861852288c2192a8ab743687",
+  "main_cross_check_commit": "a32e4806b3004071effe00243e1dabd52bc7068c",
+  "status": "static_source_analysis_not_app_output_validation",
+  "files": [
+    {
+      "path": "cap-v0.6.0/LICENSE",
+      "original_path": "LICENSE",
+      "sha256": "146364c489e69407a2deaf7621a872339bde0be46d8db6495a51f3d63d95c8dc",
+      "bytes": 34972,
+      "url": "https://github.com/CapSoftware/Cap/blob/6cfdd172cd53b1d6861852288c2192a8ab743687/LICENSE"
+    },
+    {
+      "path": "cap-v0.6.0/crates/rendering/Cargo.toml",
+      "original_path": "crates/rendering/Cargo.toml",
+      "sha256": "014920302bb048f02f719160ba594d11e8d8e5c09b95b604ccaf605aa02e806b",
+      "bytes": 1920,
+      "url": "https://github.com/CapSoftware/Cap/blob/6cfdd172cd53b1d6861852288c2192a8ab743687/crates/rendering/Cargo.toml"
+    },
+    {
+      "path": "cap-v0.6.0/crates/rendering/src/spring_mass_damper.rs",
+      "original_path": "crates/rendering/src/spring_mass_damper.rs",
+      "sha256": "7bdd77751d7e7f3c0971aa49d3b8c83f889c16adc9c341d81ef636698a7526a6",
+      "bytes": 4592,
+      "url": "https://github.com/CapSoftware/Cap/blob/6cfdd172cd53b1d6861852288c2192a8ab743687/crates/rendering/src/spring_mass_damper.rs"
+    },
+    {
+      "path": "cap-v0.6.0/crates/rendering/src/cursor_interpolation.rs",
+      "original_path": "crates/rendering/src/cursor_interpolation.rs",
+      "sha256": "05ea47b4a502dde2afe115594675970646ac2e7c8cc2f2c36d6d58de0ebb0ca0",
+      "bytes": 53857,
+      "url": "https://github.com/CapSoftware/Cap/blob/6cfdd172cd53b1d6861852288c2192a8ab743687/crates/rendering/src/cursor_interpolation.rs"
+    },
+    {
+      "path": "cap-v0.6.0/crates/rendering/src/zoom_spring.rs",
+      "original_path": "crates/rendering/src/zoom_spring.rs",
+      "sha256": "2e4f91fa6c48f36ef44dbe8053bc25c2b43129d44a5e25f5b7066847e7c8b32a",
+      "bytes": 84979,
+      "url": "https://github.com/CapSoftware/Cap/blob/6cfdd172cd53b1d6861852288c2192a8ab743687/crates/rendering/src/zoom_spring.rs"
+    },
+    {
+      "path": "cap-v0.6.0/crates/rendering/src/zoom.rs",
+      "original_path": "crates/rendering/src/zoom.rs",
+      "sha256": "587d5a9bda095107ff34fbe18bbb5d1f38c6ce81c156de06df4e5e92f82d9a57",
+      "bytes": 8306,
+      "url": "https://github.com/CapSoftware/Cap/blob/6cfdd172cd53b1d6861852288c2192a8ab743687/crates/rendering/src/zoom.rs"
+    },
+    {
+      "path": "cap-v0.6.0/crates/rendering/src/lib.rs",
+      "original_path": "crates/rendering/src/lib.rs",
+      "sha256": "eee3106f0e88138847f1c2878c6c09409992cf14747e95b95340b8997a8573c9",
+      "bytes": 333202,
+      "url": "https://github.com/CapSoftware/Cap/blob/6cfdd172cd53b1d6861852288c2192a8ab743687/crates/rendering/src/lib.rs"
+    },
+    {
+      "path": "cap-v0.6.0/crates/rendering/src/layers/cursor.rs",
+      "original_path": "crates/rendering/src/layers/cursor.rs",
+      "sha256": "55e7f6519216057ab8f158f93abf575a5e839d335a0f27bd58135325ea01b3be",
+      "bytes": 48531,
+      "url": "https://github.com/CapSoftware/Cap/blob/6cfdd172cd53b1d6861852288c2192a8ab743687/crates/rendering/src/layers/cursor.rs"
+    },
+    {
+      "path": "cap-v0.6.0/crates/rendering/src/shaders/cursor.wgsl",
+      "original_path": "crates/rendering/src/shaders/cursor.wgsl",
+      "sha256": "978918bfca49ff83d317973ecd47fb62b58a6c0e176b4caf6ac01ad5bd582725",
+      "bytes": 8419,
+      "url": "https://github.com/CapSoftware/Cap/blob/6cfdd172cd53b1d6861852288c2192a8ab743687/crates/rendering/src/shaders/cursor.wgsl"
+    },
+    {
+      "path": "cap-v0.6.0/crates/rendering/src/shaders/composite-video-frame.wgsl",
+      "original_path": "crates/rendering/src/shaders/composite-video-frame.wgsl",
+      "sha256": "bed896f718929177aa2b1d6c1aa29abdb5c94b2b55eb6f5a0fa847af62586762",
+      "bytes": 21069,
+      "url": "https://github.com/CapSoftware/Cap/blob/6cfdd172cd53b1d6861852288c2192a8ab743687/crates/rendering/src/shaders/composite-video-frame.wgsl"
+    },
+    {
+      "path": "cap-v0.6.0/crates/project/src/configuration.rs",
+      "original_path": "crates/project/src/configuration.rs",
+      "sha256": "2d08fc441d6591a6df20f6b57fbb2a6607fcfde0071b9c744ce72070da3f4dfc",
+      "bytes": 154517,
+      "url": "https://github.com/CapSoftware/Cap/blob/6cfdd172cd53b1d6861852288c2192a8ab743687/crates/project/src/configuration.rs"
+    },
+    {
+      "path": "cap-v0.6.0/apps/desktop/src-tauri/src/recording.rs",
+      "original_path": "apps/desktop/src-tauri/src/recording.rs",
+      "sha256": "3e40d29159652e82dd3587fee3e3cc23e3d670f201e87dc0e6e79fede6cec4e4",
+      "bytes": 385152,
+      "url": "https://github.com/CapSoftware/Cap/blob/6cfdd172cd53b1d6861852288c2192a8ab743687/apps/desktop/src-tauri/src/recording.rs"
+    },
+    {
+      "path": "cap-v0.6.0/apps/desktop/package.json",
+      "original_path": "apps/desktop/package.json",
+      "sha256": "7514ec27580734319d02badde35d00f5c024111e25ab50bb8698909ae9fab53e",
+      "bytes": 3931,
+      "url": "https://github.com/CapSoftware/Cap/blob/6cfdd172cd53b1d6861852288c2192a8ab743687/apps/desktop/package.json"
+    }
+  ],
+  "screen_studio_reference": {
+    "version": "3.7.5-4595",
+    "locator_manifest": "../2026-09-30-official-3.7.5/animation-chain-locators.json",
+    "entries": [
+      {
+        "path": "dist/D4qqfDv_.js",
+        "sha256": "11f9c00d21a02028469a261ed35eaeca2997427d87aadbea96b07d8406d145ca"
+      },
+      {
+        "path": "dist/5NxSBPmq.js",
+        "sha256": "e4d1e27f35d85a1e6038f28930655702e46bf7f46919f48346f0a027dd850efd"
+      }
+    ]
+  },
+  "screen_studio_additional_locators": [
+    {
+      "entry": "D4qqfDv_.js",
+      "search_token": "cursorRotateOnXMovementRatio",
+      "offset_bytes": 984585,
+      "sha256": "11f9c00d21a02028469a261ed35eaeca2997427d87aadbea96b07d8406d145ca"
+    },
+    {
+      "entry": "5NxSBPmq.js",
+      "search_token": "function O2(",
+      "offset_bytes": 1657436,
+      "sha256": "e4d1e27f35d85a1e6038f28930655702e46bf7f46919f48346f0a027dd850efd"
+    },
+    {
+      "entry": "5NxSBPmq.js",
+      "search_token": "function OA(",
+      "offset_bytes": 2158860,
+      "sha256": "e4d1e27f35d85a1e6038f28930655702e46bf7f46919f48346f0a027dd850efd"
+    },
+    {
+      "entry": "5NxSBPmq.js",
+      "search_token": "ok=",
+      "offset_bytes": 2161811,
+      "sha256": "e4d1e27f35d85a1e6038f28930655702e46bf7f46919f48346f0a027dd850efd"
+    },
+    {
+      "entry": "5NxSBPmq.js",
+      "search_token": "function sG(",
+      "offset_bytes": 1660809,
+      "sha256": "e4d1e27f35d85a1e6038f28930655702e46bf7f46919f48346f0a027dd850efd"
+    },
+    {
+      "entry": "5NxSBPmq.js",
+      "search_token": "class nZ",
+      "offset_bytes": 2192505,
+      "sha256": "e4d1e27f35d85a1e6038f28930655702e46bf7f46919f48346f0a027dd850efd"
+    }
+  ],
+  "research_artifacts": [
+    {
+      "path": "research/2026-10-11-Cap-动画差异研究.md",
+      "sha256": "597719b8fb205ed477b307e1dc9e165834a8a3f65e29d619c53f6d138e00b7a8"
+    },
+    {
+      "path": "research/evidence/2026-10-11-cap/README.md",
+      "sha256": "7bfccad946a1bb707f6df2110e3b1076b24f4b873200a6aff6e7e470b96cd7e8"
+    },
+    {
+      "path": "research/evidence/2026-10-11-cap/formula-check.py",
+      "sha256": "6ca5c838262e30d71e7fdfe6c035277dca8336bab3116bc3294395bb664c9091"
+    },
+    {
+      "path": "research/evidence/2026-10-11-cap/formula-result.json",
+      "sha256": "ee88ddcb3b76f3053700973c7a026ab17de24753a1aaf1c6f3049e3e52af9dcc"
+    },
+    {
+      "path": "research/evidence/2026-10-11-cap/installed-cap.json",
+      "sha256": "63d2b4291cd858462be8936cddcbe3613221074ce09ca6c57f79344e4cf9250d"
+    }
+  ],
+  "verification": {
+    "archived_file_hashes": "13/13 pass",
+    "new_document_local_links": "pass",
+    "protected_product_files_unchanged": 139,
+    "full_app_side_by_side_export": "not_performed"
+  }
+}

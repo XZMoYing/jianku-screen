@@ -1,0 +1,42 @@
+{
+  "status": "double_precision_formula_examples_not_app_measurements",
+  "ordinary_cursor_target_lead_ms": 148.93617021276594,
+  "isolated_solver_examples": {
+    "cursor": {
+      "max_normalized_position_error_0_to_1000ms": 0.008799589749138748,
+      "scope": "constant unit step, zero initial velocity, 60Hz; no rest snap, target planning, frame update order or float32 rounding"
+    },
+    "screen": {
+      "max_normalized_position_error_0_to_1000ms": 0.0093144459500063,
+      "scope": "constant unit step, zero initial velocity, 60Hz; no rest snap, target planning, frame update order or float32 rounding"
+    }
+  },
+  "click_release_at_130ms": {
+    "cap_fixed_smoothstep_scale": 1.0,
+    "reference_300_30_0_3_isolated_continuous_spring_scale": 0.947066884842024,
+    "scope": "release from fully held 0.8, zero velocity; not the reference frame timeline or measured export"
+  },
+  "zoom_out_center_example": {
+    "previous_rect_x": [
+      -0.8,
+      1.2
+    ],
+    "current_rect_x": [
+      -0.72,
+      1.18
+    ],
+    "previous_contains_current": true,
+    "cap_center_in_current_card_uv": 0.4842105263157895,
+    "corner_line_intersection_center_in_current_card_uv": 0.8,
+    "scope": "fixed focus x=0.8, scale2 to1.9; y can be centered so size delta is dominant"
+  },
+  "directional_kernel_centroid_in_velocity_units": {
+    "cap": 0.4999999999999999,
+    "reference": 0.4523809523809523
+  },
+  "cap_default_shadow": {
+    "opacity_multiplier": 0.501216,
+    "size_fraction_of_card_short_side": 0.105984,
+    "blur_fraction_of_card_short_side": 0.027968
+  }
+}

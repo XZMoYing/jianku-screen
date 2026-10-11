@@ -1,4 +1,5 @@
 #include "SettingsStore.h"
+#include "../render/SourceCrop.h"
 
 #include <QDir>
 #include <QFile>
@@ -36,6 +37,7 @@ QVariantMap referenceFactory() {
         {"shadowBlur", 20.0},
         {"shadowIsDirectional", false},
         {"outputAspectRatio", "auto"},
+        {"screenCrop", Render::SourceCrop{}.map()},
         {"cursorSize", 1.5},
         {"cursorSmoothing", "Smooth"},
         {"cursorRotateOnXMovementRatio", 0.5},
@@ -96,6 +98,8 @@ QVariantMap referenceFactory() {
 } // namespace
 
 SettingsStore::SettingsStore(QObject *parent, const QString &storagePath) : QObject(parent), factory_(referenceFactory()) {
+    saveTimer_.setSingleShot(true); saveTimer_.setInterval(200);
+    connect(&saveTimer_, &QTimer::timeout, this, [this] { save(); });
     storagePath_ = storagePath.isEmpty() ? QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)
         + "/settings.json" : storagePath;
     defaults_ = factory_;
@@ -103,7 +107,24 @@ SettingsStore::SettingsStore(QObject *parent, const QString &storagePath) : QObj
     load();
 }
 
+SettingsStore::~SettingsStore() { flush(); }
+
+bool SettingsStore::flush() { return !saveTimer_.isActive() || save(); }
+
+bool SettingsStore::setInteractiveCurrent(const QString &key, const QVariant &value) {
+    const QVariant cleaned = normalized(key, value);
+    if (!cleaned.isValid()) {
+        emit errorOccurred(QStringLiteral("设置值无效：") + key); return false;
+    }
+    if (current_.value(key) == cleaned) return true;
+    current_.insert(key, cleaned);
+    saveTimer_.start();
+    emit currentChanged();
+    return true;
+}
+
 void SettingsStore::initializeProject(const QVariantMap &recordedSettings) {
+    flush();
     current_ = factory_;
     for (auto it = recordedSettings.constBegin(); it != recordedSettings.constEnd(); ++it) {
         const QVariant value = normalized(it.key(), it.value());
@@ -132,6 +153,10 @@ QVariant SettingsStore::normalized(const QString &key, const QVariant &value) co
     if (exemplar.metaType().id() == QMetaType::QString)
         return value.toString();
     if (exemplar.metaType().id() == QMetaType::QVariantMap) {
+        if (key == "screenCrop") {
+            Render::SourceCrop crop;
+            return Render::readSourceCrop(value, &crop) ? QVariant(crop.map()) : QVariant();
+        }
         const QVariantMap parts = value.toMap();
         if (parts.keys() != QStringList({"damping", "mass", "stiffness"}))
             return {};
@@ -268,6 +293,7 @@ void SettingsStore::load() {
 }
 
 bool SettingsStore::save() {
+    saveTimer_.stop();
     QDir().mkpath(QFileInfo(storagePath_).absolutePath());
     QSaveFile file(storagePath_);
     if (!file.open(QIODevice::WriteOnly)) {
