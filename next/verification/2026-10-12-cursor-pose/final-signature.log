@@ -1,0 +1,47 @@
+target/debug/bundle/macos/Jianku Screen Next.app: replacing existing signature
+--prepared:/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/debug/bundle/macos/Jianku Screen Next.app/Contents/MacOS/cap-muxer
+--validated:/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/debug/bundle/macos/Jianku Screen Next.app/Contents/MacOS/cap-muxer
+--prepared:/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/debug/bundle/macos/Jianku Screen Next.app/Contents/Frameworks/Spacedrive.framework/Versions/Current/.
+--validated:/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/debug/bundle/macos/Jianku Screen Next.app/Contents/Frameworks/Spacedrive.framework/Versions/Current/.
+--prepared:/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/debug/bundle/macos/Jianku Screen Next.app/Contents/MacOS/cap-cli
+--validated:/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/debug/bundle/macos/Jianku Screen Next.app/Contents/MacOS/cap-cli
+--prepared:/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/debug/bundle/macos/Jianku Screen Next.app/Contents/MacOS/cap-exporter
+--validated:/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/debug/bundle/macos/Jianku Screen Next.app/Contents/MacOS/cap-exporter
+target/debug/bundle/macos/Jianku Screen Next.app: valid on disk
+target/debug/bundle/macos/Jianku Screen Next.app: satisfies its Designated Requirement
+--prepared:/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.2/Jianku Screen Next.app/Contents/MacOS/cap-muxer
+--validated:/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.2/Jianku Screen Next.app/Contents/MacOS/cap-muxer
+--prepared:/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.2/Jianku Screen Next.app/Contents/Frameworks/Spacedrive.framework/Versions/Current/.
+--validated:/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.2/Jianku Screen Next.app/Contents/Frameworks/Spacedrive.framework/Versions/Current/.
+--prepared:/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.2/Jianku Screen Next.app/Contents/MacOS/cap-exporter
+--validated:/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.2/Jianku Screen Next.app/Contents/MacOS/cap-exporter
+--prepared:/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.2/Jianku Screen Next.app/Contents/MacOS/cap-cli
+--validated:/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.2/Jianku Screen Next.app/Contents/MacOS/cap-cli
+/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.2/Jianku Screen Next.app: valid on disk
+/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.2/Jianku Screen Next.app: satisfies its Designated Requirement
+Executable=/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.2/Jianku Screen Next.app/Contents/MacOS/Jianku Screen Next
+Identifier=com.jianku.screen.next
+Format=app bundle with Mach-O thin (arm64)
+CodeDirectory v=20400 size=2230991 flags=0x0(none) hashes=69708+7 location=embedded
+VersionPlatform=1
+VersionMin=787200
+VersionSDK=983552
+Hash type=sha256 size=32
+CandidateCDHash sha256=9191266b6f53222edb680ca3ff7fc6448c258ce2
+CandidateCDHashFull sha256=9191266b6f53222edb680ca3ff7fc6448c258ce259d77580121126bb09b66d21
+Hash choices=sha256
+CMSDigest=9191266b6f53222edb680ca3ff7fc6448c258ce259d77580121126bb09b66d21
+CMSDigestType=2
+Executable Segment base=0
+Executable Segment limit=166658048
+Executable Segment flags=0x1
+Page size=4096
+CDHash=9191266b6f53222edb680ca3ff7fc6448c258ce2
+Signature size=1699
+Authority=JiankuDev
+Signed Time=Oct 12, 2026 at 05:34:28
+Info.plist entries=20
+TeamIdentifier=not set
+Sealed Resources version=2 rules=13 files=125
+Internal requirements count=1 size=100
+0.2.0-alpha.2

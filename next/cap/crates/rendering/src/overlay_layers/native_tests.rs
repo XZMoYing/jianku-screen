@@ -108,6 +108,118 @@ fn pixels(frame: &RenderedFrame) -> Vec<u8> {
         .collect()
 }
 
+#[tokio::test]
+async fn cursor_pose_matches_cached_and_direct_gpu_paths_across_resolutions() {
+    use crate::{PrecomputedCursorTimeline, spring_mass_damper::SpringMassDamperSimulationConfig};
+    use cap_project::{CursorClickEvent, CursorMoveEvent, CursorType};
+
+    let directory = tempfile::tempdir().unwrap();
+    let constants = constants(directory.path()).await;
+    let mut project = project();
+    project.cursor.set_cursor_type(CursorType::Circle);
+    project.cursor.motion_blur = 0.0;
+    let cursor = CursorEvents {
+        moves: [(0.0, 0.1), (100.0, 0.1), (116.0, 0.9), (1500.0, 0.9)]
+            .into_iter()
+            .map(|(time_ms, x)| CursorMoveEvent {
+                time_ms,
+                x,
+                y: 0.5,
+                cursor_id: "primary".into(),
+                active_modifiers: vec![],
+            })
+            .collect(),
+        clicks: [(500.0, true), (600.0, false)]
+            .into_iter()
+            .map(|(time_ms, down)| CursorClickEvent {
+                time_ms,
+                down,
+                cursor_num: 0,
+                cursor_id: "primary".into(),
+                active_modifiers: vec![],
+            })
+            .collect(),
+    };
+    let precomputed = PrecomputedCursorTimeline::new(
+        &cursor,
+        Some(SpringMassDamperSimulationConfig {
+            tension: project.cursor.tension,
+            mass: project.cursor.mass,
+            friction: project.cursor.friction,
+        }),
+        Some(project.cursor.click_spring_config()),
+    );
+    let zoom =
+        ZoomTransformTimeline::from_project(&project, &cursor, 3.0, constants.options.screen_size);
+    let mut direct_layers = RendererLayers::new(&constants.device, &constants.queue);
+    let mut cached_layers = RendererLayers::new(&constants.device, &constants.queue);
+    for frame in [57, 27, 38, 27] {
+        let mut decoded = frames();
+        decoded.recording_time = frame as f32 / 60.0;
+        decoded.segment_time = decoded.recording_time;
+        let direct = ProjectUniforms::new(
+            &constants,
+            &project,
+            frame,
+            60,
+            XY::new(320, 240),
+            &cursor,
+            &decoded,
+            3.0,
+            &zoom,
+        );
+        let cached = ProjectUniforms::new_with_precomputed_cursor(
+            &constants,
+            &project,
+            frame,
+            60,
+            XY::new(320, 240),
+            &cursor,
+            &decoded,
+            3.0,
+            &zoom,
+            &precomputed,
+        );
+        let large = ProjectUniforms::new_with_precomputed_cursor(
+            &constants,
+            &project,
+            frame,
+            60,
+            XY::new(1280, 720),
+            &cursor,
+            &decoded,
+            3.0,
+            &zoom,
+            &precomputed,
+        );
+        assert_eq!(
+            direct.cursor_x_axis_tilt_radians.to_bits(),
+            cached.cursor_x_axis_tilt_radians.to_bits()
+        );
+        assert_eq!(
+            large.cursor_x_axis_tilt_radians.to_bits(),
+            cached.cursor_x_axis_tilt_radians.to_bits()
+        );
+        assert_eq!(
+            direct.cursor_click_scale.to_bits(),
+            cached.cursor_click_scale.to_bits()
+        );
+        assert_eq!(
+            large.cursor_click_scale.to_bits(),
+            cached.cursor_click_scale.to_bits()
+        );
+        let direct_frame = FrameRenderer::new(&constants)
+            .render_immediate(decoded.clone(), direct, &cursor, true, &mut direct_layers)
+            .await
+            .unwrap();
+        let cached_frame = FrameRenderer::new(&constants)
+            .render_immediate(decoded, cached, &cursor, true, &mut cached_layers)
+            .await
+            .unwrap();
+        assert_eq!(pixels(&direct_frame), pixels(&cached_frame));
+    }
+}
+
 async fn render(
     constants: &RenderVideoConstants,
     project: &ProjectConfiguration,

@@ -1,0 +1,12 @@
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.78s
+     Running unittests src/lib.rs (target/debug/deps/cap_rendering-b077aa4d80692d35)
+
+running 3 tests
+test cursor_interpolation::tests::cursor_pose_setup_and_cached_sampling_benchmark ... ignored, manual cursor pose timing
+test cursor_interpolation::tests::cursor_pose_returns_smoothly_after_a_fast_move ... ok
+{"adapter":"Apple M1","backend":"Metal","deviceType":"IntegratedGpu","software":false,"test":"overlay_native_boundary"}
+test overlay_layers::native_tests::cursor_pose_matches_cached_and_direct_gpu_paths_across_resolutions ... ok
+
+test result: ok. 2 passed; 0 failed; 1 ignored; 0 measured; 302 filtered out; finished in 0.46s
+

@@ -1,0 +1,17 @@
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+   Compiling cap-editor v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/editor)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 14.22s
+     Running unittests src/lib.rs (target/debug/deps/cap_editor-478a6e32d2ef2b4f)
+
+running 8 tests
+test editor_instance::tests::preview_cursor_cache_bypasses_empty_moves_without_retaining_cursor_data ... ok
+test editor_instance::tests::preview_cursor_cache_reuses_effective_settings ... ok
+test editor_instance::tests::preview_cursor_cache_distinguishes_cursor_identity_and_segments ... ok
+test editor_instance::tests::preview_cursor_cache_evicts_the_least_recent_segment ... ok
+test editor_instance::tests::preview_cursor_cache_matches_fresh_interpolation_across_seeks_and_modes ... ok
+test editor_instance::tests::preview_cursor_cache_retains_raw_mode_for_click_animation ... ok
+test editor_instance::tests::preview_cursor_cache_invalidates_each_spring_parameter ... ok
+test editor_instance::tests::preview_cursor_cache_retains_raw_source_for_style_smoothing ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 179 filtered out; finished in 0.00s
+

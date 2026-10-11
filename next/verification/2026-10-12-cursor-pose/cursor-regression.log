@@ -1,0 +1,30 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.46s
+     Running unittests src/lib.rs (target/debug/deps/cap_rendering-b077aa4d80692d35)
+
+running 23 tests
+test cursor_interpolation::tests::benchmark_dense_cursor_lookup_against_linear_reference ... ignored
+test cursor_interpolation::tests::cursor_pose_setup_and_cached_sampling_benchmark ... ignored, manual cursor pose timing
+test cursor_interpolation::tests::decimate_thins_burst_moves ... ok
+test cursor_interpolation::tests::click_target_snap_glides_ahead_of_click ... ok
+test cursor_interpolation::tests::cursor_position_lookup_matches_linear_reference ... ok
+test cursor_interpolation::tests::cursor_pose_returns_smoothly_after_a_fast_move ... ok
+test cursor_interpolation::tests::raw_and_empty_timelines_preserve_source_events ... ok
+test cursor_interpolation::tests::click_spring_holds_and_recovers_without_a_fixed_deadline ... ok
+test cursor_interpolation::tests::spring_context_default_when_click_far ... ok
+test cursor_interpolation::tests::repeated_clicks_and_overlapping_buttons_keep_scale_continuous ... ok
+test cursor_interpolation::tests::spring_context_detects_dragging_between_clicks ... ok
+test cursor_interpolation::tests::concurrent_style_cursor_queries_share_one_variant ... ok
+test cursor_interpolation::tests::spring_context_snappy_before_imminent_click ... ok
+test cursor_interpolation::tests::spring_context_stiffens_175ms_before_click ... ok
+test cursor_interpolation::tests::smoothed_cursor_tracks_moving_target_without_lag ... ok
+test cursor_interpolation::tests::style_cursor_variant_cache_evicts_unused_history_and_preserves_base ... ok
+test cursor_interpolation::tests::style_cursor_variants_are_scoped_to_their_recording_source ... ok
+test cursor_interpolation::tests::smoothed_timeline_releases_unused_raw_events_without_changing_output ... ok
+test cursor_interpolation::tests::smoothed_timeline_has_no_jumps ... ok
+test cursor_interpolation::tests::pose_cache_handles_seeking_and_all_parameter_changes ... ok
+test cursor_interpolation::tests::style_cursor_variants_preserve_motion_and_click_spring_output ... ok
+test cursor_interpolation::tests::timeline_lookup_matches_linear_reference_at_long_times_and_duplicate_timestamps ... ok
+test cursor_interpolation::tests::complete_smoothed_timeline_matches_linear_reference ... ok
+
+test result: ok. 21 passed; 0 failed; 2 ignored; 0 measured; 282 filtered out; finished in 0.17s
+

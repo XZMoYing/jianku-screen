@@ -1,0 +1,9 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.86s
+     Running unittests src/lib.rs (target/debug/deps/cap_rendering-b077aa4d80692d35)
+
+running 1 test
+{"cachedQueries":10000,"cachedQueriesMs":1.508416,"poseVariants":1,"setupMs":88.272666,"sourceSeconds":600}
+test cursor_interpolation::tests::cursor_pose_setup_and_cached_sampling_benchmark ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 304 filtered out; finished in 0.15s
+

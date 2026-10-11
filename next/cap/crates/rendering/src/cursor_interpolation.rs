@@ -7,6 +7,7 @@ use cap_project::{ClickSpringConfig, CursorClickEvent, CursorEvents, CursorMoveE
 
 use crate::{
     Coord, RawDisplayUVSpace,
+    numeric_spring::NumericSpring,
     spring_mass_damper::{SpringMassDamperSimulation, SpringMassDamperSimulationConfig},
 };
 
@@ -334,11 +335,135 @@ struct CursorTimelineVariant {
     timeline: Arc<PrecomputedCursorTimeline>,
 }
 
+#[derive(Clone, Copy, Debug)]
+pub(crate) struct CursorPose {
+    pub rotation_degrees: f64,
+    pub click_scale: f64,
+}
+
+impl Default for CursorPose {
+    fn default() -> Self {
+        Self {
+            rotation_degrees: 0.0,
+            click_scale: 1.0,
+        }
+    }
+}
+
+struct CursorPoseVariant {
+    settings: [u64; 8],
+    timeline: Arc<CursorPoseTimeline>,
+}
+
+struct CursorPoseTimeline {
+    samples: Vec<CursorPose>,
+}
+
+impl CursorPoseTimeline {
+    fn new(
+        cursor: &CursorEvents,
+        smoothing: Option<SpringMassDamperSimulationConfig>,
+        click_spring: ClickSpringConfig,
+        degrees_per_uv: f64,
+    ) -> Self {
+        const CLICK_SCALE_LOOKAHEAD_MS: f64 = 130.0;
+        const TILT_LOOKBACK_MS: f64 = 400.0;
+        const CLICK_SCALE_SPRING: SpringMassDamperSimulationConfig =
+            SpringMassDamperSimulationConfig {
+                tension: 300.0,
+                friction: 30.0,
+                mass: 0.3,
+            };
+        if cursor.clicks.is_empty()
+            && (cursor.moves.is_empty() || smoothing.is_none() || degrees_per_uv == 0.0)
+        {
+            return Self {
+                samples: vec![CursorPose::default()],
+            };
+        }
+        let base = smoothing.unwrap_or(DEFAULT_CLICK_SPRING);
+        let presets = CursorSpringPresets::new(base, Some(click_spring));
+        let mut context = CursorSpringContext::new(&cursor.clicks);
+        let filtered = filter_cursor_shake(&cursor.moves);
+        let moves = decimate_cursor_moves(filtered.as_ref());
+        let end_ms = cursor
+            .moves
+            .last()
+            .map_or(0.0, |event| event.time_ms)
+            .max(cursor.clicks.last().map_or(0.0, |event| event.time_ms))
+            + 2000.0;
+        let count = (end_ms / SIMULATION_STEP_MS).ceil() as usize + 1;
+        let mut samples = Vec::with_capacity(count);
+        let mut rotation = NumericSpring::new(0.0, base);
+        let mut scale = NumericSpring::new(1.0, CLICK_SCALE_SPRING);
+        let mut pressed = [false; 256];
+        let mut next_click_index = 0;
+
+        for index in 0..count {
+            let time_ms = index as f64 * SIMULATION_STEP_MS;
+            if index > 0 {
+                rotation.advance(SIMULATION_STEP_MS);
+                scale.advance(SIMULATION_STEP_MS);
+            }
+            context.advance_to(time_ms);
+            while let Some(click) = cursor.clicks.get(next_click_index)
+                && click.time_ms <= time_ms
+            {
+                pressed[usize::from(click.cursor_num)] = click.down;
+                next_click_index += 1;
+            }
+
+            let target_at = |time_ms: f64| {
+                let target_time =
+                    next_click_within(&cursor.clicks, time_ms, CLICK_LOOKAHEAD_TARGET_MS)
+                        .map_or(time_ms, |click| click.time_ms);
+                position_at_time(&moves, target_time, true).0
+            };
+            let tilt = if smoothing.is_some() && degrees_per_uv != 0.0 {
+                ((target_at(time_ms) - target_at((time_ms - TILT_LOOKBACK_MS).max(0.0)))
+                    * degrees_per_uv)
+                    .clamp(-20.0, 20.0)
+            } else {
+                0.0
+            };
+            rotation.set_target(tilt);
+            rotation.set_config(presets.config(context.profile(time_ms)));
+            let anticipates_press = cursor.clicks.get(next_click_index).is_some_and(|click| {
+                click.down && click.time_ms - time_ms <= CLICK_SCALE_LOOKAHEAD_MS
+            });
+            scale.set_target(if anticipates_press || pressed.iter().any(|down| *down) {
+                0.8
+            } else {
+                1.0
+            });
+            samples.push(CursorPose {
+                rotation_degrees: rotation.value,
+                click_scale: scale.value,
+            });
+        }
+        Self { samples }
+    }
+
+    fn sample(&self, time_secs: f32) -> CursorPose {
+        let sample = (f64::from(time_secs).max(0.0) * 1000.0 / SIMULATION_STEP_MS)
+            .min(self.samples.len().saturating_sub(1) as f64);
+        let index = sample as usize;
+        let a = self.samples[index];
+        let b = self.samples[(index + 1).min(self.samples.len() - 1)];
+        let mix = sample - index as f64;
+        CursorPose {
+            rotation_degrees: a.rotation_degrees + (b.rotation_degrees - a.rotation_degrees) * mix,
+            click_scale: a.click_scale + (b.click_scale - a.click_scale) * mix,
+        }
+    }
+}
+
 pub struct PrecomputedCursorTimeline {
     timeline: Vec<SmoothedCursorEvent>,
     raw_cursor: CursorEvents,
     has_smoothing: bool,
     variants: Mutex<Vec<CursorTimelineVariant>>,
+    pose_variants: Mutex<Vec<CursorPoseVariant>>,
 }
 
 impl PrecomputedCursorTimeline {
@@ -353,6 +478,7 @@ impl PrecomputedCursorTimeline {
                 raw_cursor: cursor.clone(),
                 has_smoothing: false,
                 variants: Mutex::new(Vec::new()),
+                pose_variants: Mutex::new(Vec::new()),
             };
         }
 
@@ -371,6 +497,7 @@ impl PrecomputedCursorTimeline {
             raw_cursor: CursorEvents::default(),
             has_smoothing: true,
             variants: Mutex::new(Vec::new()),
+            pose_variants: Mutex::new(Vec::new()),
         }
     }
 
@@ -414,6 +541,52 @@ impl PrecomputedCursorTimeline {
         } else {
             interpolate_raw_cursor(&self.raw_cursor, time_ms)
         }
+    }
+
+    pub(crate) fn pose(
+        &self,
+        cursor: &CursorEvents,
+        smoothing: Option<SpringMassDamperSimulationConfig>,
+        click_spring: ClickSpringConfig,
+        degrees_per_uv: f64,
+        time_secs: f32,
+    ) -> CursorPose {
+        let config = smoothing.unwrap_or(DEFAULT_CLICK_SPRING);
+        let settings = [
+            u64::from(smoothing.is_some()),
+            u64::from(config.tension.to_bits()),
+            u64::from(config.mass.to_bits()),
+            u64::from(config.friction.to_bits()),
+            u64::from(click_spring.tension.to_bits()),
+            u64::from(click_spring.mass.to_bits()),
+            u64::from(click_spring.friction.to_bits()),
+            degrees_per_uv.to_bits(),
+        ];
+        let timeline = {
+            let mut variants = self.pose_variants.lock().unwrap();
+            if let Some(index) = variants.iter().position(|entry| entry.settings == settings) {
+                let entry = variants.remove(index);
+                let timeline = Arc::clone(&entry.timeline);
+                variants.push(entry);
+                timeline
+            } else {
+                let timeline = Arc::new(CursorPoseTimeline::new(
+                    cursor,
+                    smoothing,
+                    click_spring,
+                    degrees_per_uv,
+                ));
+                if variants.len() == CURSOR_VARIANT_CACHE_CAPACITY {
+                    variants.remove(0);
+                }
+                variants.push(CursorPoseVariant {
+                    settings,
+                    timeline: Arc::clone(&timeline),
+                });
+                timeline
+            }
+        };
+        timeline.sample(time_secs)
     }
 }
 
@@ -707,6 +880,184 @@ mod tests {
             time_ms,
             down,
         }
+    }
+
+    fn pose_timeline(cursor: &CursorEvents, smoothed: bool) -> CursorPoseTimeline {
+        CursorPoseTimeline::new(
+            cursor,
+            smoothed.then_some(SpringMassDamperSimulationConfig {
+                tension: 470.0,
+                mass: 3.0,
+                friction: 70.0,
+            }),
+            ClickSpringConfig::default(),
+            1920.0 * 0.03 * 0.15,
+        )
+    }
+
+    #[test]
+    fn cursor_pose_returns_smoothly_after_a_fast_move() {
+        let cursor = CursorEvents {
+            moves: vec![
+                cursor_move(0.0, 0.1, 0.5),
+                cursor_move(100.0, 0.1, 0.5),
+                cursor_move(116.0, 0.9, 0.5),
+                cursor_move(200.0, 0.9, 0.5),
+                cursor_move(1500.0, 0.9, 0.5),
+            ],
+            clicks: vec![],
+        };
+        let timeline = pose_timeline(&cursor, true);
+        assert!(timeline.sample(0.45).rotation_degrees > 3.0);
+        assert!(timeline.sample(0.65).rotation_degrees > 0.2);
+        for time_ms in 1..1500 {
+            let before = timeline.sample((time_ms - 1) as f32 / 1000.0);
+            let after = timeline.sample(time_ms as f32 / 1000.0);
+            assert!((after.rotation_degrees - before.rotation_degrees).abs() < 0.1);
+        }
+        assert!(timeline.sample(3.0).rotation_degrees.abs() < 0.002);
+        let raw = pose_timeline(&cursor, false);
+        assert_eq!(raw.sample(0.45).rotation_degrees, 0.0);
+    }
+
+    #[test]
+    fn click_spring_holds_and_recovers_without_a_fixed_deadline() {
+        let cursor = CursorEvents {
+            moves: vec![cursor_move(0.0, 0.5, 0.5)],
+            clicks: vec![click_event(500.0, true), click_event(1500.0, false)],
+        };
+        let timeline = pose_timeline(&cursor, true);
+        assert_eq!(timeline.sample(0.3).click_scale, 1.0);
+        assert!(timeline.sample(0.45).click_scale < 1.0);
+        assert!((timeline.sample(1.4).click_scale - 0.8).abs() < 0.002);
+        let release = timeline.sample(1.63).click_scale;
+        assert!(release > 0.8 && release < 0.99, "release={release}");
+        assert_eq!(timeline.sample(3.4).click_scale, 1.0);
+    }
+
+    #[test]
+    fn repeated_clicks_and_overlapping_buttons_keep_scale_continuous() {
+        let mut clicks = vec![
+            click_event(500.0, true),
+            click_event(520.0, true),
+            click_event(600.0, false),
+            click_event(800.0, false),
+            click_event(850.0, true),
+            click_event(900.0, false),
+        ];
+        clicks[1].cursor_num = 1;
+        clicks[3].cursor_num = 1;
+        let cursor = CursorEvents {
+            moves: vec![cursor_move(0.0, 0.5, 0.5)],
+            clicks,
+        };
+        let timeline = pose_timeline(&cursor, false);
+        let held = pose_timeline(
+            &CursorEvents {
+                moves: cursor.moves.clone(),
+                clicks: vec![click_event(500.0, true), click_event(800.0, false)],
+            },
+            false,
+        );
+        assert_eq!(
+            timeline.sample(0.75).click_scale,
+            held.sample(0.75).click_scale
+        );
+        assert!(timeline.sample(0.84).click_scale < 0.85);
+        for time_ms in 300..2000 {
+            let a = timeline.sample(time_ms as f32 / 1000.0).click_scale;
+            let b = timeline.sample((time_ms + 1) as f32 / 1000.0).click_scale;
+            assert!((a - b).abs() < 0.003);
+        }
+    }
+
+    #[test]
+    fn pose_cache_handles_seeking_and_all_parameter_changes() {
+        let cursor = dense_cursor(3);
+        let smoothing = SpringMassDamperSimulationConfig {
+            tension: 470.0,
+            mass: 3.0,
+            friction: 70.0,
+        };
+        let base = PrecomputedCursorTimeline::new(&cursor, Some(smoothing), None);
+        for raw in [false, true] {
+            for amount in [0.0, 8.64, 28.8, -8.64] {
+                let config = (!raw).then_some(smoothing);
+                let fresh =
+                    CursorPoseTimeline::new(&cursor, config, ClickSpringConfig::default(), amount);
+                for time in [2.9, 0.5, 1.5, 0.0, 3.9, 0.5] {
+                    let cached =
+                        base.pose(&cursor, config, ClickSpringConfig::default(), amount, time);
+                    let expected = fresh.sample(time);
+                    assert_eq!(
+                        cached.rotation_degrees.to_bits(),
+                        expected.rotation_degrees.to_bits()
+                    );
+                    assert_eq!(cached.click_scale.to_bits(), expected.click_scale.to_bits());
+                }
+                let variants = base.pose_variants.lock().unwrap();
+                assert!(variants.len() <= CURSOR_VARIANT_CACHE_CAPACITY);
+                assert_eq!(Arc::strong_count(&variants.last().unwrap().timeline), 1);
+            }
+        }
+        for changed in 0..6 {
+            let mut smoothing = smoothing;
+            let mut click = ClickSpringConfig::default();
+            match changed {
+                0 => smoothing.tension += 100.0,
+                1 => smoothing.mass += 0.5,
+                2 => smoothing.friction += 10.0,
+                3 => click.tension += 100.0,
+                4 => click.mass += 0.5,
+                _ => click.friction += 10.0,
+            }
+            let fresh = CursorPoseTimeline::new(&cursor, Some(smoothing), click, 28.8);
+            for time in [0.4, 1.1, 2.6] {
+                let actual = base.pose(&cursor, Some(smoothing), click, 28.8, time);
+                let expected = fresh.sample(time);
+                assert_eq!(
+                    actual.rotation_degrees.to_bits(),
+                    expected.rotation_degrees.to_bits()
+                );
+                assert_eq!(actual.click_scale.to_bits(), expected.click_scale.to_bits());
+            }
+        }
+    }
+
+    #[test]
+    #[ignore = "manual cursor pose timing"]
+    fn cursor_pose_setup_and_cached_sampling_benchmark() {
+        use std::time::Instant;
+        let cursor = dense_cursor(600);
+        let smoothing = SpringMassDamperSimulationConfig {
+            tension: 470.0,
+            mass: 3.0,
+            friction: 70.0,
+        };
+        let base = PrecomputedCursorTimeline::new(&cursor, Some(smoothing), None);
+        let start = Instant::now();
+        let _ = base.pose(
+            &cursor,
+            Some(smoothing),
+            ClickSpringConfig::default(),
+            28.8,
+            0.0,
+        );
+        let setup_ms = start.elapsed().as_secs_f64() * 1000.0;
+        let start = Instant::now();
+        for index in 0..10000 {
+            std::hint::black_box(base.pose(
+                &cursor,
+                Some(smoothing),
+                ClickSpringConfig::default(),
+                28.8,
+                (index % 600) as f32,
+            ));
+        }
+        eprintln!(
+            "{}",
+            serde_json::json!({"sourceSeconds":600,"setupMs":setup_ms,"cachedQueries":10000,"cachedQueriesMs":start.elapsed().as_secs_f64()*1000.0,"poseVariants":base.pose_variants.lock().unwrap().len()})
+        );
     }
 
     #[test]

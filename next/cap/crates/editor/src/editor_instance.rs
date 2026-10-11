@@ -45,21 +45,6 @@ impl PreviewCursorCache {
         cursor: &Arc<CursorEvents>,
         project: &ProjectConfiguration,
     ) -> Option<Arc<PrecomputedCursorTimeline>> {
-        if project.cursor.raw
-            && !project.timeline.as_ref().is_some_and(|timeline| {
-                timeline.style_segments.iter().any(|style| {
-                    style.is_active_at(style.start)
-                        && style
-                            .overrides
-                            .cursor
-                            .as_ref()
-                            .is_some_and(|cursor| !cursor.raw)
-                })
-            })
-        {
-            self.entries.clear();
-            return None;
-        }
         if cursor.moves.is_empty() {
             self.entries
                 .retain(|entry| entry.recording_clip != recording_clip);
@@ -1993,34 +1978,25 @@ mod tests {
     }
 
     #[test]
-    fn preview_cursor_cache_bypasses_raw_mode_without_retaining_cursor_data() {
+    fn preview_cursor_cache_retains_raw_mode_for_click_animation() {
         let cursor = preview_cursor_events();
         let mut project = ProjectConfiguration::default();
         let mut cache = PreviewCursorCache::default();
         let smoothed = cache.get(0, &cursor, &project).unwrap();
-        let smoothed_weak = Arc::downgrade(&smoothed);
+        let weak = Arc::downgrade(&smoothed);
         drop(smoothed);
-        drop(cache.get(1, &cursor, &project).unwrap());
         project.cursor.raw = true;
-
-        assert!(cache.get(0, &cursor, &project).is_none());
-        assert!(cache.entries.is_empty());
-        assert!(smoothed_weak.upgrade().is_none());
-        assert_eq!(Arc::strong_count(&cursor), 1);
-
-        project.cursor.tension += 1.0;
-        project.cursor.click_spring = Some(cap_project::ClickSpringConfig {
-            tension: 900.0,
-            mass: 2.0,
-            friction: 60.0,
-        });
-        assert!(cache.get(0, &cursor, &project).is_none());
-        assert!(cache.entries.is_empty());
-        assert_eq!(Arc::strong_count(&cursor), 1);
-
-        project.cursor.raw = false;
-        assert!(cache.get(0, &cursor, &project).is_some());
+        let raw = cache.get(0, &cursor, &project).unwrap();
+        assert!(weak.upgrade().is_none());
+        assert!(Arc::ptr_eq(&raw, &cache.get(0, &cursor, &project).unwrap()));
         assert_eq!(cache.entries.len(), 1);
+        let fresh = PrecomputedCursorTimeline::new(&cursor, None, None);
+        for time in [0.0, 0.5, 1.5] {
+            let actual = raw.interpolate(time).unwrap();
+            let expected = fresh.interpolate(time).unwrap();
+            assert_eq!(actual.position.coord, expected.position.coord);
+            assert_eq!(actual.cursor_id, expected.cursor_id);
+        }
     }
 
     #[test]
@@ -2063,8 +2039,8 @@ mod tests {
         assert!(!Arc::ptr_eq(&first, &smoothed));
         project.cursor.raw = true;
         project.timeline.as_mut().unwrap().style_segments[0].enabled = false;
-        assert!(cache.get(0, &cursor, &project).is_none());
-        assert!(cache.entries.is_empty());
+        assert!(cache.get(0, &cursor, &project).is_some());
+        assert_eq!(cache.entries.len(), 1);
     }
 
     #[test]
@@ -2091,8 +2067,8 @@ mod tests {
             style.enabled = enabled;
             style.overrides.cursor.as_mut().unwrap().raw = raw;
             let mut cache = PreviewCursorCache::default();
-            assert!(cache.get(0, &cursor, &project).is_none());
-            assert!(cache.entries.is_empty());
+            assert!(cache.get(0, &cursor, &project).is_some());
+            assert_eq!(cache.entries.len(), 1);
         }
     }
 
@@ -2181,7 +2157,7 @@ mod tests {
                 project.cursor.raw = raw;
                 project.cursor.click_spring = click_spring;
                 let cached = cache.get(0, &cursor, &project);
-                if raw || cursor.moves.is_empty() {
+                if cursor.moves.is_empty() {
                     assert!(cached.is_none());
                     continue;
                 }

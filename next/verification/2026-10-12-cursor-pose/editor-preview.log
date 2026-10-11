@@ -1,0 +1,18 @@
+   Compiling cap-editor v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/editor)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 7.64s
+     Running `target/debug/examples/editor-startup-benchmark --recording-path /tmp/jianku-cursor-benchmark.cap --runs 1 --preview-time 1.33`
+================================================================
+  CAP EDITOR STARTUP BENCHMARK
+================================================================
+Recording: /tmp/jianku-cursor-benchmark.cap
+Runs: 1
+Preview frame: 80
+Profile stages: false
+Profile stages only: false
+Run 1: 297.7ms preview=42.5ms meta_loaded=true timeline true->true clips 0->1
+
+================================================================
+  RESULTS
+================================================================
+Startup: avg=297.7ms p50=297.7ms p95=297.7ms max=297.7ms samples=1
+First preview: avg=42.5ms p50=42.5ms p95=42.5ms max=42.5ms samples=1

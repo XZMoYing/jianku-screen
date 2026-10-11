@@ -7,9 +7,7 @@ use cap_project::{
 };
 use composite_frame::{ColorGradeUniformParams, CompositeVideoFrameUniforms};
 use core::f64;
-use cursor_interpolation::{
-    InterpolatedCursorPosition, interpolate_cursor, interpolate_cursor_with_click_spring,
-};
+use cursor_interpolation::{CursorPose, InterpolatedCursorPosition, interpolate_cursor};
 use decoder::{AsyncVideoDecoderHandle, spawn_decoder};
 #[cfg(target_os = "macos")]
 use frame_pipeline::finish_encoder_bgra_surface;
@@ -49,6 +47,7 @@ mod layers;
 mod managed_segment;
 mod mask;
 pub mod notch_shape;
+mod numeric_spring;
 mod overlay_layers;
 mod project_recordings;
 mod readiness;
@@ -2422,6 +2421,7 @@ pub struct ProjectUniforms {
     pub output_size: (u32, u32),
     pub cursor_size: f32,
     pub cursor_x_axis_tilt_radians: f32,
+    pub cursor_click_scale: f32,
     pub frame_rate: u32,
     pub frame_number: u32,
     pub recording_time: f64,
@@ -3480,19 +3480,9 @@ impl ProjectUniforms {
         });
         let click_spring_cfg = cursor.click_spring_config();
 
-        let cursor_interp_fn = |time: f32| -> Option<InterpolatedCursorPosition> {
-            match cursor_smoothing {
-                Some(cfg) => interpolate_cursor_with_click_spring(
-                    cursor_events,
-                    time,
-                    Some(cfg),
-                    Some(click_spring_cfg),
-                ),
-                None => interpolate_cursor(cursor_events, time, None),
-            }
-        };
-
-        Self::new_inner(
+        let precomputed =
+            PrecomputedCursorTimeline::new(cursor_events, cursor_smoothing, Some(click_spring_cfg));
+        Self::new_with_precomputed_cursor(
             constants,
             project,
             frame_number,
@@ -3502,7 +3492,7 @@ impl ProjectUniforms {
             segment_frames,
             total_duration,
             zoom_timeline,
-            &cursor_interp_fn,
+            &precomputed,
         )
     }
 
@@ -3555,6 +3545,20 @@ impl ProjectUniforms {
             }
         };
 
+        let cursor_pose_fn = |time: f32, degrees_per_uv: f64| {
+            precomputed_cursor.pose(
+                cursor_events,
+                (!cursor.raw).then_some(SpringMassDamperSimulationConfig {
+                    tension: cursor.tension,
+                    mass: cursor.mass,
+                    friction: cursor.friction,
+                }),
+                current_click,
+                degrees_per_uv,
+                time,
+            )
+        };
+
         Self::new_inner(
             constants,
             project,
@@ -3566,6 +3570,7 @@ impl ProjectUniforms {
             total_duration,
             zoom_timeline,
             &cursor_interp_fn,
+            &cursor_pose_fn,
         )
     }
 
@@ -3581,6 +3586,7 @@ impl ProjectUniforms {
         total_duration: f64,
         zoom_timeline: &ZoomTransformTimeline,
         cursor_interp_fn: &dyn Fn(f32) -> Option<InterpolatedCursorPosition>,
+        cursor_pose_fn: &dyn Fn(f32, f64) -> CursorPose,
     ) -> Self {
         let options = &constants.options;
         let output_size = Self::get_output_size(options, project, resolution_base);
@@ -3646,19 +3652,12 @@ impl ProjectUniforms {
             cursor_stop_time,
             cursor_interp_fn,
         );
-        let lookback_t = (cursor_time_for_interp - 0.4).max(0.0);
-        let past_cursor_for_tilt = cursor_interp_fn(lookback_t);
-
-        let cursor_x_axis_tilt_radians =
-            if let (Some(cur), Some(past)) = (&interpolated_cursor, past_cursor_for_tilt) {
-                let delta_x_norm = cur.position.coord.x - past.position.coord.x;
-                let delta_x_px = delta_x_norm * resolution_base.x as f64;
-                let deg =
-                    (delta_x_px * 0.03 * project.cursor.rotation_amount as f64).clamp(-20.0, 20.0);
-                deg.to_radians() as f32
-            } else {
-                0.0
-            };
+        let degrees_per_uv =
+            segment_frames.screen_size.x as f64 * 0.03 * project.cursor.rotation_amount as f64;
+        let cursor_pose = cursor_pose_fn(cursor_time_for_interp, degrees_per_uv);
+        let cursor_x_axis_tilt_radians = cursor_pose.rotation_degrees.to_radians() as f32;
+        let cursor_click_scale =
+            cursor_pose_fn(current_recording_time, degrees_per_uv).click_scale as f32;
 
         let scene_segments = project
             .timeline
@@ -4649,6 +4648,7 @@ impl ProjectUniforms {
             output_size,
             cursor_size: project.cursor.size as f32,
             cursor_x_axis_tilt_radians,
+            cursor_click_scale,
             resolution_base,
             display,
             camera,

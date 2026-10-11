@@ -11,9 +11,6 @@ use crate::{
     STANDARD_CURSOR_HEIGHT, composite_frame::ColorGradeUniformParams,
 };
 
-const CURSOR_CLICK_DURATION: f64 = 0.13;
-const CURSOR_CLICK_DURATION_MS: f64 = CURSOR_CLICK_DURATION * 1000.0;
-const CLICK_SHRINK_SIZE: f32 = 0.8;
 const CURSOR_IDLE_MIN_DELAY_MS: f64 = 500.0;
 const CURSOR_IDLE_FADE_OUT_MS: f64 = 400.0;
 const CURSOR_IDLE_RESUME_LOOKAHEAD_MS: f64 = 250.0;
@@ -450,8 +447,6 @@ impl CursorLayer {
             return;
         }
 
-        let time_s = segment_frames.recording_time;
-
         let Some(interpolated_cursor) = &uniforms.interpolated_cursor else {
             return;
         };
@@ -568,15 +563,13 @@ impl CursorLayer {
         };
 
         let size = {
-            let click_t = get_click_t(&cursor.clicks, (time_s as f64) * 1000.0);
-            let click_scale_factor = click_t * 1.0 + (1.0 - click_t) * CLICK_SHRINK_SIZE;
             let display = &uniforms.display;
             let size = cursor_height_px(
                 display.frame_size[1],
                 display.crop_bounds[3] - display.crop_bounds[1],
                 display.target_size[1],
                 uniforms.cursor_size,
-                click_scale_factor,
+                uniforms.cursor_click_scale,
             );
 
             let texture_size_aspect = {
@@ -845,47 +838,6 @@ fn compute_cursor_fade_in(cursor: &CursorEvents, current_time_ms: f64, hide_dela
     let time_since_resume = (current_time_ms - resume_time_ms).max(0.0);
 
     smoothstep64(0.0, CURSOR_IDLE_FADE_OUT_MS, time_since_resume) as f32
-}
-
-fn get_click_t(clicks: &[CursorClickEvent], time_ms: f64) -> f32 {
-    fn smoothstep(low: f32, high: f32, v: f32) -> f32 {
-        let t = f32::clamp((v - low) / (high - low), 0.0, 1.0);
-        t * t * (3.0 - 2.0 * t)
-    }
-
-    let next_click = clicks.iter().find(|c| c.time_ms > time_ms);
-
-    if let Some(next) = next_click {
-        if next.down && next.time_ms - time_ms <= CURSOR_CLICK_DURATION_MS {
-            return smoothstep(
-                0.0,
-                CURSOR_CLICK_DURATION_MS as f32,
-                (next.time_ms - time_ms) as f32,
-            );
-        }
-
-        if !next.down {
-            return 0.0;
-        }
-    }
-
-    let prev_click = clicks.iter().rev().find(|c| c.time_ms <= time_ms);
-
-    if let Some(prev) = prev_click {
-        if prev.down {
-            return 0.0;
-        }
-
-        if !prev.down && time_ms - prev.time_ms <= CURSOR_CLICK_DURATION_MS {
-            return smoothstep(
-                0.0,
-                CURSOR_CLICK_DURATION_MS as f32,
-                (time_ms - prev.time_ms) as f32,
-            );
-        }
-    }
-
-    1.0
 }
 
 struct CursorTexture {

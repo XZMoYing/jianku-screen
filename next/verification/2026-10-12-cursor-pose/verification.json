@@ -1,0 +1,217 @@
+{
+	"recordedAt": "2026-10-12T05:36:43.634328+08:00",
+	"stage": "Cursor tilt and click deformation springs in the shared rendering path; signed alpha.2 opened for user trial",
+	"version": "0.2.0-alpha.2",
+	"branch": "rewrite/cap-foundation",
+	"sourceBaseCommit": "8407c1e0a1a57cc21eda8b7dbed1fbb6f3fb37e2",
+	"applicationIdentifier": "com.jianku.screen.next",
+	"profile": "debug",
+	"scope": {
+		"changed": [
+			"cursor tilt target and continuous spring",
+			"continuous click shrink and release spring",
+			"bounded cursor-pose cache shared by preview and export"
+		],
+		"retained": [
+			"Cap cursor position planner, compensation and smoothing",
+			"camera and 3D transforms",
+			"motion blur, idle cursor hiding and composition settings"
+		],
+		"referenceAnimationParity": "not yet verified against controlled reference outputs",
+		"realTimePresentation": "not integrated"
+	},
+	"checks": [
+		{
+			"name": "rust-format",
+			"status": "passed",
+			"exitCode": 0,
+			"log": "rustfmt.log"
+		},
+		{
+			"name": "rendering-editor-check",
+			"status": "passed",
+			"exitCode": 0,
+			"log": "rendering-check.log"
+		},
+		{
+			"name": "cursor-regressions",
+			"status": "passed",
+			"passed": 21,
+			"ignored": 2,
+			"log": "cursor-regression.log"
+		},
+		{
+			"name": "independent-legacy-C++-trace",
+			"status": "passed",
+			"passed": 1,
+			"steps": 60,
+			"tolerance": 1e-6,
+			"log": "legacy-solver-parity.log",
+			"generator": "numerical-reference.cpp",
+			"golden": "../../cap/crates/rendering/test-data/numeric-spring.csv"
+		},
+		{
+			"name": "native-Metal-cached-direct-pixel-parity",
+			"status": "passed",
+			"uniqueAdditionalTests": 1,
+			"selectedTestsPassed": 2,
+			"ignored": 1,
+			"adapter": "Apple M1 / Metal",
+			"log": "gpu-parity.log",
+			"scope": "Four sample times including reverse seeking; full frame pixel parity; pose output-size parity"
+		},
+		{
+			"name": "editor-cursor-cache",
+			"status": "passed",
+			"passed": 8,
+			"log": "editor-cache.log"
+		},
+		{
+			"name": "raw-style-cache",
+			"status": "passed",
+			"passed": 1,
+			"log": "raw-style-cache.log"
+		},
+		{
+			"name": "source-config-Biome",
+			"status": "passed",
+			"logs": ["config-biome.log", "docs-biome.log", "final-docs-biome.log"],
+			"scope": "Touched JSON configurations and fixture inputs; Markdown manually checked because Biome does not support it"
+		},
+		{
+			"name": "native-build-and-sign",
+			"status": "passed-after-signing-recovery",
+			"log": "final-build.log",
+			"wrapperExitCode": 1,
+			"compilationAndBundling": "completed",
+			"signingRecovery": "Development keychain locked during build; unlocked locally and resumed the same bundle signing, with no source or credential changes",
+			"strictRelocatedSignatureExitCode": 0,
+			"signatureLog": "final-signature.log",
+			"identity": "JiankuDev",
+			"developerIDNotarized": false
+		},
+		{
+			"name": "packaged-export",
+			"status": "passed",
+			"exitCode": 0,
+			"width": 1280,
+			"height": 800,
+			"fps": 60,
+			"frames": 360,
+			"seconds": 6,
+			"codec": "h264",
+			"log": "final-export.jsonl",
+			"stderr": "final-export.stderr",
+			"probe": "final-probe.json",
+			"decode": "final-decode.log",
+			"fullDecodeExitCode": 0,
+			"framesInspected": ["final-unzoomed.png", "final-zoomed.png"],
+			"scope": "Self-created synthetic input; no user captures; comparison output also retained outside Git"
+		},
+		{
+			"name": "actual-alpha.2-startup-editor",
+			"status": "passed",
+			"pid": 59880,
+			"bundlePath": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.2/Jianku Screen Next.app",
+			"nativeEditorSize": [1275, 800],
+			"startup": "startup-windows.json",
+			"windows": "editor-windows.json",
+			"log": "desktop-editor.log",
+			"firstFrameReadyObserved": true,
+			"opening": "Initial --args launch opened the main window; explicit file-open event delivered the fixture to the running application",
+			"userContext": "User confirmed exit and that no important editor or timeline files needed preservation. Alpha.1 exited normally before alpha.2 launch.",
+			"userVisualAcceptance": "pending",
+			"firstFrameDeliveredToWindowObserved": true
+		}
+	],
+	"performanceSamples": {
+		"syntheticPose": {
+			"durationSeconds": 600,
+			"setupMs": 88.272666,
+			"cachedQueries": 10000,
+			"queryTimeMs": 1.508416,
+			"log": "pose-timing.log"
+		},
+		"singleNativePreview": {
+			"startupMs": 297.7,
+			"previewMs": 42.5,
+			"log": "editor-preview.log"
+		},
+		"limitations": "Unoptimized debug, synthetic trajectory and one frame; not sustained preview FPS or release/Windows performance."
+	},
+	"trialArtifacts": {
+		"project": "/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.2/光标动画验证.cap",
+		"beforeExport": "/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.2/修改前.mp4",
+		"afterExport": "/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.2/修改后.mp4",
+		"productDefaultRotationAmount": 0.15,
+		"fixtureRotationAmount": 0.5
+	},
+	"artifactHashes": {
+		"applicationExecutable": "80734bb05985dee478b8e2e22ff7d41cb45b621bc0aa2c81f7d26f0654ebf6ff",
+		"packagedExporter": "85476e150c213c7bc8fe267eec0d99a5dac00f7f26c4097f3eb4c269087bad81",
+		"beforeExport": "3b80f4dba29f6cb4f8acd88f8cbf102caf4fef9222030d7c0563d4d1aeb5822f",
+		"finalAfterExport": "ffa8d9636d2153471105372519c72ebd9608ea98434ff83540c1ed26be6404d3"
+	},
+	"sourceHashes": {
+		"next/cap/JIANKU-NOTICE.md": "ea4c39371a71ae5aa4a5f27f768289d4e97c3bbf971edb68f63a436248d80e83",
+		"next/cap/apps/desktop/src-tauri/tauri.jianku.conf.json": "f4d09486dbb9f69d60b14f74486aa19170098e874792a448df8c48ce78671954",
+		"next/cap/apps/desktop/src-tauri/tauri.prod.conf.json": "f4d09486dbb9f69d60b14f74486aa19170098e874792a448df8c48ce78671954",
+		"next/cap/crates/editor/src/editor_instance.rs": "ffb136de5abb9beffcf98ac5a60574dced3e33a2e06f2d3397b1afe421863730",
+		"next/cap/crates/rendering/src/cursor_interpolation.rs": "32599dac79a7c5a31b63d57cd8a1c48b6497fd60ba15f949a8cf5f158dfdd345",
+		"next/cap/crates/rendering/src/layers/cursor.rs": "6948497a96f8bb4ce2aa8b97f529303c622b2d4d4901dbfac0f86e153e311005",
+		"next/cap/crates/rendering/src/lib.rs": "60925dd7b3774d894884b25769d61566318ab13da2269448a678c0cbd4f7a9b9",
+		"next/cap/crates/rendering/src/numeric_spring.rs": "4de7b7aa780dcb61e955ea255aeeec0d084ca26a94146a4de7ff2db4f6259991",
+		"next/cap/crates/rendering/src/overlay_layers/native_tests.rs": "e8cd161b77e37ca9619ad7792f5e36226396774dcaa9061bd877473021495645",
+		"next/cap/crates/rendering/test-data/numeric-spring.csv": "dffe283d087254c964a4f7838d36a22994695ae20986ee274137ad821a75c8a6"
+	},
+	"evidenceHashes": {
+		"before-1.333.png": "b0726f638b7298c7a58644e0f725681d79335ee97a9add790e64f11a7b6362d9",
+		"before-export.jsonl": "a34f5c8f015ba58d692300d1de094a7c4a8ee4bbc1887039ca6468cf59b168d7",
+		"before-export.stderr": "88b2c8e1756eb3110e1960cafd7d4e143cb17d76f1f4dcb85a23c72e9cfc064b",
+		"before-launch-windows.json": "2a5be5b50873b028fd8d911a51ab46650fc078b8121c6efeccefcdb668515c5f",
+		"config-biome.log": "0a64fe57479db5372fcb9381452d726a270174ad6172e43f5a547a05fe5944e7",
+		"current-windows.json": "426ad368790e94d855131256ec80bc14de4c5716e67ad8ddee4cd6b57ae5fb89",
+		"cursor-regression-initial-failure.log": "388f587dd827e3c6f4c2bb72be5822c4e1f78b1204d28680e5bceddc9a9e2674",
+		"cursor-regression.log": "bdaf260956f83716126a2ecde2a9b13f59994faecf644181ac69e092bd52499f",
+		"desktop-editor.log": "9b75b10854170e5f509b44ce13e750bc59d5ad81267b313d91e05e2d3fbcbbe0",
+		"docs-biome.log": "d53ddc0c5e991e7f36c1040ef2fe05575996fa4d537380aae8468ae1c8210dab",
+		"editor-cache.log": "d25d67474d4a47d02fce0eeb2c9df852c6079654ea04bca96472836b4d5fed9b",
+		"editor-preview.log": "fa94f6846bfbdaac0f9f9a3293ab395b58cb6ff402d409e86ab6125a41a0cb6f",
+		"editor-windows.json": "21798d5eb8a87305c03ea71b23ff596cab76c250ec6ef8eaf55f9a541cf33a83",
+		"final-build.log": "d0d27cd81c4e94beafc7d5e05761fa2045c8c1243fbeb53a5d545a417200029c",
+		"final-decode.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"final-docs-biome.log": "41034e0551abe01656424688cd37e7365f634c786c9e5f2e337841ebc675c3aa",
+		"final-export.jsonl": "dcb12743bf050050a1f1427cb7baee71c3cd224507908cc9394d5096ffb5093b",
+		"final-export.stderr": "fde71d9d5a6a96ef4ff9c26edea0080bb7851d53c1d77b6c5003fdb4e2f3b48c",
+		"final-late.png": "9c568968a9c5bdf004901f5c462b863976c6b33bd7fed6661c3aeea71374db0e",
+		"final-probe.json": "2c394d494e7072ec175f5edda476d1c7314d36e3884852b64225e0559a562ee1",
+		"final-signature.log": "4e68ff3ba7f829c047e596da698b0851c5c21cabcb6d9b222fad65032d780e8d",
+		"final-unzoomed.png": "4bd6787d3dbc67502869f97d8bae2d378c98429c161653567e94e8ff4f92adf7",
+		"final-zoomed.png": "2d585bf53556683a556b41482dd8b6fcd9a989a19b1fcb8404657a5e9e33c218",
+		"fixture-overrides/content/cursor.json": "56f259912501f099bd5d62741cf69e60c1bea663f50a64f99ef1da7ac722b53f",
+		"fixture-overrides/project-config.json": "f23cae3e1cb6466771acecb130cee70fe054ef388f298f8e8925553c253263c5",
+		"fixture-overrides/recording-meta.json": "8d20fdecdd55108c54a67431b80f777df09a4a3ebf180a82ce95f10f857a212f",
+		"gpu-parity.log": "c254e1e028998b4e334129e8022a3c547c48be07b8f87e95c8d8f9478bbedaf7",
+		"initial-after-1.333.png": "2d585bf53556683a556b41482dd8b6fcd9a989a19b1fcb8404657a5e9e33c218",
+		"initial-after-decode.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"initial-after-export.jsonl": "dcb12743bf050050a1f1427cb7baee71c3cd224507908cc9394d5096ffb5093b",
+		"initial-after-export.stderr": "1b68e7a98af3320bfe673d16a8ac3451232db5003c02056858d45933e93c1b38",
+		"initial-after-probe.json": "2c394d494e7072ec175f5edda476d1c7314d36e3884852b64225e0559a562ee1",
+		"initial-build.log": "74e0e8889bec4a031b2f0ec56bbd462acbff719435e4e9ba37fd68cf342cc861",
+		"initial-signature.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"legacy-solver-parity.log": "8ab2c106cd1995388c5591911a14efea01894cb6835e15a99b8bb3b9bf2ee313",
+		"legacy-source-hashes.json": "f2a2b034d8fe079b51f98bf9efea9a1de47c6633c6042263bb157fc394823a50",
+		"numerical-reference.cpp": "887b5a22adcaffb53ff50a03c0d7c31a2f55476feee843fa7ea517f0779bcf92",
+		"pose-timing.log": "fae9666f98250b672975b13fbd4b0eb6c179efa6e352c4fd78652eeb61239eff",
+		"raw-style-cache.log": "918083ed7e55d74af1a35bb5d6b0a2f06c0ebec16661bc1747ec0580d617123c",
+		"rendering-check.log": "0eb25275cbd9069910071e4ce16729a3caf64e8ffadc155612c6a118ea1b2601",
+		"rustfmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"startup-windows.json": "ab956d7e4d409d778418944e1f3d8514298e1a286f9ce23722260c69953b63e4"
+	},
+	"outstandingSourceOfTruth": "../../../docs/待验证项目交接.md",
+	"sourceCheckTotals": {
+		"uniqueRegularTestsPassed": 32,
+		"manualTimingTestPassed": 1,
+		"note": "GPU selection repeats one cursor regression; not counted twice."
+	}
+}
