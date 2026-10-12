@@ -1,0 +1,37 @@
+   Compiling ring v0.17.14
+   Compiling rustls-webpki v0.103.6
+   Compiling rustls v0.23.31
+   Compiling tokio-rustls v0.26.3
+   Compiling hyper-rustls v0.27.7
+   Compiling reqwest v0.12.24 (https://github.com/CapSoftware/reqwest?rev=9b5ecbd5210a9510fde766015cabb724c1e70d2e#9b5ecbd5)
+   Compiling workspace-hack v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/workspace-hack)
+   Compiling sentry v0.42.0
+   Compiling cap-media-info v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/media-info)
+   Compiling cap-cursor-info v0.0.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/cursor-info)
+   Compiling ffmpeg-hw-device v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/ffmpeg-hw-device)
+   Compiling cap-rnnoise v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rnnoise)
+   Compiling cap-enc-ffmpeg v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/enc-ffmpeg)
+   Compiling cap-project v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/project)
+   Compiling cap-flags v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/flags)
+   Compiling cap-camera-effects v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/camera-effects)
+   Compiling cap-media v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/media)
+   Compiling cap-utils v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/utils)
+   Compiling cap-video-decode v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/video-decode)
+   Compiling cap-audio v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/audio)
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+   Compiling cap-editor v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/editor)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 14.38s
+     Running unittests src/lib.rs (target/debug/deps/cap_editor-478a6e32d2ef2b4f)
+
+running 8 tests
+test editor_instance::tests::preview_cursor_cache_reuses_effective_settings ... ok
+test editor_instance::tests::preview_cursor_cache_distinguishes_cursor_identity_and_segments ... ok
+test editor_instance::tests::preview_cursor_cache_bypasses_empty_moves_without_retaining_cursor_data ... ok
+test editor_instance::tests::preview_cursor_cache_evicts_the_least_recent_segment ... ok
+test editor_instance::tests::preview_cursor_cache_retains_raw_mode_for_click_animation ... ok
+test editor_instance::tests::preview_cursor_cache_matches_fresh_interpolation_across_seeks_and_modes ... ok
+test editor_instance::tests::preview_cursor_cache_retains_raw_source_for_style_smoothing ... ok
+test editor_instance::tests::preview_cursor_cache_invalidates_each_spring_parameter ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 179 filtered out; finished in 0.00s
+

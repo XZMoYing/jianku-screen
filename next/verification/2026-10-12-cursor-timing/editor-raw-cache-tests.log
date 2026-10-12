@@ -1,0 +1,8 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.98s
+     Running unittests src/lib.rs (target/debug/deps/cap_editor-478a6e32d2ef2b4f)
+
+running 1 test
+test editor_instance::tests::raw_preview_cache_ignores_invalid_disabled_and_raw_styles ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 186 filtered out; finished in 0.00s
+

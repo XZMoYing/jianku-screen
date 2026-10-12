@@ -177,6 +177,11 @@ async fn cursor_pose_matches_cached_and_direct_gpu_paths_across_resolutions() {
     let mut project = project();
     project.cursor.set_cursor_type(CursorType::Circle);
     project.cursor.motion_blur = 0.0;
+    project.timeline.as_mut().unwrap().segments = serde_json::from_value(serde_json::json!([
+        {"recordingSegment": 0, "start": 0.75, "end": 1.4, "timescale": 2.0},
+        {"recordingSegment": 0, "start": 0.0, "end": 1.7, "timescale": 0.5}
+    ]))
+    .unwrap();
     let cursor = CursorEvents {
         moves: [(0.0, 0.1), (100.0, 0.1), (116.0, 0.9), (1500.0, 0.9)]
             .into_iter()
@@ -212,15 +217,18 @@ async fn cursor_pose_matches_cached_and_direct_gpu_paths_across_resolutions() {
         ZoomTransformTimeline::from_project(&project, &cursor, 3.0, constants.options.screen_size);
     let mut direct_layers = RendererLayers::new(&constants.device, &constants.queue);
     let mut cached_layers = RendererLayers::new(&constants.device, &constants.queue);
-    for frame in [57, 27, 38, 27] {
+    for (frame, fps) in [(57, 60), (27, 60), (6, 30), (144, 120), (27, 60)] {
         let mut decoded = frames();
-        decoded.recording_time = frame as f32 / 60.0;
+        decoded.recording_time = project
+            .get_segment_time(f64::from(frame) / f64::from(fps))
+            .unwrap()
+            .0 as f32;
         decoded.segment_time = decoded.recording_time;
         let direct = ProjectUniforms::new(
             &constants,
             &project,
             frame,
-            60,
+            fps,
             XY::new(320, 240),
             &cursor,
             &decoded,
@@ -231,7 +239,7 @@ async fn cursor_pose_matches_cached_and_direct_gpu_paths_across_resolutions() {
             &constants,
             &project,
             frame,
-            60,
+            fps,
             XY::new(320, 240),
             &cursor,
             &decoded,
@@ -243,7 +251,7 @@ async fn cursor_pose_matches_cached_and_direct_gpu_paths_across_resolutions() {
             &constants,
             &project,
             frame,
-            60,
+            fps,
             XY::new(1280, 720),
             &cursor,
             &decoded,
@@ -277,6 +285,77 @@ async fn cursor_pose_matches_cached_and_direct_gpu_paths_across_resolutions() {
             .unwrap();
         assert_eq!(pixels(&direct_frame), pixels(&cached_frame));
     }
+}
+
+#[tokio::test]
+async fn ordinary_cursor_target_stays_at_the_source_position_before_movement_on_gpu() {
+    use cap_project::{CursorMoveEvent, CursorType};
+    let directory = tempfile::tempdir().unwrap();
+    let constants = constants(directory.path()).await;
+    let mut project = project();
+    project.cursor.set_cursor_type(CursorType::Circle);
+    let cursor = CursorEvents {
+        moves: [(0.0, 0.1), (1000.0, 0.9)]
+            .into_iter()
+            .map(|(time_ms, x)| CursorMoveEvent {
+                time_ms,
+                x,
+                y: 0.5,
+                cursor_id: "primary".into(),
+                active_modifiers: vec![],
+            })
+            .collect(),
+        clicks: vec![],
+    };
+    let mut decoded = frames();
+    decoded.recording_time = 0.95;
+    decoded.segment_time = 0.95;
+    let make = |project| {
+        let zoom = ZoomTransformTimeline::from_project(
+            project,
+            &cursor,
+            3.0,
+            constants.options.screen_size,
+        );
+        ProjectUniforms::new(
+            &constants,
+            project,
+            57,
+            60,
+            XY::new(320, 240),
+            &cursor,
+            &decoded,
+            3.0,
+            &zoom,
+        )
+    };
+    let smoothed = make(&project);
+    let mut raw_project = project.clone();
+    raw_project.cursor.raw = true;
+    let raw = make(&raw_project);
+    let mut smoothed_layers = RendererLayers::new(&constants.device, &constants.queue);
+    let mut raw_layers = RendererLayers::new(&constants.device, &constants.queue);
+    let mut renderer = FrameRenderer::new(&constants);
+    let smoothed_frame = renderer
+        .render_immediate(
+            decoded.clone(),
+            smoothed,
+            &cursor,
+            true,
+            &mut smoothed_layers,
+        )
+        .await
+        .unwrap();
+    let raw_frame = renderer
+        .render_immediate(decoded, raw, &cursor, true, &mut raw_layers)
+        .await
+        .unwrap();
+    let differing_bytes = pixels(&smoothed_frame)
+        .iter()
+        .zip(pixels(&raw_frame))
+        .filter(|(a, b)| **a != *b)
+        .count();
+    assert_eq!(differing_bytes, 0, "Pre-movement frames must be identical");
 }
 
 async fn render(

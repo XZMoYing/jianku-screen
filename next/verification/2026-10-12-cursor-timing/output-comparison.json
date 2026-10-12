@@ -1,0 +1,11 @@
+{
+  "smoothed": {
+    "frames": 360,
+    "changedDecodedRGBAFrames": 308
+  },
+  "raw": {
+    "frames": 360,
+    "identicalDecodedRGBAFramesAndTimestamps": 360
+  },
+  "scope": "Owned synthetic source and fixed gradient, alpha.3 vs alpha.4; not reference-application output comparison."
+}

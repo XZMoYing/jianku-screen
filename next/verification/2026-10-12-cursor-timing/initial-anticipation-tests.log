@@ -1,0 +1,27 @@
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.05s
+     Running unittests src/lib.rs (target/debug/deps/cap_rendering-b077aa4d80692d35)
+
+running 2 tests
+
+thread 'cursor_interpolation::tests::ordinary_cursor_target_does_not_anticipate_future_motion' panicked at crates/rendering/src/cursor_interpolation.rs:1178:13:
+time=0.9, x=0.20680195093154907
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test cursor_interpolation::tests::ordinary_cursor_target_does_not_anticipate_future_motion ... FAILED
+{"adapter":"Apple M1","backend":"Metal","deviceType":"IntegratedGpu","software":false,"test":"overlay_native_boundary"}
+
+thread 'overlay_layers::native_tests::ordinary_cursor_target_stays_at_the_source_position_before_movement_on_gpu' panicked at crates/rendering/src/overlay_layers/native_tests.rs:350:5:
+assertion `left == right` failed: Pre-movement frames must be identical
+  left: 1360
+ right: 0
+test overlay_layers::native_tests::ordinary_cursor_target_stays_at_the_source_position_before_movement_on_gpu ... FAILED
+
+failures:
+
+failures:
+    cursor_interpolation::tests::ordinary_cursor_target_does_not_anticipate_future_motion
+    overlay_layers::native_tests::ordinary_cursor_target_stays_at_the_source_position_before_movement_on_gpu
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 313 filtered out; finished in 0.55s
+
+error: test failed, to rerun pass `-p cap-rendering --lib`

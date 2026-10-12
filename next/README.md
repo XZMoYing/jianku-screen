@@ -2,7 +2,7 @@
 
 新版在独立分支 `rewrite/cap-foundation` 开发，源代码位于 `next/cap/`。旧版源码、研究和工程格式保留在仓库原有目录；主工作目录继续停留在旧版。
 
-当前阶段：底座试用及动画校准。已完成源码接入、原生桌面检查、调试应用打包与签名，以及打包内导出程序的本地素材验证。当前源码版本为 0.2.0-alpha.3，已接入连续的光标倾斜与点击形变弹簧，预览与导出共用姿态缓存；进一步校准偏侧缩回的模糊中心与画面/光标的 21 次平移采样，保留原有强度和画面配置。完整动画对照、实时演示和旧工程迁移尚未完成；一次实际显示器录制的权限、停止、保存和自动打开编辑器已通过；截图、音频及完整编辑交互仍需实机验收。
+当前阶段：底座试用及动画校准。已完成源码接入、原生桌面检查、调试应用打包与签名，以及打包内导出程序的本地素材验证。当前源码版本为 0.2.0-alpha.4，已接入连续的光标倾斜与点击形变弹簧、偏侧缩回的模糊中心与 21 次平移采样校准；普通光标移动移除通用预读，位置缓存保留完整收尾，预览与导出共用计算，保留点击前瞻及原有参数和画面配置。完整动画对照、实时演示和旧工程迁移尚未完成；一次实际显示器录制的权限、停止、保存和自动打开编辑器已通过；截图、音频及完整编辑交互仍需实机验收。
 
 ## 版本与来源
 
@@ -35,6 +35,6 @@ macOS 打包完成后会重签并严格验证整个应用，避免调试包残�
 
 默认录制保存在 `~/Library/Application Support/com.jianku.screen.next/recordings/`；可在设置修改录制路径。调试包只用于功能验收，不能据其性能评估正式发布版。所有实测结果继续记录在统一交接文档与本阶段验证目录。
 
-2026-10-12 已确认 Xcode 16.2 初始化完成，原生构建障碍已解除。模糊阶段证据见 [动态模糊验证](verification/2026-10-12-motion-blur/verification.json)；光标阶段证据见 [姿态验证](verification/2026-10-12-cursor-pose/verification.json)；底座证据见 [原生底座验证](verification/2026-10-12-native-foundation/verification.json)；[前期接入记录](verification/2026-10-11-foundation/verification.json)保留当时的失败与等待状态，用于追溯。
+2026-10-12 已确认 Xcode 16.2 初始化完成，原生构建障碍已解除。位置时间与收尾证据见 [光标时间验证](verification/2026-10-12-cursor-timing/verification.json)；模糊阶段证据见 [动态模糊验证](verification/2026-10-12-motion-blur/verification.json)；光标阶段证据见 [姿态验证](verification/2026-10-12-cursor-pose/verification.json)；底座证据见 [原生底座验证](verification/2026-10-12-native-foundation/verification.json)；[前期接入记录](verification/2026-10-11-foundation/verification.json)保留当时的失败与等待状态，用于追溯。
 
-本机试用应用：`../Jianku Screen Next Builds/0.2.0-alpha.3/Jianku Screen Next.app`（相对项目工作目录）；已实际打开测试编辑窗口并确认帧送达。示例工程在 `~/Movies/Jianku Screen Next/试用 0.2.0-alpha.3/偏侧缩放与模糊验证.cap`；同目录的固定背景工程及修改前/后视频用于可重现对照，正在试用的工程保留原有背景选择。旧应用和工程保留。应用包大小来自未优化的调试二进制，发布版仍需单独构建和验证。
+本机试用应用：`../Jianku Screen Next Builds/0.2.0-alpha.4/Jianku Screen Next.app`（相对项目工作目录）；已实际打开测试编辑窗口并确认帧送达。示例工程在 `~/Movies/Jianku Screen Next/试用 0.2.0-alpha.4/光标时间与收尾验证.cap`；同目录保存修改前后视频和原始光标对照。旧应用和工程保留。应用包大小来自未优化的调试二进制，发布版仍需单独构建和验证。

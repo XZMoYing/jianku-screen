@@ -1,0 +1,28 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.43s
+     Running unittests src/lib.rs (target/debug/deps/cap_rendering-b077aa4d80692d35)
+
+running 3 tests
+
+thread 'cursor_interpolation::tests::cursor_settling_includes_clicks_after_the_last_move' panicked at crates/rendering/src/cursor_interpolation.rs:1209:9:
+assertion failed: timeline.timeline.last().unwrap().time >= 4000.0
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'cursor_interpolation::tests::cursor_settling_continues_after_the_last_input_until_rest' panicked at crates/rendering/src/cursor_interpolation.rs:1196:9:
+assertion failed: later.position.coord.x > early.position.coord.x + 0.001
+
+thread 'cursor_interpolation::tests::cursor_settling_preserves_undamped_motion_after_the_bounded_cache' panicked at crates/rendering/src/cursor_interpolation.rs:1229:13:
+assertion failed: (pose.position.coord.x - expected_x).abs() < 2e-4
+test cursor_interpolation::tests::cursor_settling_continues_after_the_last_input_until_rest ... FAILED
+test cursor_interpolation::tests::cursor_settling_includes_clicks_after_the_last_move ... FAILED
+test cursor_interpolation::tests::cursor_settling_preserves_undamped_motion_after_the_bounded_cache ... FAILED
+
+failures:
+
+failures:
+    cursor_interpolation::tests::cursor_settling_continues_after_the_last_input_until_rest
+    cursor_interpolation::tests::cursor_settling_includes_clicks_after_the_last_move
+    cursor_interpolation::tests::cursor_settling_preserves_undamped_motion_after_the_bounded_cache
+
+test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 312 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p cap-rendering --lib`
