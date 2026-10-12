@@ -1,0 +1,21 @@
+   Compiling cap-cursor-info v0.0.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/cursor-info)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.05s
+     Running unittests src/lib.rs (target/debug/deps/cap_cursor_info-fedbbee10b94d69b)
+
+running 13 tests
+test family_tests::every_family_arrow_resolves ... ok
+test family_tests::in_family_is_identity_within_family ... ok
+test family_tests::family_classifies_every_shape ... ok
+test family_tests::in_family_always_resolves ... ok
+test family_tests::tahoe_round_trips_by_name ... ok
+test family_tests::tahoe_only_shapes_fall_back_to_classic_arrow ... ok
+test family_tests::unresolvable_shapes_become_the_family_arrow ... ok
+test family_tests::windows_macos_round_trips_are_exact ... ok
+test macos::detection_tests::current_tahoe_hand_images_are_recognized ... ok
+test macos_runtime::tests::custom_cursors_are_not_classified_or_accumulated ... ok
+test macos_runtime::tests::system_settings_changes_replace_the_snapshot ... ok
+test macos::detection_tests::custom_pixels_and_invalid_dimensions_are_not_classified ... ok
+test macos_runtime::tests::unknown_images_remain_unclassified ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.77s
+

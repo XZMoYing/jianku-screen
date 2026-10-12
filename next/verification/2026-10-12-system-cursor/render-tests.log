@@ -1,0 +1,55 @@
+   Compiling objc2-exception-helper v0.1.1
+   Compiling ring v0.17.14
+   Compiling ffmpeg-sys-next v7.1.3
+   Compiling objc2 v0.6.2
+   Compiling rustls v0.23.31
+   Compiling objc2-core-foundation v0.3.1
+   Compiling block2 v0.6.1
+   Compiling dispatch2 v0.3.0
+   Compiling rustls-webpki v0.103.6
+   Compiling objc2-core-graphics v0.3.1
+   Compiling objc2-foundation v0.3.1
+   Compiling ffmpeg-next v7.1.0 (https://github.com/CapSoftware/rust-ffmpeg?rev=49db1fede112#49db1fed)
+   Compiling tokio-rustls v0.26.3
+   Compiling hyper-rustls v0.27.7
+   Compiling reqwest v0.12.24 (https://github.com/CapSoftware/reqwest?rev=9b5ecbd5210a9510fde766015cabb724c1e70d2e#9b5ecbd5)
+   Compiling workspace-hack v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/workspace-hack)
+   Compiling cap-media-info v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/media-info)
+   Compiling ffmpeg-hw-device v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/ffmpeg-hw-device)
+   Compiling cap-camera-effects v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/camera-effects)
+   Compiling cap-flags v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/flags)
+   Compiling cap-enc-ffmpeg v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/enc-ffmpeg)
+   Compiling cap-video-decode v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/video-decode)
+   Compiling objc2-cloud-kit v0.3.1
+   Compiling objc2-core-image v0.3.1
+   Compiling objc2-quartz-core v0.3.1
+   Compiling objc2-core-data v0.3.1
+   Compiling objc2-app-kit v0.3.1
+   Compiling cap-cursor-info v0.0.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/cursor-info)
+   Compiling cap-project v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/project)
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 31.39s
+     Running unittests src/lib.rs (target/debug/deps/cap_rendering-7db7f86910c3a9fa)
+
+running 17 tests
+test layers::cursor::tests::cursor_blur_vector_is_linear_in_travel_and_amount ... ok
+test layers::cursor::tests::cursor_height_uses_source_relative_default ... ok
+test layers::cursor::tests::cursor_height_falls_back_for_invalid_dimensions ... ok
+test layers::cursor::tests::cursor_blur_vector_caps_only_teleports ... ok
+test layers::cursor::tests::cursor_height_applies_project_size_as_percent ... ok
+test layers::cursor::tests::cursor_height_scales_with_source_crop ... ok
+test layers::cursor::tests::appearance_selection_preserves_unknown_recorded_shapes ... ok
+test layers::cursor::tests::appearance_selection_keeps_pointer_and_text_transitions ... ok
+test layers::cursor::tests::cursor_height_uses_the_fitted_zoomed_display_once ... ok
+test layers::cursor::tests::opacity_fades_once_past_delay ... ok
+test layers::cursor::tests::opacity_fades_in_after_long_inactivity ... ok
+test layers::cursor::tests::opacity_stays_visible_with_recent_move ... ok
+test layers::cursor::tests::svg_mips_keep_channels_premultiplied ... ok
+test layers::cursor::tests::svg_mips_cover_odd_non_square_edges ... ok
+test layers::cursor::tests::macos_arrow_mips_preserve_minified_structure_and_coverage ... ok
+cursor kernel adapter: Apple M1 / Metal
+test layers::cursor::tests::motion_blur_cursor_kernel_matches_centroid_and_transparent_apron_on_gpu ... ok
+test layers::cursor::tests::unclassified_recorded_hands_recover_scalable_assets ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 299 filtered out; finished in 0.40s
+

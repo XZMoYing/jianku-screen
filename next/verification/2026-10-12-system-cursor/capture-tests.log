@@ -1,0 +1,72 @@
+   Compiling block2 v0.6.1
+   Compiling ring v0.17.14
+   Compiling objc_exception v0.1.2
+   Compiling objc2-core-video v0.3.1
+   Compiling objc2-core-media v0.3.1
+   Compiling cap-rnnoise v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rnnoise)
+   Compiling objc2-io-kit v0.3.1
+   Compiling dispatch2 v0.3.0
+   Compiling objc2-foundation v0.3.1
+   Compiling sysinfo v0.35.2
+   Compiling objc v0.2.7
+   Compiling metal v0.31.0
+   Compiling cocoa-foundation v0.2.1
+   Compiling screencapturekit v0.3.6
+   Compiling rustls-webpki v0.103.6
+   Compiling cocoa v0.26.1
+   Compiling rustls v0.23.31
+   Compiling wgpu-hal v25.0.2 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/vendor/wgpu-hal)
+   Compiling tokio-rustls v0.26.3
+   Compiling wgpu-core-deps-apple v25.0.0
+   Compiling hyper-rustls v0.27.7
+   Compiling wgpu-core v25.0.2
+   Compiling reqwest v0.12.24 (https://github.com/CapSoftware/reqwest?rev=9b5ecbd5210a9510fde766015cabb724c1e70d2e#9b5ecbd5)
+   Compiling workspace-hack v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/workspace-hack)
+   Compiling cap-media-info v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/media-info)
+   Compiling ffmpeg-hw-device v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/ffmpeg-hw-device)
+   Compiling cap-camera-avfoundation v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/camera-avfoundation)
+   Compiling cap-enc-ffmpeg v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/enc-ffmpeg)
+   Compiling scap-targets v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/scap-targets)
+   Compiling cap-flags v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/flags)
+   Compiling cap-enc-avfoundation v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/enc-avfoundation)
+   Compiling cap-frame-converter v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/frame-converter)
+   Compiling cap-media v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/media)
+   Compiling cap-cursor-capture v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/cursor-capture)
+   Compiling cap-utils v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/utils)
+   Compiling cap-timestamp v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/timestamp)
+   Compiling cap-fail v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/fail)
+   Compiling cap-video-decode v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/video-decode)
+   Compiling cap-audio v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/audio)
+   Compiling wgpu v25.0.2
+   Compiling cap-camera-effects v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/camera-effects)
+   Compiling glyphon v0.9.0
+   Compiling objc2-core-image v0.3.1
+   Compiling objc2-quartz-core v0.3.1
+   Compiling objc2-core-data v0.3.1
+   Compiling objc2-cloud-kit v0.3.1
+   Compiling objc2-avf-audio v0.3.1
+   Compiling objc2-av-foundation v0.3.1
+   Compiling objc2-app-kit v0.3.1
+   Compiling cap-camera v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/camera)
+   Compiling cap-camera-ffmpeg v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/camera-ffmpeg)
+   Compiling cap-cursor-info v0.0.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/cursor-info)
+   Compiling scap-screencapturekit v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/scap-screencapturekit)
+   Compiling scap-ffmpeg v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/scap-ffmpeg)
+   Compiling cap-project v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/project)
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+   Compiling cap-recording v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/recording)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 09s
+     Running unittests src/lib.rs (target/debug/deps/cap_recording-c9cb941be3e87d55)
+
+running 8 tests
+test cursor::macos_cursor_tests::cursor_without_image_is_skipped ... ok
+test cursor::macos_cursor_tests::zero_sized_cursor_is_skipped ... ok
+test cursor::cursor_identity_tests::identical_pixels_with_different_hotspots_are_distinct_assets ... ok
+test cursor::input_epoch_tests::primed_input_waits_for_the_gate_and_then_starts_at_the_arm_point ... ok
+test cursor::input_epoch_tests::an_arm_point_before_the_pipeline_epoch_is_clamped_to_it ... ok
+test cursor::cursor_identity_tests::a_recovered_shape_does_not_reuse_an_unclassified_asset ... ok
+test cursor::macos_cursor_tests::valid_cursor_keeps_image_and_hotspot ... ok
+test cursor::macos_cursor_tests::retina_cursor_hotspot_uses_logical_image_size ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 561 filtered out; finished in 0.41s
+

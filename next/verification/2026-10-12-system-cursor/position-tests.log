@@ -1,0 +1,32 @@
+   Compiling num-traits v0.2.19
+   Compiling h2 v0.4.12
+   Compiling half v2.6.0
+   Compiling cocoa-foundation v0.2.1
+   Compiling exr v1.73.0
+   Compiling cocoa v0.26.1
+   Compiling num-integer v0.1.46
+   Compiling num-complex v0.4.6
+   Compiling chrono v0.4.42
+   Compiling num-bigint v0.4.6
+   Compiling ndarray v0.17.2
+   Compiling specta v2.0.0-rc.20
+   Compiling image v0.24.9
+   Compiling num-rational v0.4.2
+   Compiling hyper v1.7.0
+   Compiling hyper-util v0.1.17
+   Compiling ort v2.0.0-rc.12
+   Compiling hyper-tls v0.6.0
+   Compiling hyper-rustls v0.27.7
+   Compiling reqwest v0.12.24 (https://github.com/CapSoftware/reqwest?rev=9b5ecbd5210a9510fde766015cabb724c1e70d2e#9b5ecbd5)
+   Compiling workspace-hack v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/workspace-hack)
+   Compiling scap-targets v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/scap-targets)
+   Compiling cap-cursor-capture v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/cursor-capture)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 15.18s
+     Running unittests src/lib.rs (target/debug/deps/cap_cursor_capture-26907097c9351699)
+
+running 2 tests
+test position::precision_tests::system_pointer_sample_is_finite ... ok
+test position::precision_tests::fractional_points_survive_display_and_crop_mapping ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+

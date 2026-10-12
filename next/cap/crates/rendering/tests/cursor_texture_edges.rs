@@ -11,9 +11,12 @@ const TEXTURE_HEIGHT: u32 = 128;
 #[derive(Clone, Copy, Debug)]
 struct Case {
     height: f32,
+    aspect: f32,
     rotation: f32,
     offset: [f32; 2],
     motion: [f32; 2],
+    hotspot: [f32; 2],
+    tilt: f32,
 }
 
 impl Case {
@@ -22,13 +25,13 @@ impl Case {
             [
                 96.0 + self.offset[0],
                 38.0 + self.offset[1],
-                self.height * TEXTURE_WIDTH as f32 / TEXTURE_HEIGHT as f32,
+                self.height * self.aspect,
                 self.height,
             ],
             [OUTPUT_WIDTH as f32, OUTPUT_HEIGHT as f32, 0.0, 0.0],
             [0.0, 0.0, OUTPUT_WIDTH as f32, OUTPUT_HEIGHT as f32],
             [self.motion[0], self.motion[1], 1.0, 1.0],
-            [0.0, self.rotation, 0.0, 0.0],
+            [self.hotspot[0], self.rotation, self.tilt, self.hotspot[1]],
             [0.0; 4],
             [0.0; 4],
             [0.0; 4],
@@ -62,7 +65,7 @@ fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
         return apply_color_grade(base_color * opacity, input.position.xy);
     }
     var color = base_color;
-    for (var i = 1; i <= 20; i = i + 1) {
+    for (var i = 0; i < 20; i = i + 1) {
         let sample_uv = input.uv + velocity_uv * (f32(i) / 20.0);
         let texel = textureSample(t_cursor, s_cursor, sample_uv);
         let inside = all(vec4<bool>(sample_uv >= vec2<f32>(0.0), sample_uv <= vec2<f32>(1.0)));
@@ -289,14 +292,16 @@ fn assert_transparent_exterior(pixels: &[u8], case: Case) {
     for (index, pixel) in pixels.chunks_exact(4).enumerate() {
         let dx = (index as u32 % OUTPUT_WIDTH) as f32 + 0.5 - x;
         let dy = (index as u32 / OUTPUT_WIDTH) as f32 + 0.5 - y;
+        let dx = dx / width - case.hotspot[0];
+        let dy = dy / height - case.hotspot[1];
         let uv = [
-            c * dx / width - s * dy / height,
-            s * dx / width + c * dy / height,
+            c * dx - s * dy + case.hotspot[0],
+            s * dx + c * dy + case.hotspot[1],
         ];
-        let outside = (0..21).all(|tap| {
+        let outside = (0..21_usize).all(|tap| {
             let sample = [
-                uv[0] + velocity[0] * tap as f32 / 20.0,
-                uv[1] + velocity[1] * tap as f32 / 20.0,
+                uv[0] + velocity[0] * tap.saturating_sub(1) as f32 / 20.0,
+                uv[1] + velocity[1] * tap.saturating_sub(1) as f32 / 20.0,
             ];
             sample.iter().any(|value| *value < -0.001 || *value > 1.001)
         });
@@ -337,9 +342,12 @@ fn minified_cursor_edges_match_uniform_sampling() {
                 for motion in [[0.0, 0.0], [36.0, 0.0], [-18.0, 13.0]] {
                     let case = Case {
                         height,
+                        aspect: TEXTURE_WIDTH as f32 / TEXTURE_HEIGHT as f32,
                         rotation: degrees.to_radians(),
                         offset,
                         motion,
+                        hotspot: [0.0, 0.0],
+                        tilt: 0.0,
                     };
                     let actual = render(&device, &queue, &actual_pipeline, &cursor, &sampler, case);
                     let expected = render(
@@ -362,5 +370,227 @@ fn minified_cursor_edges_match_uniform_sampling() {
                 }
             }
         }
+    }
+}
+
+fn marker_position(pixels: &[u8]) -> [f64; 2] {
+    let mut sum = [0.0; 3];
+    for (index, pixel) in pixels.chunks_exact(4).enumerate() {
+        let weight = f64::from(pixel[1]);
+        sum[0] += (f64::from(index as u32 % OUTPUT_WIDTH) + 0.5) * weight;
+        sum[1] += (f64::from(index as u32 / OUTPUT_WIDTH) + 0.5) * weight;
+        sum[2] += weight;
+    }
+    assert!(sum[2] > 0.0, "hotspot marker must be visible");
+    [sum[0] / sum[2], sum[1] / sum[2]]
+}
+
+#[test]
+fn hotspot_stays_at_the_mouse_position_during_rotation_and_resizing() {
+    let instance = cap_rendering::create_wgpu_instance_sync();
+    let adapter =
+        pollster::block_on(instance.request_adapter(&wgpu::RequestAdapterOptions::default()))
+            .expect("hotspot regression requires a real GPU");
+    let info = adapter.get_info();
+    assert_ne!(info.backend, wgpu::Backend::Noop);
+    eprintln!("Cursor hotspot adapter: {info:?}");
+    let (device, queue) =
+        pollster::block_on(adapter.request_device(&wgpu::DeviceDescriptor::default())).unwrap();
+    let actual_pipeline = pipeline(&device, SHADER);
+    let old_pivot = SHADER.replace(
+        "let pivot = vec2<f32>(uniforms.rotation_params.x, -uniforms.rotation_params.w);",
+        "let pivot = vec2<f32>(0.0, 0.0);",
+    );
+    assert_ne!(old_pivot, SHADER);
+    let previous_pipeline = pipeline(&device, &old_pivot);
+    let texture = device.create_texture(&wgpu::TextureDescriptor {
+        label: Some("Synthetic hotspot marker"),
+        size: wgpu::Extent3d {
+            width: TEXTURE_WIDTH,
+            height: TEXTURE_HEIGHT,
+            depth_or_array_layers: 1,
+        },
+        mip_level_count: 1,
+        sample_count: 1,
+        dimension: wgpu::TextureDimension::D2,
+        format: wgpu::TextureFormat::Rgba8Unorm,
+        usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::COPY_DST,
+        view_formats: &[],
+    });
+    let view = texture.create_view(&Default::default());
+    let sampler = device.create_sampler(&wgpu::SamplerDescriptor {
+        mag_filter: wgpu::FilterMode::Linear,
+        min_filter: wgpu::FilterMode::Linear,
+        ..Default::default()
+    });
+    let mut previous_max_drift = 0.0_f64;
+    for hotspot in [[0.25, 0.25], [0.5, 0.5], [0.75, 0.75]] {
+        let mut rgba = vec![0; (TEXTURE_WIDTH * TEXTURE_HEIGHT * 4) as usize];
+        let cx = (hotspot[0] * TEXTURE_WIDTH as f32) as u32;
+        let cy = (hotspot[1] * TEXTURE_HEIGHT as f32) as u32;
+        for y in cy - 3..cy + 3 {
+            for x in cx - 3..cx + 3 {
+                let start = ((y * TEXTURE_WIDTH + x) * 4) as usize;
+                rgba[start..start + 4].copy_from_slice(&[0, 255, 0, 255]);
+            }
+        }
+        queue.write_texture(
+            texture.as_image_copy(),
+            &rgba,
+            wgpu::TexelCopyBufferLayout {
+                offset: 0,
+                bytes_per_row: Some(TEXTURE_WIDTH * 4),
+                rows_per_image: Some(TEXTURE_HEIGHT),
+            },
+            texture.size(),
+        );
+        for height in [32.0, 64.0, 96.0] {
+            for (rotation, tilt) in [
+                (-20.0_f32, 0.0_f32),
+                (0.0, 0.0),
+                (20.0, 0.0),
+                (0.0, -20.0),
+                (0.0, 20.0),
+                (30.0, -20.0),
+            ] {
+                let case = Case {
+                    height,
+                    aspect: TEXTURE_WIDTH as f32 / TEXTURE_HEIGHT as f32,
+                    rotation: rotation.to_radians(),
+                    tilt: tilt.to_radians(),
+                    offset: [
+                        80.0 - 96.0 - hotspot[0] * height * 0.5,
+                        60.0 - 38.0 - hotspot[1] * height,
+                    ],
+                    motion: [0.0, 0.0],
+                    hotspot,
+                };
+                let pixels = render(&device, &queue, &actual_pipeline, &view, &sampler, case);
+                let position = marker_position(&pixels);
+                let drift = (position[0] - 80.0).hypot(position[1] - 60.0);
+                assert!(
+                    drift < 0.65,
+                    "hotspot drift {drift} px, position={position:?}, {case:?}"
+                );
+                let previous = render(&device, &queue, &previous_pipeline, &view, &sampler, case);
+                let position = marker_position(&previous);
+                previous_max_drift =
+                    previous_max_drift.max((position[0] - 80.0).hypot(position[1] - 60.0));
+            }
+        }
+    }
+    assert!(
+        previous_max_drift > 10.0,
+        "must reproduce the old hotspot drift"
+    );
+    eprintln!("54 hotspot cases passed; previous pivot drift reached {previous_max_drift:.3} px");
+}
+
+#[test]
+fn stationary_macos_arrow_tip_points_at_the_recorded_position() {
+    let instance = cap_rendering::create_wgpu_instance_sync();
+    let adapter =
+        pollster::block_on(instance.request_adapter(&wgpu::RequestAdapterOptions::default()))
+            .expect("arrow alignment regression requires a real GPU");
+    assert_ne!(adapter.get_info().backend, wgpu::Backend::Noop);
+    let (device, queue) =
+        pollster::block_on(adapter.request_device(&wgpu::DeviceDescriptor::default())).unwrap();
+    let shader = pipeline(&device, SHADER);
+    let asset = cap_cursor_info::CursorShapeMacOS::Arrow.resolve().unwrap();
+    let tree = resvg::usvg::Tree::from_str(asset.raw, &resvg::usvg::Options::default()).unwrap();
+    let mut pixmap = tiny_skia::Pixmap::new(144, 200).unwrap();
+    resvg::render(
+        &tree,
+        tiny_skia::Transform::from_scale(8.0, 8.0),
+        &mut pixmap.as_mut(),
+    );
+    let texture = device.create_texture(&wgpu::TextureDescriptor {
+        label: Some("Actual macOS arrow SVG"),
+        size: wgpu::Extent3d {
+            width: 144,
+            height: 200,
+            depth_or_array_layers: 1,
+        },
+        mip_level_count: 1,
+        sample_count: 1,
+        dimension: wgpu::TextureDimension::D2,
+        format: wgpu::TextureFormat::Rgba8Unorm,
+        usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::COPY_DST,
+        view_formats: &[],
+    });
+    queue.write_texture(
+        texture.as_image_copy(),
+        pixmap.data(),
+        wgpu::TexelCopyBufferLayout {
+            offset: 0,
+            bytes_per_row: Some(144 * 4),
+            rows_per_image: Some(200),
+        },
+        texture.size(),
+    );
+    let view = texture.create_view(&Default::default());
+    let sampler = device.create_sampler(&wgpu::SamplerDescriptor {
+        mag_filter: wgpu::FilterMode::Linear,
+        min_filter: wgpu::FilterMode::Linear,
+        ..Default::default()
+    });
+    for height in [25.0, 50.0, 75.0] {
+        let mut case = Case {
+            height,
+            aspect: 18.0 / 25.0,
+            rotation: 0.0,
+            tilt: 0.0,
+            offset: [
+                80.0 - 96.0 - asset.hotspot.0 as f32 * height * 18.0 / 25.0,
+                30.0 - 38.0 - asset.hotspot.1 as f32 * height,
+            ],
+            hotspot: [asset.hotspot.0 as f32, asset.hotspot.1 as f32],
+            motion: [0.0, 0.0],
+        };
+        let tip = |pixels: &[u8]| {
+            let row = pixels
+                .chunks_exact(4)
+                .enumerate()
+                .find_map(|(index, pixel)| {
+                    (pixel[0] > 150 && pixel[1] > 150 && pixel[2] > 150 && pixel[3] > 200)
+                        .then_some(index as u32 / OUTPUT_WIDTH)
+                })
+                .expect("opaque white arrow outline");
+            let xs: Vec<_> = pixels
+                .chunks_exact(4)
+                .enumerate()
+                .filter_map(|(index, pixel)| {
+                    (index as u32 / OUTPUT_WIDTH == row
+                        && pixel[0] > 150
+                        && pixel[1] > 150
+                        && pixel[2] > 150
+                        && pixel[3] > 200)
+                        .then_some(index as u32 % OUTPUT_WIDTH)
+                })
+                .collect();
+            [
+                f64::from(*xs.iter().min().unwrap()) + 0.5,
+                f64::from(row) + 0.5,
+            ]
+        };
+        let pixels = render(&device, &queue, &shader, &view, &sampler, case);
+        let position = tip(&pixels);
+        assert!(
+            (position[0] - 80.0).abs() <= 1.5 && (position[1] - 30.0).abs() <= 1.5,
+            "arrow apex={position:?} at height {height}"
+        );
+        case.hotspot = [0.302, 0.226];
+        case.offset = [
+            80.0 - 96.0 - 0.302 * height * 18.0 / 25.0,
+            30.0 - 38.0 - 0.226 * height,
+        ];
+        let previous = tip(&render(&device, &queue, &shader, &view, &sampler, case));
+        assert!(
+            previous[1] < position[1] - 1.0,
+            "must reproduce the stationary upward offset"
+        );
+        eprintln!(
+            "stationary arrow height={height}: previous={previous:?}, corrected={position:?}"
+        );
     }
 }

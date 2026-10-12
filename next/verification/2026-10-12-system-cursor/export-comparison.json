@@ -1,0 +1,58 @@
+[
+  {
+    "name": "tilted-before",
+    "path": "/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.5/倾斜-修改前.mp4",
+    "sha256": "aa683805d9563d4b40a88faa9d5b696fdbbfd7e08e166dfa3c775aee24052ac6",
+    "frames": 360,
+    "fps": "60/1",
+    "width": 1280,
+    "height": 800,
+    "duration": "6.000000",
+    "completeDecode": true
+  },
+  {
+    "name": "tilted-after",
+    "path": "/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.5/倾斜-修改后.mp4",
+    "sha256": "deaa757c65590a26361fc406758925b422eabd84afefb3af6e845b453734c1a9",
+    "frames": 360,
+    "fps": "60/1",
+    "width": 1280,
+    "height": 800,
+    "duration": "6.000000",
+    "completeDecode": true
+  },
+  {
+    "name": "unrotated-before",
+    "path": "/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.5/关闭倾斜-修改前.mp4",
+    "sha256": "bdc1d54f3cd83c9c5bb086142dd0146771cb82fbf20b0082855948fae94ee99c",
+    "frames": 360,
+    "fps": "60/1",
+    "width": 1280,
+    "height": 800,
+    "duration": "6.000000",
+    "completeDecode": true
+  },
+  {
+    "name": "unrotated-after",
+    "path": "/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.5/关闭倾斜-修改后.mp4",
+    "sha256": "bdc1d54f3cd83c9c5bb086142dd0146771cb82fbf20b0082855948fae94ee99c",
+    "frames": 360,
+    "fps": "60/1",
+    "width": 1280,
+    "height": 800,
+    "duration": "6.000000",
+    "completeDecode": true
+  },
+  {
+    "comparison": "tilted",
+    "changedFrames": 350,
+    "timestampsEqual": true,
+    "control": "classic SVG anchor and rotation correction"
+  },
+  {
+    "comparison": "unrotated",
+    "changedFrames": 0,
+    "timestampsEqual": true,
+    "control": "recorded bitmap with zero rotation"
+  }
+]

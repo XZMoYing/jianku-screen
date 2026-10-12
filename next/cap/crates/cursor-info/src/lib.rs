@@ -1,6 +1,8 @@
 //! Cap Cursor Info: A crate for getting cursor information, assets and hotspot information.
 
 mod macos;
+#[cfg(target_os = "macos")]
+mod macos_runtime;
 mod windows;
 
 use std::{fmt, str::FromStr};

@@ -20,9 +20,10 @@ windows = { workspace = true, features = [
 [dev-dependencies]
 hex = "0.4"
 
-[target.'cfg(target_os = "macos")'.dev-dependencies]
+[target.'cfg(target_os = "macos")'.dependencies]
 objc2 = "0.6"
 objc2-app-kit = { version = "0.3.0", features = ["NSCursor", "NSApplication"] }
+objc2-foundation = { version = "0.3.1", features = ["NSProcessInfo"] }
 
 
 [lints]

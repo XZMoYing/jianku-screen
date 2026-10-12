@@ -623,10 +623,10 @@ impl CursorLayer {
                 cursor_opacity,
             ],
             rotation_params: [
-                0.0,
+                cursor_texture.hotspot.x as f32,
                 uniforms.project.cursor.base_rotation,
                 uniforms.cursor_x_axis_tilt_radians,
-                0.0,
+                cursor_texture.hotspot.y as f32,
             ],
             color_adjust_a: cursor_grade.color_adjust_a,
             color_adjust_b: cursor_grade.color_adjust_b,

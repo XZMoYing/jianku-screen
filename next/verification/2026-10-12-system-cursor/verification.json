@@ -1,0 +1,183 @@
+{
+	"recordedAt": "2026-10-12T12:41:27.472231+00:00",
+	"version": "0.2.0-alpha.5",
+	"bundleVersion": "2026.10.12.5",
+	"branch": "rewrite/cap-foundation",
+	"sourceBaseCommit": "a4bd5d8f1785eed890d7ba2bc3413d71b9fe84bb",
+	"profile": "debug",
+	"scope": {
+		"classicArrowHotspot": "SVG apex at 3/18, 3/25",
+		"macosPosition": "CoreGraphics floating logical coordinates; preserves display/crop precision",
+		"systemShapeDetection": "runtime standard image mapping, miss refresh throttled to one second, bounded snapshot",
+		"rotation": "around asset hotspot; zero rotation preserves previous vertex path",
+		"recordingAssets": "image, hotspot and shape distinguish asset identity; stationary shape changes produce an event",
+		"animationCurves": "position/pose/click/zoom/blur settings preserved",
+		"referenceParity": "not verified against controlled reference outputs",
+		"realTimePresentation": "not implemented",
+		"realRecordingOffset": "not yet confirmed by a new real recording",
+		"projectManagement": "not implemented in this stage; prioritized user bug"
+	},
+	"checks": [
+		{
+			"name": "shape-tests",
+			"passed": 13,
+			"status": "passed",
+			"log": "shape-tests.log"
+		},
+		{
+			"name": "capture-tests",
+			"passed": 8,
+			"status": "passed",
+			"log": "capture-tests.log"
+		},
+		{
+			"name": "position-tests",
+			"passed": 2,
+			"status": "passed",
+			"log": "position-tests.log"
+		},
+		{
+			"name": "gpu-tests",
+			"passed": 3,
+			"status": "passed",
+			"log": "gpu-tests.log"
+		},
+		{
+			"name": "render-tests",
+			"passed": 17,
+			"status": "passed",
+			"log": "render-tests.log"
+		}
+	],
+	"uniqueTests": 43,
+	"rustCheck": {
+		"crates": [
+			"cap-cursor-info",
+			"cap-cursor-capture",
+			"cap-recording",
+			"cap-rendering"
+		],
+		"status": "passed",
+		"log": "rust-check.log"
+	},
+	"nativeProbe": {
+		"systemSizeScale": 1.404409766197205,
+		"shapes": [
+			"Arrow",
+			"IBeam",
+			"PointingHand",
+			"Crosshair",
+			"OpenHand",
+			"ClosedHand"
+		],
+		"contexts": ["main", "recording-thread"],
+		"status": "passed",
+		"log": "system-probe.log",
+		"systemSettingsChanged": false
+	},
+	"gpu": {
+		"backend": "Metal",
+		"adapter": "Apple M1",
+		"rotationCases": 54,
+		"maxAllowedCentroidErrorPx": 0.65,
+		"previousMaxDriftPx": 30.653,
+		"stationaryArrowHeightsPx": [25, 50, 75],
+		"minifiedEdgeCases": 72,
+		"log": "gpu-tests.log"
+	},
+	"build": {
+		"initialWrapperExitCode": 1,
+		"finalWrapperExitCode": 1,
+		"compilationAndBundle": "passed",
+		"signingIssue": "errSecInternalComponent; existing development keychain unlocked, same final bundle re-signed",
+		"recovery": "passed",
+		"strictFinalSignature": "passed",
+		"logs": [
+			"initial-build.log",
+			"native-build.log",
+			"signature-recovery.log",
+			"final-signature.log"
+		],
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.5/Jianku Screen Next.app"
+	},
+	"exports": [
+		{
+			"name": "tilted-before",
+			"path": "/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.5/倾斜-修改前.mp4",
+			"sha256": "aa683805d9563d4b40a88faa9d5b696fdbbfd7e08e166dfa3c775aee24052ac6",
+			"frames": 360,
+			"fps": "60/1",
+			"width": 1280,
+			"height": 800,
+			"duration": "6.000000",
+			"completeDecode": true
+		},
+		{
+			"name": "tilted-after",
+			"path": "/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.5/倾斜-修改后.mp4",
+			"sha256": "deaa757c65590a26361fc406758925b422eabd84afefb3af6e845b453734c1a9",
+			"frames": 360,
+			"fps": "60/1",
+			"width": 1280,
+			"height": 800,
+			"duration": "6.000000",
+			"completeDecode": true
+		},
+		{
+			"name": "unrotated-before",
+			"path": "/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.5/关闭倾斜-修改前.mp4",
+			"sha256": "bdc1d54f3cd83c9c5bb086142dd0146771cb82fbf20b0082855948fae94ee99c",
+			"frames": 360,
+			"fps": "60/1",
+			"width": 1280,
+			"height": 800,
+			"duration": "6.000000",
+			"completeDecode": true
+		},
+		{
+			"name": "unrotated-after",
+			"path": "/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.5/关闭倾斜-修改后.mp4",
+			"sha256": "bdc1d54f3cd83c9c5bb086142dd0146771cb82fbf20b0082855948fae94ee99c",
+			"frames": 360,
+			"fps": "60/1",
+			"width": 1280,
+			"height": 800,
+			"duration": "6.000000",
+			"completeDecode": true
+		},
+		{
+			"comparison": "tilted",
+			"changedFrames": 350,
+			"timestampsEqual": true,
+			"control": "classic SVG anchor and rotation correction"
+		},
+		{
+			"comparison": "unrotated",
+			"changedFrames": 0,
+			"timestampsEqual": true,
+			"control": "recorded bitmap with zero rotation"
+		}
+	],
+	"launch": {
+		"pid": 92050,
+		"bundlePath": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.5/Jianku Screen Next.app",
+		"editorWindow": "1275x800",
+		"firstFrameDelivered": true,
+		"shortPlaybackObserved": true,
+		"log": "startup-frame-evidence.log",
+		"windows": "startup-windows.json",
+		"upstreamDiagnosticVersion": "0.6.0",
+		"diagnosticNote": "Bundle version identifies the alpha.5 build; inherited Cargo diagnostic version stays 0.6.0. Short synthetic playback is not a long recording or release performance test."
+	},
+	"sourceHashes": {
+		"crates/cursor-info/src/macos.rs": "677460215c4b542ce9e042e1faaadfddc94c33873e3e899535e08d9317954ad1",
+		"crates/cursor-info/src/macos_runtime.rs": "9725c76ba3b520fc6c4a6c98693162a6e4c8d5466f153f944787f1d288f64576",
+		"crates/cursor-info/examples/system-cursor-check.rs": "bbaba90c31a914107080ad7067f4e758e8427f7c495404f159c293414798454e",
+		"crates/cursor-capture/src/position.rs": "bed61596015f3119cc23b2a236a5d408055b741cbae85046ca54840ee2cf3aa1",
+		"crates/recording/src/cursor.rs": "2090f77552dd2dc44c12f08ccfd9b49573776807128de2df5216a8d1ec18e78a",
+		"crates/rendering/src/layers/cursor.rs": "009a29872944d77e12ae476d398d29e4b23a72832cb89a0c462b4cec44efdd57",
+		"crates/rendering/src/shaders/cursor.wgsl": "ec40d1043af6db97dcda268c2dba3a97d1154af10000f94a15212c989d99305d",
+		"crates/rendering/tests/cursor_texture_edges.rs": "74d1d71126ef989156f470e6597ebe795400db21ff3d1dc9c0a2dd42adb4edc9",
+		"Cargo.lock": "05b56a1d8675ec41a09ba3a3ea7532f8ef9f6b3f1853b5c94b04551e8f7f0fd0"
+	}
+}

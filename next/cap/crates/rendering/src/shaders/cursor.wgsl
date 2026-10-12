@@ -88,8 +88,8 @@ fn vs_main(@builtin(vertex_index) vertex_index: u32) -> VertexOutput {
     let clamped_tilt = clamp(x_movement_tilt, -MAX_ROTATION_RADIANS, MAX_ROTATION_RADIANS);
     let rotation_angle = clamped_tilt + base_rotation;
 
-    let pivot = vec2<f32>(0.0, 0.0);
-    let rotated_pos = rotate_point(pos, pivot, rotation_angle);
+    let pivot = vec2<f32>(uniforms.rotation_params.x, -uniforms.rotation_params.w);
+    let rotated_pos = select(pos, rotate_point(pos, pivot, rotation_angle), rotation_angle != 0.0);
 
     var adjusted_pos = screen_pos;
     adjusted_pos.y = uniforms.output_size.y - adjusted_pos.y;

@@ -2,20 +2,24 @@ use device_query::{DeviceQuery, DeviceState};
 use scap_targets::{Display, bounds::*};
 
 // Physical on Windows, Logical on macOS
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct RawCursorPosition {
-    x: i32,
-    y: i32,
+    x: f64,
+    y: f64,
 }
 
 impl RawCursorPosition {
     pub fn get() -> Self {
+        #[cfg(target_os = "macos")]
+        if let Some(position) = macos_cursor_position() {
+            return position;
+        }
         let device_state = DeviceState::new();
         let position = device_state.get_mouse().coords;
 
         Self {
-            x: position.0,
-            y: position.1,
+            x: f64::from(position.0),
+            y: f64::from(position.1),
         }
     }
 
@@ -24,11 +28,31 @@ impl RawCursorPosition {
     }
 }
 
+#[cfg(target_os = "macos")]
+fn macos_cursor_position() -> Option<RawCursorPosition> {
+    use core_graphics::{
+        event::CGEvent,
+        event_source::{CGEventSource, CGEventSourceStateID},
+    };
+
+    thread_local! {
+        static SOURCE: Option<CGEventSource> = CGEventSource::new(CGEventSourceStateID::CombinedSessionState).ok();
+    }
+    SOURCE.with(|source| {
+        let event = CGEvent::new(source.as_ref()?.clone()).ok()?;
+        let point = event.location();
+        (point.x.is_finite() && point.y.is_finite()).then_some(RawCursorPosition {
+            x: point.x,
+            y: point.y,
+        })
+    })
+}
+
 // relative to display using top-left origin
 #[derive(Clone, Copy)]
 pub struct RelativeCursorPosition {
-    x: i32,
-    y: i32,
+    x: f64,
+    y: f64,
     display: Display,
 }
 
@@ -39,8 +63,8 @@ impl RelativeCursorPosition {
             let physical_bounds = display.raw_handle().physical_bounds()?;
 
             Some(Self {
-                x: raw.x - physical_bounds.position().x() as i32,
-                y: raw.y - physical_bounds.position().y() as i32,
+                x: raw.x - physical_bounds.position().x(),
+                y: raw.y - physical_bounds.position().y(),
                 display,
             })
         }
@@ -50,8 +74,8 @@ impl RelativeCursorPosition {
             let logical_bounds = display.raw_handle().logical_bounds()?;
 
             Some(Self {
-                x: raw.x - logical_bounds.position().x() as i32,
-                y: raw.y - logical_bounds.position().y() as i32,
+                x: raw.x - logical_bounds.position().x(),
+                y: raw.y - logical_bounds.position().y(),
                 display,
             })
         }
@@ -61,8 +85,8 @@ impl RelativeCursorPosition {
             let physical_bounds = display.raw_handle().physical_bounds()?;
 
             Some(Self {
-                x: raw.x - physical_bounds.position().x() as i32,
-                y: raw.y - physical_bounds.position().y() as i32,
+                x: raw.x - physical_bounds.position().x(),
+                y: raw.y - physical_bounds.position().y(),
                 display,
             })
         }
@@ -79,8 +103,8 @@ impl RelativeCursorPosition {
             let size = bounds.size();
 
             Some(NormalizedCursorPosition {
-                x: self.x as f64 / size.width(),
-                y: self.y as f64 / size.height(),
+                x: self.x / size.width(),
+                y: self.y / size.height(),
                 crop: CursorCropBounds {
                     x: 0.0,
                     y: 0.0,
@@ -97,8 +121,8 @@ impl RelativeCursorPosition {
             let size = bounds.size();
 
             Some(NormalizedCursorPosition {
-                x: self.x as f64 / size.width(),
-                y: self.y as f64 / size.height(),
+                x: self.x / size.width(),
+                y: self.y / size.height(),
                 crop: CursorCropBounds {
                     x: 0.0,
                     y: 0.0,
@@ -115,8 +139,8 @@ impl RelativeCursorPosition {
             let size = bounds.size();
 
             Some(NormalizedCursorPosition {
-                x: self.x as f64 / size.width(),
-                y: self.y as f64 / size.height(),
+                x: self.x / size.width(),
+                y: self.y / size.height(),
                 crop: CursorCropBounds {
                     x: 0.0,
                     y: 0.0,
@@ -400,3 +424,36 @@ impl std::fmt::Debug for NormalizedCursorPosition {
 //         assert_eq!(new_normalized.crop_size(), LogicalSize::new(0.6, 0.6));
 //     }
 // }
+
+#[cfg(all(test, target_os = "macos"))]
+mod precision_tests {
+    use super::*;
+
+    #[test]
+    fn fractional_points_survive_display_and_crop_mapping() {
+        let display = Display::primary();
+        let bounds = display.raw_handle().logical_bounds().unwrap();
+        let raw = RawCursorPosition {
+            x: bounds.position().x() + 400.75,
+            y: bounds.position().y() + 300.625,
+        };
+        let relative = raw.relative_to_display(display).unwrap();
+        assert_eq!((relative.x, relative.y), (400.75, 300.625));
+        let normalized = relative.normalize().unwrap();
+        let crop = CursorCropBounds {
+            x: 100.25,
+            y: 200.125,
+            width: 600.0,
+            height: 400.0,
+        };
+        let cropped = normalized.with_crop(crop);
+        assert!((cropped.x() - 300.5 / 600.0).abs() < 1e-12);
+        assert!((cropped.y() - 100.5 / 400.0).abs() < 1e-12);
+    }
+
+    #[test]
+    fn system_pointer_sample_is_finite() {
+        let raw = macos_cursor_position().expect("CoreGraphics cursor sample");
+        assert!(raw.x.is_finite() && raw.y.is_finite());
+    }
+}

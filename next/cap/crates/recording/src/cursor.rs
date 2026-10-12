@@ -334,7 +334,6 @@ pub fn spawn_cursor_recorder(
     }
 
     use device_query::{DeviceQuery, DeviceState};
-    use sha2::{Digest, Sha256};
     use std::time::Duration;
     use tracing::{error, info};
 
@@ -420,13 +419,9 @@ pub fn spawn_cursor_recorder(
                 last_window_position = window_position;
             }
 
+            let previous_cursor_id = last_cursor_id.clone();
             let cursor_id = if let Some(data) = get_cursor_data() {
-                let hash_bytes = Sha256::digest(&data.image);
-                let id = u64::from_le_bytes(
-                    hash_bytes[..8]
-                        .try_into()
-                        .expect("sha256 produces at least 8 bytes"),
-                );
+                let id = cursor_identity(&data);
 
                 let cursor_id = if let Some(existing_id) = response.cursors.get(&id) {
                     existing_id.id.to_string()
@@ -467,7 +462,7 @@ pub fn spawn_cursor_recorder(
                 continue;
             };
 
-            if position_changed {
+            if position_changed || last_cursor_id != previous_cursor_id {
                 let cropped_norm_pos = position
                     .relative_to_display(display)
                     .and_then(|p| p.normalize())
@@ -580,6 +575,55 @@ struct CursorData {
     shape: Option<CursorShape>,
 }
 
+fn cursor_identity(data: &CursorData) -> u64 {
+    use sha2::{Digest, Sha256};
+
+    let mut digest = Sha256::new();
+    digest.update(&data.image);
+    digest.update(data.hotspot.x.to_le_bytes());
+    digest.update(data.hotspot.y.to_le_bytes());
+    if let Some(shape) = data.shape {
+        digest.update(shape.to_string().as_bytes());
+    }
+    u64::from_le_bytes(
+        digest.finalize()[..8]
+            .try_into()
+            .expect("sha256 produces at least 8 bytes"),
+    )
+}
+
+#[cfg(test)]
+mod cursor_identity_tests {
+    use super::*;
+
+    #[test]
+    fn identical_pixels_with_different_hotspots_are_distinct_assets() {
+        let mut cursor = CursorData {
+            image: vec![1, 2, 3],
+            hotspot: XY::new(0.25, 0.25),
+            shape: None,
+        };
+        let original = cursor_identity(&cursor);
+        assert_eq!(cursor_identity(&cursor), original);
+        cursor.hotspot.x = 0.5;
+        assert_ne!(cursor_identity(&cursor), original);
+        cursor.hotspot = XY::new(0.25, 0.5);
+        assert_ne!(cursor_identity(&cursor), original);
+    }
+
+    #[test]
+    fn a_recovered_shape_does_not_reuse_an_unclassified_asset() {
+        let mut cursor = CursorData {
+            image: vec![1, 2, 3],
+            hotspot: XY::new(0.25, 0.25),
+            shape: None,
+        };
+        let original = cursor_identity(&cursor);
+        cursor.shape = Some(cap_cursor_info::CursorShapeMacOS::PointingHand.into());
+        assert_ne!(cursor_identity(&cursor), original);
+    }
+}
+
 #[cfg(target_os = "macos")]
 fn get_cursor_data() -> Option<CursorData> {
     use objc::rc::autoreleasepool;
@@ -601,7 +645,6 @@ fn get_cursor_data() -> Option<CursorData> {
 fn macos_cursor_data(cursor: &objc2_app_kit::NSCursor) -> Option<CursorData> {
     use objc2::{msg_send, rc::Retained};
     use objc2_app_kit::NSImage;
-    use sha2::{Digest, Sha256};
 
     unsafe {
         // AppKit can return nil for transient system cursors despite NSCursor.image's nonnull annotation.
@@ -621,8 +664,7 @@ fn macos_cursor_data(cursor: &objc2_app_kit::NSCursor) -> Option<CursorData> {
 
         let image_data = image.TIFFRepresentation()?;
         let image = image_data.as_bytes_unchecked().to_vec();
-        let shape =
-            cap_cursor_info::CursorShapeMacOS::from_hash(&hex::encode(Sha256::digest(&image)));
+        let shape = cap_cursor_info::CursorShapeMacOS::from_system_image(&image);
 
         Some(CursorData {
             image,
@@ -678,6 +720,34 @@ mod macos_cursor_tests {
         assert_eq!(actual.image, expected_image);
         assert_eq!(actual.hotspot.x, hotspot.x / size.width);
         assert_eq!(actual.hotspot.y, hotspot.y / size.height);
+    }
+
+    #[test]
+    fn retina_cursor_hotspot_uses_logical_image_size() {
+        let mut png = std::io::Cursor::new(Vec::new());
+        image::RgbaImage::from_pixel(32, 64, image::Rgba([20, 40, 80, 255]))
+            .write_to(&mut png, image::ImageFormat::Png)
+            .unwrap();
+        let png = png.into_inner();
+        let data: Retained<AnyObject> = unsafe {
+            msg_send![class!(NSData), dataWithBytes: png.as_ptr().cast::<std::ffi::c_void>(), length: png.len()]
+        };
+        let image: Retained<NSImage> = unsafe { msg_send![NSImage::alloc(), initWithData: &*data] };
+        let mut size = unsafe { image.size() };
+        size.width = 16.0;
+        size.height = 32.0;
+        unsafe {
+            image.setSize(size);
+        }
+        let cursor = NSCursor::initWithImage_hotSpot(NSCursor::alloc(), &image, Default::default());
+        let mut hotspot = unsafe { cursor.hotSpot() };
+        hotspot.x = 4.0;
+        hotspot.y = 24.0;
+        let cursor = NSCursor::initWithImage_hotSpot(NSCursor::alloc(), &image, hotspot);
+        let captured = macos_cursor_data(&cursor).unwrap();
+        assert_eq!(captured.hotspot, cap_project::XY::new(0.25, 0.75));
+        let bitmap = image::load_from_memory(&captured.image).unwrap();
+        assert_eq!((bitmap.width(), bitmap.height()), (32, 64));
     }
 }
 
