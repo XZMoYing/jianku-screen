@@ -1,0 +1,35 @@
+--prepared:/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.6/Jianku Screen Next.app/Contents/MacOS/cap-muxer
+--validated:/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.6/Jianku Screen Next.app/Contents/MacOS/cap-muxer
+--prepared:/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.6/Jianku Screen Next.app/Contents/Frameworks/Spacedrive.framework/Versions/Current/.
+--validated:/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.6/Jianku Screen Next.app/Contents/Frameworks/Spacedrive.framework/Versions/Current/.
+--prepared:/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.6/Jianku Screen Next.app/Contents/MacOS/cap-exporter
+--validated:/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.6/Jianku Screen Next.app/Contents/MacOS/cap-exporter
+--prepared:/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.6/Jianku Screen Next.app/Contents/MacOS/cap-cli
+--validated:/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.6/Jianku Screen Next.app/Contents/MacOS/cap-cli
+/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.6/Jianku Screen Next.app: valid on disk
+/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.6/Jianku Screen Next.app: satisfies its Designated Requirement
+Executable=/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.6/Jianku Screen Next.app/Contents/MacOS/Jianku Screen Next
+Identifier=com.jianku.screen.next
+Format=app bundle with Mach-O thin (arm64)
+CodeDirectory v=20400 size=2237615 flags=0x0(none) hashes=69915+7 location=embedded
+VersionPlatform=1
+VersionMin=787200
+VersionSDK=983552
+Hash type=sha256 size=32
+CandidateCDHash sha256=e0a766f03953f7e37f4fe7e76aaec34a66bfe490
+CandidateCDHashFull sha256=e0a766f03953f7e37f4fe7e76aaec34a66bfe4900f06bd5f2cdc210984eef09e
+Hash choices=sha256
+CMSDigest=e0a766f03953f7e37f4fe7e76aaec34a66bfe4900f06bd5f2cdc210984eef09e
+CMSDigestType=2
+Executable Segment base=0
+Executable Segment limit=167067648
+Executable Segment flags=0x1
+Page size=4096
+CDHash=e0a766f03953f7e37f4fe7e76aaec34a66bfe490
+Signature size=1699
+Authority=JiankuDev
+Signed Time=Oct 12, 2026 at 21:49:13
+Info.plist entries=20
+TeamIdentifier=not set
+Sealed Resources version=2 rules=13 files=125
+Internal requirements count=1 size=100

@@ -46,6 +46,7 @@ mod platform;
 mod power_observer;
 mod preparing_finalization;
 mod presets;
+mod project_files;
 mod recording;
 mod recording_settings;
 mod recording_telemetry;
@@ -6820,6 +6821,10 @@ fn specta_builder() -> tauri_specta::Builder {
             editor_preparing::set_preparing_editor_playing,
             editor_preparing::stop_preparing_editor_frame,
             get_editor_project_path,
+            project_files::pick_local_project,
+            project_files::open_local_project,
+            project_files::copy_editor_project,
+            project_files::list_local_projects,
             get_mic_waveforms,
             get_system_audio_waveforms,
             audio_library::list_audio_library,

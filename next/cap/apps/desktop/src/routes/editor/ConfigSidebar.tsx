@@ -54,6 +54,7 @@ import {
 	getOrganizationBrandColorSwatches,
 	type OrganizationBrandColorSwatch,
 } from "~/utils/organization-branding";
+import { projectAssetPath } from "~/utils/project-files";
 import {
 	type AnimatedGradientConfig,
 	type AnimatedGradientLibrary,
@@ -2104,7 +2105,9 @@ function BackgroundConfig(props: {
 				} else if (project.background.source.type === "image") {
 					(async () => {
 						try {
-							const convertedPath = convertFileSrc(path);
+							const convertedPath = convertFileSrc(
+								projectAssetPath(editorInstance.path, path),
+							);
 							await fetch(convertedPath, { method: "HEAD" });
 						} catch (_err) {
 							setProject("background", "source", {
@@ -2634,7 +2637,9 @@ function BackgroundConfig(props: {
 								{(source) => (
 									<div class="overflow-hidden relative w-full h-48 rounded-md border border-gray-3 group">
 										<img
-											src={convertFileSrc(source())}
+											src={convertFileSrc(
+												projectAssetPath(editorInstance.path, source()),
+											)}
 											class="object-cover w-full h-full"
 											alt="Selected background"
 										/>

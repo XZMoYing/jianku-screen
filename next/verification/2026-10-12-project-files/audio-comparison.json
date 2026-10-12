@@ -1,0 +1,17 @@
+{
+	"outputs": {
+		"alpha5-原工程": {
+			"bytes": 2304000,
+			"decodedFloat32SHA256": "8ea344ef1ca0f4f80d3d990bbe6c531fea11ca5002fdb9a2960ab2497c1fbba5"
+		},
+		"alpha6-原工程": {
+			"bytes": 2304000,
+			"decodedFloat32SHA256": "8ea344ef1ca0f4f80d3d990bbe6c531fea11ca5002fdb9a2960ab2497c1fbba5"
+		},
+		"alpha6-移动副本": {
+			"bytes": 2304000,
+			"decodedFloat32SHA256": "8ea344ef1ca0f4f80d3d990bbe6c531fea11ca5002fdb9a2960ab2497c1fbba5"
+		}
+	},
+	"decodedAudioIdentical": true
+}

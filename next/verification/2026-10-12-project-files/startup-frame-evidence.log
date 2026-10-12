@@ -1,0 +1,4 @@
+2026-10-12T13:49:59.047049Z  INFO cap_desktop_lib::windows: Editor open: window ready window_built_and_shown_ms=137 shown_from_rust=true
+2026-10-12T13:49:59.808741Z  INFO create_editor_instance: cap_desktop_lib::editor_window: Editor open: instance served from prewarm wait_ms=0
+2026-10-12T13:49:59.881847Z  INFO cap_desktop_lib::frame_ws: Editor open: initial frame delivered to new socket frame_age_ms=361
+2026-10-12T13:50:00.017842Z  INFO cap_desktop_lib::screenshot_editor: screenshot_editor timing: render pipeline prewarm complete elapsed_ms=182

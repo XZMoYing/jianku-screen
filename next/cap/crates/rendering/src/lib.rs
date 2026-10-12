@@ -7117,6 +7117,7 @@ impl RendererLayers {
                 Background::from_source(
                     uniforms.project.background.source.clone(),
                     constants.options.preserve_screen_alpha,
+                    &constants.recording_meta.project_path,
                 ),
             )
             .await?;
@@ -7271,6 +7272,7 @@ impl RendererLayers {
                 Background::from_source(
                     uniforms.project.background.source.clone(),
                     constants.options.preserve_screen_alpha,
+                    &constants.recording_meta.project_path,
                 ),
             )
             .await?;

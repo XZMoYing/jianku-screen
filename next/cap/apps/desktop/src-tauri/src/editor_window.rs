@@ -729,6 +729,18 @@ impl EditorInstances {
                 "Editor open: instance built on demand (no prewarm hit)"
             );
         }
+        let app = window.app_handle().clone();
+        let path = instance.project_path.clone();
+        if let Err(error) = tokio::task::spawn_blocking(move || {
+            let path = path.canonicalize().map_err(|error| error.to_string())?;
+            crate::project_files::remember_project(&app, path)
+        })
+        .await
+        .map_err(|error| error.to_string())
+        .and_then(|result| result)
+        {
+            tracing::warn!(%error, "Editor loaded but could not be added to local history");
+        }
         Ok(instance)
     }
 

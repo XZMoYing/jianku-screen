@@ -1,0 +1,129 @@
+    Blocking waiting for file lock on build directory
+   Compiling objc2-exception-helper v0.1.1
+   Compiling ring v0.17.14
+   Compiling objc_exception v0.1.2
+   Compiling ffmpeg-sys-next v7.1.3
+   Compiling cap-rnnoise v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rnnoise)
+   Compiling onig_sys v69.9.1
+   Compiling mac-notification-sys v0.6.6
+   Compiling cap-desktop v0.6.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/apps/desktop/src-tauri)
+   Compiling objc2 v0.6.2
+   Compiling objc v0.2.7
+   Compiling metal v0.31.0
+   Compiling cocoa-foundation v0.2.1
+   Compiling rustls v0.23.31
+   Compiling objc_id v0.1.1
+   Compiling objc-foundation v0.1.1
+   Compiling cocoa v0.26.1
+   Compiling objc2-core-foundation v0.3.1
+   Compiling block2 v0.6.1
+   Compiling objc2-javascript-core v0.3.1
+   Compiling dispatch2 v0.3.0
+   Compiling rustls-webpki v0.103.6
+   Compiling objc2-core-graphics v0.3.1
+   Compiling objc2-foundation v0.3.1
+   Compiling objc2-security v0.3.1
+   Compiling objc2-core-video v0.3.1
+   Compiling objc2-core-media v0.3.1
+   Compiling onig v6.5.1
+   Compiling objc2-io-kit v0.3.1
+   Compiling screencapturekit v0.3.6
+   Compiling wgpu-hal v25.0.2 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/vendor/wgpu-hal)
+   Compiling tokenizers v0.22.2
+   Compiling sysinfo v0.35.2
+   Compiling ffmpeg-next v7.1.0 (https://github.com/CapSoftware/rust-ffmpeg?rev=49db1fede112#49db1fed)
+   Compiling wgpu-core-deps-apple v25.0.0
+   Compiling tokio-rustls v0.26.3
+   Compiling wgpu-core v25.0.2
+   Compiling hyper-rustls v0.27.7
+   Compiling reqwest v0.12.24 (https://github.com/CapSoftware/reqwest?rev=9b5ecbd5210a9510fde766015cabb724c1e70d2e#9b5ecbd5)
+   Compiling workspace-hack v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/workspace-hack)
+   Compiling sentry v0.42.0
+   Compiling opentelemetry-http v0.31.0
+   Compiling cap-media-info v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/media-info)
+   Compiling ffmpeg-hw-device v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/ffmpeg-hw-device)
+   Compiling cap-enc-ffmpeg v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/enc-ffmpeg)
+   Compiling cap-flags v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/flags)
+   Compiling cap-media v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/media)
+   Compiling cap-utils v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/utils)
+   Compiling cap-camera-avfoundation v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/camera-avfoundation)
+   Compiling scap-targets v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/scap-targets)
+   Compiling wgpu v25.0.2
+   Compiling cap-video-decode v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/video-decode)
+   Compiling cap-audio v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/audio)
+   Compiling cap-cursor-capture v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/cursor-capture)
+   Compiling sentry-rust-minidump v0.13.0
+   Compiling cap-frame-converter v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/frame-converter)
+   Compiling cap-enc-avfoundation v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/enc-avfoundation)
+   Compiling cap-enc-gif v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/enc-gif)
+   Compiling cap-timestamp v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/timestamp)
+   Compiling cap-fail v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/fail)
+   Compiling opentelemetry-otlp v0.31.0
+   Compiling parakeet-rs v0.3.4
+   Compiling cap-cli-install v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/cli-install)
+   Compiling scap-direct3d v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/scap-direct3d)
+   Compiling cap-camera-effects v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/camera-effects)
+   Compiling glyphon v0.9.0
+   Compiling objc2-core-image v0.3.1
+   Compiling objc2-quartz-core v0.3.1
+   Compiling objc2-cloud-kit v0.3.1
+   Compiling objc2-core-data v0.3.1
+   Compiling objc2-avf-audio v0.3.1
+   Compiling notify-rust v4.11.7
+   Compiling objc2-av-foundation v0.3.1
+   Compiling objc2-app-kit v0.3.1
+   Compiling cap-camera v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/camera)
+   Compiling cap-camera-ffmpeg v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/camera-ffmpeg)
+   Compiling objc2-web-kit v0.3.1
+   Compiling tao v0.34.3 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/vendor/tao)
+   Compiling muda v0.17.1
+   Compiling window-vibrancy v0.6.0
+   Compiling cap-cursor-info v0.0.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/cursor-info)
+   Compiling objc2-osa-kit v0.3.1
+   Compiling scap-screencapturekit v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/scap-screencapturekit)
+   Compiling scap-ffmpeg v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/scap-ffmpeg)
+   Compiling arboard v3.6.1
+   Compiling cap-project v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/project)
+   Compiling osakit v0.3.1
+   Compiling global-hotkey v0.7.0
+   Compiling tray-icon v0.21.1
+   Compiling rfd v0.15.4
+   Compiling clipboard-rs v0.2.4
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+   Compiling cap-automation v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/automation)
+   Compiling cap-editor v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/editor)
+   Compiling cap-recording v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/recording)
+   Compiling tauri-runtime v2.8.0
+   Compiling wry v0.53.3
+   Compiling tauri-runtime-wry v2.8.1
+   Compiling cap-export v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/export)
+   Compiling tauri v2.8.5
+   Compiling tauri-plugin-fs v2.4.2
+   Compiling tauri-plugin-deep-link v2.4.3
+   Compiling tauri-plugin-window-state v2.4.0
+   Compiling tauri-plugin-os v2.3.1
+   Compiling tauri-plugin-notification v2.3.1
+   Compiling tauri-plugin-updater v2.9.0
+   Compiling tauri-nspanel v2.0.1 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/vendor/tauri-nspanel)
+   Compiling tauri-plugin-positioner v2.3.0
+   Compiling tauri-plugin-process v2.3.0
+   Compiling tauri-plugin-single-instance v2.3.4
+   Compiling tauri-plugin-global-shortcut v2.3.0
+   Compiling tauri-plugin-clipboard-manager v2.3.0
+   Compiling tauri-plugin-opener v2.5.0
+   Compiling tauri-specta v2.0.0-rc.20
+   Compiling tauri-plugin-http v2.5.2
+   Compiling tauri-plugin-dialog v2.4.0
+   Compiling tauri-plugin-sentry v0.5.0
+   Compiling tauri-plugin-store v2.4.0
+   Compiling tauri-plugin-shell v2.3.1
+   Compiling tauri-plugin-oauth v2.0.0 (https://github.com/FabianLars/tauri-plugin-oauth?branch=v2#f941c99c)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 17s
+     Running unittests src/lib.rs (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/debug/deps/cap_desktop_lib-f3a38f070c594e16)
+
+running 2 tests
+test project_files::tests::invalid_history_is_reported_without_overwriting_original_bytes ... ok
+test project_files::tests::history_keeps_twenty_unique_paths_with_reopened_project_first ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 535 filtered out; finished in 0.13s
+

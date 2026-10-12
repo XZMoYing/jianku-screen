@@ -1,0 +1,12 @@
+{
+	"pid": 23094,
+	"started_at": "2026-10-12T13:49:58.675238+00:00",
+	"app_version": "0.6.0",
+	"os": "macos 14.7.4",
+	"arch": "aarch64",
+	"liquid_glass": "unknown",
+	"gpu_init_phase": false,
+	"graphics_recovery": false,
+	"blur_active": false,
+	"blur_recovery": false
+}

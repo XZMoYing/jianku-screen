@@ -1,0 +1,7 @@
+{
+	"exitCode": 1,
+	"stderr": "error: This project already exists. Choose a new name; existing projects are never replaced\n",
+	"stdout": "{\n  \"error\": \"This project already exists. Choose a new name; existing projects are never replaced\"\n}\n",
+	"sourceUnchanged": true,
+	"destinationUnchanged": true
+}

@@ -241,6 +241,18 @@ async stopPreparingEditorFrame(requestEpoch: number) : Promise<null> {
 async getEditorProjectPath() : Promise<string> {
     return await TAURI_INVOKE("get_editor_project_path");
 },
+async pickLocalProject() : Promise<string | null> {
+    return await TAURI_INVOKE("pick_local_project");
+},
+async openLocalProject(path: string) : Promise<null> {
+    return await TAURI_INVOKE("open_local_project", { path });
+},
+async copyEditorProject(destination: string) : Promise<string> {
+    return await TAURI_INVOKE("copy_editor_project", { destination });
+},
+async listLocalProjects() : Promise<LocalProject[]> {
+    return await TAURI_INVOKE("list_local_projects");
+},
 async getMicWaveforms() : Promise<number[][]> {
     return await TAURI_INVOKE("get_mic_waveforms");
 },
@@ -1137,6 +1149,7 @@ export type KeyPressDisplay = { key: string; timeOffset: number }
 export type KeyboardData = { settings: KeyboardSettings }
 export type KeyboardSettings = { enabled: boolean; font: string; size: number; color: string; backgroundColor: string; backgroundOpacity: number; position: string; fontWeight: number; fadeDuration: number; lingerDuration: number; groupingThresholdMs: number; showModifiers: boolean; showSpecialKeys: boolean; uppercase: boolean }
 export type KeyboardTrackSegment = { id: string; start: number; end: number; displayText: string; keys?: KeyPressDisplay[]; fadeDurationOverride?: number | null; positionOverride?: string | null; colorOverride?: string | null; backgroundColorOverride?: string | null; fontSizeOverride?: number | null; uppercaseOverride?: boolean | null }
+export type LocalProject = { path: string; name: string }
 export type LogicalBounds = { position: LogicalPosition; size: LogicalSize }
 export type LogicalPosition = { x: number; y: number }
 export type LogicalSize = { width: number; height: number }

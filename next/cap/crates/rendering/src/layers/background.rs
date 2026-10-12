@@ -324,7 +324,20 @@ fn background_source_is_empty(source: &BackgroundSource) -> bool {
 }
 
 impl Background {
-    pub fn from_source(source: BackgroundSource, transparent_when_empty: bool) -> Self {
+    pub fn from_source(
+        mut source: BackgroundSource,
+        transparent_when_empty: bool,
+        project_path: &std::path::Path,
+    ) -> Self {
+        if let BackgroundSource::Image { path } | BackgroundSource::Wallpaper { path } = &mut source
+            && let Some(stored) = path.as_ref().filter(|stored| !stored.is_empty())
+        {
+            *path = Some(
+                cap_project::resolve_project_asset_path(project_path, stored)
+                    .to_string_lossy()
+                    .into_owned(),
+            );
+        }
         if transparent_when_empty && background_source_is_empty(&source) {
             Background::Color([0.0, 0.0, 0.0, 0.0])
         } else {
@@ -777,6 +790,38 @@ impl GradientOrColorPipeline {
 mod tests {
     use super::*;
     use cap_project::BackgroundSource;
+
+    #[test]
+    fn portable_background_resolves_against_moved_project_without_changing_empty_backgrounds() {
+        let root = tempfile::tempdir().unwrap();
+        let project = root.path().join("moved.cap");
+        let asset = project.join("assets/background.png");
+        std::fs::create_dir_all(asset.parent().unwrap()).unwrap();
+        std::fs::write(&asset, b"synthetic background").unwrap();
+        for source in [
+            BackgroundSource::Image {
+                path: Some("assets/background.png".into()),
+            },
+            BackgroundSource::Wallpaper {
+                path: Some(asset.to_string_lossy().into_owned()),
+            },
+        ] {
+            match Background::from_source(source, false, &project) {
+                Background::Image { path } => assert_eq!(std::path::Path::new(&path), asset),
+                _ => panic!("Expected an image background"),
+            }
+        }
+        match Background::from_source(
+            BackgroundSource::Image {
+                path: Some(String::new()),
+            },
+            true,
+            &project,
+        ) {
+            Background::Color(color) => assert_eq!(color, [0.0; 4]),
+            _ => panic!("Expected a transparent background"),
+        }
+    }
 
     #[test]
     fn test_transparent_color_conversion() {

@@ -1,0 +1,11 @@
+{
+	"synthetic": true,
+	"base": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/verification/2026-10-12-native-foundation/fixture.cap",
+	"source": "/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.6/复制验证源.cap",
+	"externalAssets": {
+		"自建音频.wav": "ce21edd20991206d32bef0f45c6025025f90639be37ed8408261961f718bf1c2",
+		"自建贴图.png": "ad46c5fddcc06c893b00a91096f6a14ec1c863c5d2ffeace022bed35a9dea7eb",
+		"自建背景.png": "f3f5f65d4ad0e6dde3a5ed08c713ae29905684d736a58a11bbd44b8bf7c68d19"
+	},
+	"userCaptureOrWallpaper": false
+}

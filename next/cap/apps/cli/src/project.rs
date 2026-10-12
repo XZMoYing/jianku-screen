@@ -8,6 +8,23 @@ use serde::Serialize;
 
 use crate::{OutputFormat, write_json};
 
+pub fn copy(source: PathBuf, destination: PathBuf, format: OutputFormat) -> Result<(), String> {
+    let report = cap_project::create_portable_project_copy(&source, &destination)
+        .map_err(|error| error.to_string())?;
+    match format {
+        OutputFormat::Json => write_json(&report),
+        OutputFormat::Text => {
+            println!(
+                "Project copy saved to {} ({} files, {} embedded assets)",
+                report.path.display(),
+                report.files,
+                report.embedded_assets
+            );
+            Ok(())
+        }
+    }
+}
+
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ProjectInspection {

@@ -1,0 +1,31 @@
+[
+	{
+		"bundleIdentifier": "com.jianku.screen.next",
+		"bundlePath": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.5/Jianku Screen Next.app",
+		"name": "简库镜传 Next",
+		"pid": 92050,
+		"terminated": false,
+		"windows": [
+			{
+				"bounds": {
+					"Height": 24,
+					"Width": 34,
+					"X": 824,
+					"Y": 0
+				},
+				"layer": 25,
+				"number": 43634
+			},
+			{
+				"bounds": {
+					"Height": 800,
+					"Width": 1275,
+					"X": 202,
+					"Y": 101
+				},
+				"layer": 0,
+				"number": 43635
+			}
+		]
+	}
+]

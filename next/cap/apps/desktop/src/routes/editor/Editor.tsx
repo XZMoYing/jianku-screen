@@ -407,6 +407,7 @@ function Inner(props: {
 		handoffPlaybackPending,
 	} = useEditorContext();
 
+	const [projectBusy, setProjectBusy] = createSignal(false);
 	const preparingSession = usePreparingEditor();
 	const editorReady = () =>
 		preparingSession?.ordinaryReady() ??
@@ -414,7 +415,7 @@ function Inner(props: {
 		false;
 	onMount(() => {
 		const blockPreparingKeys = (event: KeyboardEvent) => {
-			if (editorReady()) return;
+			if (editorReady() && !projectBusy()) return;
 			if (
 				preparingSession?.handoffFailed() &&
 				event.target instanceof Element &&
@@ -524,6 +525,11 @@ function Inner(props: {
 	onMount(() => {
 		const closeRequested = currentWindow.onCloseRequested(async (event) => {
 			if (allowExportClose) return;
+			if (projectBusy()) {
+				event.preventDefault();
+				toast.error("工程正在保存，请稍后再关闭窗口");
+				return;
+			}
 
 			event.preventDefault();
 			if (closePromptOpen) return;
@@ -901,8 +907,19 @@ function Inner(props: {
 			>
 				<Header
 					registerTitleSave={registerEditorSave}
-					disabled={!editorReady()}
+					disabled={!editorReady() || projectBusy()}
+					onProjectBusyChange={setProjectBusy}
 				/>
+				<Show when={projectBusy()}>
+					<div
+						role="status"
+						class="absolute inset-0 z-50 flex items-center justify-center bg-ed-window/80"
+					>
+						<div class="rounded-xl bg-ed-card p-5 text-sm text-ed-text-1 shadow-ed-card">
+							正在处理工程，请稍候…
+						</div>
+					</div>
+				</Show>
 				<Show when={preparingSession?.handoffFailed()}>
 					<div class="absolute inset-0 top-13 max-[900px]:top-[72px] z-30 flex items-center justify-center p-6">
 						<div
@@ -937,7 +954,7 @@ function Inner(props: {
 					</div>
 				</Show>
 				<div
-					inert={!editorReady()}
+					inert={!editorReady() || projectBusy()}
 					class="flex overflow-y-hidden flex-col flex-1 gap-2 w-full min-h-0 leading-5 transition-opacity duration-300 ease-out motion-reduce:transition-none"
 					style={{ opacity: editorReady() ? 1 : 0.55 }}
 					data-tauri-drag-region

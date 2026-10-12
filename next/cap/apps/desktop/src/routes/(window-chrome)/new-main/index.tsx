@@ -2749,6 +2749,24 @@ function Page() {
 		setCameraMenuOpen(false);
 	};
 
+	const [openingProject, setOpeningProject] = createSignal(false);
+	const openProjectPicker = async () => {
+		if (isRecording() || openingProject() || editorRecordingFlow()) return;
+		setOpeningProject(true);
+		try {
+			const path = await commands.pickLocalProject();
+			if (!path) return;
+			await commands.openLocalProject(path);
+			await hideCurrentWindow();
+		} catch (error) {
+			toast.error(
+				`无法打开工程：${error instanceof Error ? error.message : String(error)}`,
+			);
+		} finally {
+			setOpeningProject(false);
+		}
+	};
+
 	const openRecording = async (recording: RecordingWithPath) => {
 		if (recording.mode === "studio") {
 			let projectPath = recording.path;
@@ -3037,6 +3055,16 @@ function Page() {
 					data-tauri-drag-region
 				>
 					<MainWindowHelpButton />
+					<button
+						type="button"
+						disabled={
+							isRecording() || openingProject() || !!editorRecordingFlow()
+						}
+						onClick={() => void openProjectPicker()}
+						class="h-6 px-2 text-xs text-gray-11 rounded-md hover:bg-gray-4 disabled:opacity-50"
+					>
+						{openingProject() ? "正在打开…" : "打开工程"}
+					</button>
 					<div class="flex-1 min-h-9 min-w-0" data-tauri-drag-region />
 					<div class="flex gap-1 items-center shrink-0" data-tauri-drag-region>
 						<Tooltip content={<span>Settings</span>}>

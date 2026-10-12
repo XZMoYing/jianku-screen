@@ -1,0 +1,38 @@
+{
+	"projectPath": "/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.6/移动后/可携带工程.cap",
+	"valid": true,
+	"recordingType": "studio",
+	"checks": [
+		{
+			"role": "recordingMeta",
+			"path": "/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.6/移动后/可携带工程.cap/recording-meta.json",
+			"exists": true,
+			"required": true
+		},
+		{
+			"role": "projectConfig",
+			"path": "/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.6/移动后/可携带工程.cap/project-config.json",
+			"exists": true,
+			"required": false
+		},
+		{
+			"role": "displayVideo",
+			"path": "/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.6/移动后/可携带工程.cap/content/display.mp4",
+			"exists": true,
+			"required": true
+		},
+		{
+			"role": "cursor",
+			"path": "/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.6/移动后/可携带工程.cap/content/cursor.json",
+			"exists": true,
+			"required": false
+		},
+		{
+			"role": "output",
+			"path": "/Users/moyingxz/Movies/Jianku Screen Next/试用 0.2.0-alpha.6/移动后/可携带工程.cap/output/result.mp4",
+			"exists": false,
+			"required": false
+		}
+	],
+	"missing": []
+}

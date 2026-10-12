@@ -1,0 +1,13 @@
+   Compiling cap-project v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/project)
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 15.20s
+     Running unittests src/lib.rs (target/debug/deps/cap_rendering-860a100ea92ff1de)
+
+running 4 tests
+test layers::background::tests::test_transparent_color_conversion ... ok
+test layers::background::tests::test_gradient_conversion ... ok
+test layers::background::tests::test_color_conversion_uses_normalized_byte_values ... ok
+test layers::background::tests::portable_background_resolves_against_moved_project_without_changing_empty_backgrounds ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 313 filtered out; finished in 0.00s
+

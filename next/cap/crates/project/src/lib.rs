@@ -4,6 +4,7 @@ mod configuration;
 pub mod cursor;
 pub mod keyboard;
 mod meta;
+mod portable;
 
 pub use animated_gradient::*;
 pub use caption_timing::{derive_caption_track_segments, source_caption_id, synchronize_captions};
@@ -11,6 +12,7 @@ pub use configuration::*;
 pub use cursor::*;
 pub use keyboard::*;
 pub use meta::*;
+pub use portable::*;
 
 use serde::{Deserialize, Serialize};
 use specta::Type;

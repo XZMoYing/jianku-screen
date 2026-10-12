@@ -336,6 +336,8 @@ struct ProjectArgs {
 
 #[derive(Subcommand)]
 enum ProjectCommands {
+    /// Save a portable copy without replacing the destination or changing the source
+    Copy(ProjectCopyArgs),
     /// Print project metadata and editor configuration
     Inspect(ProjectTarget),
     /// Verify a project's metadata and expected media files exist
@@ -347,6 +349,14 @@ enum ProjectCommands {
 #[derive(Args)]
 struct ProjectTarget {
     project_path: PathBuf,
+    #[arg(long, value_enum, default_value_t = OutputFormat::Text)]
+    format: OutputFormat,
+}
+
+#[derive(Args)]
+struct ProjectCopyArgs {
+    project_path: PathBuf,
+    destination: PathBuf,
     #[arg(long, value_enum, default_value_t = OutputFormat::Text)]
     format: OutputFormat,
 }
@@ -741,6 +751,13 @@ impl TargetsArgs {
 impl ProjectArgs {
     fn run(self, json: bool) -> Result<(), String> {
         match self.command {
+            ProjectCommands::Copy(args) => {
+                let format = resolve_format(json, args.format);
+                finish_json(
+                    format,
+                    project::copy(args.project_path, args.destination, format),
+                )
+            }
             // validate emits its own structured report (incl. JSON errors), so it is not wrapped.
             ProjectCommands::Validate(args) => {
                 project::validate(args.project_path, resolve_format(json, args.format))

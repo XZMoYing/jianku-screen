@@ -1,0 +1,31 @@
+   Compiling block2 v0.6.1
+   Compiling ring v0.17.14
+   Compiling objc2-foundation v0.3.1
+   Compiling dispatch2 v0.3.0
+   Compiling rustls-webpki v0.103.6
+   Compiling rustls v0.23.31
+   Compiling tokio-rustls v0.26.3
+   Compiling hyper-rustls v0.27.7
+   Compiling reqwest v0.12.24 (https://github.com/CapSoftware/reqwest?rev=9b5ecbd5210a9510fde766015cabb724c1e70d2e#9b5ecbd5)
+   Compiling workspace-hack v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/workspace-hack)
+   Compiling objc2-quartz-core v0.3.1
+   Compiling objc2-cloud-kit v0.3.1
+   Compiling objc2-core-image v0.3.1
+   Compiling objc2-core-data v0.3.1
+   Compiling objc2-app-kit v0.3.1
+   Compiling cap-cursor-info v0.0.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/cursor-info)
+   Compiling cap-project v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/project)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 28.05s
+     Running unittests src/lib.rs (target/debug/deps/cap_project-478d0b833468d2b9)
+
+running 7 tests
+test portable::tests::final_publication_cannot_replace_a_concurrent_empty_directory ... ok
+test portable::tests::directory_links_cannot_create_recursive_copies ... ok
+test portable::tests::existing_and_nested_destinations_are_preserved ... ok
+test portable::tests::unfinished_recordings_are_not_copied ... ok
+test portable::tests::missing_assets_leave_no_destination_or_staging_directory ... ok
+test portable::tests::external_recording_media_and_events_are_embedded_and_deduplicated ... ok
+test portable::tests::copy_remains_usable_after_moving_and_removing_original_assets ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 139 filtered out; finished in 0.01s
+

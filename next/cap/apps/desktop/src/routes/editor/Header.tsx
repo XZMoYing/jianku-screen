@@ -20,6 +20,7 @@ import { commands } from "~/utils/tauri";
 import { useEditorContext } from "./context";
 import OrganizationDropdown from "./OrganizationDropdown";
 import PresetsDropdown from "./PresetsDropdown";
+import { ProjectMenu } from "./ProjectMenu";
 import { createRecordingTitleSave } from "./recording-title-save";
 import ShareButton from "./ShareButton";
 import { EditorButton } from "./ui";
@@ -52,10 +53,12 @@ type RegisterTitleSave = (save: TitleSaveRegistration | undefined) => void;
 
 export function Header(props: {
 	registerTitleSave: RegisterTitleSave;
+	onProjectBusyChange: (busy: boolean) => void;
 	disabled?: boolean;
 }) {
 	const {
 		editorInstance,
+		flushProjectConfig,
 		project,
 		projectHistory,
 		dialog,
@@ -89,6 +92,15 @@ export function Header(props: {
 	});
 
 	const [titleReadOnly, setTitleReadOnly] = createSignal(false);
+	let flushName: (() => Promise<void>) | undefined;
+	const registerNameSave: RegisterTitleSave = (registration) => {
+		flushName = registration?.flush;
+		props.registerTitleSave(registration);
+	};
+	const flushEdits = async () => {
+		await flushName?.();
+		await flushProjectConfig();
+	};
 
 	return (
 		<div
@@ -113,7 +125,7 @@ export function Header(props: {
 				<div inert={props.disabled} class="flex gap-1.5 items-center min-w-0">
 					<NameEditor
 						name={meta().prettyName}
-						registerTitleSave={props.registerTitleSave}
+						registerTitleSave={registerNameSave}
 						readOnly={titleReadOnly() || props.disabled === true}
 						setReadOnly={setTitleReadOnly}
 					/>
@@ -183,6 +195,11 @@ export function Header(props: {
 					leftIcon={<IconCapRedo />}
 				/>
 				<div class="mx-1.5 w-px h-4 shrink-0 bg-ed-line-strong" />
+				<ProjectMenu
+					flush={flushEdits}
+					onBusyChange={props.onProjectBusyChange}
+					disabled={props.disabled}
+				/>
 				<OrganizationDropdown />
 				<PresetsDropdown />
 				<EditorButton
