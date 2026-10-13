@@ -1,0 +1,124 @@
+{
+	"recordedAt": "2026-10-13T10:29:27.164601+00:00",
+	"version": "0.2.0-alpha.7",
+	"bundleVersion": "2026.10.13.7",
+	"branch": "rewrite/cap-foundation",
+	"sourceBaseCommit": "9ac77d5398966d819b71926be97e6fdc2eae1cca",
+	"profile": "debug",
+	"scope": {
+		"realTimePresentation": "macOS display capture, existing GPU composition, floating output window and secondary-monitor selection",
+		"focus": "automatic, manual toggle and off; continuous actual activity extends focus; idle return",
+		"appearance": "live padding, rounding, inset, shadow, background blur, image/gradient and cursor size",
+		"sharedVisualLayers": "existing packaging, cursor pose/click and motion blur shaders retained",
+		"captureInput": "retained ScreenCaptureKit NV12 pixel buffers imported into renderer",
+		"output": "bounded latest RGBA frames over opt-in client-paced localhost websocket; no video codec; output readback/copy still present",
+		"referenceAnimationParity": "not accepted; causal real-time behavior requires controlled comparison",
+		"presentationSourceLimit": "display only; no presentation audio/camera/3D yet",
+		"windows": "shared motion and rendering structure retained; real-time platform capture not yet implemented",
+		"virtualDisplayDriver": false
+	},
+	"checks": [
+		{
+			"name": "live-motion",
+			"passed": 3,
+			"log": "motion-tests.log"
+		},
+		{
+			"name": "native-Metal-live-canvas",
+			"passed": 1,
+			"ratios": ["16:9", "1:1", "21:9"],
+			"log": "gpu-tests.log"
+		},
+		{
+			"name": "frame-channel-and-paced-client",
+			"passed": 24,
+			"log": "frame-tests.log"
+		}
+	],
+	"uniqueFunctionalTests": 28,
+	"rustCheck": {
+		"status": "passed",
+		"crates": ["cap-rendering", "cap-recording", "cap-desktop"],
+		"log": "completion-check.log"
+	},
+	"typescript": {
+		"status": "passed",
+		"log": "delivery-typescript.log"
+	},
+	"bindings": {
+		"status": "generated via existing dedicated Rust test",
+		"handEdited": false,
+		"log": "bindings.log"
+	},
+	"formatting": {
+		"rust": "passed",
+		"biome": "passed scoped touched files; generated bindings excluded by repository config",
+		"markdown": "manually reviewed; repository formatter does not support Markdown",
+		"log": "delivery-biome.log"
+	},
+	"nativeBuild": {
+		"compiledAndBundled": true,
+		"wrapperStatus": "signing step failed; final same native bundle repaired and strictly verified",
+		"log": "delivery-build.log",
+		"signingRootCause": "Tauri signed dylibs but left Spacedrive framework container unsigned; aborted recursive signing also left .cstemp files in earlier candidate",
+		"scriptFix": "remove build signing temps; sign nested framework containers before outer app; retain deep strict verification",
+		"finalSignature": "delivery-signature.log",
+		"trialSignature": "delivery-trial-signature.log",
+		"officialNotarization": false
+	},
+	"nativeSmoke": {
+		"status": "passed",
+		"log": "native-smoke.json",
+		"checks": [
+			"begin capture/composition",
+			"live padding update",
+			"manual toggle twice",
+			"stop capture",
+			"immediate restart",
+			"continued frames after restart"
+		],
+		"actualClientConnections": 2,
+		"clientProof": "both output sessions connected using paced=true and sent presentation acknowledgements",
+		"viewerLog": "delivery-viewer-evidence.log",
+		"limitations": "commands driven by explicit debug-only smoke flag; physical shortcut, mouse interaction and meeting receivers still need user acceptance",
+		"pixelsSaved": false
+	},
+	"nativeSession": {
+		"startedAt": "2026-10-13T10:26:04.008872+00:00",
+		"application": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.7/Jianku Screen Next.app",
+		"version": "0.2.0-alpha.7",
+		"build": "2026.10.13.7",
+		"userFramesSaved": false,
+		"nativeSession": {
+			"pid": 31996,
+			"started_at": "2026-10-13T10:26:07.355446+00:00",
+			"app_version": "0.6.0",
+			"os": "macos 14.7.4",
+			"arch": "aarch64",
+			"liquid_glass": "unknown",
+			"gpu_init_phase": false,
+			"graphics_recovery": false,
+			"blur_active": false,
+			"blur_recovery": false
+		}
+	},
+	"nativeWindows": "delivery-windows.json",
+	"performance": {
+		"log": "delivery-performance.json",
+		"acceptance": "not complete; debug build and overlapping native checks, variable short-window fps; do not promise stable 60 fps or infer end-to-end delay from processing time"
+	},
+	"offlineRegression": {
+		"status": "passed",
+		"frames": 360,
+		"allRGBAAndTimestampsIdentical": true,
+		"log": "offline-comparison.json",
+		"fixture": "self-generated synthetic recording copied outside repository; original fixture retained",
+		"scope": "same shared renderer changes; packaging/UI-only subsequent revisions do not alter offline renderer"
+	},
+	"failuresPreserved": {
+		"nativeRenderOnly": "native-render-only-smoke.json; earlier unregistered frontend route produced frames without output client",
+		"viewerRestart": "native-viewer-restart-failure.json; route fixed but old output label was not yet released",
+		"finalFix": "register explicit app routes; wait for native Destroyed and window-manager removal before restarting"
+	},
+	"remainingAcceptance": "docs/待验证项目交接.md V2-Live-02/03/04/05; other existing editor/cursor/recording acceptance remains"
+}

@@ -1940,6 +1940,9 @@ pub async fn start_recording(
     state_mtx: MutableState<'_, App>,
     inputs: StartRecordingInputs,
 ) -> Result<RecordingAction, String> {
+    if crate::presentation::active(&app) {
+        return Err("请先停止演示，再开始录制".into());
+    }
     #[cfg(target_os = "linux")]
     if inputs.mode != RecordingMode::Instant && linux_instant::current(&app).is_some() {
         return Err("Finish the pending Instant cleanup before recording".into());

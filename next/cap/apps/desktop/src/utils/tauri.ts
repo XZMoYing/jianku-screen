@@ -241,6 +241,27 @@ async stopPreparingEditorFrame(requestEpoch: number) : Promise<null> {
 async getEditorProjectPath() : Promise<string> {
     return await TAURI_INVOKE("get_editor_project_path");
 },
+async showPresentation() : Promise<null> {
+    return await TAURI_INVOKE("show_presentation");
+},
+async getPresentationSetup() : Promise<PresentationSetup> {
+    return await TAURI_INVOKE("get_presentation_setup");
+},
+async getPresentationStatus() : Promise<PresentationStatus> {
+    return await TAURI_INVOKE("get_presentation_status");
+},
+async startPresentation(options: PresentationOptions) : Promise<PresentationStatus> {
+    return await TAURI_INVOKE("start_presentation", { options });
+},
+async stopPresentation() : Promise<null> {
+    return await TAURI_INVOKE("stop_presentation");
+},
+async updatePresentation(options: PresentationOptions) : Promise<null> {
+    return await TAURI_INVOKE("update_presentation", { options });
+},
+async togglePresentationFocus() : Promise<null> {
+    return await TAURI_INVOKE("toggle_presentation_focus");
+},
 async pickLocalProject() : Promise<string | null> {
     return await TAURI_INVOKE("pick_local_project");
 },
@@ -1149,6 +1170,7 @@ export type KeyPressDisplay = { key: string; timeOffset: number }
 export type KeyboardData = { settings: KeyboardSettings }
 export type KeyboardSettings = { enabled: boolean; font: string; size: number; color: string; backgroundColor: string; backgroundOpacity: number; position: string; fontWeight: number; fadeDuration: number; lingerDuration: number; groupingThresholdMs: number; showModifiers: boolean; showSpecialKeys: boolean; uppercase: boolean }
 export type KeyboardTrackSegment = { id: string; start: number; end: number; displayText: string; keys?: KeyPressDisplay[]; fadeDurationOverride?: number | null; positionOverride?: string | null; colorOverride?: string | null; backgroundColorOverride?: string | null; fontSizeOverride?: number | null; uppercaseOverride?: boolean | null }
+export type LiveFocusMode = "off" | "automatic" | "manual"
 export type LocalProject = { path: string; name: string }
 export type LogicalBounds = { position: LogicalPosition; size: LogicalSize }
 export type LogicalPosition = { x: number; y: number }
@@ -1204,6 +1226,10 @@ export type PreparingEditorPhase = "preparing" | "handoff" | "unavailable" | "re
 export type PreparingEditorProgress = { totalDuration: number | null; playableUntil: number; previewAvailable: boolean; phase: PreparingEditorPhase }
 export type PreparingEditorSeed = { title: string; tracks: string[] }
 export type PreparingPlaybackState = { playheadSeconds: number; playing: boolean; buffering: boolean }
+export type PresentationMonitor = { index: number; name: string; width: number; height: number }
+export type PresentationOptions = { sourceId: string; outputMonitor: number | null; outputWidth: number; outputHeight: number; focusMode: LiveFocusMode; zoomAmount: number; idleSeconds: number; shortcut: string; project: ProjectConfiguration; toggleEpoch?: number }
+export type PresentationSetup = { supported: boolean; displays: CaptureDisplay[]; monitors: PresentationMonitor[]; options: PresentationOptions }
+export type PresentationStatus = { active: boolean; frames: number; processingMs: number; error: string | null; wsPort: number; outputDetached: boolean }
 export type Preset = { name: string; config: ProjectConfiguration }
 export type PresetsStore = { presets: Preset[]; default: number | null }
 export type ProjectConfiguration = { aspectRatio: AspectRatio | null; background: BackgroundConfiguration; camera: Camera; audio: AudioConfiguration; cursor: CursorConfiguration; hotkeys: HotkeysConfiguration; timeline: TimelineConfiguration | null; overlayOrder: OverlayTrack[]; captions: CaptionsData | null; keyboard: KeyboardData | null; clips: ClipConfiguration[]; annotations: Annotation[]; screenMotionBlur?: number; screenMovementSpring?: ScreenMovementSpring;

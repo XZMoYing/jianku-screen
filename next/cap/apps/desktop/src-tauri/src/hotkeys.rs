@@ -279,6 +279,13 @@ pub fn init(app: &AppHandle) {
     app.plugin(
         tauri_plugin_global_shortcut::Builder::new()
             .with_handler(|app, shortcut, event| {
+                if crate::presentation::handle_shortcut(
+                    app,
+                    shortcut,
+                    event.state() == HotKeyState::Pressed,
+                ) {
+                    return;
+                }
                 if *shortcut == clean_capture_shortcut()
                     && crate::clean_capture::handle_shortcut(
                         app,

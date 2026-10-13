@@ -44,6 +44,7 @@ mod frame_windows;
 #[cfg(target_os = "macos")]
 pub mod iosurface_texture;
 mod layers;
+pub mod live;
 mod managed_segment;
 mod mask;
 pub mod notch_shape;
@@ -2416,6 +2417,17 @@ pub struct ClickRipple {
     pub progress: f32,
 }
 
+pub struct LiveRenderInput<'a> {
+    pub project: &'a ProjectConfiguration,
+    pub frame_number: u32,
+    pub fps: u32,
+    pub output_size: XY<u32>,
+    pub events: &'a CursorEvents,
+    pub frames: &'a DecodedSegmentFrames,
+    pub motion: &'a live::LiveMotion,
+    pub cursor_id: &'a str,
+}
+
 #[derive(Clone, Debug)]
 pub struct ProjectUniforms {
     pub output_size: (u32, u32),
@@ -3569,9 +3581,60 @@ impl ProjectUniforms {
             cursor_events,
             segment_frames,
             total_duration,
-            zoom_timeline,
+            &|time| zoom_timeline.sample(time),
+            &|from, to| zoom_timeline.snapped_within(from, to),
+            None,
             &cursor_interp_fn,
             &cursor_pose_fn,
+        )
+    }
+
+    pub fn new_live(constants: &RenderVideoConstants, input: LiveRenderInput<'_>) -> Self {
+        let current = input.motion.latest();
+        let current_recording_time = input.frames.recording_time;
+        let current_frame_time = input.frame_number as f32 / input.fps.max(1) as f32;
+        let interpolation = |time: f32| {
+            input
+                .motion
+                .sample(
+                    current.map_or(0.0, |frame| frame.time_ms)
+                        - f64::from((current_recording_time - time).max(0.0)) * 1000.0,
+                )
+                .filter(|frame| frame.visible)
+                .map(|frame| InterpolatedCursorPosition {
+                    position: Coord::new(frame.position),
+                    velocity: frame.velocity,
+                    cursor_id: input.cursor_id.to_owned(),
+                })
+        };
+        let pose = |_: f32, _: f64| {
+            current.map_or(CursorPose::default(), |frame| CursorPose {
+                rotation_degrees: frame.rotation_degrees,
+                click_scale: frame.click_scale,
+            })
+        };
+        Self::new_inner(
+            constants,
+            input.project,
+            input.frame_number,
+            input.fps,
+            input.output_size,
+            input.events,
+            input.frames,
+            f64::MAX,
+            &|time| {
+                input
+                    .motion
+                    .sample(
+                        current.map_or(0.0, |frame| frame.time_ms)
+                            - f64::from((current_frame_time - time).max(0.0)) * 1000.0,
+                    )
+                    .map_or(InterpolatedZoom::default(), |frame| frame.zoom)
+            },
+            &|_, _| false,
+            Some(input.output_size),
+            &interpolation,
+            &pose,
         )
     }
 
@@ -3585,12 +3648,17 @@ impl ProjectUniforms {
         cursor_events: &CursorEvents,
         segment_frames: &DecodedSegmentFrames,
         total_duration: f64,
-        zoom_timeline: &ZoomTransformTimeline,
+        zoom_sample: &dyn Fn(f32) -> InterpolatedZoom,
+        zoom_snapped: &dyn Fn(f32, f32) -> bool,
+        live_output_size: Option<XY<u32>>,
         cursor_interp_fn: &dyn Fn(f32) -> Option<InterpolatedCursorPosition>,
         cursor_pose_fn: &dyn Fn(f32, f64) -> CursorPose,
     ) -> Self {
         let options = &constants.options;
-        let output_size = Self::get_output_size(options, project, resolution_base);
+        let output_size = live_output_size.map_or_else(
+            || Self::get_output_size(options, project, resolution_base),
+            |size| (size.x, size.y),
+        );
         let fps_f32 = fps.max(1) as f32;
         let timeline_time = f64::from(frame_number) / f64::from(fps.max(1));
         let frame_time = timeline_time as f32;
@@ -3603,7 +3671,20 @@ impl ProjectUniforms {
         let styled_crop = Self::get_crop(options, project);
         let has_layout_override =
             base_crop.size != styled_crop.size || base_padding != project.background.padding;
-        let display_layout = if has_layout_override {
+        let display_layout = if live_output_size.is_some() {
+            let canvas = XY::new(output_size.0 as f64, output_size.1 as f64);
+            let crop = Self::get_crop(options, project);
+            let source = XY::new(crop.size.x as f64, crop.size.y as f64);
+            let padding = Self::auto_padding_factor(project);
+            let scale = (canvas.x / source.x.max(1.0)).min(canvas.y / source.y.max(1.0))
+                / (1.0 + padding * 2.0);
+            Self::display_layout_in_box(
+                options,
+                project,
+                output_size,
+                (canvas - source * scale) / 2.0,
+            )
+        } else if has_layout_override {
             Self::styled_display_layout(options, project, output_size, resolution_base)
         } else {
             Self::display_layout(options, project, resolution_base)
@@ -3671,8 +3752,8 @@ impl ProjectUniforms {
         // segment_end_focus/segment_end_cursor plumbing that patched its
         // boundary discontinuities — is gone: the spring is continuous across
         // segment starts, ends and re-aims by construction.
-        let zoom = zoom_timeline.sample(frame_time);
-        let prev_zoom = zoom_timeline.sample(prev_frame_time);
+        let zoom = zoom_sample(frame_time);
+        let prev_zoom = zoom_sample(prev_frame_time);
 
         let motion_sample_frames = frame_number.min(DISPLAY_MOTION_SAMPLE_FRAMES);
         let motion_frame_delta = motion_sample_frames as f32 / fps_f32;
@@ -3682,7 +3763,7 @@ impl ProjectUniforms {
         } else {
             1.0
         };
-        let motion_prev_zoom = zoom_timeline.sample(motion_prev_frame_time);
+        let motion_prev_zoom = zoom_sample(motion_prev_frame_time);
 
         let scene = InterpolatedScene::new(SceneSegmentsCursor::new(timeline_time, scene_segments));
         let prev_scene = InterpolatedScene::new(SceneSegmentsCursor::new(
@@ -3907,8 +3988,7 @@ impl ProjectUniforms {
             // bounds delta across it is not motion, so blurring it would smear
             // a single frame. Suppress display blur whenever the timeline
             // snapped inside the sampling window.
-            let zoom_snapped_in_window =
-                zoom_timeline.snapped_within(motion_prev_frame_time, frame_time);
+            let zoom_snapped_in_window = zoom_snapped(motion_prev_frame_time, frame_time);
 
             let display_motion = if zoom_snapped_in_window {
                 MotionBlurComputation::none()
@@ -4365,8 +4445,7 @@ impl ProjectUniforms {
                 // Camera size rides the zoom activity spring, so a zoom snap
                 // also jumps the camera rect — suppress blur across snaps here
                 // for the same reason as the display layer.
-                let camera_snapped_in_window =
-                    zoom_timeline.snapped_within(prev_frame_time, frame_time);
+                let camera_snapped_in_window = zoom_snapped(prev_frame_time, frame_time);
                 let camera_descriptor = if camera_snapped_in_window {
                     MotionBlurDescriptor::none()
                 } else {
@@ -8636,6 +8715,82 @@ mod project_uniforms_tests {
                     "{name}, ripple={ripple_only}: RGB changed outside overlay alpha support; max error={outside_support_max_error}",
                 );
             }
+        }
+    }
+
+    #[tokio::test]
+    async fn live_canvas_uses_shared_gpu_layers_and_preserves_source_aspect() {
+        let constants = cursor_test_constants().await;
+        let mut project = ProjectConfiguration::default();
+        project.cursor.hide = true;
+        project.background.source = BackgroundSource::Color {
+            value: [80, 100, 180],
+            alpha: 255,
+        };
+        project.background.padding = 8.0;
+        let size = constants.options.screen_size;
+        let frame = DecodedFrame::new(vec![220; (size.x * size.y * 4) as usize], size.x, size.y);
+        let frames = DecodedSegmentFrames {
+            screen_size: size,
+            screen_frame: Some(frame),
+            camera_frame: None,
+            recording_time: 1.0,
+            segment_time: 1.0,
+            segment_has_camera: false,
+        };
+        let events = CursorEvents::default();
+        let mut motion =
+            live::LiveMotion::new(size, &project.cursor, project.screen_movement_spring);
+        motion.advance(
+            1000.0,
+            live::LivePointerInput {
+                position: XY::new(0.5, 0.5),
+                pressed: false,
+                keyboard_active: false,
+                visible: true,
+            },
+            live::LiveFocusMode::Off,
+            &project.cursor,
+            1.8,
+            4.0,
+        );
+        let mut renderer = FrameRenderer::new(&constants);
+        let mut layers = RendererLayers::new(&constants.device, &constants.queue);
+        for output in [XY::new(640, 360), XY::new(400, 400), XY::new(840, 360)] {
+            let uniforms = ProjectUniforms::new_live(
+                &constants,
+                LiveRenderInput {
+                    project: &project,
+                    frame_number: 60,
+                    fps: 60,
+                    output_size: output,
+                    events: &events,
+                    frames: &frames,
+                    motion: &motion,
+                    cursor_id: "primary",
+                },
+            );
+            assert_eq!(uniforms.output_size, (output.x, output.y));
+            let bounds = uniforms.frame_layout().display;
+            assert!(
+                ((bounds[2] - bounds[0]) / (bounds[3] - bounds[1]) - size.x as f32 / size.y as f32)
+                    .abs()
+                    < 0.001
+            );
+            assert!(bounds[0] >= 0.0 && bounds[1] >= 0.0);
+            let rendered = match renderer
+                .render(frames.clone(), uniforms, &events, true, &mut layers)
+                .await
+                .unwrap()
+            {
+                Some(frame) => frame,
+                None => renderer.flush_pipeline().await.unwrap().unwrap(),
+            };
+            assert_eq!((rendered.width, rendered.height), (output.x, output.y));
+            assert!(
+                rendered.data[2] > rendered.data[0] && rendered.data[3] == 255,
+                "background must reach canvas corners"
+            );
         }
     }
 

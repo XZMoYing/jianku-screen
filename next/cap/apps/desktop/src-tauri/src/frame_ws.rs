@@ -204,6 +204,8 @@ impl Drop for SubscriberCountGuard {
 struct WatchFrameQuery {
     #[serde(default)]
     instant: bool,
+    #[serde(default)]
+    paced: bool,
 }
 
 fn is_normal_socket_disconnect(error: &impl std::fmt::Debug) -> bool {
@@ -262,7 +264,7 @@ async fn create_watch_frame_ws_inner(
                 tokio::select! {
                     biased;
                     _ = shutdown.cancelled() => {},
-                    _ = handle_socket(socket, state, subscribers, instant_subscribers) => {},
+                    _ = handle_socket(socket, state, subscribers, instant_subscribers, query.paced) => {},
                 }
             })
     }
@@ -272,10 +274,12 @@ async fn create_watch_frame_ws_inner(
         mut camera_rx: watch::Receiver<Option<std::sync::Arc<WSFrame>>>,
         subscribers: Arc<AtomicUsize>,
         instant_subscribers: Option<Arc<AtomicUsize>>,
+        paced: bool,
     ) {
         tracing::info!("Socket connection established");
         let now = std::time::Instant::now();
         let mut stats = WsFrameStats::default();
+        let mut awaiting_present = false;
 
         subscribers.fetch_add(1, Ordering::AcqRel);
         if let Some(instant_subscribers) = &instant_subscribers {
@@ -306,6 +310,7 @@ async fn create_watch_frame_ws_inner(
                         }
                         return;
                     }
+                    awaiting_present = paced;
                     tracing::info!(
                         frame_age_ms = frame_age.as_millis() as u64,
                         "Editor open: initial frame delivered to new socket"
@@ -325,6 +330,7 @@ async fn create_watch_frame_ws_inner(
                             tracing::info!("WebSocket closed");
                             break;
                         }
+                        Some(Ok(Message::Text(text))) if paced && text.as_str() == "presented" => { awaiting_present = false; }
                         Some(Ok(_)) => {}
                         Some(Err(e)) => {
                             if is_normal_socket_disconnect(&e) {
@@ -336,7 +342,7 @@ async fn create_watch_frame_ws_inner(
                         }
                     }
                 },
-                changed = camera_rx.changed() => {
+                changed = camera_rx.changed(), if !awaiting_present => {
                     if changed.is_err() {
                         break;
                     }
@@ -358,6 +364,7 @@ async fn create_watch_frame_ws_inner(
                         let send_start = Instant::now();
                         match socket.send(Message::Binary(packed)).await {
                             Ok(()) => {
+                                awaiting_present = paced;
                                 let send_duration = send_start.elapsed();
                                 stats.record(
                                     packed_len,
@@ -765,6 +772,40 @@ mod shutdown_tests {
         .expect("websocket listener still owns its port");
         drop(listener);
         assert_listener_closed(port).await;
+    }
+
+    #[tokio::test]
+    async fn paced_output_waits_for_presentation_and_skips_old_frames() {
+        use futures::{SinkExt, StreamExt};
+        let (tx, rx) = watch::channel(Some(Arc::new(frame())));
+        let (port, cancel) = create_watch_frame_ws(rx, Default::default()).await;
+        let (mut socket, _) =
+            tokio_tungstenite::connect_async(format!("ws://127.0.0.1:{port}/?paced=true"))
+                .await
+                .unwrap();
+        assert!(socket.next().await.unwrap().unwrap().is_binary());
+        for number in 0..20 {
+            let mut value = frame();
+            value.frame_number = number;
+            tx.send_replace(Some(Arc::new(value)));
+        }
+        assert!(
+            tokio::time::timeout(Duration::from_millis(80), socket.next())
+                .await
+                .is_err()
+        );
+        socket
+            .send(tokio_tungstenite::tungstenite::Message::Text(
+                "presented".into(),
+            ))
+            .await
+            .unwrap();
+        let bytes = socket.next().await.unwrap().unwrap().into_data();
+        assert_eq!(
+            u32::from_le_bytes(bytes[bytes.len() - 12..bytes.len() - 8].try_into().unwrap()),
+            19
+        );
+        cancel.cancel();
     }
 
     #[tokio::test]

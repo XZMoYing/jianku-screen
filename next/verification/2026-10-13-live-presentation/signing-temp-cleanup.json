@@ -1,0 +1,6 @@
+{
+	"removedGeneratedSigningTemps": [
+		"Contents/MacOS/cap-muxer.cstemp",
+		"Contents/MacOS/cap-exporter.cstemp"
+	]
+}

@@ -1,0 +1,51 @@
+{
+	"edited": {
+		"active": true,
+		"error": null,
+		"frames": 542,
+		"outputDetached": false,
+		"processingMs": 19.123958,
+		"wsPort": 63654
+	},
+	"final": {
+		"active": true,
+		"error": null,
+		"frames": 181,
+		"outputDetached": false,
+		"processingMs": 18.860417,
+		"wsPort": 63708
+	},
+	"initial": {
+		"active": true,
+		"error": null,
+		"frames": 1,
+		"outputDetached": false,
+		"processingMs": 579.06475,
+		"wsPort": 63654
+	},
+	"playing": {
+		"active": true,
+		"error": null,
+		"frames": 301,
+		"outputDetached": false,
+		"processingMs": 17.642333,
+		"wsPort": 63654
+	},
+	"restarted": {
+		"active": true,
+		"error": null,
+		"frames": 1,
+		"outputDetached": false,
+		"processingMs": 540.513417,
+		"wsPort": 63708
+	},
+	"stopped": {
+		"active": false,
+		"error": null,
+		"frames": 542,
+		"outputDetached": false,
+		"processingMs": 19.123958,
+		"wsPort": 63654
+	},
+	"userFramesSaved": false
+}

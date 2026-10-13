@@ -1,0 +1,36 @@
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+   Compiling cap-desktop v0.6.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/apps/desktop/src-tauri)
+   Compiling cap-editor v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/editor)
+   Compiling cap-recording v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/recording)
+   Compiling cap-export v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/export)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 50.28s
+     Running unittests src/lib.rs (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/debug/deps/cap_desktop_lib-f3a38f070c594e16)
+
+running 24 tests
+test frame_ws::shutdown_tests::aborted_construction_drop_guard_releases_listener ... ok
+test frame_ws::owned_preparing_tests::owned_transport_joins_incomplete_handshake_and_releases_port ... ok
+test frame_ws::owned_preparing_tests::owned_transport_keeps_exact_frame_encoding_and_joins_live_client ... ok
+test frame_ws::shutdown_tests::broadcast_listener_releases_port_after_cancel_before_server_poll ... ok
+test frame_ws::shutdown_tests::broadcast_shutdown_drains_incomplete_http_upgrade ... ok
+test frame_ws::shutdown_tests::cancelling_owner_child_does_not_stop_sibling_server ... ok
+test frame_ws::shutdown_tests::broadcast_shutdown_drains_existing_clients ... ok
+test frame_ws::shutdown_tests::dropping_owner_token_preserves_app_scoped_camera_server ... ok
+test frame_ws::shutdown_tests::packed_frames_replay_to_late_clients_and_deliver_replacements ... ok
+test frame_ws::shutdown_tests::successful_construction_disarms_guard_until_owner_cancels ... ok
+test frame_ws::shutdown_tests::watch_shutdown_drains_http_keep_alive_connection ... ok
+test frame_ws::shutdown_tests::watch_shutdown_drains_incomplete_http_upgrade ... ok
+test frame_ws::tests::owned_frame_packing_reuses_pixels_and_replay_shares_the_packet ... ok
+test frame_ws::tests::packing_shared_pixels_preserves_other_readers_and_camera_pool_contents ... ok
+test frame_ws::tests::packs_nv12_frame_with_video_range_marker ... ok
+test frame_ws::tests::packs_rgba_frame_with_legacy_metadata_shape ... ok
+test frame_ws::shutdown_tests::watch_shutdown_drains_existing_clients_and_subscriber_counts ... ok
+test frame_ws::tests::subscriber_guard_decrements_both_counts ... ok
+test frame_ws::shutdown_tests::watch_listener_releases_port_after_cancel_before_server_poll ... ok
+test frame_ws::shutdown_tests::watch_source_close_does_not_resend_retained_frame ... ok
+test frame_ws::shutdown_tests::repeated_watch_open_cancel_releases_every_port ... ok
+test frame_ws::owned_preparing_tests::owned_transport_cancellation_joins_stalled_large_frame_send ... ok
+test frame_ws::shutdown_tests::watch_shutdown_interrupts_stalled_initial_send ... ok
+test frame_ws::shutdown_tests::paced_output_waits_for_presentation_and_skips_old_frames ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 514 filtered out; finished in 0.10s
+

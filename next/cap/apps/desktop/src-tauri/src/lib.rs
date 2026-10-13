@@ -45,6 +45,7 @@ mod picker_benchmark;
 mod platform;
 mod power_observer;
 mod preparing_finalization;
+mod presentation;
 mod presets;
 mod project_files;
 mod recording;
@@ -3394,6 +3395,12 @@ async fn cleanup_camera_after_overlay_close(app: AppHandle, captured_session_id:
 async fn cleanup_app_resources_for_exit(app: &AppHandle) {
     let started = Instant::now();
     log_process_memory_snapshot("exit_cleanup_begin");
+    let _ = await_exit_step(
+        "stop_presentation",
+        APP_EXIT_STEP_TIMEOUT,
+        presentation::stop_presentation(app.clone()),
+    )
+    .await;
 
     // Reverse the macOS Liquid Glass private SPI (remove the NSGlassEffectView, restore
     // window/WKWebView occlusion detection) BEFORE anything else, so a slow camera/ML
@@ -6821,6 +6828,13 @@ fn specta_builder() -> tauri_specta::Builder {
             editor_preparing::set_preparing_editor_playing,
             editor_preparing::stop_preparing_editor_frame,
             get_editor_project_path,
+            presentation::show_presentation,
+            presentation::get_presentation_setup,
+            presentation::get_presentation_status,
+            presentation::start_presentation,
+            presentation::stop_presentation,
+            presentation::update_presentation,
+            presentation::toggle_presentation_focus,
             project_files::pick_local_project,
             project_files::open_local_project,
             project_files::copy_editor_project,
@@ -7258,6 +7272,7 @@ pub async fn run(recording_logging_handle: LoggingHandle, logs_dir: PathBuf) {
             app.manage(http_client::HttpClient::default());
             app.manage(http_client::RetryableHttpClient::default());
             app.manage(PendingScreenshots::default());
+            app.manage(presentation::PresentationState::default());
             app.manage(FinalizingRecordings::default());
             app.manage(editor_preparing::PreparingConsumers::default());
             app.manage(updates::UpdatesState::default());
@@ -7431,6 +7446,8 @@ pub async fn run(recording_logging_handle: LoggingHandle, logs_dir: PathBuf) {
                     #[cfg(debug_assertions)]
                     stop_editor_benchmark::run(app.clone());
                     #[cfg(debug_assertions)]
+                    presentation::run_smoke(app.clone());
+                    #[cfg(debug_assertions)]
                     picker_benchmark::run(app.clone());
                     gpu_context::prewarm_gpu();
                     tokio::task::spawn_blocking(cap_rendering::prewarm_fonts);
@@ -7571,6 +7588,11 @@ pub async fn run(recording_logging_handle: LoggingHandle, logs_dir: PathBuf) {
         .on_window_event(|window, event| {
             let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
                 let label = window.label();
+                if label == "presentation-output" && let WindowEvent::Resized(size) = event { presentation::output_resized(window.app_handle(), size.width, size.height); }
+                if matches!(event, WindowEvent::Destroyed) && (label == "presentation-controls") {
+                    let handle = window.app_handle().clone();
+                    spawn_on_runtime(async move { let _ = presentation::stop_presentation(handle).await; });
+                }
                 let app = window.app_handle();
 
                 if matches!(
@@ -7590,7 +7612,7 @@ pub async fn run(recording_logging_handle: LoggingHandle, logs_dir: PathBuf) {
                             window_id,
                             Some(CapWindowId::Editor { .. })
                                 | Some(CapWindowId::ScreenshotEditor { .. })
-                        ) && export::export_session_active()
+                        ) && !label.starts_with("presentation-") && export::export_session_active()
                         {
                             api.prevent_close();
                             warn!(

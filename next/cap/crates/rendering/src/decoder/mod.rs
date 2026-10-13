@@ -337,7 +337,7 @@ impl DecodedFrame {
     }
 
     #[cfg(target_os = "macos")]
-    pub(crate) fn new_nv12_with_image_buf(
+    pub fn new_nv12_with_image_buf(
         width: u32,
         height: u32,
         y_stride: u32,

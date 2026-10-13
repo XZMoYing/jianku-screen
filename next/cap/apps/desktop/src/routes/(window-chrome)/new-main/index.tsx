@@ -3057,6 +3057,18 @@ function Page() {
 					<MainWindowHelpButton />
 					<button
 						type="button"
+						class="h-6 px-2 text-xs text-gray-11 rounded-md hover:bg-gray-4 disabled:opacity-50"
+						disabled={isRecording() || !!editorRecordingFlow()}
+						onClick={() =>
+							void commands
+								.showPresentation()
+								.catch((error) => toast.error(String(error)))
+						}
+					>
+						实时演示
+					</button>
+					<button
+						type="button"
 						disabled={
 							isRecording() || openingProject() || !!editorRecordingFlow()
 						}

@@ -1177,3 +1177,18 @@ mod input_epoch_tests {
         );
     }
 }
+
+#[cfg(target_os = "macos")]
+pub fn live_cursor_observation(
+    display: scap_targets::Display,
+) -> Option<(XY<f64>, Option<String>)> {
+    let position = cap_cursor_capture::RawCursorPosition::get()
+        .relative_to_display(display)?
+        .normalize()?;
+    Some((
+        XY::new(position.x(), position.y()),
+        get_cursor_data()
+            .and_then(|data| data.shape)
+            .map(|shape| shape.to_string()),
+    ))
+}

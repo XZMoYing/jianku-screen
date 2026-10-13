@@ -1,0 +1,19 @@
+{
+	"startedAt": "2026-10-13T10:26:04.008872+00:00",
+	"application": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.7/Jianku Screen Next.app",
+	"version": "0.2.0-alpha.7",
+	"build": "2026.10.13.7",
+	"userFramesSaved": false,
+	"nativeSession": {
+		"pid": 31996,
+		"started_at": "2026-10-13T10:26:07.355446+00:00",
+		"app_version": "0.6.0",
+		"os": "macos 14.7.4",
+		"arch": "aarch64",
+		"liquid_glass": "unknown",
+		"gpu_init_phase": false,
+		"graphics_recovery": false,
+		"blur_active": false,
+		"blur_recovery": false
+	}
+}

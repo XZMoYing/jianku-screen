@@ -1,0 +1,11 @@
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.51s
+     Running unittests src/lib.rs (target/debug/deps/cap_rendering-860a100ea92ff1de)
+
+running 3 tests
+test live::tests::reversal_preserves_pose_and_click_recovers_without_snapping ... ok
+test live::tests::manual_toggle_and_off_are_independent_of_clicks ... ok
+test live::tests::continuous_operations_keep_focus_until_actual_idle ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 318 filtered out; finished in 0.00s
+

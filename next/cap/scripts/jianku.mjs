@@ -3,7 +3,9 @@ import {
 	copyFileSync,
 	existsSync,
 	mkdirSync,
+	readdirSync,
 	readFileSync,
+	unlinkSync,
 	writeFileSync,
 } from "node:fs";
 import { homedir } from "node:os";
@@ -107,6 +109,25 @@ function buildSidecars() {
 	run("node", ["scripts/prepare.js"], desktop);
 }
 
+function removeSigningTemps(directory) {
+	for (const entry of readdirSync(directory, { withFileTypes: true })) {
+		const target = path.join(directory, entry.name);
+		if (entry.isDirectory()) removeSigningTemps(target);
+		else if (entry.name.endsWith(".cstemp")) unlinkSync(target);
+	}
+}
+
+function nestedFrameworks(directory) {
+	const frameworks = [];
+	for (const entry of readdirSync(directory, { withFileTypes: true })) {
+		if (!entry.isDirectory()) continue;
+		const target = path.join(directory, entry.name);
+		frameworks.push(...nestedFrameworks(target));
+		if (entry.name.endsWith(".framework")) frameworks.push(target);
+	}
+	return frameworks;
+}
+
 function signMacBundle() {
 	if (process.platform !== "darwin") return;
 	const available = spawnSync(
@@ -137,12 +158,26 @@ function signMacBundle() {
 		profile,
 		"bundle/macos/Jianku Screen Next.app",
 	);
-	// A debug bundle may keep the linker's signature without a resource seal.
+	// Sign framework containers explicitly: Tauri signs their dylibs, but not every container.
+	removeSigningTemps(app);
+	for (const framework of nestedFrameworks(app)) {
+		run(
+			"codesign",
+			[
+				"--force",
+				"--sign",
+				identity,
+				...(keychain ? ["--keychain", keychain] : []),
+				framework,
+			],
+			root,
+			60_000,
+		);
+	}
 	run(
 		"codesign",
 		[
 			"--force",
-			"--deep",
 			"--sign",
 			identity,
 			...(keychain ? ["--keychain", keychain] : []),

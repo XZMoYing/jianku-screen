@@ -1,0 +1,9 @@
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.65s
+     Running unittests src/lib.rs (target/debug/deps/cap_rendering-860a100ea92ff1de)
+
+running 1 test
+test project_uniforms_tests::live_canvas_uses_shared_gpu_layers_and_preserves_source_aspect ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 320 filtered out; finished in 0.64s
+

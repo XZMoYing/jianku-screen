@@ -1,0 +1,35 @@
+2026-10-13T10:00:04.653148Z  INFO cap_desktop_lib::presentation: Presentation ready; capture frames are composited without video encoding
+2026-10-13T10:00:06.622162Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=120 processing_ms=18.321458
+2026-10-13T10:00:08.621611Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=240 processing_ms=17.134375
+2026-10-13T10:00:10.621039Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=360 processing_ms=16.808792
+2026-10-13T10:00:12.622212Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=480 processing_ms=18.285290999999997
+2026-10-13T10:00:14.451774Z  INFO cap_desktop_lib::presentation: Presentation ready; capture frames are composited without video encoding
+2026-10-13T10:00:16.429931Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=120 processing_ms=19.414875000000002
+2026-10-13T10:00:18.430732Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=240 processing_ms=19.789791
+2026-10-13T10:00:20.429944Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=360 processing_ms=19.231375
+2026-10-13T10:00:22.562740Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=480 processing_ms=17.741833
+2026-10-13T10:00:24.562965Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=600 processing_ms=17.726291000000003
+2026-10-13T10:00:26.561897Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=720 processing_ms=16.90625
+2026-10-13T10:00:28.563103Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=840 processing_ms=19.102792
+2026-10-13T10:00:30.562596Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=960 processing_ms=17.884292
+2026-10-13T10:00:32.562917Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=1080 processing_ms=18.073875
+2026-10-13T10:00:34.562478Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=1200 processing_ms=17.971042
+2026-10-13T10:00:36.562405Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=1320 processing_ms=18.281208
+2026-10-13T10:00:38.562456Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=1440 processing_ms=18.308958
+2026-10-13T10:00:40.562979Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=1560 processing_ms=17.834792
+2026-10-13T10:00:42.561654Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=1680 processing_ms=16.387
+2026-10-13T10:00:44.562913Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=1800 processing_ms=19.48575
+2026-10-13T10:00:46.563137Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=1920 processing_ms=18.129625
+2026-10-13T10:00:48.562854Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=2040 processing_ms=18.966832999999998
+2026-10-13T10:00:50.562222Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=2160 processing_ms=18.339000000000002
+2026-10-13T10:00:52.563470Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=2280 processing_ms=18.990625
+2026-10-13T10:00:54.562746Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=2400 processing_ms=18.686500000000002
+2026-10-13T10:00:56.562220Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=2520 processing_ms=17.797
+2026-10-13T10:00:58.562377Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=2640 processing_ms=17.742667
+2026-10-13T10:01:00.562484Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=2760 processing_ms=18.777041
+2026-10-13T10:01:02.561791Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=2880 processing_ms=17.489667
+2026-10-13T10:01:04.562765Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=3000 processing_ms=18.391583999999998
+2026-10-13T10:01:06.562072Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=3120 processing_ms=17.050666
+2026-10-13T10:01:08.562416Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=3240 processing_ms=18.924958
+2026-10-13T10:01:10.562528Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=3360 processing_ms=18.598917
+2026-10-13T10:01:12.561594Z  INFO cap_desktop_lib::presentation::macos: Presentation frame delivery frames=3480 processing_ms=17.277082999999998
