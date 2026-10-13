@@ -11,6 +11,11 @@ import {
 } from "solid-js";
 import toast from "solid-toast";
 import {
+	ASPECT_RATIO_OPTIONS,
+	ASPECT_RATIOS,
+} from "~/routes/editor/projectConfig";
+import {
+	type AspectRatio,
 	commands,
 	type PresentationOptions,
 	type PresentationStatus,
@@ -79,8 +84,18 @@ export default function Presentation(props: {
 	const changes = listen<PresentationOptions>(
 		"presentation-options-changed",
 		(event) => {
-			pending = undefined;
-			setOptions(event.payload);
+			if (pending) {
+				pending = {
+					...pending,
+					outputWidth: event.payload.outputWidth,
+					outputHeight: event.payload.outputHeight,
+					focusMode: event.payload.focusMode,
+					toggleEpoch: event.payload.toggleEpoch,
+				};
+				setOptions(pending);
+			} else {
+				setOptions(event.payload);
+			}
 		},
 	);
 	onCleanup(() => {
@@ -100,7 +115,8 @@ export default function Presentation(props: {
 			while (pending && !disposed) {
 				const latest = pending;
 				pending = undefined;
-				await commands.updatePresentation(latest);
+				const normalized = await commands.updatePresentation(latest);
+				if (!pending) setOptions(normalized);
 			}
 		} catch (error) {
 			report(error);
@@ -337,31 +353,67 @@ export default function Presentation(props: {
 													: "输出铺满所选副屏，原屏幕保持原样。"}
 											</small>
 										</label>
+
+										<label class="studio-field">
+											<span>输出比例</span>
+											<div class="studio-select">
+												<select
+													aria-label="输出比例"
+													disabled={busy() || status()?.active}
+													value={value().outputAspectRatio ?? "auto"}
+													onChange={(event) =>
+														update({
+															...value(),
+															outputAspectRatio:
+																event.currentTarget.value === "auto"
+																	? null
+																	: (event.currentTarget.value as AspectRatio),
+														})
+													}
+												>
+													<For each={ASPECT_RATIO_OPTIONS}>
+														{(aspect) => (
+															<option value={aspect}>
+																{aspect === "auto"
+																	? "适合屏幕 · 默认"
+																	: `${ASPECT_RATIOS[aspect].ratio[0]}:${ASPECT_RATIOS[aspect].ratio[1]} · ${ASPECT_RATIOS[aspect].name}`}
+															</option>
+														)}
+													</For>
+												</select>
+												<IconChevronDown />
+											</div>
+											<small>
+												{status()?.active
+													? "停止演示后可更改比例。"
+													: "适合屏幕按来源或副屏比例计算；固定比例保持画布形状。"}
+											</small>
+										</label>
 										<label class="studio-field">
 											<span>输出清晰度</span>
 											<div class="studio-select">
 												<select
 													aria-label="输出清晰度"
-													value={value().outputWidth}
+													value={value().outputResolution}
 													onChange={(event) =>
 														update({
 															...value(),
-															outputWidth: Number(event.currentTarget.value),
-															outputHeight:
-																Math.round(
-																	(Number(event.currentTarget.value) * 9) /
-																		16 /
-																		2,
-																) * 2,
+															outputResolution: Number(
+																event.currentTarget.value,
+															),
 														})
 													}
 												>
+													<option value={1280}>720p · 标准</option>
 													<option value={1920}>1080p · 默认</option>
 													<option value={2560}>1440p · 高清</option>
 													<option value={3840}>2160p · 4K</option>
 												</select>
 												<IconChevronDown />
 											</div>
+											<small>
+												{value().outputWidth} × {value().outputHeight} 像素
+											</small>
 										</label>
 									</section>
 									<section class="studio-card">

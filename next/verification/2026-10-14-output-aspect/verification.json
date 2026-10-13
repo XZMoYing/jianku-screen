@@ -1,0 +1,121 @@
+{
+	"date": "2026-10-14",
+	"version": "0.2.0-alpha.10",
+	"aspectOptions": 14,
+	"fixedAspectRatios": 13,
+	"defaultAspect": "fit screen",
+	"qualityLevels": [
+		"720p",
+		"1080p",
+		"1440p",
+		"2160p"
+	],
+	"checks": {
+		"desktopTypeScript": true,
+		"scopedBiome": true,
+		"rustFormat": true,
+		"nativeChecks": [
+			"cap-desktop",
+			"cap-project",
+			"cap-rendering"
+		],
+		"aspectQualityParameterCombinations": 52,
+		"renderingAspectRegressions": 5,
+		"bindingsGeneratedByNativeTest": true,
+		"nativeBuild": true,
+		"strictBundleSignature": true,
+		"finalDesktopTypeScript": true
+	},
+	"workspace": {
+		"activeQualityFrame": {
+			"height": 720,
+			"width": 720
+		},
+		"activeWindowLabels": [
+			"main",
+			"presentation-output"
+		],
+		"aspectOptions": 14,
+		"desktopSourceRestored": true,
+		"externalUpdaterDisabled": true,
+		"fitScreenFrame": {
+			"height": 1080,
+			"width": 1728
+		},
+		"fitWindowResizeFrame": {
+			"height": 1080,
+			"width": 1920
+		},
+		"fixedWindowRatio": 1,
+		"idleAspectAndQualitySaved": true,
+		"mobileSourcePanel": {
+			"androidToolsFound": true,
+			"deviceCount": 1,
+			"iosHelperBundled": true,
+			"visible": true
+		},
+		"narrow": {
+			"footerBottom": 529,
+			"height": 530,
+			"scrollTop": 1259,
+			"width": 660
+		},
+		"passed": true,
+		"presentationStartStop": true,
+		"recordingVisible": true,
+		"scroll": {
+			"clientHeight": 495,
+			"footerBottom": 739,
+			"scrollHeight": 988,
+			"scrollTop": 493,
+			"windowHeight": 740
+		},
+		"settingsRetainedAcrossModeSwitch": true,
+		"squareFrame": {
+			"height": 1080,
+			"width": 1080
+		},
+		"stage": "fit-output-verified",
+		"userFramesSaved": false
+	},
+	"icon": {
+		"production": {
+			"width": 1024,
+			"height": 1024,
+			"cornerAlpha": 0,
+			"marginAlpha": 0,
+			"centerAlpha": 255
+		},
+		"native": {
+			"width": 512,
+			"height": 512,
+			"cornerAlpha": 0,
+			"marginAlpha": 0,
+			"centerAlpha": 255
+		},
+		"interface": {
+			"width": 256,
+			"height": 256,
+			"cornerAlpha": 0,
+			"marginAlpha": 0,
+			"centerAlpha": 255
+		}
+	},
+	"bundle": {
+		"version": "0.2.0-alpha.10",
+		"bundleVersion": "2026.10.13.10",
+		"identifier": "com.jianku.screen.next",
+		"nativeIconMatchesSource": true,
+		"jksAssociation": true,
+		"iosHelperBundled": true
+	},
+	"windowGeometryRestoreExcluded": true,
+	"screenFramesInRepository": false,
+	"pending": [
+		"Physical secondary monitors and conferencing screen sharing",
+		"Long projects and all added ratios across full editing/export workflows"
+	],
+	"trialApp": "Jianku Screen Next Builds/0.2.0-alpha.10/Jianku Screen Next.app",
+	"normalTrialOpened": true,
+	"normalTrialDiagnosticDisabled": true
+}

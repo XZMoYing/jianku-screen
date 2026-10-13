@@ -46,9 +46,9 @@
 	width: 36px;
 	height: 36px;
 	color: #fff;
-	background: linear-gradient(145deg, #9985f5, #6855d9);
+	background: transparent;
 	border-radius: 12px;
-	box-shadow: 0 3px 8px #7063e82b;
+	box-shadow: none;
 }
 .workspace-brand-mark img {
 	width: 100%;

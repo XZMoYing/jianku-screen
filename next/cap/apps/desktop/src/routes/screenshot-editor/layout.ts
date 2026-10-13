@@ -1,3 +1,4 @@
+import { ASPECT_RATIOS } from "~/routes/editor/projectConfig";
 import type { AspectRatio, XY } from "~/utils/tauri";
 
 export const SCREEN_MAX_PADDING = 0.4;
@@ -8,18 +9,8 @@ const roundBaseDimension = (value: number) =>
 const roundAutoBaseDimension = (value: number) => (Math.floor(value) + 1) & ~1;
 
 function getAspectRatioValue(aspectRatio: AspectRatio) {
-	switch (aspectRatio) {
-		case "wide":
-			return 16 / 9;
-		case "vertical":
-			return 9 / 16;
-		case "square":
-			return 1;
-		case "classic":
-			return 4 / 3;
-		case "tall":
-			return 3 / 4;
-	}
+	const [width, height] = ASPECT_RATIOS[aspectRatio].ratio;
+	return width / height;
 }
 
 function getBaseSize(

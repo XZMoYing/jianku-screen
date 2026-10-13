@@ -3,7 +3,7 @@ import { createSignal, Show } from "solid-js";
 import Tooltip from "~/components/Tooltip";
 import type { AspectRatio } from "~/utils/tauri";
 import { useEditorContext } from "./context";
-import { ASPECT_RATIOS } from "./projectConfig";
+import { ASPECT_RATIO_OPTIONS, ASPECT_RATIOS } from "./projectConfig";
 import {
 	EditorButton,
 	MenuItem,
@@ -18,7 +18,7 @@ function AspectRatioSelect() {
 	let triggerSelect: HTMLDivElement | undefined;
 
 	return (
-		<Tooltip content="Aspect Ratio">
+		<Tooltip content="画面比例">
 			<KSelect<AspectRatio | "auto">
 				open={open()}
 				onOpenChange={setOpen}
@@ -29,9 +29,7 @@ function AspectRatioSelect() {
 					setProject("aspectRatio", v === "auto" ? null : v);
 				}}
 				defaultValue="auto"
-				options={
-					["auto", "wide", "vertical", "square", "classic", "tall"] as const
-				}
+				options={ASPECT_RATIO_OPTIONS}
 				multiple={false}
 				itemComponent={(props) => {
 					const item = () =>
@@ -43,7 +41,7 @@ function AspectRatioSelect() {
 						<MenuItem<typeof KSelect.Item> as={KSelect.Item} item={props.item}>
 							<KSelect.ItemLabel class="flex-1">
 								{props.item.rawValue === "auto"
-									? "Auto"
+									? "适合屏幕"
 									: ASPECT_RATIOS[props.item.rawValue].name}
 								<Show when={item()}>
 									{(item) => (
@@ -76,7 +74,9 @@ function AspectRatioSelect() {
 						{(state) => {
 							const text = () => {
 								const option = state.selectedOption();
-								return option === "auto" ? "Auto" : ASPECT_RATIOS[option].name;
+								return option === "auto"
+									? "适合屏幕"
+									: ASPECT_RATIOS[option].name;
 							};
 							return <span class="max-[1200px]:hidden">{text()}</span>;
 						}}
@@ -89,7 +89,7 @@ function AspectRatioSelect() {
 					>
 						<MenuItemList<typeof KSelect.Listbox>
 							as={KSelect.Listbox}
-							class="w-50"
+							class="w-60 max-h-80 overflow-y-auto"
 						/>
 					</PopperContent>
 				</KSelect.Portal>

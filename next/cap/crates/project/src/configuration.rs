@@ -14,7 +14,7 @@ use specta::Type;
 
 use crate::DisplayNotch;
 
-#[derive(Type, Serialize, Deserialize, Clone, Debug, Default)]
+#[derive(Type, Serialize, Deserialize, Clone, Debug, Default, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub enum AspectRatio {
     #[default]
@@ -23,6 +23,34 @@ pub enum AspectRatio {
     Square,
     Classic,
     Tall,
+    WideScreen,
+    TallScreen,
+    Landscape,
+    Portrait,
+    Photo,
+    Social,
+    Ultrawide,
+    Cinema,
+}
+
+impl AspectRatio {
+    pub const fn ratio(&self) -> f64 {
+        match self {
+            Self::Wide => 16.0 / 9.0,
+            Self::Vertical => 9.0 / 16.0,
+            Self::Square => 1.0,
+            Self::Classic => 4.0 / 3.0,
+            Self::Tall => 3.0 / 4.0,
+            Self::WideScreen => 16.0 / 10.0,
+            Self::TallScreen => 10.0 / 16.0,
+            Self::Landscape => 3.0 / 2.0,
+            Self::Portrait => 2.0 / 3.0,
+            Self::Photo => 5.0 / 4.0,
+            Self::Social => 4.0 / 5.0,
+            Self::Ultrawide => 21.0 / 9.0,
+            Self::Cinema => 239.0 / 100.0,
+        }
+    }
 }
 
 pub type Color = [u16; 3];

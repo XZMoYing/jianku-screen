@@ -1,4 +1,4 @@
-use cap_project::ProjectConfiguration;
+use cap_project::{AspectRatio, ProjectConfiguration};
 use cap_rendering::live::LiveFocusMode;
 use serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex};
@@ -15,6 +15,10 @@ pub struct PresentationOptions {
     pub output_monitor: Option<usize>,
     pub output_width: u32,
     pub output_height: u32,
+    #[serde(default)]
+    pub output_resolution: u32,
+    #[serde(default)]
+    pub output_aspect_ratio: Option<AspectRatio>,
     pub focus_mode: LiveFocusMode,
     pub zoom_amount: f64,
     pub idle_seconds: f64,
@@ -25,7 +29,52 @@ pub struct PresentationOptions {
     pub toggle_epoch: u64,
 }
 
+fn output_size(resolution: u32, ratio: f64) -> (u32, u32) {
+    let short_edge = f64::from(resolution) * 9.0 / 16.0;
+    let (width, height) = if ratio >= 1.0 {
+        (f64::from(resolution), short_edge)
+    } else {
+        (short_edge, f64::from(resolution))
+    };
+    let scale = (width / ratio).min(height);
+    let even = |value: f64| ((value / 2.0).round() as u32 * 2).max(2);
+    (even(scale * ratio), even(scale))
+}
+
 impl PresentationOptions {
+    fn normalize(&mut self, app: &AppHandle, live_ratio: Option<f64>) -> Result<(), String> {
+        if self.output_resolution == 0 {
+            self.output_resolution = if [1280, 1920, 2560, 3840].contains(&self.output_width) {
+                self.output_width
+            } else {
+                1920
+            };
+        }
+        if ![1280, 1920, 2560, 3840].contains(&self.output_resolution) {
+            return Err("请选择有效的输出清晰度".into());
+        }
+        let ratio = if let Some(aspect) = &self.output_aspect_ratio {
+            aspect.ratio()
+        } else if let Some(ratio) = live_ratio {
+            ratio
+        } else if let Some(index) = self.output_monitor {
+            let monitors = app
+                .available_monitors()
+                .map_err(|error| error.to_string())?;
+            let monitor = monitors.get(index).ok_or("输出显示器已断开")?;
+            f64::from(monitor.size().width) / f64::from(monitor.size().height)
+        } else {
+            let source = scap_targets::Display::list()
+                .into_iter()
+                .find(|display| display.id().to_string() == self.source_id)
+                .ok_or("来源显示器已断开")?;
+            let size = source.physical_size().ok_or("无法读取来源屏幕尺寸")?;
+            f64::from(size.width()) / f64::from(size.height())
+        };
+        (self.output_width, self.output_height) = output_size(self.output_resolution, ratio);
+        Ok(())
+    }
+
     fn validate(&self) -> Result<(), String> {
         if !(320..=7680).contains(&self.output_width)
             || !(240..=4320).contains(&self.output_height)
@@ -142,17 +191,28 @@ pub fn get_presentation_setup(app: AppHandle) -> Result<PresentationSetup, Strin
             height: monitor.size().height,
         })
         .collect();
-    let mut options = app
-        .store("store")
-        .ok()
-        .and_then(|store| store.get("presentation-options"))
-        .and_then(|value| serde_json::from_value::<PresentationOptions>(value).ok())
-        .filter(|options| options.validate().is_ok())
+    let live_options = app.try_state::<PresentationState>().and_then(|state| {
+        let sessions = state.session.lock().unwrap();
+        sessions
+            .as_ref()
+            .map(|session| session.options.borrow().clone())
+    });
+    let mut options = live_options
+        .clone()
+        .or_else(|| {
+            app.store("store")
+                .ok()
+                .and_then(|store| store.get("presentation-options"))
+                .and_then(|value| serde_json::from_value::<PresentationOptions>(value).ok())
+                .filter(|options| options.validate().is_ok())
+        })
         .unwrap_or(PresentationOptions {
             source_id: scap_targets::Display::primary().id().to_string(),
             output_monitor: None,
             output_width: 1920,
             output_height: 1080,
+            output_resolution: 1920,
+            output_aspect_ratio: None,
             focus_mode: LiveFocusMode::Automatic,
             zoom_amount: 1.8,
             idle_seconds: 4.0,
@@ -176,6 +236,12 @@ pub fn get_presentation_setup(app: AppHandle) -> Result<PresentationSetup, Strin
     {
         options.output_monitor = None;
     }
+    options.normalize(
+        &app,
+        live_options
+            .as_ref()
+            .map(|options| f64::from(options.output_width) / f64::from(options.output_height)),
+    )?;
     Ok(PresentationSetup {
         supported: cfg!(target_os = "macos"),
         displays,
@@ -196,9 +262,11 @@ pub fn get_presentation_status(app: AppHandle) -> PresentationStatus {
 
 #[tauri::command]
 #[specta::specta]
-pub fn update_presentation(app: AppHandle, mut options: PresentationOptions) -> Result<(), String> {
+pub fn update_presentation(
+    app: AppHandle,
+    mut options: PresentationOptions,
+) -> Result<PresentationOptions, String> {
     use tauri_plugin_store::StoreExt;
-    options.validate()?;
     let state = app.state::<PresentationState>();
     let sessions = state.session.lock().unwrap();
     if let Some(session) = sessions.as_ref() {
@@ -206,26 +274,30 @@ pub fn update_presentation(app: AppHandle, mut options: PresentationOptions) -> 
         if current.source_id != options.source_id
             || current.output_monitor != options.output_monitor
             || current.shortcut != options.shortcut
+            || current.output_aspect_ratio != options.output_aspect_ratio
         {
-            return Err("请先停止演示，再更换来源、输出显示器或快捷键".into());
+            return Err("请先停止演示，再更换来源、输出位置、比例或快捷键".into());
         }
         options.toggle_epoch = current.toggle_epoch;
-        options.output_height = (((options.output_width as f64 * current.output_height as f64
-            / current.output_width as f64)
-            .round() as u32
-            + 1)
-            & !1)
-            .clamp(240, 4320);
-        session.options.send_replace(options);
-        return Ok(());
+        options.normalize(
+            &app,
+            Some(f64::from(current.output_width) / f64::from(current.output_height)),
+        )?;
+        options.validate()?;
+        session.options.send_replace(options.clone());
+        let _ = app.emit("presentation-output-settings", &options);
+        return Ok(options);
     }
     drop(sessions);
+    options.normalize(&app, None)?;
+    options.validate()?;
     let store = app.store("store").map_err(|error| error.to_string())?;
     store.set(
         "presentation-options",
-        serde_json::to_value(options).map_err(|error| error.to_string())?,
+        serde_json::to_value(&options).map_err(|error| error.to_string())?,
     );
-    store.save().map_err(|error| error.to_string())
+    store.save().map_err(|error| error.to_string())?;
+    Ok(options)
 }
 
 #[tauri::command]
@@ -329,6 +401,7 @@ pub async fn start_presentation(
     if crate::mobile::active(&app) {
         return Err("请先结束设备录制，再开始演示".into());
     }
+    options.normalize(&app, None)?;
     options.validate()?;
     #[cfg(not(target_os = "macos"))]
     {
@@ -382,11 +455,6 @@ pub async fn start_presentation(
             {
                 return Err("请选择副显示器输出；主显示器保持原有画面。也可以选择共享窗口".into());
             }
-            options.output_height = ((options.output_width as f64 * monitor.size().height as f64
-                / monitor.size().width as f64)
-                .round() as u32
-                + 1)
-                & !1;
             Some(monitor)
         } else {
             None
@@ -402,6 +470,8 @@ pub async fn start_presentation(
         app.global_shortcut()
             .register(shortcut)
             .map_err(|e| e.to_string())?;
+        let preview_scale =
+            (960.0 / f64::from(options.output_width)).min(680.0 / f64::from(options.output_height));
         let output = match WebviewWindowBuilder::new(
             &app,
             "presentation-output",
@@ -410,7 +480,10 @@ pub async fn start_presentation(
         .title("简库演示输出")
         .visible(false)
         .focused(false)
-        .inner_size(960.0, 540.0)
+        .inner_size(
+            f64::from(options.output_width) * preview_scale,
+            f64::from(options.output_height) * preview_scale,
+        )
         .decorations(false)
         .build()
         {
@@ -420,6 +493,25 @@ pub async fn start_presentation(
                 return Err(error.to_string());
             }
         };
+        if target.is_none() && options.output_aspect_ratio.is_some() {
+            let window = output.clone();
+            let size = (options.output_width, options.output_height);
+            if let Err(error) = app.run_on_main_thread(move || {
+                if let Ok(pointer) = window.ns_window() {
+                    let window = unsafe { &*(pointer as *const objc2_app_kit::NSWindow) };
+                    unsafe {
+                        window.setContentAspectRatio(objc2_foundation::NSSize::new(
+                            f64::from(size.0),
+                            f64::from(size.1),
+                        ));
+                    }
+                }
+            }) {
+                let _ = app.global_shortcut().unregister(shortcut);
+                let _ = output.close();
+                return Err(error.to_string());
+            }
+        }
         if let Some(monitor) = &target {
             output
                 .set_position(*monitor.position())
@@ -430,6 +522,8 @@ pub async fn start_presentation(
             output.set_always_on_top(true).map_err(|e| e.to_string())?;
         }
         output.show().map_err(|error| error.to_string())?;
+        let _ = app.emit("presentation-options-changed", &options);
+        let _ = app.emit("presentation-output-settings", &options);
         let (options_tx, options_rx) = watch::channel(options.clone());
         let (frame_tx, frame_rx) = watch::channel(None);
         let (port, ws_cancel) =
@@ -852,11 +946,20 @@ pub fn output_resized(app: &AppHandle, width: u32, height: u32) {
     };
     if let Some(session) = state.session.lock().unwrap().as_ref() {
         let mut options = session.options.borrow().clone();
-        let new_height =
-            ((options.output_width as f64 * height as f64 / width as f64).round() as u32 + 1) & !1;
-        if (240..=4320).contains(&new_height) && options.output_height != new_height {
-            options.output_height = new_height;
-            session.options.send_replace(options);
+        if options.output_aspect_ratio.is_some() {
+            return;
+        }
+        let size = output_size(
+            options.output_resolution,
+            f64::from(width) / f64::from(height),
+        );
+        if (320..=7680).contains(&size.0)
+            && (240..=4320).contains(&size.1)
+            && (options.output_width, options.output_height) != size
+        {
+            (options.output_width, options.output_height) = size;
+            session.options.send_replace(options.clone());
+            let _ = app.emit("presentation-options-changed", &options);
         }
     }
 }
@@ -904,4 +1007,39 @@ pub fn run_smoke(app: AppHandle) {
         };
         let _ = std::fs::write(path, serde_json::to_vec_pretty(&json).unwrap());
     });
+}
+
+#[cfg(test)]
+mod output_aspect_tests {
+    use super::*;
+
+    #[test]
+    fn quality_reference_preserves_ratios_and_even_dimensions_without_stretching() {
+        for resolution in [1280, 1920, 2560, 3840] {
+            for aspect in [
+                AspectRatio::Wide,
+                AspectRatio::Vertical,
+                AspectRatio::Square,
+                AspectRatio::WideScreen,
+                AspectRatio::TallScreen,
+                AspectRatio::Classic,
+                AspectRatio::Tall,
+                AspectRatio::Landscape,
+                AspectRatio::Portrait,
+                AspectRatio::Photo,
+                AspectRatio::Social,
+                AspectRatio::Ultrawide,
+                AspectRatio::Cinema,
+            ] {
+                let (width, height) = output_size(resolution, aspect.ratio());
+                assert_eq!(width % 2, 0);
+                assert_eq!(height % 2, 0);
+                assert!(width <= resolution && height <= resolution);
+                assert!((f64::from(width) / f64::from(height) - aspect.ratio()).abs() < 0.006);
+            }
+        }
+        assert_eq!(output_size(1920, 16.0 / 10.0), (1728, 1080));
+        assert_eq!(output_size(1920, 1.0), (1080, 1080));
+        assert_eq!(output_size(1920, 9.0 / 16.0), (1080, 1920));
+    }
 }

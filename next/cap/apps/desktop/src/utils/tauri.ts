@@ -268,7 +268,7 @@ async startPresentation(options: PresentationOptions) : Promise<PresentationStat
 async stopPresentation() : Promise<null> {
     return await TAURI_INVOKE("stop_presentation");
 },
-async updatePresentation(options: PresentationOptions) : Promise<null> {
+async updatePresentation(options: PresentationOptions) : Promise<PresentationOptions> {
     return await TAURI_INVOKE("update_presentation", { options });
 },
 async togglePresentationFocus() : Promise<null> {
@@ -724,7 +724,7 @@ export type AnimatedGradientStop = { color: [number, number, number]; position: 
 export type Annotation = { id: string; type: AnnotationType; x: number; y: number; width: number; height: number; strokeColor: string; strokeWidth: number; fillColor: string; opacity: number; rotation: number; text: string | null; maskType?: MaskType | null; maskLevel?: number | null; points?: ([number, number])[] | null }
 export type AnnotationType = "arrow" | "circle" | "rectangle" | "text" | "mask" | "draw"
 export type AppTheme = "system" | "light" | "dark"
-export type AspectRatio = "wide" | "vertical" | "square" | "classic" | "tall"
+export type AspectRatio = "wide" | "vertical" | "square" | "classic" | "tall" | "wideScreen" | "tallScreen" | "landscape" | "portrait" | "photo" | "social" | "ultrawide" | "cinema"
 export type Audio = { duration: number; sample_rate: number; channels: number; start_time: number }
 export type AudioConfiguration = { mute: boolean; improve: boolean; isolation: VoiceIsolation; micVolumeDb: number; micStereoMode: StereoMode; systemVolumeDb: number }
 /**
@@ -1245,7 +1245,7 @@ export type PreparingEditorProgress = { totalDuration: number | null; playableUn
 export type PreparingEditorSeed = { title: string; tracks: string[] }
 export type PreparingPlaybackState = { playheadSeconds: number; playing: boolean; buffering: boolean }
 export type PresentationMonitor = { index: number; name: string; width: number; height: number }
-export type PresentationOptions = { sourceId: string; outputMonitor: number | null; outputWidth: number; outputHeight: number; focusMode: LiveFocusMode; zoomAmount: number; idleSeconds: number; shortcut: string; project: ProjectConfiguration; toggleEpoch?: number }
+export type PresentationOptions = { sourceId: string; outputMonitor: number | null; outputWidth: number; outputHeight: number; outputResolution?: number; outputAspectRatio?: AspectRatio | null; focusMode: LiveFocusMode; zoomAmount: number; idleSeconds: number; shortcut: string; project: ProjectConfiguration; toggleEpoch?: number }
 export type PresentationSetup = { supported: boolean; displays: CaptureDisplay[]; monitors: PresentationMonitor[]; options: PresentationOptions }
 export type PresentationStatus = { active: boolean; frames: number; processingMs: number; error: string | null; wsPort: number; outputDetached: boolean }
 export type Preset = { name: string; config: ProjectConfiguration }

@@ -7177,6 +7177,7 @@ pub async fn run(recording_logging_handle: LoggingHandle, logs_dir: PathBuf) {
                     CapWindowId::Settings.label().as_str(),
                     "window-capture-occluder",
                     "target-select-overlay",
+                    "presentation-output",
                     CapWindowId::CaptureArea.label().as_str(),
                     CapWindowId::Camera.label().as_str(),
                     CapWindowId::RecordingsOverlay.label().as_str(),

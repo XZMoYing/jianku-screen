@@ -1,9 +1,11 @@
 use anyhow::Result;
+#[cfg(test)]
+use cap_project::AspectRatio;
 use cap_project::{
-    AspectRatio, Camera, CameraShape, CameraXPosition, CameraYPosition, ClipOffsets,
-    ClipTransitionType, CornerStyle, Crop, CursorEvents, CursorType, FrameConfiguration,
-    FrameStyle, OverlayTrackKind, ProjectConfiguration, RecordingMeta, SceneMode,
-    StudioRecordingMeta, TimelineFrameMapping, TimelineSource, XY,
+    Camera, CameraShape, CameraXPosition, CameraYPosition, ClipOffsets, ClipTransitionType,
+    CornerStyle, Crop, CursorEvents, CursorType, FrameConfiguration, FrameStyle, OverlayTrackKind,
+    ProjectConfiguration, RecordingMeta, SceneMode, StudioRecordingMeta, TimelineFrameMapping,
+    TimelineSource, XY,
 };
 use composite_frame::{ColorGradeUniformParams, CompositeVideoFrameUniforms};
 use core::f64;
@@ -3069,19 +3071,7 @@ impl ProjectUniforms {
                 let height = ((crop.size.y as f64 * scale) as u32 + 1) & !1;
                 (width, height)
             }
-            Some(AspectRatio::Square) => Self::fixed_aspect_base_size(&crop, 1.0, padding_factor),
-            Some(AspectRatio::Wide) => {
-                Self::fixed_aspect_base_size(&crop, 16.0 / 9.0, padding_factor)
-            }
-            Some(AspectRatio::Vertical) => {
-                Self::fixed_aspect_base_size(&crop, 9.0 / 16.0, padding_factor)
-            }
-            Some(AspectRatio::Classic) => {
-                Self::fixed_aspect_base_size(&crop, 4.0 / 3.0, padding_factor)
-            }
-            Some(AspectRatio::Tall) => {
-                Self::fixed_aspect_base_size(&crop, 3.0 / 4.0, padding_factor)
-            }
+            Some(aspect) => Self::fixed_aspect_base_size(&crop, aspect.ratio(), padding_factor),
         }
     }
 

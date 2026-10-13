@@ -4,7 +4,10 @@ import type { AspectRatio } from "~/utils/tauri";
 import IconCapChevronDown from "~icons/cap/chevron-down";
 import IconCapLayout from "~icons/cap/layout";
 import IconLucideCheckCircle from "~icons/lucide/check-circle-2";
-import { ASPECT_RATIOS } from "../../editor/projectConfig";
+import {
+	ASPECT_RATIO_OPTIONS,
+	ASPECT_RATIOS,
+} from "../../editor/projectConfig";
 import { useScreenshotEditorContext } from "../context";
 import {
 	EditorButton,
@@ -30,9 +33,7 @@ export function AspectRatioSelect() {
 				setProject("aspectRatio", v === "auto" ? null : v);
 			}}
 			defaultValue="auto"
-			options={
-				["auto", "wide", "vertical", "square", "classic", "tall"] as const
-			}
+			options={ASPECT_RATIO_OPTIONS}
 			multiple={false}
 			itemComponent={(props) => {
 				const item = () =>
@@ -44,7 +45,7 @@ export function AspectRatioSelect() {
 					<MenuItem<typeof KSelect.Item> as={KSelect.Item} item={props.item}>
 						<KSelect.ItemLabel class="flex-1">
 							{props.item.rawValue === "auto"
-								? "Auto"
+								? "适合屏幕"
 								: ASPECT_RATIOS[props.item.rawValue].name}
 							<Show when={item()}>
 								{(item) => (
@@ -65,8 +66,8 @@ export function AspectRatioSelect() {
 		>
 			<EditorButton<typeof KSelect.Trigger>
 				as={KSelect.Trigger}
-				class="w-20"
-				tooltipText="Aspect Ratio"
+				class="w-32"
+				tooltipText="画面比例"
 				leftIcon={<IconCapLayout class="size-4" />}
 				rightIcon={
 					<KSelect.Icon>
@@ -79,7 +80,7 @@ export function AspectRatioSelect() {
 					{(state) => {
 						const text = () => {
 							const option = state.selectedOption();
-							if (option === "auto") return "Auto";
+							if (option === "auto") return "适合屏幕";
 							const ratio = ASPECT_RATIOS[option].ratio;
 							return `${ratio[0]}:${ratio[1]}`;
 						};
@@ -94,7 +95,7 @@ export function AspectRatioSelect() {
 				>
 					<MenuItemList<typeof KSelect.Listbox>
 						as={KSelect.Listbox}
-						class="w-50"
+						class="w-56 max-h-80 overflow-y-auto"
 					/>
 				</PopperContent>
 			</KSelect.Portal>

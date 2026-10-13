@@ -1,15 +1,40 @@
+import { convertFileSrc } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 import { createSignal, onCleanup, onMount, Show } from "solid-js";
 import FrameWorker from "~/utils/frame-worker?worker";
-import { commands } from "~/utils/tauri";
+import { commands, type PresentationOptions } from "~/utils/tauri";
 
 export default function PresentationOutput() {
 	let canvas!: HTMLCanvasElement;
+	const [options, setOptions] = createSignal<PresentationOptions>();
+	const background = () => {
+		const source = options()?.project.background.source;
+		if (!source) return "#eeeaf6";
+		const rgb = (value: number[]) => `rgb(${value.join(",")})`;
+		if (source.type === "color") return rgb(source.value);
+		if (source.type === "gradient")
+			return `linear-gradient(${source.angle ?? 90}deg, ${rgb(source.from)}, ${rgb(source.to)})`;
+		if (
+			(source.type === "image" || source.type === "wallpaper") &&
+			source.path?.startsWith("/")
+		)
+			return `url("${convertFileSrc(source.path)}") center / cover`;
+		return "#eeeaf6";
+	};
 	const [error, setError] = createSignal("");
 	onMount(() => {
 		let disposed = false;
 		let socket: WebSocket | undefined;
 		let pending: ArrayBuffer | undefined;
 		let available = false;
+		const changes = listen<PresentationOptions>(
+			"presentation-output-settings",
+			(event) => setOptions(event.payload),
+		);
+		const setup = commands.getPresentationSetup().then((value) => {
+			if (!disposed) setOptions(value.options);
+		});
+		void setup.catch((cause: unknown) => setError(String(cause)));
 		const worker = new FrameWorker();
 		const send = () => {
 			if (!available || !pending || disposed) return;
@@ -60,10 +85,11 @@ export default function PresentationOutput() {
 			socket?.close();
 			worker.postMessage({ type: "cleanup" });
 			worker.terminate();
+			void changes.then((remove) => remove());
 		});
 	});
 	return (
-		<div class="fixed inset-0 bg-black cursor-none">
+		<div class="fixed inset-0 cursor-none" style={{ background: background() }}>
 			<canvas
 				data-tauri-drag-region
 				ref={canvas}
