@@ -12,7 +12,6 @@ use std::{
     path::PathBuf,
     sync::{Arc, Mutex},
 };
-use tauri::Manager;
 use tauri::menu::{IconMenuItem, MenuId, PredefinedMenuItem, Submenu};
 use tauri::{
     AppHandle,
@@ -20,6 +19,7 @@ use tauri::{
     menu::{Menu, MenuItem},
     tray::{TrayIcon, TrayIconBuilder},
 };
+use tauri::{Listener, Manager};
 use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_opener::OpenerExt;
 use tauri_specta::Event;
@@ -246,7 +246,7 @@ fn load_single_item(
     }
 
     let meta = RecordingMeta::load_for_project(path).ok()?;
-    let is_screenshot = path.extension().and_then(|s| s.to_str()) == Some("cap")
+    let is_screenshot = cap_project::is_project_path(&path)
         && path.parent().map(|p| p == screenshots_dir).unwrap_or(false);
 
     let (thumbnail_path, item_type) = if is_screenshot {
@@ -306,7 +306,7 @@ fn load_all_previous_items(app: &AppHandle, load_thumbnails: bool) -> Vec<Cached
     {
         for entry in entries.flatten() {
             let path = entry.path();
-            if path.extension().and_then(|s| s.to_str()) == Some("cap") {
+            if cap_project::is_project_path(&path) {
                 paths.push(path);
             }
         }
@@ -659,7 +659,7 @@ fn handle_previous_item_click(app: &AppHandle, path_str: &str) {
     let path = PathBuf::from(path_str);
 
     let screenshots_dir = screenshots_path(app);
-    let is_screenshot = path.extension().and_then(|s| s.to_str()) == Some("cap")
+    let is_screenshot = cap_project::is_project_path(&path)
         && path.parent().map(|p| p == screenshots_dir).unwrap_or(false);
 
     if is_screenshot {
@@ -711,6 +711,9 @@ pub fn get_tray_icon() -> &'static [u8] {
 }
 
 pub fn get_mode_icon(mode: RecordingMode) -> &'static [u8] {
+    if cfg!(target_os = "macos") {
+        return include_bytes!("../icons/jianku/tray.png");
+    }
     if cfg!(target_os = "windows") {
         return get_tray_icon();
     }
@@ -1040,7 +1043,11 @@ pub fn create_tray(app: &AppHandle) -> tauri::Result<()> {
                         }
                         let app = app_handle.clone();
                         tokio::spawn(async move {
-                            let _ = recording::stop_recording(app.clone(), app.state()).await;
+                            if crate::mobile::active(&app) {
+                                let _ = crate::mobile::stop_mobile_recording(app.clone()).await;
+                            } else {
+                                let _ = recording::stop_recording(app.clone(), app.state()).await;
+                            }
                         });
                     } else {
                         let _ = tray.set_visible(true);
@@ -1056,6 +1063,25 @@ pub fn create_tray(app: &AppHandle) -> tauri::Result<()> {
     {
         tracing::warn!("Failed to initialize Linux tray icon: {error}");
     }
+
+    app.listen("mobile-recording-active", {
+        let app = app.clone();
+        let is_recording = is_recording.clone();
+        move |event| {
+            let active = event.payload() == "true";
+            is_recording.store(active, Ordering::Relaxed);
+            if let Some(tray) = app.tray_by_id("tray") {
+                let result = if active {
+                    set_tray_stop_icon(&tray)
+                } else {
+                    set_tray_icon_for_mode(&tray, get_current_mode(&app))
+                };
+                if let Err(error) = result {
+                    tracing::warn!(%error, "Could not update mobile tray state");
+                }
+            }
+        }
+    });
 
     RecordingStarted::listen_any(&app, {
         let app = app.clone();

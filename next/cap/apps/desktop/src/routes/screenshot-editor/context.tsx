@@ -11,6 +11,7 @@ import {
 	onCleanup,
 } from "solid-js";
 import { createStore, reconcile, unwrap } from "solid-js/store";
+import { isProjectPath } from "~/utils/project-files";
 import { createLazySignal, type FrameData } from "~/utils/socket";
 import {
 	type Annotation,
@@ -286,7 +287,7 @@ function createScreenshotEditorContext() {
 			};
 
 			const pathStr = instance.path;
-			const isCapDir = pathStr.endsWith(".cap");
+			const isCapDir = isProjectPath(pathStr);
 			const imagePath = isCapDir ? `${pathStr}/original.png` : pathStr;
 			loadImage(imagePath);
 		}

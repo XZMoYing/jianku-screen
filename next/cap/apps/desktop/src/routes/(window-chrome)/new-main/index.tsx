@@ -30,6 +30,8 @@ import {
 import { createStore, produce, reconcile } from "solid-js/store";
 import toast from "solid-toast";
 import { Transition } from "solid-transition-group";
+import brandLogo from "~/assets/branding/logo.png";
+import MobileRecorder from "~/components/MobileRecorder";
 import Mode from "~/components/Mode";
 import { RecoveryToast } from "~/components/RecoveryToast";
 import { Input } from "~/routes/editor/ui";
@@ -86,7 +88,6 @@ import { openTeleprompter } from "~/utils/teleprompter";
 import IconLucideAppWindowMac from "~icons/lucide/app-window-mac";
 import IconLucideArrowLeft from "~icons/lucide/arrow-left";
 import IconLucideChevronDown from "~icons/lucide/chevron-down";
-import IconLucideClapperboard from "~icons/lucide/clapperboard";
 import IconLucideFolderOpen from "~icons/lucide/folder-open";
 import IconLucideImage from "~icons/lucide/image";
 import IconLucideImport from "~icons/lucide/import";
@@ -1647,6 +1648,10 @@ export default function () {
 }
 
 function Page() {
+	const [recordSource, setRecordSource] = createSignal<"desktop" | "mobile">(
+		"desktop",
+	);
+	const [mobileActive, setMobileActive] = createSignal(false);
 	const [workspaceMode, setWorkspaceMode] = createSignal<
 		"recording" | "presentation"
 	>(
@@ -2228,7 +2233,13 @@ function Page() {
 
 	const changeWorkspaceMode = async (mode: "recording" | "presentation") => {
 		if (mode === workspaceMode()) return;
-		if (isRecording() || editorRecordingFlow() || presentationBusy()) return;
+		if (
+			isRecording() ||
+			mobileActive() ||
+			editorRecordingFlow() ||
+			presentationBusy()
+		)
+			return;
 		if (mode === "recording" && presentationStatus()?.active) {
 			toast("请先停止演示，再切换到录屏。");
 			return;
@@ -3002,7 +3013,7 @@ function Page() {
 			<header class="workspace-top">
 				<div class="workspace-brand">
 					<span class="workspace-brand-mark">
-						<IconLucideClapperboard />
+						<img src={brandLogo} alt="简库镜传" />
 					</span>
 					<div>
 						<strong>简库镜传</strong>
@@ -3030,7 +3041,10 @@ function Page() {
 						aria-pressed={workspaceMode() === "presentation"}
 						class={workspaceMode() === "presentation" ? "is-selected" : ""}
 						disabled={
-							isRecording() || !!editorRecordingFlow() || presentationBusy()
+							isRecording() ||
+							mobileActive() ||
+							!!editorRecordingFlow() ||
+							presentationBusy()
 						}
 						onClick={() =>
 							void changeWorkspaceMode("presentation").catch((error) =>
@@ -3048,6 +3062,7 @@ function Page() {
 					type="button"
 					disabled={
 						isRecording() ||
+						mobileActive() ||
 						openingProject() ||
 						!!editorRecordingFlow() ||
 						presentationStatus()?.active
@@ -3059,7 +3074,9 @@ function Page() {
 				</button>
 				<button
 					type="button"
-					disabled={isRecording() || presentationStatus()?.active}
+					disabled={
+						isRecording() || mobileActive() || presentationStatus()?.active
+					}
 					onClick={async () => {
 						await changeWorkspaceMode("recording");
 						closeAllMenuPanels();
@@ -3071,7 +3088,9 @@ function Page() {
 				</button>
 				<button
 					type="button"
-					disabled={isRecording() || presentationStatus()?.active}
+					disabled={
+						isRecording() || mobileActive() || presentationStatus()?.active
+					}
 					onClick={async () => {
 						await changeWorkspaceMode("recording");
 						closeAllMenuPanels();
@@ -3128,7 +3147,7 @@ function Page() {
 				aria-hidden={workspaceMode() !== "presentation"}
 			>
 				<Presentation
-					blocked={isRecording() || !!editorRecordingFlow()}
+					blocked={isRecording() || mobileActive() || !!editorRecordingFlow()}
 					onStatus={setPresentationStatus}
 					onBusy={setPresentationBusy}
 				/>
@@ -3139,218 +3158,271 @@ function Page() {
 				style={{ display: workspaceMode() === "recording" ? "flex" : "none" }}
 				aria-hidden={workspaceMode() !== "recording"}
 			>
-				<Show when={!isActivelyRecording() && recordingErrors().length > 0}>
-					<div
-						role="alert"
-						tabIndex={0}
-						class="max-h-20 shrink-0 space-y-1 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-red-3 p-2 text-sm text-red-11"
+				<div class="workspace-sources" role="group" aria-label="录制来源">
+					<button
+						type="button"
+						class={recordSource() === "desktop" ? "is-selected" : ""}
+						aria-pressed={recordSource() === "desktop"}
+						disabled={mobileActive()}
+						onClick={() => setRecordSource("desktop")}
 					>
-						<For each={recordingErrors()}>{(error) => <p>{error}</p>}</For>
-					</div>
-				</Show>
-				<Show when={!activeMenu()}>
-					<div class="workspace-recording-heading">
-						<div>
-							<h2>
-								{editorRecordingFlow()
-									? "为工程录制新片段"
-									: rawOptions.mode === "screenshot"
-										? "捕捉一个瞬间"
-										: "从一次录制开始"}
-							</h2>
-							<p>
-								{editorRecordingFlow()
-									? `将加入 ${editorRecordingFlow()?.projectName}`
-									: rawOptions.mode === "screenshot"
-										? "选择屏幕、窗口或区域，截图后继续标注。"
-										: "选择来源与声音，停止后进入编辑器。"}
-							</p>
-						</div>
-						<Mode
-							locked={isRecording() || !!editorRecordingFlow()}
-							onInfoClick={() => {
-								closeAllMenuPanels();
-								setModeInfoMenuOpen(true);
-							}}
-						/>
-						<Show when={editorRecordingFlow()}>
-							<button
-								type="button"
-								class="studio-secondary"
-								onClick={() => void cancelEditorRecordingFlow()}
-							>
-								返回编辑器
-							</button>
-						</Show>
-					</div>
-				</Show>
-				<div class="workspace-recording-body">
-					<Show when={signIn.isPending}>
-						<div class="flex absolute inset-0 justify-center items-center bg-gray-1 animate-in fade-in">
-							<div class="flex flex-col gap-4 justify-center items-center">
-								<span>Signing In...</span>
-
-								<Button
-									onClick={() => {
-										signIn.variables?.abort();
-										signIn.reset();
-									}}
-									variant="gray"
-									class="w-full"
-								>
-									Cancel Sign In
-								</Button>
-							</div>
+						电脑屏幕
+					</button>
+					<button
+						type="button"
+						class={recordSource() === "mobile" ? "is-selected" : ""}
+						aria-pressed={recordSource() === "mobile"}
+						disabled={isRecording() || !!editorRecordingFlow()}
+						onClick={() => {
+							closeAllMenuPanels();
+							setRecordSource("mobile");
+						}}
+					>
+						手机与平板
+					</button>
+				</div>
+				<div
+					class="flex flex-1 min-h-0 flex-col"
+					style={{ display: recordSource() === "desktop" ? "flex" : "none" }}
+				>
+					<Show when={!isActivelyRecording() && recordingErrors().length > 0}>
+						<div
+							role="alert"
+							tabIndex={0}
+							class="max-h-20 shrink-0 space-y-1 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-red-3 p-2 text-sm text-red-11"
+						>
+							<For each={recordingErrors()}>{(error) => <p>{error}</p>}</For>
 						</div>
 					</Show>
-					<Show when={!signIn.isPending}>
-						<Show when={activeMenu()} keyed fallback={<TargetSelectionHome />}>
-							{(variant) =>
-								variant === "display" ? (
-									<TargetMenuPanel
-										variant="display"
-										targets={displayTargetsData()}
-										isLoading={displayMenuLoading()}
-										errorMessage={displayErrorMessage()}
-										onSelect={selectDisplayTarget}
-										disabled={isRecording()}
-										onBack={() => {
-											setDisplayMenuOpen(false);
-											displayTriggerRef?.focus();
+					<Show when={!activeMenu()}>
+						<div class="workspace-recording-heading">
+							<div>
+								<h2>
+									{editorRecordingFlow()
+										? "为工程录制新片段"
+										: rawOptions.mode === "screenshot"
+											? "捕捉一个瞬间"
+											: "从一次录制开始"}
+								</h2>
+								<p>
+									{editorRecordingFlow()
+										? `将加入 ${editorRecordingFlow()?.projectName}`
+										: rawOptions.mode === "screenshot"
+											? "选择屏幕、窗口或区域，截图后继续标注。"
+											: "选择来源与声音，停止后进入编辑器。"}
+								</p>
+							</div>
+							<Mode
+								locked={isRecording() || !!editorRecordingFlow()}
+								onInfoClick={() => {
+									closeAllMenuPanels();
+									setModeInfoMenuOpen(true);
+								}}
+							/>
+							<Show when={editorRecordingFlow()}>
+								<button
+									type="button"
+									class="studio-secondary"
+									onClick={() => void cancelEditorRecordingFlow()}
+								>
+									返回编辑器
+								</button>
+							</Show>
+						</div>
+					</Show>
+					<div class="workspace-recording-body">
+						<Show when={signIn.isPending}>
+							<div class="flex absolute inset-0 justify-center items-center bg-gray-1 animate-in fade-in">
+								<div class="flex flex-col gap-4 justify-center items-center">
+									<span>Signing In...</span>
+
+									<Button
+										onClick={() => {
+											signIn.variables?.abort();
+											signIn.reset();
 										}}
-									/>
-								) : variant === "window" ? (
-									<TargetMenuPanel
-										variant="window"
-										targets={windowTargetsData()}
-										isLoading={windowMenuLoading()}
-										errorMessage={windowErrorMessage()}
-										onSelect={selectWindowTarget}
-										disabled={isRecording()}
-										onBack={() => {
-											setWindowMenuOpen(false);
-											windowTriggerRef?.focus();
-										}}
-									/>
-								) : variant === "recording" ? (
-									<TargetMenuPanel
-										variant="recording"
-										targets={recordingsData()}
-										isLoading={recordings.isPending}
-										errorMessage={
-											recordings.error ? "Failed to load recordings" : undefined
-										}
-										onSelect={openRecording}
-										disabled={isRecording()}
-										onBack={() => {
-											setRecordingsMenuOpen(false);
-										}}
-										onViewAll={async () => {
-											await commands.showWindow({
-												Settings: { page: "recordings" },
-											});
-											hideCurrentWindow();
-										}}
-										uploadProgress={uploadProgress}
-										reuploadingPaths={reuploadingPaths()}
-										onReupload={handleReupload}
-										onRefetch={refreshRecordings}
-									/>
-								) : variant === "screenshot" ? (
-									<TargetMenuPanel
-										variant="screenshot"
-										targets={screenshotsData()}
-										isLoading={screenshots.isPending}
-										errorMessage={
-											screenshots.error
-												? "Failed to load screenshots"
-												: undefined
-										}
-										onSelect={openScreenshot}
-										disabled={isRecording()}
-										onBack={() => {
-											setScreenshotsMenuOpen(false);
-										}}
-										onViewAll={async () => {
-											await commands.showWindow({
-												Settings: { page: "screenshots" },
-											});
-											hideCurrentWindow();
-										}}
-									/>
-								) : variant === "camera" ? (
-									<TargetMenuPanel
-										variant="camera"
-										targets={devices.cameras}
-										selectedTarget={options.camera() ?? null}
-										isLoading={devices.isPending}
-										onSelect={(c) => {
-											if (!c) {
-												setOptions("cameraLabel", null);
-												setCamera.mutate({ model: null });
-											} else if (c.model_id) {
-												setOptions("cameraLabel", c.display_name);
-												setCamera.mutate({ model: { ModelID: c.model_id } });
-											} else {
-												setOptions("cameraLabel", c.display_name);
-												setCamera.mutate({ model: { DeviceID: c.device_id } });
-											}
-											setCameraMenuOpen(false);
-											setCameraInitialSettings(null);
-										}}
-										disabled={isRecording()}
-										onBack={() => {
-											setCameraMenuOpen(false);
-											setCameraInitialSettings(null);
-										}}
-										permissions={currentPermissions()}
-										deviceSettings={deviceSettings() ?? undefined}
-										onCameraSettingsChange={(camera, settings) => {
-											void setCameraDeviceSettings(camera, settings);
-										}}
-										compatibilityStudioMode={compatibilityStudioMode()}
-										initialSettingsTarget={cameraInitialSettings()}
-									/>
-								) : variant === "microphone" ? (
-									<TargetMenuPanel
-										variant="microphone"
-										targets={devices.microphones}
-										selectedTarget={options.micName() ?? null}
-										isLoading={devices.isPending}
-										onSelect={(v) => {
-											setMicInput.mutate(v?.name ?? null);
-											setMicrophoneMenuOpen(false);
-											setMicrophoneInitialSettings(null);
-										}}
-										disabled={isRecording()}
-										onBack={() => {
-											setMicrophoneMenuOpen(false);
-											setMicrophoneInitialSettings(null);
-										}}
-										permissions={currentPermissions()}
-										deviceSettings={deviceSettings() ?? undefined}
-										onMicrophoneSettingsChange={(key, settings) => {
-											void setMicrophoneDeviceSettings(key, settings);
-										}}
-										compatibilityStudioMode={compatibilityStudioMode()}
-										initialSettingsTarget={microphoneInitialSettings()}
-									/>
-								) : (
-									<ModeInfoPanel
-										onBack={() => {
-											setModeInfoMenuOpen(false);
-										}}
-									/>
-								)
-							}
+										variant="gray"
+										class="w-full"
+									>
+										Cancel Sign In
+									</Button>
+								</div>
+							</div>
 						</Show>
+						<Show when={!signIn.isPending}>
+							<Show
+								when={activeMenu()}
+								keyed
+								fallback={<TargetSelectionHome />}
+							>
+								{(variant) =>
+									variant === "display" ? (
+										<TargetMenuPanel
+											variant="display"
+											targets={displayTargetsData()}
+											isLoading={displayMenuLoading()}
+											errorMessage={displayErrorMessage()}
+											onSelect={selectDisplayTarget}
+											disabled={isRecording()}
+											onBack={() => {
+												setDisplayMenuOpen(false);
+												displayTriggerRef?.focus();
+											}}
+										/>
+									) : variant === "window" ? (
+										<TargetMenuPanel
+											variant="window"
+											targets={windowTargetsData()}
+											isLoading={windowMenuLoading()}
+											errorMessage={windowErrorMessage()}
+											onSelect={selectWindowTarget}
+											disabled={isRecording()}
+											onBack={() => {
+												setWindowMenuOpen(false);
+												windowTriggerRef?.focus();
+											}}
+										/>
+									) : variant === "recording" ? (
+										<TargetMenuPanel
+											variant="recording"
+											targets={recordingsData()}
+											isLoading={recordings.isPending}
+											errorMessage={
+												recordings.error
+													? "Failed to load recordings"
+													: undefined
+											}
+											onSelect={openRecording}
+											disabled={isRecording()}
+											onBack={() => {
+												setRecordingsMenuOpen(false);
+											}}
+											onViewAll={async () => {
+												await commands.showWindow({
+													Settings: { page: "recordings" },
+												});
+												hideCurrentWindow();
+											}}
+											uploadProgress={uploadProgress}
+											reuploadingPaths={reuploadingPaths()}
+											onReupload={handleReupload}
+											onRefetch={refreshRecordings}
+										/>
+									) : variant === "screenshot" ? (
+										<TargetMenuPanel
+											variant="screenshot"
+											targets={screenshotsData()}
+											isLoading={screenshots.isPending}
+											errorMessage={
+												screenshots.error
+													? "Failed to load screenshots"
+													: undefined
+											}
+											onSelect={openScreenshot}
+											disabled={isRecording()}
+											onBack={() => {
+												setScreenshotsMenuOpen(false);
+											}}
+											onViewAll={async () => {
+												await commands.showWindow({
+													Settings: { page: "screenshots" },
+												});
+												hideCurrentWindow();
+											}}
+										/>
+									) : variant === "camera" ? (
+										<TargetMenuPanel
+											variant="camera"
+											targets={devices.cameras}
+											selectedTarget={options.camera() ?? null}
+											isLoading={devices.isPending}
+											onSelect={(c) => {
+												if (!c) {
+													setOptions("cameraLabel", null);
+													setCamera.mutate({ model: null });
+												} else if (c.model_id) {
+													setOptions("cameraLabel", c.display_name);
+													setCamera.mutate({ model: { ModelID: c.model_id } });
+												} else {
+													setOptions("cameraLabel", c.display_name);
+													setCamera.mutate({
+														model: { DeviceID: c.device_id },
+													});
+												}
+												setCameraMenuOpen(false);
+												setCameraInitialSettings(null);
+											}}
+											disabled={isRecording()}
+											onBack={() => {
+												setCameraMenuOpen(false);
+												setCameraInitialSettings(null);
+											}}
+											permissions={currentPermissions()}
+											deviceSettings={deviceSettings() ?? undefined}
+											onCameraSettingsChange={(camera, settings) => {
+												void setCameraDeviceSettings(camera, settings);
+											}}
+											compatibilityStudioMode={compatibilityStudioMode()}
+											initialSettingsTarget={cameraInitialSettings()}
+										/>
+									) : variant === "microphone" ? (
+										<TargetMenuPanel
+											variant="microphone"
+											targets={devices.microphones}
+											selectedTarget={options.micName() ?? null}
+											isLoading={devices.isPending}
+											onSelect={(v) => {
+												setMicInput.mutate(v?.name ?? null);
+												setMicrophoneMenuOpen(false);
+												setMicrophoneInitialSettings(null);
+											}}
+											disabled={isRecording()}
+											onBack={() => {
+												setMicrophoneMenuOpen(false);
+												setMicrophoneInitialSettings(null);
+											}}
+											permissions={currentPermissions()}
+											deviceSettings={deviceSettings() ?? undefined}
+											onMicrophoneSettingsChange={(key, settings) => {
+												void setMicrophoneDeviceSettings(key, settings);
+											}}
+											compatibilityStudioMode={compatibilityStudioMode()}
+											initialSettingsTarget={microphoneInitialSettings()}
+										/>
+									) : (
+										<ModeInfoPanel
+											onBack={() => {
+												setModeInfoMenuOpen(false);
+											}}
+										/>
+									)
+								}
+							</Show>
+						</Show>
+					</div>
+					<Show when={!activeMenu()}>
+						<p class="workspace-recording-note">
+							屏幕与窗口支持独立选择；录制结束后可在编辑器调整画面、镜头与光标。
+						</p>
 					</Show>
 				</div>
-				<Show when={!activeMenu()}>
-					<p class="workspace-recording-note">
-						屏幕与窗口支持独立选择；录制结束后可在编辑器调整画面、镜头与光标。
-					</p>
-				</Show>
+				<MobileRecorder
+					visible={
+						workspaceMode() === "recording" && recordSource() === "mobile"
+					}
+					blocked={
+						isRecording() ||
+						!!editorRecordingFlow() ||
+						!!presentationStatus()?.active
+					}
+					onActive={(active) => {
+						setMobileActive(active);
+						if (active) {
+							setRecordSource("mobile");
+							setWorkspaceMode("recording");
+						}
+					}}
+				/>
 			</section>
 			<Show when={isActivelyRecording()}>
 				<div class="absolute inset-0 z-10 flex flex-col justify-end bg-gray-1/80 px-6 pb-8 backdrop-blur-xs">

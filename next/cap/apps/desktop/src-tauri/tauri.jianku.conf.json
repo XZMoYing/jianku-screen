@@ -3,7 +3,7 @@
 	"productName": "Jianku Screen Next",
 	"mainBinaryName": "Jianku Screen Next",
 	"identifier": "com.jianku.screen.next",
-	"version": "0.2.0-alpha.8",
+	"version": "0.2.0-alpha.9",
 	"build": {
 		"beforeBuildCommand": "bun run build"
 	},
@@ -21,7 +21,13 @@
 	},
 	"bundle": {
 		"createUpdaterArtifacts": false,
-		"fileAssociations": [],
+		"fileAssociations": [
+			{
+				"ext": ["jks"],
+				"name": "简库录制工程",
+				"role": "Editor"
+			}
+		],
 		"icon": [
 			"icons/jianku/128x128.png",
 			"icons/jianku/icon.icns",
@@ -33,8 +39,14 @@
 		},
 		"macOS": {
 			"bundleName": "简库镜传 Next",
-			"bundleVersion": "2026.10.13.8",
+			"bundleVersion": "2026.10.13.9",
 			"entitlements": "Entitlements.plist"
-		}
+		},
+		"externalBin": [
+			"binaries/cap-muxer",
+			"binaries/cap-exporter",
+			"binaries/cap-cli",
+			"binaries/jianku-device-capture"
+		]
 	}
 }

@@ -1,0 +1,113 @@
+{
+	"version": "0.2.0-alpha.9",
+	"date": "2026-10-13",
+	"platform": "macOS 14.7.4 / Apple M1",
+	"checks": {
+		"rustProjectTests": 147,
+		"mobileLifecycleAndRawMediaTests": 3,
+		"projectFileFrontendTests": 5,
+		"typescriptBindingsRegenerated": true,
+		"desktopAndCliCargoCheck": true,
+		"desktopTypecheck": true,
+		"scopedBiome": true,
+		"swiftHelperCompiled": true,
+		"bundleSignatureDeepStrict": true
+	},
+	"mobile": {
+		"complete": true,
+		"deviceSerialSaved": false,
+		"duration": 4.779133,
+		"editorOpened": true,
+		"extension": "jks",
+		"height": 1920,
+		"mi6Compatibility": true,
+		"ok": true,
+		"platform": "android",
+		"sourceAudioSupported": true,
+		"sourceBytes": 1226295,
+		"started": true,
+		"stopped": true,
+		"userFramesSavedInRepository": false,
+		"width": 1080
+	},
+	"workspace": {
+		"activeWindowLabels": ["presentation-output", "main"],
+		"desktopSourceRestored": true,
+		"externalUpdaterDisabled": true,
+		"mobileSourcePanel": {
+			"androidToolsFound": true,
+			"deviceCount": 1,
+			"iosHelperBundled": true,
+			"visible": true
+		},
+		"narrow": {
+			"footerBottom": 529,
+			"height": 530,
+			"scrollTop": 1126,
+			"width": 660
+		},
+		"passed": true,
+		"presentationStartStop": true,
+		"recordingVisible": true,
+		"scroll": {
+			"clientHeight": 495,
+			"footerBottom": 739,
+			"scrollHeight": 855,
+			"scrollTop": 360,
+			"windowHeight": 740
+		},
+		"settingsRetainedAcrossModeSwitch": true,
+		"userFramesSaved": false
+	},
+	"export": {
+		"programs": [],
+		"stream_groups": [],
+		"streams": [
+			{
+				"width": 1080,
+				"height": 1920,
+				"avg_frame_rate": "60/1",
+				"nb_frames": "287"
+			}
+		],
+		"format": {
+			"duration": "4.783333"
+		}
+	},
+	"branding": {
+		"approvedLogoSha256": "af12a5595d9bea5385844a82c59843d7baba07f6779a1021b36a8583f7425785",
+		"traySource": "assets/branding/jianku-next-tray.svg",
+		"trayPixels": [54, 54],
+		"trayLogicalPoints": 18
+	},
+	"projectAssociation": [
+		{
+			"UTTypeIdentifier": "com.jianku.screen.project",
+			"UTTypeDescription": "简库录制工程",
+			"UTTypeConformsTo": ["com.apple.package"],
+			"UTTypeTagSpecification": {
+				"public.filename-extension": ["jks"]
+			}
+		}
+	],
+	"protectedAndroidApps": {
+		"VPNHotspotRunningAfterRecording": true,
+		"NekoBoxRunningAfterRecording": true,
+		"phoneAppsStopped": false,
+		"networkSettingsChanged": false,
+		"adbServerRestarted": false
+	},
+	"notVerified": [
+		"physical iPad/iPhone recording and audio",
+		"other Android models",
+		"physical device touch-event capture",
+		"device rotation and variable-resolution recording",
+		"long recording, disk-full and recovery",
+		"complete reference animation parity",
+		"Windows adaptation"
+	],
+	"privacy": {
+		"realDeviceMediaStoredInRepository": false,
+		"deviceSerialStoredInVerification": false
+	}
+}

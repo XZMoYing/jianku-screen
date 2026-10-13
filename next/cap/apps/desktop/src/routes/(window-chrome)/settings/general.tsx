@@ -5,6 +5,7 @@ import {
 	requestPermission,
 } from "@tauri-apps/plugin-notification";
 import { type OsType, type } from "@tauri-apps/plugin-os";
+import BrandLogo from "~/components/BrandLogo";
 import "@total-typescript/ts-reset/filter-boolean";
 import { Collapsible } from "@kobalte/core/collapsible";
 import { CheckMenuItem, Menu, MenuItem } from "@tauri-apps/api/menu";
@@ -1124,7 +1125,7 @@ function DefaultProjectNameCard(props: {
 					/>
 
 					<div class="flex gap-2 items-center px-3 py-2 rounded-lg border border-dashed bg-gray-3 border-gray-5">
-						<IconCapLogo class="pointer-events-none size-4 shrink-0" />
+						<BrandLogo class="pointer-events-none size-4 shrink-0" />
 						<p class="text-xs text-gray-12 whitespace-pre-wrap">{preview()}</p>
 					</div>
 

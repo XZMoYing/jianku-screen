@@ -130,7 +130,7 @@ fn migratable_projects(app: &AppHandle<Wry>) -> Vec<PathBuf> {
         };
         for entry in entries.flatten() {
             let path = entry.path();
-            if !path.is_dir() || path.extension().and_then(|e| e.to_str()) != Some("cap") {
+            if !path.is_dir() || !cap_project::is_project_path(&path) {
                 continue;
             }
             // Never try to move a folder into itself if the user nested the

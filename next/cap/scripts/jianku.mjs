@@ -106,6 +106,31 @@ function buildSidecars() {
 			path.join(binaries, `${target}-${triple}${extension}`),
 		);
 	}
+	if (process.platform === "darwin") {
+		run("xcrun", [
+			"swiftc",
+			"-O",
+			"-target",
+			`${triple.startsWith("aarch64") ? "arm64" : "x86_64"}-apple-macosx12.3`,
+			"scripts/ios-device-capture.swift",
+			"-o",
+			path.join(binaries, `jianku-device-capture-${triple}`),
+			"-framework",
+			"AVFoundation",
+			"-framework",
+			"CoreMediaIO",
+			"-framework",
+			"AppKit",
+			"-Xlinker",
+			"-sectcreate",
+			"-Xlinker",
+			"__TEXT",
+			"-Xlinker",
+			"__info_plist",
+			"-Xlinker",
+			"scripts/ios-device-capture.plist",
+		]);
+	}
 	run("node", ["scripts/prepare.js"], desktop);
 }
 
@@ -160,6 +185,23 @@ function signMacBundle() {
 	);
 	// Sign framework containers explicitly: Tauri signs their dylibs, but not every container.
 	removeSigningTemps(app);
+	const deviceCapture = path.join(app, "Contents/MacOS/jianku-device-capture");
+	if (existsSync(deviceCapture)) {
+		run(
+			"codesign",
+			[
+				"--force",
+				"--sign",
+				identity,
+				...(keychain ? ["--keychain", keychain] : []),
+				"--identifier",
+				"com.jianku.screen.next.devicecapture",
+				deviceCapture,
+			],
+			root,
+			60_000,
+		);
+	}
 	for (const framework of nestedFrameworks(app)) {
 		run(
 			"codesign",

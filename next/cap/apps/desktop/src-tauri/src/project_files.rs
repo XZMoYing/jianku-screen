@@ -113,10 +113,13 @@ pub async fn list_local_projects(app: AppHandle) -> Result<Vec<LocalProject>, St
 #[specta::specta]
 pub async fn open_local_project(app: AppHandle, path: PathBuf) -> Result<(), String> {
     let path = path.canonicalize().map_err(|error| error.to_string())?;
+    if path.join("project.json").exists() && !path.join("recording-meta.json").exists() {
+        return Err("这是旧版工程，当前编辑器尚未支持迁移其时间线。请使用保留的旧版应用打开，原文件不会修改。".into());
+    }
     let meta = RecordingMeta::load_for_project(&path)
         .map_err(|error| format!("无法打开这个工程：{error}"))?;
     let RecordingMetaInner::Studio(studio) = &meta.inner else {
-        return Err("请选择可编辑的录制工程（.cap）".into());
+        return Err("请选择可编辑的录制工程（.jks）".into());
     };
     if !matches!(studio.status(), StudioRecordingStatus::Complete) {
         return Err("工程仍在录制或处理中，请完成处理后再打开".into());
@@ -170,7 +173,7 @@ pub async fn pick_local_project(app: AppHandle) -> Result<Option<PathBuf>, Strin
                 panel.setAllowsMultipleSelection(false);
                 panel.setTitle(Some(&NSString::from_str("打开录制工程")));
                 panel.setMessage(Some(&NSString::from_str(
-                    "选择 .cap 工程。工程可以显示为文件夹或文件包。",
+                    "选择 .jks 工程，也可以打开历史 .cap 工程。",
                 )));
                 panel.setPrompt(Some(&NSString::from_str("打开工程")));
                 (panel.runModal() == NSModalResponseOK)
@@ -193,7 +196,7 @@ pub async fn pick_local_project(app: AppHandle) -> Result<Option<PathBuf>, Strin
         let (sender, receiver) = tokio::sync::oneshot::channel();
         app.dialog()
             .file()
-            .set_title("打开 .cap 工程文件夹")
+            .set_title("打开 .jks 工程文件夹")
             .pick_folder(move |path| {
                 let _ = sender.send(path.and_then(|path| path.into_path().ok()));
             });

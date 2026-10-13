@@ -165,11 +165,7 @@ impl UploadArgs {
             }
         };
 
-        let is_project = self.file.is_dir()
-            || self
-                .file
-                .extension()
-                .is_some_and(|ext| ext.eq_ignore_ascii_case("cap"));
+        let is_project = self.file.is_dir() || cap_project::is_project_path(&self.file);
         if is_project {
             crate::automation::run_upload_completed(&self.file, &link, &video_id).await;
         }
@@ -187,10 +183,7 @@ impl UploadArgs {
 
     async fn resolve_upload_file(&self) -> Result<PathBuf, String> {
         let input = &self.file;
-        let is_project = input.is_dir()
-            || input
-                .extension()
-                .is_some_and(|ext| ext.eq_ignore_ascii_case("cap"));
+        let is_project = input.is_dir() || cap_project::is_project_path(input);
 
         if is_project {
             let meta = RecordingMeta::load_for_project(input)

@@ -45,6 +45,19 @@ export async function runWorkspaceSmoke() {
 		button("录屏")?.click();
 		await waitFor(() => visible('[data-testid="recording-panel"]'));
 		results.recordingVisible = true;
+		button("手机与平板")?.click();
+		await waitFor(() => visible('[data-testid="mobile-recorder"]'));
+		const mobileSetup = await commands.getMobileSetup();
+		results.mobileSourcePanel = {
+			visible: !!visible('[data-testid="mobile-recorder"]'),
+			deviceCount: mobileSetup.devices.length,
+			iosHelperBundled: mobileSetup.iosReady,
+			androidToolsFound: mobileSetup.androidReady,
+		};
+		check(mobileSetup.iosReady, "iOS 捕获组件未打包");
+		button("电脑屏幕")?.click();
+		await waitFor(() => !visible('[data-testid="mobile-recorder"]'));
+		results.desktopSourceRestored = true;
 		button("演示")?.click();
 		await waitFor(() => visible('[data-testid="presentation-panel"]'));
 		await waitFor(() =>

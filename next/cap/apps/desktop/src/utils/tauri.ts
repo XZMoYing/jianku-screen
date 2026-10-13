@@ -241,6 +241,18 @@ async stopPreparingEditorFrame(requestEpoch: number) : Promise<null> {
 async getEditorProjectPath() : Promise<string> {
     return await TAURI_INVOKE("get_editor_project_path");
 },
+async getMobileSetup() : Promise<MobileSetup> {
+    return await TAURI_INVOKE("get_mobile_setup");
+},
+async getMobileStatus() : Promise<MobileStatus> {
+    return await TAURI_INVOKE("get_mobile_status");
+},
+async startMobileRecording(options: MobileRecordingOptions) : Promise<MobileStatus> {
+    return await TAURI_INVOKE("start_mobile_recording", { options });
+},
+async stopMobileRecording() : Promise<string | null> {
+    return await TAURI_INVOKE("stop_mobile_recording");
+},
 async showPresentation() : Promise<null> {
     return await TAURI_INVOKE("show_presentation");
 },
@@ -1187,6 +1199,12 @@ export type MatchMode = "all" | "any"
 export type MicrophoneDeviceSettings = { sampleRate: number | null; channels: number | null }
 export type MicrophoneFormatInfo = { sampleRate: number; channels: number }
 export type MicrophoneInfo = { name: string; sampleRate: number; channels: number; formats: MicrophoneFormatInfo[] }
+export type MobileDevice = { id: string; name: string; platform: MobilePlatform; authorized: boolean; audioSupported: boolean; mi6Compatibility: boolean }
+export type MobilePhase = "idle" | "starting" | "recording" | "finalizing" | "complete" | "failed"
+export type MobilePlatform = "android" | "ios"
+export type MobileRecordingOptions = { platform: MobilePlatform; deviceId: string; audio: boolean; preview: boolean }
+export type MobileSetup = { devices: MobileDevice[]; androidReady: boolean; iosReady: boolean; warnings: string[] }
+export type MobileStatus = { phase: MobilePhase; active: boolean; elapsedSeconds: number; deviceName: string | null; projectPath: string | null; error: string | null; notice: string | null }
 export type ModelDownloadState = "downloading" | "completed" | "failed"
 export type ModelDownloadStatus = { state: ModelDownloadState; progress: number; message: string }
 export type ModelIDType = string

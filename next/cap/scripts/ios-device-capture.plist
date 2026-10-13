@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>CFBundleIdentifier</key><string>com.jianku.screen.next.devicecapture</string>
+<key>CFBundleName</key><string>简库移动设备录制</string>
+<key>NSCameraUsageDescription</key><string>访问通过 USB 连接的 iPhone 或 iPad 画面，用于设备录制。</string>
+<key>NSMicrophoneUsageDescription</key><string>录制所连接设备播放的声音，可在设备录制设置中关闭。</string>
+</dict></plist>

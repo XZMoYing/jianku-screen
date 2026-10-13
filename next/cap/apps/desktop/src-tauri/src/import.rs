@@ -1384,12 +1384,12 @@ pub async fn start_video_import(app: AppHandle, source_path: PathBuf) -> Result<
 
     let project_name = generate_project_name(&source_path);
     let sanitized_name = sanitize_filename(&project_name);
-    let project_dir_name = format!("{sanitized_name}.cap");
+    let project_dir_name = format!("{sanitized_name}.jks");
 
     let mut project_path = recordings_dir.join(&project_dir_name);
     let mut counter = 1;
     while project_path.exists() {
-        let new_name = format!("{sanitized_name} ({counter}).cap");
+        let new_name = format!("{sanitized_name} ({counter}).jks");
         project_path = recordings_dir.join(new_name);
         counter += 1;
     }
@@ -1968,7 +1968,7 @@ pub async fn start_image_import(app: AppHandle, source_path: PathBuf) -> Result<
 
     let project_name = generate_image_project_name(&source_path);
     let filename = project_name.replace(":", ".");
-    let filename = format!("{}.cap", sanitize_filename::sanitize(&filename));
+    let filename = format!("{}.jks", sanitize_filename::sanitize(&filename));
     let project_path = screenshots_dir.join(cap_utils::ensure_unique_filename(
         &filename,
         &screenshots_dir,

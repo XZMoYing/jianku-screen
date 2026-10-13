@@ -40,15 +40,17 @@ impl From<QualityArg> for cap_export::mp4::ExportCompression {
 }
 
 #[derive(Args)]
-#[command(long_about = "Render a '.cap' project to a video file.
+#[command(
+    long_about = "Render a '.jks' or legacy '.cap' project to a video file.
 
 NOTE: here --format selects the CONTAINER (mp4/gif/mov), NOT the output mode. For machine-readable
 output pass --json (the global flag), which streams NDJSON progress + completion events to stdout.
 The NDJSON uses PascalCase type tags and snake_case fields ({\"type\":\"Progress\",\"rendered_count\":N,
 \"total_frames\":N} then {\"type\":\"Completed\",\"path\":\"...\"}); on failure a final
-{\"type\":\"Error\",\"error\":\"...\"} is emitted.")]
+{\"type\":\"Error\",\"error\":\"...\"} is emitted."
+)]
 pub struct Export {
-    /// Path to a '.cap' project directory (as produced by `cap record`)
+    /// Path to a '.jks' or legacy '.cap' project directory
     project_path: PathBuf,
     /// Output file (positional alternative to --output)
     output_path: Option<PathBuf>,

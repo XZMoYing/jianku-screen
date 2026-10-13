@@ -53,7 +53,7 @@ pub struct RecordParams {
     system_audio: bool,
     #[arg(
         long,
-        help = "New '.cap' project path (defaults to <recordingId>.cap in the working directory). The path must not already exist, including an empty directory."
+        help = "New '.jks' project path (defaults to <recordingId>.jks in the working directory). The path must not already exist, including an empty directory."
     )]
     path: Option<PathBuf>,
     /// Maximum fps to record at (clamped to 1-120; camera recordings follow the desktop camera cap)
@@ -1171,7 +1171,7 @@ fn resolve_path(params: &RecordParams, recording_id: &str) -> Result<PathBuf, St
         Some(path) => Ok(path.clone()),
         None => current_dir()
             .map_err(|e| format!("Could not determine current directory: {e}"))
-            .map(|dir| dir.join(format!("{recording_id}.cap"))),
+            .map(|dir| dir.join(format!("{recording_id}.jks"))),
     }
 }
 

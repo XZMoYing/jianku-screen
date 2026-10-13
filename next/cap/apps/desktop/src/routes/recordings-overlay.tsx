@@ -681,7 +681,7 @@ function createRecordingMutations(
 
 			const defaultName = isRecording
 				? "Cap Recording"
-				: media.path.split(".cap/")[1];
+				: media.path.split(/\.(?:jks|cap)\//i)[1];
 			const suggestedName = meta.pretty_name || defaultName;
 
 			const fileType = isRecording ? "mp4" : "screenshot";

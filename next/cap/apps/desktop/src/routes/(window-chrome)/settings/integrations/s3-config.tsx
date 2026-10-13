@@ -2,6 +2,7 @@ import { Button } from "@cap/ui-solid";
 import { createWritableMemo } from "@solid-primitives/memo";
 import { useMutation } from "@tanstack/solid-query";
 import { createResource, Show, Suspense } from "solid-js";
+import BrandLogo from "~/components/BrandLogo";
 import { Input } from "~/routes/editor/ui";
 import { createSelectedOrganization } from "~/utils/organization-branding";
 import { commands } from "~/utils/tauri";
@@ -180,7 +181,7 @@ export default function S3ConfigPage() {
 						<Suspense
 							fallback={
 								<div class="flex justify-center items-center w-full h-screen">
-									<IconCapLogo class="animate-spin size-16" />
+									<BrandLogo class="animate-spin size-16" />
 								</div>
 							}
 						>

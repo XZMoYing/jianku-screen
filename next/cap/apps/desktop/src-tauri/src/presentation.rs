@@ -324,6 +324,11 @@ pub async fn start_presentation(
     app: AppHandle,
     mut options: PresentationOptions,
 ) -> Result<PresentationStatus, String> {
+    let capture_gate = app.state::<crate::mobile::CaptureStartGate>();
+    let _capture_guard = capture_gate.0.lock().await;
+    if crate::mobile::active(&app) {
+        return Err("请先结束设备录制，再开始演示".into());
+    }
     options.validate()?;
     #[cfg(not(target_os = "macos"))]
     {

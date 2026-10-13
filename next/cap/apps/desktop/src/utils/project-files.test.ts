@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { projectAssetPath, projectCopyName } from "./project-files";
+import {
+	isProjectPath,
+	projectAssetPath,
+	projectCopyName,
+} from "./project-files";
 
 describe("portable project paths", () => {
 	it("resolves moved project assets with spaces without modifying absolute paths", () => {
@@ -30,15 +34,25 @@ describe("portable project paths", () => {
 	});
 
 	it("keeps Unicode titles and removes unsafe filename characters", () => {
-		expect(projectCopyName(" 演示项目.CAP ".trim())).toBe("演示项目 副本.cap");
-		expect(projectCopyName("a/b:c\n\u0000d?e")).toBe("a_b_c__d_e 副本.cap");
-		expect(projectCopyName("   ")).toBe("简库工程 副本.cap");
+		expect(projectCopyName(" 演示项目.CAP ".trim())).toBe("演示项目 副本.jks");
+		expect(projectCopyName("a/b:c\n\u0000d?e")).toBe("a_b_c__d_e 副本.jks");
+		expect(projectCopyName("   ")).toBe("简库工程 副本.jks");
 	});
 
 	it("limits long Unicode filenames by UTF-8 bytes without splitting characters", () => {
 		const name = projectCopyName("演示🎬".repeat(100));
 		expect(new TextEncoder().encode(name).length).toBeLessThan(200);
-		expect(name.endsWith(" 副本.cap")).toBe(true);
+		expect(name.endsWith(" 副本.jks")).toBe(true);
 		expect(name.includes("\ufffd")).toBe(false);
+	});
+});
+
+describe("project packages", () => {
+	it("recognizes legacy and new package paths and always names new copies jks", () => {
+		expect(isProjectPath("/test/Demo.JKS/")).toBe(true);
+		expect(isProjectPath("/test/Demo.cap")).toBe(true);
+		expect(isProjectPath("/test/Demo.jianku")).toBe(false);
+		expect(projectCopyName("Demo.jks")).toBe("Demo 副本.jks");
+		expect(projectCopyName("Demo.jianku")).toBe("Demo 副本.jks");
 	});
 });

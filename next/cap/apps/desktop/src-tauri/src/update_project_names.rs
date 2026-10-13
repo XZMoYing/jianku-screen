@@ -169,7 +169,9 @@ async fn collect_uuid_projects(recordings_dir: &Path) -> Result<Vec<PathBuf>, St
             continue;
         };
 
-        if filename.ends_with(".cap") && fast_is_project_filename_uuid(filename) {
+        if cap_project::is_project_path(Path::new(filename))
+            && fast_is_project_filename_uuid(filename)
+        {
             uuid_projects.push(path);
         }
     }
@@ -256,11 +258,15 @@ async fn migrate_project_filename_async(
 ) -> Result<PathBuf, String> {
     let sanitized = sanitize_filename::sanitize(meta.pretty_name.replace(":", "."));
 
-    let filename = if sanitized.ends_with(".cap") {
-        sanitized
-    } else {
-        format!("{sanitized}.cap")
-    };
+    let extension = project_path
+        .extension()
+        .and_then(|value| value.to_str())
+        .unwrap_or(cap_project::PROJECT_EXTENSION);
+    let filename = format!(
+        "{}.{}",
+        cap_project::project_name_without_extension(&sanitized),
+        extension
+    );
 
     let parent_dir = project_path
         .parent()
@@ -279,7 +285,7 @@ async fn migrate_project_filename_async(
 }
 
 pub fn fast_is_project_filename_uuid(filename: &str) -> bool {
-    if filename.len() != 40 || !filename.ends_with(".cap") {
+    if filename.len() != 40 || !cap_project::is_project_path(Path::new(filename)) {
         return false;
     }
 

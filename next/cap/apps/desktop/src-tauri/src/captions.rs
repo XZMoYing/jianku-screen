@@ -1956,7 +1956,7 @@ fn app_captions_dir(app: &AppHandle, video_id: &str) -> Result<PathBuf, String> 
         .app_data_dir()
         .map_err(|_| "Failed to get app data directory".to_string())?;
 
-    let clean_video_id = video_id.trim_end_matches(".cap");
+    let clean_video_id = cap_project::project_name_without_extension(&video_id);
     let captions_dir = app_dir.join("captions").join(clean_video_id);
 
     tracing::info!("Captions directory path: {:?}", captions_dir);

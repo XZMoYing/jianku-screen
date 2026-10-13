@@ -46,9 +46,9 @@ pub fn create_portable_project_copy(
     if !destination
         .extension()
         .and_then(|extension| extension.to_str())
-        .is_some_and(|extension| extension.eq_ignore_ascii_case("cap"))
+        .is_some_and(|extension| extension.eq_ignore_ascii_case(crate::PROJECT_EXTENSION))
     {
-        return Err(io::Error::other("The project name must end in .cap"));
+        return Err(io::Error::other("The project name must end in .jks"));
     }
     let parent = destination
         .parent()
@@ -398,7 +398,7 @@ mod tests {
         .unwrap();
         let original_meta = fs::read(source.join("recording-meta.json")).unwrap();
         let original_config = fs::read(source.join("project-config.json")).unwrap();
-        let destination = root.path().join("copy.cap");
+        let destination = root.path().join("copy.jks");
         let report = create_portable_project_copy(&source, &destination).unwrap();
         assert_eq!(report.embedded_assets, 1);
         assert_eq!(
@@ -409,7 +409,7 @@ mod tests {
             fs::read(source.join("project-config.json")).unwrap(),
             original_config
         );
-        let moved = root.path().join("another-location.cap");
+        let moved = root.path().join("another-location.jks");
         fs::rename(destination, &moved).unwrap();
         fs::remove_dir_all(source).unwrap();
         fs::remove_file(external).unwrap();
@@ -452,7 +452,7 @@ mod tests {
         };
         config.write(&source).unwrap();
         let original = fs::read(source.join("project-config.json")).unwrap();
-        let destination = root.path().join("copy.cap");
+        let destination = root.path().join("copy.jks");
         assert!(create_portable_project_copy(&source, &destination).is_err());
         assert!(!destination.exists());
         assert_eq!(
@@ -471,13 +471,13 @@ mod tests {
     fn existing_and_nested_destinations_are_preserved() {
         let root = tempfile::tempdir().unwrap();
         let source = fixture(root.path());
-        let destination = root.path().join("copy.cap");
+        let destination = root.path().join("copy.jks");
         fs::create_dir(&destination).unwrap();
         fs::write(destination.join("keep"), b"existing").unwrap();
         assert!(create_portable_project_copy(&source, &destination).is_err());
         assert_eq!(fs::read(destination.join("keep")).unwrap(), b"existing");
-        assert!(create_portable_project_copy(&source, &source.join("nested.cap")).is_err());
-        assert!(!source.join("nested.cap").exists());
+        assert!(create_portable_project_copy(&source, &source.join("nested.jks")).is_err());
+        assert!(!source.join("nested.jks").exists());
     }
 
     #[test]
@@ -490,7 +490,7 @@ mod tests {
             metadata["status"] = json!({"status":status,"error":"synthetic failure"});
             let original = serde_json::to_vec(&metadata).unwrap();
             fs::write(source.join("recording-meta.json"), &original).unwrap();
-            let destination = root.path().join("copy.cap");
+            let destination = root.path().join("copy.jks");
             assert!(create_portable_project_copy(&source, &destination).is_err());
             assert!(!destination.exists());
             assert_eq!(
@@ -523,7 +523,7 @@ mod tests {
             serde_json::to_vec(&metadata).unwrap(),
         )
         .unwrap();
-        let destination = root.path().join("copy.cap");
+        let destination = root.path().join("copy.jks");
         let report = create_portable_project_copy(&source, &destination).unwrap();
         assert_eq!(report.embedded_assets, 4);
         for path in [&video, &sound, &events, &cursor] {
@@ -562,7 +562,7 @@ mod tests {
         let root = tempfile::tempdir().unwrap();
         let source = fixture(root.path());
         std::os::unix::fs::symlink(&source, source.join("cycle")).unwrap();
-        let destination = root.path().join("copy.cap");
+        let destination = root.path().join("copy.jks");
         assert!(create_portable_project_copy(&source, &destination).is_err());
         assert!(!destination.exists());
         assert!(source.join("content/display.mp4").is_file());
@@ -572,7 +572,7 @@ mod tests {
     fn final_publication_cannot_replace_a_concurrent_empty_directory() {
         let root = tempfile::tempdir().unwrap();
         let source = root.path().join("staging");
-        let target = root.path().join("existing.cap");
+        let target = root.path().join("existing.jks");
         fs::create_dir(&source).unwrap();
         fs::create_dir(&target).unwrap();
         fs::write(source.join("media"), b"new").unwrap();

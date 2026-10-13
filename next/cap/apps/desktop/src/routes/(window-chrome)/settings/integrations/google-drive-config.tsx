@@ -1,6 +1,7 @@
 import { Button } from "@cap/ui-solid";
 import { useMutation } from "@tanstack/solid-query";
 import { createResource, createSignal, Show, Suspense } from "solid-js";
+import BrandLogo from "~/components/BrandLogo";
 import { createSelectedOrganization } from "~/utils/organization-branding";
 import { commands } from "~/utils/tauri";
 import { apiClient, protectedHeaders } from "~/utils/web-api";
@@ -285,7 +286,7 @@ export default function GoogleDriveConfigPage() {
 						<Suspense
 							fallback={
 								<div class="flex justify-center items-center w-full h-screen">
-									<IconCapLogo class="animate-spin size-16" />
+									<BrandLogo class="animate-spin size-16" />
 								</div>
 							}
 						>

@@ -1940,8 +1940,10 @@ pub async fn start_recording(
     state_mtx: MutableState<'_, App>,
     inputs: StartRecordingInputs,
 ) -> Result<RecordingAction, String> {
-    if crate::presentation::active(&app) {
-        return Err("请先停止演示，再开始录制".into());
+    let capture_gate = app.state::<crate::mobile::CaptureStartGate>();
+    let _capture_guard = capture_gate.0.lock().await;
+    if crate::presentation::active(&app) || crate::mobile::active(&app) {
+        return Err("请先结束演示或设备录制，再开始录屏".into());
     }
     #[cfg(target_os = "linux")]
     if inputs.mode != RecordingMode::Instant && linux_instant::current(&app).is_some() {
@@ -1949,9 +1951,9 @@ pub async fn start_recording(
     }
     #[cfg(target_os = "linux")]
     if inputs.mode == RecordingMode::Instant && EditorRecordingTarget::current(&app).is_none() {
-        return linux_instant::start(app, state_mtx, inputs).await;
+        return linux_instant::start(app.clone(), state_mtx, inputs).await;
     }
-    start_recording_inner(app, state_mtx, inputs).await
+    start_recording_inner(app.clone(), state_mtx, inputs).await
 }
 
 async fn start_recording_inner(
@@ -2123,7 +2125,7 @@ async fn start_recording_prepared(
     );
 
     let filename = project_name.replace(":", ".");
-    let filename = format!("{}.cap", sanitize_filename::sanitize(&filename));
+    let filename = format!("{}.jks", sanitize_filename::sanitize(&filename));
 
     let recordings_base_dir = GeneralSettingsStore::recordings_dir(&app);
 
@@ -5445,7 +5447,7 @@ pub async fn take_screenshot(
     let image_data = image.into_bytes();
 
     let filename = project_name.replace(":", ".");
-    let filename = format!("{}.cap", sanitize_filename::sanitize(&filename));
+    let filename = format!("{}.jks", sanitize_filename::sanitize(&filename));
 
     let screenshots_base_dir = app.path().app_data_dir().unwrap().join("screenshots");
 

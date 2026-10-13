@@ -574,7 +574,7 @@ pub fn collect_recent_recordings(
         .filter_map(|entry| {
             let entry = entry.ok()?;
             let path = entry.path();
-            if !path.is_dir() || path.extension().is_none_or(|ext| ext != "cap") {
+            if !path.is_dir() || !cap_project::is_project_path(&path) {
                 return None;
             }
             let modified = entry

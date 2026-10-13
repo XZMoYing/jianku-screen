@@ -3,6 +3,7 @@ import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { type as ostype } from "@tauri-apps/plugin-os";
 import { ErrorBoundary, type ParentProps } from "solid-js";
+import BrandLogo from "~/components/BrandLogo";
 import Titlebar from "./titlebar/Titlebar";
 
 export function CapErrorBoundary(props: ParentProps) {
@@ -26,7 +27,7 @@ export function CapErrorBoundary(props: ParentProps) {
 					<div class="w-full h-full flex flex-col bg-gray-2 max-h-screen overflow-hidden">
 						{showTitlebar && <Titlebar />}
 						<div class="flex flex-col flex-1 min-h-0 justify-center items-center border-gray-3 overflow-hidden transition-[border-radius] duration-200 text-(--text-secondary) gap-y-4 max-sm:gap-y-2 px-8 text-center">
-							<IconCapLogo class="max-sm:size-16" />
+							<BrandLogo class="max-sm:size-16" />
 							<h1 class="text-(--text-primary) text-3xl max-sm:text-xl font-bold">
 								An Error Occured
 							</h1>

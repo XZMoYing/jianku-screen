@@ -37,6 +37,7 @@ mod logging;
 #[cfg(target_os = "macos")]
 mod macos_save_panel;
 mod main_window_geometry;
+mod mobile;
 mod notifications;
 mod panel_manager;
 mod permissions;
@@ -3396,6 +3397,12 @@ async fn cleanup_app_resources_for_exit(app: &AppHandle) {
     let started = Instant::now();
     log_process_memory_snapshot("exit_cleanup_begin");
     let _ = await_exit_step(
+        "stop_mobile_recording",
+        Duration::from_secs(45),
+        mobile::stop_mobile_recording(app.clone()),
+    )
+    .await;
+    let _ = await_exit_step(
         "stop_presentation",
         APP_EXIT_STEP_TIMEOUT,
         presentation::stop_presentation(app.clone()),
@@ -5317,7 +5324,7 @@ async fn upload_exported_video(
 
 fn screenshot_project_path_from_path(path: &std::path::Path) -> Option<PathBuf> {
     path.ancestors()
-        .find(|ancestor| ancestor.extension().and_then(|s| s.to_str()) == Some("cap"))
+        .find(|ancestor| cap_project::is_project_path(ancestor))
         .map(std::path::Path::to_path_buf)
 }
 
@@ -5524,10 +5531,7 @@ async fn save_file_dialog_inner(
 ) -> Result<Option<String>, String> {
     info!(file_name, file_type, "Save file dialog requested");
 
-    let file_name = file_name
-        .strip_suffix(".cap")
-        .unwrap_or(&file_name)
-        .to_string();
+    let file_name = cap_project::project_name_without_extension(&file_name).to_string();
 
     let (name, extension) = match file_type.as_str() {
         "recording" | "mp4" => ("MP4 Video", "mp4"),
@@ -5831,6 +5835,9 @@ fn recording_delete_target(
 #[specta::specta]
 #[instrument(skip(app))]
 async fn delete_recording_directory(app: AppHandle, path: PathBuf) -> Result<(), String> {
+    if mobile::owns_active_project(&app, &path) {
+        return Err("请先停止设备录制并完成保存，再删除工程。".into());
+    }
     // The library lists recordings from every known storage folder, so
     // deletion must accept the same set — but nothing outside it.
     let recordings_dirs = recordings_locations::known_recordings_dirs(&app);
@@ -5881,7 +5888,7 @@ fn list_screenshots_inner(
         .filter_map(|entry| {
             let entry = entry.ok()?;
             let path = entry.path();
-            if path.is_dir() && path.extension().and_then(|s| s.to_str()) == Some("cap") {
+            if path.is_dir() && cap_project::is_project_path(&path) {
                 let png_path = std::fs::read_dir(&path)
                     .ok()?
                     .filter_map(|e| e.ok())
@@ -6828,6 +6835,10 @@ fn specta_builder() -> tauri_specta::Builder {
             editor_preparing::set_preparing_editor_playing,
             editor_preparing::stop_preparing_editor_frame,
             get_editor_project_path,
+            mobile::get_mobile_setup,
+            mobile::get_mobile_status,
+            mobile::start_mobile_recording,
+            mobile::stop_mobile_recording,
             presentation::show_presentation,
             presentation::get_presentation_setup,
             presentation::get_presentation_status,
@@ -7273,6 +7284,8 @@ pub async fn run(recording_logging_handle: LoggingHandle, logs_dir: PathBuf) {
             app.manage(http_client::RetryableHttpClient::default());
             app.manage(PendingScreenshots::default());
             app.manage(presentation::PresentationState::default());
+            app.manage(mobile::MobileState::default());
+            app.manage(mobile::CaptureStartGate::default());
             app.manage(FinalizingRecordings::default());
             app.manage(editor_preparing::PreparingConsumers::default());
             app.manage(updates::UpdatesState::default());
@@ -7455,6 +7468,8 @@ pub async fn run(recording_logging_handle: LoggingHandle, logs_dir: PathBuf) {
                     stop_editor_benchmark::run(app.clone());
                     #[cfg(debug_assertions)]
                     presentation::run_smoke(app.clone());
+                    #[cfg(debug_assertions)]
+                    mobile::run_smoke(app.clone());
                     #[cfg(debug_assertions)]
                     picker_benchmark::run(app.clone());
                     gpu_context::prewarm_gpu();
@@ -7995,7 +8010,7 @@ fn handle_single_instance(app: &AppHandle, args: Vec<String>) {
 
     let Some(cap_file) = args
         .iter()
-        .find(|arg| arg.ends_with(".cap"))
+        .find(|arg| cap_project::is_project_path(std::path::Path::new(arg)))
         .map(PathBuf::from)
     else {
         let app = app.clone();
@@ -8720,7 +8735,7 @@ async fn resume_uploads(app: AppHandle, mark_crashed: bool) -> Result<(), String
                     return paths;
                 }
                 let path = entry.path();
-                if path.extension().and_then(|value| value.to_str()) == Some("cap")
+                if cap_project::is_project_path(&path)
                     && (mark_crashed || upload::recovery_age::eligible(&path, SystemTime::now()))
                 {
                     paths.push(path);

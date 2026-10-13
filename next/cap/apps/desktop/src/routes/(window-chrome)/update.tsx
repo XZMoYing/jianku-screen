@@ -9,6 +9,7 @@ import {
 	Show,
 	Switch,
 } from "solid-js";
+import BrandLogo from "~/components/BrandLogo";
 import { commands, events } from "~/utils/tauri";
 import { restartAfterUpdate, returnToGpui } from "~/utils/updater";
 
@@ -81,7 +82,7 @@ export default function () {
 				</div>
 			</Show>
 			<Show when={!updateError() && update.loading}>
-				<IconCapLogo class="size-4 animate-spin text-(--text-primary)" />
+				<BrandLogo class="size-4 animate-spin text-(--text-primary)" />
 			</Show>
 			<Show
 				when={!updateError() && update()}
@@ -163,7 +164,7 @@ export default function () {
 						<div>
 							<Switch
 								fallback={
-									<IconCapLogo class="animate-spin size-4 text-(--text-primary)" />
+									<BrandLogo class="animate-spin size-4 text-(--text-primary)" />
 								}
 							>
 								<Match when={updateStatus()?.type === "done"}>

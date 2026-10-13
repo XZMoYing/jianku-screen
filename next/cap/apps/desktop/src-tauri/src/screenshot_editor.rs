@@ -266,10 +266,10 @@ impl ScreenshotEditorInstances {
             "screenshot_editor timing: source image ready"
         );
 
-        let cap_dir = if path.extension().and_then(|s| s.to_str()) == Some("cap") {
+        let cap_dir = if cap_project::is_project_path(&path) {
             Some(path.clone())
         } else if let Some(parent) = path.parent() {
-            if parent.extension().and_then(|s| s.to_str()) == Some("cap") {
+            if cap_project::is_project_path(parent) {
                 Some(parent.to_path_buf())
             } else {
                 None
@@ -1097,7 +1097,7 @@ pub async fn update_screenshot_config(
         return Ok(());
     };
 
-    if parent.extension().and_then(|s| s.to_str()) == Some("cap") {
+    if cap_project::is_project_path(parent) {
         let path = parent.to_path_buf();
         if let Err(e) = config.write(&path) {
             eprintln!("Failed to save screenshot config: {e}");
@@ -1647,10 +1647,10 @@ pub async fn render_screenshot_png(instance: &ScreenshotEditorInstance) -> Resul
 
     let data = instance.source_rgba.as_ref().clone();
 
-    let cap_dir = if path.extension().and_then(|s| s.to_str()) == Some("cap") {
+    let cap_dir = if cap_project::is_project_path(&path) {
         Some(path.clone())
     } else if let Some(parent) = path.parent() {
-        if parent.extension().and_then(|s| s.to_str()) == Some("cap") {
+        if cap_project::is_project_path(parent) {
             Some(parent.to_path_buf())
         } else {
             None

@@ -24,6 +24,7 @@ import {
 	type Ratio,
 } from "~/components/Cropper";
 import { composeEventHandlers } from "~/utils/composeEventHandlers";
+import { isProjectPath } from "~/utils/project-files";
 import IconCapCircleX from "~icons/cap/circle-x";
 import IconLucideMaximize from "~icons/lucide/maximize";
 import IconLucideRatio from "~icons/lucide/ratio";
@@ -203,7 +204,7 @@ function Dialogs() {
 	const path = () => editorInstance()?.path ?? "";
 	const imagePath = () => {
 		const p = path();
-		if (p.endsWith(".cap")) {
+		if (isProjectPath(p)) {
 			return `${p}/original.png`;
 		}
 		return p;
