@@ -79,7 +79,23 @@ fn restore_main_window_bounds(window: &WebviewWindow) -> tauri::Result<()> {
         (f64::from(outer.width) - f64::from(inner.width)).max(0.0) / scale,
         (f64::from(outer.height) - f64::from(inner.height)).max(0.0) / scale,
     );
-    let (width, height) = crate::main_window_geometry::SIZE;
+    let (min_width, min_height) = crate::main_window_geometry::MINIMUM;
+    let logical = (
+        f64::from(inner.width) / scale,
+        f64::from(inner.height) / scale,
+    );
+    let maximum = monitor
+        .as_ref()
+        .map(|monitor| {
+            let area = monitor.work_area();
+            (
+                f64::from(area.size.width) / scale - frame.0 - 24.0,
+                f64::from(area.size.height) / scale - frame.1 - 24.0,
+            )
+        })
+        .unwrap_or((logical.0.max(min_width), logical.1.max(min_height)));
+    let width = logical.0.max(min_width).min(maximum.0.max(1.0));
+    let height = logical.1.max(min_height).min(maximum.1.max(1.0));
     if (width - f64::from(inner.width) / scale).abs() > 0.5
         || (height - f64::from(inner.height) / scale).abs() > 0.5
     {
@@ -1274,6 +1290,7 @@ impl std::fmt::Display for CapWindowId {
 impl CapWindowId {
     fn preferred_content_size(&self) -> Option<(f64, f64)> {
         match self {
+            Self::Main => Some(crate::main_window_geometry::SIZE),
             Self::Settings => Some((782.0, 775.0)),
             Self::Editor { .. } => Some((1275.0, 800.0)),
             Self::ScreenshotEditor { .. } => Some((1240.0, 800.0)),
@@ -1365,7 +1382,7 @@ impl CapWindowId {
 
     pub fn min_size(&self) -> Option<(f64, f64)> {
         Some(match self {
-            Self::Main => crate::main_window_geometry::SIZE,
+            Self::Main => crate::main_window_geometry::MINIMUM,
             Self::Editor { .. } => (1275.0, 800.0),
             Self::ScreenshotEditor { .. } => (800.0, 600.0),
             Self::Settings => (780.0, 560.0),
@@ -1927,22 +1944,25 @@ impl ShowCapWindow {
 
                 let window = self
                     .window_builder(app, "/")
-                    .resizable(false)
+                    .resizable(true)
                     .maximized(false)
                     .maximizable(false)
                     .minimizable(false)
-                    .always_on_top(true)
-                    .visible_on_all_workspaces(true)
+                    .always_on_top(false)
+                    .visible_on_all_workspaces(false)
                     .content_protected(should_protect)
                     .transparent(true)
                     .visible(false)
                     .initialization_script(format!(
                         "
                         window.__CAP__ = window.__CAP__ ?? {{}};
-                        window.__CAP__.initialTargetMode = {}
+                        window.__CAP__.initialTargetMode = {};
+                        window.__CAP__.workspaceSmoke = {};
                     ",
                         serde_json::to_string(init_target_mode)
-                            .expect("Failed to serialize initial target mode")
+                            .expect("Failed to serialize initial target mode"),
+                        cfg!(debug_assertions)
+                            && std::env::var_os("JIANKU_WORKSPACE_SMOKE_OUTPUT").is_some()
                     ))
                     .build()?;
                 lock_window_text_scale(&window);
@@ -1987,9 +2007,9 @@ impl ShowCapWindow {
                                 }
                             };
 
+                            panel.set_level(0);
                             panel.set_collection_behaviour(
-                                NSWindowCollectionBehavior::NSWindowCollectionBehaviorCanJoinAllSpaces
-                                    | NSWindowCollectionBehavior::NSWindowCollectionBehaviorFullScreenPrimary,
+                                NSWindowCollectionBehavior::NSWindowCollectionBehaviorFullScreenAuxiliary,
                             );
 
                             let resized_window = window.clone();

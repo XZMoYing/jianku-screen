@@ -1,0 +1,102 @@
+{
+	"recordedAt": "2026-10-13T12:32:37.852825+00:00",
+	"version": "0.2.0-alpha.8",
+	"bundleVersion": "2026.10.13.8",
+	"branch": "rewrite/cap-foundation",
+	"sourceBaseCommit": "46b4dfbc9faf7c668a02ad1ab4c6285bcd8faefc",
+	"profile": "debug",
+	"scope": {
+		"main": "single recording/presentation workspace; persistent mounted mode panels; common project/library/tools navigation",
+		"recording": "existing capture, audio/camera, screenshot and editor flows retained; video/screenshot subtype has visible text labels",
+		"presentation": "grouped output/focus/appearance, fixed actions, independent scrolling, narrow single-column layout, shared existing renderer",
+		"window": "860x740 preferred,620x500 minimum, resizable, preserves current size on focus/reveal within screen work area, normal stacking",
+		"options": "idle settings persisted with short coalescing; active updates serialized and latest pending value retained",
+		"updater": "explicit plugin active=false respected by native check/download/background loop; inherited automatic Cap prompt removed",
+		"motionSolverOrShaderChanges": false
+	},
+	"frontendTests": {
+		"passed": 30,
+		"log": "frontend-tests.log"
+	},
+	"typescript": {
+		"status": "passed",
+		"log": "typescript.log"
+	},
+	"rust": {
+		"status": "passed",
+		"crate": "cap-desktop",
+		"log": "completion-check.log"
+	},
+	"formatting": {
+		"rust": "passed",
+		"biome": "passed scoped touched files",
+		"markdown": "repository formatter does not support Markdown; manually reviewed",
+		"log": "biome.log"
+	},
+	"nativeBuild": {
+		"status": "compiled, bundled and strictly signed",
+		"log": "final-build.log",
+		"unchangedSidecars": "reused sidecars from first complete build; no CLI/shared renderer changes in second revision",
+		"firstBuild": "initial-build.log",
+		"finalSourceSignature": "final-signing.log",
+		"trialSignature": "final-trial-signature.log",
+		"officialNotarization": false
+	},
+	"nativeUi": {
+		"status": "passed",
+		"log": "workspace-smoke.json",
+		"method": "explicit debug-only flag; actual native webview DOM clicks, input dispatch, scrolling and native resize; no mocked API",
+		"recordingPresentationSwitch": true,
+		"idleSaveAndModeStatePreservation": true,
+		"presentationBeginAndStop": true,
+		"liveModeSwitchProtected": true,
+		"onlyMainAndOutputDuringPresentation": true,
+		"updaterCheckReturnsNull": true,
+		"normalScroll": {
+			"clientHeight": 495,
+			"footerBottom": 739,
+			"scrollHeight": 855,
+			"scrollTop": 360,
+			"windowHeight": 740
+		},
+		"narrowScroll": {
+			"footerBottom": 529,
+			"height": 530,
+			"scrollTop": 1126,
+			"width": 660
+		},
+		"outputClientConnected": true,
+		"outputLog": "output-client.log",
+		"nativeWindowLog": "windows.json",
+		"finalVisualInspection": "local snapshots of own control UI reviewed after updater fix; no grey modal veil or separate update alert; snapshots kept outside repository",
+		"screensOrAudioSaved": false
+	},
+	"firstCandidateFinding": {
+		"uiSmoke": "initial-workspace-smoke.json",
+		"issue": "inherited frontend update check after 10 seconds created an Update Cap native modal, even though plugin updater configuration was inactive; first DOM-only check did not detect OS modal",
+		"fix": "remove automatic frontend prompt; gate native updater operations and release background loop on explicit active=false; verify native API and real window snapshot in final candidate"
+	},
+	"session": {
+		"startedAt": "2026-10-13T12:17:12.605217+00:00",
+		"application": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.8/Jianku Screen Next.app",
+		"version": "0.2.0-alpha.8",
+		"bundleVersion": "2026.10.13.8",
+		"previousTrialStoppedGracefully": true,
+		"userFramesSaved": false,
+		"finalNativeSession": {
+			"pid": 58209,
+			"started_at": "2026-10-13T12:28:05.791090+00:00",
+			"app_version": "0.6.0",
+			"os": "macos 14.7.4",
+			"arch": "aarch64",
+			"liquid_glass": "unknown",
+			"gpu_init_phase": false,
+			"graphics_recovery": false,
+			"blur_active": false,
+			"blur_recovery": false
+		},
+		"finalPid": 58209,
+		"upstreamUpdateModalPresent": false
+	},
+	"remaining": "docs/待验证项目交接.md V2-UI-01/02 and existing V2-Live items; full manual recording/editing, dark theme, keyboard/trackpad, mixed DPI, meetings and Windows acceptance retained"
+}

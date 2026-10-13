@@ -7437,6 +7437,14 @@ pub async fn run(recording_logging_handle: LoggingHandle, logs_dir: PathBuf) {
                 app.manage(Arc::new(RwLock::new(clipboard)));
             }
 
+            #[cfg(debug_assertions)]
+            if let Some(path) = std::env::var_os("JIANKU_WORKSPACE_SMOKE_OUTPUT") {
+                app.listen_any("jianku-workspace-smoke-result", move |event| {
+                    if let Err(error) = std::fs::write(&path, event.payload()) {
+                        tracing::warn!(%error, "Could not save workspace validation metrics");
+                    }
+                });
+            }
             app.listen_any("main-window-ready", {
                 let app = app.clone();
                 move |_| {
@@ -7589,10 +7597,6 @@ pub async fn run(recording_logging_handle: LoggingHandle, logs_dir: PathBuf) {
             let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
                 let label = window.label();
                 if label == "presentation-output" && let WindowEvent::Resized(size) = event { presentation::output_resized(window.app_handle(), size.width, size.height); }
-                if matches!(event, WindowEvent::Destroyed) && (label == "presentation-controls") {
-                    let handle = window.app_handle().clone();
-                    spawn_on_runtime(async move { let _ = presentation::stop_presentation(handle).await; });
-                }
                 let app = window.app_handle();
 
                 if matches!(

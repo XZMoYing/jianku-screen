@@ -107,22 +107,15 @@ pub fn active(app: &AppHandle) -> bool {
 #[tauri::command]
 #[specta::specta]
 pub async fn show_presentation(app: AppHandle) -> Result<(), String> {
-    if let Some(window) = app.get_webview_window("presentation-controls") {
-        window.show().map_err(|e| e.to_string())?;
-        window.set_focus().map_err(|e| e.to_string())?;
-        return Ok(());
+    let window = crate::windows::ShowCapWindow::Main {
+        init_target_mode: None,
     }
-    WebviewWindowBuilder::new(
-        &app,
-        "presentation-controls",
-        WebviewUrl::App("/presentation".into()),
-    )
-    .title("实时演示 · 简库镜传")
-    .inner_size(620.0, 760.0)
-    .min_inner_size(520.0, 580.0)
-    .center()
-    .build()
-    .map_err(|e| e.to_string())?;
+    .show(&app)
+    .await
+    .map_err(|error| error.to_string())?;
+    window.eval("localStorage.setItem('jianku.main.mode', 'presentation'); window.dispatchEvent(new Event('jianku-main-mode')); ").map_err(|error| error.to_string())?;
+    window.show().map_err(|error| error.to_string())?;
+    window.set_focus().map_err(|error| error.to_string())?;
     Ok(())
 }
 
@@ -204,6 +197,7 @@ pub fn get_presentation_status(app: AppHandle) -> PresentationStatus {
 #[tauri::command]
 #[specta::specta]
 pub fn update_presentation(app: AppHandle, mut options: PresentationOptions) -> Result<(), String> {
+    use tauri_plugin_store::StoreExt;
     options.validate()?;
     let state = app.state::<PresentationState>();
     let sessions = state.session.lock().unwrap();
@@ -223,8 +217,15 @@ pub fn update_presentation(app: AppHandle, mut options: PresentationOptions) -> 
             & !1)
             .clamp(240, 4320);
         session.options.send_replace(options);
+        return Ok(());
     }
-    Ok(())
+    drop(sessions);
+    let store = app.store("store").map_err(|error| error.to_string())?;
+    store.set(
+        "presentation-options",
+        serde_json::to_value(options).map_err(|error| error.to_string())?,
+    );
+    store.save().map_err(|error| error.to_string())
 }
 
 #[tauri::command]

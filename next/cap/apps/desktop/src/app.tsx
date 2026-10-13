@@ -22,6 +22,7 @@ import { Toaster } from "solid-toast";
 import "@cap/ui-solid/main.css";
 import "unfonts.css";
 import "./styles/theme.css";
+import "./styles/workspace.css";
 
 import { CapErrorBoundary } from "./components/CapErrorBoundary";
 import WindowChromeLayout from "./routes/(window-chrome)";
@@ -89,7 +90,6 @@ const CameraPage = lazy(() => import("./routes/camera"));
 const CaptureAreaPage = lazy(() => import("./routes/capture-area"));
 const DebugPage = lazy(() => import("./routes/debug"));
 const EditorPage = lazy(() => import("./routes/editor"));
-const PresentationPage = lazy(() => import("./routes/presentation"));
 const PresentationOutputPage = lazy(
 	() => import("./routes/presentation-output"),
 );
@@ -241,10 +241,10 @@ function Inner() {
 						<Route path="/upgrade" component={UpgradePage} />
 						<Route path="/update" component={UpdatePage} />
 					</Route>
-					<Route path="/presentation" component={PresentationPage} />
 					<Route
 						path="/presentation-output"
 						component={PresentationOutputPage}
+						info={{ AUTO_SHOW_WINDOW: false }}
 					/>
 					<Route path="/camera" component={CameraPage} />
 					<Route path="/capture-area" component={CaptureAreaPage} />

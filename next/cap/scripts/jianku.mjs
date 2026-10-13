@@ -195,13 +195,19 @@ function signMacBundle() {
 
 function main() {
 	const command = process.argv[2];
-	if (!["setup", "frontend", "check", "build", "release"].includes(command)) {
+	if (
+		!["setup", "frontend", "check", "build", "release", "sign"].includes(
+			command,
+		)
+	) {
 		throw new Error(
-			"用法：node scripts/jianku.mjs setup|frontend|check|build|release",
+			"用法：node scripts/jianku.mjs setup|frontend|check|build|release|sign",
 		);
 	}
 	prepareEnvironment();
-	if (command === "setup") {
+	if (command === "sign") {
+		signMacBundle();
+	} else if (command === "setup") {
 		run("bun", ["install", "--frozen-lockfile"]);
 		run("node", ["scripts/setup.js"]);
 	} else if (command === "frontend") {

@@ -1,5 +1,4 @@
 import { Button } from "@cap/ui-solid";
-import { useNavigate } from "@solidjs/router";
 import {
 	createMutation,
 	queryOptions,
@@ -8,10 +7,7 @@ import {
 } from "@tanstack/solid-query";
 import { Channel } from "@tauri-apps/api/core";
 import { emit, listen } from "@tauri-apps/api/event";
-import {
-	getAllWebviewWindows,
-	WebviewWindow,
-} from "@tauri-apps/api/webviewWindow";
+import { getAllWebviewWindows } from "@tauri-apps/api/webviewWindow";
 import {
 	currentMonitor,
 	getCurrentWindow,
@@ -36,8 +32,8 @@ import toast from "solid-toast";
 import { Transition } from "solid-transition-group";
 import Mode from "~/components/Mode";
 import { RecoveryToast } from "~/components/RecoveryToast";
-import Tooltip from "~/components/Tooltip";
 import { Input } from "~/routes/editor/ui";
+import Presentation from "~/routes/presentation";
 import { generalSettingsStore, recordingSettingsStore } from "~/store";
 import { createSignInMutation } from "~/utils/auth";
 import { createTauriEventListener } from "~/utils/createEventListener";
@@ -81,19 +77,20 @@ import {
 	type DeviceOrModelID,
 	events,
 	type OSPermissionsCheck,
+	type PresentationStatus,
 	type RecordingTargetMode,
 	type ScreenCaptureTarget,
-	type UpdateCheckResult,
 	type UploadProgress,
 } from "~/utils/tauri";
 import { openTeleprompter } from "~/utils/teleprompter";
-import { restartAfterUpdate } from "~/utils/updater";
 import IconLucideAppWindowMac from "~icons/lucide/app-window-mac";
 import IconLucideArrowLeft from "~icons/lucide/arrow-left";
-import IconLucideBug from "~icons/lucide/bug";
-import IconLucideCircleHelp from "~icons/lucide/circle-help";
+import IconLucideChevronDown from "~icons/lucide/chevron-down";
+import IconLucideClapperboard from "~icons/lucide/clapperboard";
+import IconLucideFolderOpen from "~icons/lucide/folder-open";
 import IconLucideImage from "~icons/lucide/image";
 import IconLucideImport from "~icons/lucide/import";
+import IconLucidePresentation from "~icons/lucide/presentation";
 import IconLucideScanText from "~icons/lucide/scan-text";
 import IconLucideSearch from "~icons/lucide/search";
 import IconLucideSettings from "~icons/lucide/settings";
@@ -107,7 +104,6 @@ import {
 	useRecordingOptions,
 } from "../OptionsContext";
 import CameraSelect from "./CameraSelect";
-import ChangelogButton from "./ChangeLogButton";
 import MicrophoneSelect from "./MicrophoneSelect";
 import ModeInfoPanel from "./ModeInfoPanel";
 import SystemAudio from "./SystemAudio";
@@ -117,8 +113,9 @@ import TargetMenuGrid from "./TargetMenuGrid";
 import TargetTypeButton from "./TargetTypeButton";
 import useRequestPermission from "./useRequestPermission";
 import { getPostResizeWindowPosition } from "./window-geometry";
+import { runWorkspaceSmoke } from "./workspace-smoke";
 
-const MAIN_WINDOW_SIZE = { width: 420, height: 480 } as const;
+const MAIN_WINDOW_SIZE = { width: 860, height: 740 } as const;
 const MAIN_WINDOW_SCREEN_PADDING = 12;
 const CAPTURE_LIST_STALE_TIME = 5_000;
 const CAPTURE_LIST_GC_TIME = 60_000;
@@ -1649,121 +1646,18 @@ export default function () {
 	);
 }
 
-let hasChecked = false;
-const [installingUpdate, setInstallingUpdate] = createSignal(false);
-function createUpdateCheck() {
-	if (import.meta.env.DEV) return;
-
-	const navigate = useNavigate();
-
-	onMount(async () => {
-		if (hasChecked) return;
-		hasChecked = true;
-
-		await new Promise((res) => setTimeout(res, 10_000));
-
-		// The Rust background loop owns nightly updates.
-		const settings = await generalSettingsStore.get();
-		if (settings?.updateChannel === "nightly") return;
-
-		let update: UpdateCheckResult | null = null;
-		try {
-			update = await commands.updatesCheck();
-		} catch (e) {
-			console.error("Failed to check for updates:", e);
-			return;
-		}
-
-		if (!update) return;
-
-		let shouldUpdate: boolean | undefined;
-		try {
-			shouldUpdate = await dialog.confirm(
-				`Version ${update.version} of Cap is available, would you like to install it?`,
-				{ title: "Update Cap", okLabel: "Update", cancelLabel: "Ignore" },
-			);
-		} catch (e) {
-			console.error("Failed to show update dialog:", e);
-			return;
-		}
-
-		if (!shouldUpdate) return;
-		navigate("/update");
-	});
-}
-
-function createUpdateReadyToast() {
-	createTauriEventListener(events.updateReady, (update) => {
-		toast.custom(
-			(t) => (
-				// Keep the toast inside the compact main window.
-				// (never exceed the viewport) and stack its actions below the message
-				// rather than racing them on one line — otherwise the card overflows
-				// the window edge and gets clipped.
-				<div class="flex flex-col gap-2.5 px-4 py-3 rounded-xl border shadow-lg bg-gray-1 border-gray-4 text-gray-12 w-[min(24rem,calc(100vw-2rem))]">
-					<p class="text-sm">
-						{update.installed
-							? `Cap ${update.version} has been installed — restart to apply`
-							: `Cap ${update.version} is ready to install`}
-					</p>
-					<div class="flex gap-2 items-center">
-						<button
-							type="button"
-							disabled={installingUpdate()}
-							class="px-2.5 py-1 text-xs font-medium rounded-lg transition-colors bg-blue-9 text-white hover:bg-blue-10 disabled:cursor-not-allowed disabled:opacity-60"
-							onClick={() => {
-								if (installingUpdate()) return;
-								setInstallingUpdate(true);
-								restartAfterUpdate()
-									.catch((error) => {
-										console.error("Failed to install update:", error);
-										toast.error(
-											typeof error === "string"
-												? error
-												: "Unable to restart Cap safely.",
-										);
-									})
-									.finally(() => setInstallingUpdate(false));
-							}}
-						>
-							{update.installed ? "Restart now" : "Install and restart"}
-						</button>
-						<button
-							type="button"
-							class="px-2.5 py-1 text-xs font-medium rounded-lg transition-colors text-gray-11 hover:text-gray-12"
-							onClick={() => toast.dismiss(t.id)}
-						>
-							Dismiss
-						</button>
-					</div>
-				</div>
-			),
-			{
-				// One toast per version: re-emissions replace instead of stacking.
-				id: `update-ready-${update.version}`,
-				duration: Number.POSITIVE_INFINITY,
-			},
-		);
-	});
-}
-
-function MainWindowHelpButton() {
-	return (
-		<Tooltip content={<span>Help & Tour</span>}>
-			<button
-				type="button"
-				onClick={() => {
-					commands.showWindow("Onboarding");
-				}}
-				class="flex shrink-0 justify-center items-center size-5 focus:outline-hidden"
-			>
-				<IconLucideCircleHelp class="transition-colors text-gray-11 size-4 hover:text-gray-12" />
-			</button>
-		</Tooltip>
-	);
-}
-
 function Page() {
+	const [workspaceMode, setWorkspaceMode] = createSignal<
+		"recording" | "presentation"
+	>(
+		localStorage.getItem("jianku.main.mode") === "presentation"
+			? "presentation"
+			: "recording",
+	);
+	const [presentationStatus, setPresentationStatus] =
+		createSignal<PresentationStatus>();
+	const [presentationBusy, setPresentationBusy] = createSignal(false);
+
 	const queryClient = useQueryClient();
 	const { rawOptions, setOptions, getCameraRevision } = useRecordingOptions();
 	const currentRecording = createCurrentRecordingQuery();
@@ -2332,15 +2226,49 @@ function Page() {
 		closeAllMenuPanels();
 	});
 
+	const changeWorkspaceMode = async (mode: "recording" | "presentation") => {
+		if (mode === workspaceMode()) return;
+		if (isRecording() || editorRecordingFlow() || presentationBusy()) return;
+		if (mode === "recording" && presentationStatus()?.active) {
+			toast("请先停止演示，再切换到录屏。");
+			return;
+		}
+		closeAllMenuPanels();
+		setOptions({
+			targetMode: null,
+			targetModeSource: null,
+			targetModeDismissal: "cancelled",
+		});
+		await commands.closeTargetSelectOverlays();
+		setWorkspaceMode(mode);
+		localStorage.setItem("jianku.main.mode", mode);
+	};
+	const onModeRequested = () => {
+		const mode =
+			localStorage.getItem("jianku.main.mode") === "presentation"
+				? "presentation"
+				: "recording";
+		void changeWorkspaceMode(mode).catch((error) => toast.error(String(error)));
+	};
+	window.addEventListener("jianku-main-mode", onModeRequested);
+	onCleanup(() =>
+		window.removeEventListener("jianku-main-mode", onModeRequested),
+	);
+	createEffect(() => {
+		if (
+			(isRecording() || editorRecordingFlow()) &&
+			workspaceMode() !== "recording"
+		) {
+			setWorkspaceMode("recording");
+		}
+	});
+
 	const setMicInput = createMicrophoneMutation();
 	const setCamera = createCameraMutation();
 	let cameraRestoreDisposed = false;
 	onCleanup(() => {
 		cameraRestoreDisposed = true;
 	});
-
-	createUpdateCheck();
-	createUpdateReadyToast();
 
 	onMount(async () => {
 		if (document.activeElement instanceof HTMLElement) {
@@ -2376,6 +2304,7 @@ function Page() {
 
 		setCanRevealMainWindow(true);
 		void emit("main-window-ready");
+		void runWorkspaceSmoke();
 		if (!targetMode) scheduleTargetListPrewarm();
 
 		if (rawOptions.micName) {
@@ -2403,9 +2332,6 @@ function Page() {
 		const unlistenFocus = currentWindow.onFocusChanged(
 			({ payload: focused }) => {
 				if (focused) {
-					void resizeMainWindow().catch((error) => {
-						console.error("Failed to restore main window size:", error);
-					});
 					scheduleTargetListPrewarm();
 				}
 			},
@@ -2880,112 +2806,118 @@ function Page() {
 			exitClass="scale-100"
 			exitToClass="scale-95"
 		>
-			<div class="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pb-1 w-full">
-				<div class="flex flex-col gap-2 w-full text-xs text-gray-11">
-					<div class="flex flex-row gap-2 items-stretch w-full">
-						<div
-							class={cx(
-								"flex flex-1 overflow-hidden rounded-lg border border-gray-6 bg-gray-2 ring-1 ring-transparent ring-offset-1 ring-offset-gray-1 transition-[background-color,border-color] focus-within:ring-blue-9 focus-within:ring-offset-1 focus-within:ring-offset-gray-1",
-								rawOptions.targetMode === "display" || displayMenuOpen()
-									? "border-blue-8 bg-blue-3 ring-blue-8 hover:border-blue-9 hover:bg-blue-4 dark:bg-blue-3/30 dark:hover:bg-blue-4/40"
-									: "hover:border-gray-8 hover:bg-gray-3",
-							)}
-						>
-							<TargetTypeButton
-								selected={rawOptions.targetMode === "display"}
-								Component={IconMdiMonitor}
-								disabled={isRecording()}
-								onClick={() => {
-									toggleTargetMode("display");
-								}}
-								name="Display"
-								class="flex-1 rounded-none border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 pl-5"
-							/>
-							<TargetDropdownButton
+			<div class="workspace-recording-home flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pb-1 w-full">
+				<section>
+					<h3>捕获来源</h3>
+					<div class="flex flex-col gap-2 w-full text-xs text-gray-11">
+						<div class="flex flex-row gap-2 items-stretch w-full">
+							<div
 								class={cx(
-									"rounded-none border-l border-gray-6 focus-visible:ring-0 focus-visible:ring-offset-0",
-									displayMenuOpen() && "bg-gray-5",
+									"flex flex-1 overflow-hidden rounded-lg border border-gray-6 bg-gray-2 ring-1 ring-transparent ring-offset-1 ring-offset-gray-1 transition-[background-color,border-color] focus-within:ring-blue-9 focus-within:ring-offset-1 focus-within:ring-offset-gray-1",
+									rawOptions.targetMode === "display" || displayMenuOpen()
+										? "border-blue-8 bg-blue-3 ring-blue-8 hover:border-blue-9 hover:bg-blue-4 dark:bg-blue-3/30 dark:hover:bg-blue-4/40"
+										: "hover:border-gray-8 hover:bg-gray-3",
 								)}
-								ref={displayTriggerRef}
-								disabled={isRecording()}
-								expanded={displayMenuOpen()}
-								onClick={() => {
-									setDisplayMenuOpen((prev) => {
-										const next = !prev;
-										if (next) {
-											setWindowMenuOpen(false);
-										}
-										return next;
-									});
-								}}
-								aria-haspopup="menu"
-								aria-label="Choose display"
-							/>
+							>
+								<TargetTypeButton
+									selected={rawOptions.targetMode === "display"}
+									Component={IconMdiMonitor}
+									disabled={isRecording()}
+									onClick={() => {
+										toggleTargetMode("display");
+									}}
+									name="屏幕"
+									class="flex-1 rounded-none border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 pl-5"
+								/>
+								<TargetDropdownButton
+									class={cx(
+										"rounded-none border-l border-gray-6 focus-visible:ring-0 focus-visible:ring-offset-0",
+										displayMenuOpen() && "bg-gray-5",
+									)}
+									ref={displayTriggerRef}
+									disabled={isRecording()}
+									expanded={displayMenuOpen()}
+									onClick={() => {
+										setDisplayMenuOpen((prev) => {
+											const next = !prev;
+											if (next) {
+												setWindowMenuOpen(false);
+											}
+											return next;
+										});
+									}}
+									aria-haspopup="menu"
+									aria-label="Choose display"
+								/>
+							</div>
+							<div
+								class={cx(
+									"flex flex-1 overflow-hidden rounded-lg border border-gray-6 bg-gray-2 ring-1 ring-transparent ring-offset-1 ring-offset-gray-1 transition-[background-color,border-color] focus-within:ring-blue-9 focus-within:ring-offset-1 focus-within:ring-offset-gray-1",
+									rawOptions.targetMode === "window" || windowMenuOpen()
+										? "border-blue-8 bg-blue-3 ring-blue-8 hover:border-blue-9 hover:bg-blue-4 dark:bg-blue-3/30 dark:hover:bg-blue-4/40"
+										: "hover:border-gray-8 hover:bg-gray-3",
+								)}
+							>
+								<TargetTypeButton
+									selected={rawOptions.targetMode === "window"}
+									Component={IconLucideAppWindowMac}
+									disabled={isRecording()}
+									onClick={() => {
+										toggleTargetMode("window");
+									}}
+									name="窗口"
+									class="flex-1 rounded-none border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 pl-5"
+								/>
+								<TargetDropdownButton
+									class={cx(
+										"rounded-none border-l border-gray-6 focus-visible:ring-0 focus-visible:ring-offset-0",
+										windowMenuOpen() && "bg-gray-5",
+									)}
+									ref={windowTriggerRef}
+									disabled={isRecording()}
+									expanded={windowMenuOpen()}
+									onClick={() => {
+										setWindowMenuOpen((prev) => {
+											const next = !prev;
+											if (next) {
+												setDisplayMenuOpen(false);
+											}
+											return next;
+										});
+									}}
+									aria-haspopup="menu"
+									aria-label="Choose window"
+								/>
+							</div>
 						</div>
-						<div
-							class={cx(
-								"flex flex-1 overflow-hidden rounded-lg border border-gray-6 bg-gray-2 ring-1 ring-transparent ring-offset-1 ring-offset-gray-1 transition-[background-color,border-color] focus-within:ring-blue-9 focus-within:ring-offset-1 focus-within:ring-offset-gray-1",
-								rawOptions.targetMode === "window" || windowMenuOpen()
-									? "border-blue-8 bg-blue-3 ring-blue-8 hover:border-blue-9 hover:bg-blue-4 dark:bg-blue-3/30 dark:hover:bg-blue-4/40"
-									: "hover:border-gray-8 hover:bg-gray-3",
-							)}
-						>
+						<div class="flex flex-row gap-2 items-stretch w-full">
 							<TargetTypeButton
-								selected={rawOptions.targetMode === "window"}
-								Component={IconLucideAppWindowMac}
+								selected={rawOptions.targetMode === "area"}
+								Component={IconMaterialSymbolsScreenshotFrame2Rounded}
 								disabled={isRecording()}
 								onClick={() => {
-									toggleTargetMode("window");
+									toggleTargetMode("area");
 								}}
-								name="Window"
-								class="flex-1 rounded-none border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 pl-5"
+								name="区域"
+								class="flex-1"
 							/>
-							<TargetDropdownButton
-								class={cx(
-									"rounded-none border-l border-gray-6 focus-visible:ring-0 focus-visible:ring-offset-0",
-									windowMenuOpen() && "bg-gray-5",
-								)}
-								ref={windowTriggerRef}
+							<TargetTypeButton
+								selected={rawOptions.targetMode === "camera"}
+								Component={IconLucideVideo}
 								disabled={isRecording()}
-								expanded={windowMenuOpen()}
 								onClick={() => {
-									setWindowMenuOpen((prev) => {
-										const next = !prev;
-										if (next) {
-											setDisplayMenuOpen(false);
-										}
-										return next;
-									});
+									toggleTargetMode("camera");
 								}}
-								aria-haspopup="menu"
-								aria-label="Choose window"
+								name="仅摄像头"
+								class="flex-1"
 							/>
 						</div>
 					</div>
-					<div class="flex flex-row gap-2 items-stretch w-full">
-						<TargetTypeButton
-							selected={rawOptions.targetMode === "area"}
-							Component={IconMaterialSymbolsScreenshotFrame2Rounded}
-							disabled={isRecording()}
-							onClick={() => {
-								toggleTargetMode("area");
-							}}
-							name="Area"
-							class="flex-1"
-						/>
-						<TargetTypeButton
-							selected={rawOptions.targetMode === "camera"}
-							Component={IconLucideVideo}
-							disabled={isRecording()}
-							onClick={() => {
-								toggleTargetMode("camera");
-							}}
-							name="Camera Only"
-							class="flex-1"
-						/>
-					</div>
-				</div>
-				<BaseControls />
+				</section>
+				<section>
+					<h3>设备与声音</h3>
+					<BaseControls />
+				</section>
 			</div>
 		</Transition>
 	);
@@ -3012,10 +2944,7 @@ function Page() {
 	onCleanup(() => startSignInCleanup.then((cb) => cb()));
 
 	return (
-		<div
-			onMouseEnter={handleMouseEnter}
-			class="flex relative flex-col px-[18px] gap-3 pb-[12px] h-full min-h-0 text-(--text-primary)"
-		>
+		<div onMouseEnter={handleMouseEnter} class="jianku-workspace relative">
 			<Show when={cleanCapture.data?.phase === "awaitingShortcut"}>
 				<div
 					class="absolute inset-0 z-50 flex flex-col justify-center gap-4 p-5 bg-gray-2"
@@ -3051,334 +2980,378 @@ function Page() {
 			</Show>
 			<WindowChromeHeader hideMaximize>
 				<div
-					class="flex flex-1 gap-1 items-center mx-2 min-w-0"
+					class="flex flex-1 items-center gap-2 px-4 text-xs text-gray-10"
 					data-tauri-drag-region
 				>
-					<MainWindowHelpButton />
+					<span class="flex-1" data-tauri-drag-region>
+						简库镜传
+					</span>
 					<button
 						type="button"
-						class="h-6 px-2 text-xs text-gray-11 rounded-md hover:bg-gray-4 disabled:opacity-50"
-						disabled={isRecording() || !!editorRecordingFlow()}
+						class="p-1 rounded-md hover:bg-gray-4"
+						aria-label="应用设置"
+						title="应用设置"
 						onClick={() =>
-							void commands
-								.showPresentation()
-								.catch((error) => toast.error(String(error)))
+							void commands.showWindow({ Settings: { page: "general" } })
 						}
 					>
-						实时演示
+						<IconLucideSettings class="size-3.5" />
 					</button>
-					<button
-						type="button"
-						disabled={
-							isRecording() || openingProject() || !!editorRecordingFlow()
-						}
-						onClick={() => void openProjectPicker()}
-						class="h-6 px-2 text-xs text-gray-11 rounded-md hover:bg-gray-4 disabled:opacity-50"
-					>
-						{openingProject() ? "正在打开…" : "打开工程"}
-					</button>
-					<div class="flex-1 min-h-9 min-w-0" data-tauri-drag-region />
-					<div class="flex gap-1 items-center shrink-0" data-tauri-drag-region>
-						<Tooltip content={<span>Settings</span>}>
-							<button
-								type="button"
-								onClick={async () => {
-									await commands.showWindow({ Settings: { page: "general" } });
-									hideCurrentWindow();
-								}}
-								class="flex items-center justify-center size-5 focus:outline-hidden"
-							>
-								<IconLucideSettings class="transition-colors text-gray-11 size-4 hover:text-gray-12" />
-							</button>
-						</Tooltip>
-						<Tooltip content={<span>Screenshots</span>}>
-							<button
-								type="button"
-								onClick={() => {
-									setScreenshotsMenuOpen((prev) => {
-										const next = !prev;
-										if (next) {
-											setDisplayMenuOpen(false);
-											setWindowMenuOpen(false);
-											setRecordingsMenuOpen(false);
-										}
-										return next;
-									});
-								}}
-								class="flex justify-center items-center size-5 focus:outline-hidden"
-							>
-								<IconLucideImage class="transition-colors text-gray-11 size-4 hover:text-gray-12" />
-							</button>
-						</Tooltip>
-						<Tooltip content={<span>Recordings</span>}>
-							<button
-								type="button"
-								onClick={() => {
-									setRecordingsMenuOpen((prev) => {
-										const next = !prev;
-										if (next) {
-											setDisplayMenuOpen(false);
-											setWindowMenuOpen(false);
-											setScreenshotsMenuOpen(false);
-										}
-										return next;
-									});
-								}}
-								class="flex justify-center items-center size-5 focus:outline-hidden"
-							>
-								<IconLucideSquarePlay class="transition-colors text-gray-11 size-4 hover:text-gray-12" />
-							</button>
-						</Tooltip>
-						<Tooltip content={<span>Teleprompter</span>}>
-							<button
-								type="button"
-								onClick={() => void openTeleprompter()}
-								class="flex justify-center items-center size-5 focus:outline-hidden"
-								aria-label="Open teleprompter"
-							>
-								<IconLucideScanText class="transition-colors text-gray-11 size-4 hover:text-gray-12" />
-							</button>
-						</Tooltip>
-						<ChangelogButton />
-						{import.meta.env.DEV && (
-							<button
-								type="button"
-								onClick={() => {
-									new WebviewWindow("debug", { url: "/debug" });
-								}}
-								class="flex justify-center items-center focus:outline-hidden"
-							>
-								<IconLucideBug class="transition-colors text-gray-11 size-4 hover:text-gray-12" />
-							</button>
-						)}
-					</div>
 				</div>
 			</WindowChromeHeader>
-			<Show when={!isActivelyRecording() && recordingErrors().length > 0}>
-				<div
-					role="alert"
-					tabIndex={0}
-					class="max-h-20 shrink-0 space-y-1 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-red-3 p-2 text-sm text-red-11"
-				>
-					<For each={recordingErrors()}>{(error) => <p>{error}</p>}</For>
-				</div>
-			</Show>
-			<Show when={!activeMenu()}>
-				<div class="flex items-center justify-between mt-[16px] mb-[6px]">
-					<Show
-						when={editorRecordingFlow()}
-						fallback={
-							<div class="flex items-center gap-2.5">
-								<span class="text-base font-semibold tracking-tight">
-									简库镜传
-								</span>
-								<span class="rounded-md border border-gray-5 bg-gray-3 px-1.5 py-0.5 text-[10px] text-gray-11">
-									新版预览
-								</span>
-							</div>
-						}
-					>
-						{(flow) => (
-							<div class="flex min-w-0 flex-1 items-center gap-2.5 pr-3 animate-in fade-in slide-in-from-left-1 duration-200">
-								<div class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-blue-3 text-blue-10 dark:bg-blue-4">
-									<IconCapClapperboard class="size-4" />
-								</div>
-								<div class="flex min-w-0 flex-col leading-tight">
-									<span class="truncate text-[13px] font-medium text-gray-12">
-										Record a new clip
-									</span>
-									<span class="truncate text-[11px] text-gray-11">
-										Adds to {flow().projectName}
-									</span>
-								</div>
-								<Tooltip content={<span>Back to editor</span>}>
-									<button
-										type="button"
-										onClick={() => void cancelEditorRecordingFlow()}
-										aria-label="Back to editor"
-										class="flex size-6 shrink-0 items-center justify-center rounded-full text-gray-10 transition-colors hover:bg-gray-4 hover:text-gray-12 focus:outline-hidden"
-									>
-										<IconCapX class="size-2.5" />
-									</button>
-								</Tooltip>
-							</div>
-						)}
-					</Show>
-					<Mode
-						locked={!!editorRecordingFlow()}
-						onInfoClick={() => {
-							if (editorRecordingFlow()) return;
-							setModeInfoMenuOpen(true);
-							setDisplayMenuOpen(false);
-							setWindowMenuOpen(false);
-							setRecordingsMenuOpen(false);
-							setScreenshotsMenuOpen(false);
-							setCameraMenuOpen(false);
-							setMicrophoneMenuOpen(false);
-						}}
-					/>
-				</div>
-			</Show>
-			<div class="flex-1 min-h-0 w-full flex flex-col">
-				<Show when={signIn.isPending}>
-					<div class="flex absolute inset-0 justify-center items-center bg-gray-1 animate-in fade-in">
-						<div class="flex flex-col gap-4 justify-center items-center">
-							<span>Signing In...</span>
-
-							<Button
-								onClick={() => {
-									signIn.variables?.abort();
-									signIn.reset();
-								}}
-								variant="gray"
-								class="w-full"
-							>
-								Cancel Sign In
-							</Button>
-						</div>
+			<header class="workspace-top">
+				<div class="workspace-brand">
+					<span class="workspace-brand-mark">
+						<IconLucideClapperboard />
+					</span>
+					<div>
+						<strong>简库镜传</strong>
+						<small>录下精彩，呈现细节</small>
 					</div>
-				</Show>
-				<Show when={!signIn.isPending}>
-					<Show when={activeMenu()} keyed fallback={<TargetSelectionHome />}>
-						{(variant) =>
-							variant === "display" ? (
-								<TargetMenuPanel
-									variant="display"
-									targets={displayTargetsData()}
-									isLoading={displayMenuLoading()}
-									errorMessage={displayErrorMessage()}
-									onSelect={selectDisplayTarget}
-									disabled={isRecording()}
-									onBack={() => {
-										setDisplayMenuOpen(false);
-										displayTriggerRef?.focus();
-									}}
-								/>
-							) : variant === "window" ? (
-								<TargetMenuPanel
-									variant="window"
-									targets={windowTargetsData()}
-									isLoading={windowMenuLoading()}
-									errorMessage={windowErrorMessage()}
-									onSelect={selectWindowTarget}
-									disabled={isRecording()}
-									onBack={() => {
-										setWindowMenuOpen(false);
-										windowTriggerRef?.focus();
-									}}
-								/>
-							) : variant === "recording" ? (
-								<TargetMenuPanel
-									variant="recording"
-									targets={recordingsData()}
-									isLoading={recordings.isPending}
-									errorMessage={
-										recordings.error ? "Failed to load recordings" : undefined
-									}
-									onSelect={openRecording}
-									disabled={isRecording()}
-									onBack={() => {
-										setRecordingsMenuOpen(false);
-									}}
-									onViewAll={async () => {
-										await commands.showWindow({
-											Settings: { page: "recordings" },
-										});
-										hideCurrentWindow();
-									}}
-									uploadProgress={uploadProgress}
-									reuploadingPaths={reuploadingPaths()}
-									onReupload={handleReupload}
-									onRefetch={refreshRecordings}
-								/>
-							) : variant === "screenshot" ? (
-								<TargetMenuPanel
-									variant="screenshot"
-									targets={screenshotsData()}
-									isLoading={screenshots.isPending}
-									errorMessage={
-										screenshots.error ? "Failed to load screenshots" : undefined
-									}
-									onSelect={openScreenshot}
-									disabled={isRecording()}
-									onBack={() => {
-										setScreenshotsMenuOpen(false);
-									}}
-									onViewAll={async () => {
-										await commands.showWindow({
-											Settings: { page: "screenshots" },
-										});
-										hideCurrentWindow();
-									}}
-								/>
-							) : variant === "camera" ? (
-								<TargetMenuPanel
-									variant="camera"
-									targets={devices.cameras}
-									selectedTarget={options.camera() ?? null}
-									isLoading={devices.isPending}
-									onSelect={(c) => {
-										if (!c) {
-											setOptions("cameraLabel", null);
-											setCamera.mutate({ model: null });
-										} else if (c.model_id) {
-											setOptions("cameraLabel", c.display_name);
-											setCamera.mutate({ model: { ModelID: c.model_id } });
-										} else {
-											setOptions("cameraLabel", c.display_name);
-											setCamera.mutate({ model: { DeviceID: c.device_id } });
-										}
-										setCameraMenuOpen(false);
-										setCameraInitialSettings(null);
-									}}
-									disabled={isRecording()}
-									onBack={() => {
-										setCameraMenuOpen(false);
-										setCameraInitialSettings(null);
-									}}
-									permissions={currentPermissions()}
-									deviceSettings={deviceSettings() ?? undefined}
-									onCameraSettingsChange={(camera, settings) => {
-										void setCameraDeviceSettings(camera, settings);
-									}}
-									compatibilityStudioMode={compatibilityStudioMode()}
-									initialSettingsTarget={cameraInitialSettings()}
-								/>
-							) : variant === "microphone" ? (
-								<TargetMenuPanel
-									variant="microphone"
-									targets={devices.microphones}
-									selectedTarget={options.micName() ?? null}
-									isLoading={devices.isPending}
-									onSelect={(v) => {
-										setMicInput.mutate(v?.name ?? null);
-										setMicrophoneMenuOpen(false);
-										setMicrophoneInitialSettings(null);
-									}}
-									disabled={isRecording()}
-									onBack={() => {
-										setMicrophoneMenuOpen(false);
-										setMicrophoneInitialSettings(null);
-									}}
-									permissions={currentPermissions()}
-									deviceSettings={deviceSettings() ?? undefined}
-									onMicrophoneSettingsChange={(key, settings) => {
-										void setMicrophoneDeviceSettings(key, settings);
-									}}
-									compatibilityStudioMode={compatibilityStudioMode()}
-									initialSettingsTarget={microphoneInitialSettings()}
-								/>
-							) : (
-								<ModeInfoPanel
-									onBack={() => {
-										setModeInfoMenuOpen(false);
-									}}
-								/>
+				</div>
+				<div class="workspace-modes" role="group" aria-label="工作模式">
+					<button
+						type="button"
+						aria-pressed={workspaceMode() === "recording"}
+						class={workspaceMode() === "recording" ? "is-selected" : ""}
+						disabled={presentationStatus()?.active || presentationBusy()}
+						title={presentationStatus()?.active ? "停止演示后切换" : "录屏模式"}
+						onClick={() =>
+							void changeWorkspaceMode("recording").catch((error) =>
+								toast.error(String(error)),
 							)
 						}
-					</Show>
-				</Show>
+					>
+						<IconLucideVideo />
+						录屏
+					</button>
+					<button
+						type="button"
+						aria-pressed={workspaceMode() === "presentation"}
+						class={workspaceMode() === "presentation" ? "is-selected" : ""}
+						disabled={
+							isRecording() || !!editorRecordingFlow() || presentationBusy()
+						}
+						onClick={() =>
+							void changeWorkspaceMode("presentation").catch((error) =>
+								toast.error(String(error)),
+							)
+						}
+					>
+						<IconLucidePresentation />
+						演示
+					</button>
+				</div>
+			</header>
+			<nav class="workspace-toolbar" aria-label="工程与工具">
+				<button
+					type="button"
+					disabled={
+						isRecording() ||
+						openingProject() ||
+						!!editorRecordingFlow() ||
+						presentationStatus()?.active
+					}
+					onClick={() => void openProjectPicker()}
+				>
+					<IconLucideFolderOpen />
+					{openingProject() ? "正在打开…" : "打开工程"}
+				</button>
+				<button
+					type="button"
+					disabled={isRecording() || presentationStatus()?.active}
+					onClick={async () => {
+						await changeWorkspaceMode("recording");
+						closeAllMenuPanels();
+						setRecordingsMenuOpen(true);
+					}}
+				>
+					<IconLucideSquarePlay />
+					录制库
+				</button>
+				<button
+					type="button"
+					disabled={isRecording() || presentationStatus()?.active}
+					onClick={async () => {
+						await changeWorkspaceMode("recording");
+						closeAllMenuPanels();
+						setScreenshotsMenuOpen(true);
+					}}
+				>
+					<IconLucideImage />
+					截图库
+				</button>
+				<details class="workspace-tools">
+					<summary>
+						更多工具
+						<IconLucideChevronDown />
+					</summary>
+					<div class="workspace-tools-menu">
+						<button
+							type="button"
+							onClick={(event) => {
+								event.currentTarget.closest("details")?.removeAttribute("open");
+								void openTeleprompter();
+							}}
+						>
+							<IconLucideScanText />
+							提词器
+						</button>
+						<button
+							type="button"
+							onClick={(event) => {
+								event.currentTarget.closest("details")?.removeAttribute("open");
+								void commands.showWindow({ Settings: { page: "quality" } });
+							}}
+						>
+							<IconLucideSettings />
+							录制设置
+						</button>
+						<button
+							type="button"
+							onClick={(event) => {
+								event.currentTarget.closest("details")?.removeAttribute("open");
+								void commands.showWindow({ Settings: { page: "hotkeys" } });
+							}}
+						>
+							<IconLucideSettings />
+							快捷键设置
+						</button>
+					</div>
+				</details>
+			</nav>
+			<div
+				class="flex-1 min-h-0 flex-col"
+				style={{
+					display: workspaceMode() === "presentation" ? "flex" : "none",
+				}}
+				aria-hidden={workspaceMode() !== "presentation"}
+			>
+				<Presentation
+					blocked={isRecording() || !!editorRecordingFlow()}
+					onStatus={setPresentationStatus}
+					onBusy={setPresentationBusy}
+				/>
 			</div>
+			<section
+				class="workspace-recording"
+				data-testid="recording-panel"
+				style={{ display: workspaceMode() === "recording" ? "flex" : "none" }}
+				aria-hidden={workspaceMode() !== "recording"}
+			>
+				<Show when={!isActivelyRecording() && recordingErrors().length > 0}>
+					<div
+						role="alert"
+						tabIndex={0}
+						class="max-h-20 shrink-0 space-y-1 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-red-3 p-2 text-sm text-red-11"
+					>
+						<For each={recordingErrors()}>{(error) => <p>{error}</p>}</For>
+					</div>
+				</Show>
+				<Show when={!activeMenu()}>
+					<div class="workspace-recording-heading">
+						<div>
+							<h2>
+								{editorRecordingFlow()
+									? "为工程录制新片段"
+									: rawOptions.mode === "screenshot"
+										? "捕捉一个瞬间"
+										: "从一次录制开始"}
+							</h2>
+							<p>
+								{editorRecordingFlow()
+									? `将加入 ${editorRecordingFlow()?.projectName}`
+									: rawOptions.mode === "screenshot"
+										? "选择屏幕、窗口或区域，截图后继续标注。"
+										: "选择来源与声音，停止后进入编辑器。"}
+							</p>
+						</div>
+						<Mode
+							locked={isRecording() || !!editorRecordingFlow()}
+							onInfoClick={() => {
+								closeAllMenuPanels();
+								setModeInfoMenuOpen(true);
+							}}
+						/>
+						<Show when={editorRecordingFlow()}>
+							<button
+								type="button"
+								class="studio-secondary"
+								onClick={() => void cancelEditorRecordingFlow()}
+							>
+								返回编辑器
+							</button>
+						</Show>
+					</div>
+				</Show>
+				<div class="workspace-recording-body">
+					<Show when={signIn.isPending}>
+						<div class="flex absolute inset-0 justify-center items-center bg-gray-1 animate-in fade-in">
+							<div class="flex flex-col gap-4 justify-center items-center">
+								<span>Signing In...</span>
+
+								<Button
+									onClick={() => {
+										signIn.variables?.abort();
+										signIn.reset();
+									}}
+									variant="gray"
+									class="w-full"
+								>
+									Cancel Sign In
+								</Button>
+							</div>
+						</div>
+					</Show>
+					<Show when={!signIn.isPending}>
+						<Show when={activeMenu()} keyed fallback={<TargetSelectionHome />}>
+							{(variant) =>
+								variant === "display" ? (
+									<TargetMenuPanel
+										variant="display"
+										targets={displayTargetsData()}
+										isLoading={displayMenuLoading()}
+										errorMessage={displayErrorMessage()}
+										onSelect={selectDisplayTarget}
+										disabled={isRecording()}
+										onBack={() => {
+											setDisplayMenuOpen(false);
+											displayTriggerRef?.focus();
+										}}
+									/>
+								) : variant === "window" ? (
+									<TargetMenuPanel
+										variant="window"
+										targets={windowTargetsData()}
+										isLoading={windowMenuLoading()}
+										errorMessage={windowErrorMessage()}
+										onSelect={selectWindowTarget}
+										disabled={isRecording()}
+										onBack={() => {
+											setWindowMenuOpen(false);
+											windowTriggerRef?.focus();
+										}}
+									/>
+								) : variant === "recording" ? (
+									<TargetMenuPanel
+										variant="recording"
+										targets={recordingsData()}
+										isLoading={recordings.isPending}
+										errorMessage={
+											recordings.error ? "Failed to load recordings" : undefined
+										}
+										onSelect={openRecording}
+										disabled={isRecording()}
+										onBack={() => {
+											setRecordingsMenuOpen(false);
+										}}
+										onViewAll={async () => {
+											await commands.showWindow({
+												Settings: { page: "recordings" },
+											});
+											hideCurrentWindow();
+										}}
+										uploadProgress={uploadProgress}
+										reuploadingPaths={reuploadingPaths()}
+										onReupload={handleReupload}
+										onRefetch={refreshRecordings}
+									/>
+								) : variant === "screenshot" ? (
+									<TargetMenuPanel
+										variant="screenshot"
+										targets={screenshotsData()}
+										isLoading={screenshots.isPending}
+										errorMessage={
+											screenshots.error
+												? "Failed to load screenshots"
+												: undefined
+										}
+										onSelect={openScreenshot}
+										disabled={isRecording()}
+										onBack={() => {
+											setScreenshotsMenuOpen(false);
+										}}
+										onViewAll={async () => {
+											await commands.showWindow({
+												Settings: { page: "screenshots" },
+											});
+											hideCurrentWindow();
+										}}
+									/>
+								) : variant === "camera" ? (
+									<TargetMenuPanel
+										variant="camera"
+										targets={devices.cameras}
+										selectedTarget={options.camera() ?? null}
+										isLoading={devices.isPending}
+										onSelect={(c) => {
+											if (!c) {
+												setOptions("cameraLabel", null);
+												setCamera.mutate({ model: null });
+											} else if (c.model_id) {
+												setOptions("cameraLabel", c.display_name);
+												setCamera.mutate({ model: { ModelID: c.model_id } });
+											} else {
+												setOptions("cameraLabel", c.display_name);
+												setCamera.mutate({ model: { DeviceID: c.device_id } });
+											}
+											setCameraMenuOpen(false);
+											setCameraInitialSettings(null);
+										}}
+										disabled={isRecording()}
+										onBack={() => {
+											setCameraMenuOpen(false);
+											setCameraInitialSettings(null);
+										}}
+										permissions={currentPermissions()}
+										deviceSettings={deviceSettings() ?? undefined}
+										onCameraSettingsChange={(camera, settings) => {
+											void setCameraDeviceSettings(camera, settings);
+										}}
+										compatibilityStudioMode={compatibilityStudioMode()}
+										initialSettingsTarget={cameraInitialSettings()}
+									/>
+								) : variant === "microphone" ? (
+									<TargetMenuPanel
+										variant="microphone"
+										targets={devices.microphones}
+										selectedTarget={options.micName() ?? null}
+										isLoading={devices.isPending}
+										onSelect={(v) => {
+											setMicInput.mutate(v?.name ?? null);
+											setMicrophoneMenuOpen(false);
+											setMicrophoneInitialSettings(null);
+										}}
+										disabled={isRecording()}
+										onBack={() => {
+											setMicrophoneMenuOpen(false);
+											setMicrophoneInitialSettings(null);
+										}}
+										permissions={currentPermissions()}
+										deviceSettings={deviceSettings() ?? undefined}
+										onMicrophoneSettingsChange={(key, settings) => {
+											void setMicrophoneDeviceSettings(key, settings);
+										}}
+										compatibilityStudioMode={compatibilityStudioMode()}
+										initialSettingsTarget={microphoneInitialSettings()}
+									/>
+								) : (
+									<ModeInfoPanel
+										onBack={() => {
+											setModeInfoMenuOpen(false);
+										}}
+									/>
+								)
+							}
+						</Show>
+					</Show>
+				</div>
+				<Show when={!activeMenu()}>
+					<p class="workspace-recording-note">
+						屏幕与窗口支持独立选择；录制结束后可在编辑器调整画面、镜头与光标。
+					</p>
+				</Show>
+			</section>
 			<Show when={isActivelyRecording()}>
 				<div class="absolute inset-0 z-10 flex flex-col justify-end bg-gray-1/80 px-6 pb-8 backdrop-blur-xs">
 					<div class="pointer-events-auto">

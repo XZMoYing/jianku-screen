@@ -90,6 +90,16 @@ fn begin_install<'a>(
     .map_err(|reason| reason.message().to_string())
 }
 
+fn updates_enabled(app: &AppHandle) -> bool {
+    app.config()
+        .plugins
+        .0
+        .get("updater")
+        .and_then(|config| config.get("active"))
+        .and_then(serde_json::Value::as_bool)
+        != Some(false)
+}
+
 fn current_channel(app: &AppHandle) -> UpdateChannel {
     GeneralSettingsStore::get(app)
         .ok()
@@ -182,6 +192,9 @@ fn pick_higher_version(a: Option<Update>, b: Option<Update>) -> Option<Update> {
 }
 
 pub async fn check(app: &AppHandle) -> Result<Option<Update>, String> {
+    if !updates_enabled(app) {
+        return Ok(None);
+    }
     let channel = current_channel(app);
 
     let stable = check_channel(app, UpdateChannel::Stable, channel == UpdateChannel::Stable).await;
@@ -254,6 +267,9 @@ pub async fn updates_check(app: AppHandle) -> Result<Option<UpdateCheckResult>, 
 #[tauri::command]
 #[specta::specta]
 pub async fn updates_download_and_install(app: AppHandle) -> Result<(), String> {
+    if !updates_enabled(&app) {
+        return Err("当前试用版本未启用自动更新，请使用本项目提供的安装包".into());
+    }
     let state = app.state::<UpdatesState>();
     let _install = state.install.lock().await;
 
@@ -307,7 +323,7 @@ pub fn updates_channel_changed(app: AppHandle) -> Result<(), String> {
 
 pub fn spawn_background_loop(app: AppHandle) {
     // Never auto-update dev builds.
-    if cfg!(debug_assertions) {
+    if cfg!(debug_assertions) || !updates_enabled(&app) {
         return;
     }
 

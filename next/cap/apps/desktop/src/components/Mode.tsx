@@ -22,7 +22,7 @@ type ModeButtonConfig = {
 const MODE_BUTTONS: ModeButtonConfig[] = [
 	{
 		mode: "studio",
-		label: "录制模式",
+		label: "视频",
 		description: "录制保存在本机，停止后打开编辑器。可在设置中选择录制质量。",
 		settingsSection: "studio-quality",
 		icon: (p) => <IconCapFilmCut {...p} />,
@@ -61,13 +61,13 @@ const Mode = (props: ModeProps) => {
 	};
 
 	return (
-		<div class="flex relative gap-2 items-center p-1.5 rounded-full border border-gray-5 bg-gray-3 w-fit">
+		<div class="flex relative gap-1 items-center p-1 rounded-xl border border-gray-5 bg-gray-3 w-fit">
 			<button
 				type="button"
 				onClick={handleInfoClick}
 				disabled={props.locked}
 				class={cx(
-					"absolute -left-1.5 -top-2 p-1 rounded-full w-fit bg-gray-5 group focus:outline-none",
+					"p-1.5 rounded-md w-fit text-gray-10 group focus:outline-none",
 					props.locked && "opacity-50",
 				)}
 				aria-label="Recording mode info"
@@ -95,15 +95,16 @@ const Mode = (props: ModeProps) => {
 							}}
 							aria-disabled={props.locked && !isSelected()}
 							class={cx(
-								"relative flex justify-center items-center rounded-full transition-all duration-200 size-7 focus:outline-none",
+								"relative flex gap-1.5 justify-center items-center rounded-lg transition-colors duration-150 px-3 py-2 text-xs focus:outline-none",
 								isSelected()
-									? "ring-2 ring-offset-1 ring-offset-gray-1 bg-gray-7 hover:bg-gray-7 ring-blue-500"
+									? "bg-gray-1 text-gray-12 shadow-xs"
 									: props.locked
 										? "bg-gray-3 opacity-40 cursor-default"
 										: "bg-gray-3 hover:bg-gray-7",
 							)}
 						>
 							<button.icon class={button.iconClass} />
+							<span>{button.label}</span>
 						</HoverCard.Trigger>
 						<HoverCard.Portal>
 							<HoverCard.Content class="z-50 outline-none animate-in fade-in slide-in-from-top-1 duration-100">

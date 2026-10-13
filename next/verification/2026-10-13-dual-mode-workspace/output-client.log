@@ -1,0 +1,4 @@
+2026-10-13T12:28:07.861021Z  INFO cap_desktop_lib::frame_ws: Socket connection established
+2026-10-13T12:28:08.742304Z  INFO cap_desktop_lib::presentation: Presentation ready; capture frames are composited without video encoding
+2026-10-13T12:28:08.760471Z  INFO cap_desktop_lib::frame_ws: WS frame stats fps=0 mb_per_sec="4.1" avg_kb="8100.0" pack_avg_ms="2.914" pack_max_ms="2.914" send_avg_ms="15.396" send_max_ms="15.396" created_to_sent_avg_ms="18.422" created_to_sent_max_ms="18.422" dims="1920x1080" format="RGBA"
+2026-10-13T12:28:10.130226Z  INFO cap_desktop_lib::frame_ws: WebSocket server shutting down

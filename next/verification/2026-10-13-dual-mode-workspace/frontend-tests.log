@@ -1,0 +1,11 @@
+
+ RUN  v2.1.9 /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/apps/desktop
+
+ ✓ src/routes/(window-chrome)/new-main/window-geometry.test.ts (3 tests) 4ms
+ ✓ src/routes/(window-chrome)/new-main/use-request-permission.test.ts (27 tests) 86ms
+
+ Test Files  2 passed (2)
+      Tests  30 passed (30)
+   Start at  20:12:51
+   Duration  1.07s (transform 247ms, setup 0ms, collect 441ms, tests 90ms, environment 0ms, prepare 222ms)
+

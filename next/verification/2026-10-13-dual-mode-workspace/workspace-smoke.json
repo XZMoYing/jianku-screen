@@ -1,0 +1,22 @@
+{
+	"activeWindowLabels": ["presentation-output", "main"],
+	"externalUpdaterDisabled": true,
+	"narrow": {
+		"footerBottom": 529,
+		"height": 530,
+		"scrollTop": 1126,
+		"width": 660
+	},
+	"passed": true,
+	"presentationStartStop": true,
+	"recordingVisible": true,
+	"scroll": {
+		"clientHeight": 495,
+		"footerBottom": 739,
+		"scrollHeight": 855,
+		"scrollTop": 360,
+		"windowHeight": 740
+	},
+	"settingsRetainedAcrossModeSwitch": true,
+	"userFramesSaved": false
+}
