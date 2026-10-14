@@ -1,0 +1,101 @@
+{
+	"date": "2026-10-14",
+	"version": "0.2.0-alpha.13",
+	"checks": {
+		"nativeTests": 14,
+		"frontendSettingsTests": 6,
+		"bindingGenerator": true,
+		"nativeCompilation": true,
+		"desktopTypeScript": true,
+		"scopedBiome": true,
+		"strictBundleSignature": true,
+		"stdoutBufferingReproducedAndFixed": true
+	},
+	"ui": {
+		"captureSettingsRetained": true,
+		"captureSettingsSaved": {
+			"bitRateMbps": 8,
+			"maxFps": 30,
+			"maxSize": 1280,
+			"orientation": "rotate90"
+		},
+		"deviceCaptureStarted": false,
+		"editorOpened": true,
+		"editorRecoveryCommandSupportsMobile": true,
+		"initialPhase": "complete",
+		"listUpdated": true,
+		"narrowWindow": {
+			"clientHeight": 259,
+			"historyWidth": 610,
+			"scrollHeight": 1298,
+			"scrollTop": 1039,
+			"windowWidth": 660
+		},
+		"ok": true,
+		"reopenedAfterRestart": true,
+		"stage": "complete",
+		"synthetic": true
+	},
+	"android": {
+		"complete": true,
+		"deviceSerialSaved": false,
+		"duration": 1.1,
+		"editorOpened": true,
+		"extension": "jks",
+		"height": 1280,
+		"mi6Compatibility": true,
+		"ok": true,
+		"platform": "android",
+		"requestedCapture": {
+			"bitRateMbps": 8,
+			"maxFps": 30,
+			"maxSize": 1280,
+			"orientation": "initial"
+		},
+		"sourceAudioSupported": true,
+		"sourceBytes": 46766,
+		"started": true,
+		"stopped": true,
+		"userFramesSavedInRepository": false,
+		"width": 720
+	},
+	"protectedAppsBefore": {
+		"authorizedDevices": 1,
+		"protectedApps": {
+			"be.mygod.vpnhotspot": true,
+			"moe.nb4a": true
+		}
+	},
+	"protectedAppsAfter": {
+		"authorizedDevices": 1,
+		"protectedApps": {
+			"be.mygod.vpnhotspot": true,
+			"moe.nb4a": true
+		}
+	},
+	"recordingDurationValidation": {
+		"passed": false,
+		"requestedRecordingAfterReadySeconds": 6,
+		"actualMediaSeconds": 1.1,
+		"pendingItem": "V2-Mobile-11"
+	},
+	"realDeviceFramesInRepository": false,
+	"phoneAppTerminationOrNetworkChangesPerformed": false,
+	"physicalIosTestDeferredByUser": true,
+	"trialFolder": "Jianku Screen Next Builds/0.2.0-alpha.13/",
+	"pending": [
+		"Static tail duration and preview/export consistency",
+		"Physical device rotation and control mapping",
+		"Other Android encoders, audio and long capture",
+		"Physical iPad when available",
+		"Matching all reference animations"
+	],
+	"normalTrialOpened": true,
+	"temporaryTestSettingsRestored": true,
+	"mainWindowObserved": {
+		"Height": 740,
+		"Width": 860,
+		"X": 376,
+		"Y": 123
+	}
+}

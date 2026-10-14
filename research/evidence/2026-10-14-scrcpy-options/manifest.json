@@ -1,0 +1,15 @@
+{
+	"version": "v4.1",
+	"source": "https://github.com/Genymobile/scrcpy/tree/v4.1",
+	"sha256": {
+		"LICENSE": "01c12035bf35af37241298dc7ad538eb2a07e5c940437bc6876feeaa9d1951d0",
+		"doc/video.md": "043dcf1187f87ca39d0487b316aeda1ad4b88478f7b318a27dfd9b6ffb176e28",
+		"doc/recording.md": "6fe13d1b39f8388e6890baf9681bcda9808ed8b0d8823c93391e38c1b461c877",
+		"server/src/main/java/com/genymobile/scrcpy/video/ScreenCapture.java": "8b34e8fec43ccf3e333df4658eb07c5dfd2bcb741b56297caf5afd66bf7cb9ee",
+		"server/src/main/java/com/genymobile/scrcpy/video/VideoFilter.java": "97f8a0df13a8207b24833d59edbd176078d92165fbd141b7f79c0fea39b1149b",
+		"server/src/main/java/com/genymobile/scrcpy/video/SurfaceEncoder.java": "f37c238b748608b1cfcedf9ea411793e208b085f22350e4f70ee8b835820abee",
+		"app/src/recorder.c": "a2a3dbd35ededf812cb9de0b957fd0204754301ff97e51d12c1b533a19d74e8b",
+		"app/src/main.c": "83a40db0d69c721a6c47a7a791d1de24ab4ffbd7549adad65951881ae2a84104",
+		"app/src/util/log.c": "4bf020c1041a406e277a33f77def03ed28511b4ae2acce3d1e364ab4af136a90"
+	}
+}

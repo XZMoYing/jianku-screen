@@ -1,6 +1,10 @@
 import { emit } from "@tauri-apps/api/event";
 import { getAllWebviewWindows } from "@tauri-apps/api/webviewWindow";
 import { getCurrentWindow, LogicalSize } from "@tauri-apps/api/window";
+import {
+	mobileCaptureDefaults,
+	parseMobileCaptureSettings,
+} from "~/utils/mobile-capture-settings";
 import { commands } from "~/utils/tauri";
 
 export async function runMobileRecoverySmoke() {
@@ -27,10 +31,55 @@ export async function runMobileRecoverySmoke() {
 		Array.from(root.querySelectorAll<HTMLButtonElement>("button")).find(
 			(node) => node.textContent?.trim() === text,
 		);
+	const setCapture = (label: string, value: string) => {
+		const select = document.querySelector<HTMLSelectElement>(
+			`select[aria-label="${label}"]`,
+		);
+		if (!select) throw new Error(`${label}不存在`);
+		select.value = value;
+		select.dispatchEvent(new Event("change", { bubbles: true }));
+	};
+	let originalCapture:
+		| ReturnType<typeof parseMobileCaptureSettings>
+		| undefined;
 	try {
 		await stage("initializing");
 		(await waitFor(() => button("录屏"))).click();
 		(await waitFor(() => button("手机与平板"))).click();
+		await waitFor(() =>
+			document.querySelector('select[aria-label="设备录制方向"]'),
+		);
+		originalCapture = parseMobileCaptureSettings(
+			localStorage.getItem("jianku.mobile.captureSettings") ??
+				JSON.stringify(mobileCaptureDefaults),
+		);
+		setCapture("设备录制尺寸", "1280");
+		setCapture("设备录制帧率", "30");
+		setCapture("设备录制画质", "8");
+		setCapture("设备录制方向", "rotate90");
+		const stored = parseMobileCaptureSettings(
+			localStorage.getItem("jianku.mobile.captureSettings") ?? "{}",
+		);
+		if (
+			stored.maxSize !== 1280 ||
+			stored.maxFps !== 30 ||
+			stored.bitRateMbps !== 8 ||
+			stored.orientation !== "rotate90"
+		)
+			throw new Error("设备录制选项没有保存");
+		metrics.captureSettingsSaved = stored;
+		button("电脑屏幕")?.click();
+		button("手机与平板")?.click();
+		await waitFor(() =>
+			document.querySelector('select[aria-label="设备录制方向"]'),
+		);
+		if (
+			document.querySelector<HTMLSelectElement>(
+				'select[aria-label="设备录制方向"]',
+			)?.value !== "rotate90"
+		)
+			throw new Error("切换来源丢失方向设置");
+		metrics.captureSettingsRetained = true;
 		const project = (await commands.listMobileProjects()).find(
 			(project) => project.name === "简库恢复合成验证",
 		);
@@ -102,5 +151,15 @@ export async function runMobileRecoverySmoke() {
 		metrics.ok = false;
 		metrics.error = String(error);
 		await stage("failed");
+	} finally {
+		if (originalCapture) {
+			await waitFor(() =>
+				document.querySelector('select[aria-label="设备录制方向"]'),
+			);
+			setCapture("设备录制尺寸", String(originalCapture.maxSize));
+			setCapture("设备录制帧率", String(originalCapture.maxFps));
+			setCapture("设备录制画质", String(originalCapture.bitRateMbps));
+			setCapture("设备录制方向", originalCapture.orientation);
+		}
 	}
 }

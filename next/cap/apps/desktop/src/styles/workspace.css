@@ -637,6 +637,26 @@
 	gap: 20px;
 	padding-top: 16px;
 }
+.mobile-capture-settings {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 14px;
+	margin-top: 16px;
+}
+.mobile-capture-settings label {
+	min-width: 0;
+}
+.mobile-capture-settings select {
+	margin: 8px 0 0;
+	padding: 9px;
+	font-size: 12px;
+}
+.mobile-capture-note {
+	margin-top: 10px;
+	font-size: 12px;
+	line-height: 1.6;
+	color: var(--studio-muted);
+}
 .mobile-toggle strong {
 	display: block;
 	font-weight: 550;
@@ -752,6 +772,9 @@
 	flex-shrink: 0;
 }
 @media (max-width: 700px) {
+	.mobile-capture-settings {
+		grid-template-columns: 1fr;
+	}
 	.mobile-history-row {
 		align-items: flex-start;
 		flex-direction: column;

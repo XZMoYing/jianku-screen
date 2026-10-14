@@ -18,7 +18,9 @@ use tokio::{
     sync::watch,
 };
 
+mod options;
 pub(crate) mod projects;
+use options::MobileCaptureSettings;
 
 #[derive(Default)]
 pub struct CaptureStartGate(pub tokio::sync::Mutex<()>);
@@ -81,6 +83,8 @@ pub struct MobileRecordingOptions {
     pub device_id: String,
     pub audio: bool,
     pub preview: bool,
+    #[serde(default)]
+    pub capture: MobileCaptureSettings,
 }
 
 struct Session {
@@ -480,13 +484,8 @@ fn recording_command(
             let mut command = Command::new(tool("scrcpy").ok_or("本机未安装 scrcpy")?);
             command
                 .env("ADB", adb)
-                .args([
-                    "--serial",
-                    &device.id,
-                    "--video-codec=h264",
-                    "--video-bit-rate=16M",
-                    "--max-fps=60",
-                ])
+                .args(["--serial", &device.id, "--video-codec=h264"])
+                .args(options.capture.scrcpy_args()?)
                 .arg(format!("--record={}", source.display()));
             if options.audio && device.audio_supported {
                 command.args(["--audio-codec=aac", "--no-audio-playback"]);
@@ -567,6 +566,41 @@ async fn interrupt(
     Ok(())
 }
 
+#[cfg(target_os = "macos")]
+fn streaming_stdout() -> Result<(Stdio, tokio::fs::File), String> {
+    use std::os::fd::FromRawFd;
+    let mut master = -1;
+    let mut slave = -1;
+    // scrcpy buffers stdout when piped on macOS; a PTY makes its start event arrive even on a static screen.
+    if unsafe {
+        nix::libc::openpty(
+            &mut master,
+            &mut slave,
+            std::ptr::null_mut(),
+            std::ptr::null_mut(),
+            std::ptr::null_mut(),
+        )
+    } != 0
+    {
+        return Err(std::io::Error::last_os_error().to_string());
+    }
+    let master = unsafe { std::fs::File::from_raw_fd(master) };
+    let slave = unsafe { std::fs::File::from_raw_fd(slave) };
+    use std::os::fd::AsRawFd;
+    for file in [&master, &slave] {
+        if unsafe { nix::libc::fcntl(file.as_raw_fd(), nix::libc::F_SETFD, nix::libc::FD_CLOEXEC) }
+            < 0
+        {
+            return Err(std::io::Error::last_os_error().to_string());
+        }
+    }
+    Ok((Stdio::from(slave), tokio::fs::File::from_std(master)))
+}
+
+fn startup_expired(phase: &MobilePhase, elapsed: Duration) -> bool {
+    *phase == MobilePhase::Starting && elapsed > Duration::from_secs(25)
+}
+
 async fn capture(
     mut command: Command,
     platform: MobilePlatform,
@@ -579,14 +613,32 @@ async fn capture(
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
+    #[cfg(target_os = "macos")]
+    let terminal_stdout = if platform == MobilePlatform::Android {
+        let (stdout, reader) = streaming_stdout()?;
+        command.stdout(stdout);
+        Some(reader)
+    } else {
+        None
+    };
     let mut child = command
         .spawn()
         .map_err(|error| format!("设备录制启动失败：{error}"))?;
+    drop(command);
     let mut stdin = child.stdin.take();
     let stdout_task = child
         .stdout
         .take()
         .map(|reader| tokio::spawn(drain(reader, status.clone(), device_id.clone())));
+    #[cfg(target_os = "macos")]
+    let stdout_task = match terminal_stdout {
+        Some(reader) => Some(tokio::spawn(drain(
+            reader,
+            status.clone(),
+            device_id.clone(),
+        ))),
+        None => stdout_task,
+    };
     let stderr_task = child
         .stderr
         .take()
@@ -617,7 +669,7 @@ async fn capture(
                 if source.metadata().is_ok_and(|meta| meta.len() > 128) {
                     let mut state = status.lock().unwrap();
                     if state.phase == MobilePhase::Starting { state.phase = MobilePhase::Recording; }
-                } else if startup.elapsed() > Duration::from_secs(25) {
+                } else if startup_expired(&status.lock().unwrap().phase, startup.elapsed()) {
                     let _ = interrupt(&mut child, &mut stdin, platform).await;
                     let _ = tokio::time::timeout(Duration::from_secs(5), child.wait()).await;
                     break Err("设备未传来画面，请解锁设备并检查 USB 授权。".into());
@@ -663,6 +715,9 @@ pub async fn start_mobile_recording(
     }
     if crate::EditorRecordingTarget::current(&app).is_some() {
         return Err("请先退出为已有工程录制片段的流程。".into());
+    }
+    if options.platform == MobilePlatform::Android {
+        options.capture.validate()?;
     }
     let setup = get_mobile_setup().await?;
     let device = setup
@@ -727,7 +782,8 @@ pub async fn start_mobile_recording(
     .save_for_project()
     .map_err(|error| error.to_string())?;
     let command = recording_command(&device, &options, &project.join(source))?;
-    std::fs::write(project.join("mobile-source.json"), serde_json::to_vec_pretty(&serde_json::json!({"platform":device.platform, "deviceName":device.name, "touchEventsAvailable":false, "source":source})).map_err(|error| error.to_string())?).map_err(|error| error.to_string())?;
+    let capture_settings = (device.platform == MobilePlatform::Android).then_some(options.capture);
+    std::fs::write(project.join("mobile-source.json"), serde_json::to_vec_pretty(&serde_json::json!({"platform":device.platform, "deviceName":device.name, "touchEventsAvailable":false, "source":source, "capture": capture_settings})).map_err(|error| error.to_string())?).map_err(|error| error.to_string())?;
     let initial = MobileStatus {
         phase: MobilePhase::Starting,
         active: true,
@@ -974,6 +1030,60 @@ mod tests {
             Some("ERROR: 设备 disconnected")
         );
     }
+
+    #[test]
+    fn startup_deadline_does_not_stop_a_confirmed_static_recording() {
+        let elapsed = Duration::from_secs(30);
+        assert!(startup_expired(&MobilePhase::Starting, elapsed));
+        assert!(!startup_expired(&MobilePhase::Recording, elapsed));
+        assert!(!startup_expired(&MobilePhase::Finalizing, elapsed));
+    }
+
+    #[cfg(target_os = "macos")]
+    #[tokio::test]
+    async fn recorder_start_message_is_received_before_buffered_process_exits() {
+        let root = tempfile::tempdir().unwrap();
+        let c = root.path().join("stdout.c");
+        let binary = root.path().join("stdout-fixture");
+        std::fs::write(&c, b"#include <stdio.h>\n#include <unistd.h>\nint main(void) { printf(\"INFO: Recording started to mp4 file: fixture\\n\"); sleep(10); return 0; }\n").unwrap();
+        assert!(
+            std::process::Command::new("/usr/bin/clang")
+                .arg(&c)
+                .arg("-o")
+                .arg(&binary)
+                .status()
+                .unwrap()
+                .success()
+        );
+        let (stop, receiver) = watch::channel(false);
+        let status = Arc::new(Mutex::new(MobileStatus {
+            phase: MobilePhase::Starting,
+            active: true,
+            ..Default::default()
+        }));
+        let worker_status = status.clone();
+        let worker_source = root.path().join("buffered.mp4");
+        let worker = tokio::spawn(async move {
+            capture(
+                Command::new(binary),
+                MobilePlatform::Android,
+                &worker_source,
+                receiver,
+                worker_status,
+                "fixture".into(),
+            )
+            .await
+        });
+        tokio::time::timeout(Duration::from_secs(3), async {
+            while status.lock().unwrap().phase != MobilePhase::Recording {
+                tokio::time::sleep(Duration::from_millis(10)).await;
+            }
+        })
+        .await
+        .unwrap();
+        stop.send_replace(true);
+        assert!(worker.await.unwrap().is_err());
+    }
 }
 
 #[cfg(debug_assertions)]
@@ -990,7 +1100,8 @@ pub fn run_smoke(app: AppHandle) {
         let result = async {
             let setup = get_mobile_setup().await?;
             let device = setup.devices.into_iter().find(|device| device.authorized && device.platform == MobilePlatform::Android).ok_or("No authorized Android device connected")?;
-            let initial = start_mobile_recording(app.clone(), MobileRecordingOptions { platform: device.platform, device_id: device.id, audio: false, preview: false }).await?;
+            let capture = std::env::var("JIANKU_MOBILE_SMOKE_SETTINGS").ok().map(|value| serde_json::from_str::<MobileCaptureSettings>(&value)).transpose().map_err(|error| error.to_string())?.unwrap_or_default();
+            let initial = start_mobile_recording(app.clone(), MobileRecordingOptions { platform: device.platform, device_id: device.id, audio: false, preview: false, capture }).await?;
             tokio::time::timeout(Duration::from_secs(30), async {
                 loop {
                     let status = get_mobile_status(app.clone());
@@ -1015,7 +1126,8 @@ pub fn run_smoke(app: AppHandle) {
                 "complete": matches!(meta.inner, RecordingMetaInner::Studio(ref studio) if matches!(studio.status(), StudioRecordingStatus::Complete)),
                 "started":initial.active, "stopped":!active(&app),
                 "editorOpened":app.webview_windows().keys().any(|label| label.starts_with("editor")),
-                "deviceSerialSaved":false, "userFramesSavedInRepository":false
+                "deviceSerialSaved":false, "userFramesSavedInRepository":false,
+                "requestedCapture":capture
             }))
         }.await;
         let value = match result {

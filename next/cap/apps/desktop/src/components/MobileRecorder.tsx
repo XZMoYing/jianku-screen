@@ -1,3 +1,4 @@
+import { makePersisted } from "@solid-primitives/storage";
 import { revealItemInDir } from "@tauri-apps/plugin-opener";
 import {
 	createEffect,
@@ -9,7 +10,17 @@ import {
 	Show,
 } from "solid-js";
 import toast from "solid-toast";
-import { commands, type MobileStatus } from "~/utils/tauri";
+import {
+	mobileCaptureDefaults,
+	mobileOrientationOptions,
+	mobileSizeOptions,
+	parseMobileCaptureSettings,
+} from "~/utils/mobile-capture-settings";
+import {
+	commands,
+	type MobileCaptureSettings,
+	type MobileStatus,
+} from "~/utils/tauri";
 import IconRefresh from "~icons/lucide/refresh-cw";
 import IconSmartphone from "~icons/lucide/smartphone";
 import IconSquare from "~icons/lucide/square";
@@ -26,6 +37,13 @@ export default function MobileRecorder(props: {
 	const [selection, setSelection] = createSignal("");
 	const [audio, setAudio] = createSignal(true);
 	const [preview, setPreview] = createSignal(true);
+	const [captureSettings, setCaptureSettings] = makePersisted(
+		createSignal<MobileCaptureSettings>({ ...mobileCaptureDefaults }),
+		{
+			name: "jianku.mobile.captureSettings",
+			deserialize: parseMobileCaptureSettings,
+		},
+	);
 	const [status, setStatus] = createSignal<MobileStatus>();
 	const [busy, setBusy] = createSignal(false);
 	const [error, setError] = createSignal("");
@@ -95,6 +113,7 @@ export default function MobileRecorder(props: {
 					platform: device.platform,
 					audio: audio() && device.audioSupported,
 					preview: preview(),
+					capture: captureSettings(),
 				}),
 			);
 		} catch (error) {
@@ -197,13 +216,117 @@ export default function MobileRecorder(props: {
 						已识别 MI 6，使用专用连接兼容；手机应用与网络设置保持运行。
 					</p>
 				</Show>
+				<Show when={selected()?.platform === "android"}>
+					<div
+						class="mobile-capture-settings"
+						data-testid="mobile-capture-settings"
+					>
+						<label>
+							<span>录制尺寸</span>
+							<select
+								aria-label="设备录制尺寸"
+								value={captureSettings().maxSize}
+								disabled={status()?.active || busy()}
+								onChange={(event) =>
+									setCaptureSettings((settings) => ({
+										...settings,
+										maxSize: Number(event.currentTarget.value),
+									}))
+								}
+							>
+								<For each={mobileSizeOptions}>
+									{(option) => (
+										<option
+											value={option.value}
+											selected={captureSettings().maxSize === option.value}
+										>
+											{option.label}
+										</option>
+									)}
+								</For>
+							</select>
+						</label>
+						<label>
+							<span>帧率上限</span>
+							<select
+								aria-label="设备录制帧率"
+								value={captureSettings().maxFps}
+								disabled={status()?.active || busy()}
+								onChange={(event) =>
+									setCaptureSettings((settings) => ({
+										...settings,
+										maxFps: Number(event.currentTarget.value),
+									}))
+								}
+							>
+								<option value={30}>最高 30 fps</option>
+								<option value={60}>最高 60 fps</option>
+							</select>
+						</label>
+						<label>
+							<span>编码画质</span>
+							<select
+								aria-label="设备录制画质"
+								value={captureSettings().bitRateMbps}
+								disabled={status()?.active || busy()}
+								onChange={(event) =>
+									setCaptureSettings((settings) => ({
+										...settings,
+										bitRateMbps: Number(event.currentTarget.value),
+									}))
+								}
+							>
+								<option value={8}>标准 · 8 Mbps</option>
+								<option value={16}>高画质 · 16 Mbps</option>
+								<option value={32}>更高画质 · 32 Mbps</option>
+							</select>
+						</label>
+						<label>
+							<span>画面方向</span>
+							<select
+								aria-label="设备录制方向"
+								value={captureSettings().orientation}
+								disabled={status()?.active || busy()}
+								onChange={(event) => {
+									const orientation = mobileOrientationOptions.find(
+										(option) => option.value === event.currentTarget.value,
+									)?.value;
+									if (orientation)
+										setCaptureSettings((settings) => ({
+											...settings,
+											orientation,
+										}));
+								}}
+							>
+								<For each={mobileOrientationOptions}>
+									{(option) => (
+										<option
+											value={option.value}
+											selected={captureSettings().orientation === option.value}
+										>
+											{option.label}
+										</option>
+									)}
+								</For>
+							</select>
+						</label>
+					</div>
+					<p class="mobile-capture-note">
+						按设备比例录制，不放大低分辨率来源。实际帧率由设备与画面变化决定。
+					</p>
+					<p class="mobile-capture-note">
+						画面方向在录制期间保持不变，设备仍可正常旋转。需要换画幅时，可停止后重新开始。
+					</p>
+				</Show>
 				<label class="mobile-toggle">
 					<span>
 						<strong>设备声音</strong>
 						<small>
 							{selected()?.audioSupported
 								? "录制设备播放的声音"
-								: "安卓声音录制需 Android 11 或更新版本；应用也可限制录音。"}
+								: selected()?.platform === "ios"
+									? "这台设备暂未提供可录制的声音。"
+									: "安卓声音录制需 Android 11 或更新版本；应用也可限制录音。"}
 						</small>
 					</span>
 					<input
