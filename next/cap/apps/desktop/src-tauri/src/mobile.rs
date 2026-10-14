@@ -18,6 +18,8 @@ use tokio::{
     sync::watch,
 };
 
+pub(crate) mod projects;
+
 #[derive(Default)]
 pub struct CaptureStartGate(pub tokio::sync::Mutex<()>);
 
@@ -357,30 +359,114 @@ fn finalize_project(project: &Path, source: &str, name: &str) -> Result<(), Stri
     };
     let has_audio = input.streams().best(ffmpeg::media::Type::Audio).is_some();
     drop(input);
-    let mut config = crate::recording::default_project_config();
-    config.cursor.hide = true;
-    config.camera.hide = true;
-    let short_edge = size.0.min(size.1).max(1);
-    let aspect = f64::from(size.0.max(size.1)) / f64::from(short_edge);
-    config.background.frame = Some(cap_project::FrameConfiguration {
-        style: if aspect >= 1.7 {
-            cap_project::FrameStyle::Phone
-        } else {
-            cap_project::FrameStyle::Tablet
-        },
-        ..Default::default()
-    });
-    config.write(project).map_err(|error| error.to_string())?;
-    project_meta(
-        project,
-        source,
-        name,
-        fps,
-        has_audio,
-        StudioRecordingStatus::Complete,
-    )
-    .save_for_project()
-    .map_err(|error| error.to_string())
+    let mut meta = if project.join("recording-meta.json").exists() {
+        RecordingMeta::load_for_project(project).map_err(|error| error.to_string())?
+    } else {
+        project_meta(
+            project,
+            source,
+            name,
+            fps,
+            has_audio,
+            StudioRecordingStatus::InProgress,
+        )
+    };
+    let RecordingMetaInner::Studio(studio) = &mut meta.inner else {
+        return Err("设备工程结构不受支持，原文件未修改。".into());
+    };
+    let StudioRecordingMeta::MultipleSegments { inner } = studio.as_mut() else {
+        return Err("设备工程结构不受支持，原文件未修改。".into());
+    };
+    if inner.segments.len() != 1 || inner.segments[0].display.path.as_str() != source {
+        return Err("设备工程的媒体片段不匹配，原文件未修改。".into());
+    }
+    let config_path = project.join("project-config.json");
+    if config_path.exists() {
+        let config: cap_project::ProjectConfiguration =
+            serde_json::from_slice(&std::fs::read(config_path).map_err(|error| error.to_string())?)
+                .map_err(|error| format!("已有编辑设置无法读取，文件已保留：{error}"))?;
+        config.validate().map_err(|error| error.to_string())?;
+    } else {
+        let mut config = crate::recording::default_project_config();
+        config.cursor.hide = true;
+        config.camera.hide = true;
+        let short_edge = size.0.min(size.1).max(1);
+        let aspect = f64::from(size.0.max(size.1)) / f64::from(short_edge);
+        config.background.frame = Some(cap_project::FrameConfiguration {
+            style: if aspect >= 1.7 {
+                cap_project::FrameStyle::Phone
+            } else {
+                cap_project::FrameStyle::Tablet
+            },
+            ..Default::default()
+        });
+        config.write(project).map_err(|error| error.to_string())?;
+    }
+    inner.segments[0].display.fps = fps;
+    if has_audio && inner.segments[0].system_audio.is_none() {
+        inner.segments[0].system_audio = Some(AudioMeta {
+            path: RelativePathBuf::from(source),
+            start_time: Some(0.0),
+            device_id: None,
+            gap_summary: None,
+        });
+    }
+    inner.status = Some(StudioRecordingStatus::Complete);
+    meta.save_for_project().map_err(|error| error.to_string())
+}
+
+fn finalize_capture(
+    project: &Path,
+    source: &str,
+    name: &str,
+    capture_result: Result<(), String>,
+) -> Result<Option<String>, String> {
+    match finalize_project(project, source, name) {
+        Ok(()) => Ok(capture_result.err().map(|reason| {
+            format!("录制提前结束，已保存收到的可用画面。请在编辑器检查结尾。原因：{reason}")
+        })),
+        Err(error) => Err(match capture_result {
+            Ok(()) => error,
+            Err(reason) => format!("{reason} {error}"),
+        }),
+    }
+}
+
+fn capture_exit_status(status: std::process::ExitStatus) -> Result<(), String> {
+    if status.success() {
+        Ok(())
+    } else {
+        Err(format!(
+            "设备录制进程异常退出（{status}），正在检查已收到的画面。"
+        ))
+    }
+}
+
+async fn publish_saved_project(app: &AppHandle, project: &Path, source: &str) -> Option<String> {
+    if let Err(error) = crate::project_files::remember_project(app, project.to_path_buf()) {
+        tracing::warn!(%error, "Mobile project could not be added to local history");
+    }
+    let screenshot = project.join("screenshots/display.jpg");
+    if !screenshot.exists() {
+        if let Some(parent) = screenshot.parent() {
+            let _ = std::fs::create_dir_all(parent);
+        }
+        let _ = crate::create_screenshot(project.join(source), screenshot, None).await;
+    }
+    let _ = crate::NewStudioRecordingAdded {
+        path: project.to_path_buf(),
+    }
+    .emit(app);
+    if !crate::app_is_exiting(app)
+        && let Err(error) = (crate::windows::ShowCapWindow::Editor {
+            project_path: project.to_path_buf(),
+        })
+        .show(app)
+        .await
+    {
+        return Some(format!("工程已保存，可从录制库打开。{error}"));
+    }
+    None
 }
 
 fn recording_command(
@@ -519,13 +605,13 @@ async fn capture(
         if requested_stop {
             let result = tokio::time::timeout(Duration::from_secs(20), child.wait()).await;
             break match result {
-                Ok(Ok(_)) => Ok(()),
+                Ok(Ok(status)) => capture_exit_status(status),
                 Ok(Err(error)) => Err(error.to_string()),
                 Err(_) => Err("设备保存超时，原始文件已保留。".into()),
             };
         }
         tokio::select! {
-            result = child.wait() => { break result.map(|_| ()).map_err(|error| error.to_string()); }
+            result = child.wait() => { break result.map_err(|error| error.to_string()).and_then(capture_exit_status); }
             changed = stop.changed() => { if changed.is_err() { stop.mark_changed(); requested_stop = true; let _ = interrupt(&mut child, &mut stdin, platform).await; } }
             _ = interval.tick() => {
                 if source.metadata().is_ok_and(|meta| meta.len() > 128) {
@@ -673,37 +759,26 @@ pub async fn start_mobile_recording(
         )
         .await;
         status.lock().unwrap().phase = MobilePhase::Finalizing;
-        let result = if result.is_ok() {
+        let result = {
             let project = project.clone();
             let name = name.clone();
-            tokio::task::spawn_blocking(move || finalize_project(&project, source, &name))
+            tokio::task::spawn_blocking(move || finalize_capture(&project, source, &name, result))
                 .await
                 .map_err(|error| error.to_string())
                 .and_then(|value| value)
-        } else {
-            result
         };
         match &result {
-            Ok(()) => {
-                let _ = crate::project_files::remember_project(&app, project.clone());
-                let screenshot = project.join("screenshots/display.jpg");
-                if let Some(parent) = screenshot.parent() {
-                    let _ = std::fs::create_dir_all(parent);
-                }
-                let _ = crate::create_screenshot(project.join(source), screenshot, None).await;
-                let _ = crate::NewStudioRecordingAdded {
-                    path: project.clone(),
-                }
-                .emit(&app);
-                if !crate::app_is_exiting(&app)
-                    && let Err(error) = (crate::windows::ShowCapWindow::Editor {
-                        project_path: project.clone(),
-                    })
-                    .show(&app)
-                    .await
-                {
-                    status.lock().unwrap().notice =
-                        Some(format!("工程已保存，可从录制库打开。{error}"));
+            Ok(notice) => {
+                let open_notice = publish_saved_project(&app, &project, source).await;
+                if notice.is_some() || open_notice.is_some() {
+                    status.lock().unwrap().notice = Some(
+                        notice
+                            .iter()
+                            .chain(open_notice.iter())
+                            .cloned()
+                            .collect::<Vec<_>>()
+                            .join(" "),
+                    );
                 }
             }
             Err(error) => {
@@ -732,7 +807,7 @@ pub async fn start_mobile_recording(
             status.error = result.as_ref().err().cloned();
         }
         let _ = app.emit("mobile-recording-active", false);
-        done.send_replace(Some(result.map(|()| project)));
+        done.send_replace(Some(result.map(|_| project)));
     });
     Ok(initial)
 }
@@ -871,6 +946,33 @@ mod tests {
         stop.send_replace(true);
         worker.await.unwrap().unwrap();
         assert_eq!(std::fs::read(&source).unwrap(), b"startedflushed");
+    }
+
+    #[tokio::test]
+    async fn nonzero_capture_exit_is_reported_with_device_diagnostics() {
+        let root = tempfile::tempdir().unwrap();
+        let mut command = Command::new("/bin/sh");
+        command.args([
+            "-c",
+            "printf 'ERROR: fixture-serial disconnected\\n' >&2; exit 7",
+        ]);
+        let (_stop, receiver) = watch::channel(false);
+        let status = Arc::new(Mutex::new(MobileStatus::default()));
+        let error = capture(
+            command,
+            MobilePlatform::Android,
+            &root.path().join("source.mp4"),
+            receiver,
+            status.clone(),
+            "fixture-serial".into(),
+        )
+        .await
+        .unwrap_err();
+        assert!(error.contains("7"));
+        assert_eq!(
+            status.lock().unwrap().notice.as_deref(),
+            Some("ERROR: 设备 disconnected")
+        );
     }
 }
 

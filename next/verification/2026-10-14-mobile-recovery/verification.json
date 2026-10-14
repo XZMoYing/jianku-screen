@@ -1,0 +1,71 @@
+{
+	"date": "2026-10-14",
+	"version": "0.2.0-alpha.12",
+	"checks": {
+		"mobileTestsPassed": 9,
+		"bindingGeneratorTestsPassed": 1,
+		"nativeCompilation": true,
+		"desktopTypeScript": true,
+		"scopedBiome": true,
+		"strictBundleSignature": true,
+		"sourceVideoBytesPreserved": true,
+		"existingTimelineBytesPreserved": true,
+		"savedTitlePreserved": true,
+		"editorFrameDelivered": true
+	},
+	"uiRecovery": {
+		"deviceCaptureStarted": false,
+		"editorOpened": true,
+		"editorRecoveryCommandSupportsMobile": true,
+		"initialPhase": "failed",
+		"listUpdated": true,
+		"narrowWindow": {
+			"clientHeight": 259,
+			"historyWidth": 610,
+			"scrollHeight": 1015,
+			"scrollTop": 756,
+			"windowWidth": 660
+		},
+		"ok": true,
+		"recoveredViaUi": true,
+		"stage": "complete",
+		"synthetic": true
+	},
+	"uiRestart": {
+		"deviceCaptureStarted": false,
+		"editorOpened": true,
+		"editorRecoveryCommandSupportsMobile": true,
+		"initialPhase": "complete",
+		"listUpdated": true,
+		"narrowWindow": {
+			"clientHeight": 259,
+			"historyWidth": 610,
+			"scrollHeight": 1015,
+			"scrollTop": 756,
+			"windowWidth": 660
+		},
+		"ok": true,
+		"reopenedAfterRestart": true,
+		"stage": "complete",
+		"synthetic": true
+	},
+	"syntheticMediaOnly": true,
+	"realDeviceFramesInRepository": false,
+	"deviceRecordingOrNetworkMutationPerformed": false,
+	"trialFolder": "Jianku Screen Next Builds/0.2.0-alpha.12/",
+	"pending": [
+		"Physical unplug, lock screen and iPad capture",
+		"Storage-full and external-drive failure",
+		"Forced termination and containers missing indexes",
+		"Long recording and quit/recovery races",
+		"Orientation changes and real touch capture",
+		"Every reference animation comparison"
+	],
+	"normalTrialOpened": true,
+	"mainWindowObserved": {
+		"Height": 740,
+		"Width": 860,
+		"X": 376,
+		"Y": 123
+	}
+}

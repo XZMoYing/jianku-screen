@@ -6837,6 +6837,8 @@ fn specta_builder() -> tauri_specta::Builder {
             get_editor_project_path,
             mobile::get_mobile_setup,
             mobile::get_mobile_status,
+            mobile::projects::list_mobile_projects,
+            mobile::projects::recover_mobile_project,
             mobile::start_mobile_recording,
             mobile::stop_mobile_recording,
             presentation::show_presentation,
@@ -7456,6 +7458,14 @@ pub async fn run(recording_logging_handle: LoggingHandle, logs_dir: PathBuf) {
                 app.listen_any("jianku-workspace-smoke-result", move |event| {
                     if let Err(error) = std::fs::write(&path, event.payload()) {
                         tracing::warn!(%error, "Could not save workspace validation metrics");
+                    }
+                });
+            }
+            #[cfg(debug_assertions)]
+            if let Some(path) = std::env::var_os("JIANKU_MOBILE_RECOVERY_SMOKE_OUTPUT") {
+                app.listen_any("jianku-mobile-recovery-smoke-result", move |event| {
+                    if let Err(error) = std::fs::write(&path, event.payload()) {
+                        tracing::warn!(%error, "Could not save mobile recovery validation metrics");
                     }
                 });
             }

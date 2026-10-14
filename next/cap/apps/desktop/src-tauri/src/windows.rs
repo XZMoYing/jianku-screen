@@ -1958,11 +1958,14 @@ impl ShowCapWindow {
                         window.__CAP__ = window.__CAP__ ?? {{}};
                         window.__CAP__.initialTargetMode = {};
                         window.__CAP__.workspaceSmoke = {};
+                        window.__CAP__.mobileRecoverySmoke = {};
                     ",
                         serde_json::to_string(init_target_mode)
                             .expect("Failed to serialize initial target mode"),
                         cfg!(debug_assertions)
-                            && std::env::var_os("JIANKU_WORKSPACE_SMOKE_OUTPUT").is_some()
+                            && std::env::var_os("JIANKU_WORKSPACE_SMOKE_OUTPUT").is_some(),
+                        cfg!(debug_assertions)
+                            && std::env::var_os("JIANKU_MOBILE_RECOVERY_SMOKE_OUTPUT").is_some()
                     ))
                     .build()?;
                 lock_window_text_scale(&window);

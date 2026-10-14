@@ -29,6 +29,19 @@ export default function MobileRecorder(props: {
 	const [status, setStatus] = createSignal<MobileStatus>();
 	const [busy, setBusy] = createSignal(false);
 	const [error, setError] = createSignal("");
+	const [allProjects, setAllProjects] = createSignal(false);
+	const historyKey = createMemo(() =>
+		props.visible
+			? `${status()?.phase ?? "idle"}:${status()?.projectPath ?? ""}`
+			: false,
+	);
+	const [projects, { refetch: refreshProjects }] = createResource(
+		historyKey,
+		() => commands.listMobileProjects(),
+	);
+	const visibleProjects = createMemo(() =>
+		allProjects() ? projects() : projects()?.slice(0, 8),
+	);
 	let disposed = false;
 	let polling = false;
 	const selected = createMemo(() =>
@@ -94,6 +107,7 @@ export default function MobileRecorder(props: {
 	const stop = async () => {
 		if (busy()) return;
 		setBusy(true);
+		setError("");
 		try {
 			await commands.stopMobileRecording();
 			await refresh();
@@ -104,6 +118,24 @@ export default function MobileRecorder(props: {
 			setBusy(false);
 		}
 	};
+	const recover = async (path: string) => {
+		if (busy() || status()?.active || props.blocked) return;
+		setBusy(true);
+		setError("");
+		try {
+			await commands.recoverMobileProject(path);
+			await refresh();
+			await refreshProjects();
+			toast.success("工程已恢复，原始视频已保留");
+		} catch (error) {
+			setError(String(error));
+			toast.error(String(error));
+		} finally {
+			setBusy(false);
+		}
+	};
+	const reveal = (path: string) =>
+		void revealItemInDir(path).catch((error) => toast.error(String(error)));
 	const time = () => {
 		const seconds = Math.floor(status()?.elapsedSeconds ?? 0);
 		return `${Math.floor(seconds / 60)
@@ -268,10 +300,7 @@ export default function MobileRecorder(props: {
 					class="mobile-project-location"
 					onClick={() => {
 						const path = status()?.projectPath;
-						if (path)
-							void revealItemInDir(path).catch((error) =>
-								toast.error(String(error)),
-							);
+						if (path) reveal(path);
 					}}
 				>
 					{status()?.phase === "failed"
@@ -279,6 +308,94 @@ export default function MobileRecorder(props: {
 						: "查看工程保存位置"}
 				</button>
 			</Show>
+			<section class="mobile-history" data-testid="mobile-history">
+				<div class="mobile-history-heading">
+					<h3>最近设备录制</h3>
+					<button
+						type="button"
+						class="studio-secondary"
+						disabled={projects.loading || busy()}
+						onClick={() => void refreshProjects()}
+					>
+						<IconRefresh class="size-3.5" />
+						刷新列表
+					</button>
+				</div>
+				<Show when={projects.error}>
+					<p class="mobile-error">{String(projects.error)}</p>
+				</Show>
+				<Show
+					when={projects()?.length}
+					fallback={
+						<p class="mobile-history-empty">
+							{projects.loading
+								? "正在读取录制…"
+								: "设备录制会保存在这里，重启后也能继续编辑。"}
+						</p>
+					}
+				>
+					<For each={visibleProjects()}>
+						{(project) => (
+							<div class="mobile-history-row" data-project-path={project.path}>
+								<div class="mobile-history-name">
+									<strong title={project.name}>{project.name}</strong>
+									<small>
+										{project.phase === "complete"
+											? "已保存"
+											: project.phase === "recording"
+												? "录制或保存中"
+												: project.hasSource
+													? "待恢复 · 原始视频已保留"
+													: "原始视频缺失"}
+									</small>
+								</div>
+								<div class="mobile-history-actions">
+									<button
+										type="button"
+										class="studio-secondary"
+										disabled={
+											busy() ||
+											props.blocked ||
+											status()?.active ||
+											project.phase === "recording" ||
+											!project.hasSource
+										}
+										onClick={() => {
+											if (project.phase === "complete") {
+												void commands
+													.openLocalProject(project.path)
+													.catch((error) => toast.error(String(error)));
+											} else {
+												void recover(project.path);
+											}
+										}}
+									>
+										{project.phase === "complete" ? "继续编辑" : "恢复并编辑"}
+									</button>
+									<button
+										type="button"
+										class="mobile-project-location"
+										onClick={() => reveal(project.path)}
+									>
+										定位
+									</button>
+								</div>
+							</div>
+						)}
+					</For>
+				</Show>
+				<Show when={(projects()?.length ?? 0) > 8}>
+					<button
+						type="button"
+						class="mobile-project-location mt-4"
+						onClick={() => setAllProjects(!allProjects())}
+					>
+						{allProjects()
+							? "收起列表"
+							: `显示全部 ${projects()?.length} 条设备录制`}
+					</button>
+				</Show>
+			</section>
 			<div class="mobile-connection-guide">
 				<p>
 					<strong>iPhone / iPad</strong>连接

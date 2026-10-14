@@ -141,6 +141,12 @@ pub async fn get_recording_recovery_success(
 #[tauri::command]
 #[specta::specta]
 pub async fn recover_recording(app: AppHandle, project_path: String) -> Result<String, String> {
+    let path = PathBuf::from(&project_path);
+    if path.join("mobile-source.json").is_file() {
+        return crate::mobile::projects::recover_mobile_project(app, path)
+            .await
+            .map(|path| path.to_string_lossy().into_owned());
+    }
     let project = crate::FinalizationProject::admit(PathBuf::from(&project_path)).await?;
     let token = app
         .state::<crate::FinalizingRecordings>()

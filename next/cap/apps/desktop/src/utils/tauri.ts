@@ -247,6 +247,12 @@ async getMobileSetup() : Promise<MobileSetup> {
 async getMobileStatus() : Promise<MobileStatus> {
     return await TAURI_INVOKE("get_mobile_status");
 },
+async listMobileProjects() : Promise<MobileProject[]> {
+    return await TAURI_INVOKE("list_mobile_projects");
+},
+async recoverMobileProject(path: string) : Promise<string> {
+    return await TAURI_INVOKE("recover_mobile_project", { path });
+},
 async startMobileRecording(options: MobileRecordingOptions) : Promise<MobileStatus> {
     return await TAURI_INVOKE("start_mobile_recording", { options });
 },
@@ -1202,6 +1208,7 @@ export type MicrophoneInfo = { name: string; sampleRate: number; channels: numbe
 export type MobileDevice = { id: string; name: string; platform: MobilePlatform; authorized: boolean; audioSupported: boolean; mi6Compatibility: boolean }
 export type MobilePhase = "idle" | "starting" | "recording" | "finalizing" | "complete" | "failed"
 export type MobilePlatform = "android" | "ios"
+export type MobileProject = { path: string; name: string; phase: MobilePhase; hasSource: boolean }
 export type MobileRecordingOptions = { platform: MobilePlatform; deviceId: string; audio: boolean; preview: boolean }
 export type MobileSetup = { devices: MobileDevice[]; androidReady: boolean; iosReady: boolean; warnings: string[] }
 export type MobileStatus = { phase: MobilePhase; active: boolean; elapsedSeconds: number; deviceName: string | null; projectPath: string | null; error: string | null; notice: string | null }
