@@ -284,6 +284,8 @@ pub enum FrameStyle {
     Browser,
     /// A MacBook mockup: black bezel, aluminum body and deck.
     Macbook,
+    Phone,
+    Tablet,
 }
 
 #[derive(Type, Serialize, Deserialize, Clone, Copy, Debug, Default, PartialEq, Eq)]

@@ -246,6 +246,22 @@ export default function MobileRecorder(props: {
 			<For each={setup()?.warnings}>
 				{(warning) => <p class="mobile-hint">{warning}</p>}
 			</For>
+			<Show when={status()?.phase === "complete" && status()?.projectPath}>
+				{(path) => (
+					<button
+						type="button"
+						class="studio-secondary"
+						disabled={busy() || props.blocked}
+						onClick={() =>
+							void commands
+								.openLocalProject(path())
+								.catch((error) => toast.error(String(error)))
+						}
+					>
+						继续编辑设备录制
+					</button>
+				)}
+			</Show>
 			<Show when={status()?.projectPath}>
 				<button
 					type="button"
@@ -273,8 +289,8 @@ export default function MobileRecorder(props: {
 					Mac。
 				</p>
 				<p>
-					录后可使用缩放、运镜、动态模糊和画面设置。设备原生 USB
-					画面目前没有触摸坐标，不会自动生成点击跟随镜头。
+					录后按画幅初选手机或平板外框，可在编辑器中切换或关闭。支持缩放、运镜、动态模糊和画面设置。
+					当前不支持自动跟随设备触摸，可手动添加镜头。
 				</p>
 			</div>
 		</div>

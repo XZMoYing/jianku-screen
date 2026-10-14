@@ -3150,9 +3150,9 @@ impl ProjectUniforms {
         {
             (base, box_size, base, box_size)
         } else {
-            let insets = frame_chrome::chrome_insets(style);
             let crop = Self::get_crop(options, project);
             let aspect = (crop.size.x as f64 / f64::from(crop.size.y.max(1))).max(f64::EPSILON);
+            let insets = frame_chrome::chrome_insets_for_aspect(style, aspect);
             // Insets are fractions of the content height; solve for the
             // largest content that keeps the outer card inside the box.
             let outer_w_per_h = aspect + insets.left + insets.right;
@@ -4136,7 +4136,16 @@ impl ProjectUniforms {
                         crop_bounds: [0.0, 0.0, 1.0, 1.0],
                         target_bounds: chrome_bounds,
                         target_size: chrome_size,
-                        rounding_px: if decorated { display_rounding_px } else { 0.0 },
+                        rounding_px: if decorated {
+                            display_rounding_px
+                                + frame_chrome::mobile_bezel_px(
+                                    frame.style,
+                                    f64::from(chrome_size[0]),
+                                    f64::from(chrome_size[1]),
+                                ) as f32
+                        } else {
+                            0.0
+                        },
                         rounding_type: rounding_type_value(project.background.rounding_type),
                         mirror_x: 0.0,
                         motion_blur_vector: descriptor.movement_vector_uv,
@@ -5164,6 +5173,44 @@ mod tests {
         assert_eq!(outer_delta, content_delta);
         assert_eq!(moved.outer_size, centered.outer_size);
         assert_eq!(moved.content_size, centered.content_size);
+    }
+
+    #[test]
+    fn mobile_frames_preserve_complete_content_in_portrait_and_landscape() {
+        for style in [FrameStyle::Phone, FrameStyle::Tablet] {
+            for (width, height) in [(360, 640), (640, 360), (768, 1024), (1024, 768)] {
+                let options = render_options(width, height);
+                let mut project = ProjectConfiguration::default();
+                project.background.frame = Some(FrameConfiguration {
+                    style,
+                    ..Default::default()
+                });
+                for aspect in [None, Some(AspectRatio::Wide), Some(AspectRatio::Square)] {
+                    project.aspect_ratio = aspect;
+                    let output_size =
+                        ProjectUniforms::get_output_size(&options, &project, XY::new(1920, 1080));
+                    let layout =
+                        ProjectUniforms::display_layout(&options, &project, XY::new(1920, 1080));
+                    assert!(
+                        (layout.content_size.x / layout.content_size.y
+                            - f64::from(width) / f64::from(height))
+                        .abs()
+                            < 1e-9
+                    );
+                    assert!(layout.content_offset.x > layout.outer_offset.x);
+                    assert!(layout.content_offset.y > layout.outer_offset.y);
+                    assert!(layout.outer_offset.x >= 0.0 && layout.outer_offset.y >= 0.0);
+                    assert!(
+                        layout.outer_offset.x + layout.outer_size.x
+                            <= f64::from(output_size.0) + 1e-6
+                    );
+                    assert!(
+                        layout.outer_offset.y + layout.outer_size.y
+                            <= f64::from(output_size.1) + 1e-6
+                    );
+                }
+            }
+        }
     }
 
     #[test]

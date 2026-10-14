@@ -84,7 +84,41 @@ pub fn chrome_insets(style: FrameStyle) -> ChromeInsets {
             bottom: MACBOOK_BEZEL_FRAC + MACBOOK_DECK_FRAC + MACBOOK_SHADOW_ROOM_FRAC,
             left: MACBOOK_BEZEL_FRAC + MACBOOK_OVERHANG_FRAC,
         },
+        FrameStyle::Phone | FrameStyle::Tablet => {
+            let bezel = mobile_bezel_fraction(style);
+            ChromeInsets {
+                top: bezel,
+                right: bezel,
+                bottom: bezel,
+                left: bezel,
+            }
+        }
     }
+}
+
+fn mobile_bezel_fraction(style: FrameStyle) -> f64 {
+    match style {
+        FrameStyle::Phone => 0.024,
+        FrameStyle::Tablet => 0.04,
+        _ => 0.0,
+    }
+}
+
+pub fn chrome_insets_for_aspect(style: FrameStyle, aspect: f64) -> ChromeInsets {
+    let mut insets = chrome_insets(style);
+    if mobile_bezel_fraction(style) > 0.0 {
+        let scale = aspect.clamp(f64::EPSILON, 1.0);
+        insets.top *= scale;
+        insets.right *= scale;
+        insets.bottom *= scale;
+        insets.left *= scale;
+    }
+    insets
+}
+
+pub fn mobile_bezel_px(style: FrameStyle, width: f64, height: f64) -> f64 {
+    let fraction = mobile_bezel_fraction(style);
+    width.min(height) * fraction / (1.0 + 2.0 * fraction)
 }
 
 /// Whether the shader-side shadow/border decoration applies to this style.
@@ -93,7 +127,11 @@ pub fn chrome_insets(style: FrameStyle) -> ChromeInsets {
 pub fn style_uses_card_decoration(style: FrameStyle) -> bool {
     matches!(
         style,
-        FrameStyle::MacOS | FrameStyle::Windows | FrameStyle::Browser
+        FrameStyle::MacOS
+            | FrameStyle::Windows
+            | FrameStyle::Browser
+            | FrameStyle::Phone
+            | FrameStyle::Tablet
     )
 }
 
@@ -550,6 +588,42 @@ fn macbook_svg(w: f64, h: f64, content_h: f64, theme: FrameTheme) -> String {
     )
 }
 
+fn mobile_svg(style: FrameStyle, theme: FrameTheme, w: f64, h: f64) -> String {
+    let bezel = mobile_bezel_px(style, w, h);
+    let landscape_phone = style == FrameStyle::Phone && w > h;
+    let (camera_x, camera_y) = if landscape_phone {
+        (bezel * 0.5, h * 0.5)
+    } else {
+        (w * 0.5, bezel * 0.5)
+    };
+    let (top, bottom, edge) = match theme {
+        FrameTheme::Dark => ("#343840", "#101319", "#626975"),
+        FrameTheme::Light => ("#D8DCE4", "#9CA3AF", "#F4F5F8"),
+    };
+    format!(
+        concat!(
+            r##"<svg width="{w}" height="{h}" viewBox="0 0 {w} {h}" xmlns="http://www.w3.org/2000/svg">"##,
+            r##"<defs><linearGradient id="body" x1="0" y1="0" x2="1" y2="1"><stop stop-color="{top}"/><stop offset="1" stop-color="{bottom}"/></linearGradient></defs>"##,
+            r##"<rect width="{w}" height="{h}" fill="url(#body)"/>"##,
+            r##"<rect x="0" y="0" width="{w}" height="{h}" fill="none" stroke="{edge}" stroke-width="{rim}" stroke-opacity="0.6"/>"##,
+            r##"<circle cx="{camera_x}" cy="{camera_y}" r="{camera_r}" fill="#080B11" stroke="#6D778B" stroke-opacity="0.6" stroke-width="{lens_rim}"/>"##,
+            r##"<circle cx="{camera_x}" cy="{camera_y}" r="{lens_r}" fill="#152438"/>"##,
+            "</svg>"
+        ),
+        w = w,
+        h = h,
+        top = top,
+        bottom = bottom,
+        edge = edge,
+        camera_x = camera_x,
+        camera_y = camera_y,
+        rim = (bezel * 0.06).max(0.6),
+        camera_r = bezel * 0.16,
+        lens_r = bezel * 0.07,
+        lens_rim = (bezel * 0.025).max(0.35),
+    )
+}
+
 /// Build the SVG for a chrome card of `w`×`h` texture pixels wrapping a video
 /// content area of height `content_h` texture pixels.
 pub fn chrome_svg(
@@ -573,6 +647,7 @@ pub fn chrome_svg(
         )),
         FrameStyle::Browser => Some(browser_svg(w, h, content_h * BROWSER_BAR_FRAC, theme, url)),
         FrameStyle::Macbook => Some(macbook_svg(w, h, content_h, theme)),
+        FrameStyle::Phone | FrameStyle::Tablet => Some(mobile_svg(style, theme, w, h)),
     }
 }
 
@@ -610,7 +685,11 @@ pub fn rasterize_chrome(
     )?;
 
     let options = resvg::usvg::Options {
-        fontdb: chrome_fontdb(),
+        fontdb: if matches!(style, FrameStyle::Phone | FrameStyle::Tablet) {
+            Arc::new(resvg::usvg::fontdb::Database::new())
+        } else {
+            chrome_fontdb()
+        },
         ..Default::default()
     };
 
@@ -697,6 +776,8 @@ mod tests {
             FrameStyle::Windows,
             FrameStyle::Browser,
             FrameStyle::Macbook,
+            FrameStyle::Phone,
+            FrameStyle::Tablet,
         ] {
             for theme in [FrameTheme::Light, FrameTheme::Dark] {
                 let rgba = rasterize_chrome(style, theme, "cap.so", "Recording", 640, 420, 360.0);
@@ -704,6 +785,39 @@ mod tests {
                 assert_eq!(rgba.len(), 640 * 420 * 4);
                 // Something visible must have been drawn.
                 assert!(rgba.chunks_exact(4).any(|px| px[3] > 0));
+            }
+        }
+    }
+
+    #[test]
+    fn mobile_bezels_keep_the_same_thickness_when_rotated() {
+        for style in [FrameStyle::Phone, FrameStyle::Tablet] {
+            for (width, height) in [
+                (360.0, 640.0),
+                (640.0, 360.0),
+                (768.0, 1024.0),
+                (1024.0, 768.0),
+            ] {
+                let insets = chrome_insets_for_aspect(style, width / height);
+                let bezel = insets.top * height;
+                assert!((bezel - mobile_bezel_fraction(style) * width.min(height)).abs() < 1e-9);
+                let outer_width = width + bezel * 2.0;
+                let outer_height = height + bezel * 2.0;
+                assert!((mobile_bezel_px(style, outer_width, outer_height) - bezel).abs() < 1e-9);
+                let rgba = rasterize_chrome(
+                    style,
+                    FrameTheme::Dark,
+                    "",
+                    "",
+                    outer_width.ceil() as u32,
+                    outer_height.ceil() as u32,
+                    height,
+                )
+                .unwrap();
+                assert_eq!(
+                    rgba.len(),
+                    outer_width.ceil() as usize * outer_height.ceil() as usize * 4
+                );
             }
         }
     }

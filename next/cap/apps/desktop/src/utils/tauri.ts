@@ -1123,7 +1123,7 @@ export type FrameStyle =
 /**
  * A MacBook mockup: black bezel, aluminum body and deck.
  */
-"macbook"
+"macbook" | "phone" | "tablet"
 export type FrameTheme = "dark" | "light"
 export type FramesRendered = { renderedCount: number; totalFrames: number; type: "FramesRendered" }
 export type GeneralSettingsStore = { instanceId?: string; uploadIndividualFiles?: boolean; hideDockIcon?: boolean; autoCreateShareableLink?: boolean; enableNotifications?: boolean; disableAutoOpenLinks?: boolean; hasCompletedStartup?: boolean; theme?: AppTheme; commercialLicense?: CommercialLicense | null; lastVersion?: string | null; windowTransparency?: boolean; postStudioRecordingBehaviour?: PostStudioRecordingBehaviour; mainWindowRecordingStartBehaviour?: MainWindowRecordingStartBehaviour; custom_cursor_capture2?: boolean; serverUrl?: string; recordingCountdown?: number | null; enableNativeCameraPreview: boolean; autoZoomOnClicks?: boolean; defaultZoomAmount?: number | null;

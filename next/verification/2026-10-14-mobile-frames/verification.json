@@ -1,0 +1,89 @@
+{
+	"date": "2026-10-14",
+	"version": "0.2.0-alpha.11",
+	"features": [
+		"Phone and tablet frames with light/dark themes",
+		"Mobile default frame selected by recorded aspect",
+		"Reopen completed mobile project",
+		"Shared GPU zoom, 3D, shadow and motion blur"
+	],
+	"checks": {
+		"nativeCompilation": true,
+		"generatedBindings": true,
+		"desktopTypeScript": true,
+		"scopedBiome": true,
+		"mobileLifecycleTests": 3,
+		"frameChromeTests": 5,
+		"mobileLayoutCombinations": 24,
+		"originalVideoBytesRetained": true,
+		"strictBundleSignature": true
+	},
+	"exports": [
+		{
+			"style": "phone",
+			"media": {
+				"programs": [],
+				"stream_groups": [],
+				"streams": [
+					{
+						"codec_type": "video",
+						"width": 720,
+						"height": 1278,
+						"avg_frame_rate": "60/1",
+						"nb_frames": "360"
+					},
+					{
+						"codec_type": "audio",
+						"avg_frame_rate": "0/0",
+						"nb_frames": "283"
+					}
+				],
+				"format": {
+					"duration": "6.000000"
+				}
+			},
+			"synthetic": true
+		},
+		{
+			"style": "tablet",
+			"media": {
+				"programs": [],
+				"stream_groups": [],
+				"streams": [
+					{
+						"codec_type": "video",
+						"width": 1440,
+						"height": 1080,
+						"avg_frame_rate": "60/1",
+						"nb_frames": "360"
+					},
+					{
+						"codec_type": "audio",
+						"avg_frame_rate": "0/0",
+						"nb_frames": "283"
+					}
+				],
+				"format": {
+					"duration": "6.000000"
+				}
+			},
+			"synthetic": true
+		}
+	],
+	"fixturesSynthetic": true,
+	"realDeviceFramesInRepository": false,
+	"physicalIosDevicesFound": 0,
+	"pending": [
+		"Physical iPad capture and playback",
+		"Real touch capture and automatic focus",
+		"Capture orientation changes and actual device audio",
+		"Matching every reference animation"
+	],
+	"trialOpened": true,
+	"editorWindowObserved": {
+		"width": 1275,
+		"height": 800
+	},
+	"trialFolder": "Jianku Screen Next Builds/0.2.0-alpha.11/",
+	"editorFirstFrameObserved": true
+}

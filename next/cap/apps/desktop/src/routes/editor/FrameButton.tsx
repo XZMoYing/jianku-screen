@@ -11,6 +11,8 @@ import IconLucideAppWindowMac from "~icons/lucide/app-window-mac";
 import IconLucideBan from "~icons/lucide/ban";
 import IconLucideGlobe from "~icons/lucide/globe";
 import IconLucideLaptop from "~icons/lucide/laptop";
+import IconLucideSmartphone from "~icons/lucide/smartphone";
+import IconLucideTablet from "~icons/lucide/tablet";
 import { EditorStyleContext, useEditorContext } from "./context";
 import { StyleGroupToggle } from "./style-segment-config";
 import { EditorButton, Input } from "./ui";
@@ -18,7 +20,7 @@ import { EditorButton, Input } from "./ui";
 const DEFAULT_FRAME_CONFIG: FrameConfiguration = {
 	style: "none",
 	theme: "dark",
-	url: "Cap.so",
+	url: "",
 	title: "",
 };
 
@@ -30,33 +32,45 @@ const FRAME_STYLES: Array<{
 }> = [
 	{
 		value: "none",
-		label: "None",
-		description: "Show the recording as-is",
+		label: "无外框",
+		description: "保留原始画面",
 		icon: IconLucideBan,
 	},
 	{
 		value: "macOS",
 		label: "macOS",
-		description: "Window chrome with traffic lights",
+		description: "带红黄绿控制按钮的窗口",
 		icon: IconLucideAppWindowMac,
 	},
 	{
 		value: "windows",
 		label: "Windows",
-		description: "Title bar with window controls",
+		description: "带标题栏和窗口控制按钮",
 		icon: IconLucideAppWindow,
 	},
 	{
 		value: "browser",
-		label: "Browser",
-		description: "Browser chrome with address bar",
+		label: "浏览器",
+		description: "带地址栏的浏览器窗口",
 		icon: IconLucideGlobe,
 	},
 	{
 		value: "macbook",
 		label: "MacBook",
-		description: "Laptop bezel around the recording",
+		description: "笔记本屏幕和机身",
 		icon: IconLucideLaptop,
+	},
+	{
+		value: "phone",
+		label: "手机",
+		description: "轻薄边框，适应横屏和竖屏",
+		icon: IconLucideSmartphone,
+	},
+	{
+		value: "tablet",
+		label: "平板",
+		description: "平板边框，保留完整屏幕内容",
+		icon: IconLucideTablet,
 	},
 ];
 
@@ -85,9 +99,9 @@ function FrameSettings() {
 	return (
 		<>
 			<div class="flex flex-col gap-0.5 px-4 pt-3.5 pb-3 border-b shrink-0 border-ed-line">
-				<span class="text-[13px] font-semibold text-ed-text-1">Frame</span>
+				<span class="text-[13px] font-semibold text-ed-text-1">画面外框</span>
 				<span class="text-[0.6875rem] leading-snug text-ed-text-3">
-					Wrap your recording in a window or device frame.
+					为画面添加窗口或设备外框，跟随镜头一起运动。
 				</span>
 			</div>
 			<Show when={selectedStyle()}>
@@ -137,7 +151,7 @@ function FrameSettings() {
 				<Show when={style() !== "none" && project.background.frame}>
 					{(frame) => (
 						<div class="flex flex-col gap-3 p-3 border-t border-ed-line">
-							<SettingRow name="Theme">
+							<SettingRow name="外观">
 								<KTabs
 									class="w-40"
 									value={frame().theme}
@@ -150,10 +164,10 @@ function FrameSettings() {
 											value="light"
 											class={THEME_TAB_TRIGGER_CLASS}
 										>
-											Light
+											浅色
 										</KTabs.Trigger>
 										<KTabs.Trigger value="dark" class={THEME_TAB_TRIGGER_CLASS}>
-											Dark
+											深色
 										</KTabs.Trigger>
 										<KTabs.Indicator class="overflow-hidden absolute inset-0 rounded-lg transition-transform flex p-0.5 peer-focus-visible:outline-solid outline-2 outline-ed-accent outline-offset-2">
 											<div class="flex-1 rounded-md bg-ed-card shadow-[0_1px_2px_rgba(0,0,0,0.12),0_0_0_0.5px_rgba(0,0,0,0.06)] dark:bg-white/12 dark:shadow-none" />
@@ -166,7 +180,7 @@ function FrameSettings() {
 									<div class="w-40">
 										<Input
 											value={frame().url}
-											placeholder="cap.so"
+											placeholder="example.com"
 											onInput={(e) =>
 												updateFrame({ url: e.currentTarget.value })
 											}
@@ -175,11 +189,11 @@ function FrameSettings() {
 								</SettingRow>
 							</Show>
 							<Show when={frame().style === "macOS"}>
-								<SettingRow name="Title">
+								<SettingRow name="窗口标题">
 									<div class="w-40">
 										<Input
 											value={frame().title}
-											placeholder="Window title"
+											placeholder="输入窗口标题"
 											onInput={(e) =>
 												updateFrame({ title: e.currentTarget.value })
 											}
@@ -228,7 +242,7 @@ function ScopedFrameButton() {
 			<EditorButton<typeof KPopover.Trigger>
 				as={KPopover.Trigger}
 				variant="text"
-				tooltipText="Add a frame"
+				tooltipText="画面外框"
 				leftIcon={
 					<Dynamic
 						component={hasFrame() ? activeStyle().icon : IconLucideAppWindowMac}
@@ -237,13 +251,13 @@ function ScopedFrameButton() {
 				rightIcon={<IconCapChevronDown />}
 			>
 				<span class="max-[1200px]:hidden">
-					{hasFrame() ? activeStyle().label : "Frame"}
+					{hasFrame() ? activeStyle().label : "外框"}
 				</span>
 			</EditorButton>
 			<KPopover.Portal>
 				<KPopover.Content
 					class={cx(
-						"z-60 flex w-[min(19rem,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-2xl bg-ed-card shadow-ed-pop outline-hidden",
+						"z-60 flex w-[min(19rem,calc(100vw-1.5rem))] flex-col max-h-[min(40rem,calc(100vh-5rem))] overflow-y-auto rounded-2xl bg-ed-card shadow-ed-pop outline-hidden",
 						"origin-[var(--kb-popover-content-transform-origin)] data-expanded:animate-in data-expanded:fade-in data-expanded:zoom-in-95 data-closed:animate-out data-closed:fade-out data-closed:zoom-out-95",
 					)}
 				>

@@ -344,6 +344,10 @@ fn finalize_project(project: &Path, source: &str, name: &str) -> Result<(), Stri
         .best(ffmpeg::media::Type::Video)
         .ok_or("未找到设备视频")?;
     let rate = video.avg_frame_rate();
+    let decoder = ffmpeg::codec::context::Context::from_parameters(video.parameters())
+        .and_then(|context| context.decoder().video())
+        .map_err(|error| error.to_string())?;
+    let size = (decoder.width(), decoder.height());
     let fps = if rate.denominator() > 0 {
         (f64::from(rate.numerator()) / f64::from(rate.denominator()))
             .round()
@@ -356,6 +360,16 @@ fn finalize_project(project: &Path, source: &str, name: &str) -> Result<(), Stri
     let mut config = crate::recording::default_project_config();
     config.cursor.hide = true;
     config.camera.hide = true;
+    let short_edge = size.0.min(size.1).max(1);
+    let aspect = f64::from(size.0.max(size.1)) / f64::from(short_edge);
+    config.background.frame = Some(cap_project::FrameConfiguration {
+        style: if aspect >= 1.7 {
+            cap_project::FrameStyle::Phone
+        } else {
+            cap_project::FrameStyle::Tablet
+        },
+        ..Default::default()
+    });
     config.write(project).map_err(|error| error.to_string())?;
     project_meta(
         project,
@@ -819,6 +833,12 @@ mod tests {
         assert_eq!(audio.path, inner.segments[0].display.path);
         assert!(cap_audio::AudioData::from_file(audio.path.to_path(&project)).is_ok());
         assert!(project.join("project-config.json").is_file());
+        let config = cap_project::ProjectConfiguration::load(&project).unwrap();
+        assert_eq!(
+            config.background.frame.unwrap().style,
+            cap_project::FrameStyle::Phone
+        );
+        assert!(config.cursor.hide && config.camera.hide);
     }
 
     #[tokio::test]
