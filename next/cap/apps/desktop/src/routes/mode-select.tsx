@@ -3,6 +3,7 @@ import { type as ostype } from "@tauri-apps/plugin-os";
 import { onMount } from "solid-js";
 import ModeSelect from "~/components/ModeSelect";
 import CaptionControlsWindows11 from "~/components/titlebar/controls/CaptionControlsWindows11";
+import { t as localize } from "~/utils/i18n";
 
 const ModeSelectWindow = () => {
 	const isWindows = ostype() === "windows";
@@ -35,10 +36,10 @@ const ModeSelectWindow = () => {
 			<div class="flex flex-col items-center w-full px-6 py-5">
 				<div class="mb-5 text-center">
 					<h2 class="text-xl font-semibold text-gray-12 mb-1">
-						Choose Recording Mode
+						{localize("Choose Recording Mode")}
 					</h2>
 					<p class="text-sm text-gray-11">
-						Select how you want to capture your screen
+						{localize("Select how you want to capture your screen")}
 					</p>
 				</div>
 

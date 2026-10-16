@@ -1,5 +1,6 @@
 import type { Component, ComponentProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
+import { t as localize } from "~/utils/i18n";
 import type { InfoPillVariant } from "./InfoPill";
 
 export default function TargetSelectInfoPill<T>(props: {
@@ -37,13 +38,15 @@ export default function TargetSelectInfoPill<T>(props: {
 				props.onClick(e);
 			}}
 		>
-			{!props.permissionGranted
-				? "授权"
-				: props.disconnected
-					? "Not connected"
-					: props.value !== null
-						? "On"
-						: "Off"}
+			{localize(
+				!props.permissionGranted
+					? "授权"
+					: props.disconnected
+						? "Not connected"
+						: props.value !== null
+							? "On"
+							: "Off",
+			)}
 		</Dynamic>
 	);
 }

@@ -15,6 +15,7 @@ import {
 	Show,
 } from "solid-js";
 import { produce } from "solid-js/store";
+import { t as localize } from "~/utils/i18n";
 import type { TextSegment as TauriTextSegment } from "~/utils/tauri";
 import { useCanvasSnapTargets } from "./CanvasElementsOverlay";
 import { FPS, useEditorContext } from "./context";
@@ -825,7 +826,7 @@ function TextSegmentOverlay(props: {
 							opacity: "var(--preview-controls-opacity, 1)",
 						}}
 					>
-						Text
+						{localize("Text")}
 					</div>
 				</Show>
 				<Show when={editing()}>

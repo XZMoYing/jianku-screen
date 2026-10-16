@@ -2,6 +2,7 @@ import { createEventListenerMap } from "@solid-primitives/event-listener";
 import { cx } from "cva";
 import { createMemo, createRoot, createSignal, For, Show } from "solid-js";
 import { produce } from "solid-js/store";
+import { t as localize } from "~/utils/i18n";
 
 import { type AudioTrackSegment, MIN_AUDIO_SEGMENT_DURATION } from "../audio";
 import { useEditorContext } from "../context";
@@ -412,8 +413,10 @@ export function AudioTrack(props: {
 							props.onRequestAdd(props.laneIndex);
 						}}
 					>
-						<span>Add background music or import your own audio</span>
-						<span class="cap-empty-lane-action">· Add audio</span>
+						<span>
+							{localize("Add background music or import your own audio")}
+						</span>
+						<span class="cap-empty-lane-action">{localize("· Add audio")}</span>
 					</button>
 				}
 			>

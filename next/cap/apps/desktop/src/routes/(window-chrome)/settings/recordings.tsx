@@ -25,6 +25,7 @@ import CapTooltip from "~/components/Tooltip";
 import { Input } from "~/routes/editor/ui";
 import { trackEvent } from "~/utils/analytics";
 import { createTauriEventListener } from "~/utils/createEventListener";
+import { t as localize } from "~/utils/i18n";
 import { importVideoFromPicker, showImportError } from "~/utils/importMedia";
 import { openRecordingFolder } from "~/utils/recording";
 import { createRecordingThumbnail } from "~/utils/recording-thumbnail";
@@ -200,8 +201,8 @@ export default function Recordings() {
 		<div class="cap-settings-page flex relative flex-col w-full h-full custom-scroll">
 			<SettingsPageContent class="max-w-none space-y-4">
 				<Section
-					title="Recordings"
-					description="Manage your recordings and perform actions."
+					title={localize("Recordings")}
+					description={localize("Manage your recordings and perform actions.")}
 					right={
 						<Button
 							variant="gray"
@@ -210,7 +211,7 @@ export default function Recordings() {
 							onClick={handleVideoImport}
 						>
 							<IconLucideImport class="size-3.5" />
-							<span>Import</span>
+							<span>{localize("Import")}</span>
 						</Button>
 					}
 				>
@@ -218,7 +219,7 @@ export default function Recordings() {
 						when={recordings.data && recordings.data.length > 0}
 						fallback={
 							<p class="text-center text-(--text-tertiary) absolute flex items-center justify-center w-full h-full">
-								No recordings found
+								{localize("No recordings found")}
 							</p>
 						}
 					>
@@ -254,12 +255,12 @@ export default function Recordings() {
 											setSearch("");
 										}
 									}}
-									placeholder="Search"
+									placeholder={localize("Search")}
 									autoCapitalize="off"
 									autocorrect="off"
 									autocomplete="off"
 									spellcheck={false}
-									aria-label="Search recordings"
+									aria-label={localize("Search recordings")}
 								/>
 							</div>
 						</div>
@@ -306,7 +307,7 @@ export default function Recordings() {
 											)
 										}
 									>
-										Load more
+										{localize("Load more")}
 									</Button>
 								</div>
 							</Show>
@@ -359,7 +360,7 @@ function RecordingItem(props: {
 				>
 					<img
 						class="object-cover rounded-sm size-12"
-						alt="Recording thumbnail"
+						alt={localize("Recording thumbnail")}
 						src={thumbnail()}
 						onError={() => setImageExists(false)}
 					/>
@@ -394,7 +395,7 @@ function RecordingItem(props: {
 								)}
 							>
 								<IconPhRecordFill class="invert size-2.5 dark:invert-0" />
-								<p>Recording in progress</p>
+								<p>{localize("Recording in progress")}</p>
 							</div>
 						</Show>
 
@@ -414,7 +415,7 @@ function RecordingItem(props: {
 									)}
 								>
 									<IconPhWarningBold class="invert size-2.5 dark:invert-0" />
-									<p>Recording failed</p>
+									<p>{localize("Recording failed")}</p>
 								</div>
 							</CapTooltip>
 						</Show>
@@ -435,7 +436,7 @@ function RecordingItem(props: {
 					<Show when={props.recording.meta.sharing}>
 						{(sharing) => (
 							<TooltipIconButton
-								tooltipText="Open link"
+								tooltipText={localize("Open link")}
 								onClick={() => shell.open(sharing().link)}
 							>
 								<IconCapLink class="size-4" />
@@ -443,7 +444,7 @@ function RecordingItem(props: {
 						)}
 					</Show>
 					<TooltipIconButton
-						tooltipText="Edit"
+						tooltipText={localize("Edit")}
 						onClick={async () => {
 							if (
 								props.recording.meta.status.status === "Failed" &&
@@ -481,7 +482,7 @@ function RecordingItem(props: {
 									when={props.uploadProgress || reupload.isPending}
 									fallback={
 										<TooltipIconButton
-											tooltipText="Reupload"
+											tooltipText={localize("Reupload")}
 											onClick={() => reupload.mutate()}
 										>
 											<IconLucideRotateCcw class="size-4" />
@@ -498,7 +499,7 @@ function RecordingItem(props: {
 								<Show when={props.recording.meta.sharing}>
 									{(sharing) => (
 										<TooltipIconButton
-											tooltipText="Open link"
+											tooltipText={localize("Open link")}
 											onClick={() => shell.open(sharing().link)}
 										>
 											<IconCapLink class="size-4" />
@@ -510,7 +511,7 @@ function RecordingItem(props: {
 					}}
 				</Show>
 				<TooltipIconButton
-					tooltipText="Open recording bundle"
+					tooltipText={localize("Open recording bundle")}
 					onClick={() => {
 						props.onOpenFolder();
 					}}
@@ -518,7 +519,7 @@ function RecordingItem(props: {
 					<IconLucideFolder class="size-4" />
 				</TooltipIconButton>
 				<TooltipIconButton
-					tooltipText="Delete"
+					tooltipText={localize("Delete")}
 					onClick={async () => {
 						if (!(await ask("Are you sure you want to delete this recording?")))
 							return;

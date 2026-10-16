@@ -19,6 +19,7 @@ import {
 import { produce } from "solid-js/store";
 import { Portal } from "solid-js/web";
 import toast from "solid-toast";
+import { t as localize } from "~/utils/i18n";
 import { commands } from "~/utils/tauri";
 import {
 	clipTimelineOffsets,
@@ -260,7 +261,7 @@ export function ClipsSidebar(props: { class?: string }) {
 	const importRecordingPath = async (sourcePath: string) => {
 		if (importing()) return;
 		setImporting(true);
-		const toastId = toast.loading("Importing clip…");
+		const toastId = toast.loading(localize("Importing clip…"));
 		try {
 			if (!(await pauseForProjectChange())) {
 				toast.dismiss(toastId);
@@ -553,7 +554,7 @@ export function ClipsSidebar(props: { class?: string }) {
 				class="flex flex-none gap-2 items-center px-4 w-full h-[46px] text-[13px] font-medium border-b transition-colors text-ed-text-1 border-ed-line hover:bg-ed-ctl"
 			>
 				<IconCapMoveLeft class="size-4 text-ed-text-2" />
-				Back to editor
+				{localize("Back to editor")}
 			</button>
 
 			<div class="flex flex-col flex-1 gap-3 p-3 min-h-0">
@@ -565,7 +566,7 @@ export function ClipsSidebar(props: { class?: string }) {
 						onClick={() => void recordNewClip()}
 					>
 						<IconLucideVideo class="size-4" />
-						Record a new clip
+						{localize("Record a new clip")}
 					</Button>
 					<Button
 						variant="gray"
@@ -574,12 +575,14 @@ export function ClipsSidebar(props: { class?: string }) {
 						onClick={openImportMenu}
 					>
 						<IconCapCirclePlus class="size-4" />
-						Import
+						{localize("Import")}
 					</Button>
 				</div>
 
 				<div class="flex flex-none gap-2 items-center">
-					<span class="text-sm font-medium text-gray-12">Clips</span>
+					<span class="text-sm font-medium text-gray-12">
+						{localize("Clips")}
+					</span>
 					<Show when={recordedClipCount() > 0}>
 						<span class="rounded-md bg-gray-3 px-1.5 py-0.5 text-[10px] font-medium tabular-nums text-gray-11">
 							{recordedClipCount()}
@@ -595,9 +598,13 @@ export function ClipsSidebar(props: { class?: string }) {
 								<div class="flex justify-center items-center rounded-full size-10 bg-gray-3 text-gray-9">
 									<IconCapClapperboard class="size-5" />
 								</div>
-								<p class="text-sm font-medium text-gray-12">No clips yet</p>
+								<p class="text-sm font-medium text-gray-12">
+									{localize("No clips yet")}
+								</p>
 								<p class="max-w-[200px] text-xs text-gray-10">
-									Record or import a clip and it will show up here.
+									{localize(
+										"Record or import a clip and it will show up here.",
+									)}
 								</p>
 							</div>
 						}
@@ -692,7 +699,7 @@ export function ClipsSidebar(props: { class?: string }) {
 														onClick={() =>
 															startRename(index(), segment.name ?? "")
 														}
-														aria-label="Rename clip"
+														aria-label={localize("Rename clip")}
 														class="flex flex-none justify-center items-center rounded-md opacity-0 transition-colors size-7 text-gray-10 hover:bg-gray-5 hover:text-gray-12 group-hover:opacity-100"
 													>
 														<IconCapPencil class="size-3.5" />
@@ -702,7 +709,7 @@ export function ClipsSidebar(props: { class?: string }) {
 															type="button"
 															data-clip-delete
 															onClick={() => deleteClip(index())}
-															aria-label="Remove clip"
+															aria-label={localize("Remove clip")}
 															class="flex flex-none justify-center items-center rounded-md opacity-0 transition-colors size-7 text-gray-10 hover:bg-red-3 hover:text-red-11 group-hover:opacity-100"
 														>
 															<IconCapTrash class="size-3.5" />

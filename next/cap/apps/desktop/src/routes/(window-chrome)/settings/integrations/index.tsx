@@ -1,6 +1,7 @@
 import { Button } from "@cap/ui-solid";
 import { useNavigate } from "@solidjs/router";
 import { createResource, For, onMount } from "solid-js";
+import { t as localize } from "~/utils/i18n";
 import IconLucideDatabase from "~icons/lucide/database";
 
 import "@total-typescript/ts-reset/filter-boolean";
@@ -83,8 +84,9 @@ export default function AppsTab() {
 	const apps = [
 		{
 			name: "Google Drive",
-			description:
+			description: localize(
 				"Connect Google Drive for new shareable link uploads. Cap stores new videos in a private Cap folder in your Drive and continues serving them through Cap after normal access checks.",
+			),
 			icon: GoogleDriveIcon,
 			url: "/settings/integrations/google-drive-config",
 			pro: true,
@@ -116,8 +118,10 @@ export default function AppsTab() {
 		<div class="cap-settings-page flex flex-col h-full custom-scroll">
 			<SettingsPageContent>
 				<Section
-					title="Integrations"
-					description="Configure integrations to extend Cap's functionality and connect with third-party services."
+					title={localize("Integrations")}
+					description={localize(
+						"Configure integrations to extend Cap's functionality and connect with third-party services.",
+					)}
 				>
 					<div class="space-y-3">
 						<For each={apps}>
@@ -137,7 +141,7 @@ export default function AppsTab() {
 											{managedByOrganization()
 												? "Managed by your organization"
 												: app.pro && !isPro()
-													? "Upgrade to Pro"
+													? localize("Upgrade to Pro")
 													: "Configure"}
 										</Button>
 									</div>

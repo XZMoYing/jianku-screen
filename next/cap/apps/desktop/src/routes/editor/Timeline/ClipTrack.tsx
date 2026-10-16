@@ -18,6 +18,7 @@ import {
 	Switch,
 } from "solid-js";
 import { produce } from "solid-js/store";
+import { t as localize } from "~/utils/i18n";
 import type { TimelineSegment } from "~/utils/tauri";
 import IconLucideArrowLeftToLine from "~icons/lucide/arrow-left-to-line";
 import IconLucideArrowRightToLine from "~icons/lucide/arrow-right-to-line";
@@ -587,7 +588,7 @@ function ClipSettingsControl(props: {
 					"pointer-events-auto flex items-center gap-0.5 rounded-full bg-ed-ctl-active px-1.5 py-0.5 text-[10px] font-medium text-ed-text-2 transition-colors hover:bg-ed-ctl-hover hover:text-ed-text-1",
 					props.triggerClass,
 				)}
-				aria-label="Clip settings"
+				aria-label={localize("Clip settings")}
 				onMouseDown={(event) => event.stopPropagation()}
 			>
 				<IconLucideSettings class="size-3" />
@@ -621,7 +622,7 @@ function ClipSettingsControl(props: {
 
 					<ClipMenuSection name="Speed">
 						<ClipMenuChips
-							label="Clip speed"
+							label={localize("Clip speed")}
 							options={CLIP_SPEEDS.map((mult) => [mult, `${mult}x`] as const)}
 							value={props.segment.timescale}
 							onChange={(mult) =>
@@ -630,12 +631,14 @@ function ClipSettingsControl(props: {
 						/>
 					</ClipMenuSection>
 
-					<ClipMenuSection name="Audio">
+					<ClipMenuSection name={localize("Audio")}>
 						<div class="flex h-7 items-center gap-2 px-2 text-[11.5px]">
-							<span class="w-12 shrink-0 text-ed-text-2">Volume</span>
+							<span class="w-12 shrink-0 text-ed-text-2">
+								{localize("Volume")}
+							</span>
 							<Slider
 								class="min-w-0 flex-1"
-								aria-label="Clip volume"
+								aria-label={localize("Clip volume")}
 								value={[Math.round(clipVolume(props.segment) * 100)]}
 								minValue={0}
 								maxValue={200}
@@ -655,8 +658,8 @@ function ClipSettingsControl(props: {
 							fallback={
 								<ClipMenuToggleRow
 									icon={<IconLucideVolumeX />}
-									label="Mute clip"
-									description="Silence this clip's audio"
+									label={localize("Mute clip")}
+									description={localize("Silence this clip's audio")}
 									checked={muted()}
 									onChange={(checked) =>
 										projectActions.setClipSegmentMuted(props.index, checked)
@@ -665,7 +668,7 @@ function ClipSettingsControl(props: {
 							}
 						>
 							<ClipMenuChips
-								label="Audio at this speed"
+								label={localize("Audio at this speed")}
 								options={
 									[
 										["mute", "Mute"],
@@ -684,8 +687,8 @@ function ClipSettingsControl(props: {
 					<ClipMenuSection name="Cursor">
 						<ClipMenuToggleRow
 							icon={<IconLucideMousePointerBan />}
-							label="Hide cursor"
-							description="Fades out while this clip plays"
+							label={localize("Hide cursor")}
+							description={localize("Fades out while this clip plays")}
 							checked={cursorHidden()}
 							onChange={(checked) =>
 								projectActions.setClipSegmentHideCursor(props.index, checked)
@@ -698,7 +701,7 @@ function ClipSettingsControl(props: {
 					<div class="flex flex-col gap-0.5">
 						<ClipMenuRow
 							icon={<IconLucideScissors />}
-							label="Split at playhead"
+							label={localize("Split at playhead")}
 							kbd="C"
 							hint="Move the playhead into this clip"
 							disabled={!canSplitAtPlayhead()}
@@ -709,7 +712,7 @@ function ClipSettingsControl(props: {
 						/>
 						<ClipMenuRow
 							icon={<IconLucideArrowLeftToLine />}
-							label="Merge with previous clip"
+							label={localize("Merge with previous clip")}
 							hint={mergeHint("previous")}
 							disabled={mergeBlocker("previous") !== null}
 							onClick={() => {
@@ -719,7 +722,7 @@ function ClipSettingsControl(props: {
 						/>
 						<ClipMenuRow
 							icon={<IconLucideArrowRightToLine />}
-							label="Merge with next clip"
+							label={localize("Merge with next clip")}
 							hint={mergeHint("next")}
 							disabled={mergeBlocker("next") !== null}
 							onClick={() => {
@@ -732,7 +735,7 @@ function ClipSettingsControl(props: {
 							fallback={
 								<ClipMenuRow
 									icon={<IconLucidePencil />}
-									label="Rename clip"
+									label={localize("Rename clip")}
 									onClick={startRename}
 								/>
 							}
@@ -748,7 +751,7 @@ function ClipSettingsControl(props: {
 									class="h-7 min-w-0 flex-1 px-2 text-[12px]"
 									value={draftName()}
 									placeholder={props.defaultLabel}
-									aria-label="Clip name"
+									aria-label={localize("Clip name")}
 									onInput={(event) => setDraftName(event.currentTarget.value)}
 									onKeyDown={(event) => {
 										if (event.key === "Enter") {
@@ -769,7 +772,7 @@ function ClipSettingsControl(props: {
 
 					<ClipMenuRow
 						icon={<IconLucideTrash2 />}
-						label="Delete clip"
+						label={localize("Delete clip")}
 						kbd="⌫"
 						hint="Can't delete the only clip"
 						disabled={!canDelete()}
@@ -975,7 +978,7 @@ export function ClipTrack(
 					const defaultClipName = () =>
 						hasMultipleRecordingSegments()
 							? `Clip ${segment().recordingSegment}`
-							: "Clip";
+							: localize("Clip");
 					const clipName = () => segment().name?.trim() || defaultClipName();
 
 					const speedControl = (triggerClass?: string) => (
@@ -1375,7 +1378,9 @@ export function ClipTrack(
 													"background-image":
 														"repeating-linear-gradient(-45deg, rgba(127,127,127,0.12) 0px, rgba(127,127,127,0.12) 4px, transparent 4px, transparent 8px)",
 												}}
-												title="Video paused while the fullscreen text is shown"
+												title={localize(
+													"Video paused while the fullscreen text is shown",
+												)}
 											>
 												<IconLucidePause
 													class={cx(
@@ -1394,7 +1399,7 @@ export function ClipTrack(
 																: "text-ed-text-3",
 														)}
 													>
-														Paused
+														{localize("Paused")}
 													</span>
 												</Show>
 											</div>
@@ -1458,7 +1463,9 @@ export function ClipTrack(
 												title={`${transition().type === "cross-fade" ? "Crossfade" : "Fade through black"} · ${transition().duration.toFixed(2)}s`}
 												onMouseDown={(event) => event.stopPropagation()}
 											>
-												<span class="sr-only">Edit clip transition</span>
+												<span class="sr-only">
+													{localize("Edit clip transition")}
+												</span>
 											</Popover.Trigger>
 											<Popover.Portal>
 												<Popover.Content
@@ -1467,7 +1474,7 @@ export function ClipTrack(
 												>
 													<div class="flex items-center justify-between">
 														<span class="text-sm font-medium">
-															Clip transition
+															{localize("Clip transition")}
 														</span>
 														<span class="text-xs tabular-nums text-gray-10">
 															{transition().duration.toFixed(2)}s
@@ -1502,7 +1509,7 @@ export function ClipTrack(
 													</div>
 													<input
 														type="range"
-														aria-label="Transition duration"
+														aria-label={localize("Transition duration")}
 														min={MIN_CLIP_TRANSITION_DURATION}
 														max={maxTransitionDuration(
 															segments()[i() - 1],
@@ -1524,7 +1531,7 @@ export function ClipTrack(
 															projectActions.deleteClipTransition(i())
 														}
 													>
-														Remove transition
+														{localize("Remove transition")}
 													</button>
 												</Popover.Content>
 											</Popover.Portal>

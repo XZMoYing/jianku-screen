@@ -1,6 +1,7 @@
 import { Button } from "@cap/ui-solid";
 import { createMutation } from "@tanstack/solid-query";
 import { createSignal, onMount, Show } from "solid-js";
+import { t as localize } from "~/utils/i18n";
 import { commands, type IncompleteRecordingInfo } from "~/utils/tauri";
 
 function formatDuration(secs: number): string {
@@ -78,7 +79,7 @@ export function RecoveryToast() {
 					<div class="flex items-center gap-2">
 						<div class="flex-1 min-w-0">
 							<p class="text-red-11 text-[10px] font-medium">
-								Incomplete Recording
+								{localize("Incomplete Recording")}
 							</p>
 							<p class="text-gray-12 text-xs font-medium truncate">
 								{rec().prettyName}
@@ -117,7 +118,7 @@ export function RecoveryToast() {
 								variant="gray"
 								size="xs"
 							>
-								Discard
+								{localize("Discard")}
 							</Button>
 						</div>
 					</div>

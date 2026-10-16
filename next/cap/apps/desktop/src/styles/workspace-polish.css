@@ -554,3 +554,33 @@
 		gap: 4px;
 	}
 }
+.jk-stage-rendered {
+	position: relative;
+	min-height: 0;
+	overflow: hidden;
+	padding: 8px;
+}
+.jk-stage-gpu {
+	display: block;
+	width: min(100cqw, calc(100cqh * var(--jk-preview-ratio, 1.6)));
+	height: min(100cqh, calc(100cqw / var(--jk-preview-ratio, 1.6)));
+	object-fit: contain;
+}
+.jk-preview-loading,
+.jk-preview-error {
+	position: absolute;
+	inset: 0;
+	margin: auto;
+	width: max-content;
+	height: max-content;
+	font-size: 12px;
+	color: var(--jk-muted);
+}
+.jk-stage-footer button {
+	border: 0;
+	padding: 4px 10px;
+	border-radius: 12px;
+	background: var(--jk-container);
+	color: var(--jk-primary);
+	font-size: 11px;
+}

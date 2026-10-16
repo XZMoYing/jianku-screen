@@ -18,6 +18,7 @@ import {
 	BaseDirectory,
 	exists,
 	readDir,
+	stat,
 	writeFile,
 } from "@tauri-apps/plugin-fs";
 import { type as ostype } from "@tauri-apps/plugin-os";
@@ -42,13 +43,18 @@ import {
 import { createStore, produce } from "solid-js/store";
 import { Dynamic } from "solid-js/web";
 import toast from "solid-toast";
-import { cameraBackgroundOptions } from "~/components/CameraPreviewChrome";
+import { CameraSettings } from "~/components/CameraSettings";
+import { CursorSettings } from "~/components/CursorSettings";
+import { MotionGroup } from "~/components/InterfaceMotion";
+import { LayoutSettings } from "~/components/LayoutSettings";
 import { Toggle } from "~/components/Toggle";
 import {
 	animatedGradientsStore,
 	audioEnhancementStore,
 	generalSettingsStore,
 } from "~/store";
+import { t as localize } from "~/utils/i18n";
+import { springFrames } from "~/utils/interface-spring";
 import {
 	createSelectedOrganization,
 	getOrganizationBrandColorSwatches,
@@ -58,14 +64,9 @@ import { projectAssetPath } from "~/utils/project-files";
 import {
 	type AnimatedGradientConfig,
 	type AnimatedGradientLibrary,
-	type BackgroundBlurMode,
 	type BackgroundSource,
-	type CameraShape,
-	type CameraXPosition,
-	type CameraYPosition,
 	type CaptionTrackSegment,
 	type ClipOffsets,
-	type CursorAnimationStyle,
 	commands,
 	type KeyboardTrackSegment,
 	type NotchConfiguration,
@@ -97,19 +98,11 @@ import {
 } from "./audio";
 import { BrandColorsDropdown } from "./BrandColorsDropdown";
 import { ColorCorrectionSection } from "./ColorCorrectionSection";
-import {
-	CursorRippleSection,
-	CursorStylePicker,
-	isExplicitCursorFamily,
-} from "./CursorStylePicker";
+import { recordedCursorFamily } from "./CursorStylePicker";
 import { syncCaptionWordsWithText } from "./captions";
 import { type ClipTransition, clipSourceTimeAt } from "./clip-transitions";
 import { hexToRgb, RgbInput } from "./color-utils";
-import {
-	type CornerRoundingType,
-	EditorStyleContext,
-	useEditorContext,
-} from "./context";
+import { EditorStyleContext, useEditorContext } from "./context";
 import { GradientEditor } from "./GradientEditor";
 import { ImageSegmentConfig } from "./image-segment-config";
 import { KeyboardTab } from "./KeyboardTab";
@@ -124,13 +117,11 @@ import {
 import {
 	DEFAULT_BACKGROUND_PADDING,
 	DEFAULT_BACKGROUND_ROUNDING,
-	DEFAULT_CAMERA_SCALE_DURING_ZOOM,
 	DEFAULT_GRADIENT_FROM,
 	DEFAULT_GRADIENT_TO,
 	DEFAULT_SCENE_TRANSITION,
 	DEFAULT_SPLIT_LAYOUT,
 } from "./projectConfig";
-import ShadowSettings from "./ShadowSettings";
 import { StyleGroupToggle, StyleSegmentConfig } from "./style-segment-config";
 import type { TextSegment } from "./text";
 import { TextSegmentConfig } from "./text-segment-config";
@@ -288,9 +279,9 @@ const CURRENT_DESKTOP_BACKGROUND_ID = "current-desktop-background";
 const CURRENT_DESKTOP_BACKGROUND_BASENAME = "current-desktop-background";
 const getCurrentDesktopBackgroundLabel = () => {
 	const os = ostype();
-	if (os === "macos") return "This Mac";
-	if (os === "windows") return "This PC";
-	return "This device";
+	if (os === "macos") return localize("This Mac");
+	if (os === "windows") return localize("This PC");
+	return localize("This device");
 };
 
 type WallpaperOption = {
@@ -306,6 +297,8 @@ const isCurrentDesktopBackgroundPath = (path: string | null | undefined) => {
 	const filename = path.split(/[\\/]/).pop();
 	if (!filename) return false;
 	return (
+		/\.(mov|mp4|m4v)$/i.test(filename) ||
+		filename === "capture-wallpaper.jpg" ||
 		filename.startsWith(`${CURRENT_DESKTOP_BACKGROUND_BASENAME}.`) ||
 		filename.startsWith(`${CURRENT_DESKTOP_BACKGROUND_BASENAME}-`)
 	);
@@ -317,29 +310,6 @@ const STEREO_MODES = [
 	{ name: "Mono R", value: "monoR" },
 ] satisfies Array<{ name: string; value: StereoMode }>;
 
-const CAMERA_SHAPES = [
-	{
-		name: "Square",
-		value: "square",
-	},
-	{
-		name: "Source",
-		value: "source",
-	},
-] satisfies Array<{ name: string; value: CameraShape }>;
-
-const CAMERA_X_POSITIONS = [
-	"left",
-	"center",
-	"right",
-] satisfies CameraXPosition[];
-const CAMERA_Y_POSITIONS = ["top", "bottom"] satisfies CameraYPosition[];
-
-const CORNER_STYLE_OPTIONS = [
-	{ name: "Squircle", value: "squircle" },
-	{ name: "Rounded", value: "rounded" },
-] satisfies Array<{ name: string; value: CornerRoundingType }>;
-
 const BACKGROUND_THEMES = {
 	macOS: "macOS",
 	dark: "Dark",
@@ -349,76 +319,8 @@ const BACKGROUND_THEMES = {
 	orange: "Orange",
 };
 
-type CursorPresetValues = {
-	tension: number;
-	mass: number;
-	friction: number;
-};
-
-const DEFAULT_MOTION_BLUR = 1.0;
-
 const formatVolumeDb = (value: number) =>
 	value <= -30 ? "Muted" : `${value > 0 ? "+" : ""}${value.toFixed(1)} dB`;
-
-const CURSOR_ANIMATION_STYLE_OPTIONS = [
-	{
-		value: "slow",
-		label: "Slow",
-		description: "Relaxed easing with a gentle follow and higher inertia.",
-		preset: { tension: 200, mass: 2.25, friction: 40 },
-	},
-	{
-		value: "smooth",
-		label: "Smooth",
-		description: "Ultra-smooth cinematic feel with high damping.",
-		preset: { tension: 80, mass: 2.5, friction: 28 },
-	},
-	{
-		value: "mellow",
-		label: "Mellow",
-		description: "Balanced smoothing for everyday tutorials and walkthroughs.",
-		preset: { tension: 470, mass: 3, friction: 70 },
-	},
-	{
-		value: "fast",
-		label: "Fast",
-		description: "Quick, responsive smoothing for fast-paced content.",
-		preset: { tension: 380, mass: 1.0, friction: 30 },
-	},
-	{
-		value: "custom",
-		label: "Custom",
-		description: "Tune tension, friction, and mass manually for full control.",
-	},
-] satisfies Array<{
-	value: CursorAnimationStyle;
-	label: string;
-	description: string;
-	preset?: CursorPresetValues;
-}>;
-
-const CURSOR_PRESET_TOLERANCE = {
-	tension: 1,
-	mass: 0.05,
-	friction: 0.2,
-} as const;
-
-const findCursorPreset = (
-	values: CursorPresetValues,
-): CursorAnimationStyle | null => {
-	const preset = CURSOR_ANIMATION_STYLE_OPTIONS.find(
-		(option) =>
-			option.preset &&
-			Math.abs(option.preset.tension - values.tension) <=
-				CURSOR_PRESET_TOLERANCE.tension &&
-			Math.abs(option.preset.mass - values.mass) <=
-				CURSOR_PRESET_TOLERANCE.mass &&
-			Math.abs(option.preset.friction - values.friction) <=
-				CURSOR_PRESET_TOLERANCE.friction,
-	);
-
-	return preset?.value ?? null;
-};
 
 const TAB_IDS = {
 	background: "background",
@@ -458,17 +360,17 @@ function StudioSoundCard() {
 	const isolationOptions = [
 		{
 			value: "light",
-			label: "Light",
+			label: "轻度",
 			description: "Keep more of your original voice and room sound.",
 		},
 		{
 			value: "balanced",
-			label: "Balanced",
+			label: "均衡",
 			description: "Clearer isolation with natural voice detail.",
 		},
 		{
 			value: "strong",
-			label: "Strong",
+			label: "强力",
 			description: "More isolation for noisy spaces. May change voice texture.",
 		},
 	] satisfies { value: VoiceIsolation; label: string; description: string }[];
@@ -487,10 +389,12 @@ function StudioSoundCard() {
 				</div>
 				<div class="flex flex-col flex-1 gap-0.5 min-w-0">
 					<span class="text-[13px] font-medium text-ed-text-1">
-						Studio Sound
+						{localize("Studio Sound")}
 					</span>
 					<span class="text-xs leading-4 text-ed-text-3">
-						Reduces background noise and balances your voice level.
+						{localize(
+							"Reduces background noise and balances your voice level.",
+						)}
 					</span>
 				</div>
 				<Toggle
@@ -500,7 +404,7 @@ function StudioSoundCard() {
 			</div>
 			<Show when={enabled()}>
 				<RadioGroup
-					aria-label="Voice isolation"
+					aria-label={localize("Voice isolation")}
 					value={project.audio.isolation}
 					disabled={savingDefault() || audioEnhancement.isPending}
 					onChange={async (value) => {
@@ -515,7 +419,7 @@ function StudioSoundCard() {
 							await audioEnhancementStore.set({ isolation: option.value });
 							await audioEnhancement.refetch();
 						} catch {
-							toast.error("Could not save the Studio Sound default");
+							toast.error(localize("Could not save the Studio Sound default"));
 						} finally {
 							setSavingDefault(false);
 						}
@@ -527,7 +431,7 @@ function StudioSoundCard() {
 							<RadioGroup.Item value={option.value} class="flex-1 min-w-0">
 								<RadioGroup.ItemInput class="sr-only peer" />
 								<RadioGroup.ItemLabel class="flex justify-center py-1 text-xs font-medium rounded-md cursor-pointer text-ed-text-2 peer-focus-visible:ring-2 peer-focus-visible:ring-ed-accent data-checked:bg-ed-card data-checked:text-ed-text-1 data-disabled:opacity-50">
-									{option.label}
+									{localize(option.label)}
 								</RadioGroup.ItemLabel>
 							</RadioGroup.Item>
 						)}
@@ -542,7 +446,9 @@ function StudioSoundCard() {
 				</p>
 			</Show>
 			<div class="flex flex-row gap-2.5 justify-between items-center pt-3 mt-3 border-t border-ed-line">
-				<span class="text-xs text-ed-text-2">Use for new recordings</span>
+				<span class="text-xs text-ed-text-2">
+					{localize("Use for new recordings")}
+				</span>
 				<Toggle
 					size="sm"
 					checked={audioEnhancement.data?.enabledByDefault ?? true}
@@ -556,7 +462,7 @@ function StudioSoundCard() {
 							});
 							await audioEnhancement.refetch();
 						} catch {
-							toast.error("Could not save the Studio Sound default");
+							toast.error(localize("Could not save the Studio Sound default"));
 						} finally {
 							setSavingDefault(false);
 						}
@@ -584,47 +490,6 @@ function ConfigSidebarContent() {
 			organizationSelection.selectedOrganization(),
 		),
 	);
-
-	const cursorIdleDelay = () =>
-		((project.cursor as { hideWhenIdleDelay?: number }).hideWhenIdleDelay ??
-			2) as number;
-
-	const clampIdleDelay = (value: number) =>
-		Math.round(Math.min(5, Math.max(0.5, value)) * 10) / 10;
-
-	type CursorPhysicsKey = "tension" | "mass" | "friction";
-
-	const setCursorPhysics = (key: CursorPhysicsKey, value: number) => {
-		const nextValues: CursorPresetValues = {
-			tension: key === "tension" ? value : project.cursor.tension,
-			mass: key === "mass" ? value : project.cursor.mass,
-			friction: key === "friction" ? value : project.cursor.friction,
-		};
-		const matched = findCursorPreset(nextValues);
-		const nextStyle = (matched ?? "custom") as CursorAnimationStyle;
-
-		batch(() => {
-			setProject("cursor", key, value);
-			if (project.cursor.animationStyle !== nextStyle) {
-				setProject("cursor", "animationStyle", nextStyle);
-			}
-		});
-	};
-
-	const applyCursorStylePreset = (style: CursorAnimationStyle) => {
-		const option = CURSOR_ANIMATION_STYLE_OPTIONS.find(
-			(item) => item.value === style,
-		);
-
-		batch(() => {
-			setProject("cursor", "animationStyle", style);
-			if (option?.preset) {
-				setProject("cursor", "tension", option.preset.tension);
-				setProject("cursor", "mass", option.preset.mass);
-				setProject("cursor", "friction", option.preset.friction);
-			}
-		});
-	};
 
 	const [state, setState] = createStore({
 		selectedTab: "background" as
@@ -657,6 +522,34 @@ function ConfigSidebarContent() {
 			setState("selectedTab", "background");
 	});
 	let scrollRef!: HTMLDivElement;
+	let inspectorAnimation: Animation | undefined;
+	createEffect(() => {
+		const tab = state.selectedTab;
+		queueMicrotask(() => {
+			inspectorAnimation?.cancel();
+			if (
+				document.visibilityState !== "visible" ||
+				matchMedia("(prefers-reduced-motion: reduce)").matches
+			)
+				return;
+			const panel =
+				scrollRef?.querySelector<HTMLElement>(
+					`[role="tabpanel"][data-value="${tab}"]`,
+				) ??
+				scrollRef?.querySelector<HTMLElement>("[role=tabpanel]:not([hidden])");
+			if (panel)
+				inspectorAnimation = panel.animate(
+					springFrames(0.42, 0.86, 0.65).map(({ offset, progress }) => ({
+						offset,
+						opacity: Math.min(1, Math.max(0, progress)),
+						transform: `translateY(${10 * (1 - progress)}px)`,
+					})),
+					{ duration: 650, easing: "linear" },
+				);
+		});
+	});
+	onCleanup(() => inspectorAnimation?.cancel());
+
 	let selectionScrollRef!: HTMLDivElement;
 	let previousStyle: number | null = null;
 	createEffect(() => {
@@ -685,91 +578,97 @@ function ConfigSidebarContent() {
 					? undefined
 					: state.selectedTab
 			}
-			class="jk-inspector flex overflow-hidden z-10 flex-col flex-1 min-h-0 max-w-104 rounded-xl shrink-0 bg-ed-card shadow-ed-card"
+			class="jk-inspector flex overflow-hidden z-10 flex-col flex-1 min-h-0 min-w-0 rounded-xl shrink-0 bg-ed-card shadow-ed-card"
 		>
-			<KTabs.List class="flex sticky top-0 z-60 flex-row justify-around items-center px-2.5 h-[46px] border-b border-ed-line shrink-0 bg-ed-card">
-				<For
-					each={[
-						{ id: TAB_IDS.background, icon: IconCapImage },
-						{
-							id: TAB_IDS.camera,
-							icon: IconCapCamera,
-							disabled: editorInstance.recordings.segments.every(
-								(s) => s.camera === null,
-							),
-						},
-						{ id: TAB_IDS.audio, icon: IconCapAudioOn },
-						{
-							id: TAB_IDS.cursor,
-							icon: IconCapCursor,
-							disabled: !meta().hasRecordedCursorData,
-						},
-						{
-							id: TAB_IDS.keyboard,
-							icon: IconLucideKeyboard,
-						},
-						{
-							id: TAB_IDS.captions,
-							icon: IconCapMessageBubble,
-						},
-						// { id: "hotkeys" as const, icon: IconCapHotkeys },
-					].filter(
-						(item) =>
-							!selectedStyle() ||
-							item.id === "background" ||
-							item.id === "camera" ||
-							item.id === "cursor",
-					)}
+			<KTabs.List class="jk-inspector-tabs flex sticky top-0 z-60 flex-row justify-around items-center px-2.5 h-[46px] border-b border-ed-line shrink-0 bg-ed-card">
+				<MotionGroup
+					class="jk-inspector-tab-motion"
+					label={localize("编辑设置")}
 				>
-					{(item) => (
-						<KTabs.Trigger
-							value={item.id}
-							aria-label={
-								item.id === "background"
-									? "Background"
-									: item.id.charAt(0).toUpperCase() + item.id.slice(1)
-							}
-							title={
-								item.id === "background"
-									? "Background"
-									: item.id.charAt(0).toUpperCase() + item.id.slice(1)
-							}
-							class="flex justify-center items-center w-10 h-[30px] rounded-[9px] transition-colors shrink-0 outline-hidden focus-visible:ring-1 focus-visible:ring-ed-accent text-ed-text-2 hover:bg-ed-ctl hover:text-ed-text-1 data-selected:bg-ed-ctl-hover data-selected:text-ed-text-1 disabled:text-ed-text-3 disabled:opacity-60 disabled:hover:bg-transparent"
-							onClick={() => {
-								// Clear any active selection first
-								if (sidebarSelection()) {
-									setEditorState("timeline", "selection", null);
-								}
-								if (editorState.timeline.audioPicker !== null) {
-									setEditorState("timeline", "audioPicker", null);
-								}
-								if (editorState.timeline.audioReplace !== null) {
-									setEditorState("timeline", "audioReplace", null);
-								}
-								setState("selectedTab", item.id);
-								scrollRef.scrollTo({
-									top: 0,
-								});
-							}}
-							disabled={item.disabled}
-						>
-							<Dynamic component={item.icon} class="size-4" />
-							<span class="jk-tab-label">
-								{
-									{
-										background: "画面",
-										camera: "摄像",
-										audio: "声音",
-										cursor: "光标",
-										keyboard: "按键",
-										captions: "字幕",
-										hotkeys: "快捷键",
-									}[item.id]
-								}
-							</span>
-						</KTabs.Trigger>
-					)}
-				</For>
+					<For
+						each={[
+							{ id: TAB_IDS.background, icon: IconCapImage },
+							{
+								id: TAB_IDS.camera,
+								icon: IconCapCamera,
+								disabled: editorInstance.recordings.segments.every(
+									(s) => s.camera === null,
+								),
+							},
+							{ id: TAB_IDS.audio, icon: IconCapAudioOn },
+							{
+								id: TAB_IDS.cursor,
+								icon: IconCapCursor,
+								disabled: !meta().hasRecordedCursorData,
+							},
+							{
+								id: TAB_IDS.keyboard,
+								icon: IconLucideKeyboard,
+							},
+							{
+								id: TAB_IDS.captions,
+								icon: IconCapMessageBubble,
+							},
+							// { id: "hotkeys" as const, icon: IconCapHotkeys },
+						].filter(
+							(item) =>
+								!selectedStyle() ||
+								item.id === "background" ||
+								item.id === "camera" ||
+								item.id === "cursor",
+						)}
+					>
+						{(item) => (
+							<KTabs.Trigger
+								value={item.id}
+								data-inspector-tab={item.id}
+								aria-label={localize(
+									item.id === "background"
+										? "Background"
+										: item.id.charAt(0).toUpperCase() + item.id.slice(1),
+								)}
+								title={localize(
+									item.id === "background"
+										? "Background"
+										: item.id.charAt(0).toUpperCase() + item.id.slice(1),
+								)}
+								class="flex justify-center items-center w-10 h-[30px] rounded-[9px] transition-colors shrink-0 outline-hidden focus-visible:ring-1 focus-visible:ring-ed-accent text-ed-text-2 hover:bg-ed-ctl hover:text-ed-text-1 data-selected:bg-ed-ctl-hover data-selected:text-ed-text-1 disabled:text-ed-text-3 disabled:opacity-60 disabled:hover:bg-transparent"
+								onClick={() => {
+									// Clear any active selection first
+									if (sidebarSelection()) {
+										setEditorState("timeline", "selection", null);
+									}
+									if (editorState.timeline.audioPicker !== null) {
+										setEditorState("timeline", "audioPicker", null);
+									}
+									if (editorState.timeline.audioReplace !== null) {
+										setEditorState("timeline", "audioReplace", null);
+									}
+									setState("selectedTab", item.id);
+									scrollRef.scrollTo({
+										top: 0,
+									});
+								}}
+								disabled={item.disabled}
+							>
+								<Dynamic component={item.icon} class="size-4" />
+								<span class="jk-tab-label">
+									{localize(
+										{
+											background: "画面",
+											camera: "摄像",
+											audio: "声音",
+											cursor: "光标",
+											keyboard: "按键",
+											captions: "字幕",
+											hotkeys: "快捷键",
+										}[item.id],
+									)}
+								</span>
+							</KTabs.Trigger>
+						)}
+					</For>
+				</MotionGroup>
 			</KTabs.List>
 			<div
 				ref={scrollRef}
@@ -794,15 +693,15 @@ function ConfigSidebarContent() {
 					value="audio"
 					class="flex flex-col flex-1 gap-3.5 pt-3.5 px-4 pb-4 min-h-0"
 				>
-					<Section name="Audio">
-						<Subfield name="Mute Audio">
+					<Section name={localize("Audio")}>
+						<Subfield name={localize("Mute Audio")}>
 							<Toggle
 								checked={project.audio.mute}
 								onChange={(v) => setProject("audio", "mute", v)}
 							/>
 						</Subfield>
 						{editorInstance.recordings.segments[0].mic?.channels === 2 && (
-							<Subfield name="Microphone Stereo Mode">
+							<Subfield name={localize("Microphone Stereo Mode")}>
 								<KSelect<{ name: string; value: StereoMode }>
 									options={STEREO_MODES}
 									optionValue="value"
@@ -863,7 +762,7 @@ function ConfigSidebarContent() {
 					{meta().hasMicrophone && (
 						<Field
 							inline
-							name="Microphone Volume"
+							name={localize("Microphone Volume")}
 							value={formatVolumeDb(project.audio.micVolumeDb ?? 0)}
 						>
 							<Slider
@@ -882,7 +781,7 @@ function ConfigSidebarContent() {
 					{meta().hasSystemAudio && (
 						<Field
 							inline
-							name="System Audio Volume"
+							name={localize("System Audio Volume")}
 							value={formatVolumeDb(project.audio.systemVolumeDb ?? 0)}
 						>
 							<Slider
@@ -908,213 +807,11 @@ function ConfigSidebarContent() {
 					<Show
 						when={!selectedStyle() || selectedStyle()?.overrides.cursor != null}
 					>
-						<Field inline name="Show cursor">
-							<Toggle
-								checked={!project.cursor.hide}
-								onChange={(v) => {
-									setProject("cursor", "hide", !v);
-								}}
-							/>
-						</Field>
-						<Show when={!project.cursor.hide}>
-							<CursorStylePicker />
-							<Field
-								inline
-								name="Size"
-								value={`${Math.round(project.cursor.size)}%`}
-							>
-								<Slider
-									value={[project.cursor.size]}
-									onChange={(v) => setProject("cursor", "size", v[0])}
-									minValue={20}
-									maxValue={300}
-									step={1}
-								/>
-							</Field>
-							<Field
-								inline
-								name="Tilt"
-								value={`${Math.round(
-									(project.cursor.rotationAmount ?? 0.15) * 100,
-								)}%`}
-							>
-								<Slider
-									value={[project.cursor.rotationAmount ?? 0.15]}
-									onChange={(v) => setProject("cursor", "rotationAmount", v[0])}
-									minValue={0}
-									maxValue={1}
-									step={0.01}
-									formatTooltip={(value) => `${Math.round(value * 100)}%`}
-								/>
-							</Field>
-							<CursorRippleSection />
-							<Field inline name="Hide When Idle">
-								<Toggle
-									checked={project.cursor.hideWhenIdle}
-									onChange={(value) =>
-										setProject("cursor", "hideWhenIdle", value)
-									}
-								/>
-							</Field>
-							<Show when={project.cursor.hideWhenIdle}>
-								<Field
-									inline
-									name="Inactivity Delay"
-									value={`${cursorIdleDelay().toFixed(1)}s`}
-								>
-									<Slider
-										value={[cursorIdleDelay()]}
-										onChange={(v) => {
-											const rounded = clampIdleDelay(v[0]);
-											setProject("cursor", "hideWhenIdleDelay", rounded);
-										}}
-										minValue={0.5}
-										maxValue={5}
-										step={0.1}
-										formatTooltip={(value) => `${value.toFixed(1)}s`}
-									/>
-								</Field>
-							</Show>
-							<Field name="Cursor Movement Style">
-								<RadioGroup
-									class="flex flex-col gap-2"
-									value={project.cursor.animationStyle}
-									onChange={(value) =>
-										applyCursorStylePreset(value as CursorAnimationStyle)
-									}
-								>
-									{CURSOR_ANIMATION_STYLE_OPTIONS.map((option) => (
-										<RadioGroup.Item
-											value={option.value}
-											class="rounded-lg border border-gray-3 transition-colors data-checked:border-blue-8 data-checked:bg-blue-3/40"
-										>
-											<RadioGroup.ItemInput class="sr-only" />
-											<RadioGroup.ItemLabel class="flex items-start gap-3 p-3">
-												<RadioGroup.ItemControl class="mt-1 size-4 rounded-full border border-gray-7 data-checked:border-blue-9 data-checked:bg-blue-9" />
-												<div class="flex flex-col text-left">
-													<span class="text-[13px] font-medium text-ed-text-1">
-														{option.label}
-													</span>
-													<span class="text-[11px] text-ed-text-3">
-														{option.description}
-													</span>
-												</div>
-											</RadioGroup.ItemLabel>
-										</RadioGroup.Item>
-									))}
-								</RadioGroup>
-							</Field>
-							<KCollapsible open={!project.cursor.raw}>
-								<Field inline name="Smooth Movement">
-									<Toggle
-										checked={!project.cursor.raw}
-										onChange={(value) => {
-											setProject("cursor", "raw", !value);
-										}}
-									/>
-								</Field>
-								<KCollapsible.Content class="overflow-hidden border-b opacity-0 transition-opacity border-gray-3 animate-collapsible-up data-expanded:animate-collapsible-down data-expanded:opacity-100">
-									{/* if Content has padding or margin the animation doesn't look as good */}
-									<div class="flex flex-col gap-1 pt-2 pb-4">
-										<Field
-											inline
-											name="Tension"
-											value={Math.round(project.cursor.tension)}
-										>
-											<Slider
-												value={[project.cursor.tension]}
-												onChange={(v) => setCursorPhysics("tension", v[0])}
-												minValue={1}
-												maxValue={600}
-												step={1}
-											/>
-										</Field>
-										<Field
-											inline
-											name="Friction"
-											value={project.cursor.friction.toFixed(1)}
-										>
-											<Slider
-												value={[project.cursor.friction]}
-												onChange={(v) => setCursorPhysics("friction", v[0])}
-												minValue={0}
-												maxValue={200}
-												step={0.1}
-											/>
-										</Field>
-										<Field
-											inline
-											name="Mass"
-											value={project.cursor.mass.toFixed(2)}
-										>
-											<Slider
-												value={[project.cursor.mass]}
-												onChange={(v) => setCursorPhysics("mass", v[0])}
-												minValue={0.1}
-												maxValue={15}
-												step={0.01}
-											/>
-										</Field>
-									</div>
-								</KCollapsible.Content>
-							</KCollapsible>
-							<Show when={!isExplicitCursorFamily(project.cursor.type)}>
-								<Field inline name="High Quality SVG Cursors">
-									<Toggle
-										checked={project.cursor.useSvg ?? true}
-										onChange={(value) => {
-											setProject("cursor", "useSvg", value);
-										}}
-									/>
-								</Field>
-							</Show>
-						</Show>
-
-						{/* <Field name="Animation Style" icon={<IconLucideRabbit />}>
-            <RadioGroup
-              defaultValue="regular"
-              value={project.cursor.animationStyle}
-              onChange={(value) => {
-                setProject(
-                  "cursor",
-                  "animationStyle",
-                  value as CursorAnimationStyle
-                );
-              }}
-              class="flex flex-col gap-2"
-              disabled
-            >
-              {(
-                Object.entries(CURSOR_ANIMATION_STYLES) as [
-                  CursorAnimationStyle,
-                  string
-                ][]
-              ).map(([value, label]) => (
-                <RadioGroup.Item value={value} class="flex items-center">
-                  <RadioGroup.ItemInput class="sr-only peer" />
-                  <RadioGroup.ItemControl
-                    class={cx(
-                      "mr-2 w-4 h-4 rounded-full border border-gray-300",
-                      "relative after:absolute after:inset-0 after:m-auto after:block after:w-2 after:h-2 after:rounded-full",
-                      "after:transition-colors after:duration-200",
-                      "peer-checked:border-blue-500 peer-checked:after:bg-blue-400",
-                      "peer-focus-visible:ring-2 peer-focus-visible:ring-blue-400/50",
-                      "peer-disabled:opacity-50"
-                    )}
-                  />
-                  <span
-                    class={cx(
-                      "text-gray-12",
-                      "peer-checked:text-gray-900",
-                      "peer-disabled:opacity-50"
-                    )}
-                  >
-                    {label}
-                  </span>
-                </RadioGroup.Item>
-              ))}
-            </RadioGroup>
-          </Field> */}
+						<CursorSettings
+							cursor={project.cursor}
+							recorded={recordedCursorFamily(meta())}
+							onChange={(patch) => setProject("cursor", patch)}
+						/>
 					</Show>
 				</KTabs.Content>
 				<KTabs.Content
@@ -1253,7 +950,7 @@ function ConfigSidebarContent() {
 													}
 													leftIcon={<IconLucideCheck />}
 												>
-													Done
+													{localize("Done")}
 												</EditorButton>
 												<span class="text-[12px] text-ed-text-2">
 													{value().segments.length} caption{" "}
@@ -1272,7 +969,7 @@ function ConfigSidebarContent() {
 												}
 												leftIcon={<IconCapTrash />}
 											>
-												Delete
+												{localize("Delete")}
 											</EditorButton>
 										</div>
 										<For each={value().segments}>
@@ -1326,7 +1023,7 @@ function ConfigSidebarContent() {
 													}}
 													leftIcon={<IconLucideCheck />}
 												>
-													Done
+													{localize("Done")}
 												</EditorButton>
 												<span class="text-[12px] text-ed-text-2">
 													{value().segments.length} keyboard{" "}
@@ -1345,7 +1042,7 @@ function ConfigSidebarContent() {
 												}
 												leftIcon={<IconCapTrash />}
 											>
-												Delete
+												{localize("Delete")}
 											</EditorButton>
 										</div>
 										<For each={value().segments}>
@@ -1393,7 +1090,7 @@ function ConfigSidebarContent() {
 													}
 													leftIcon={<IconLucideCheck />}
 												>
-													Done
+													{localize("Done")}
 												</EditorButton>
 												<span class="text-[12px] text-ed-text-2">
 													{value().segments.length} text{" "}
@@ -1412,7 +1109,7 @@ function ConfigSidebarContent() {
 												}
 												leftIcon={<IconCapTrash />}
 											>
-												Delete
+												{localize("Delete")}
 											</EditorButton>
 										</div>
 										<For each={value().segments}>
@@ -1465,7 +1162,7 @@ function ConfigSidebarContent() {
 													}
 													leftIcon={<IconLucideCheck />}
 												>
-													Done
+													{localize("Done")}
 												</EditorButton>
 												<span class="text-[12px] text-ed-text-2">
 													{value().segments.length} audio{" "}
@@ -1484,7 +1181,7 @@ function ConfigSidebarContent() {
 												}
 												leftIcon={<IconCapTrash />}
 											>
-												Delete
+												{localize("Delete")}
 											</EditorButton>
 										</div>
 										<For each={value().segments}>
@@ -1532,7 +1229,7 @@ function ConfigSidebarContent() {
 													}
 													leftIcon={<IconLucideCheck />}
 												>
-													Done
+													{localize("Done")}
 												</EditorButton>
 												<span class="text-[12px] text-ed-text-2">
 													{value().segments.length} mask{" "}
@@ -1551,7 +1248,7 @@ function ConfigSidebarContent() {
 												}
 												leftIcon={<IconCapTrash />}
 											>
-												Delete
+												{localize("Delete")}
 											</EditorButton>
 										</div>
 										<For each={value().segments}>
@@ -1615,7 +1312,7 @@ function ConfigSidebarContent() {
 														}
 														leftIcon={<IconLucideCheck />}
 													>
-														Done
+														{localize("Done")}
 													</EditorButton>
 													<span class="text-[12px] text-ed-text-2 whitespace-nowrap">
 														{selectionLabel()}
@@ -1636,7 +1333,7 @@ function ConfigSidebarContent() {
 																})
 															}
 														>
-															Select all
+															{localize("Select all")}
 														</button>
 													</Show>
 												</div>
@@ -1649,7 +1346,7 @@ function ConfigSidebarContent() {
 													}}
 													leftIcon={<IconCapTrash />}
 												>
-													Delete
+													{localize("Delete")}
 												</EditorButton>
 											</div>
 											<Show
@@ -1707,7 +1404,7 @@ function ConfigSidebarContent() {
 													}
 													leftIcon={<IconLucideCheck />}
 												>
-													Done
+													{localize("Done")}
 												</EditorButton>
 												<span class="text-[12px] truncate text-ed-text-2">
 													<Show
@@ -1734,7 +1431,7 @@ function ConfigSidebarContent() {
 															}
 															leftIcon={<IconLucidePlay />}
 														>
-															Play shot
+															{localize("Play shot")}
 														</EditorButton>
 													)}
 												</Show>
@@ -1747,7 +1444,7 @@ function ConfigSidebarContent() {
 													}}
 													leftIcon={<IconCapTrash />}
 												>
-													Delete
+													{localize("Delete")}
 												</EditorButton>
 											</div>
 										</div>
@@ -1806,7 +1503,7 @@ function ConfigSidebarContent() {
 																}
 																leftIcon={<IconLucideCheck />}
 															>
-																Done
+																{localize("Done")}
 															</EditorButton>
 															<span class="text-[12px] text-ed-text-2">
 																{value().segments.length} scene{" "}
@@ -1830,7 +1527,7 @@ function ConfigSidebarContent() {
 															}}
 															leftIcon={<IconCapTrash />}
 														>
-															Delete
+															{localize("Delete")}
 														</EditorButton>
 													</div>
 												</div>
@@ -1865,6 +1562,7 @@ function BackgroundConfig(props: {
 		if (source.type !== "wallpaper" || !source.path) return null;
 		return isCurrentDesktopBackgroundPath(source.path) ? source.path : null;
 	};
+	const [desktopPreviewPath, setDesktopPreviewPath] = createSignal<string>();
 	const [currentDesktopBackgroundPath, setCurrentDesktopBackgroundPath] =
 		createSignal<string | null>(initialCurrentDesktopBackgroundPath());
 
@@ -1911,7 +1609,9 @@ function BackgroundConfig(props: {
 		pendingGradientPreference = null;
 		if (!preference) return;
 		void animatedGradientsStore.set(preference).catch(() => {
-			toast.error("Could not remember your animated gradient settings");
+			toast.error(
+				localize("Could not remember your animated gradient settings"),
+			);
 		});
 	};
 	const gradientPreferenceFingerprint = createMemo(() => {
@@ -1999,15 +1699,18 @@ function BackgroundConfig(props: {
 
 		return {
 			id: CURRENT_DESKTOP_BACKGROUND_ID,
-			url: convertFileSrc(path),
-			thumbnailUrl: convertFileSrc(path),
+			url: convertFileSrc(desktopPreviewPath() ?? path),
+			thumbnailUrl: convertFileSrc(desktopPreviewPath() ?? path),
 			rawPath: path,
-			label: getCurrentDesktopBackgroundLabel(),
+			label: /\.(mov|mp4|m4v)$/i.test(path)
+				? localize("当前桌面 · 动态壁纸")
+				: getCurrentDesktopBackgroundLabel(),
 		};
 	});
 
 	const findStoredCurrentDesktopBackgroundPath = async () => {
-		if (currentDesktopBackgroundPath()) return currentDesktopBackgroundPath();
+		const selected = currentDesktopBackgroundPath();
+		if (selected && !/\.(mov|mp4|m4v)$/i.test(selected)) return selected;
 
 		const assetsDir = `${editorInstance.path}/assets`;
 
@@ -2017,20 +1720,32 @@ function BackgroundConfig(props: {
 			for (const entry of await readDir(assetsDir)) {
 				if (!entry.isFile || entry.name.includes(".pending.")) continue;
 				if (!entry.name.startsWith(importedPrefix)) continue;
-				const timestamp = Number(entry.name.match(/-(\d+)\./)?.[1] ?? 0);
+				const timestamp =
+					(await stat(`${assetsDir}/${entry.name}`)).mtime?.getTime() ?? 0;
 				if (!newest || timestamp > newest.timestamp) {
 					newest = { path: `${assetsDir}/${entry.name}`, timestamp };
 				}
 			}
-			if (newest) return newest.path;
+			if (newest) {
+				setDesktopPreviewPath(newest.path);
+				return selected ?? newest.path;
+			}
 		} catch {}
 
-		for (const extension of BACKGROUND_IMAGE_EXTENSIONS) {
-			const path = `${assetsDir}/${CURRENT_DESKTOP_BACKGROUND_BASENAME}.${extension}`;
-			if (await exists(path)) return path;
+		for (const name of [
+			"capture-wallpaper.jpg",
+			...BACKGROUND_IMAGE_EXTENSIONS.map(
+				(extension) => `${CURRENT_DESKTOP_BACKGROUND_BASENAME}.${extension}`,
+			),
+		]) {
+			const path = `${assetsDir}/${name}`;
+			if (await exists(path).catch(() => false)) {
+				setDesktopPreviewPath(path);
+				return selected ?? path;
+			}
 		}
 
-		return null;
+		return selected ?? null;
 	};
 
 	const wallpaperOptions = createMemo(() => wallpapers() ?? []);
@@ -2054,23 +1769,6 @@ function BackgroundConfig(props: {
 				setProject("background", "padding", DEFAULT_BACKGROUND_PADDING);
 			if (fromNone && project.background.rounding === 0)
 				setProject("background", "rounding", DEFAULT_BACKGROUND_ROUNDING);
-		});
-	};
-
-	const setBackgroundDimension = (
-		key: "padding" | "rounding",
-		value: number,
-	) => {
-		batch(() => {
-			// Revealing padding/rounding out of "None" shows a clean white canvas
-			// rather than resurrecting the hidden source. The tab stays on "None".
-			if (value > 0 && backgroundSourceTab() === "none" && isNoneBackground())
-				setProject("background", "source", {
-					type: "color",
-					value: [255, 255, 255],
-					alpha: 255,
-				});
-			setProject("background", key, value);
 		});
 	};
 
@@ -2109,7 +1807,7 @@ function BackgroundConfig(props: {
 
 								setWallpaperSource(rawPath);
 							} catch (_err) {
-								toast.error("Failed to set wallpaper");
+								toast.error(localize("Failed to set wallpaper"));
 							}
 						};
 
@@ -2196,9 +1894,9 @@ function BackgroundConfig(props: {
 		if (importingDesktopBackground()) return;
 		setImportingDesktopBackground(true);
 		try {
-			const path = await commands.importCurrentDesktopBackground(
-				editorInstance.path,
-			);
+			const wallpaper = await commands.getDesktopWallpaper(editorInstance.path);
+			const path = wallpaper.path;
+			setDesktopPreviewPath(wallpaper.previewPath);
 			const addingFromBlankBackground = isNoneBackground();
 			batch(() => {
 				setCurrentDesktopBackgroundPath(path);
@@ -2207,7 +1905,7 @@ function BackgroundConfig(props: {
 				ensureBackgroundPresentation(addingFromBlankBackground);
 			});
 		} catch (_err) {
-			toast.error("Couldn't import your desktop wallpaper");
+			toast.error(localize("Couldn't import your desktop wallpaper"));
 		} finally {
 			setImportingDesktopBackground(false);
 		}
@@ -2230,7 +1928,7 @@ function BackgroundConfig(props: {
 				props.class,
 			)}
 		>
-			{BACKGROUND_SOURCES[props.item]}
+			{localize(BACKGROUND_SOURCES[props.item])}
 		</KTabs.Trigger>
 	);
 
@@ -2251,22 +1949,6 @@ function BackgroundConfig(props: {
 		};
 
 		setProject("background", "source", colorBackground);
-	};
-
-	const setBackgroundBorderColor = (color: string) => {
-		const rgbValue = hexToRgb(color);
-		if (!rgbValue) return;
-		const [r, g, b] = rgbValue;
-
-		setProject("background", "border", {
-			...(project.background.border ?? {
-				enabled: true,
-				width: 5.0,
-				color: [0, 0, 0],
-				opacity: 50.0,
-			}),
-			color: [r, g, b],
-		});
 	};
 
 	const selectBackgroundSourceTab = (v: string) => {
@@ -2302,11 +1984,7 @@ function BackgroundConfig(props: {
 		}
 		setBackgroundSourceTab(tab);
 		if (tab === "desktop") {
-			const desktopBackground = currentDesktopBackground();
-			if (desktopBackground) {
-				ensureBackgroundPresentation(fromNone);
-				setWallpaperSource(desktopBackground.rawPath);
-			}
+			void importDesktopBackground();
 			return;
 		}
 		ensureBackgroundPresentation(fromNone);
@@ -2386,7 +2064,7 @@ function BackgroundConfig(props: {
 				when={!selectedStyle() || selectedStyle()?.overrides.background != null}
 			>
 				<Section
-					name="Background"
+					name={localize("Background")}
 					action={
 						<EditorButton
 							size="sm"
@@ -2398,7 +2076,7 @@ function BackgroundConfig(props: {
 							}
 							onClick={() => selectBackgroundSourceTab("none")}
 						>
-							None
+							{localize("None")}
 						</EditorButton>
 					}
 				>
@@ -2429,7 +2107,7 @@ function BackgroundConfig(props: {
 						>
 							<div class="mt-2 flex items-center justify-between gap-2 text-xs">
 								<span role="alert" class="text-red-11">
-									Could not load animated gradients.
+									{localize("Could not load animated gradients.")}
 								</span>
 								<button
 									type="button"
@@ -2439,7 +2117,7 @@ function BackgroundConfig(props: {
 										void animatedGradientLibrary.refetch();
 									}}
 								>
-									Retry
+									{localize("Retry")}
 								</button>
 							</div>
 						</Show>
@@ -2451,7 +2129,7 @@ function BackgroundConfig(props: {
 									<div class="flex flex-col gap-3 items-center justify-center p-6 w-full rounded-xl border border-dashed bg-ed-card-2 border-ed-line-strong">
 										<IconLucideMonitor class="size-6 text-ed-text-3" />
 										<span class="text-[13px] text-center text-ed-text-1">
-											Use the wallpaper from your desktop
+											{localize("Use the wallpaper from your desktop")}
 										</span>
 										<EditorButton
 											onClick={importDesktopBackground}
@@ -2459,7 +2137,7 @@ function BackgroundConfig(props: {
 											leftIcon={<IconLucideMonitor />}
 										>
 											{importingDesktopBackground()
-												? "Importing..."
+												? localize("Importing...")
 												: "Import desktop background"}
 										</EditorButton>
 									</div>
@@ -2500,8 +2178,8 @@ function BackgroundConfig(props: {
 												leftIcon={<IconLucideMonitor />}
 											>
 												{importingDesktopBackground()
-													? "Importing..."
-													: "Re-import"}
+													? localize("Importing...")
+													: localize("Re-import")}
 											</EditorButton>
 										</div>
 									</div>
@@ -2567,7 +2245,7 @@ function BackgroundConfig(props: {
 
 										ensureBackgroundPresentation();
 									} catch (_err) {
-										toast.error("Failed to set wallpaper");
+										toast.error(localize("Failed to set wallpaper"));
 									}
 								}}
 								class="grid grid-cols-6 gap-1.5 h-auto"
@@ -2578,7 +2256,7 @@ function BackgroundConfig(props: {
 										<div class="flex col-span-6 justify-center items-center h-32 text-ed-text-2">
 											<div class="flex flex-col gap-2 items-center">
 												<div class="w-6 h-6 rounded-full border-2 animate-spin border-gray-5 border-t-blue-400" />
-												<span>Loading wallpapers...</span>
+												<span>{localize("Loading wallpapers...")}</span>
 											</div>
 										</div>
 									}
@@ -2595,7 +2273,7 @@ function BackgroundConfig(props: {
 														src={photo.thumbnailUrl}
 														loading="eager"
 														class="object-cover w-full h-full"
-														alt="Wallpaper option"
+														alt={localize("Wallpaper option")}
 													/>
 												</KRadioGroup.ItemControl>
 											</KRadioGroup.Item>
@@ -2614,7 +2292,7 @@ function BackgroundConfig(props: {
 															<KRadioGroup.ItemControl class="overflow-hidden w-full h-full rounded-md transition data-checked:ring-2 data-checked:ring-ed-accent data-checked:ring-offset-2 data-checked:ring-offset-ed-card">
 																<img
 																	src={photo.thumbnailUrl}
-																	alt="Wallpaper option"
+																	alt={localize("Wallpaper option")}
 																	class="object-cover w-full h-full"
 																	loading="lazy"
 																/>
@@ -2642,7 +2320,7 @@ function BackgroundConfig(props: {
 									>
 										<IconCapImage class="text-ed-text-3 size-6" />
 										<span class="text-ed-text-1">
-											Click to select or drag and drop image
+											{localize("Click to select or drag and drop image")}
 										</span>
 									</button>
 								}
@@ -2654,7 +2332,7 @@ function BackgroundConfig(props: {
 												projectAssetPath(editorInstance.path, source()),
 											)}
 											class="object-cover w-full h-full"
-											alt="Selected background"
+											alt={localize("Selected background")}
 										/>
 										<div class="absolute top-2 right-2">
 											<button
@@ -2684,7 +2362,7 @@ function BackgroundConfig(props: {
 
 									const extension = getValidBackgroundImageExtension(file);
 									if (!extension) {
-										toast.error("Invalid image file type");
+										toast.error(localize("Invalid image file type"));
 										return;
 									}
 
@@ -2704,7 +2382,7 @@ function BackgroundConfig(props: {
 											path: fullPath,
 										});
 									} catch (_err) {
-										toast.error("Failed to save image");
+										toast.error(localize("Failed to save image"));
 									}
 								}}
 							/>
@@ -2806,209 +2484,29 @@ function BackgroundConfig(props: {
 				</Section>
 
 				<div class="w-full border-t border-ed-line" />
-				<SectionLabel name="Layout" />
-				<Field
-					inline
-					name="Blur"
-					value={`${project.background.blur.toFixed(1)}%`}
-				>
-					<Slider
-						value={[project.background.blur]}
-						onChange={(v) => setProject("background", "blur", v[0])}
-						minValue={0}
-						maxValue={100}
-						step={0.1}
-						formatTooltip="%"
-					/>
-				</Field>
-				<Field
-					inline
-					name="Padding"
-					value={`${project.background.padding.toFixed(1)}%`}
-				>
-					<Slider
-						value={[project.background.padding]}
-						onChange={(v) => setBackgroundDimension("padding", v[0])}
-						minValue={0}
-						maxValue={40}
-						step={0.1}
-						formatTooltip="%"
-					/>
-				</Field>
-				<Show when={project.background.displayPosition}>
-					<div class="flex gap-2 justify-between items-center">
-						<span class="text-[11px] text-ed-text-3">
-							Custom screen position (dragged on canvas)
-						</span>
-						<EditorButton
-							size="sm"
-							onClick={() => setProject("background", "displayPosition", null)}
-						>
-							Reset
-						</EditorButton>
-					</div>
-				</Show>
-				<Field
-					inline
-					name="Corners"
-					value={`${project.background.rounding.toFixed(1)}%`}
-				>
-					<Slider
-						value={[project.background.rounding]}
-						onChange={(v) => setBackgroundDimension("rounding", v[0])}
-						minValue={0}
-						maxValue={100}
-						step={0.1}
-						formatTooltip="%"
-					/>
-				</Field>
-				<Field inline name="Corner Style">
-					<CornerStyleSelect
-						value={project.background.roundingType}
-						onChange={(value) =>
-							setProject("background", "roundingType", value)
-						}
-					/>
-				</Field>
-				<Show when={!selectedStyle()}>
-					<Field
-						inline
-						name="Motion Blur"
-						value={`${Math.round(
-							(project.screenMotionBlur ??
-								project.cursor.motionBlur ??
-								DEFAULT_MOTION_BLUR) * 100,
-						)}%`}
-					>
-						<Slider
-							value={[
-								project.screenMotionBlur ??
-									project.cursor.motionBlur ??
-									DEFAULT_MOTION_BLUR,
-							]}
-							onChange={(v) => {
-								const value = v[0] ?? 0;
-								batch(() => {
-									setProject("cursor", "motionBlur", value);
-									setProject("screenMotionBlur", value);
-								});
-							}}
-							minValue={0}
-							maxValue={1}
-							step={0.01}
-							formatTooltip={(value) => `${Math.round(value * 100)}%`}
-						/>
-					</Field>
-				</Show>
-				<Field inline name="Border">
-					<Toggle
-						checked={project.background.border?.enabled ?? false}
-						onChange={(enabled) => {
-							const prev = project.background.border ?? {
-								enabled: false,
-								width: 5.0,
-								color: [0, 0, 0],
-								opacity: 50.0,
-							};
-
-							if (props.scrollRef && enabled) {
-								setTimeout(
-									() =>
-										props.scrollRef.scrollTo({
-											top: props.scrollRef.scrollHeight,
-											behavior: "smooth",
-										}),
-									100,
-								);
-							}
-
-							setProject("background", "border", {
-								...prev,
-								enabled,
+				<SectionLabel name={localize("Layout")} />
+				<LayoutSettings
+					background={project.background}
+					aspectRatio={project.aspectRatio}
+					onAspectRatio={(ratio) => setProject("aspectRatio", ratio)}
+					onChange={(patch) => {
+						if (
+							(patch.padding ?? patch.rounding ?? 0) > 0 &&
+							backgroundSourceTab() === "none" &&
+							isNoneBackground()
+						)
+							setProject("background", "source", {
+								type: "color",
+								value: [255, 255, 255],
+								alpha: 255,
 							});
-						}}
-					/>
-				</Field>
-				<KCollapsible open={project.background.border?.enabled ?? false}>
-					<KCollapsible.Content class="overflow-hidden opacity-0 transition-opacity animate-collapsible-up data-expanded:animate-collapsible-down data-expanded:opacity-100">
-						<div class="flex flex-col gap-2 pb-4">
-							<Field
-								inline
-								name="Border Width"
-								value={`${(project.background.border?.width ?? 5).toFixed(
-									1,
-								)}px`}
-							>
-								<Slider
-									value={[project.background.border?.width ?? 5.0]}
-									onChange={(v) =>
-										setProject("background", "border", {
-											...(project.background.border ?? {
-												enabled: true,
-												width: 5.0,
-												color: [0, 0, 0],
-												opacity: 50.0,
-											}),
-											width: v[0],
-										})
-									}
-									minValue={1}
-									maxValue={20}
-									step={0.1}
-									formatTooltip="px"
-								/>
-							</Field>
-							<Field name="Border Color">
-								<div class="flex flex-col gap-2">
-									<RgbInput
-										value={project.background.border?.color ?? [0, 0, 0]}
-										onChange={(color) =>
-											setProject("background", "border", {
-												...(project.background.border ?? {
-													enabled: true,
-													width: 5.0,
-													color: [0, 0, 0],
-													opacity: 50.0,
-												}),
-												color,
-											})
-										}
-									/>
-									<BrandColorsDropdown
-										swatches={props.brandColorSwatches}
-										onSelect={setBackgroundBorderColor}
-									/>
-								</div>
-							</Field>
-							<Field
-								inline
-								name="Border Opacity"
-								value={`${(project.background.border?.opacity ?? 50).toFixed(
-									1,
-								)}%`}
-							>
-								<Slider
-									value={[project.background.border?.opacity ?? 50.0]}
-									onChange={(v) =>
-										setProject("background", "border", {
-											...(project.background.border ?? {
-												enabled: true,
-												width: 5.0,
-												color: [0, 0, 0],
-												opacity: 50.0,
-											}),
-											opacity: v[0],
-										})
-									}
-									minValue={0}
-									maxValue={100}
-									step={0.1}
-									formatTooltip="%"
-								/>
-							</Field>
-						</div>
-					</KCollapsible.Content>
-				</KCollapsible>
+						setProject("background", patch);
+					}}
+					motionBlur={
+						project.screenMotionBlur ?? project.cursor.motionBlur ?? 1
+					}
+					onMotionBlur={(amount) => setProject("screenMotionBlur", amount)}
+				/>
 				<Field inline name="MacBook notch">
 					<Toggle
 						checked={project.background.notch?.enabled ?? false}
@@ -3024,9 +2522,9 @@ function BackgroundConfig(props: {
 					<KCollapsible.Content class="overflow-hidden opacity-0 transition-opacity animate-collapsible-up data-expanded:animate-collapsible-down data-expanded:opacity-100">
 						<div class="flex flex-col gap-2 pb-4">
 							<p class="text-[11px] text-ed-text-3">
-								Draws a MacBook notch over the recording. Recordings made on a
-								Mac with a notch use their own measurements; otherwise start
-								from the size below and adjust to match.
+								{localize(
+									"Draws a MacBook notch over the recording. Recordings made on a Mac with a notch use their own measurements; otherwise start from the size below and adjust to match.",
+								)}
 							</p>
 							<For
 								each={
@@ -3098,74 +2596,6 @@ function BackgroundConfig(props: {
 						</div>
 					</KCollapsible.Content>
 				</KCollapsible>
-				<Field
-					inline
-					name="Shadow"
-					value={`${(project.background.shadow ?? 0).toFixed(1)}%`}
-				>
-					<Slider
-						value={[project.background.shadow ?? 0]}
-						onChange={(v) => {
-							batch(() => {
-								setProject("background", "shadow", v[0]);
-								// Initialize advanced shadow settings if they don't exist and shadow is enabled
-								if (v[0] > 0 && !project.background.advancedShadow) {
-									setProject("background", "advancedShadow", {
-										size: 50,
-										opacity: 18,
-										blur: 50,
-									});
-								}
-							});
-						}}
-						minValue={0}
-						maxValue={100}
-						step={0.1}
-						formatTooltip="%"
-					/>
-				</Field>
-				<ShadowSettings
-					scrollRef={props.scrollRef}
-					size={{
-						value: [project.background.advancedShadow?.size ?? 50],
-						onChange: (v) => {
-							setProject("background", "advancedShadow", {
-								...(project.background.advancedShadow ?? {
-									size: 50,
-									opacity: 18,
-									blur: 50,
-								}),
-								size: v[0],
-							});
-						},
-					}}
-					opacity={{
-						value: [project.background.advancedShadow?.opacity ?? 18],
-						onChange: (v) => {
-							setProject("background", "advancedShadow", {
-								...(project.background.advancedShadow ?? {
-									size: 50,
-									opacity: 18,
-									blur: 50,
-								}),
-								opacity: v[0],
-							});
-						},
-					}}
-					blur={{
-						value: [project.background.advancedShadow?.blur ?? 50],
-						onChange: (v) => {
-							setProject("background", "advancedShadow", {
-								...(project.background.advancedShadow ?? {
-									size: 50,
-									opacity: 18,
-									blur: 50,
-								}),
-								blur: v[0],
-							});
-						},
-					}}
-				/>
 				<Show when={!selectedStyle()}>
 					<ColorCorrectionSection target="screen" scrollRef={props.scrollRef} />
 				</Show>
@@ -3187,14 +2617,6 @@ function BackgroundConfig(props: {
 
 function CameraConfig(props: { scrollRef: HTMLDivElement }) {
 	const { project, setProject, selectedStyle } = useEditorContext();
-	// A camera dragged on the preview canvas has a manual position; none of
-	// the preset dots match until it is reset.
-	const cameraPositionValue = createMemo(() =>
-		project.camera.manualPosition
-			? "custom"
-			: `${project.camera.position.x}:${project.camera.position.y}`,
-	);
-
 	return (
 		<KTabs.Content
 			value={TAB_IDS.camera}
@@ -3204,403 +2626,15 @@ function CameraConfig(props: { scrollRef: HTMLDivElement }) {
 			<Show
 				when={!selectedStyle() || selectedStyle()?.overrides.camera != null}
 			>
-				<Section name="Camera">
-					<div class="flex flex-col gap-2">
-						<div>
-							<Subfield name="Position" />
-							<KRadioGroup
-								value={cameraPositionValue()}
-								onChange={(v) => {
-									const [x, y] = v.split(":");
-									const xPosition = CAMERA_X_POSITIONS.find(
-										(position) => position === x,
-									);
-									const yPosition = CAMERA_Y_POSITIONS.find(
-										(position) => position === y,
-									);
-									if (!xPosition || !yPosition) return;
-									batch(() => {
-										setProject("camera", "position", {
-											x: xPosition,
-											y: yPosition,
-										});
-										setProject("camera", "manualPosition", null);
-									});
-								}}
-								class="mt-1 rounded-xl bg-ed-card-2 w-full h-30 relative"
-							>
-								<For
-									each={[
-										{ x: "left", y: "top" } as const,
-										{ x: "center", y: "top" } as const,
-										{ x: "right", y: "top" } as const,
-										{ x: "left", y: "bottom" } as const,
-										{ x: "center", y: "bottom" } as const,
-										{ x: "right", y: "bottom" } as const,
-									]}
-								>
-									{(item) => {
-										const itemValue = `${item.x}:${item.y}`;
-										const selected = () => cameraPositionValue() === itemValue;
-										return (
-											<RadioGroup.Item value={itemValue}>
-												<RadioGroup.ItemInput class="peer" />
-												<RadioGroup.ItemControl
-													class={cx(
-														"size-6 shrink-0 rounded-md absolute flex justify-center items-center focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-blue-9 focus-visible:outline-offset-2 peer-focus-visible:outline-solid peer-focus-visible:outline-2 peer-focus-visible:outline-blue-9 peer-focus-visible:outline-offset-2 transition-colors duration-100",
-														selected() ? "bg-ed-accent" : "bg-ed-ctl-active",
-														item.x === "left"
-															? "left-2"
-															: item.x === "right"
-																? "right-2"
-																: "left-1/2 transform -translate-x-1/2",
-														item.y === "top" ? "top-2" : "bottom-2",
-													)}
-												>
-													<div class="size-2 shrink-0 bg-solid-white rounded-full" />
-												</RadioGroup.ItemControl>
-											</RadioGroup.Item>
-										);
-									}}
-								</For>
-							</KRadioGroup>
-							<Show when={project.camera.manualPosition}>
-								<div class="flex justify-between items-center mt-3">
-									<span class="text-[11px] text-ed-text-3">
-										Custom position (dragged on canvas)
-									</span>
-									<EditorButton
-										onClick={() => setProject("camera", "manualPosition", null)}
-									>
-										Reset
-									</EditorButton>
-								</div>
-							</Show>
-						</div>
-						<Subfield name="Hide Camera">
-							<Toggle
-								checked={project.camera.hide}
-								onChange={(hide) => setProject("camera", "hide", hide)}
-							/>
-						</Subfield>
-						<Subfield name="Mirror Camera">
-							<Toggle
-								checked={project.camera.mirror}
-								onChange={(mirror) => setProject("camera", "mirror", mirror)}
-							/>
-						</Subfield>
-						<Subfield name="Background">
-							<KSelect<{ name: string; value: BackgroundBlurMode }>
-								options={cameraBackgroundOptions(ostype() === "macos")}
-								optionValue="value"
-								optionTextValue="name"
-								value={
-									cameraBackgroundOptions(ostype() === "macos").find(
-										(option) =>
-											option.value ===
-											(project.camera.backgroundBlur?.mode ?? "off"),
-									) ?? { name: "Off", value: "off" }
-								}
-								onChange={(v) => {
-									if (v)
-										setProject("camera", "backgroundBlur", {
-											mode: v.value,
-										});
-								}}
-								disallowEmptySelection
-								itemComponent={(props) => (
-									<MenuItem<typeof KSelect.Item>
-										as={KSelect.Item}
-										item={props.item}
-									>
-										<KSelect.ItemLabel class="flex-1">
-											{props.item.rawValue.name}
-										</KSelect.ItemLabel>
-									</MenuItem>
-								)}
-							>
-								<KSelect.Trigger class="flex flex-row gap-1.5 items-center px-2 w-full h-[26px] rounded-[7px] transition-colors bg-ed-ctl hover:bg-ed-ctl-hover outline-hidden disabled:text-ed-text-3">
-									<KSelect.Value<{
-										name: string;
-										value: string;
-									}> class="flex-1 text-[12px] text-left truncate text-ed-text-1 font-normal">
-										{(state) => <span>{state.selectedOption().name}</span>}
-									</KSelect.Value>
-									<KSelect.Icon<ValidComponent>
-										as={(iconProps) => (
-											<IconCapChevronDown
-												{...iconProps}
-												class="size-3.5 shrink-0 transform transition-transform data-expanded:rotate-180 text-ed-text-3"
-											/>
-										)}
-									/>
-								</KSelect.Trigger>
-								<KSelect.Portal>
-									<PopperContent<typeof KSelect.Content>
-										as={KSelect.Content}
-										class={cx(topSlideAnimateClasses, "z-50")}
-									>
-										<MenuItemList<typeof KSelect.Listbox>
-											class="overflow-y-auto max-h-32"
-											as={KSelect.Listbox}
-										/>
-									</PopperContent>
-								</KSelect.Portal>
-							</KSelect>
-						</Subfield>
-						<Subfield name="Shape">
-							<KSelect<{ name: string; value: CameraShape }>
-								options={CAMERA_SHAPES}
-								optionValue="value"
-								optionTextValue="name"
-								value={CAMERA_SHAPES.find(
-									(v) => v.value === project.camera.shape,
-								)}
-								onChange={(v) => {
-									if (v) setProject("camera", "shape", v.value);
-								}}
-								disallowEmptySelection
-								itemComponent={(props) => (
-									<MenuItem<typeof KSelect.Item>
-										as={KSelect.Item}
-										item={props.item}
-									>
-										<KSelect.ItemLabel class="flex-1">
-											{props.item.rawValue.name}
-										</KSelect.ItemLabel>
-									</MenuItem>
-								)}
-							>
-								<KSelect.Trigger class="flex flex-row gap-1.5 items-center px-2 w-full h-[26px] rounded-[7px] transition-colors bg-ed-ctl hover:bg-ed-ctl-hover outline-hidden disabled:text-ed-text-3">
-									<KSelect.Value<{
-										name: string;
-										value: StereoMode;
-									}> class="flex-1 text-[12px] text-left truncate text-ed-text-1 font-normal">
-										{(state) => <span>{state.selectedOption().name}</span>}
-									</KSelect.Value>
-									<KSelect.Icon<ValidComponent>
-										as={(props) => (
-											<IconCapChevronDown
-												{...props}
-												class="size-3.5 shrink-0 transform transition-transform data-expanded:rotate-180 text-ed-text-3"
-											/>
-										)}
-									/>
-								</KSelect.Trigger>
-								<KSelect.Portal>
-									<PopperContent<typeof KSelect.Content>
-										as={KSelect.Content}
-										class={cx(topSlideAnimateClasses, "z-50")}
-									>
-										<MenuItemList<typeof KSelect.Listbox>
-											class="overflow-y-auto max-h-32"
-											as={KSelect.Listbox}
-										/>
-									</PopperContent>
-								</KSelect.Portal>
-							</KSelect>
-						</Subfield>
-
-						{/* <Subfield name="Use Camera Aspect Ratio">
-            <Toggle
-              checked={project.camera.use_camera_aspect}
-              onChange={(v) => setProject("camera", "use_camera_aspect", v)}
-            />
-          </Subfield> */}
-					</div>
-				</Section>
-				<div class="w-full border-t border-ed-line" />
-				<Field inline name="Size" value={`${project.camera.size.toFixed(1)}%`}>
-					<Slider
-						value={[project.camera.size]}
-						onChange={(v) => setProject("camera", "size", v[0])}
-						minValue={20}
-						maxValue={80}
-						step={0.1}
-						formatTooltip="%"
-					/>
-				</Field>
-				<Field
-					inline
-					name="Size During Zoom"
-					value={`${(project.camera.zoomSize ?? 60).toFixed(1)}%`}
-				>
-					<Slider
-						value={[project.camera.zoomSize ?? 60]}
-						onChange={(v) => setProject("camera", "zoomSize", v[0])}
-						minValue={10}
-						maxValue={60}
-						step={0.1}
-						formatTooltip="%"
-					/>
-				</Field>
-				<Subfield name="Keep original size during zoom">
-					<Toggle
-						checked={
-							(project.camera.scaleDuringZoom ??
-								DEFAULT_CAMERA_SCALE_DURING_ZOOM) >= 1
-						}
-						onChange={(keep) =>
-							setProject(
-								"camera",
-								"scaleDuringZoom",
-								keep ? 1 : DEFAULT_CAMERA_SCALE_DURING_ZOOM,
-							)
-						}
-					/>
-				</Subfield>
-				<Field
-					inline
-					name="Corners"
-					value={`${(project.camera.rounding ?? 0).toFixed(1)}%`}
-				>
-					<Slider
-						value={[project.camera.rounding ?? 0]}
-						onChange={(v) => setProject("camera", "rounding", v[0])}
-						minValue={0}
-						maxValue={100}
-						step={0.1}
-						formatTooltip="%"
-					/>
-				</Field>
-				<Field inline name="Corner Style">
-					<CornerStyleSelect
-						value={project.camera.roundingType}
-						onChange={(value) => setProject("camera", "roundingType", value)}
-					/>
-				</Field>
-				<Field
-					inline
-					name="Shadow"
-					value={`${(project.camera.shadow ?? 0).toFixed(1)}%`}
-				>
-					<Slider
-						value={[project.camera.shadow ?? 0]}
-						onChange={(v) => setProject("camera", "shadow", v[0])}
-						minValue={0}
-						maxValue={100}
-						step={0.1}
-						formatTooltip="%"
-					/>
-				</Field>
-				<div class="flex flex-col">
-					<ShadowSettings
-						scrollRef={props.scrollRef}
-						size={{
-							value: [project.camera.advancedShadow?.size ?? 50],
-							onChange: (v) => {
-								setProject("camera", "advancedShadow", {
-									...(project.camera.advancedShadow ?? {
-										size: 50,
-										opacity: 18,
-										blur: 50,
-									}),
-									size: v[0],
-								});
-							},
-						}}
-						opacity={{
-							value: [project.camera.advancedShadow?.opacity ?? 18],
-							onChange: (v) => {
-								setProject("camera", "advancedShadow", {
-									...(project.camera.advancedShadow ?? {
-										size: 50,
-										opacity: 18,
-										blur: 50,
-									}),
-									opacity: v[0],
-								});
-							},
-						}}
-						blur={{
-							value: [project.camera.advancedShadow?.blur ?? 50],
-							onChange: (v) => {
-								setProject("camera", "advancedShadow", {
-									...(project.camera.advancedShadow ?? {
-										size: 50,
-										opacity: 18,
-										blur: 50,
-									}),
-									blur: v[0],
-								});
-							},
-						}}
-					/>
-				</div>
+				<CameraSettings
+					camera={project.camera}
+					onChange={(patch) => setProject("camera", patch)}
+				/>
 				<Show when={!selectedStyle()}>
 					<ColorCorrectionSection target="camera" scrollRef={props.scrollRef} />
 				</Show>
-				{/* <ComingSoonTooltip>
-            <Field name="Shadow" icon={<IconCapShadow />}>
-              <Slider
-                disabled
-                value={[project.camera.shadow]}
-                onChange={(v) => setProject("camera", "shadow", v[0])}
-                minValue={0}
-                maxValue={100}
-              />
-            </Field>
-          </ComingSoonTooltip> */}
 			</Show>
 		</KTabs.Content>
-	);
-}
-
-function CornerStyleSelect(props: {
-	value: CornerRoundingType;
-	onChange: (value: CornerRoundingType) => void;
-}) {
-	return (
-		<div class="w-32">
-			<KSelect<{ name: string; value: CornerRoundingType }>
-				options={CORNER_STYLE_OPTIONS}
-				optionValue="value"
-				optionTextValue="name"
-				value={CORNER_STYLE_OPTIONS.find(
-					(option) => option.value === props.value,
-				)}
-				onChange={(option) => option && props.onChange(option.value)}
-				disallowEmptySelection
-				itemComponent={(itemProps) => (
-					<MenuItem<typeof KSelect.Item>
-						as={KSelect.Item}
-						item={itemProps.item}
-					>
-						<KSelect.ItemLabel class="flex-1">
-							{itemProps.item.rawValue.name}
-						</KSelect.ItemLabel>
-					</MenuItem>
-				)}
-			>
-				<KSelect.Trigger class="flex flex-row gap-1.5 items-center px-2 w-full h-[26px] rounded-[7px] transition-colors bg-ed-ctl hover:bg-ed-ctl-hover outline-hidden disabled:text-ed-text-3">
-					<KSelect.Value<{
-						name: string;
-						value: CornerRoundingType;
-					}> class="flex-1 text-[12px] text-left truncate text-ed-text-1 font-normal">
-						{(state) => <span>{state.selectedOption().name}</span>}
-					</KSelect.Value>
-					<KSelect.Icon<ValidComponent>
-						as={(iconProps) => (
-							<IconCapChevronDown
-								{...iconProps}
-								class="size-3.5 shrink-0 transform transition-transform data-expanded:rotate-180 text-ed-text-3"
-							/>
-						)}
-					/>
-				</KSelect.Trigger>
-				<KSelect.Portal>
-					<PopperContent<typeof KSelect.Content>
-						as={KSelect.Content}
-						class={cx(topSlideAnimateClasses, "z-50")}
-					>
-						<MenuItemList<typeof KSelect.Listbox>
-							class="overflow-y-auto max-h-32"
-							as={KSelect.Listbox}
-						/>
-					</PopperContent>
-				</KSelect.Portal>
-			</KSelect>
-		</div>
 	);
 }
 
@@ -3649,18 +2683,20 @@ function AudioSegmentConfig(props: {
 							<span class="text-sm font-medium truncate text-gray-12">
 								{props.segment.name || "Audio"}
 							</span>
-							<span class="text-xs text-gray-10">Tap to change track</span>
+							<span class="text-xs text-gray-10">
+								{localize("Tap to change track")}
+							</span>
 						</div>
 						<span class="flex gap-1 items-center px-2 h-7 text-xs font-medium rounded-lg border transition-colors shrink-0 border-gray-3 bg-gray-1 text-gray-11 group-hover:text-gray-12">
 							<IconLucideRefreshCw class="size-3.5" />
-							Change
+							{localize("Change")}
 						</span>
 					</button>
 					<div class="flex gap-3 items-center">
 						<input
 							class="flex-1 px-3 py-2 rounded-lg border border-gray-3 bg-gray-2 text-gray-12"
 							value={props.segment.name ?? ""}
-							placeholder="Audio"
+							placeholder={localize("Audio")}
 							onInput={(e) =>
 								updateSegment((segment) => {
 									segment.name = e.currentTarget.value;
@@ -3668,7 +2704,9 @@ function AudioSegmentConfig(props: {
 							}
 						/>
 						<div class="flex flex-col gap-2 items-center">
-							<span class="text-[11px] text-ed-text-3">Enabled</span>
+							<span class="text-[11px] text-ed-text-3">
+								{localize("Enabled")}
+							</span>
 							<Toggle
 								checked={props.segment.enabled}
 								onChange={(value) =>
@@ -3683,7 +2721,7 @@ function AudioSegmentConfig(props: {
 			</Section>
 			<Field
 				inline
-				name="Volume"
+				name={localize("Volume")}
 				value={`${clampNumber(
 					props.segment.volumeDb,
 					MIN_VOLUME_DB,
@@ -3785,7 +2823,7 @@ function KeyboardSegmentConfig(props: {
 					<div class="grid grid-cols-[1fr_auto_1fr] gap-2 items-start">
 						<div class="rounded-lg bg-ed-card p-2.5 space-y-2">
 							<div class="flex items-center justify-between text-[10px] uppercase tracking-[0.08em] text-ed-text-3">
-								<span>Start</span>
+								<span>{localize("Start")}</span>
 								<span>{formatTime(props.segment.start)}</span>
 							</div>
 							<Input
@@ -3803,7 +2841,7 @@ function KeyboardSegmentConfig(props: {
 						<div class="pt-10 text-[11px] font-medium text-ed-text-3">to</div>
 						<div class="rounded-lg bg-ed-card p-2.5 space-y-2">
 							<div class="flex items-center justify-between text-[10px] uppercase tracking-[0.08em] text-ed-text-3">
-								<span>End</span>
+								<span>{localize("End")}</span>
 								<span>{formatTime(props.segment.end)}</span>
 							</div>
 							<Input
@@ -3820,7 +2858,7 @@ function KeyboardSegmentConfig(props: {
 						</div>
 					</div>
 					<div class="flex items-center justify-between rounded-lg bg-ed-card px-3 py-2 text-[11px] text-ed-text-2">
-						<span>Duration</span>
+						<span>{localize("Duration")}</span>
 						<span class="font-medium text-ed-text-1">
 							{Math.max(0, props.segment.end - props.segment.start).toFixed(2)}s
 						</span>
@@ -3900,7 +2938,7 @@ function CaptionSegmentConfig(props: {
 					<div class="grid grid-cols-[1fr_auto_1fr] gap-2 items-start">
 						<div class="rounded-lg bg-ed-card p-2.5 space-y-2">
 							<div class="flex items-center justify-between text-[10px] uppercase tracking-[0.08em] text-ed-text-3">
-								<span>Start</span>
+								<span>{localize("Start")}</span>
 								<span>{formatTime(props.segment.start)}</span>
 							</div>
 							<Input
@@ -3923,7 +2961,7 @@ function CaptionSegmentConfig(props: {
 						<div class="pt-10 text-[11px] font-medium text-ed-text-3">to</div>
 						<div class="rounded-lg bg-ed-card p-2.5 space-y-2">
 							<div class="flex items-center justify-between text-[10px] uppercase tracking-[0.08em] text-ed-text-3">
-								<span>End</span>
+								<span>{localize("End")}</span>
 								<span>{formatTime(props.segment.end)}</span>
 							</div>
 							<Input
@@ -3945,7 +2983,7 @@ function CaptionSegmentConfig(props: {
 						</div>
 					</div>
 					<div class="flex items-center justify-between rounded-lg bg-ed-card px-3 py-2 text-[11px] text-ed-text-2">
-						<span>Duration</span>
+						<span>{localize("Duration")}</span>
 						<span class="font-medium text-ed-text-1">
 							{Math.max(0, props.segment.end - props.segment.start).toFixed(2)}s
 						</span>
@@ -4040,13 +3078,15 @@ function MaskSegmentConfig(props: {
 								<RadioGroup.ItemInput class="sr-only" />
 								<RadioGroup.ItemLabel class="flex items-center gap-2 p-2 text-[13px] text-ed-text-1">
 									<RadioGroup.ItemControl class="size-4 rounded-full border border-gray-7 data-checked:border-blue-9 data-checked:bg-blue-9" />
-									{option.label}
+									{localize(option.label)}
 								</RadioGroup.ItemLabel>
 							</RadioGroup.Item>
 						))}
 					</RadioGroup>
 					<div class="flex items-center gap-2">
-						<span class="text-[11px] text-ed-text-3">Enabled</span>
+						<span class="text-[11px] text-ed-text-3">
+							{localize("Enabled")}
+						</span>
 						<Toggle
 							checked={props.segment.enabled}
 							onChange={(value) =>
@@ -4076,7 +3116,7 @@ function MaskSegmentConfig(props: {
 								<RadioGroup.ItemInput class="sr-only" />
 								<RadioGroup.ItemLabel class="flex items-center gap-2 p-2 text-[13px] text-ed-text-1">
 									<RadioGroup.ItemControl class="size-4 rounded-full border border-gray-7 data-checked:border-blue-9 data-checked:bg-blue-9" />
-									{option.label}
+									{localize(option.label)}
 								</RadioGroup.ItemLabel>
 							</RadioGroup.Item>
 						))}
@@ -4262,7 +3302,7 @@ function ZoomSegmentPreview(props: {
 		<>
 			<div class="space-y-1.5">
 				<div class="text-xs font-medium text-center text-gray-12">
-					Zoom {props.segmentIndex + 1}
+					{localize("Zoom")} {props.segmentIndex + 1}
 				</div>
 				<div class="overflow-hidden relative rounded-sm border aspect-video border-gray-3 bg-gray-3">
 					<canvas
@@ -4274,7 +3314,7 @@ function ZoomSegmentPreview(props: {
 					/>
 					<Show when={!loaded()}>
 						<p class="flex absolute inset-0 justify-center items-center text-xs text-gray-11">
-							Loading...
+							{localize("Loading...")}
 						</p>
 					</Show>
 				</div>
@@ -4346,13 +3386,13 @@ function ZoomSegmentConfig(props: {
 							class="z-10 flex-1 h-[26px] rounded-md text-[11.5px] font-medium text-ed-text-2 transition-colors duration-100 outline-hidden data-selected:text-ed-text-1 peer"
 							disabled={!generalSettings.data?.custom_cursor_capture2}
 						>
-							Auto
+							{localize("Auto")}
 						</KTabs.Trigger>
 						<KTabs.Trigger
 							value="manual"
 							class="z-10 flex-1 h-[26px] rounded-md text-[11.5px] font-medium text-ed-text-2 transition-colors duration-100 outline-hidden data-selected:text-ed-text-1 peer"
 						>
-							Manual
+							{localize("Manual")}
 						</KTabs.Trigger>
 						<KTabs.Indicator class="flex overflow-hidden absolute inset-y-0.5 left-0 rounded-md transition-transform">
 							<div class="flex-1 bg-ed-card dark:bg-white/11 shadow-[0_1px_2px_rgba(0,0,0,.12),0_0_0_.5px_rgba(0,0,0,.06)] dark:shadow-none" />
@@ -4361,8 +3401,9 @@ function ZoomSegmentConfig(props: {
 					<div class="space-y-3">
 						<Show when={!generalSettings.data?.custom_cursor_capture2}>
 							<p class="text-[11px] text-ed-text-3">
-								Auto mode needs cursor capture. Enable "Custom cursor capture
-								(Studio)" in Settings → General.
+								{localize(
+									'Auto mode needs cursor capture. Enable "Custom cursor capture (Studio)" in Settings → General.',
+								)}
 							</p>
 						</Show>
 						<ZoomModeHelper
@@ -4574,7 +3615,7 @@ function ZoomSegmentConfig(props: {
 											<Show when={!loaded()}>
 												<div class="flex absolute inset-0 justify-center items-center bg-gray-2">
 													<div class="text-sm text-gray-11">
-														Loading preview...
+														{localize("Loading preview...")}
 													</div>
 												</div>
 											</Show>
@@ -4712,7 +3753,7 @@ function ZoomMultiSegmentConfig(props: {
 							onClick={() => setAllModes("auto")}
 							class={modeButtonClass}
 						>
-							Auto
+							{localize("Auto")}
 						</button>
 						<button
 							type="button"
@@ -4720,13 +3761,14 @@ function ZoomMultiSegmentConfig(props: {
 							onClick={() => setAllModes("manual")}
 							class={modeButtonClass}
 						>
-							Manual
+							{localize("Manual")}
 						</button>
 					</div>
 					<Show when={!generalSettings.data?.custom_cursor_capture2}>
 						<p class="text-[11px] text-ed-text-3">
-							Auto mode needs cursor capture. Enable "Custom cursor capture
-							(Studio)" in Settings → General.
+							{localize(
+								'Auto mode needs cursor capture. Enable "Custom cursor capture (Studio)" in Settings → General.',
+							)}
 						</p>
 					</Show>
 					<Show
@@ -4745,8 +3787,9 @@ function ZoomMultiSegmentConfig(props: {
 							/>
 							<Show when={manualPositionsMixed()}>
 								<p class="text-xs text-gray-10">
-									Segments zoom into different spots. Drag to move them all to
-									the same one.
+									{localize(
+										"Segments zoom into different spots. Drag to move them all to the same one.",
+									)}
 								</p>
 							</Show>
 						</div>
@@ -4760,7 +3803,7 @@ function ZoomMultiSegmentConfig(props: {
 							<button
 								type="button"
 								class="hidden absolute top-1.5 right-1.5 z-10 justify-center items-center rounded-full transition-colors group-hover:flex bg-gray-5 hover:bg-gray-6 text-gray-11 hover:text-gray-12 size-5"
-								aria-label="Remove from selection"
+								aria-label={localize("Remove from selection")}
 								onClick={() => removeFromSelection(item().index)}
 							>
 								<IconLucideX class="size-3" />
@@ -4816,8 +3859,9 @@ function SyncOffsetsConfig() {
 			<div class="flex flex-col gap-3.5">
 				<Section name="Sync">
 					<p class="text-[11px] text-ed-text-3">
-						Fine-tune source offsets if audio or camera drifts out of sync with
-						the screen recording.
+						{localize(
+							"Fine-tune source offsets if audio or camera drifts out of sync with the screen recording.",
+						)}
 					</p>
 				</Section>
 
@@ -4829,8 +3873,9 @@ function SyncOffsetsConfig() {
 							</Show>
 							<Show when={clipConfig(index())?.offsetsAutoCalculated === true}>
 								<p class="text-[11px] text-ed-text-3">
-									Cap calculated these offsets automatically to keep audio in
-									sync with the video. Adjust them if anything still sounds off.
+									{localize(
+										"Cap calculated these offsets automatically to keep audio in sync with the video. Adjust them if anything still sounds off.",
+									)}
 								</p>
 							</Show>
 							{meta().hasSystemAudio && (
@@ -5031,7 +4076,7 @@ function SceneSegmentConfig(props: {
 						onClick={() => setEditorState("timeline", "selection", null)}
 						leftIcon={<IconLucideCheck />}
 					>
-						Done
+						{localize("Done")}
 					</EditorButton>
 				</div>
 				<EditorButton
@@ -5041,7 +4086,7 @@ function SceneSegmentConfig(props: {
 					}}
 					leftIcon={<IconCapTrash />}
 				>
-					Delete
+					{localize("Delete")}
 				</EditorButton>
 			</div>
 			<Field name="Camera Layout">
@@ -5077,15 +4122,15 @@ function SceneSegmentConfig(props: {
 					<KTabs.List class="grid grid-cols-2 gap-2">
 						<KTabs.Trigger value="default" class={SCENE_MODE_TRIGGER_CLASS}>
 							<IconLucideMonitor class="size-3.5" />
-							Default
+							{localize("Default")}
 						</KTabs.Trigger>
 						<KTabs.Trigger value="cameraOnly" class={SCENE_MODE_TRIGGER_CLASS}>
 							<IconLucideVideo class="size-3.5" />
-							Camera Only
+							{localize("Camera Only")}
 						</KTabs.Trigger>
 						<KTabs.Trigger value="hideCamera" class={SCENE_MODE_TRIGGER_CLASS}>
 							<IconLucideEyeOff class="size-3.5" />
-							Hide Camera
+							{localize("Hide Camera")}
 						</KTabs.Trigger>
 						<KTabs.Trigger
 							value="splitScreen"
@@ -5093,7 +4138,7 @@ function SceneSegmentConfig(props: {
 							class={SCENE_MODE_TRIGGER_CLASS}
 						>
 							<IconLucideColumns2 class="size-3.5" />
-							Split Screen
+							{localize("Split Screen")}
 						</KTabs.Trigger>
 						<KTabs.Trigger
 							value="floating"
@@ -5101,7 +4146,7 @@ function SceneSegmentConfig(props: {
 							class={SCENE_MODE_TRIGGER_CLASS}
 						>
 							<IconLucidePanelRight class="size-3.5" />
-							Floating
+							{localize("Floating")}
 						</KTabs.Trigger>
 					</KTabs.List>
 					<div class="p-2.5 rounded-lg bg-ed-card-2">

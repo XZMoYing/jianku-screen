@@ -25,6 +25,7 @@ import {
 } from "solid-js";
 import { produce } from "solid-js/store";
 import toast from "solid-toast";
+import { t as localize } from "~/utils/i18n";
 import IconLucidePalette from "~icons/lucide/palette";
 import { stylesRevealCamera } from "../style";
 import { ImageTrack } from "./image-track";
@@ -1478,7 +1479,11 @@ export function Timeline(props: {
 						}}
 					>
 						<div class="flex flex-col gap-1.5 min-h-full">
-							<TrackRow icon={trackIcons.clip} label="Video" type="clip">
+							<TrackRow
+								icon={trackIcons.clip}
+								label={localize("Video")}
+								type="clip"
+							>
 								<ClipTrack
 									ref={setTimelineRef}
 									handleUpdatePlayhead={handleUpdatePlayhead}
@@ -1487,7 +1492,7 @@ export function Timeline(props: {
 							<Show when={captionTrackVisible()}>
 								<TrackRow
 									icon={trackIcons.caption}
-									label="Captions"
+									label={localize("Captions")}
 									type="caption"
 									onDelete={() => handleDeleteSingleTrack("caption")}
 								>
@@ -1504,7 +1509,7 @@ export function Timeline(props: {
 							<Show when={keyboardTrackVisible()}>
 								<TrackRow
 									icon={trackIcons.keyboard}
-									label="Keyboard"
+									label={localize("Keyboard")}
 									type="keyboard"
 									onDelete={() => handleDeleteSingleTrack("keyboard")}
 								>
@@ -1607,7 +1612,7 @@ export function Timeline(props: {
 							</For>
 							<TrackRow
 								icon={trackIcons.zoom}
-								label="Zoom"
+								label={localize("Zoom")}
 								type="zoom"
 								onDelete={
 									(project.timeline?.zoomSegments?.length ?? 0) > 0
@@ -1648,7 +1653,7 @@ export function Timeline(props: {
 							<Show when={sceneTrackVisible()}>
 								<TrackRow
 									icon={trackIcons.scene}
-									label="Scene"
+									label={localize("Scene")}
 									type="scene"
 									onDelete={
 										(project.timeline?.sceneSegments?.length ?? 0) > 0

@@ -10,6 +10,7 @@ import {
 	Show,
 } from "solid-js";
 import toast from "solid-toast";
+import { t as localize } from "~/utils/i18n";
 import {
 	mobileCaptureDefaults,
 	mobileOrientationOptions,
@@ -168,7 +169,7 @@ export default function MobileRecorder(props: {
 		>
 			<div class="mobile-device-card">
 				<div class="flex items-center justify-between gap-3">
-					<label for="mobile-device">录制设备</label>
+					<label for="mobile-device">{localize("录制设备")}</label>
 					<button
 						type="button"
 						class="studio-secondary"
@@ -195,7 +196,7 @@ export default function MobileRecorder(props: {
 								disabled={!device.authorized}
 							>
 								{device.name} ·{" "}
-								{device.platform === "ios" ? "iOS / iPadOS" : "安卓"}
+								{device.platform === "ios" ? "iOS / iPadOS" : localize("安卓")}
 								{device.authorized ? "" : " · 请允许 USB 调试"}
 							</option>
 						)}
@@ -212,9 +213,9 @@ export default function MobileRecorder(props: {
 						data-testid="mobile-capture-settings"
 					>
 						<label>
-							<span>录制尺寸</span>
+							<span>{localize("录制尺寸")}</span>
 							<select
-								aria-label="设备录制尺寸"
+								aria-label={localize("设备录制尺寸")}
 								value={captureSettings().maxSize}
 								disabled={status()?.active || busy()}
 								onChange={(event) =>
@@ -237,9 +238,9 @@ export default function MobileRecorder(props: {
 							</select>
 						</label>
 						<label>
-							<span>帧率上限</span>
+							<span>{localize("帧率上限")}</span>
 							<select
-								aria-label="设备录制帧率"
+								aria-label={localize("设备录制帧率")}
 								value={captureSettings().maxFps}
 								disabled={status()?.active || busy()}
 								onChange={(event) =>
@@ -249,14 +250,14 @@ export default function MobileRecorder(props: {
 									}))
 								}
 							>
-								<option value={30}>最高 30 fps</option>
-								<option value={60}>最高 60 fps</option>
+								<option value={30}>{localize("最高 30 fps")}</option>
+								<option value={60}>{localize("最高 60 fps")}</option>
 							</select>
 						</label>
 						<label>
-							<span>编码画质</span>
+							<span>{localize("编码画质")}</span>
 							<select
-								aria-label="设备录制画质"
+								aria-label={localize("设备录制画质")}
 								value={captureSettings().bitRateMbps}
 								disabled={status()?.active || busy()}
 								onChange={(event) =>
@@ -266,15 +267,15 @@ export default function MobileRecorder(props: {
 									}))
 								}
 							>
-								<option value={8}>标准 · 8 Mbps</option>
-								<option value={16}>高画质 · 16 Mbps</option>
-								<option value={32}>更高画质 · 32 Mbps</option>
+								<option value={8}>{localize("标准 · 8 Mbps")}</option>
+								<option value={16}>{localize("高画质 · 16 Mbps")}</option>
+								<option value={32}>{localize("更高画质 · 32 Mbps")}</option>
 							</select>
 						</label>
 						<label>
-							<span>画面方向</span>
+							<span>{localize("画面方向")}</span>
 							<select
-								aria-label="设备录制方向"
+								aria-label={localize("设备录制方向")}
 								value={captureSettings().orientation}
 								disabled={status()?.active || busy()}
 								onChange={(event) => {
@@ -310,7 +311,7 @@ export default function MobileRecorder(props: {
 				</Show>
 				<label class="mobile-toggle">
 					<span>
-						<strong>设备声音</strong>
+						<strong>{localize("设备声音")}</strong>
 						<small>
 							{selected()?.audioSupported
 								? "录制设备播放的声音"
@@ -328,8 +329,10 @@ export default function MobileRecorder(props: {
 				</label>
 				<label class="mobile-toggle">
 					<span>
-						<strong>打开设备预览</strong>
-						<small>在独立窗口查看画面；安卓设备也支持鼠标操作。</small>
+						<strong>{localize("打开设备预览")}</strong>
+						<small>
+							{localize("在独立窗口查看画面；安卓设备也支持鼠标操作。")}
+						</small>
 					</span>
 					<input
 						type="checkbox"
@@ -403,7 +406,7 @@ export default function MobileRecorder(props: {
 								.catch((error) => toast.error(String(error)))
 						}
 					>
-						继续编辑设备录制
+						{localize("继续编辑设备录制")}
 					</button>
 				)}
 			</Show>
@@ -423,7 +426,7 @@ export default function MobileRecorder(props: {
 			</Show>
 			<section class="mobile-history" data-testid="mobile-history">
 				<div class="mobile-history-heading">
-					<h3>最近设备录制</h3>
+					<h3>{localize("最近设备录制")}</h3>
 					<button
 						type="button"
 						class="studio-secondary"
@@ -431,7 +434,7 @@ export default function MobileRecorder(props: {
 						onClick={() => void refreshProjects()}
 					>
 						<IconRefresh class="size-3.5" />
-						刷新列表
+						{localize("刷新列表")}
 					</button>
 				</div>
 				<Show when={projects.error}>
@@ -454,7 +457,7 @@ export default function MobileRecorder(props: {
 									<strong title={project.name}>{project.name}</strong>
 									<small>
 										{project.phase === "complete"
-											? "已保存"
+											? localize("已保存")
 											: project.phase === "recording"
 												? "录制或保存中"
 												: project.hasSource
@@ -490,7 +493,7 @@ export default function MobileRecorder(props: {
 										class="mobile-project-location"
 										onClick={() => reveal(project.path)}
 									>
-										定位
+										{localize("定位")}
 									</button>
 								</div>
 							</div>
@@ -511,12 +514,12 @@ export default function MobileRecorder(props: {
 			</section>
 			<div class="mobile-connection-guide">
 				<p>
-					<strong>iPhone / iPad</strong>连接
-					USB，解锁设备，在设备上选择「信任」。
+					<strong>iPhone / iPad</strong>
+					{localize("连接 USB，解锁设备，在设备上选择「信任」。")}
 				</p>
 				<p>
-					<strong>安卓</strong>开启「开发者选项 → USB 调试」，连接后允许这台
-					Mac。
+					<strong>{localize("安卓")}</strong>
+					{localize("开启「开发者选项 → USB 调试」，连接后允许这台 Mac。")}
 				</p>
 				<p>
 					录后按画幅初选手机或平板外框，可在编辑器中切换或关闭。支持缩放、运镜、动态模糊和画面设置。

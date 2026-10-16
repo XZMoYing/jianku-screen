@@ -1,3 +1,4 @@
+use crate::interface_language::text as localized;
 use crate::{
     NewScreenshotAdded, NewStudioRecordingAdded, RecordingStarted, RecordingStopped,
     RequestOpenSettings, recording,
@@ -454,6 +455,7 @@ fn create_mode_submenu(app: &AppHandle) -> tauri::Result<Submenu<tauri::Wry>> {
     ];
 
     for (tray_item, mode, label) in modes {
+        let label = localized(app, label);
         let is_selected = current_mode == mode;
         let display_label = if is_selected {
             format!("✓ {label}")
@@ -476,7 +478,7 @@ fn build_tray_menu(app: &AppHandle, cache: &PreviousItemsCache) -> tauri::Result
                 &MenuItem::with_id(
                     app,
                     TrayItem::RequestPermissions,
-                    "Request Permissions",
+                    localized(app, "Request Permissions"),
                     true,
                     None::<&str>,
                 )?,
@@ -484,11 +486,21 @@ fn build_tray_menu(app: &AppHandle, cache: &PreviousItemsCache) -> tauri::Result
                 &MenuItem::with_id(
                     app,
                     "version",
-                    format!("Cap v{}", env!("CARGO_PKG_VERSION")),
+                    format!(
+                        "{} v{}",
+                        localized(app, "简库镜传 Next"),
+                        app.package_info().version
+                    ),
                     false,
                     None::<&str>,
                 )?,
-                &MenuItem::with_id(app, TrayItem::Quit, "Quit Cap", true, None::<&str>)?,
+                &MenuItem::with_id(
+                    app,
+                    TrayItem::Quit,
+                    localized(app, "Quit Cap"),
+                    true,
+                    None::<&str>,
+                )?,
             ],
         );
     }
@@ -503,7 +515,7 @@ fn build_tray_menu(app: &AppHandle, cache: &PreviousItemsCache) -> tauri::Result
     menu.append(&MenuItem::with_id(
         app,
         TrayItem::OpenCap,
-        "Open Main Window",
+        localized(app, "Open Main Window"),
         true,
         None::<&str>,
     )?)?;
@@ -512,21 +524,21 @@ fn build_tray_menu(app: &AppHandle, cache: &PreviousItemsCache) -> tauri::Result
         menu.append(&MenuItem::with_id(
             app,
             TrayItem::RecordDisplay,
-            "Screenshot Display",
+            localized(app, "Screenshot Display"),
             true,
             None::<&str>,
         )?)?;
         menu.append(&MenuItem::with_id(
             app,
             TrayItem::RecordWindow,
-            "Screenshot Window",
+            localized(app, "Screenshot Window"),
             true,
             None::<&str>,
         )?)?;
         menu.append(&MenuItem::with_id(
             app,
             TrayItem::RecordArea,
-            "Screenshot Area",
+            localized(app, "Screenshot Area"),
             true,
             None::<&str>,
         )?)?;
@@ -534,28 +546,28 @@ fn build_tray_menu(app: &AppHandle, cache: &PreviousItemsCache) -> tauri::Result
         menu.append(&MenuItem::with_id(
             app,
             TrayItem::RecordDisplay,
-            "Record Display",
+            localized(app, "Record Display"),
             true,
             None::<&str>,
         )?)?;
         menu.append(&MenuItem::with_id(
             app,
             TrayItem::RecordWindow,
-            "Record Window",
+            localized(app, "Record Window"),
             true,
             None::<&str>,
         )?)?;
         menu.append(&MenuItem::with_id(
             app,
             TrayItem::RecordArea,
-            "Record Area",
+            localized(app, "Record Area"),
             true,
             None::<&str>,
         )?)?;
         menu.append(&MenuItem::with_id(
             app,
             TrayItem::TakeScreenshot,
-            "Take a Screenshot",
+            localized(app, "Take a Screenshot"),
             true,
             None::<&str>,
         )?)?;
@@ -564,7 +576,7 @@ fn build_tray_menu(app: &AppHandle, cache: &PreviousItemsCache) -> tauri::Result
     menu.append(&MenuItem::with_id(
         app,
         TrayItem::ImportVideo,
-        "Import Media...",
+        localized(app, "Import Media..."),
         true,
         None::<&str>,
     )?)?;
@@ -577,21 +589,21 @@ fn build_tray_menu(app: &AppHandle, cache: &PreviousItemsCache) -> tauri::Result
     menu.append(&MenuItem::with_id(
         app,
         TrayItem::ViewAllRecordings,
-        "View all recordings",
+        localized(app, "View all recordings"),
         true,
         None::<&str>,
     )?)?;
     menu.append(&MenuItem::with_id(
         app,
         TrayItem::ViewAllScreenshots,
-        "View all screenshots",
+        localized(app, "View all screenshots"),
         true,
         None::<&str>,
     )?)?;
     menu.append(&MenuItem::with_id(
         app,
         TrayItem::OpenSettings,
-        "Settings",
+        localized(app, "Settings"),
         true,
         None::<&str>,
     )?)?;
@@ -600,21 +612,25 @@ fn build_tray_menu(app: &AppHandle, cache: &PreviousItemsCache) -> tauri::Result
     menu.append(&MenuItem::with_id(
         app,
         TrayItem::UploadLogs,
-        "Upload Logs",
+        localized(app, "本机诊断"),
         true,
         None::<&str>,
     )?)?;
     menu.append(&MenuItem::with_id(
         app,
         "version",
-        format!("Cap v{}", env!("CARGO_PKG_VERSION")),
+        format!(
+            "{} v{}",
+            localized(app, "简库镜传 Next"),
+            app.package_info().version
+        ),
         false,
         None::<&str>,
     )?)?;
     menu.append(&MenuItem::with_id(
         app,
         TrayItem::Quit,
-        "Quit Cap",
+        localized(app, "Quit Cap"),
         true,
         None::<&str>,
     )?)?;
@@ -820,6 +836,23 @@ fn handle_mode_selection(
 }
 
 pub fn create_tray(app: &AppHandle) -> tauri::Result<()> {
+    let language_app = app.clone();
+    app.listen("store://change", move |event| {
+        if serde_json::from_str::<serde_json::Value>(event.payload())
+            .ok()
+            .and_then(|v| {
+                v.get("key")
+                    .and_then(serde_json::Value::as_str)
+                    .map(str::to_string)
+            })
+            .as_deref()
+            == Some("interface_language")
+        {
+            let app = language_app.clone();
+            // Store change callbacks run while the store is locked.
+            tauri::async_runtime::spawn_blocking(move || crate::interface_language::refresh(&app));
+        }
+    });
     let cache = Arc::new(Mutex::new(PreviousItemsCache::default()));
 
     app.manage(TrayMenuCache {
@@ -991,18 +1024,11 @@ pub fn create_tray(app: &AppHandle) -> tauri::Result<()> {
                 Ok(TrayItem::UploadLogs) => {
                     let app = app.clone();
                     tokio::spawn(async move {
-                        match crate::logging::upload_log_file(&app).await {
-                            Ok(_) => {
-                                tracing::info!("Successfully uploaded logs");
-                                app.dialog()
-                                    .message("Logs uploaded successfully")
-                                    .show(|_| {});
-                            }
-                            Err(e) => {
-                                tracing::error!("Failed to upload logs: {e:#}");
-                                app.dialog().message("Failed to upload logs").show(|_| {});
-                            }
+                        let _ = ShowCapWindow::Settings {
+                            page: Some("feedback".into()),
                         }
+                        .show(&app)
+                        .await;
                     });
                 }
                 Ok(TrayItem::Quit) => {

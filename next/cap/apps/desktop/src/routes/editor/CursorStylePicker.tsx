@@ -1,15 +1,16 @@
 import { Collapsible as KCollapsible } from "@kobalte/core/collapsible";
 import { RadioGroup as KRadioGroup } from "@kobalte/core/radio-group";
 import { type as ostype } from "@tauri-apps/plugin-os";
-import { createMemo, For, Show } from "solid-js";
+import { For, Show } from "solid-js";
 import { Toggle } from "~/components/Toggle";
 import Tooltip from "~/components/Tooltip";
+import { t as localize } from "~/utils/i18n";
 import type { CursorRippleConfig, CursorType } from "~/utils/tauri";
 import macArrow from "../../../../../crates/cursor-info/assets/mac/arrow.svg?raw";
 import tahoeArrow from "../../../../../crates/cursor-info/assets/mac/tahoe/default.svg?raw";
 import windowsArrow from "../../../../../crates/cursor-info/assets/windows/arrow.svg?raw";
 import { RgbInput } from "./color-utils";
-import { type TransformedMeta, useEditorContext } from "./context";
+import type { TransformedMeta } from "./context";
 import {
 	type CursorFamily,
 	type CursorStyle,
@@ -106,8 +107,12 @@ function CursorStyleCard(props: {
 				{(family) => <CursorArrow svg={CURSOR_FAMILIES[family()].arrow} />}
 			</Show>
 			<Show when={props.style === "auto"}>
-				<span class="text-xs font-medium text-ed-text-1">Default</span>
-				<span class="text-[11px] text-ed-text-2">Recorded cursors</span>
+				<span class="text-xs font-medium text-ed-text-1">
+					{localize("Default")}
+				</span>
+				<span class="text-[11px] text-ed-text-2">
+					{localize("Recorded cursors")}
+				</span>
 			</Show>
 		</div>
 	);
@@ -121,7 +126,7 @@ function CursorStyleCard(props: {
 			<KRadioGroup.ItemInput class="sr-only" />
 			<KRadioGroup.ItemLabel class="flex cursor-pointer flex-col items-center gap-1.5">
 				<Tooltip
-					content={cursorStyleDescription(props.style)}
+					content={localize(cursorStyleDescription(props.style))}
 					childClass="w-full"
 				>
 					{tile()}
@@ -130,48 +135,49 @@ function CursorStyleCard(props: {
 					classList={{ hidden: props.style === "auto" }}
 					class="max-w-full text-[11px] font-medium leading-none truncate transition-colors text-ed-text-2 group-hover:text-ed-text-1 group-data-checked:text-ed-text-1"
 				>
-					{label()}
+					{localize(label())}
 				</span>
 			</KRadioGroup.ItemLabel>
 		</KRadioGroup.Item>
 	);
 }
 
-export function CursorStylePicker() {
-	const { project, setProject, meta } = useEditorContext();
-
-	const recorded = createMemo(() => recordedCursorFamily(meta()));
-
-	const selected = createMemo(() => selectedCursorStyle(project.cursor.type));
-
+export function CursorStyleOptions(props: {
+	value: CursorType;
+	onChange: (value: CursorType) => void;
+	recorded?: CursorFamily;
+}) {
 	return (
-		<Section name="Cursor style">
+		<Section name={localize("Cursor style")}>
 			<KRadioGroup
 				class="grid grid-cols-4 gap-2"
-				value={selected()}
-				onChange={(value) => setProject("cursor", "type", value as CursorType)}
+				value={selectedCursorStyle(props.value)}
+				onChange={(value) => props.onChange(value as CursorType)}
 			>
 				<For each={cursorStyleOrder(ostype())}>
-					{(style) => <CursorStyleCard style={style} recorded={recorded()} />}
+					{(style) => (
+						<CursorStyleCard style={style} recorded={props.recorded} />
+					)}
 				</For>
 			</KRadioGroup>
 			<p class="text-[11px] leading-relaxed text-ed-text-2">
-				{cursorStyleDescription(selected())}
+				{localize(cursorStyleDescription(selectedCursorStyle(props.value)))}
 			</p>
 		</Section>
 	);
 }
 
-export function CursorRippleSection() {
-	const { project, setProject } = useEditorContext();
-
-	const ripple = () => project.cursor.ripple ?? DEFAULT_CURSOR_RIPPLE;
+export function CursorRippleControls(props: {
+	value: CursorRippleConfig | null | undefined;
+	onChange: (value: CursorRippleConfig) => void;
+}) {
+	const ripple = () => props.value ?? DEFAULT_CURSOR_RIPPLE;
 	const updateRipple = (patch: Partial<CursorRippleConfig>) =>
-		setProject("cursor", "ripple", { ...ripple(), ...patch });
+		props.onChange({ ...ripple(), ...patch });
 
 	return (
 		<KCollapsible open={ripple().enabled}>
-			<Field name="Click Ripple" inline>
+			<Field name={localize("Click Ripple")} inline>
 				<Toggle
 					checked={ripple().enabled}
 					onChange={(value) => updateRipple({ enabled: value })}
@@ -179,14 +185,14 @@ export function CursorRippleSection() {
 			</Field>
 			<KCollapsible.Content class="overflow-hidden opacity-0 transition-opacity animate-collapsible-up data-expanded:animate-collapsible-down data-expanded:opacity-100">
 				<div class="flex flex-col gap-2 pt-1 pb-3.5">
-					<Field name="Color">
+					<Field name={localize("Color")}>
 						<RgbInput
 							value={ripple().color}
 							onChange={(color) => updateRipple({ color })}
 						/>
 					</Field>
 					<Field
-						name="Strength"
+						name={localize("Strength")}
 						inline
 						value={`${Math.round(ripple().strength * 100)}%`}
 					>
@@ -200,7 +206,7 @@ export function CursorRippleSection() {
 						/>
 					</Field>
 					<Field
-						name="Size"
+						name={localize("Size")}
 						inline
 						value={`${Math.round(ripple().size * 100)}%`}
 					>
@@ -214,7 +220,7 @@ export function CursorRippleSection() {
 						/>
 					</Field>
 					<Field
-						name="Duration"
+						name={localize("Duration")}
 						inline
 						value={`${ripple().duration.toFixed(2)}s`}
 					>

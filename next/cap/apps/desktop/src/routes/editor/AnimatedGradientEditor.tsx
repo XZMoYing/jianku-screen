@@ -11,6 +11,7 @@ import {
 } from "solid-js";
 import { produce } from "solid-js/store";
 import { animatedGradientsStore } from "~/store";
+import { t as localize } from "~/utils/i18n";
 import type { OrganizationBrandColorSwatch } from "~/utils/organization-branding";
 import {
 	type AnimatedGradientConfig,
@@ -377,12 +378,12 @@ export function AnimatedGradientEditor(props: {
 					</Show>
 
 					<Section
-						name="Presets"
+						name={localize("Presets")}
 						action={
 							<EditorButton
 								size="sm"
 								leftIcon={<IconLucideSave />}
-								title="Save the current gradient"
+								title={localize("Save the current gradient")}
 								aria-pressed={saveOpen()}
 								class={
 									saveOpen() ? "bg-ed-ctl-hover text-ed-text-1" : undefined
@@ -395,7 +396,7 @@ export function AnimatedGradientEditor(props: {
 								}
 								onClick={() => (saveOpen() ? closeSave() : setSaveOpen(true))}
 							>
-								Save
+								{localize("Save")}
 							</EditorButton>
 						}
 					>
@@ -403,8 +404,8 @@ export function AnimatedGradientEditor(props: {
 							<div class="grid grid-cols-7 gap-2">
 								<button
 									type="button"
-									title="Randomize"
-									aria-label="Randomize gradient"
+									title={localize("Randomize")}
+									aria-label={localize("Randomize gradient")}
 									disabled={randomizing()}
 									class={cx(
 										swatchClass,
@@ -436,8 +437,8 @@ export function AnimatedGradientEditor(props: {
 									<Input
 										ref={(element) => queueMicrotask(() => element.focus())}
 										class="min-w-0 flex-1"
-										placeholder="Name this gradient"
-										aria-label="Saved gradient name"
+										placeholder={localize("Name this gradient")}
+										aria-label={localize("Saved gradient name")}
 										maxLength={80}
 										value={presetName()}
 										disabled={saving()}
@@ -460,11 +461,11 @@ export function AnimatedGradientEditor(props: {
 										disabled={!presetName().trim() || saving()}
 										onClick={() => void savePreset()}
 									>
-										{saving() ? "Saving…" : "Save"}
+										{saving() ? "Saving…" : localize("Save")}
 									</button>
 									<button
 										type="button"
-										aria-label="Cancel"
+										aria-label={localize("Cancel")}
 										class="rounded-md p-1.5 text-ed-text-3 outline-hidden transition-colors duration-150 hover:bg-ed-ctl-hover hover:text-ed-text-1"
 										onClick={closeSave}
 									>
@@ -473,7 +474,9 @@ export function AnimatedGradientEditor(props: {
 								</div>
 							</Show>
 							<Show when={savedPresets().length > 0}>
-								<span class="text-[11px] text-ed-text-3">Saved</span>
+								<span class="text-[11px] text-ed-text-3">
+									{localize("Saved")}
+								</span>
 								<div class="grid grid-cols-7 gap-2">
 									<For each={savedPresets()}>
 										{(preset) => (
@@ -493,7 +496,7 @@ export function AnimatedGradientEditor(props: {
 												<Show when={isSelected(preset)}>
 													<button
 														type="button"
-														title="Delete"
+														title={localize("Delete")}
 														aria-label={`Delete ${preset.name}`}
 														disabled={deletingId() !== null}
 														class="absolute -top-1.5 -right-1.5 flex size-5 items-center justify-center rounded-full bg-ed-text-1 text-ed-card shadow-ed-card outline-hidden transition-colors duration-150 hover:bg-red-11 hover:text-white disabled:opacity-40"
@@ -518,13 +521,13 @@ export function AnimatedGradientEditor(props: {
 							<EditorButton
 								size="sm"
 								leftIcon={<IconLucidePlus />}
-								title="Add a colour"
+								title={localize("Add a colour")}
 								disabled={current().colorStops.length >= MAX_STOPS}
 								onClick={() =>
 									addStop(largestGapPosition(current().colorStops))
 								}
 							>
-								Add
+								{localize("Add")}
 							</EditorButton>
 						}
 					>
@@ -637,7 +640,7 @@ export function AnimatedGradientEditor(props: {
 											</span>
 											<button
 												type="button"
-												title="Remove colour"
+												title={localize("Remove colour")}
 												aria-label={`Remove colour ${stopIndex() + 1}`}
 												disabled={current().colorStops.length <= MIN_STOPS}
 												class="rounded-md p-1.5 text-ed-text-3 outline-hidden transition-colors duration-150 hover:bg-ed-ctl-hover hover:text-ed-text-1 disabled:opacity-30 disabled:hover:bg-transparent"
@@ -679,7 +682,7 @@ export function AnimatedGradientEditor(props: {
 									maxValue={control().max}
 									step={control().step}
 									formatTooltip={(value) => controlValue(control(), value)}
-									aria-label="Motion speed"
+									aria-label={localize("Motion speed")}
 									onChange={([next]) =>
 										updateConfig((value) => {
 											value[MOTION_KEY] = next;
@@ -695,17 +698,17 @@ export function AnimatedGradientEditor(props: {
 					<KCollapsible open={fineTuneOpen()} onOpenChange={setFineTuneOpen}>
 						<div class="flex items-center min-h-[22px]">
 							<KCollapsible.Trigger class="group flex flex-1 items-center gap-1.5 text-[12px] font-medium text-ed-text-2 transition-colors duration-150 hover:text-ed-text-1 outline-hidden">
-								Fine-tune
+								{localize("Fine-tune")}
 								<IconCapChevronDown class="size-3.5 text-ed-text-3 transition-transform duration-200 group-data-expanded:rotate-180" />
 							</KCollapsible.Trigger>
 							<Show when={fineTuneOpen()}>
 								<EditorButton
 									size="sm"
 									leftIcon={<IconLucideRotateCcw />}
-									title="Reset fine-tune settings"
+									title={localize("Reset fine-tune settings")}
 									onClick={resetFineTune}
 								>
-									Reset
+									{localize("Reset")}
 								</EditorButton>
 							</Show>
 						</div>

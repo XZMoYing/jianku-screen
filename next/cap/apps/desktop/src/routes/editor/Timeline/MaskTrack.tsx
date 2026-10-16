@@ -1,6 +1,7 @@
 import { createEventListenerMap } from "@solid-primitives/event-listener";
 import { createMemo, createRoot, createSignal, For, Show } from "solid-js";
 import { produce } from "solid-js/store";
+import { t as localize } from "~/utils/i18n";
 
 import { useEditorContext } from "../context";
 import { defaultMaskSegment } from "../masks";
@@ -330,8 +331,12 @@ export function MaskTrack(props: {
 						fallback={<div class="w-full rounded-lg bg-transparent" />}
 					>
 						<div class="cap-empty-lane pointer-events-none">
-							<span>Combine sensitive blur or highlight masks</span>
-							<span class="cap-empty-lane-action">· Add mask</span>
+							<span>
+								{localize("Combine sensitive blur or highlight masks")}
+							</span>
+							<span class="cap-empty-lane-action">
+								{localize("· Add mask")}
+							</span>
 						</div>
 					</Show>
 				}
@@ -473,7 +478,7 @@ export function MaskTrack(props: {
 								<SegmentLabel
 									full={() => (
 										<div class="cap-seg-labels">
-											<span class="cap-seg-label">Mask</span>
+											<span class="cap-seg-label">{localize("Mask")}</span>
 											<span class="cap-seg-sublabel">{contentLabel()}</span>
 										</div>
 									)}

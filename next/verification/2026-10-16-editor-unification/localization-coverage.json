@@ -1,0 +1,16 @@
+{
+	"languages": ["zh-CN", "en", "system"],
+	"defaultLanguage": "zh-CN",
+	"catalogEntries": {
+		"zh-CN": 730,
+		"en": 840
+	},
+	"localizedTsxFiles": 117,
+	"accountBehavior": "Local coming-soon prompt; no upstream sign-in flow",
+	"preserved": [
+		"User text and filenames",
+		"Protocol/format identifiers",
+		"Cap copyright and license notices"
+	],
+	"remaining": "Advanced runtime/native errors and interpolated statuses require manual scenario coverage"
+}

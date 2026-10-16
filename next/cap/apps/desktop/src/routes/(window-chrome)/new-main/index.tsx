@@ -49,6 +49,7 @@ import {
 	type MicrophoneWithDetails,
 } from "~/utils/devices";
 import { hideCurrentWindow } from "~/utils/hide-window";
+import { t as localize } from "~/utils/i18n";
 import {
 	importImageFromPicker,
 	importVideoFromPicker,
@@ -477,8 +478,8 @@ function CameraListItem(props: {
 			<button
 				type="button"
 				disabled={props.disabled}
-				title="Device settings"
-				aria-label="Device settings"
+				title={localize("Device settings")}
+				aria-label={localize("Device settings")}
 				onPointerDown={(event) => event.stopPropagation()}
 				onClick={(event) => {
 					event.preventDefault();
@@ -572,8 +573,8 @@ function MicrophoneListItem(props: {
 			<button
 				type="button"
 				disabled={props.disabled}
-				title="Device settings"
-				aria-label="Device settings"
+				title={localize("Device settings")}
+				aria-label={localize("Device settings")}
 				onPointerDown={(event) => event.stopPropagation()}
 				onClick={(event) => {
 					event.preventDefault();
@@ -658,7 +659,7 @@ function CameraSettingsPanel(props: {
 				)}
 			>
 				<div class="flex-1 min-w-0">
-					<div class="truncate">Default</div>
+					<div class="truncate">{localize("Default")}</div>
 					<Show when={defaultSetting()}>
 						{(setting) => (
 							<div
@@ -707,7 +708,7 @@ function CameraSettingsPanel(props: {
 													: "text-amber-11",
 											)}
 										>
-											Compatibility mode may reduce this setting.
+											{localize("Compatibility mode may reduce this setting.")}
 										</div>
 									</Show>
 								</div>
@@ -785,7 +786,7 @@ function MicrophoneSettingsPanel(props: {
 				)}
 			>
 				<div class="flex-1 min-w-0">
-					<div class="truncate">Default</div>
+					<div class="truncate">{localize("Default")}</div>
 					<Show when={defaultSetting()}>
 						{(setting) => (
 							<div
@@ -835,7 +836,7 @@ function MicrophoneSettingsPanel(props: {
 													: "text-amber-11",
 											)}
 										>
-											Compatibility mode may reduce this setting.
+											{localize("Compatibility mode may reduce this setting.")}
 										</div>
 									</Show>
 								</div>
@@ -1017,7 +1018,9 @@ function DeviceListPanel(props: DeviceListPanelProps) {
 				</div>
 			</Show>
 			<Show when={props.isLoading}>
-				<div class="py-6 text-sm text-center text-gray-11">Loading...</div>
+				<div class="py-6 text-sm text-center text-gray-11">
+					{localize("Loading...")}
+				</div>
 			</Show>
 			<Show when={!props.isLoading && !props.errorMessage}>
 				<button
@@ -1505,7 +1508,7 @@ function TargetMenuPanel(props: TargetMenuPanelProps & SharedTargetMenuProps) {
 					aria-label={inSettingsMode() ? "Back to list" : "Back"}
 				>
 					<IconLucideArrowLeft class="size-3 text-gray-11" />
-					<span class="font-medium text-gray-12">Back</span>
+					<span class="font-medium text-gray-12">{localize("Back")}</span>
 				</button>
 				<Show
 					when={inSettingsMode()}
@@ -1550,7 +1553,9 @@ function TargetMenuPanel(props: TargetMenuPanelProps & SharedTargetMenuProps) {
 								>
 									<IconLucideImport class="size-3.5" />
 									<span>
-										{props.variant === "screenshot" ? "Import image" : "Import"}
+										{props.variant === "screenshot"
+											? localize("Import image")
+											: localize("Import")}
 									</span>
 								</Button>
 							</Show>
@@ -2817,7 +2822,7 @@ function Page() {
 	const TargetSelectionHome = () => (
 		<div class="workspace-recording-home flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pb-1 w-full">
 			<section>
-				<h3>捕获来源</h3>
+				<h3>{localize("捕获来源")}</h3>
 				<div class="jk-capture-targets flex flex-col gap-2 w-full text-xs text-gray-11">
 					<div class="flex flex-row gap-2 items-stretch w-full">
 						<div
@@ -2835,7 +2840,7 @@ function Page() {
 								onClick={() => {
 									toggleTargetMode("display");
 								}}
-								name="屏幕"
+								name={localize("屏幕")}
 								class="flex-1 rounded-none border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 pl-5"
 							/>
 							<TargetDropdownButton
@@ -2856,7 +2861,7 @@ function Page() {
 									});
 								}}
 								aria-haspopup="menu"
-								aria-label="Choose display"
+								aria-label={localize("Choose display")}
 							/>
 						</div>
 						<div
@@ -2895,7 +2900,7 @@ function Page() {
 									});
 								}}
 								aria-haspopup="menu"
-								aria-label="Choose window"
+								aria-label={localize("Choose window")}
 							/>
 						</div>
 					</div>
@@ -2917,14 +2922,14 @@ function Page() {
 							onClick={() => {
 								toggleTargetMode("camera");
 							}}
-							name="仅摄像头"
+							name={localize("仅摄像头")}
 							class="flex-1"
 						/>
 					</div>
 				</div>
 			</section>
 			<section>
-				<h3>设备与声音</h3>
+				<h3>{localize("设备与声音")}</h3>
 				<BaseControls />
 			</section>
 		</div>
@@ -2963,18 +2968,24 @@ function Page() {
 							: "Clean Studio recording"
 					}
 				>
-					<strong>Record without Cap's preview and controls</strong>
+					<strong>
+						{localize("Record without Cap's preview and controls")}
+					</strong>
 					<p class="text-sm">
 						{cleanCapture.data?.mode === "instant"
-							? "Any selected camera will be included in the video with its preview appearance. Cap's preview and controls will hide."
-							: "Any selected camera will keep recording as a separate editable track. Cap's preview and controls will hide."}
+							? localize(
+									"Any selected camera will be included in the video with its preview appearance. Cap's preview and controls will hide.",
+								)
+							: localize(
+									"Any selected camera will keep recording as a separate editable track. Cap's preview and controls will hide.",
+								)}
 					</p>
 					<p class="text-sm">
-						Press <strong>{cleanCapture.data?.shortcut}</strong> to start, then
-						use it to stop.{" "}
+						Press <strong>{cleanCapture.data?.shortcut}</strong>{" "}
+						{localize("to start, then use it to stop.")}{" "}
 						{cleanCapture.data?.mode === "instant"
-							? "Open Cap to stop and show controls."
-							: "Open Cap to pause and show controls."}
+							? localize("Open Cap to stop and show controls.")
+							: localize("Open Cap to pause and show controls.")}
 					</p>
 					<button
 						type="button"
@@ -2982,7 +2993,7 @@ function Page() {
 						disabled={stopRequested()}
 						onClick={() => stopRecording.mutate()}
 					>
-						Cancel
+						{localize("Cancel")}
 					</button>
 				</div>
 			</Show>
@@ -2995,8 +3006,8 @@ function Page() {
 					<button
 						type="button"
 						class="p-1 rounded-md hover:bg-gray-4"
-						aria-label="应用设置"
-						title="应用设置"
+						aria-label={localize("应用设置")}
+						title={localize("应用设置")}
 						onClick={() =>
 							void commands.showWindow({ Settings: { page: "general" } })
 						}
@@ -3008,10 +3019,10 @@ function Page() {
 			<header class="workspace-top">
 				<div class="workspace-brand">
 					<span class="workspace-brand-mark">
-						<img src={brandLogo} alt="简库镜传" />
+						<img src={brandLogo} alt={localize("简库镜传")} />
 					</span>
 				</div>
-				<MotionGroup class="workspace-modes" label="工作模式">
+				<MotionGroup class="workspace-modes" label={localize("工作模式")}>
 					<button
 						type="button"
 						aria-pressed={workspaceMode() === "recording"}
@@ -3025,7 +3036,7 @@ function Page() {
 						}
 					>
 						<IconLucideVideo />
-						录屏
+						{localize("录屏")}
 					</button>
 					<button
 						type="button"
@@ -3044,10 +3055,10 @@ function Page() {
 						}
 					>
 						<IconLucidePresentation />
-						演示
+						{localize("演示")}
 					</button>
 				</MotionGroup>
-				<nav class="workspace-toolbar" aria-label="工程与工具">
+				<nav class="workspace-toolbar" aria-label={localize("工程与工具")}>
 					<button
 						type="button"
 						disabled={
@@ -3074,7 +3085,7 @@ function Page() {
 						}}
 					>
 						<IconLucideSquarePlay />
-						录制库
+						{localize("录制库")}
 					</button>
 					<button
 						type="button"
@@ -3088,11 +3099,11 @@ function Page() {
 						}}
 					>
 						<IconLucideImage />
-						截图库
+						{localize("截图库")}
 					</button>
 					<details class="workspace-tools">
 						<summary>
-							更多工具
+							{localize("更多工具")}
 							<IconLucideChevronDown />
 						</summary>
 						<div class="workspace-tools-menu">
@@ -3106,7 +3117,7 @@ function Page() {
 								}}
 							>
 								<IconLucideScanText />
-								提词器
+								{localize("提词器")}
 							</button>
 							<button
 								type="button"
@@ -3118,7 +3129,7 @@ function Page() {
 								}}
 							>
 								<IconLucideSettings />
-								录制设置
+								{localize("录制设置")}
 							</button>
 							<button
 								type="button"
@@ -3130,7 +3141,7 @@ function Page() {
 								}}
 							>
 								<IconLucideSettings />
-								快捷键设置
+								{localize("快捷键设置")}
 							</button>
 						</div>
 					</details>
@@ -3143,7 +3154,14 @@ function Page() {
 					data-mode={workspaceMode()}
 					data-source={recordSource()}
 				>
-					<CaptureStage style={captureStyle()} />
+					<CaptureStage
+						style={captureStyle()}
+						cameraEnabled={
+							!!rawOptions.cameraID &&
+							recordSource() === "desktop" &&
+							workspaceMode() === "recording"
+						}
+					/>
 					<div class="jk-workspace-controls">
 						<MotionPresence visible={workspaceMode() === "presentation"}>
 							<Presentation
@@ -3163,7 +3181,10 @@ function Page() {
 							testId="recording-panel"
 							visible={workspaceMode() === "recording"}
 						>
-							<MotionGroup class="workspace-sources" label="录制来源">
+							<MotionGroup
+								class="workspace-sources"
+								label={localize("录制来源")}
+							>
 								<button
 									type="button"
 									class={recordSource() === "desktop" ? "is-selected" : ""}
@@ -3171,7 +3192,7 @@ function Page() {
 									disabled={mobileActive()}
 									onClick={() => setRecordSource("desktop")}
 								>
-									电脑屏幕
+									{localize("电脑屏幕")}
 								</button>
 								<button
 									type="button"
@@ -3183,7 +3204,7 @@ function Page() {
 										setRecordSource("mobile");
 									}}
 								>
-									手机与平板
+									{localize("手机与平板")}
 								</button>
 							</MotionGroup>
 							<div
@@ -3220,7 +3241,7 @@ function Page() {
 												class="studio-secondary"
 												onClick={() => void cancelEditorRecordingFlow()}
 											>
-												返回编辑器
+												{localize("返回编辑器")}
 											</button>
 										</Show>
 									</div>
@@ -3229,7 +3250,7 @@ function Page() {
 									<Show when={signIn.isPending}>
 										<div class="flex absolute inset-0 justify-center items-center bg-gray-1 animate-in fade-in">
 											<div class="flex flex-col gap-4 justify-center items-center">
-												<span>Signing In...</span>
+												<span>{localize("Signing In...")}</span>
 
 												<Button
 													onClick={() => {
@@ -3239,7 +3260,7 @@ function Page() {
 													variant="gray"
 													class="w-full"
 												>
-													Cancel Sign In
+													{localize("Cancel Sign In")}
 												</Button>
 											</div>
 										</div>
@@ -3407,7 +3428,7 @@ function Page() {
 								fallback={
 									<Show when={recordSource() === "mobile"}>
 										<div class="studio-empty" role="status">
-											正在查找移动设备…
+											{localize("正在查找移动设备…")}
 										</div>
 									</Show>
 								}
@@ -3456,7 +3477,11 @@ function Page() {
 						<Show when={cleanCapture.data?.phase === "paused"}>
 							<div class="mb-3 flex items-center justify-between gap-2 rounded-lg bg-gray-3 p-2 text-sm">
 								<div class="min-w-0">
-									<span>Recording paused. Cap will hide before resuming.</span>
+									<span>
+										{localize(
+											"Recording paused. Cap will hide before resuming.",
+										)}
+									</span>
 								</div>
 								<button
 									type="button"
@@ -3467,7 +3492,7 @@ function Page() {
 											.catch((error: unknown) => toast.error(String(error)))
 									}
 								>
-									Resume
+									{localize("Resume")}
 								</button>
 							</div>
 						</Show>
@@ -3483,7 +3508,7 @@ function Page() {
 							>
 								<IconCapStopCircle class="size-4" />
 							</Show>
-							<span>Stop Recording</span>
+							<span>{localize("Stop Recording")}</span>
 						</button>
 					</div>
 				</div>

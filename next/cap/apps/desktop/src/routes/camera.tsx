@@ -40,6 +40,7 @@ import {
 import { generalSettingsStore } from "~/store";
 import { cameraPresentationInput } from "~/utils/camera-presentation";
 import { createTauriEventListener } from "~/utils/createEventListener";
+import { t as localize } from "~/utils/i18n";
 import {
 	createCameraMutation,
 	createCurrentRecordingQuery,
@@ -353,7 +354,7 @@ function NativeCameraPreviewPage(props: {
 
 			<Show when={cameraPreviewReady.loading}>
 				<div class="w-full flex-1 flex items-center justify-center">
-					<div class="text-gray-11">Loading camera...</div>
+					<div class="text-gray-11">{localize("Loading camera...")}</div>
 				</div>
 			</Show>
 		</div>
@@ -1111,7 +1112,7 @@ function Canvas(props: {
 function CameraLoadingState() {
 	return (
 		<div class="w-full flex-1 flex items-center justify-center">
-			<div class="text-gray-11">Loading camera...</div>
+			<div class="text-gray-11">{localize("Loading camera...")}</div>
 		</div>
 	);
 }

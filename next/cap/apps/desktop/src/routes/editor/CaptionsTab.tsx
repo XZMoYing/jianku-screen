@@ -25,6 +25,7 @@ import {
 	defaultCaptionSettings,
 	type EditorCaptionSettings,
 } from "~/store/captions";
+import { t as localize } from "~/utils/i18n";
 import type { OrganizationBrandColorSwatch } from "~/utils/organization-branding";
 import { commands, events } from "~/utils/tauri";
 import IconCapChevronDown from "~icons/cap/chevron-down";
@@ -771,14 +772,14 @@ export function CaptionsTab(props: {
 	return (
 		<div class="flex flex-col gap-3.5">
 			<div class="flex flex-row gap-2 items-center min-h-[22px]">
-				<SectionLabel name="Captions" />
+				<SectionLabel name={localize("Captions")} />
 				<span class="px-1.5 py-0.5 text-[10px] font-medium rounded-full bg-ed-ctl text-ed-text-2">
-					Beta
+					{localize("Beta")}
 				</span>
 			</div>
 
 			<div class="flex flex-col gap-2">
-				<Field name="Model">
+				<Field name={localize("Model")}>
 					<KSelect<string>
 						options={availableModelOptions().map((model) => model.name)}
 						value={selectedModel()}
@@ -880,16 +881,19 @@ export function CaptionsTab(props: {
 
 				<Show when={!supportsParakeetTranscription()}>
 					<p class="text-[11px] leading-relaxed text-ed-text-3">
-						Parakeet caption models are unavailable on Intel Macs. Whisper
-						models remain available.
+						{localize(
+							"Parakeet caption models are unavailable on Intel Macs. Whisper models remain available.",
+						)}
 					</p>
 				</Show>
 
 				<p class="text-[11px] leading-relaxed text-ed-text-3">
-					One time download to your system. All captions are stored locally.
+					{localize(
+						"One time download to your system. All captions are stored locally.",
+					)}
 				</p>
 
-				<Field name="Language" inline>
+				<Field name={localize("Language")} inline>
 					<KSelect<string>
 						options={LANGUAGE_OPTIONS.map((l) => l.code)}
 						value={selectedLanguage()}
@@ -951,13 +955,13 @@ export function CaptionsTab(props: {
 									fallback={
 										<>
 											<IconLucideDownload class="size-4" />
-											Download{" "}
+											{localize("Download")}{" "}
 											{
 												availableModelOptions().find(
 													(m) => m.name === selectedModel(),
 												)?.label
 											}{" "}
-											Model
+											{localize("Model")}
 										</>
 									}
 								>
@@ -984,7 +988,9 @@ export function CaptionsTab(props: {
 									</div>
 									<p class="text-[11px] leading-relaxed text-ed-text-3">
 										{downloadMessage() ||
-											"Keep Cap open while the model downloads. Editor reloads will reconnect automatically."}
+											localize(
+												"Keep Cap open while the model downloads. Editor reloads will reconnect automatically.",
+											)}
 									</p>
 								</div>
 							</Show>
@@ -999,7 +1005,7 @@ export function CaptionsTab(props: {
 								class="w-full"
 							>
 								{isGenerating()
-									? "Generating..."
+									? localize("Generating...")
 									: hasCaptions()
 										? "Regenerate Captions"
 										: "Generate Captions"}
@@ -1009,7 +1015,8 @@ export function CaptionsTab(props: {
 							<span class="flex gap-1.5 items-center min-w-0">
 								<IconCapCircleCheck class="shrink-0 size-3.5 text-ed-text-3" />
 								<span class="truncate">
-									{selectedModelOption()?.label ?? "Caption"} model downloaded
+									{selectedModelOption()?.label ?? "Caption"}{" "}
+									{localize("model downloaded")}
 								</span>
 							</span>
 							<EditorButton
@@ -1022,7 +1029,9 @@ export function CaptionsTab(props: {
 									deletingModel() === selectedModel()
 								}
 							>
-								{deletingModel() === selectedModel() ? "Deleting..." : "Delete"}
+								{deletingModel() === selectedModel()
+									? "Deleting..."
+									: localize("Delete")}
 							</EditorButton>
 						</div>
 					</div>
@@ -1037,7 +1046,7 @@ export function CaptionsTab(props: {
 					!hasCaptions() && "opacity-50 pointer-events-none",
 				)}
 			>
-				<Section name="Style">
+				<Section name={localize("Style")}>
 					<div class="grid grid-cols-2 gap-2">
 						<For each={CAPTION_STYLE_PRESETS}>
 							{(preset) => (
@@ -1063,10 +1072,10 @@ export function CaptionsTab(props: {
 						<Show when={selectedPresetId() === "custom"}>
 							<div class="flex flex-col gap-1.5 p-1.5 text-left rounded-lg ring-2 ring-ed-accent ring-offset-2 ring-offset-ed-card">
 								<div class="flex justify-center items-center h-12 text-[11px] rounded-md bg-ed-card-2 text-ed-text-3">
-									Custom
+									{localize("Custom")}
 								</div>
 								<span class="px-0.5 text-[11px] font-medium text-ed-text-1">
-									Custom
+									{localize("Custom")}
 								</span>
 							</div>
 						</Show>
@@ -1127,7 +1136,7 @@ export function CaptionsTab(props: {
 							</KSelect>
 						</Field>
 
-						<Field name="Size" inline>
+						<Field name={localize("Size")} inline>
 							<Slider
 								value={[getSetting("size")]}
 								onChange={(v) => updateCaptionSetting("size", v[0])}
@@ -1138,7 +1147,7 @@ export function CaptionsTab(props: {
 							/>
 						</Field>
 
-						<Field name="Uppercase" inline>
+						<Field name={localize("Uppercase")} inline>
 							<Toggle
 								checked={getSetting("uppercase")}
 								onChange={(checked) =>
@@ -1158,9 +1167,9 @@ export function CaptionsTab(props: {
 							/>
 						</Field>
 						<p class="text-[11px] leading-relaxed text-ed-text-3">
-							This is the first version of captions in Cap. Active word
-							highlighting may be inaccurate in some situations. We're working
-							on a fix for this and it will be released in upcoming versions.
+							{localize(
+								"This is the first version of captions in Cap. Active word highlighting may be inaccurate in some situations. We're working on a fix for this and it will be released in upcoming versions.",
+							)}
 						</p>
 
 						<Show when={getSetting("activeWordHighlight")}>
@@ -1259,7 +1268,7 @@ export function CaptionsTab(props: {
 				<div class="w-full border-t border-ed-line" />
 
 				<div class="flex flex-col gap-2">
-					<Field name="Position" inline>
+					<Field name={localize("Position")} inline>
 						<KSelect<string>
 							options={CAPTION_POSITION_OPTIONS.map((p) => p.value)}
 							value={getSetting("position")}

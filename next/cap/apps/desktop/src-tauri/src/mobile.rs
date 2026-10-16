@@ -785,7 +785,7 @@ pub async fn start_mobile_recording(
     )
     .save_for_project()
     .map_err(|error| error.to_string())?;
-    crate::capture_style::snapshot(&app, &project, None).await?;
+    crate::capture_style::snapshot(&app, &project, None, true).await?;
     let command = recording_command(&device, &options, &project.join(source))?;
     let capture_settings = (device.platform == MobilePlatform::Android).then_some(options.capture);
     std::fs::write(project.join("mobile-source.json"), serde_json::to_vec_pretty(&serde_json::json!({"platform":device.platform, "deviceName":device.name, "touchEventsAvailable":false, "source":source, "capture": capture_settings})).map_err(|error| error.to_string())?).map_err(|error| error.to_string())?;

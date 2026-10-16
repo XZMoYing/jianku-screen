@@ -1,5 +1,6 @@
 import { Button } from "@cap/ui-solid";
 import { useNavigate } from "@solidjs/router";
+import { t as localize } from "~/utils/i18n";
 import IconLucideArrowLeft from "~icons/lucide/arrow-left";
 
 export function IntegrationConfigHeader(props: { title: string }) {
@@ -14,7 +15,7 @@ export function IntegrationConfigHeader(props: { title: string }) {
 				onClick={() => navigate("/settings/integrations")}
 			>
 				<IconLucideArrowLeft class="size-3.5" />
-				Back
+				{localize("Back")}
 			</Button>
 			<h3 class="text-sm font-semibold tracking-tight text-gray-12">
 				{props.title}

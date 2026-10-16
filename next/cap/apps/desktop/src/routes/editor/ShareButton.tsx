@@ -1,6 +1,7 @@
 import { Select as KSelect } from "@kobalte/core/select";
 import { createSignal, Show } from "solid-js";
 import Tooltip from "~/components/Tooltip";
+import { t as localize } from "~/utils/i18n";
 import IconLucideExternalLink from "~icons/lucide/external-link";
 import { useEditorContext } from "./context";
 import {
@@ -79,7 +80,7 @@ function ShareButton() {
 								}}
 								leftIcon={<IconCapUpload />}
 							>
-								Reupload
+								{localize("Reupload")}
 							</EditorButton>
 							<Tooltip content="Open link">
 								<div class="flex flex-row gap-1.5 items-center px-2.5 h-7 rounded-[7px] transition-colors duration-100 bg-ed-ctl hover:bg-ed-ctl-hover">
@@ -88,7 +89,7 @@ function ShareButton() {
 										target="_blank"
 										rel="noreferrer"
 										title={linkToDisplay() ?? "Open link"}
-										aria-label="Open recording link"
+										aria-label={localize("Open recording link")}
 										class="w-full truncate max-w-[200px] max-[1400px]:w-4 max-[1400px]:shrink-0"
 									>
 										<span class="text-xs text-ed-text-2 max-[1400px]:hidden">

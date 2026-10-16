@@ -14,6 +14,7 @@ import {
 import { produce } from "solid-js/store";
 import toast from "solid-toast";
 import { generalSettingsStore } from "~/store";
+import { t as localize } from "~/utils/i18n";
 import { commands } from "~/utils/tauri";
 import { useEditorContext } from "../context";
 import { useTimelineContext, useTrackContext } from "./context";
@@ -309,7 +310,9 @@ export function ZoomTrack(props: {
 							when={
 								hasRecordedCursorData() && !sessionDismissedGenerateZoomPrompt()
 							}
-							fallback={<span>Drag across this lane to add a zoom</span>}
+							fallback={
+								<span>{localize("Drag across this lane to add a zoom")}</span>
+							}
 						>
 							<div
 								class="relative z-10 flex items-center gap-1.5"
@@ -317,7 +320,7 @@ export function ZoomTrack(props: {
 								onMouseLeave={() => setIsHoveringGenerateZoomButton(false)}
 								onMouseDown={(e) => e.stopPropagation()}
 							>
-								<span>Generate zoom segments automatically</span>
+								<span>{localize("Generate zoom segments automatically")}</span>
 								<button
 									type="button"
 									class="cap-empty-lane-action outline-hidden"
@@ -326,13 +329,16 @@ export function ZoomTrack(props: {
 										void handleGenerateZoomSegments();
 									}}
 								>
-									· {isGeneratingAutoZoom() ? "Generating..." : "Generate"}
+									·{" "}
+									{isGeneratingAutoZoom()
+										? localize("Generating...")
+										: localize("Generate")}
 								</button>
 								<button
 									type="button"
 									class="flex shrink-0 justify-center items-center rounded-md outline-hidden text-ed-text-3 hover:text-ed-text-1 hover:bg-ed-ctl-hover size-5 transition-colors"
 									disabled={isGeneratingAutoZoom()}
-									aria-label="Dismiss for this session"
+									aria-label={localize("Dismiss for this session")}
 									onClick={() => setSessionDismissedGenerateZoomPrompt(true)}
 								>
 									<IconLucideX class="size-3" />
@@ -726,7 +732,7 @@ export function ZoomTrack(props: {
 														<span class="cap-seg-label truncate">
 															{visibleBox().width >= 140
 																? zoomModeLabel()
-																: "Zoom"}
+																: localize("Zoom")}
 														</span>
 														<span class="cap-seg-sublabel">
 															{zoomPercentage()}
@@ -735,7 +741,9 @@ export function ZoomTrack(props: {
 												)}
 												compact={() => (
 													<div class="cap-seg-labels">
-														<span class="cap-seg-label">Zoom</span>
+														<span class="cap-seg-label">
+															{localize("Zoom")}
+														</span>
 														<span class="cap-seg-sublabel">
 															{zoomPercentage()}
 														</span>

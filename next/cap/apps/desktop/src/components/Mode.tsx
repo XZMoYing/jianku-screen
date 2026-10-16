@@ -1,8 +1,8 @@
 import { HoverCard } from "@kobalte/core/hover-card";
 import { cx } from "cva";
 import { type JSX, Show } from "solid-js";
-
 import { useRecordingOptions } from "~/routes/(window-chrome)/OptionsContext";
+import { t as localize } from "~/utils/i18n";
 import { commands, events, type RecordingMode } from "~/utils/tauri";
 import IconImage from "~icons/lucide/image";
 import IconInfo from "~icons/lucide/info";
@@ -73,7 +73,7 @@ const Mode = (props: ModeProps) => {
 					"p-1.5 rounded-md w-fit text-gray-10 group focus:outline-none",
 					props.locked && "opacity-50",
 				)}
-				aria-label="捕获方式说明"
+				aria-label={localize("捕获方式说明")}
 			>
 				<IconInfo class="size-3.5" />
 			</button>
@@ -129,7 +129,7 @@ const Mode = (props: ModeProps) => {
 												class="flex gap-1.5 items-center px-2 py-1 -mx-1 text-[11px] rounded-md transition-colors text-gray-4 hover:bg-gray-11 hover:text-gray-1"
 											>
 												<IconCapSettings class="size-3" />
-												<span>Quality settings</span>
+												<span>{localize("Quality settings")}</span>
 											</button>
 										)}
 									</Show>

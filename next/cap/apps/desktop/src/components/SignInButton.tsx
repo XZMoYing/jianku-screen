@@ -1,7 +1,7 @@
 import { Button } from "@cap/ui-solid";
-
 import type { ComponentProps } from "solid-js";
 import { createSignInMutation } from "~/utils/auth";
+import { t as localize } from "~/utils/i18n";
 
 export function SignInButton(
 	props: Omit<ComponentProps<typeof Button>, "onClick">,
@@ -23,7 +23,9 @@ export function SignInButton(
 				}
 			}}
 		>
-			{signIn.isPending ? "Cancel Sign In" : (props.children ?? "Sign In")}
+			{signIn.isPending
+				? localize("Cancel Sign In")
+				: (props.children ?? localize("Sign In"))}
 		</Button>
 	);
 }

@@ -8,6 +8,7 @@ import {
 } from "solid-js";
 import { trackEvent } from "~/utils/analytics";
 import { createTauriEventListener } from "~/utils/createEventListener";
+import { t as localize } from "~/utils/i18n";
 import { createCurrentRecordingQuery } from "~/utils/queries";
 import { events, type OSPermissionsCheck } from "~/utils/tauri";
 import {
@@ -119,8 +120,8 @@ export default function MicrophoneSelect(props: {
 							}}
 							onPointerDown={(e) => e.stopPropagation()}
 							class={DEVICE_SHORTCUT_BUTTON_CLASS}
-							title="Microphone settings"
-							aria-label="Microphone settings"
+							title={localize("Microphone settings")}
+							aria-label={localize("Microphone settings")}
 						>
 							<IconLucideSettings class="size-3.5" />
 						</button>

@@ -8,6 +8,7 @@ import { cx } from "cva";
 import { createEffect, onCleanup, Suspense } from "solid-js";
 import CaptionControlsMacOS from "~/components/titlebar/controls/CaptionControlsMacOS";
 import CaptionControlsWindows11 from "~/components/titlebar/controls/CaptionControlsWindows11";
+import { t as localize } from "~/utils/i18n";
 import IconCapCrop from "~icons/cap/crop";
 import IconCapTrash from "~icons/cap/trash";
 import IconLucideCopy from "~icons/lucide/copy";
@@ -119,7 +120,7 @@ export function Header() {
 			<div class="flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
 				<AspectRatioSelect />
 				<EditorButton
-					tooltipText="Crop Image"
+					tooltipText={localize("Crop Image")}
 					onClick={cropDialogHandler}
 					disabled={isCropDisabled()}
 					leftIcon={<IconCapCrop class="size-4" />}
@@ -146,13 +147,13 @@ export function Header() {
 					onClick={() => {
 						exportImage("clipboard");
 					}}
-					tooltipText="Copy to Clipboard"
+					tooltipText={localize("Copy to Clipboard")}
 					disabled={isExporting()}
 					leftIcon={<IconLucideCopy class="w-4" />}
 				/>
 
 				<EditorButton
-					tooltipText="Save"
+					tooltipText={localize("Save")}
 					onClick={() => exportImage("file")}
 					disabled={isExporting()}
 					leftIcon={<IconLucideSave class="size-4" />}
@@ -168,7 +169,7 @@ export function Header() {
 				<DropdownMenu gutter={8} placement="bottom-end">
 					<EditorButton<typeof DropdownMenu.Trigger>
 						as={DropdownMenu.Trigger}
-						tooltipText="More Actions"
+						tooltipText={localize("More Actions")}
 						leftIcon={<IconLucideMoreHorizontal class="size-4" />}
 						disabled={isExporting()}
 					/>
@@ -188,7 +189,7 @@ export function Header() {
 										}}
 									>
 										<IconLucideFolder class="size-4 text-gray-11" />
-										<span>Open Folder</span>
+										<span>{localize("Open Folder")}</span>
 									</DropdownItem>
 									<DropdownItem
 										onSelect={async () => {
@@ -203,7 +204,7 @@ export function Header() {
 										}}
 									>
 										<IconCapTrash class="size-4 text-gray-11" />
-										<span>Delete</span>
+										<span>{localize("Delete")}</span>
 									</DropdownItem>
 								</MenuItemList>
 							</PopperContent>

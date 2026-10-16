@@ -5,7 +5,6 @@ import { getVersion } from "@tauri-apps/api/app";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import * as dialog from "@tauri-apps/plugin-dialog";
 import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
-import * as shell from "@tauri-apps/plugin-shell";
 import {
 	createEffect,
 	createMemo,
@@ -20,10 +19,10 @@ import {
 import toast from "solid-toast";
 import { CapErrorBoundary } from "~/components/CapErrorBoundary";
 import { SignInButton } from "~/components/SignInButton";
-
 import { authStore, userProfileStore } from "~/store";
 import { resetUser, trackEvent } from "~/utils/analytics";
-import { createSignInMutation } from "~/utils/auth";
+import { showAccountComingSoon } from "~/utils/auth";
+import { t as localize } from "~/utils/i18n";
 import { commands } from "~/utils/tauri";
 import {
 	apiClient,
@@ -136,7 +135,6 @@ function SettingsContentSkeleton() {
 export default function Settings(props: RouteSectionProps) {
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
-	const signIn = createSignInMutation();
 	const [auth, setAuth] =
 		createSignal<Awaited<ReturnType<typeof authStore.get>>>();
 	const [authLoaded, setAuthLoaded] = createSignal(false);
@@ -283,25 +281,8 @@ export default function Settings(props: RouteSectionProps) {
 		return imageUrl || null;
 	});
 	const accountImageUrl = createMemo(() => profileImageObjectUrl());
-	const openDashboard = () => {
-		void getConfiguredServerUrl().then((serverUrl) =>
-			shell.open(new URL("/dashboard", serverUrl).toString()),
-		);
-	};
-	const handleProfileClick = () => {
-		if (auth()) {
-			openDashboard();
-			return;
-		}
+	const handleProfileClick = () => showAccountComingSoon();
 
-		if (signIn.isPending) {
-			signIn.variables.abort();
-			signIn.reset();
-			return;
-		}
-
-		signIn.mutate(new AbortController());
-	};
 	const handleProfileImageError = (imageUrl: string) => {
 		setFailedProfileImageUrl(imageUrl);
 		void userProfile.refetch();
@@ -431,31 +412,29 @@ export default function Settings(props: RouteSectionProps) {
 			const update = await commands.updatesCheck();
 
 			if (!update) {
-				await dialog.message(
-					"You're already using the latest version of Cap.",
-					{
-						title: "No Update Available",
-						kind: "info",
-					},
-				);
+				await dialog.message(localize("当前已是最新版本。"), {
+					title: "No Update Available",
+					kind: "info",
+				});
 				return;
 			}
 
 			const shouldUpdate = await dialog.confirm(
-				`Version ${update.version} of Cap is available, would you like to install it?`,
-				{ title: "Update Cap", okLabel: "Update", cancelLabel: "Ignore" },
+				`${localize("发现新版本")} ${update.version}`,
+				{ title: "简库镜传 Next", okLabel: "Update", cancelLabel: "Ignore" },
 			);
 
 			if (shouldUpdate) navigate("/update");
 		} catch (e) {
 			console.error("Failed to check for updates:", e);
 			const openDownload = await dialog
-				.confirm(
-					"Couldn't check for updates automatically. You can download the latest version of Cap from cap.so/download \u2014 your data won't be lost.",
-					{ title: "Update Cap", okLabel: "Download", cancelLabel: "Later" },
-				)
+				.confirm(localize("暂时无法检查更新，请稍后重试。"), {
+					title: "简库镜传 Next",
+					okLabel: "Download",
+					cancelLabel: "Later",
+				})
 				.catch(() => false);
-			if (openDownload) await shell.open("https://cap.so/download");
+			if (openDownload) showAccountComingSoon();
 		} finally {
 			setIsCheckingForUpdates(false);
 		}
@@ -501,7 +480,7 @@ export default function Settings(props: RouteSectionProps) {
 							{accountName()}
 						</p>
 						<p class="h-[13px] truncate text-[11px] leading-[13px] text-gray-10">
-							Account
+							{localize("Account")}
 						</p>
 					</div>
 				</button>
@@ -515,7 +494,7 @@ export default function Settings(props: RouteSectionProps) {
 									class="cap-settings-nav-item rounded-lg h-8 hover:bg-gray-3 text-[13px] px-2 flex flex-row items-center gap-1.5 transition-colors"
 								>
 									<item.icon class="opacity-60 size-4" aria-hidden="true" />
-									<span>{item.name}</span>
+									<span>{localize(item.name)}</span>
 								</A>
 							</li>
 						)}
@@ -528,7 +507,7 @@ export default function Settings(props: RouteSectionProps) {
 								<button
 									type="button"
 									class="-ml-1 cursor-copy rounded px-1 py-0.5 transition-colors hover:bg-gray-3 hover:text-gray-12"
-									title="Copy version to clipboard"
+									title={localize("Copy version to clipboard")}
 									aria-label={`Copy version ${v()} to clipboard`}
 									onClick={() => copyVersion(v())}
 								>
@@ -538,11 +517,9 @@ export default function Settings(props: RouteSectionProps) {
 									<button
 										type="button"
 										class="text-gray-11 hover:text-gray-12 underline transition-colors"
-										onClick={() =>
-											shell.open("https://cap.so/download/versions")
-										}
+										onClick={() => showAccountComingSoon()}
 									>
-										View previous versions
+										{localize("View previous versions")}
 									</button>
 									<button
 										type="button"
@@ -566,10 +543,10 @@ export default function Settings(props: RouteSectionProps) {
 					>
 						{auth() ? (
 							<Button onClick={handleAuth} variant="gray" class="w-full">
-								Sign Out
+								{localize("Sign Out")}
 							</Button>
 						) : (
-							<SignInButton>Sign In</SignInButton>
+							<SignInButton>{localize("Sign In")}</SignInButton>
 						)}
 					</Show>
 				</div>

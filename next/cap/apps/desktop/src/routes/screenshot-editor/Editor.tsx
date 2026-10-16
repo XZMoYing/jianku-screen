@@ -24,6 +24,7 @@ import {
 	type Ratio,
 } from "~/components/Cropper";
 import { composeEventHandlers } from "~/utils/composeEventHandlers";
+import { t as localize } from "~/utils/i18n";
 import { isProjectPath } from "~/utils/project-files";
 import IconCapCircleX from "~icons/cap/circle-x";
 import IconLucideMaximize from "~icons/lucide/maximize";
@@ -348,7 +349,7 @@ function Dialogs() {
 										<Dialog.Header>
 											<div class="flex flex-row space-x-8">
 												<div class="flex flex-row items-center space-x-3 text-gray-11">
-													<span>Size</span>
+													<span>{localize("Size")}</span>
 													<div class="w-13">
 														<BoundInput field="width" max={originalSize.x} />
 													</div>
@@ -358,7 +359,7 @@ function Dialogs() {
 													</div>
 												</div>
 												<div class="flex flex-row items-center space-x-3 text-gray-11">
-													<span>Position</span>
+													<span>{localize("Position")}</span>
 													<div class="w-13">
 														<BoundInput field="x" />
 													</div>
@@ -408,7 +409,7 @@ function Dialogs() {
 														crop().height === originalSize.y
 													}
 												>
-													Full
+													{localize("Full")}
 												</EditorButton>
 												<EditorButton
 													leftIcon={<IconCapCircleX />}
@@ -423,7 +424,7 @@ function Dialogs() {
 														crop().height === initialBounds.height
 													}
 												>
-													Reset
+													{localize("Reset")}
 												</EditorButton>
 											</div>
 										</Dialog.Header>
@@ -453,7 +454,7 @@ function Dialogs() {
 														>
 															<img
 																class="w-full h-full pointer-events-none select-none shadow-sm"
-																alt="screenshot"
+																alt={localize("screenshot")}
 																src={convertFileSrc(imagePath())}
 															/>
 														</Cropper>
@@ -478,7 +479,7 @@ function Dialogs() {
 													setDialog({ open: false });
 												}}
 											>
-												Save
+												{localize("Save")}
 											</Button>
 										</Dialog.Footer>
 									</>

@@ -103,6 +103,9 @@ async importCurrentDesktopBackground(projectPath: string) : Promise<string> {
 async getDefaultProjectConfig() : Promise<ProjectConfiguration> {
     return await TAURI_INVOKE("get_default_project_config");
 },
+async renderCapturePreview(config: ProjectConfiguration, time: number) : Promise<string> {
+    return await TAURI_INVOKE("render_capture_preview", { config, time });
+},
 async getCaptureStyle() : Promise<CaptureStyle> {
     return await TAURI_INVOKE("get_capture_style");
 },
@@ -111,6 +114,9 @@ async setCaptureStyle(style: CaptureStyle) : Promise<null> {
 },
 async getCurrentWallpaperPreview() : Promise<string> {
     return await TAURI_INVOKE("get_current_wallpaper_preview");
+},
+async getDesktopWallpaper(projectPath: string | null) : Promise<DesktopWallpaper> {
+    return await TAURI_INVOKE("get_desktop_wallpaper", { projectPath });
 },
 async listCameras() : Promise<CameraInfo[]> {
     return await TAURI_INVOKE("list_cameras");
@@ -1055,6 +1061,7 @@ export type CursorMeta = { imagePath: string; hotspot: XY<number>; shape?: strin
 export type CursorRippleConfig = { enabled: boolean; color: [number, number, number]; strength: number; size: number; duration: number }
 export type CursorType = "auto" | "pointer" | "circle" | "macos" | "tahoe" | "windows"
 export type Cursors = { [key in string]: string } | { [key in string]: CursorMeta }
+export type DesktopWallpaper = { path: string; previewPath: string; animated: boolean }
 export type DeviceOrModelID = { DeviceID: string } | { ModelID: ModelIDType }
 export type DevicesUpdated = { cameras: CameraInfo[]; microphones: string[]; permissions: OSPermissionsCheck }
 export type DiagnosticOptions = { includeSyncTest: boolean;

@@ -1,0 +1,1381 @@
+[
+	{
+		"body": {
+			"height": 800,
+			"width": 1120
+		},
+		"canvas": {
+			"height": 150,
+			"parent": {
+				"height": 346,
+				"width": 690
+			},
+			"rect": {
+				"height": 330,
+				"width": 528
+			},
+			"width": 300
+		},
+		"colorSeed": "#1d293b",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [
+			{
+				"complete": true,
+				"height": 256,
+				"width": 256
+			}
+		],
+		"phase": "dom",
+		"primary": "#43608a",
+		"route": "/",
+		"title": "",
+		"visibility": "visible",
+		"width": 1120
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1120
+		},
+		"canvas": {
+			"height": 150,
+			"parent": {
+				"height": 346,
+				"width": 690
+			},
+			"rect": {
+				"height": 330,
+				"width": 528
+			},
+			"width": 300
+		},
+		"colorSeed": "#1d293b",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [
+			{
+				"complete": true,
+				"height": 256,
+				"width": 256
+			}
+		],
+		"phase": "dom",
+		"primary": "#43608a",
+		"route": "/",
+		"title": "",
+		"visibility": "visible",
+		"width": 1120
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1120
+		},
+		"canvas": {
+			"height": 150,
+			"parent": {
+				"height": 346,
+				"width": 690
+			},
+			"rect": {
+				"height": 330,
+				"width": 528
+			},
+			"width": 300
+		},
+		"colorSeed": "#1d293b",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [
+			{
+				"complete": true,
+				"height": 256,
+				"width": 256
+			}
+		],
+		"phase": "dom",
+		"primary": "#43608a",
+		"route": "/",
+		"title": "",
+		"visibility": "visible",
+		"width": 1120
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1120
+		},
+		"canvas": {
+			"height": 150,
+			"parent": {
+				"height": 346,
+				"width": 690
+			},
+			"rect": {
+				"height": 330,
+				"width": 528
+			},
+			"width": 300
+		},
+		"colorSeed": "#1d293b",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [
+			{
+				"complete": true,
+				"height": 256,
+				"width": 256
+			}
+		],
+		"phase": "dom",
+		"primary": "#43608a",
+		"route": "/",
+		"title": "",
+		"visibility": "visible",
+		"width": 1120
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1120
+		},
+		"canvas": {
+			"height": 150,
+			"parent": {
+				"height": 346,
+				"width": 690
+			},
+			"rect": {
+				"height": 330,
+				"width": 528
+			},
+			"width": 300
+		},
+		"colorSeed": "#1d293b",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [
+			{
+				"complete": true,
+				"height": 256,
+				"width": 256
+			}
+		],
+		"phase": "dom",
+		"primary": "#43608a",
+		"route": "/",
+		"title": "",
+		"visibility": "visible",
+		"width": 1120
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1120
+		},
+		"canvas": {
+			"height": 600,
+			"parent": {
+				"height": 264.875,
+				"width": 690
+			},
+			"rect": {
+				"height": 248.875,
+				"width": 398.1875
+			},
+			"width": 960
+		},
+		"colorSeed": "#1d293b",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [
+			{
+				"complete": true,
+				"height": 256,
+				"width": 256
+			}
+		],
+		"phase": "dom",
+		"primary": "#43608a",
+		"route": "/",
+		"title": "",
+		"visibility": "visible",
+		"width": 1120
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1120
+		},
+		"canvas": {
+			"height": 600,
+			"parent": {
+				"height": 260.484375,
+				"width": 690
+			},
+			"rect": {
+				"height": 244.484375,
+				"width": 391.171875
+			},
+			"width": 960
+		},
+		"colorSeed": "#1d293b",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [
+			{
+				"complete": true,
+				"height": 256,
+				"width": 256
+			}
+		],
+		"phase": "dom",
+		"primary": "#43608a",
+		"route": "/",
+		"title": "",
+		"visibility": "visible",
+		"width": 1120
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1120
+		},
+		"canvas": {
+			"height": 600,
+			"parent": {
+				"height": 346,
+				"width": 690
+			},
+			"rect": {
+				"height": 330,
+				"width": 528
+			},
+			"width": 960
+		},
+		"colorSeed": "#1d293b",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [
+			{
+				"complete": true,
+				"height": 256,
+				"width": 256
+			}
+		],
+		"phase": "dom",
+		"primary": "#43608a",
+		"route": "/",
+		"title": "",
+		"visibility": "visible",
+		"width": 1120
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1120
+		},
+		"canvas": {
+			"height": 600,
+			"parent": {
+				"height": 346,
+				"width": 690
+			},
+			"rect": {
+				"height": 330,
+				"width": 528
+			},
+			"width": 960
+		},
+		"colorSeed": "#1d293b",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [
+			{
+				"complete": true,
+				"height": 256,
+				"width": 256
+			}
+		],
+		"phase": "dom",
+		"primary": "#43608a",
+		"route": "/",
+		"title": "",
+		"visibility": "visible",
+		"width": 1120
+	},
+	{
+		"body": {
+			"height": 530,
+			"width": 660
+		},
+		"canvas": {
+			"height": 600,
+			"parent": {
+				"height": 192,
+				"width": 582
+			},
+			"rect": {
+				"height": 176,
+				"width": 281.59375
+			},
+			"width": 960
+		},
+		"colorSeed": "#1d293b",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 530,
+		"images": [
+			{
+				"complete": true,
+				"height": 256,
+				"width": 256
+			}
+		],
+		"phase": "dom",
+		"primary": "#43608a",
+		"route": "/",
+		"title": "",
+		"visibility": "visible",
+		"width": 660
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1120
+		},
+		"canvas": {
+			"height": 600,
+			"parent": {
+				"height": 346,
+				"width": 690
+			},
+			"rect": {
+				"height": 330,
+				"width": 528
+			},
+			"width": 960
+		},
+		"colorSeed": "#1d293b",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [
+			{
+				"complete": true,
+				"height": 256,
+				"width": 256
+			}
+		],
+		"phase": "dom",
+		"primary": "#43608a",
+		"route": "/",
+		"title": "",
+		"visibility": "visible",
+		"width": 1120
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1120
+		},
+		"canvas": {
+			"height": 600,
+			"parent": {
+				"height": 346,
+				"width": 690
+			},
+			"rect": {
+				"height": 330,
+				"width": 528
+			},
+			"width": 960
+		},
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [
+			{
+				"complete": true,
+				"height": 256,
+				"width": 256
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/",
+		"title": "",
+		"visibility": "visible",
+		"width": 1120
+	},
+	{
+		"available": true,
+		"phase": "wallpaper",
+		"route": "/settings/general"
+	},
+	{
+		"dark": true,
+		"ink": "#e1e5ef",
+		"phase": "theme-dark",
+		"route": "/settings/general"
+	},
+	{
+		"dark": false,
+		"phase": "theme-dark-to-system",
+		"route": "/settings/general"
+	},
+	{
+		"body": {
+			"height": 775,
+			"width": 782
+		},
+		"canvas": null,
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 775,
+		"images": [
+			{
+				"complete": true,
+				"height": 256,
+				"width": 256
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/settings/general",
+		"title": "",
+		"visibility": "visible",
+		"width": 782
+	},
+	{
+		"dark": false,
+		"phase": "theme-rapid-to-system",
+		"route": "/settings/general"
+	},
+	{
+		"dark": false,
+		"phase": "theme-restored",
+		"restored": "light",
+		"route": "/settings/general"
+	},
+	{
+		"lang": "en",
+		"phase": "language",
+		"route": "/settings/general",
+		"selected": "en",
+		"selectorLabel": "Language"
+	},
+	{
+		"body": {
+			"height": 775,
+			"width": 782
+		},
+		"canvas": null,
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 775,
+		"images": [
+			{
+				"complete": true,
+				"height": 256,
+				"width": 256
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/settings/general",
+		"title": "",
+		"visibility": "visible",
+		"width": 782
+	},
+	{
+		"lang": "zh-CN",
+		"phase": "language",
+		"route": "/settings/general",
+		"selected": "zh-CN",
+		"selectorLabel": "界面语言"
+	},
+	{
+		"found": true,
+		"phase": "account-placeholder",
+		"prompt": true,
+		"route": "/settings/general"
+	},
+	{
+		"animated": true,
+		"phase": "desktop-wallpaper",
+		"route": "/settings/general",
+		"videoExtension": "mov"
+	},
+	{
+		"body": {
+			"height": 775,
+			"width": 782
+		},
+		"canvas": null,
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 775,
+		"images": [
+			{
+				"complete": true,
+				"height": 256,
+				"width": 256
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/settings/general",
+		"title": "",
+		"visibility": "visible",
+		"width": 782
+	},
+	{
+		"body": {
+			"height": 775,
+			"width": 782
+		},
+		"canvas": null,
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 775,
+		"images": [
+			{
+				"complete": true,
+				"height": 256,
+				"width": 256
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/settings/general",
+		"title": "",
+		"visibility": "visible",
+		"width": 782
+	},
+	{
+		"body": {
+			"height": 775,
+			"width": 782
+		},
+		"canvas": null,
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 775,
+		"images": [
+			{
+				"complete": true,
+				"height": 256,
+				"width": 256
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/settings/general",
+		"title": "",
+		"visibility": "visible",
+		"width": 782
+	},
+	{
+		"elapsedMs": 2615.9999999999995,
+		"firstHash": 1446479982,
+		"phase": "dynamic-wallpaper-render",
+		"route": "/settings/general",
+		"secondHash": 3351262058
+	},
+	{
+		"messages": [
+			"[Player] Canvas init effect",
+			{
+				"alreadyInit": false,
+				"hasCanvas": true,
+				"hasControls": true
+			}
+		],
+		"phase": "player",
+		"route": "/editor"
+	},
+	{
+		"messages": [
+			"[Player] Initializing canvas",
+			{
+				"canvasId": "canvas",
+				"isConnected": true
+			}
+		],
+		"phase": "player",
+		"route": "/editor"
+	},
+	{
+		"messages": ["[Player] Canvas initialized successfully"],
+		"phase": "player",
+		"route": "/editor"
+	},
+	{
+		"body": {
+			"height": 775,
+			"width": 782
+		},
+		"canvas": null,
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 775,
+		"images": [
+			{
+				"complete": true,
+				"height": 256,
+				"width": 256
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/settings/general",
+		"title": "",
+		"visibility": "hidden",
+		"width": 782
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1275
+		},
+		"busy": "false",
+		"canvas": {
+			"height": 702,
+			"parent": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"rect": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"width": 1124
+		},
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/editor",
+		"title": "",
+		"visibility": "visible",
+		"width": 1275
+	},
+	{
+		"dragged": 424,
+		"initial": 352,
+		"phase": "inspector-resize",
+		"restored": 352,
+		"route": "/editor"
+	},
+	{
+		"phase": "shared-cursor-settings",
+		"present": true,
+		"route": "/editor",
+		"sliderTrack": "8px"
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1275
+		},
+		"busy": "false",
+		"canvas": {
+			"height": 702,
+			"parent": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"rect": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"width": 1124
+		},
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/editor",
+		"title": "",
+		"visibility": "visible",
+		"width": 1275
+	},
+	{
+		"body": {
+			"height": 775,
+			"width": 782
+		},
+		"canvas": null,
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 775,
+		"images": [
+			{
+				"complete": true,
+				"height": 256,
+				"width": 256
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/settings/general",
+		"title": "",
+		"visibility": "hidden",
+		"width": 782
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1275
+		},
+		"busy": "false",
+		"canvas": {
+			"height": 702,
+			"parent": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"rect": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"width": 1124
+		},
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/editor",
+		"title": "",
+		"visibility": "visible",
+		"width": 1275
+	},
+	{
+		"body": {
+			"height": 775,
+			"width": 782
+		},
+		"canvas": null,
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 775,
+		"images": [
+			{
+				"complete": true,
+				"height": 256,
+				"width": 256
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/settings/general",
+		"title": "",
+		"visibility": "visible",
+		"width": 782
+	},
+	{
+		"messages": [
+			"[Player] Canvas init effect",
+			{
+				"alreadyInit": false,
+				"hasCanvas": true,
+				"hasControls": true
+			}
+		],
+		"phase": "player",
+		"route": "/editor"
+	},
+	{
+		"messages": [
+			"[Player] Initializing canvas",
+			{
+				"canvasId": "canvas",
+				"isConnected": true
+			}
+		],
+		"phase": "player",
+		"route": "/editor"
+	},
+	{
+		"messages": ["[Player] Canvas initialized successfully"],
+		"phase": "player",
+		"route": "/editor"
+	},
+	{
+		"body": {
+			"height": 775,
+			"width": 782
+		},
+		"canvas": null,
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 775,
+		"images": [
+			{
+				"complete": true,
+				"height": 256,
+				"width": 256
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/settings/general",
+		"title": "",
+		"visibility": "hidden",
+		"width": 782
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1275
+		},
+		"busy": "false",
+		"canvas": {
+			"height": 702,
+			"parent": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"rect": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"width": 1124
+		},
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [
+			{
+				"complete": true,
+				"height": 2100,
+				"width": 3360
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/editor",
+		"title": "",
+		"visibility": "visible",
+		"width": 1275
+	},
+	{
+		"dragged": 424,
+		"initial": 352,
+		"phase": "inspector-resize",
+		"restored": 352,
+		"route": "/editor"
+	},
+	{
+		"phase": "shared-cursor-settings",
+		"present": true,
+		"route": "/editor",
+		"sliderTrack": "8px"
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1275
+		},
+		"busy": "false",
+		"canvas": {
+			"height": 702,
+			"parent": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"rect": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"width": 1124
+		},
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [
+			{
+				"complete": true,
+				"height": 2100,
+				"width": 3360
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/editor",
+		"title": "",
+		"visibility": "visible",
+		"width": 1275
+	},
+	{
+		"body": {
+			"height": 775,
+			"width": 782
+		},
+		"canvas": null,
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 775,
+		"images": [
+			{
+				"complete": true,
+				"height": 256,
+				"width": 256
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/settings/general",
+		"title": "",
+		"visibility": "hidden",
+		"width": 782
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1275
+		},
+		"busy": "false",
+		"canvas": {
+			"height": 702,
+			"parent": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"rect": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"width": 1124
+		},
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [
+			{
+				"complete": true,
+				"height": 2100,
+				"width": 3360
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/editor",
+		"title": "",
+		"visibility": "visible",
+		"width": 1275
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1275
+		},
+		"busy": "false",
+		"canvas": {
+			"height": 702,
+			"parent": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"rect": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"width": 1124
+		},
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [
+			{
+				"complete": true,
+				"height": 2100,
+				"width": 3360
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/editor",
+		"title": "",
+		"visibility": "visible",
+		"width": 1275
+	},
+	{
+		"elapsedMs": 1431,
+		"path": "/Users/moyingxz/Library/Application Support/com.jianku.screen.next/recordings/界面验收-20261016-动态背景.jks/output/result.mp4",
+		"phase": "dynamic-background-export",
+		"progressMessages": 12,
+		"route": "/editor"
+	},
+	{
+		"body": {
+			"height": 775,
+			"width": 782
+		},
+		"canvas": null,
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 775,
+		"images": [
+			{
+				"complete": true,
+				"height": 256,
+				"width": 256
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/settings/general",
+		"title": "",
+		"visibility": "hidden",
+		"width": 782
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1275
+		},
+		"busy": "false",
+		"canvas": {
+			"height": 702,
+			"parent": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"rect": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"width": 1124
+		},
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [
+			{
+				"complete": true,
+				"height": 2100,
+				"width": 3360
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/editor",
+		"title": "",
+		"visibility": "visible",
+		"width": 1275
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1275
+		},
+		"busy": "false",
+		"canvas": {
+			"height": 702,
+			"parent": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"rect": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"width": 1124
+		},
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [
+			{
+				"complete": true,
+				"height": 2100,
+				"width": 3360
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/editor",
+		"title": "",
+		"visibility": "visible",
+		"width": 1275
+	},
+	{
+		"body": {
+			"height": 775,
+			"width": 782
+		},
+		"canvas": null,
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 775,
+		"images": [
+			{
+				"complete": true,
+				"height": 256,
+				"width": 256
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/settings/general",
+		"title": "",
+		"visibility": "hidden",
+		"width": 782
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1275
+		},
+		"busy": "false",
+		"canvas": {
+			"height": 702,
+			"parent": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"rect": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"width": 1124
+		},
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [
+			{
+				"complete": true,
+				"height": 2100,
+				"width": 3360
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/editor",
+		"title": "",
+		"visibility": "visible",
+		"width": 1275
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1275
+		},
+		"busy": "false",
+		"canvas": {
+			"height": 702,
+			"parent": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"rect": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"width": 1124
+		},
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [
+			{
+				"complete": true,
+				"height": 2100,
+				"width": 3360
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/editor",
+		"title": "",
+		"visibility": "visible",
+		"width": 1275
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1275
+		},
+		"busy": "false",
+		"canvas": {
+			"height": 702,
+			"parent": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"rect": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"width": 1124
+		},
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [
+			{
+				"complete": true,
+				"height": 2100,
+				"width": 3360
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/editor",
+		"title": "",
+		"visibility": "visible",
+		"width": 1275
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1275
+		},
+		"busy": "false",
+		"canvas": {
+			"height": 702,
+			"parent": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"rect": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"width": 1124
+		},
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [
+			{
+				"complete": true,
+				"height": 2100,
+				"width": 3360
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/editor",
+		"title": "",
+		"visibility": "visible",
+		"width": 1275
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1275
+		},
+		"busy": "false",
+		"canvas": {
+			"height": 702,
+			"parent": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"rect": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"width": 1124
+		},
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [
+			{
+				"complete": true,
+				"height": 2100,
+				"width": 3360
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/editor",
+		"title": "",
+		"visibility": "visible",
+		"width": 1275
+	},
+	{
+		"body": {
+			"height": 800,
+			"width": 1275
+		},
+		"busy": "false",
+		"canvas": {
+			"height": 702,
+			"parent": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"rect": {
+				"height": 329,
+				"width": 526.765625
+			},
+			"width": 1124
+		},
+		"colorSeed": "#0788e3",
+		"colorSource": "wallpaper",
+		"dark": false,
+		"height": 800,
+		"images": [
+			{
+				"complete": true,
+				"height": 2100,
+				"width": 3360
+			}
+		],
+		"phase": "dom",
+		"primary": "#3f6188",
+		"route": "/editor",
+		"title": "",
+		"visibility": "visible",
+		"width": 1275
+	}
+]

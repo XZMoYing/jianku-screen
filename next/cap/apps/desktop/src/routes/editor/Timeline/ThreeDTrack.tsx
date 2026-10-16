@@ -12,6 +12,7 @@ import {
 	Show,
 } from "solid-js";
 import { produce } from "solid-js/store";
+import { t as localize } from "~/utils/i18n";
 import { useEditorContext } from "../context";
 import {
 	camera3DShotLabel,
@@ -224,7 +225,9 @@ export function ThreeDTrack(props: {
 						when={pickerOpen()}
 						fallback={
 							<>
-								<span>Add cinematic 3D shots to your recording</span>
+								<span>
+									{localize("Add cinematic 3D shots to your recording")}
+								</span>
 								<div
 									class="flex relative z-10 gap-2 items-center"
 									onMouseDown={(e) => e.stopPropagation()}
@@ -234,7 +237,7 @@ export function ThreeDTrack(props: {
 										class="cap-lane-chip outline-hidden"
 										onClick={() => setPickerOpen(true)}
 									>
-										Auto scene
+										{localize("Auto scene")}
 									</button>
 									<button
 										type="button"
@@ -247,7 +250,7 @@ export function ThreeDTrack(props: {
 							</>
 						}
 					>
-						<span>How many shots?</span>
+						<span>{localize("How many shots?")}</span>
 						<div
 							class="flex relative z-10 gap-1 items-center"
 							onMouseDown={(e) => e.stopPropagation()}
@@ -259,7 +262,7 @@ export function ThreeDTrack(props: {
 							/>
 							<button
 								type="button"
-								aria-label="Close the shot picker"
+								aria-label={localize("Close the shot picker")}
 								class="flex justify-center items-center ml-1 rounded-md transition-colors outline-hidden text-ed-text-3 hover:text-ed-text-1 hover:bg-ed-ctl-hover size-5"
 								onClick={() => closePicker()}
 							>

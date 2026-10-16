@@ -43,6 +43,7 @@ import {
 	type Trigger,
 	testAutomation,
 } from "~/utils/automations";
+import { t as localize } from "~/utils/i18n";
 import IconLucideBell from "~icons/lucide/bell";
 import IconLucideChevronDown from "~icons/lucide/chevron-down";
 import IconLucideChevronUp from "~icons/lucide/chevron-up";
@@ -217,7 +218,9 @@ const TEMPLATES: Template[] = [
 	{
 		id: "ocr-screenshot",
 		name: "Pull the text out of screenshots",
-		description: "Cap reads the text in your screenshot and copies it for you.",
+		description: localize(
+			"Cap reads the text in your screenshot and copies it for you.",
+		),
 		icon: IconLucideScanText,
 		build: () =>
 			buildRule({
@@ -287,7 +290,7 @@ const TEMPLATES: Template[] = [
 				actions: [
 					{
 						type: "notify",
-						titleTemplate: "Cap",
+						titleTemplate: localize("Cap"),
 						bodyTemplate: "Your recording is ready to share.",
 					},
 				],
@@ -519,8 +522,10 @@ export default function AutomationsSettings() {
 		<div class="cap-settings-page flex flex-col h-full custom-scroll">
 			<SettingsPageContent>
 				<Section
-					title="Automations"
-					description="Run actions automatically when something happens in Cap. Rules are shared with the Cap CLI."
+					title={localize("Automations")}
+					description={localize(
+						"Run actions automatically when something happens in Cap. Rules are shared with the Cap CLI.",
+					)}
 				>
 					<Suspense
 						fallback={<div class="h-24 rounded-xl bg-gray-3 animate-pulse" />}
@@ -558,8 +563,10 @@ export default function AutomationsSettings() {
 				</Section>
 
 				<Section
-					title="Templates"
-					description="One click to add a ready-made automation. Tweak anything afterwards."
+					title={localize("Templates")}
+					description={localize(
+						"One click to add a ready-made automation. Tweak anything afterwards.",
+					)}
 				>
 					<div class="grid grid-cols-2 gap-2.5">
 						<For each={TEMPLATES}>
@@ -584,10 +591,13 @@ function EmptyState(props: { onCreate: () => void }) {
 				<div class="flex justify-center items-center mb-1 rounded-full size-11 bg-gray-3 text-gray-10">
 					<IconLucideZap class="size-5" />
 				</div>
-				<p class="text-[13px] font-medium text-gray-12">No automations yet</p>
+				<p class="text-[13px] font-medium text-gray-12">
+					{localize("No automations yet")}
+				</p>
 				<p class="max-w-xs text-xs leading-relaxed text-gray-10">
-					Pick a template below to get started in one click, or build your own
-					from scratch.
+					{localize(
+						"Pick a template below to get started in one click, or build your own from scratch.",
+					)}
 				</p>
 				<Button
 					variant="gray"
@@ -596,7 +606,7 @@ function EmptyState(props: { onCreate: () => void }) {
 					class="flex gap-1.5 items-center mt-1"
 				>
 					<IconLucidePlus class="size-3.5" />
-					Start from scratch
+					{localize("Start from scratch")}
 				</Button>
 			</div>
 		</SectionCard>
@@ -611,7 +621,7 @@ function AddRuleButton(props: { onClick: () => void }) {
 			class="flex gap-1.5 justify-center items-center py-2.5 w-full text-[13px] rounded-xl border border-dashed transition-colors border-gray-4 text-gray-10 hover:text-gray-12 hover:border-gray-6 hover:bg-gray-2"
 		>
 			<IconLucidePlus class="size-4" />
-			New automation
+			{localize("New automation")}
 		</button>
 	);
 }
@@ -749,7 +759,7 @@ function RuleEditorBody(props: {
 
 	return (
 		<div class="p-4 space-y-5">
-			<Field label="Name">
+			<Field label={localize("Name")}>
 				<TextInput
 					value={props.rule.name}
 					placeholder={autoRuleName(props.rule)}
@@ -762,7 +772,7 @@ function RuleEditorBody(props: {
 			</Field>
 
 			<div class="space-y-1.5">
-				<GroupLabel>When this happens</GroupLabel>
+				<GroupLabel>{localize("When this happens")}</GroupLabel>
 				<SelectInput<Trigger>
 					value={props.rule.trigger}
 					options={ALL_TRIGGERS.map((t) => ({
@@ -779,7 +789,7 @@ function RuleEditorBody(props: {
 
 			<div class="space-y-2">
 				<div class="flex justify-between items-center">
-					<GroupLabel>Only run if</GroupLabel>
+					<GroupLabel>{localize("Only run if")}</GroupLabel>
 					<div class="flex gap-2 items-center">
 						<Show when={props.rule.conditions.length > 1}>
 							<SelectInput<MatchMode>
@@ -797,7 +807,7 @@ function RuleEditorBody(props: {
 							/>
 						</Show>
 						<Button variant="gray" size="xs" onClick={addCondition}>
-							Add condition
+							{localize("Add condition")}
 						</Button>
 					</div>
 				</div>
@@ -837,9 +847,9 @@ function RuleEditorBody(props: {
 
 			<div class="space-y-2">
 				<div class="flex justify-between items-center">
-					<GroupLabel>Then do this</GroupLabel>
+					<GroupLabel>{localize("Then do this")}</GroupLabel>
 					<Button variant="gray" size="xs" onClick={addAction}>
-						Add action
+						{localize("Add action")}
 					</Button>
 				</div>
 				<div class="space-y-2">
@@ -878,15 +888,20 @@ function RuleEditorBody(props: {
 
 			<Show when={hasDangerous()}>
 				<p class="text-xs leading-relaxed text-amber-600 dark:text-amber-500">
-					This automation runs commands or sends network requests. Only use
-					values you trust — they execute automatically with your permissions.
+					{localize(
+						"This automation runs commands or sends network requests. Only use values you trust — they execute automatically with your permissions.",
+					)}
 				</p>
 			</Show>
 
 			<div class="flex justify-between items-center pt-4 border-t border-gray-3 -mx-4 px-4 -mb-4 pb-4 mt-2">
-				<span title="Checks which actions are supported on this device. Does not run the automation.">
+				<span
+					title={localize(
+						"Checks which actions are supported on this device. Does not run the automation.",
+					)}
+				>
 					<Button variant="gray" size="xs" onClick={props.onTest}>
-						Check compatibility
+						{localize("Check compatibility")}
 					</Button>
 				</span>
 				<button
@@ -895,7 +910,7 @@ function RuleEditorBody(props: {
 					class="flex gap-1.5 items-center px-2 h-6 text-[0.75rem] rounded-lg transition-colors text-gray-10 hover:text-red-500 hover:bg-red-500/10"
 				>
 					<IconLucideTrash2 class="size-3.5" />
-					Delete
+					{localize("Delete")}
 				</button>
 			</div>
 		</div>
@@ -928,13 +943,16 @@ function ConditionRow(props: {
 						onChange={props.onChange}
 					/>
 				</div>
-				<RowButton onClick={props.onRemove} title="Remove condition">
+				<RowButton
+					onClick={props.onRemove}
+					title={localize("Remove condition")}
+				>
 					<IconLucideX class="size-4" />
 				</RowButton>
 			</div>
 			<Show when={!applies()}>
 				<p class="px-1 text-[11px] text-amber-600 dark:text-amber-500">
-					This condition never matches for the selected trigger.
+					{localize("This condition never matches for the selected trigger.")}
 				</p>
 			</Show>
 		</div>
@@ -1010,7 +1028,7 @@ function ConditionValue(props: {
 			return (
 				<TextInput
 					value={c.id}
-					placeholder="Organization ID"
+					placeholder={localize("Organization ID")}
 					onInput={(v) =>
 						props.onChange((cond) => {
 							if (cond.type === "organizationIs") cond.id = v;
@@ -1048,34 +1066,34 @@ function ActionRow(props: {
 				/>
 				<Show when={props.support === false}>
 					<span
-						title="Not supported on this device; will be skipped"
+						title={localize("Not supported on this device; will be skipped")}
 						class="text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded-md bg-amber-500/15 text-amber-600 dark:text-amber-500"
 					>
-						Skipped here
+						{localize("Skipped here")}
 					</span>
 				</Show>
 				<RowButton
 					onClick={() => props.onMove(-1)}
-					title="Move up"
+					title={localize("Move up")}
 					disabled={props.isFirst}
 				>
 					<IconLucideChevronUp class="size-4" />
 				</RowButton>
 				<RowButton
 					onClick={() => props.onMove(1)}
-					title="Move down"
+					title={localize("Move down")}
 					disabled={props.isLast}
 				>
 					<IconLucideChevronDown class="size-4" />
 				</RowButton>
-				<RowButton onClick={props.onRemove} title="Remove action">
+				<RowButton onClick={props.onRemove} title={localize("Remove action")}>
 					<IconLucideX class="size-4" />
 				</RowButton>
 			</div>
 			<ActionParams action={props.action} onChange={props.onChange} />
 			<Show when={!applies()}>
 				<p class="text-[11px] text-amber-600 dark:text-amber-500">
-					This action has no effect for the selected trigger.
+					{localize("This action has no effect for the selected trigger.")}
 				</p>
 			</Show>
 		</div>
@@ -1090,7 +1108,7 @@ function ActionParams(props: {
 	switch (a.type) {
 		case "copyToClipboard":
 			return (
-				<Field label="Source">
+				<Field label={localize("Source")}>
 					<SelectInput<ClipboardSource>
 						value={a.source}
 						options={[
@@ -1108,7 +1126,7 @@ function ActionParams(props: {
 		case "saveToLocation":
 			return (
 				<div class="flex gap-2">
-					<Field label="Folder">
+					<Field label={localize("Folder")}>
 						<div class="flex gap-2">
 							<TextInput
 								value={a.dir}
@@ -1130,11 +1148,11 @@ function ActionParams(props: {
 										});
 								}}
 							>
-								Browse
+								{localize("Browse")}
 							</Button>
 						</div>
 					</Field>
-					<Field label="Filename template (optional)">
+					<Field label={localize("Filename template (optional)")}>
 						<TextInput
 							value={a.filenameTemplate ?? ""}
 							placeholder="{date}-{window}"
@@ -1153,7 +1171,7 @@ function ActionParams(props: {
 		case "upload":
 			return (
 				<div class="space-y-2">
-					<Field label="Organization ID (optional)">
+					<Field label={localize("Organization ID (optional)")}>
 						<TextInput
 							value={a.organizationId ?? ""}
 							onInput={(v) =>
@@ -1175,7 +1193,7 @@ function ActionParams(props: {
 									})
 								}
 							/>
-							Copy link to clipboard
+							{localize("Copy link to clipboard")}
 						</label>
 						<label class="flex gap-2 items-center text-[13px] text-gray-12">
 							<Toggle
@@ -1187,7 +1205,7 @@ function ActionParams(props: {
 									})
 								}
 							/>
-							Open in browser
+							{localize("Open in browser")}
 						</label>
 					</div>
 				</div>
@@ -1196,7 +1214,7 @@ function ActionParams(props: {
 			return (
 				<div class="space-y-2">
 					<div class="flex gap-2">
-						<Field label="Program">
+						<Field label={localize("Program")}>
 							<TextInput
 								value={a.program}
 								placeholder="/usr/local/bin/my-script"
@@ -1207,7 +1225,7 @@ function ActionParams(props: {
 								}
 							/>
 						</Field>
-						<Field label="Arguments (space-separated)">
+						<Field label={localize("Arguments (space-separated)")}>
 							<TextInput
 								value={a.args.join(" ")}
 								onInput={(v) =>
@@ -1229,7 +1247,7 @@ function ActionParams(props: {
 								})
 							}
 						/>
-						Run through shell
+						{localize("Run through shell")}
 					</label>
 				</div>
 			);
@@ -1248,7 +1266,7 @@ function ActionParams(props: {
 								}
 							/>
 						</Field>
-						<Field label="Method">
+						<Field label={localize("Method")}>
 							<SelectInput<string>
 								class="w-28"
 								value={a.method}
@@ -1265,7 +1283,7 @@ function ActionParams(props: {
 							/>
 						</Field>
 					</div>
-					<Field label="Body template (optional)">
+					<Field label={localize("Body template (optional)")}>
 						<TextInput
 							value={a.bodyTemplate ?? ""}
 							placeholder='{"text":"{share_link}"}'
@@ -1282,7 +1300,7 @@ function ActionParams(props: {
 		case "notify":
 			return (
 				<div class="flex gap-2">
-					<Field label="Title">
+					<Field label={localize("Title")}>
 						<TextInput
 							value={a.titleTemplate}
 							onInput={(v) =>
@@ -1292,7 +1310,7 @@ function ActionParams(props: {
 							}
 						/>
 					</Field>
-					<Field label="Body">
+					<Field label={localize("Body")}>
 						<TextInput
 							value={a.bodyTemplate}
 							onInput={(v) =>
@@ -1306,7 +1324,7 @@ function ActionParams(props: {
 			);
 		case "applyPreset":
 			return (
-				<Field label="Preset">
+				<Field label={localize("Preset")}>
 					<PresetSelect
 						value={a.name}
 						onChange={(name) =>
@@ -1339,7 +1357,7 @@ function PresetSelect(props: {
 			when={props.allowNone || names().length > 0}
 			fallback={
 				<p class="px-0.5 py-1.5 text-[11px] text-gray-9">
-					No presets yet — create one in the editor first.
+					{localize("No presets yet — create one in the editor first.")}
 				</p>
 			}
 		>
@@ -1372,7 +1390,7 @@ function ExportParams(props: {
 	return (
 		<div class="space-y-2">
 			<div class="flex gap-2">
-				<Field label="Format">
+				<Field label={localize("Format")}>
 					<SelectInput<ExportFormat>
 						value={a.profile.format}
 						options={[
@@ -1387,7 +1405,7 @@ function ExportParams(props: {
 						}
 					/>
 				</Field>
-				<Field label="Resolution">
+				<Field label={localize("Resolution")}>
 					<SelectInput
 						value={resolutionValue()}
 						options={RESOLUTION_PRESETS.map((r) => ({
@@ -1405,7 +1423,7 @@ function ExportParams(props: {
 				</Field>
 			</div>
 			<div class="flex gap-2">
-				<Field label="Frame rate">
+				<Field label={localize("Frame rate")}>
 					<SelectInput
 						value={String(a.profile.fps)}
 						options={FPS_PRESETS.map((f) => ({
@@ -1420,7 +1438,7 @@ function ExportParams(props: {
 					/>
 				</Field>
 				<Show when={a.profile.format === "mp4"}>
-					<Field label="Compression">
+					<Field label={localize("Compression")}>
 						<SelectInput<ExportCompression>
 							value={a.profile.compression ?? "web"}
 							options={[
@@ -1438,7 +1456,11 @@ function ExportParams(props: {
 					</Field>
 				</Show>
 			</div>
-			<Field label="Destination folder (optional, blank = project folder)">
+			<Field
+				label={localize(
+					"Destination folder (optional, blank = project folder)",
+				)}
+			>
 				<div class="flex gap-2">
 					<TextInput
 						value={
@@ -1446,7 +1468,7 @@ function ExportParams(props: {
 								? ""
 								: a.destination.customPath.dir
 						}
-						placeholder="Project folder"
+						placeholder={localize("Project folder")}
 						onInput={(v) =>
 							props.onChange((act) => {
 								if (act.type === "export")
@@ -1467,7 +1489,7 @@ function ExportParams(props: {
 								});
 						}}
 					>
-						Browse
+						{localize("Browse")}
 					</Button>
 				</div>
 			</Field>

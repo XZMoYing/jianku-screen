@@ -1,6 +1,7 @@
 import { cx } from "cva";
 import { For } from "solid-js";
 import { Transition } from "solid-transition-group";
+import { t as localize } from "~/utils/i18n";
 import { commands, type RecordingMode } from "~/utils/tauri";
 import IconLucideArrowLeft from "~icons/lucide/arrow-left";
 import { useRecordingOptions } from "../OptionsContext";
@@ -45,9 +46,11 @@ export default function ModeInfoPanel(props: ModeInfoPanelProps) {
 					focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-9 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-1"
 				>
 					<IconLucideArrowLeft class="size-3 text-gray-11" />
-					<span class="font-medium text-gray-12">Back</span>
+					<span class="font-medium text-gray-12">{localize("Back")}</span>
 				</button>
-				<span class="text-xs font-medium text-gray-11">Recording Modes</span>
+				<span class="text-xs font-medium text-gray-11">
+					{localize("Recording Modes")}
+				</span>
 			</div>
 			<div class="flex flex-col flex-1 min-h-0 pt-4">
 				<div class="px-1 custom-scroll flex-1 overflow-y-auto">

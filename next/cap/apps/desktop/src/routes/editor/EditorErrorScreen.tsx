@@ -7,6 +7,7 @@ import { type as ostype } from "@tauri-apps/plugin-os";
 import { createEffect, onCleanup, Show } from "solid-js";
 import CaptionControlsWindows11 from "~/components/titlebar/controls/CaptionControlsWindows11";
 import { createTauriEventListener } from "~/utils/createEventListener";
+import { t as localize } from "~/utils/i18n";
 import { isRecordingStorageError } from "~/utils/recording";
 import { commands } from "~/utils/tauri";
 import IconAlertTriangle from "~icons/lucide/alert-triangle";
@@ -202,7 +203,7 @@ export function EditorErrorScreen(props: {
 							class="w-full"
 						>
 							<IconRefreshCw class="size-4 mr-2" />
-							Try again
+							{localize("Try again")}
 						</Button>
 					</Show>
 
@@ -217,7 +218,9 @@ export function EditorErrorScreen(props: {
 								<p class="text-xs text-gray-11">
 									{storageShortage()
 										? "Free up space on the recording drive, then click Recover Recording. Your recording files have been kept."
-										: "Cap can attempt to recover your recording automatically. This will reconstruct the recording from available segment data."}
+										: localize(
+												"Cap can attempt to recover your recording automatically. This will reconstruct the recording from available segment data.",
+											)}
 								</p>
 							</div>
 
@@ -237,19 +240,19 @@ export function EditorErrorScreen(props: {
 									fallback={
 										<>
 											<IconRefreshCw class="size-4 mr-2" />
-											Recover Recording
+											{localize("Recover Recording")}
 										</>
 									}
 								>
 									<IconLoaderCircle class="size-4 mr-2 animate-spin" />
-									Recovering...
+									{localize("Recovering...")}
 								</Show>
 							</Button>
 
 							<Show when={recoverMutation.error}>
 								<div class="bg-red-2 border border-red-6 rounded-lg p-3">
 									<p class="text-red-11 text-xs">
-										Recovery failed:{" "}
+										{localize("Recovery failed:")}{" "}
 										{recoverMutation.error instanceof Error
 											? recoverMutation.error.message
 											: String(recoverMutation.error)}
@@ -262,11 +265,12 @@ export function EditorErrorScreen(props: {
 					<div class="bg-gray-2 border border-gray-4 rounded-xl p-4 space-y-4">
 						<div class="space-y-2">
 							<h3 class="font-medium text-gray-12 text-sm">
-								Manual Investigation
+								{localize("Manual Investigation")}
 							</h3>
 							<p class="text-xs text-gray-11">
-								You can open the recording folder to inspect the raw files
-								directly.
+								{localize(
+									"You can open the recording folder to inspect the raw files directly.",
+								)}
 							</p>
 
 							<div class="bg-gray-3 rounded-lg p-3 space-y-2">
@@ -277,14 +281,16 @@ export function EditorErrorScreen(props: {
 									when={isMac()}
 									fallback={
 										<p class="text-xs text-gray-10 italic">
-											Tip: Double-click inside the folder to browse the
-											contents.
+											{localize(
+												"Tip: Double-click inside the folder to browse the contents.",
+											)}
 										</p>
 									}
 								>
 									<p class="text-xs text-gray-10 italic">
-										Tip: Right-click and select "Show Enclosing Folder" to see
-										the .cap bundle contents.
+										{localize(
+											'Tip: Right-click and select "Show Enclosing Folder" to see the .cap bundle contents.',
+										)}
 									</p>
 								</Show>
 							</div>
@@ -292,7 +298,7 @@ export function EditorErrorScreen(props: {
 
 						<Button onClick={handleOpenFolder} variant="outline" class="w-full">
 							<IconFolder class="size-4 mr-2" />
-							Open Folder
+							{localize("Open Folder")}
 						</Button>
 					</div>
 
@@ -302,7 +308,7 @@ export function EditorErrorScreen(props: {
 							onClick={() => window.close()}
 							class="text-sm text-gray-10 hover:text-gray-11 transition-colors"
 						>
-							Close Window
+							{localize("Close Window")}
 						</button>
 					</div>
 				</div>

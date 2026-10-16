@@ -10,7 +10,10 @@ use wgpu::{include_wgsl, util::DeviceExt};
 
 use crate::{ProjectUniforms, RenderVideoConstants, RenderingError, create_shader_render_pipeline};
 
-use super::AnimatedGradientLayer;
+use super::{
+    AnimatedGradientLayer,
+    video_background::{VideoBackground, is_video},
+};
 
 const MAX_BACKGROUND_DIMENSION: u32 = 2560;
 
@@ -351,6 +354,7 @@ pub enum Inner {
     Image {
         path: String,
         bind_group: wgpu::BindGroup,
+        output_size: (u32, u32),
     },
     ColorOrGradient {
         value: ColorOrGradient,
@@ -363,6 +367,8 @@ pub enum Inner {
 pub struct BackgroundLayer {
     inner: Option<Inner>,
     image_pipeline: ImageBackgroundPipeline,
+    video: Option<VideoBackground>,
+    video_texture: Option<wgpu::Texture>,
     color_pipeline: GradientOrColorPipeline,
 }
 
@@ -370,6 +376,8 @@ impl BackgroundLayer {
     pub fn new(device: &wgpu::Device) -> Self {
         Self {
             inner: None,
+            video: None,
+            video_texture: None,
             image_pipeline: ImageBackgroundPipeline::new(device),
             color_pipeline: GradientOrColorPipeline::new(device),
         }
@@ -384,6 +392,100 @@ impl BackgroundLayer {
         let device = &constants.device;
         let queue = &constants.queue;
 
+        if let Background::Image { path } = &background
+            && is_video(path)
+        {
+            if self.video.as_ref().is_none_or(|video| video.path != *path) {
+                self.video_texture = None;
+                self.video = Some(
+                    VideoBackground::new(path.clone()).map_err(RenderingError::ImageLoadError)?,
+                );
+            }
+            let frame = self
+                .video
+                .as_ref()
+                .ok_or_else(|| RenderingError::ImageLoadError("壁纸视频未就绪".into()))?
+                .frame(f64::from(uniforms.frame_number) / f64::from(uniforms.frame_rate.max(1)))
+                .await
+                .map_err(RenderingError::ImageLoadError)?;
+            let new_texture = self.video_texture.as_ref().is_none_or(|texture| {
+                texture.width() != frame.width || texture.height() != frame.height
+            });
+            if new_texture {
+                self.video_texture = Some(device.create_texture(&wgpu::TextureDescriptor {
+                    label: Some("Wallpaper Video Frame"),
+                    size: wgpu::Extent3d {
+                        width: frame.width,
+                        height: frame.height,
+                        depth_or_array_layers: 1,
+                    },
+                    mip_level_count: 1,
+                    sample_count: 1,
+                    dimension: wgpu::TextureDimension::D2,
+                    format: wgpu::TextureFormat::Rgba8Unorm,
+                    usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::COPY_DST,
+                    view_formats: &[],
+                }));
+            }
+            let texture = self
+                .video_texture
+                .as_ref()
+                .ok_or_else(|| RenderingError::ImageLoadError("无法创建壁纸纹理".into()))?;
+            queue.write_texture(
+                wgpu::TexelCopyTextureInfo {
+                    texture: &texture,
+                    mip_level: 0,
+                    origin: wgpu::Origin3d::ZERO,
+                    aspect: wgpu::TextureAspect::All,
+                },
+                &frame.data,
+                wgpu::TexelCopyBufferLayout {
+                    offset: 0,
+                    bytes_per_row: Some(frame.width * 4),
+                    rows_per_image: Some(frame.height),
+                },
+                texture.size(),
+            );
+            if !new_texture
+                && matches!(&self.inner,Some(Inner::Image { path: current, output_size, .. }) if current == path && *output_size == uniforms.output_size)
+            {
+                return Ok(());
+            }
+            let output_ar = uniforms.output_size.0 as f32 / uniforms.output_size.1 as f32;
+            let image_ar = frame.width as f32 / frame.height as f32;
+            let image_uniforms = ImageBackgroundUniforms {
+                output_size: [uniforms.output_size.0 as f32, uniforms.output_size.1 as f32],
+                padding: 0.0,
+                x_width: if output_ar < image_ar {
+                    (1.0 - output_ar / image_ar) * 0.5
+                } else {
+                    0.0
+                },
+                y_height: if output_ar > image_ar {
+                    (1.0 - image_ar / output_ar) * 0.5
+                } else {
+                    0.0
+                },
+                _padding: 0.0,
+            };
+            let buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("Wallpaper Video Layout"),
+                contents: bytemuck::bytes_of(&image_uniforms),
+                usage: wgpu::BufferUsages::UNIFORM,
+            });
+            self.inner = Some(Inner::Image {
+                path: path.clone(),
+                output_size: uniforms.output_size,
+                bind_group: self.image_pipeline.bind_group(
+                    device,
+                    &buffer,
+                    &texture.create_view(&wgpu::TextureViewDescriptor::default()),
+                ),
+            });
+            return Ok(());
+        }
+        self.video = None;
+        self.video_texture = None;
         match background {
             Background::AnimatedGradient(config) => match &mut self.inner {
                 Some(Inner::AnimatedGradient(layer)) => {
@@ -398,8 +500,10 @@ impl BackgroundLayer {
             Background::Image { path } => {
                 match &self.inner {
                     Some(Inner::Image {
-                        path: current_path, ..
-                    }) if current_path == &path => {}
+                        path: current_path,
+                        output_size,
+                        ..
+                    }) if current_path == &path && *output_size == uniforms.output_size => {}
                     _ => {
                         let texture = match constants
                             .background_textures
@@ -462,6 +566,7 @@ impl BackgroundLayer {
 
                         self.inner = Some(Inner::Image {
                             path,
+                            output_size: uniforms.output_size,
                             bind_group: self.image_pipeline.bind_group(
                                 device,
                                 &uniform_buffer,

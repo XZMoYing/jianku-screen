@@ -8,6 +8,7 @@ import {
 	Show,
 } from "solid-js";
 import toast from "solid-toast";
+import { t as localize } from "~/utils/i18n";
 import { useEditorContext } from "./context";
 
 type PerformanceOverlayProps = {
@@ -224,7 +225,7 @@ export function PerformanceOverlay(_props: PerformanceOverlayProps) {
 						border: "1px solid rgba(255, 255, 255, 0.15)",
 					}}
 					onClick={copyStatsToClipboard}
-					title="Click to copy stats"
+					title={localize("Click to copy stats")}
 				>
 					<div class="flex flex-col gap-0.5">
 						<div class="flex items-center gap-2">
@@ -236,14 +237,14 @@ export function PerformanceOverlay(_props: PerformanceOverlayProps) {
 							</Show>
 						</div>
 						<div style={{ color: "rgba(255, 255, 255, 0.7)" }}>
-							<span>Frame: </span>
+							<span>{localize("Frame:")} </span>
 							<span style={{ color: "#93c5fd" }}>
 								{formatMs(stats().avgFrameMs)}ms
 							</span>
 							<span style={{ color: "rgba(255, 255, 255, 0.4)" }}> avg</span>
 						</div>
 						<div style={{ color: "rgba(255, 255, 255, 0.7)" }}>
-							<span>Range: </span>
+							<span>{localize("Range:")} </span>
 							<span style={{ color: "#86efac" }}>
 								{formatMs(stats().minFrameMs)}
 							</span>
@@ -253,14 +254,15 @@ export function PerformanceOverlay(_props: PerformanceOverlayProps) {
 							</span>
 						</div>
 						<div style={{ color: "rgba(255, 255, 255, 0.7)" }}>
-							<span>Jitter: </span>
+							<span>{localize("Jitter:")} </span>
 							<span style={{ color: jitterColor() }}>
 								±{formatMs(stats().jitter)}ms
 							</span>
 						</div>
 						<Show when={stats().droppedFrames > 0}>
 							<div style={{ color: "#f87171" }}>
-								Dropped: {stats().droppedFrames}/{stats().totalFrames}
+								{localize("Dropped:")} {stats().droppedFrames}/
+								{stats().totalFrames}
 							</div>
 						</Show>
 					</div>

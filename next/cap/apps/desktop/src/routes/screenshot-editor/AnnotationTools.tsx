@@ -1,6 +1,7 @@
 import { cx } from "cva";
 import type { Component } from "solid-js";
 import Tooltip from "~/components/Tooltip";
+import { t as localize } from "~/utils/i18n";
 import IconLucideArrowUpRight from "~icons/lucide/arrow-up-right";
 import IconLucideCircle from "~icons/lucide/circle";
 import IconLucideEyeOff from "~icons/lucide/eye-off";
@@ -37,40 +38,45 @@ export function AnnotationTools() {
 			<ToolButton
 				tool="select"
 				icon={IconLucideMousePointer2}
-				label="Select"
+				label={localize("Select")}
 				shortcut="V"
 			/>
 			<ToolButton
 				tool="draw"
 				icon={IconLucidePencil}
-				label="Draw"
+				label={localize("Draw")}
 				shortcut="D"
 			/>
 			<ToolButton
 				tool="arrow"
 				icon={IconLucideArrowUpRight}
-				label="Arrow"
+				label={localize("Arrow")}
 				shortcut="A"
 			/>
 			<ToolButton
 				tool="rectangle"
 				icon={IconLucideSquare}
-				label="Rectangle"
+				label={localize("Rectangle")}
 				shortcut="R"
 			/>
 			<ToolButton
 				tool="mask"
 				icon={IconLucideEyeOff}
-				label="Mask"
+				label={localize("Mask")}
 				shortcut="M"
 			/>
 			<ToolButton
 				tool="circle"
 				icon={IconLucideCircle}
-				label="Circle"
+				label={localize("Circle")}
 				shortcut="C"
 			/>
-			<ToolButton tool="text" icon={IconLucideType} label="Text" shortcut="T" />
+			<ToolButton
+				tool="text"
+				icon={IconLucideType}
+				label={localize("Text")}
+				shortcut="T"
+			/>
 		</div>
 	);
 }

@@ -205,6 +205,12 @@ impl<T: Manager<R> + Emitter<R>, R: Runtime> ManagerExt<R> for T {
         };
 
         let path = path.into();
+        if path.starts_with("/api/desktop/session")
+            || path.starts_with("/api/desktop/plan")
+            || path.starts_with("/api/desktop/user")
+        {
+            return Err(AuthedApiError::Other("账号功能敬请期待".into()));
+        }
         let server_url = crate::upload::lifecycle::cancellable(current_server_url(self)).await??;
         let server_url = if let Some(context) = UploadRequestContext::current() {
             context.check_identity(&server_url, auth.user_id.as_deref())?;

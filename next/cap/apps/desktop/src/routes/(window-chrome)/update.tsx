@@ -10,6 +10,7 @@ import {
 	Switch,
 } from "solid-js";
 import BrandLogo from "~/components/BrandLogo";
+import { t as localize } from "~/utils/i18n";
 import { commands, events } from "~/utils/tauri";
 import { restartAfterUpdate, returnToGpui } from "~/utils/updater";
 
@@ -29,7 +30,9 @@ export default function () {
 		} catch (error) {
 			console.error("Failed to restart after update:", error);
 			setUpdateError(
-				typeof error === "string" ? error : "Unable to restart Cap safely.",
+				typeof error === "string"
+					? error
+					: localize("Unable to restart Cap safely."),
 			);
 		}
 	};
@@ -41,7 +44,7 @@ export default function () {
 			setUpdateError(
 				typeof error === "string"
 					? error
-					: "Unable to return to Cap GPUI safely.",
+					: localize("Unable to return to Cap GPUI safely."),
 			);
 		}
 	};
@@ -66,18 +69,19 @@ export default function () {
 				<div class="flex flex-col gap-4 items-center text-center max-w-md">
 					<p class="text-(--text-primary)">{updateError()}</p>
 					<p class="text-(--text-tertiary)">
-						Please download the latest version manually from cap.so/download.
-						Your data will not be lost.
+						{localize(
+							"Please download the latest version manually from cap.so/download. Your data will not be lost.",
+						)}
 					</p>
 					<p class="text-(--text-tertiary) text-xs">
-						If this issue persists, please contact support.
+						{localize("If this issue persists, please contact support.")}
 					</p>
 					<Button
 						onClick={() =>
 							fromGpui ? void returnSafelyToGpui() : navigate("/")
 						}
 					>
-						{fromGpui ? "Return to Cap GPUI" : "Go Back"}
+						{fromGpui ? localize("Return to Cap GPUI") : "Go Back"}
 					</Button>
 				</div>
 			</Show>
@@ -90,10 +94,12 @@ export default function () {
 					!updateError() &&
 					!update.loading && (
 						<div class="flex flex-col items-center gap-4">
-							<span class="text-(--text-tertiary)">No update available</span>
+							<span class="text-(--text-tertiary)">
+								{localize("No update available")}
+							</span>
 							<Show when={fromGpui}>
 								<Button onClick={() => void returnSafelyToGpui()}>
-									Return to Cap GPUI
+									{localize("Return to Cap GPUI")}
 								</Button>
 							</Show>
 						</div>
@@ -170,9 +176,11 @@ export default function () {
 								<Match when={updateStatus()?.type === "done"}>
 									<div class="flex flex-col gap-4 items-center">
 										<p class="text-(--text-tertiary)">
-											Update has been installed. Restart Cap to finish updating.
+											{localize(
+												"Update has been installed. Restart Cap to finish updating.",
+											)}
 										</p>
-										<Button onClick={restart}>Restart Now</Button>
+										<Button onClick={restart}>{localize("Restart Now")}</Button>
 									</div>
 								</Match>
 								<Match
@@ -189,7 +197,7 @@ export default function () {
 									{(status) => (
 										<>
 											<h1 class="text-(--text-primary) mb-4">
-												Installing Update
+												{localize("Installing Update")}
 											</h1>
 
 											<div class="w-full bg-gray-3 rounded-full h-2.5">

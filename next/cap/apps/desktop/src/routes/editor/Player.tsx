@@ -18,6 +18,7 @@ import {
 import Tooltip from "~/components/Tooltip";
 import { captionsStore } from "~/store/captions";
 import { createTauriEventListener } from "~/utils/createEventListener";
+import { t as localize } from "~/utils/i18n";
 import { commands } from "~/utils/tauri";
 import AspectRatioSelect from "./AspectRatioSelect";
 import {
@@ -384,19 +385,19 @@ export function PlayerContent(props: { compactness?: number }) {
 					</Show>
 					<EditorButton
 						variant="text"
-						tooltipText="Crop Video"
+						tooltipText={localize("Crop Video")}
 						onClick={cropDialogHandler}
 						leftIcon={<IconCapCrop />}
 					>
-						<span class="max-[1200px]:hidden">Crop</span>
+						<span class="max-[1200px]:hidden">{localize("Crop")}</span>
 					</EditorButton>
 					<FrameButton />
 				</div>
 				<div class="flex flex-row flex-none gap-2 items-center">
-					<span class="text-xs text-ed-text-2">Preview</span>
+					<span class="text-xs text-ed-text-2">{localize("Preview")}</span>
 					<div
 						role="group"
-						aria-label="Preview quality"
+						aria-label={localize("Preview quality")}
 						class="inline-flex gap-0.5 p-0.5 rounded-lg shrink-0 bg-ed-ctl"
 					>
 						<For each={previewOptions}>
@@ -405,8 +406,8 @@ export function PlayerContent(props: { compactness?: number }) {
 								return (
 									<button
 										type="button"
-										title={`${option.label} preview quality`}
-										aria-label={`${option.label} preview quality`}
+										title={`${localize(option.label)} preview quality`}
+										aria-label={`${localize(option.label)} preview quality`}
 										aria-pressed={selected()}
 										onClick={() => handlePreviewQualityChange(option.value)}
 										class={cx(
@@ -416,7 +417,7 @@ export function PlayerContent(props: { compactness?: number }) {
 												: "text-ed-text-2 hover:text-ed-text-1",
 										)}
 									>
-										{option.label}
+										{localize(option.label)}
 									</button>
 								);
 							}}
@@ -495,7 +496,7 @@ export function PlayerContent(props: { compactness?: number }) {
 				</div>
 				<div class="flex flex-row flex-1 gap-0.5 justify-end items-center min-w-fit">
 					<EditorButton<typeof KToggleButton>
-						tooltipText="Toggle Split"
+						tooltipText={localize("Toggle Split")}
 						kbd={["S"]}
 						pressed={editorState.timeline.interactMode === "split"}
 						onChange={(v: boolean) =>
@@ -508,7 +509,7 @@ export function PlayerContent(props: { compactness?: number }) {
 					<div class="mx-1.5 w-px h-4 shrink-0 bg-ed-line-strong" />
 					<div class="flex flex-row gap-0.5 items-center" title={zoomHint()}>
 						<EditorButton
-							tooltipText="Zoom out"
+							tooltipText={localize("Zoom out")}
 							kbd={["meta", "-"]}
 							onClick={() => {
 								editorState.timeline.transform.updateZoom(
@@ -546,7 +547,7 @@ export function PlayerContent(props: { compactness?: number }) {
 							}
 						/>
 						<EditorButton
-							tooltipText="Zoom in"
+							tooltipText={localize("Zoom in")}
 							kbd={["meta", "+"]}
 							onClick={() => {
 								editorState.timeline.transform.updateZoom(

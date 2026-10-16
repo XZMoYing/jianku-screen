@@ -45,7 +45,7 @@ export function MotionGroup(props: {
 	};
 	const update = () => {
 		const selected = root.querySelector<HTMLElement>(
-			"button[aria-pressed=true]",
+			"button[aria-pressed=true], button[aria-selected=true]",
 		);
 		if (!selected || !selected.offsetWidth) return;
 		if (!x || !width || reducedMotion()) {
@@ -64,7 +64,7 @@ export function MotionGroup(props: {
 		changes.observe(root, {
 			subtree: true,
 			attributes: true,
-			attributeFilter: ["aria-pressed"],
+			attributeFilter: ["aria-pressed", "aria-selected"],
 		});
 		const size = new ResizeObserver(update);
 		size.observe(root);

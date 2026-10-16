@@ -235,6 +235,11 @@ fn write_current_desktop_background_to(
     display_id: Option<&str>,
     enforce_protected_check: bool,
 ) -> Result<CurrentDesktopBackgroundWrite, String> {
+    if let Some(source) = crate::desktop_wallpaper::selected_media(display_id)
+        .filter(|p| !crate::desktop_wallpaper::is_video(p))
+    {
+        return write_desktop_background_source_to(&source, output_path, pending_path);
+    }
     #[cfg(target_os = "macos")]
     if write_visible_wallpaper_layer(output_path, display_id).is_ok() {
         return Ok(CurrentDesktopBackgroundWrite::Stored);
@@ -2390,8 +2395,13 @@ async fn start_recording_prepared(
     ));
     if matches!(inputs.mode, RecordingMode::Studio) {
         pending_try!(
-            crate::capture_style::snapshot(&app, &project_file_path, Some(&inputs.capture_target))
-                .await,
+            crate::capture_style::snapshot(
+                &app,
+                &project_file_path,
+                Some(&inputs.capture_target),
+                true
+            )
+            .await,
             |e| e
         );
     }
@@ -5636,7 +5646,8 @@ pub async fn take_screenshot(
     meta.save_for_project()
         .map_err(|e| format!("Failed to save recording meta: {e}"))?;
 
-    crate::capture_style::snapshot(&app, &project_file_path, Some(&automation_target)).await?;
+    crate::capture_style::snapshot(&app, &project_file_path, Some(&automation_target), false)
+        .await?;
     let mut screenshot_config = crate::capture_style::project_config(&project_file_path)?
         .unwrap_or_else(default_project_config);
     screenshot_config.camera.hide = true;

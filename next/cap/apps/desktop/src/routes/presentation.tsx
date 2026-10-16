@@ -16,6 +16,7 @@ import {
 	ASPECT_RATIO_OPTIONS,
 	ASPECT_RATIOS,
 } from "~/routes/editor/projectConfig";
+import { t as localize } from "~/utils/i18n";
 import {
 	type AspectRatio,
 	type CaptureStyle,
@@ -272,13 +273,13 @@ export default function Presentation(props: {
 					<div class="studio-empty">
 						{setup.error ? (
 							<>
-								<span>无法读取演示设置</span>
+								<span>{localize("无法读取演示设置")}</span>
 								<button
 									type="button"
 									class="studio-secondary"
 									onClick={() => void refetch()}
 								>
-									重试
+									{localize("重试")}
 								</button>
 							</>
 						) : (
@@ -307,15 +308,15 @@ export default function Presentation(props: {
 										<div class="studio-card-heading">
 											<IconMonitor />
 											<div>
-												<h3>来源与输出</h3>
-												<p>为观众选择一块独立的画布</p>
+												<h3>{localize("来源与输出")}</h3>
+												<p>{localize("为观众选择一块独立的画布")}</p>
 											</div>
 										</div>
 										<label class="studio-field">
-											<span>演示来源</span>
+											<span>{localize("演示来源")}</span>
 											<div class="studio-select">
 												<select
-													aria-label="演示来源"
+													aria-label={localize("演示来源")}
 													disabled={busy() || status()?.active}
 													value={value().sourceId}
 													onChange={(event) =>
@@ -335,10 +336,10 @@ export default function Presentation(props: {
 											</div>
 										</label>
 										<label class="studio-field">
-											<span>输出位置</span>
+											<span>{localize("输出位置")}</span>
 											<div class="studio-select">
 												<select
-													aria-label="输出位置"
+													aria-label={localize("输出位置")}
 													disabled={busy() || status()?.active}
 													value={value().outputMonitor ?? "window"}
 													onChange={(event) =>
@@ -351,7 +352,7 @@ export default function Presentation(props: {
 														})
 													}
 												>
-													<option value="window">共享窗口</option>
+													<option value="window">{localize("共享窗口")}</option>
 													<For each={setup()?.monitors}>
 														{(monitor) => (
 															<option value={monitor.index}>
@@ -371,10 +372,10 @@ export default function Presentation(props: {
 										</label>
 
 										<label class="studio-field">
-											<span>输出比例</span>
+											<span>{localize("输出比例")}</span>
 											<div class="studio-select">
 												<select
-													aria-label="输出比例"
+													aria-label={localize("输出比例")}
 													disabled={busy() || status()?.active}
 													value={value().outputAspectRatio ?? "auto"}
 													onChange={(event) =>
@@ -406,10 +407,10 @@ export default function Presentation(props: {
 											</small>
 										</label>
 										<label class="studio-field">
-											<span>输出清晰度</span>
+											<span>{localize("输出清晰度")}</span>
 											<div class="studio-select">
 												<select
-													aria-label="输出清晰度"
+													aria-label={localize("输出清晰度")}
 													value={value().outputResolution}
 													onChange={(event) =>
 														update({
@@ -420,15 +421,22 @@ export default function Presentation(props: {
 														})
 													}
 												>
-													<option value={1280}>720p · 标准</option>
-													<option value={1920}>1080p · 默认</option>
-													<option value={2560}>1440p · 高清</option>
+													<option value={1280}>
+														{localize("720p · 标准")}
+													</option>
+													<option value={1920}>
+														{localize("1080p · 默认")}
+													</option>
+													<option value={2560}>
+														{localize("1440p · 高清")}
+													</option>
 													<option value={3840}>2160p · 4K</option>
 												</select>
 												<IconChevronDown />
 											</div>
 											<small>
-												{value().outputWidth} × {value().outputHeight} 像素
+												{value().outputWidth} × {value().outputHeight}{" "}
+												{localize("像素")}
 											</small>
 										</label>
 									</section>
@@ -436,14 +444,14 @@ export default function Presentation(props: {
 										<div class="studio-card-heading">
 											<IconMousePointer2 />
 											<div>
-												<h3>焦点跟随</h3>
-												<p>控制观众在什么时候看清细节</p>
+												<h3>{localize("焦点跟随")}</h3>
+												<p>{localize("控制观众在什么时候看清细节")}</p>
 											</div>
 										</div>
 										<div
 											class="focus-mode-group"
 											role="group"
-											aria-label="焦点跟随方式"
+											aria-label={localize("焦点跟随方式")}
 										>
 											<For each={focusModes}>
 												{(mode) => (
@@ -493,10 +501,10 @@ export default function Presentation(props: {
 											)}
 										</Show>
 										<label class="studio-field">
-											<span>焦点快捷键</span>
+											<span>{localize("焦点快捷键")}</span>
 											<input
 												class="studio-shortcut"
-												aria-label="焦点快捷键"
+												aria-label={localize("焦点快捷键")}
 												value={value()
 													.shortcut.replace("CommandOrControl", "⌘ / Ctrl")
 													.replace("Super", "⌘")
@@ -506,7 +514,7 @@ export default function Presentation(props: {
 													.replace("Space", "空格")}
 												readOnly
 												disabled={status()?.active || busy()}
-												title="点击后按下组合键"
+												title={localize("点击后按下组合键")}
 												onKeyDown={(event) => {
 													event.preventDefault();
 													if (
@@ -528,7 +536,7 @@ export default function Presentation(props: {
 														});
 												}}
 											/>
-											<small>停止演示后可修改组合键。</small>
+											<small>{localize("停止演示后可修改组合键。")}</small>
 										</label>
 										<Show
 											when={status()?.active && value().focusMode === "manual"}
@@ -541,7 +549,7 @@ export default function Presentation(props: {
 													void commands.togglePresentationFocus().catch(report)
 												}
 											>
-												切换放大 / 缩小
+												{localize("切换放大 / 缩小")}
 											</button>
 										</Show>
 									</section>
@@ -553,14 +561,14 @@ export default function Presentation(props: {
 									<div class="studio-card-heading">
 										<IconSlidersHorizontal />
 										<div>
-											<h3>画面外观</h3>
-											<p>调整会即时应用到输出</p>
+											<h3>{localize("画面外观")}</h3>
+											<p>{localize("调整会即时应用到输出")}</p>
 										</div>
 									</div>
 									<div
 										class="background-swatches"
 										role="group"
-										aria-label="背景预设"
+										aria-label={localize("背景预设")}
 									>
 										<For each={backgrounds}>
 											{(preset) => {
@@ -660,11 +668,13 @@ export default function Presentation(props: {
 							</Show>
 							<Show when={status()?.outputDetached}>
 								<div class="studio-notice">
-									副屏已断开，输出已回到共享窗口。
+									{localize("副屏已断开，输出已回到共享窗口。")}
 								</div>
 							</Show>
 							<Show when={!setup()?.supported}>
-								<div class="studio-notice">当前平台暂不支持实时演示。</div>
+								<div class="studio-notice">
+									{localize("当前平台暂不支持实时演示。")}
+								</div>
 							</Show>
 						</div>
 						<footer
@@ -696,7 +706,7 @@ export default function Presentation(props: {
 										onClick={() => void showOutput().catch(report)}
 									>
 										<IconSquareArrowOutUpRight />
-										查看输出
+										{localize("查看输出")}
 									</button>
 								</Show>
 								<button

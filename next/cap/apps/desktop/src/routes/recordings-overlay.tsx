@@ -26,6 +26,7 @@ import { TransitionGroup } from "solid-transition-group";
 import { authStore } from "~/store";
 import { createTauriEventListener } from "~/utils/createEventListener";
 import { createExportToFileTask, exportVideo } from "~/utils/export";
+import { t as localize } from "~/utils/i18n";
 import {
 	recordingMetaNeedsRecovery,
 	recordingOpenErrorMessage,
@@ -239,7 +240,7 @@ export default function () {
 												>
 													<img
 														class="pointer-events-none w-full h-full object-cover absolute inset-0 -z-10 rounded-[7.4px]"
-														alt="media preview"
+														alt={localize("media preview")}
 														src={`${convertFileSrc(
 															isRecording
 																? `${media.path}/screenshots/display.jpg`
@@ -346,7 +347,7 @@ export default function () {
 												>
 													<TooltipIconButton
 														class="absolute top-3 left-3 z-20"
-														tooltipText="Close"
+														tooltipText={localize("Close")}
 														tooltipPlacement="right"
 														onClick={() => {
 															openRecording.cancel();
@@ -370,7 +371,7 @@ export default function () {
 													{isRecording ? (
 														<TooltipIconButton
 															class="absolute bottom-3 left-3 z-20"
-															tooltipText="Edit"
+															tooltipText={localize("Edit")}
 															tooltipPlacement="right"
 															disabled={openRecording.isOpening()}
 															onClick={openRecording.open}
@@ -380,7 +381,7 @@ export default function () {
 													) : (
 														<TooltipIconButton
 															class="absolute bottom-3 left-3 z-20"
-															tooltipText="View"
+															tooltipText={localize("View")}
 															tooltipPlacement="right"
 															onClick={() => {
 																commands.openFilePath(media.path);
@@ -419,7 +420,7 @@ export default function () {
 															size="sm"
 															onClick={() => save.mutate()}
 														>
-															Export
+															{localize("Export")}
 														</Button>
 													</div>
 												</div>
@@ -680,7 +681,7 @@ function createRecordingMutations(
 			}
 
 			const defaultName = isRecording
-				? "Cap Recording"
+				? localize("Cap Recording")
 				: media.path.split(/\.(?:jks|cap)\//i)[1];
 			const suggestedName = meta.pretty_name || defaultName;
 

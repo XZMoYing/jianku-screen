@@ -18,6 +18,7 @@ import {
 	Suspense,
 } from "solid-js";
 import { Toaster } from "solid-toast";
+import { installLanguage } from "~/utils/i18n";
 
 import "@cap/ui-solid/main.css";
 import "unfonts.css";
@@ -349,6 +350,8 @@ function createHiddenWindowQueryPause(currentWindow: WebviewWindow) {
 function createThemeListener(currentWindow: WebviewWindow) {
 	onMount(() => {
 		const dispose = installExpressiveMotion();
+		const disposeLanguage = installLanguage();
+		onCleanup(disposeLanguage);
 		const disposeTheme = installDynamicTheme(currentWindow);
 		onCleanup(dispose);
 		onCleanup(disposeTheme);
@@ -357,6 +360,8 @@ function createThemeListener(currentWindow: WebviewWindow) {
 	let disposed = false;
 	let stopSettingsListening: (() => void) | undefined;
 	let stopThemeListening: (() => void) | undefined;
+	let themeRevision = 0;
+	let themeQueue = Promise.resolve();
 
 	createEffect(() => {
 		update(appTheme());
@@ -388,7 +393,9 @@ function createThemeListener(currentWindow: WebviewWindow) {
 			);
 
 		void currentWindow
-			.onThemeChanged(() => update(appTheme()))
+			.onThemeChanged(() => {
+				if (appTheme() === "system") void refreshSystemTheme(themeRevision);
+			})
 			.then((unlisten) => {
 				if (disposed) {
 					unlisten();
@@ -407,22 +414,28 @@ function createThemeListener(currentWindow: WebviewWindow) {
 		stopThemeListening?.();
 	});
 
-	function update(appTheme: AppTheme | null | undefined) {
-		if (location.pathname === "/camera") return;
+	async function refreshSystemTheme(revision: number) {
+		const theme = await currentWindow.theme();
+		if (!disposed && revision === themeRevision && appTheme() === "system") {
+			document.documentElement.classList.toggle("dark", theme === "dark");
+		}
+	}
 
-		if (appTheme === undefined || appTheme === null) return;
-
-		const isDark =
-			appTheme === "dark" ||
-			(appTheme === "system" &&
-				window.matchMedia("(prefers-color-scheme: dark)").matches);
-
+	function update(theme: AppTheme | null | undefined) {
+		if (location.pathname === "/camera" || theme == null) return;
+		const revision = ++themeRevision;
 		try {
-			localStorage.setItem("cap-theme", appTheme);
+			localStorage.setItem("cap-theme", theme);
 		} catch {}
-
-		commands.setTheme(appTheme).then(() => {
-			document.documentElement.classList.toggle("dark", isDark);
-		});
+		themeQueue = themeQueue
+			.then(async () => {
+				if (disposed || revision !== themeRevision) return;
+				await commands.setTheme(theme);
+				if (disposed || revision !== themeRevision) return;
+				if (theme === "system") await refreshSystemTheme(revision);
+				else
+					document.documentElement.classList.toggle("dark", theme === "dark");
+			})
+			.catch((error) => console.error("Failed to apply theme:", error));
 	}
 }

@@ -12,6 +12,7 @@ import {
 	Show,
 } from "solid-js";
 import toast from "solid-toast";
+import { t as localize } from "~/utils/i18n";
 
 import { commands, type ImportedAudioTrack } from "~/utils/tauri";
 import { AUDIO_IMPORT_EXTENSIONS } from "./audio";
@@ -234,7 +235,7 @@ export function AudioLibraryPanel(props: {
 		<div class="flex flex-col gap-4">
 			<div class="flex flex-row gap-2 items-center">
 				<EditorButton onClick={close} leftIcon={<IconLucideCheck />}>
-					Done
+					{localize("Done")}
 				</EditorButton>
 				<span class="text-sm text-gray-10">
 					{isReplace() ? "Change audio" : "Add audio"}
@@ -266,7 +267,7 @@ export function AudioLibraryPanel(props: {
 						)}
 					</For>
 					<span class="text-[11px] text-gray-9">
-						More categories coming soon
+						{localize("More categories coming soon")}
 					</span>
 				</div>
 			</Show>

@@ -3,6 +3,7 @@ import { cx } from "cva";
 import { createSignal, For, Show } from "solid-js";
 import { produce } from "solid-js/store";
 import { Toggle } from "~/components/Toggle";
+import { t as localize } from "~/utils/i18n";
 import {
 	COLOR_CORRECTION_PRESETS,
 	COLOR_PRESET_CUSTOM,
@@ -167,7 +168,7 @@ export function ColorCorrectionSection(props: {
 			<div class="w-full">
 				<KCollapsible open={adjustOpen()} onOpenChange={handleAdjustToggle}>
 					<KCollapsible.Trigger class="flex gap-1 items-center w-full text-[12px] font-medium text-left group text-ed-text-2 hover:text-ed-text-1 transition-colors duration-200 outline-hidden">
-						Fine-tune colors
+						{localize("Fine-tune colors")}
 						<IconCapChevronDown class="transition-transform duration-200 size-3.5 text-ed-text-3 group-data-expanded:rotate-180" />
 					</KCollapsible.Trigger>
 					<KCollapsible.Content class="overflow-hidden opacity-0 transition-opacity animate-collapsible-up data-expanded:animate-collapsible-down data-expanded:opacity-100">

@@ -13,12 +13,14 @@ mod camera_legacy;
 #[cfg(target_os = "macos")]
 mod camera_native;
 mod captions;
+mod capture_preview;
 mod capture_style;
 mod clean_capture;
 mod cli;
 mod clip_thumbnails;
 mod crash_sentinel;
 mod deeplink_actions;
+mod desktop_wallpaper;
 mod diagnostics;
 mod editor_preparing;
 mod editor_recording;
@@ -33,6 +35,7 @@ mod gpui_app;
 mod hotkeys;
 mod http_client;
 mod import;
+mod interface_language;
 pub mod linux_instant_camera;
 mod logging;
 #[cfg(target_os = "macos")]
@@ -5981,6 +5984,13 @@ async fn check_upgraded_and_update(app: AppHandle) -> Result<bool, String> {
 #[specta::specta]
 #[instrument(skip(app))]
 fn open_external_link(app: tauri::AppHandle, url: String) -> Result<(), String> {
+    if reqwest::Url::parse(&url)
+        .ok()
+        .and_then(|url| url.host_str().map(str::to_string))
+        .is_some_and(|host| host == "cap.so" || host.ends_with(".cap.so"))
+    {
+        return Err("账号功能敬请期待".into());
+    }
     if let Ok(Some(settings)) = GeneralSettingsStore::get(&app)
         && settings.disable_auto_open_links
     {
@@ -6788,9 +6798,11 @@ fn specta_builder() -> tauri_specta::Builder {
             recording::take_screenshot,
             recording::import_current_desktop_background,
             recording::get_default_project_config,
+            capture_preview::render_capture_preview,
             capture_style::get_capture_style,
             capture_style::set_capture_style,
             capture_style::get_current_wallpaper_preview,
+            desktop_wallpaper::get_desktop_wallpaper,
             recording::list_cameras,
             recording::get_camera_formats,
             recording::get_microphone_info,

@@ -15,6 +15,7 @@ import {
 	onCleanup,
 	Show,
 } from "solid-js";
+import { t as localize } from "~/utils/i18n";
 import type { FrameLayoutEvent } from "~/utils/tauri";
 import { FPS, useEditorContext } from "./context";
 import {
@@ -691,7 +692,7 @@ export function CanvasElementsOverlay(props: { size: Size }) {
 						<ElementBox
 							size={props.size}
 							rect={rect()}
-							label="Screen"
+							label={localize("Screen")}
 							selected={selection()?.type === "display"}
 							draggable={displayDraggable()}
 							resizable={displayDraggable()}
@@ -725,7 +726,7 @@ export function CanvasElementsOverlay(props: { size: Size }) {
 						<ElementBox
 							size={props.size}
 							rect={rect()}
-							label="Camera"
+							label={localize("Camera")}
 							selected={selection()?.type === "camera"}
 							draggable={cameraDraggable()}
 							resizable={cameraResizable()}

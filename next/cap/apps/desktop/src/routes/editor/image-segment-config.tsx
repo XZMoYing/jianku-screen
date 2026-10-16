@@ -1,6 +1,7 @@
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { createEffect, createSignal, Show } from "solid-js";
 import { Toggle } from "~/components/Toggle";
+import { t as localize } from "~/utils/i18n";
 import IconLucideCrosshair from "~icons/lucide/crosshair";
 import { useEditorContext } from "./context";
 import { imageAssetPath } from "./images";
@@ -22,7 +23,7 @@ export function ImageSegmentConfig(props: { index: number }) {
 				<div class="flex flex-col gap-3.5 p-4">
 					<div class="flex gap-2">
 						<input
-							aria-label="Image name"
+							aria-label={localize("Image name")}
 							class="h-8 min-w-0 flex-1 rounded-[7px] border-0 bg-ed-ctl px-2 text-[13px] text-ed-text-1 caret-ed-accent outline-hidden transition-colors duration-150 placeholder:text-ed-text-3 hover:bg-ed-ctl-hover focus:bg-ed-ctl-hover focus:ring-1 focus:ring-ed-accent"
 							value={image().name}
 							onChange={(event) =>
@@ -55,7 +56,9 @@ export function ImageSegmentConfig(props: { index: number }) {
 								role="status"
 								class="rounded-lg bg-orange-3 p-3 text-[13px] text-ed-text-1"
 							>
-								Image unavailable. Replace it to restore this layer.
+								{localize(
+									"Image unavailable. Replace it to restore this layer.",
+								)}
 							</p>
 						}
 					>
@@ -85,14 +88,15 @@ export function ImageSegmentConfig(props: { index: number }) {
 								projectActions.deleteOverlaySegments("image", [props.index])
 							}
 						>
-							Delete
+							{localize("Delete")}
 						</EditorButton>
 					</div>
 					<div class="flex flex-col gap-2.5 rounded-lg bg-ed-card-2 p-3">
 						<SectionLabel name="Arrange on canvas" />
 						<p class="text-[11px] leading-relaxed text-ed-text-3">
-							Drag the image to move it. Pull a corner to resize, or use the
-							rotation handle to turn it. Arrow keys nudge it into place.
+							{localize(
+								"Drag the image to move it. Pull a corner to resize, or use the rotation handle to turn it. Arrow keys nudge it into place.",
+							)}
 						</p>
 						<EditorButton
 							class="w-full justify-center"
@@ -104,13 +108,13 @@ export function ImageSegmentConfig(props: { index: number }) {
 								})
 							}
 						>
-							Center on canvas
+							{localize("Center on canvas")}
 						</EditorButton>
 					</div>
 					<div class="flex flex-col">
 						<Field
 							inline
-							name="Opacity"
+							name={localize("Opacity")}
 							value={`${(image().opacity * 100).toFixed(1)}%`}
 						>
 							<Slider
@@ -223,11 +227,12 @@ export function ImageSegmentConfig(props: { index: number }) {
 							})
 						}
 					>
-						Center and reset rotation
+						{localize("Center and reset rotation")}
 					</EditorButton>
 					<p class="text-[11px] leading-relaxed text-ed-text-3">
-						Drag the image to move it. Drag a corner to resize. Shift
-						temporarily disables snapping.
+						{localize(
+							"Drag the image to move it. Drag a corner to resize. Shift temporarily disables snapping.",
+						)}
 					</p>
 				</div>
 			)}

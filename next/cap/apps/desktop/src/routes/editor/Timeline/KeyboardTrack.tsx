@@ -1,5 +1,6 @@
 import { createEventListenerMap } from "@solid-primitives/event-listener";
 import { createMemo, createRoot, For } from "solid-js";
+import { t as localize } from "~/utils/i18n";
 
 import { useEditorContext } from "../context";
 import { useTimelineContext } from "./context";
@@ -144,9 +145,9 @@ export function KeyboardTrack(props: {
 				each={keyboardSegments()}
 				fallback={
 					<div class="cap-empty-lane pointer-events-none">
-						<span>No keyboard events</span>
+						<span>{localize("No keyboard events")}</span>
 						<span class="cap-empty-lane-action">
-							· Record keyboard presses or generate from recording
+							{localize("· Record keyboard presses or generate from recording")}
 						</span>
 					</div>
 				}

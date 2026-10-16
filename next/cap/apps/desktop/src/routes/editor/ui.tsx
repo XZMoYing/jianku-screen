@@ -7,7 +7,6 @@ import { Tooltip as KTooltip } from "@kobalte/core/tooltip";
 import { createElementBounds } from "@solid-primitives/bounds";
 import { createEventListener } from "@solid-primitives/event-listener";
 import { cva, cx, type VariantProps } from "cva";
-
 import {
 	type ComponentProps,
 	children,
@@ -22,6 +21,7 @@ import {
 	type ValidComponent,
 } from "solid-js";
 import Tooltip from "~/components/Tooltip";
+import { t as localize } from "~/utils/i18n";
 import { useEditorContext } from "./context";
 import { TextInput } from "./TextInput";
 
@@ -31,7 +31,7 @@ export function Section(
 	return (
 		<div class={cx("flex flex-col gap-2.5", props.class)}>
 			<div class="flex flex-row gap-2 items-center min-h-[22px]">
-				<SectionLabel name={props.name} />
+				<SectionLabel name={localize(props.name)} />
 				<Show when={props.action}>
 					<div class="ml-auto flex flex-row gap-1 items-center">
 						{props.action}
@@ -46,7 +46,7 @@ export function Section(
 export function SectionLabel(props: { name: string; class?: string }) {
 	return (
 		<span class={cx("text-[12px] font-medium text-ed-text-2", props.class)}>
-			{props.name}
+			{localize(props.name)}
 		</span>
 	);
 }
@@ -67,7 +67,7 @@ function FieldLabel(props: {
 			)}
 		>
 			{props.icon}
-			{props.name}
+			{localize(props.name)}
 			<Show when={props.badge}>
 				{(badge) => (
 					<span class="px-1.5 py-0.5 text-[10px] font-medium rounded-full bg-ed-ctl text-ed-text-2">
@@ -97,7 +97,7 @@ export function Field(
 				<div class={cx("flex flex-col gap-2", props.class)}>
 					<div class="flex flex-row gap-1.5 items-center">
 						<FieldLabel
-							name={props.name}
+							name={localize(props.name)}
 							badge={props.badge}
 							disabled={props.disabled}
 							icon={props.icon}
@@ -112,7 +112,7 @@ export function Field(
 		>
 			<div class={cx("flex flex-row gap-2 items-center h-[34px]", props.class)}>
 				<FieldLabel
-					name={props.name}
+					name={localize(props.name)}
 					badge={props.badge}
 					disabled={props.disabled}
 					class="min-w-24 shrink-0 whitespace-nowrap"
@@ -141,7 +141,7 @@ export function Subfield(
 			)}
 		>
 			<span class="text-[13px] font-normal text-ed-text-1">
-				{props.name}
+				{localize(props.name)}
 				{props.required && (
 					<span class="ml-[2px] text-xs text-blue-500">*</span>
 				)}
@@ -204,7 +204,7 @@ export function Slider(
 			}}
 		>
 			<KSlider.Track
-				class="h-[3px] transition-[height] relative mx-1 bg-ed-ctl-active rounded-full w-full before:content-[''] before:absolute before:inset-0 before:-top-3 before:-bottom-3"
+				class="jk-slider-track h-[3px] transition-[height] relative mx-1 bg-ed-ctl-active rounded-full w-full before:content-[''] before:absolute before:inset-0 before:-top-3 before:-bottom-3"
 				onPointerDown={() => {
 					setDragging(true);
 					createRoot((dispose) => {
@@ -215,7 +215,7 @@ export function Slider(
 					});
 				}}
 			>
-				<KSlider.Fill class="absolute -ml-2 h-full rounded-full bg-ed-accent data-disabled:bg-ed-ctl-active" />
+				<KSlider.Fill class="jk-slider-fill absolute h-full rounded-full bg-ed-accent data-disabled:bg-ed-ctl-active" />
 				<Tooltip
 					open={dragging() ? true : undefined}
 					getAnchorRect={() => {
@@ -245,7 +245,7 @@ export function Slider(
 							setDragging(false);
 						}}
 						class={cx(
-							"bg-ed-thumb rounded-full outline-hidden size-3.5 -top-[5.5px] shadow-[0_1px_3px_rgba(0,0,0,.25),0_0_0_.5px_rgba(0,0,0,.1)] data-disabled:opacity-50 after:content-[''] after:absolute after:inset-0 after:-m-3",
+							"jk-slider-thumb bg-ed-thumb rounded-full outline-hidden size-3.5 -top-[5.5px] shadow-[0_1px_3px_rgba(0,0,0,.25),0_0_0_.5px_rgba(0,0,0,.1)] data-disabled:opacity-50 after:content-[''] after:absolute after:inset-0 after:-m-3",
 							local.thumbClass,
 						)}
 					/>
@@ -299,7 +299,7 @@ export const Dialog = {
 	CloseButton() {
 		return (
 			<KDialog.CloseButton as={Button} variant="gray">
-				Cancel
+				{localize("Cancel")}
 			</KDialog.CloseButton>
 		);
 	},
@@ -355,7 +355,9 @@ export function DialogContent(
 	return (
 		<>
 			<Dialog.Header>
-				<KDialog.Title class="text-ed-text-1">{props.title}</KDialog.Title>
+				<KDialog.Title class="text-ed-text-1">
+					{localize(props.title)}
+				</KDialog.Title>
 			</Dialog.Header>
 			<Dialog.Content class={props.class}>{props.children}</Dialog.Content>
 			<Dialog.Footer
@@ -574,7 +576,7 @@ export function ComingSoonTooltip(
 			</KTooltip.Trigger>
 			<KTooltip.Portal>
 				<KTooltip.Content class="p-2 font-medium bg-gray-12 text-gray-1 data-expanded:animate-in data-expanded:slide-in-from-bottom-1 data-expanded:fade-in data-closed:animate-out data-closed:slide-out-to-bottom-1 data-closed:fade-out rounded-lg text-xs z-1000">
-					Coming Soon
+					{localize("Coming Soon")}
 				</KTooltip.Content>
 			</KTooltip.Portal>
 		</KTooltip>

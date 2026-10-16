@@ -3,6 +3,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { createResource, createSignal, Show } from "solid-js";
 import toast from "solid-toast";
+import { t as localize } from "~/utils/i18n";
 import { Section, SectionCard, SettingsPageContent } from "./Setting";
 
 type CliInstallStatus = {
@@ -46,7 +47,7 @@ export default function CliSettings() {
 
 		try {
 			mutate(await installCli());
-			toast.success("Cap CLI installed");
+			toast.success(localize("Cap CLI installed"));
 		} catch (error) {
 			toast.error(errorMessage(error, "Failed to install CLI"));
 			await refetch();
@@ -60,7 +61,7 @@ export default function CliSettings() {
 
 		try {
 			mutate(await uninstallCli());
-			toast.success("Cap CLI removed");
+			toast.success(localize("Cap CLI removed"));
 		} catch (error) {
 			toast.error(errorMessage(error, "Failed to remove CLI"));
 			await refetch();
@@ -71,15 +72,17 @@ export default function CliSettings() {
 
 	const copyPathCommand = async (command: string) => {
 		await writeText(command);
-		toast.success("Copied to clipboard");
+		toast.success(localize("Copied to clipboard"));
 	};
 
 	return (
 		<div class="cap-settings-page flex flex-col h-full custom-scroll">
 			<SettingsPageContent>
 				<Section
-					title="Command Line"
-					description="Install the Cap command for terminals, agents, scripts, and local automation."
+					title={localize("Command Line")}
+					description={localize(
+						"Install the Cap command for terminals, agents, scripts, and local automation.",
+					)}
 				>
 					<SectionCard padded>
 						<Show
@@ -102,7 +105,7 @@ export default function CliSettings() {
 											class="self-start"
 											onClick={() => refetch()}
 										>
-											Retry
+											{localize("Retry")}
 										</Button>
 									</div>
 								</Show>
@@ -118,9 +121,11 @@ export default function CliSettings() {
 													: "Not installed"}
 											</p>
 											<p class="text-xs leading-snug text-gray-10">
-												The desktop app installs a local{" "}
-												<code class="font-mono text-gray-12">cap</code> command
-												that points back to the bundled CLI.
+												{localize("The desktop app installs a local")}{" "}
+												<code class="font-mono text-gray-12">cap</code>{" "}
+												{localize(
+													"command that points back to the bundled CLI.",
+												)}
 											</p>
 										</div>
 										<div class="flex shrink-0 gap-2">
@@ -131,7 +136,9 @@ export default function CliSettings() {
 													disabled={isUninstalling()}
 													onClick={handleUninstall}
 												>
-													{isUninstalling() ? "Removing..." : "Remove"}
+													{isUninstalling()
+														? "Removing..."
+														: localize("Remove")}
 												</Button>
 											</Show>
 											<Button
@@ -146,9 +153,12 @@ export default function CliSettings() {
 									</div>
 
 									<div class="grid gap-2 text-xs">
-										<PathRow label="Command" value={currentStatus().shimPath} />
 										<PathRow
-											label="Target"
+											label={localize("Command")}
+											value={currentStatus().shimPath}
+										/>
+										<PathRow
+											label={localize("Target")}
 											value={currentStatus().targetPath}
 										/>
 									</div>
@@ -170,7 +180,7 @@ export default function CliSettings() {
 													when={currentStatus().pathConfigured}
 													fallback={
 														<>
-															Add{" "}
+															{localize("Add")}{" "}
 															<code class="font-mono text-gray-12">
 																{currentStatus().pathEntry}
 															</code>{" "}
@@ -181,8 +191,9 @@ export default function CliSettings() {
 													}
 												>
 													Added <code class="font-mono text-gray-12">cap</code>{" "}
-													to your PATH. Restart your terminal to use it, or run
-													this now:
+													{localize(
+														"to your PATH. Restart your terminal to use it, or run this now:",
+													)}
 												</Show>
 											</p>
 											<div class="flex items-center gap-2">
@@ -196,7 +207,7 @@ export default function CliSettings() {
 														copyPathCommand(currentStatus().shellCommand)
 													}
 												>
-													Copy
+													{localize("Copy")}
 												</Button>
 											</div>
 										</div>

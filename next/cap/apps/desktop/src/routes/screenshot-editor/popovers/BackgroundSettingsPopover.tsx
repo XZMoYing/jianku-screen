@@ -12,6 +12,7 @@ import {
 	For,
 	Show,
 } from "solid-js";
+import { t as localize } from "~/utils/i18n";
 import type { BackgroundSource } from "~/utils/tauri";
 import IconCapBgBlur from "~icons/cap/bg-blur";
 import IconCapCircleX from "~icons/cap/circle-x";
@@ -239,7 +240,7 @@ export function BackgroundSettingsPopover() {
 					)
 				}
 				leftIcon={<IconCapImage class="size-4" />}
-				tooltipText="Background"
+				tooltipText={localize("Background")}
 				kbd={["B"]}
 			/>
 			<Popover.Portal>
@@ -372,7 +373,7 @@ export function BackgroundSettingsPopover() {
 															src={photo.url}
 															loading="eager"
 															class="object-cover w-full h-full"
-															alt="Wallpaper option"
+															alt={localize("Wallpaper option")}
 														/>
 													</KRadioGroup.ItemControl>
 												</KRadioGroup.Item>
@@ -395,7 +396,7 @@ export function BackgroundSettingsPopover() {
 											>
 												<IconCapImage class="text-gray-11 size-6" />
 												<span class="text-gray-12">
-													Click to select or drag and drop image
+													{localize("Click to select or drag and drop image")}
 												</span>
 											</button>
 										}
@@ -405,7 +406,7 @@ export function BackgroundSettingsPopover() {
 												<img
 													src={convertFileSrc(source())}
 													class="object-cover w-full h-full"
-													alt="Selected background"
+													alt={localize("Selected background")}
 												/>
 												<div class="absolute top-2 right-2">
 													<button
@@ -559,8 +560,9 @@ export function BackgroundSettingsPopover() {
 								</KTabs.Content>
 								<KTabs.Content value="animatedGradient">
 									<p class="text-xs text-gray-11">
-										This screenshot uses a still frame of the animated gradient.
-										Choose another background above to replace it.
+										{localize(
+											"This screenshot uses a still frame of the animated gradient. Choose another background above to replace it.",
+										)}
 									</p>
 								</KTabs.Content>
 							</KTabs>

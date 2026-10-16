@@ -1,0 +1,53 @@
+{
+	"animationFramesAvailable": true,
+	"before": {
+		"controls": [
+			{ "disabled": false, "label": "背景", "selected": "true" },
+			{ "disabled": false, "label": "布局", "selected": "false" },
+			{ "disabled": false, "label": "光标", "selected": "false" },
+			{ "disabled": false, "label": "摄像与声音", "selected": "false" }
+		],
+		"disabled": false,
+		"inert": false
+	},
+	"cancelReleased": true,
+	"captureControls": { "height": 226, "scrollHeight": 226 },
+	"captureStyleSaved": true,
+	"currentWallpaper": { "available": true, "uniqueFile": true },
+	"customColorApplied": true,
+	"gpuPreview": { "hasPixels": true, "height": 600, "width": 960 },
+	"mobileLoadKeepsWorkspace": true,
+	"mobileScroll": { "height": 247, "scrollHeight": 935 },
+	"motionVerification": "foreground",
+	"narrow": {
+		"height": 530,
+		"horizontalOverflow": false,
+		"scrolls": true,
+		"width": 660
+	},
+	"noSlogan": true,
+	"ok": true,
+	"permissions": {
+		"accessibility": "granted",
+		"camera": "granted",
+		"microphone": "granted",
+		"screenRecording": "granted"
+	},
+	"presentationScroll": { "height": 242, "scrollHeight": 854 },
+	"presentationStyleApplied": true,
+	"pressMotion": {
+		"held": 0.96,
+		"heldRaw": "0.96",
+		"reduced": false,
+		"released": "none",
+		"visibility": "visible"
+	},
+	"rapidTabs": { "indicatorDelta": 0.5032958984375, "selected": "布局" },
+	"slider": { "label": "留白", "value": "18" },
+	"stage": "wallpaper-colors",
+	"theme": { "dark": false, "surface": "#f9f9fe" },
+	"userMediaSaved": false,
+	"wallpaperColorRestored": true,
+	"wallpaperColors": { "count": 3, "seed": "#0788e3" },
+	"wide": { "height": 800, "horizontalOverflow": false, "width": 1120 }
+}

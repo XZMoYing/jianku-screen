@@ -1,12 +1,11 @@
 import { Button } from "@cap/ui-solid";
 import { action, useAction, useSubmission } from "@solidjs/router";
-import { getVersion } from "@tauri-apps/api/app";
 import { CheckMenuItem, Menu } from "@tauri-apps/api/menu";
 import { confirm } from "@tauri-apps/plugin-dialog";
-import { type OsType, type as ostype } from "@tauri-apps/plugin-os";
-import * as shell from "@tauri-apps/plugin-shell";
 import { createResource, createSignal, For, Show } from "solid-js";
 import toast from "solid-toast";
+import { showAccountComingSoon } from "~/utils/auth";
+import { t as localize } from "~/utils/i18n";
 import {
 	commands,
 	type DiagnosticProgress,
@@ -14,7 +13,6 @@ import {
 	events,
 	type SystemDiagnostics,
 } from "~/utils/tauri";
-import { apiClient, protectedHeaders } from "~/utils/web-api";
 import IconLucideAlertTriangle from "~icons/lucide/alert-triangle";
 import {
 	Section,
@@ -24,20 +22,9 @@ import {
 	ToggleSettingItem,
 } from "./Setting";
 
-const getFeedbackOs = (): Extract<OsType, "macos" | "windows" | "linux"> => {
-	const os = ostype();
-	if (os === "macos" || os === "windows" || os === "linux") return os;
-	throw new Error(`Unsupported OS for feedback submission: ${os}`);
-};
-
-const sendFeedbackAction = action(async (feedback: string) => {
-	const response = await apiClient.desktop.submitFeedback({
-		body: { feedback, os: getFeedbackOs(), version: await getVersion() },
-		headers: await protectedHeaders(),
-	});
-
-	if (response.status !== 200) throw new Error("Failed to submit feedback");
-	return response.body;
+const sendFeedbackAction = action(async (_feedback: string) => {
+	showAccountComingSoon();
+	return { success: false };
 });
 
 async function fetchDiagnostics(): Promise<SystemDiagnostics | null> {
@@ -124,7 +111,6 @@ function SelectDiagnosticItem<T extends string | number>(props: {
 
 export default function FeedbackTab() {
 	const [feedback, setFeedback] = createSignal("");
-	const [uploadingLogs, setUploadingLogs] = createSignal(false);
 	const [diagnostics] = createResource(fetchDiagnostics);
 
 	const [mode, setMode] = createSignal("both");
@@ -133,14 +119,16 @@ export default function FeedbackTab() {
 	const [running, setRunning] = createSignal(false);
 	const [status, setStatus] = createSignal<string | null>(null);
 	const [result, setResult] = createSignal<DiagnosticRunResult | null>(null);
-	const [sendingReport, setSendingReport] = createSignal(false);
 
 	const submission = useSubmission(sendFeedbackAction);
 	const sendFeedback = useAction(sendFeedbackAction);
 
 	const handleRunDiagnostic = async () => {
 		const confirmed = await confirm(
-			`Cap will take over your screen with a flashing test pattern and play loud beeps for about ${durationSecs()} seconds per pipeline. Take your headphones off, leave the volume audible, and don't use the machine until it finishes.`,
+			localize(
+				"诊断将显示闪烁测试图案并播放提示音，每种录制流程约 {seconds} 秒。请摘下耳机、保持音量可听见，并在完成前暂停操作。",
+				{ seconds: durationSecs() },
+			),
 			{ title: "Run diagnostic?", kind: "warning", okLabel: "Run Diagnostic" },
 		);
 		if (!confirmed) return;
@@ -174,21 +162,7 @@ export default function FeedbackTab() {
 		}
 	};
 
-	const handleSendReport = async () => {
-		const report = result();
-		if (!report) return;
-
-		setSendingReport(true);
-		try {
-			await commands.uploadDiagnosticReport(report.reportPath);
-			toast.success("Diagnostic report sent to Cap");
-		} catch (error) {
-			toast.error("Failed to send diagnostic report");
-			console.error("Failed to send diagnostic report:", error);
-		} finally {
-			setSendingReport(false);
-		}
-	};
+	const handleSendReport = () => showAccountComingSoon();
 
 	const handleRevealReport = async () => {
 		const report = result();
@@ -202,25 +176,14 @@ export default function FeedbackTab() {
 		}
 	};
 
-	const handleUploadLogs = async () => {
-		setUploadingLogs(true);
-		try {
-			await commands.uploadLogs();
-			toast.success("Logs uploaded successfully");
-		} catch (error) {
-			toast.error("Failed to upload logs");
-			console.error("Failed to upload logs:", error);
-		} finally {
-			setUploadingLogs(false);
-		}
-	};
+	const handleUploadLogs = () => showAccountComingSoon();
 
 	return (
 		<div class="cap-settings-page flex flex-col w-full h-full custom-scroll">
 			<SettingsPageContent>
 				<Section
-					title="Feedback"
-					description="Help us improve Cap by submitting feedback or reporting bugs. We'll get right on it."
+					title={localize("Feedback")}
+					description={localize("在线反馈敬请期待，本机诊断仍可正常使用。")}
 				>
 					<form
 						class="space-y-4"
@@ -234,7 +197,7 @@ export default function FeedbackTab() {
 								<textarea
 									value={feedback()}
 									onInput={(e) => setFeedback(e.currentTarget.value)}
-									placeholder="Tell us what you think about Cap..."
+									placeholder={localize("Tell us what you think about Cap...")}
 									required
 									minLength={10}
 									class="p-2 w-full h-32 text-[13px] rounded-md border transition-colors duration-200 resize-none bg-gray-2 placeholder:text-gray-10 border-gray-3 text-primary focus:outline-hidden focus:ring-1 focus:ring-gray-8 hover:border-gray-6"
@@ -248,7 +211,9 @@ export default function FeedbackTab() {
 							)}
 
 							{submission.result?.success && (
-								<p class="text-sm text-primary">Thank you for your feedback!</p>
+								<p class="text-sm text-primary">
+									{localize("Thank you for your feedback!")}
+								</p>
 							)}
 
 							<Button
@@ -265,53 +230,59 @@ export default function FeedbackTab() {
 				</Section>
 
 				<Section
-					title="Join the Community"
-					description="Have questions, want to share ideas, or just hang out? Join the Cap Discord community."
+					title={localize("Join the Community")}
+					description={localize("在线社区功能敬请期待。")}
 				>
-					<Button
-						onClick={() => shell.open("https://cap.link/discord")}
-						size="md"
-						variant="gray"
-					>
-						Join Discord
+					<Button onClick={showAccountComingSoon} size="md" variant="gray">
+						{localize("Join Discord")}
 					</Button>
 				</Section>
 
 				<Section
-					title="Diagnostic Report"
-					description="Runs an audio/video sync test and collects your hardware, displays, cameras, microphones, Cap settings, details of your recent recordings and a copy of Cap's log file, so we can reproduce your setup instead of guessing at it. You can read the whole report before sending it."
+					title={localize("Diagnostic Report")}
+					description={localize(
+						"Runs an audio/video sync test and collects your hardware, displays, cameras, microphones, Cap settings, details of your recent recordings and a copy of Cap's log file, so we can reproduce your setup instead of guessing at it. You can read the whole report before sending it.",
+					)}
 				>
 					<div class="space-y-2.5">
 						<div class="flex gap-2.5 items-start px-3 py-2.5 rounded-xl border border-amber-500/30 bg-amber-500/10">
 							<IconLucideAlertTriangle class="mt-0.5 size-3.5 shrink-0 text-amber-400" />
 							<p class="text-xs leading-relaxed text-gray-11">
-								The sync test takes over your screen with a flashing pattern and
-								plays loud beeps for about {durationSecs()} seconds per
-								pipeline. Take your headphones off and leave the volume audible
-								(the microphone test needs to hear the beeps through your
-								speakers), and don't use the machine until it finishes.
+								{localize(
+									"The sync test takes over your screen with a flashing pattern and plays loud beeps for about",
+								)}
+								{durationSecs()}{" "}
+								{localize(
+									"seconds per pipeline. Take your headphones off and leave the volume audible (the microphone test needs to hear the beeps through your speakers), and don't use the machine until it finishes.",
+								)}
 							</p>
 						</div>
 
 						<fieldset disabled={running()}>
 							<SectionRows>
 								<SelectDiagnosticItem
-									label="Pipelines to test"
-									description="Studio recordings, Instant recordings, or both in one run."
+									label={localize("Pipelines to test")}
+									description={localize(
+										"Studio recordings, Instant recordings, or both in one run.",
+									)}
 									value={mode()}
 									options={DIAGNOSTIC_MODES}
 									onChange={setMode}
 								/>
 								<SelectDiagnosticItem
-									label="Test duration"
-									description="Longer runs are more sensitive to slow drift."
+									label={localize("Test duration")}
+									description={localize(
+										"Longer runs are more sensitive to slow drift.",
+									)}
 									value={durationSecs()}
 									options={DIAGNOSTIC_DURATIONS}
 									onChange={setDurationSecs}
 								/>
 								<ToggleSettingItem
-									label="Test microphone too"
-									description="Also records your microphone and checks it against the beeps it can hear."
+									label={localize("Test microphone too")}
+									description={localize(
+										"Also records your microphone and checks it against the beeps it can hear.",
+									)}
 									value={includeMicrophone()}
 									onChange={setIncludeMicrophone}
 								/>
@@ -354,27 +325,24 @@ export default function FeedbackTab() {
 									<Show when={report().syncTestError}>
 										{(error) => (
 											<p class="text-xs leading-relaxed text-amber-400">
-												The sync test couldn't run: {error()}. The report still
-												contains your system information.
+												{localize("The sync test couldn't run:")} {error()}
+												{localize(
+													". The report still contains your system information.",
+												)}
 											</p>
 										)}
 									</Show>
 
 									<div class="flex gap-2 items-center">
-										<Button
-											onClick={handleSendReport}
-											size="md"
-											variant="dark"
-											disabled={sendingReport()}
-										>
-											{sendingReport() ? "Sending..." : "Send to Cap"}
+										<Button onClick={handleSendReport} size="md" variant="dark">
+											{localize("敬请期待")}
 										</Button>
 										<Button
 											onClick={handleRevealReport}
 											size="md"
 											variant="gray"
 										>
-											Show File
+											{localize("Show File")}
 										</Button>
 									</div>
 								</div>
@@ -384,25 +352,22 @@ export default function FeedbackTab() {
 				</Section>
 
 				<Section
-					title="Debug Information"
-					description="Upload Cap's log file to help us diagnose issues. It records what the app did, which can include file paths and the names of things you recorded."
+					title={localize("Debug Information")}
+					description={localize(
+						"在线日志反馈敬请期待，诊断报告可在本机生成和查看。",
+					)}
 				>
-					<Button
-						onClick={handleUploadLogs}
-						size="md"
-						variant="gray"
-						disabled={uploadingLogs()}
-					>
-						{uploadingLogs() ? "Uploading..." : "Upload Logs"}
+					<Button onClick={handleUploadLogs} size="md" variant="gray">
+						{localize("敬请期待")}
 					</Button>
 				</Section>
 
-				<Section title="System Information">
+				<Section title={localize("System Information")}>
 					<Show
 						when={!diagnostics.loading && diagnostics()}
 						fallback={
 							<p class="text-xs leading-relaxed text-gray-10">
-								Loading system information...
+								{localize("Loading system information...")}
 							</p>
 						}
 					>
@@ -427,7 +392,9 @@ export default function FeedbackTab() {
 									<Show when={osVersion}>
 										{(ver) => (
 											<div class="space-y-1">
-												<p class="text-gray-11 font-medium">Operating System</p>
+												<p class="text-gray-11 font-medium">
+													{localize("Operating System")}
+												</p>
 												<p class="text-gray-10 bg-gray-2 px-2 py-1.5 rounded-sm font-mono text-xs">
 													{ver().displayName}
 												</p>
@@ -436,7 +403,9 @@ export default function FeedbackTab() {
 									</Show>
 
 									<div class="space-y-1">
-										<p class="text-gray-11 font-medium">Capture Support</p>
+										<p class="text-gray-11 font-medium">
+											{localize("Capture Support")}
+										</p>
 										<div class="flex gap-2 flex-wrap">
 											<span
 												class={`px-2 py-1 rounded text-xs ${
@@ -445,7 +414,7 @@ export default function FeedbackTab() {
 														: "bg-red-500/20 text-red-400"
 												}`}
 											>
-												Screen Capture:{" "}
+												{localize("Screen Capture:")}{" "}
 												{captureSupported ? "Supported" : "Not Supported"}
 											</span>
 										</div>
@@ -453,7 +422,9 @@ export default function FeedbackTab() {
 
 									<Show when={(d.availableEncoders as string[])?.length > 0}>
 										<div class="space-y-1">
-											<p class="text-gray-11 font-medium">Available Encoders</p>
+											<p class="text-gray-11 font-medium">
+												{localize("Available Encoders")}
+											</p>
 											<div class="flex gap-1.5 flex-wrap">
 												<For each={d.availableEncoders as string[]}>
 													{(encoder) => (

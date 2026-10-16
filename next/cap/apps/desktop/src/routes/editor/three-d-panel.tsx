@@ -18,6 +18,7 @@ import {
 } from "solid-js";
 import { produce } from "solid-js/store";
 import { Toggle } from "~/components/Toggle";
+import { t as localize } from "~/utils/i18n";
 import IconLucideArrowLeftRight from "~icons/lucide/arrow-left-right";
 import IconLucideArrowRight from "~icons/lucide/arrow-right";
 import IconLucideFlipHorizontal2 from "~icons/lucide/flip-horizontal-2";
@@ -337,7 +338,7 @@ function SequenceCard(props: { scene: Camera3DScene; onClick: () => void }) {
 				{props.scene.name}
 			</span>
 			<span class="text-[10px] text-ed-text-2">
-				{props.scene.shots.length} shots
+				{props.scene.shots.length} {localize("shots")}
 			</span>
 			<div class="flex gap-[3px] mt-[3px] w-full">
 				<For each={props.scene.shots}>
@@ -421,7 +422,7 @@ function OrbitPad(props: {
 				style={{ left: `${x() * 100}%`, top: `${y() * 100}%` }}
 			/>
 			<span class="absolute inset-x-0 bottom-1.5 text-[10px] text-center pointer-events-none text-ed-text-2">
-				Drag to orbit
+				{localize("Drag to orbit")}
 			</span>
 		</div>
 	);
@@ -747,9 +748,11 @@ export function Camera3DShotPanel(props: {
 		<div class="flex flex-col gap-3">
 			<div
 				class="flex flex-row gap-2 items-center px-3 h-9 rounded-[10px] shadow-[0_0_0_1px_var(--ed-line)]"
-				title="Rebuilds every 3D shot on the track"
+				title={localize("Rebuilds every 3D shot on the track")}
 			>
-				<span class="text-[12px] font-medium text-ed-text-2">Auto scene</span>
+				<span class="text-[12px] font-medium text-ed-text-2">
+					{localize("Auto scene")}
+				</span>
 				<div class="ml-auto">
 					<ShotCountPills
 						max={maxAutoCamera3DShots(totalDuration())}
@@ -808,19 +811,19 @@ export function Camera3DShotPanel(props: {
 			</PanelGroup>
 
 			<PanelGroup
-				name="Camera"
+				name={localize("Camera")}
 				action={
 					<div class="flex flex-row gap-1 items-center">
 						<EditorButton
 							size="sm"
 							onClick={() => flipSegment("horizontal")}
-							tooltipText="Flip horizontal"
+							tooltipText={localize("Flip horizontal")}
 							leftIcon={<IconLucideFlipHorizontal2 />}
 						/>
 						<EditorButton
 							size="sm"
 							onClick={() => flipSegment("vertical")}
-							tooltipText="Flip vertical"
+							tooltipText={localize("Flip vertical")}
 							leftIcon={<IconLucideFlipVertical2 />}
 						/>
 					</div>
@@ -836,7 +839,7 @@ export function Camera3DShotPanel(props: {
 							size="sm"
 							onClick={swapPoses}
 							disabled={isStill()}
-							tooltipText="Swap start and end"
+							tooltipText={localize("Swap start and end")}
 							leftIcon={<IconLucideArrowLeftRight />}
 						/>
 					</div>
@@ -852,7 +855,7 @@ export function Camera3DShotPanel(props: {
 						}
 						leftIcon={<IconLucidePause />}
 					>
-						Still shot
+						{localize("Still shot")}
 					</EditorButton>
 				</div>
 				<div class="flex flex-row gap-3 mt-3">
@@ -888,7 +891,7 @@ export function Camera3DShotPanel(props: {
 					when={blurOn()}
 					fallback={
 						<p class="text-[11px] text-ed-text-3">
-							Turn on to blur everything outside the focus area.
+							{localize("Turn on to blur everything outside the focus area.")}
 						</p>
 					}
 				>
@@ -915,7 +918,7 @@ export function Camera3DShotPanel(props: {
 					</Field>
 					<DrillSection
 						subtle
-						name="Fine-tune"
+						name={localize("Fine-tune")}
 						open={fineTuneOpen()}
 						onOpenChange={setFineTuneOpen}
 					>
@@ -1047,7 +1050,7 @@ export function Camera3DShotPanel(props: {
 						leftIcon={<IconLucideRotateCcw />}
 						onClick={resetCamera}
 					>
-						Reset camera
+						{localize("Reset camera")}
 					</EditorButton>
 				</div>
 			</DrillSection>

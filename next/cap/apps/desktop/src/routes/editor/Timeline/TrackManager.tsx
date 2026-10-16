@@ -1,6 +1,7 @@
 import { Popover } from "@kobalte/core/popover";
 import { cx } from "cva";
 import { createSignal, Index, type JSX, Show } from "solid-js";
+import { t as localize } from "~/utils/i18n";
 import IconLucideGripVertical from "~icons/lucide/grip-vertical";
 import type { TimelineTrackType } from "../context";
 
@@ -189,7 +190,7 @@ export function TrackManager(props: {
 					onMouseDown={(e) => e.stopPropagation()}
 				>
 					<IconLucidePlus class="size-3 shrink-0 transition-transform duration-200 ease-out group-data-[expanded]/trigger:rotate-45" />
-					<span class="whitespace-nowrap">Add track</span>
+					<span class="whitespace-nowrap">{localize("Add track")}</span>
 				</Popover.Trigger>
 			</Popover.Anchor>
 			<Popover.Portal>

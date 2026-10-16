@@ -157,3 +157,7 @@ export const teleprompterStore = declareStore<TeleprompterStore>(
 	"teleprompter",
 	teleprompterDefaults,
 );
+
+export const languageStore = declareStore<{
+	language: "zh-CN" | "en" | "system";
+}>("interface_language", { language: "zh-CN" });

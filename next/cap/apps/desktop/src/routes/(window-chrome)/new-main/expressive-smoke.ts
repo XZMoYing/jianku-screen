@@ -149,22 +149,42 @@ export async function runExpressiveSmoke() {
 			await delay(30);
 		}
 		await press("布局");
-		await waitFor(() =>
-			Array.from(
-				document.querySelectorAll<HTMLLabelElement>(".jk-appearance label"),
-			).find((label) => label.textContent?.startsWith("留白")),
-		);
 		const slider = await waitFor(() =>
-			document.querySelector<HTMLInputElement>(
-				'.jk-appearance input[type="range"]',
-			),
+			Array.from(
+				document.querySelectorAll<HTMLElement>(
+					".jk-layout-settings .ed-slider",
+				),
+			)
+				.find((element) =>
+					element.parentElement?.parentElement?.textContent?.startsWith("留白"),
+				)
+				?.querySelector<HTMLElement>("[role=slider]"),
 		);
-		slider.value = "18";
-		slider.dispatchEvent(new Event("input", { bubbles: true }));
+		slider.focus();
+		slider.dispatchEvent(
+			new KeyboardEvent("keydown", { key: "Home", bubbles: true }),
+		);
+		for (let step = 0; step < 180; step++)
+			slider.dispatchEvent(
+				new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }),
+			);
+		slider.dispatchEvent(
+			new KeyboardEvent("keyup", { key: "ArrowRight", bubbles: true }),
+		);
 		results.slider = {
-			label: slider.closest("label")?.textContent,
-			value: slider.value,
+			value: slider.getAttribute("aria-valuenow"),
+			label: "留白",
 		};
+		const preview = await waitFor(() => {
+			const canvas = document.querySelector<HTMLCanvasElement>(".jk-stage-gpu");
+			return canvas && canvas.width > 300 ? canvas : null;
+		});
+		results.gpuPreview = {
+			width: preview.width,
+			height: preview.height,
+			hasPixels: !!preview.getContext("2d")?.getImageData(0, 0, 1, 1).data[3],
+		};
+
 		let saved = await commands.getCaptureStyle();
 		for (
 			let attempt = 0;

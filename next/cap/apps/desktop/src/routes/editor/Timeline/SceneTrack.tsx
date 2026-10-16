@@ -12,6 +12,7 @@ import {
 	Show,
 } from "solid-js";
 import { produce } from "solid-js/store";
+import { t as localize } from "~/utils/i18n";
 
 import { useEditorContext } from "../context";
 import { useTimelineContext, useTrackContext } from "./context";
@@ -215,8 +216,10 @@ export function SceneTrack(props: {
 				each={project.timeline?.sceneSegments}
 				fallback={
 					<div class="cap-empty-lane pointer-events-none">
-						<span>Switch layouts between your screen and camera</span>
-						<span class="cap-empty-lane-action">· Add scene</span>
+						<span>
+							{localize("Switch layouts between your screen and camera")}
+						</span>
+						<span class="cap-empty-lane-action">{localize("· Add scene")}</span>
 					</div>
 				}
 			>
@@ -537,7 +540,7 @@ export function SceneTrack(props: {
 								<SegmentLabel
 									full={() => (
 										<div class="cap-seg-labels animate-in fade-in">
-											<span class="cap-seg-label">Scene</span>
+											<span class="cap-seg-label">{localize("Scene")}</span>
 											<span class="cap-seg-sublabel truncate">
 												{getSceneLabel(segment.mode)}
 											</span>

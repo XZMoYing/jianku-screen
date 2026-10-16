@@ -43,6 +43,7 @@ import {
 import { Toggle } from "~/components/Toggle";
 import { composeEventHandlers } from "~/utils/composeEventHandlers";
 import { createTauriEventListener } from "~/utils/createEventListener";
+import { t as localize } from "~/utils/i18n";
 import { commands, events } from "~/utils/tauri";
 import { ConfigSidebar } from "./ConfigSidebar";
 import {
@@ -55,7 +56,11 @@ import {
 	useEditorInstanceContext,
 } from "./context";
 import { EditorErrorScreen } from "./EditorErrorScreen";
-import { DEFAULT_TIMELINE_HEIGHT, editorVerticalLayout } from "./editor-layout";
+import {
+	DEFAULT_TIMELINE_HEIGHT,
+	editorInspectorWidth,
+	editorVerticalLayout,
+} from "./editor-layout";
 import { EditorSkeleton } from "./editor-skeleton";
 import { Header, type TitleSaveRegistration } from "./Header";
 import { ImportProgress } from "./ImportProgress";
@@ -859,9 +864,44 @@ function Inner(props: {
 		{ name: "editorTranscriptSplitRatio" },
 	);
 	const [isResizingSplit, setIsResizingSplit] = createSignal(false);
+	const [preferredInspectorWidth, setPreferredInspectorWidth] = makePersisted(
+		createSignal(352),
+		{ name: "editor-inspector-width" },
+	);
 	const [splitContainerRef, setSplitContainerRef] =
 		createSignal<HTMLDivElement>();
 
+	const splitBounds = createElementBounds(splitContainerRef);
+	const inspectorWidth = () =>
+		editorInspectorWidth(splitBounds.width ?? 1024, preferredInspectorWidth());
+	let endInspectorResize: (() => void) | undefined;
+	onCleanup(() => endInspectorResize?.());
+	const handleInspectorResizeStart = (event: PointerEvent) => {
+		if (event.button !== 0) return;
+		event.preventDefault();
+		endInspectorResize?.();
+		const start = event.clientX;
+		const width = inspectorWidth();
+		const handleMove = (move: PointerEvent) =>
+			setPreferredInspectorWidth(
+				editorInspectorWidth(
+					splitBounds.width ?? 1024,
+					width + start - move.clientX,
+				),
+			);
+		const finish = () => {
+			window.removeEventListener("pointermove", handleMove);
+			window.removeEventListener("pointerup", finish);
+			window.removeEventListener("pointercancel", finish);
+			window.removeEventListener("blur", finish);
+			endInspectorResize = undefined;
+		};
+		endInspectorResize = finish;
+		window.addEventListener("pointermove", handleMove);
+		window.addEventListener("pointerup", finish);
+		window.addEventListener("pointercancel", finish);
+		window.addEventListener("blur", finish);
+	};
 	const handleSplitResizeStart = (event: MouseEvent) => {
 		if (event.button !== 0) return;
 		event.preventDefault();
@@ -916,7 +956,7 @@ function Inner(props: {
 						class="absolute inset-0 z-50 flex items-center justify-center bg-ed-window/80"
 					>
 						<div class="rounded-xl bg-ed-card p-5 text-sm text-ed-text-1 shadow-ed-card">
-							正在处理工程，请稍候…
+							{localize("正在处理工程，请稍候…")}
 						</div>
 					</div>
 				</Show>
@@ -933,10 +973,10 @@ function Inner(props: {
 								id="editor-handoff-error-title"
 								class="text-sm font-medium text-ed-text-1"
 							>
-								Couldn’t open the editor
+								{localize("Couldn’t open the editor")}
 							</h2>
 							<p class="mt-2 text-xs text-ed-text-2">
-								Try again to finish opening your recording.
+								{localize("Try again to finish opening your recording.")}
 							</p>
 							<button
 								type="button"
@@ -948,7 +988,7 @@ function Inner(props: {
 								}
 								onClick={() => void preparingSession?.retryHandoff()}
 							>
-								Try again
+								{localize("Try again")}
 							</button>
 						</div>
 					</div>
@@ -982,7 +1022,30 @@ function Inner(props: {
 								<PlayerContent compactness={layoutLimits().compactness} />
 							</div>
 							<Show when={!isTranscriptMode()}>
-								<div class="ml-2 flex min-h-0 w-104 min-w-104 flex-none overflow-hidden">
+								<div
+									class="jk-inspector-divider"
+									role="separator"
+									aria-label={localize("调整预览和编辑栏宽度")}
+									aria-orientation="vertical"
+									tabIndex={0}
+									aria-valuenow={inspectorWidth()}
+									onPointerDown={handleInspectorResizeStart}
+									onDblClick={() => setPreferredInspectorWidth(352)}
+									onKeyDown={(event) => {
+										if (event.key !== "ArrowLeft" && event.key !== "ArrowRight")
+											return;
+										event.preventDefault();
+										setPreferredInspectorWidth(
+											inspectorWidth() + (event.key === "ArrowLeft" ? 16 : -16),
+										);
+									}}
+								>
+									<span />
+								</div>
+								<div
+									class="jk-inspector-pane flex min-h-0 min-w-0 flex-none overflow-hidden"
+									style={{ width: `${inspectorWidth()}px` }}
+								>
 									<div
 										class="overflow-hidden min-h-0"
 										classList={{
@@ -1007,7 +1070,7 @@ function Inner(props: {
 									class="flex-none flex items-center justify-center cursor-col-resize select-none group z-10"
 									style={{ width: "12px" }}
 									onMouseDown={handleSplitResizeStart}
-									aria-label="Resize captions panel"
+									aria-label={localize("Resize captions panel")}
 									role="separator"
 									aria-orientation="vertical"
 								>
@@ -1040,7 +1103,7 @@ function Inner(props: {
 							<div
 								role="separator"
 								aria-orientation="horizontal"
-								aria-label="Resize timeline height"
+								aria-label={localize("Resize timeline height")}
 								class="group absolute left-2 right-2 h-[14px] -top-[11px] z-20 cursor-row-resize select-none"
 								onMouseDown={handleTimelineResizeStart}
 							>
@@ -1113,24 +1176,24 @@ function Dialogs() {
 
 								return (
 									<DialogContent
-										title="Create Preset"
+										title={localize("Create Preset")}
 										confirm={
 											<Dialog.ConfirmButton
 												disabled={createPreset.isPending}
 												onClick={() => createPreset.mutate()}
 											>
-												Create
+												{localize("Create")}
 											</Dialog.ConfirmButton>
 										}
 									>
-										<Subfield name="Name" required />
+										<Subfield name={localize("Name")} required />
 										<Input
 											class="mt-2"
 											value={form.name}
-											placeholder="Enter preset name..."
+											placeholder={localize("Enter preset name...")}
 											onInput={(e) => setForm("name", e.currentTarget.value)}
 										/>
-										<Subfield name="Set as default" class="mt-4">
+										<Subfield name={localize("Set as default")} class="mt-4">
 											<Toggle
 												checked={form.default}
 												onChange={(checked) => setForm("default", checked)}
@@ -1161,17 +1224,17 @@ function Dialogs() {
 
 								return (
 									<DialogContent
-										title="Rename Preset"
+										title={localize("Rename Preset")}
 										confirm={
 											<Dialog.ConfirmButton
 												disabled={renamePreset.isPending}
 												onClick={() => renamePreset.mutate()}
 											>
-												Rename
+												{localize("Rename")}
 											</Dialog.ConfirmButton>
 										}
 									>
-										<Subfield name="Name" required />
+										<Subfield name={localize("Name")} required />
 										<Input
 											class="mt-2"
 											value={name()}
@@ -1200,19 +1263,19 @@ function Dialogs() {
 
 								return (
 									<DialogContent
-										title="Delete Preset"
+										title={localize("Delete Preset")}
 										confirm={
 											<Dialog.ConfirmButton
 												variant="destructive"
 												onClick={() => deletePreset.mutate()}
 												disabled={deletePreset.isPending}
 											>
-												Delete
+												{localize("Delete")}
 											</Dialog.ConfirmButton>
 										}
 									>
 										<p class="text-gray-11">
-											Are you sure you want to delete this preset?
+											{localize("Are you sure you want to delete this preset?")}
 										</p>
 									</DialogContent>
 								);
@@ -1586,11 +1649,11 @@ function Dialogs() {
 									<>
 										<div class="flex h-[52px] shrink-0 items-center justify-between px-5">
 											<KDialog.Title class="text-sm font-semibold text-ed-text-1">
-												Crop
+												{localize("Crop")}
 											</KDialog.Title>
 											<EditorButton
 												leftIcon={<IconLucideX />}
-												tooltipText="Close"
+												tooltipText={localize("Close")}
 												onClick={closeCrop}
 											/>
 										</div>
@@ -1625,7 +1688,7 @@ function Dialogs() {
 													>
 														<img
 															class="block h-full w-full select-none pointer-events-none"
-															alt="Current frame"
+															alt={localize("Current frame")}
 															onError={() => {
 																const url = frameUrl();
 																if (url) {
@@ -1646,14 +1709,16 @@ function Dialogs() {
 													<div class="absolute inset-0 z-40 flex flex-col items-center justify-center gap-3 rounded-xl bg-ed-stage">
 														<div class="size-6 animate-spin rounded-full border-2 border-ed-line-strong border-t-ed-accent" />
 														<span class="text-xs font-medium text-ed-text-2">
-															Loading frame…
+															{localize("Loading frame…")}
 														</span>
 													</div>
 												</Show>
 											</div>
 
 											<div class="flex w-[300px] shrink-0 flex-col gap-3 rounded-xl bg-ed-card-2 p-3.5">
-												<span class={inspectorLabel}>Preview</span>
+												<span class={inspectorLabel}>
+													{localize("Preview")}
+												</span>
 												<div class="relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-lg bg-ed-stage">
 													<canvas
 														ref={previewCanvas}
@@ -1663,7 +1728,7 @@ function Dialogs() {
 														<div class="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-ed-stage">
 															<div class="size-5 animate-spin rounded-full border-2 border-ed-line-strong border-t-ed-accent" />
 															<span class="text-[11px] font-medium text-ed-text-3">
-																Rendering preview…
+																{localize("Rendering preview…")}
 															</span>
 														</div>
 													</Show>
@@ -1671,7 +1736,9 @@ function Dialogs() {
 
 												<div class="h-px bg-ed-line" />
 
-												<span class={inspectorLabel}>Aspect ratio</span>
+												<span class={inspectorLabel}>
+													{localize("Aspect ratio")}
+												</span>
 												<div class="grid grid-cols-3 gap-1.5">
 													<For each={[null, ...COMMON_RATIOS]}>
 														{(ratio) => (
@@ -1694,7 +1761,7 @@ function Dialogs() {
 												</div>
 												<div class={inspectorRow}>
 													<span class="text-xs text-ed-text-2">
-														Snap to ratios
+														{localize("Snap to ratios")}
 													</span>
 													<Toggle
 														size="sm"
@@ -1706,7 +1773,9 @@ function Dialogs() {
 												<div class="h-px bg-ed-line" />
 
 												<div class={inspectorRow}>
-													<span class="text-xs text-ed-text-2">Size</span>
+													<span class="text-xs text-ed-text-2">
+														{localize("Size")}
+													</span>
 													<div class="flex items-center gap-1.5">
 														<BoundInput field="width" max={display.width} />
 														<span class="w-2 text-center text-xs text-ed-text-3">
@@ -1716,7 +1785,9 @@ function Dialogs() {
 													</div>
 												</div>
 												<div class={inspectorRow}>
-													<span class="text-xs text-ed-text-2">Position</span>
+													<span class="text-xs text-ed-text-2">
+														{localize("Position")}
+													</span>
 													<div class="flex items-center gap-1.5">
 														<BoundInput field="x" />
 														<span class="w-2" />
@@ -1744,7 +1815,7 @@ function Dialogs() {
 															});
 														}}
 													>
-														Center
+														{localize("Center")}
 													</button>
 													<button
 														type="button"
@@ -1752,7 +1823,7 @@ function Dialogs() {
 														disabled={isFull()}
 														onClick={() => cropperRef?.fill()}
 													>
-														Full
+														{localize("Full")}
 													</button>
 													<button
 														type="button"
@@ -1763,13 +1834,13 @@ function Dialogs() {
 															setAspect(null);
 														}}
 													>
-														Reset
+														{localize("Reset")}
 													</button>
 												</div>
 											</div>
 										</div>
 										<p class="px-5 pt-3 pb-5 text-center text-xs text-ed-text-3">
-											Drag to move · Arrow keys nudge · Hold{" "}
+											{localize("Drag to move · Arrow keys nudge · Hold")}{" "}
 											<kbd class="rounded-[4px] bg-ed-ctl px-1 font-sans text-ed-text-2">
 												⇧
 											</kbd>{" "}
@@ -1781,8 +1852,9 @@ function Dialogs() {
 													when={cropTargetValid()}
 													fallback={
 														<p role="alert" class="text-orange-11">
-															Crop target changed. Close and reopen Crop to
-															continue.
+															{localize(
+																"Crop target changed. Close and reopen Crop to continue.",
+															)}
 														</p>
 													}
 												>
@@ -1792,7 +1864,9 @@ function Dialogs() {
 												</Show>
 											</div>
 											<div class="flex shrink-0 items-center gap-2">
-												<EditorButton onClick={closeCrop}>Cancel</EditorButton>
+												<EditorButton onClick={closeCrop}>
+													{localize("Cancel")}
+												</EditorButton>
 												<button
 													type="button"
 													class={cx(
@@ -1810,7 +1884,7 @@ function Dialogs() {
 													}
 													onClick={saveCrop}
 												>
-													Save
+													{localize("Save")}
 												</button>
 											</div>
 										</div>

@@ -16,6 +16,7 @@ import Tooltip from "~/components/Tooltip";
 import CaptionControlsMacOS from "~/components/titlebar/controls/CaptionControlsMacOS";
 import CaptionControlsWindows11 from "~/components/titlebar/controls/CaptionControlsWindows11";
 import { trackEvent } from "~/utils/analytics";
+import { t as localize } from "~/utils/i18n";
 import { commands } from "~/utils/tauri";
 import { useEditorContext } from "./context";
 import OrganizationDropdown from "./OrganizationDropdown";
@@ -143,7 +144,7 @@ export function Header(props: {
 							console.log({ path: `${editorInstance.path}/` });
 							revealItemInDir(`${editorInstance.path}/`);
 						}}
-						tooltipText="Open recording bundle"
+						tooltipText={localize("Open recording bundle")}
 						leftIcon={<IconLucideFolder />}
 					/>
 					<EditorButton
@@ -157,7 +158,7 @@ export function Header(props: {
 
 							await commands.editorDeleteProject();
 						}}
-						tooltipText="Delete recording"
+						tooltipText={localize("Delete recording")}
 						leftIcon={<IconCapTrash />}
 					/>
 				</div>
@@ -179,7 +180,7 @@ export function Header(props: {
 					disabled={
 						!projectHistory.canUndo() && !editorState.timeline.selection
 					}
-					tooltipText="Undo"
+					tooltipText={localize("Undo")}
 					leftIcon={<IconCapUndo />}
 				/>
 				<EditorButton
@@ -191,7 +192,7 @@ export function Header(props: {
 					disabled={
 						!projectHistory.canRedo() && !editorState.timeline.selection
 					}
-					tooltipText="Redo"
+					tooltipText={localize("Redo")}
 					leftIcon={<IconCapRedo />}
 				/>
 				<div class="mx-1.5 w-px h-4 shrink-0 bg-ed-line-strong" />
@@ -203,8 +204,8 @@ export function Header(props: {
 				<OrganizationDropdown />
 				<PresetsDropdown />
 				<EditorButton
-					title="Clips"
-					aria-label="Clips"
+					title={localize("Clips")}
+					aria-label={localize("Clips")}
 					class={cx(isClipsOpen() && "bg-ed-ctl-hover text-ed-text-1")}
 					leftIcon={<IconCapClapperboard />}
 					onClick={() => {
@@ -216,7 +217,7 @@ export function Header(props: {
 						}
 					}}
 				>
-					<span class="max-[1200px]:hidden">片段</span>
+					<span class="max-[1200px]:hidden">{localize("片段")}</span>
 				</EditorButton>
 				<Show when={hasTranscript()}>
 					<EditorButton
@@ -238,7 +239,7 @@ export function Header(props: {
 						}}
 					>
 						<span class="max-[1200px]:hidden">
-							{isTranscriptOpen() ? "Back" : "Captions"}
+							{isTranscriptOpen() ? localize("Back") : localize("Captions")}
 						</span>
 					</EditorButton>
 				</Show>
@@ -262,7 +263,7 @@ export function Header(props: {
 					}}
 				>
 					<UploadIcon class="size-4" />
-					Export
+					{localize("Export")}
 				</button>
 			</div>
 			{ostype() === "windows" && (

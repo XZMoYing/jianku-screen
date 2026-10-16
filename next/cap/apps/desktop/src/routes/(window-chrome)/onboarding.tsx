@@ -3,6 +3,7 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import brandLogo from "~/assets/branding/logo.png";
 import { generalSettingsStore } from "~/store";
+import { t as localize } from "~/utils/i18n";
 import {
 	isPermissionGranted,
 	requestAndVerifyPermission,
@@ -116,13 +117,13 @@ export default function OnboardingPage() {
 		<div class="jk-onboarding">
 			<WindowChromeHeader>
 				<span class="jk-guide-window-name" data-tauri-drag-region>
-					简库镜传 Next
+					{localize("简库镜传 Next")}
 				</span>
 			</WindowChromeHeader>
 			<div class="jk-guide-body">
 				<div class="jk-guide-brand">
-					<img src={brandLogo} alt="简库镜传 Next" />
-					<span>权限与输入</span>
+					<img src={brandLogo} alt={localize("简库镜传 Next")} />
+					<span>{localize("权限与输入")}</span>
 					<IconShield />
 				</div>
 				<div class="jk-guide-permissions">
@@ -133,7 +134,7 @@ export default function OnboardingPage() {
 									<span class="jk-guide-label">
 										{permission.name}
 										<Show when={permission.optional}>
-											<small>可选</small>
+											<small>{localize("可选")}</small>
 										</Show>
 									</span>
 									<p>{permission.detail}</p>
@@ -168,7 +169,7 @@ export default function OnboardingPage() {
 					onClick={() => void refresh()}
 					disabled={busy()}
 				>
-					重新检测
+					{localize("重新检测")}
 				</button>
 				<button
 					type="button"
@@ -180,7 +181,7 @@ export default function OnboardingPage() {
 							.catch((e: unknown) => setError(String(e)))
 					}
 				>
-					重新启动
+					{localize("重新启动")}
 				</button>
 				<button
 					type="button"
@@ -188,10 +189,10 @@ export default function OnboardingPage() {
 					disabled={busy()}
 					onClick={() => void finish(true)}
 				>
-					稍后设置
+					{localize("稍后设置")}
 				</button>
 				<Button disabled={!ready() || busy()} onClick={() => void finish()}>
-					进入工作台
+					{localize("进入工作台")}
 				</Button>
 			</footer>
 		</div>

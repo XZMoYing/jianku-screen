@@ -1,5 +1,6 @@
 import { createEventListenerMap } from "@solid-primitives/event-listener";
 import { createMemo, createRoot, For } from "solid-js";
+import { t as localize } from "~/utils/i18n";
 
 import { useEditorContext } from "../context";
 import { useTimelineContext } from "./context";
@@ -144,7 +145,7 @@ export function CaptionsTrack(props: {
 				each={captionSegments()}
 				fallback={
 					<div class="cap-empty-lane">
-						<span>No captions</span>
+						<span>{localize("No captions")}</span>
 						<button
 							type="button"
 							class="cap-empty-lane-action outline-hidden"
@@ -155,7 +156,10 @@ export function CaptionsTrack(props: {
 								void props.onGenerate();
 							}}
 						>
-							· {props.isGenerating ? "Generating..." : "Generate captions"}
+							·{" "}
+							{props.isGenerating
+								? localize("Generating...")
+								: "Generate captions"}
 						</button>
 					</div>
 				}

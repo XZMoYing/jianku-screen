@@ -22,6 +22,7 @@ import {
 import { createStore } from "solid-js/store";
 import { Transition } from "solid-transition-group";
 import { createKeyDownSignal } from "~/utils/events";
+import { t as localize } from "~/utils/i18n";
 
 import { commands } from "~/utils/tauri";
 import { alignCrop, type CropGuides } from "./crop-alignment";
@@ -1401,7 +1402,7 @@ export function Cropper(
 				<button
 					type="button"
 					class="absolute inset-0 z-20 bg-transparent p-0 m-0 border-0"
-					aria-label="Start selection"
+					aria-label={localize("Start selection")}
 					onPointerDown={onOverlayPointerDown}
 					style={{ cursor: cursorStyle() ?? "crosshair" }}
 				/>

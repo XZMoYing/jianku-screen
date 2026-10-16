@@ -11,7 +11,6 @@ import {
 	onMount,
 	Show,
 } from "solid-js";
-
 import { Toggle } from "~/components/Toggle";
 import CaptionControlsMacOS from "~/components/titlebar/controls/CaptionControlsMacOS";
 import CaptionControlsWindows11 from "~/components/titlebar/controls/CaptionControlsWindows11";
@@ -20,6 +19,7 @@ import {
 	teleprompterDefaults,
 	teleprompterStore,
 } from "~/store";
+import { t as localize } from "~/utils/i18n";
 import { applyMacOSWindowMaterial } from "~/utils/macos-window-material";
 import { commands, events } from "~/utils/tauri";
 import IconLucideChevronLeft from "~icons/lucide/chevron-left";
@@ -428,7 +428,7 @@ export default function Teleprompter() {
 								? "Scrolling paused with recording"
 								: isLinux
 									? "This window may appear in recordings on Linux"
-									: "This window is hidden from Cap recordings")}
+									: localize("This window is hidden from Cap recordings"))}
 					</span>
 				</div>
 				<Show when={isWindows}>
@@ -465,13 +465,13 @@ export default function Teleprompter() {
 						spellcheck={true}
 						value={state().script}
 						onInput={(event) => updateScript(event.currentTarget.value)}
-						placeholder="Paste or type your script…"
+						placeholder={localize("Paste or type your script…")}
 						class="block w-full resize-none overflow-hidden bg-transparent px-8 text-center font-medium tracking-[-0.025em] text-gray-12 outline-none placeholder:text-gray-8/70 selection:bg-blue-9/25"
 						style={{
 							"font-size": `${state().fontSize}px`,
 							"line-height": state().lineHeight,
 						}}
-						aria-label="Teleprompter script"
+						aria-label={localize("Teleprompter script")}
 					/>
 					<div aria-hidden="true" style={{ height: spacerHeight() }} />
 				</div>
@@ -481,7 +481,7 @@ export default function Teleprompter() {
 				<div class="absolute bottom-12 right-2 z-30 w-48 rounded-2xl border border-gray-12/8 bg-gray-1/80 p-2 shadow-xl backdrop-blur-2xl">
 					<div>
 						<SettingToggle
-							label="Cue markers"
+							label={localize("Cue markers")}
 							active={state().showCueMarkers}
 							onChange={(showCueMarkers) =>
 								setState((current) => ({ ...current, showCueMarkers }))
@@ -490,7 +490,7 @@ export default function Teleprompter() {
 							<IconLucideChevronRight class="size-3.5" />
 						</SettingToggle>
 						<SettingToggle
-							label="Mirror text"
+							label={localize("Mirror text")}
 							active={state().mirror}
 							onChange={(mirror) =>
 								setState((current) => ({ ...current, mirror }))
@@ -547,7 +547,7 @@ export default function Teleprompter() {
 							}))
 						}
 						class="h-1 w-12 cursor-pointer appearance-none rounded-full bg-gray-12/10 [&::-webkit-slider-thumb]:size-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-9 [&::-webkit-slider-thumb]:shadow-sm"
-						aria-label="Scroll speed"
+						aria-label={localize("Scroll speed")}
 					/>
 					<span class="w-12 text-right text-[10px] tabular-nums text-gray-9">
 						{state().wordsPerMinute} wpm
@@ -573,22 +573,28 @@ export default function Teleprompter() {
 								}))
 							}
 							class="h-1 w-12 cursor-pointer appearance-none rounded-full bg-gray-12/10 [&::-webkit-slider-thumb]:size-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-gray-11 [&::-webkit-slider-thumb]:shadow-sm"
-							aria-label="Window opacity"
+							aria-label={localize("Window opacity")}
 						/>
 					</div>
 					<div class="flex h-8 items-center rounded-full border border-gray-12/6 bg-gray-12/5 px-0.5 backdrop-blur-xl">
-						<ToolButton label="Smaller text" onClick={() => changeFontSize(-2)}>
+						<ToolButton
+							label={localize("Smaller text")}
+							onClick={() => changeFontSize(-2)}
+						>
 							<IconLucideMinus class="size-3.5" />
 						</ToolButton>
 						<span class="w-6 text-center text-[10px] tabular-nums text-gray-9">
 							{state().fontSize}
 						</span>
-						<ToolButton label="Larger text" onClick={() => changeFontSize(2)}>
+						<ToolButton
+							label={localize("Larger text")}
+							onClick={() => changeFontSize(2)}
+						>
 							<IconLucidePlus class="size-3.5" />
 						</ToolButton>
 					</div>
 					<ToolButton
-						label="Settings"
+						label={localize("Settings")}
 						active={settingsOpen()}
 						onClick={() => setSettingsOpen((open) => !open)}
 					>

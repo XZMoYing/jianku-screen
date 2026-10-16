@@ -1,3 +1,4 @@
+import { t as localize } from "~/utils/i18n";
 import "@radix-ui/colors/amber.css";
 import "@radix-ui/colors/amber-dark.css";
 import { createTimer } from "@solid-primitives/timer";
@@ -909,7 +910,7 @@ function InProgressRecordingInner() {
 							type="button"
 							class="shrink-0 text-red-9 transition hover:text-red-11"
 							onClick={() => dismissIssuePanel()}
-							aria-label="Dismiss recording issue"
+							aria-label={localize("Dismiss recording issue")}
 						>
 							<IconLucideX class="size-4" />
 						</button>
@@ -933,7 +934,7 @@ function InProgressRecordingInner() {
 										<div class="flex flex-row items-center gap-1.5 rounded-lg py-1 px-2 text-gray-12">
 											<IconLucideLoader2 class="size-4 animate-spin" />
 											<span class="truncate text-sm font-medium tabular-nums">
-												Starting
+												{localize("Starting")}
 											</span>
 										</div>
 									}
@@ -954,8 +955,8 @@ function InProgressRecordingInner() {
 											requestStopRecording();
 										}}
 										onClick={requestStopRecording}
-										title="Stop recording"
-										aria-label="Stop recording"
+										title={localize("Stop recording")}
+										aria-label={localize("Stop recording")}
 									>
 										<IconCapStopCircle class="size-5 shrink-0" />
 										<span class="truncate text-sm font-medium tabular-nums">
@@ -1106,8 +1107,8 @@ function InProgressRecordingInner() {
 												onClick={() => {
 													void closeStartingBar();
 												}}
-												title="Close recording controls"
-												aria-label="Close recording controls"
+												title={localize("Close recording controls")}
+												aria-label={localize("Close recording controls")}
 											>
 												<IconLucideX class="size-5" />
 											</ActionButton>
@@ -1123,7 +1124,7 @@ function InProgressRecordingInner() {
 												onClick={() => toggleIssuePanel()}
 												title={issueMessages().join(", ")}
 												aria-pressed={issuePanelVisible() ? "true" : "false"}
-												aria-label="Recording issues"
+												aria-label={localize("Recording issues")}
 											>
 												<IconLucideAlertTriangle class="size-5" />
 											</ActionButton>
@@ -1174,16 +1175,16 @@ function InProgressRecordingInner() {
 										<ActionButton
 											disabled={restartRecording.isPending || isCountdown()}
 											onClick={() => restartRecording.mutate()}
-											title="Restart recording"
-											aria-label="Restart recording"
+											title={localize("Restart recording")}
+											aria-label={localize("Restart recording")}
 										>
 											<IconCapRestart />
 										</ActionButton>
 										<ActionButton
 											disabled={deleteRecording.isPending || isCountdown()}
 											onClick={() => deleteRecording.mutate()}
-											title="Delete recording"
-											aria-label="Delete recording"
+											title={localize("Delete recording")}
+											aria-label={localize("Delete recording")}
 										>
 											<IconCapTrash />
 										</ActionButton>
@@ -1194,8 +1195,8 @@ function InProgressRecordingInner() {
 											onClick={() => {
 												void openRecordingSettingsMenu();
 											}}
-											title="Recording settings"
-											aria-label="Recording settings"
+											title={localize("Recording settings")}
+											aria-label={localize("Recording settings")}
 										>
 											<IconCapSettings class="size-5" />
 										</ActionButton>
@@ -1204,7 +1205,7 @@ function InProgressRecordingInner() {
 							</div>
 						</div>
 						<div
-							aria-label="Move recording controls"
+							aria-label={localize("Move recording controls")}
 							class="non-styled-move flex w-6 shrink-0 cursor-move items-center justify-center border-l border-gray-5 p-1 hover:cursor-move transition-colors duration-100 hover:bg-gray-12/4 dark:hover:bg-white/6"
 							data-tauri-drag-region
 						>

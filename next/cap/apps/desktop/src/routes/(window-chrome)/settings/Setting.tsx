@@ -2,6 +2,7 @@ import { cx } from "cva";
 import type { JSX, ParentProps } from "solid-js";
 import { Show } from "solid-js";
 import { Toggle } from "~/components/Toggle";
+import { t as localize } from "~/utils/i18n";
 
 export function SettingsPageContent(props: ParentProps<{ class?: string }>) {
 	return (
@@ -25,7 +26,7 @@ export function Section(
 				<div class="flex flex-col gap-0.5 min-w-0">
 					<div class="flex gap-2 items-center">
 						<h3 class="text-sm font-semibold tracking-tight text-gray-12">
-							{props.title}
+							{localize(props.title)}
 						</h3>
 						<Show when={props.pro}>
 							<span class="text-[10px] font-medium uppercase tracking-wide px-1.5 py-0.5 rounded-md bg-blue-9 text-white">
@@ -33,9 +34,17 @@ export function Section(
 							</span>
 						</Show>
 					</div>
-					<Show when={props.description}>
+					<Show
+						when={
+							typeof props.description === "string"
+								? localize(props.description)
+								: props.description
+						}
+					>
 						<div class="text-xs leading-relaxed text-gray-10">
-							{props.description}
+							{typeof props.description === "string"
+								? localize(props.description)
+								: props.description}
 						</div>
 					</Show>
 				</div>
@@ -83,9 +92,19 @@ export function SettingItem(props: {
 			class="cap-setting-row flex flex-row gap-4 justify-between items-center px-4 py-3.5"
 		>
 			<div class="flex flex-col flex-1 min-w-0 gap-0.5">
-				<p class="text-[13px] text-gray-12">{props.label}</p>
-				<Show when={props.description}>
-					<p class="text-xs leading-snug text-gray-10">{props.description}</p>
+				<p class="text-[13px] text-gray-12">{localize(props.label)}</p>
+				<Show
+					when={
+						typeof props.description === "string"
+							? localize(props.description)
+							: props.description
+					}
+				>
+					<p class="text-xs leading-snug text-gray-10">
+						{typeof props.description === "string"
+							? localize(props.description)
+							: props.description}
+					</p>
 				</Show>
 			</div>
 			<div class="flex shrink-0 items-center">{props.children}</div>

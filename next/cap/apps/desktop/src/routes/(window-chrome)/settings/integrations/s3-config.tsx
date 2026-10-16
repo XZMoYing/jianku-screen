@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/solid-query";
 import { createResource, Show, Suspense } from "solid-js";
 import BrandLogo from "~/components/BrandLogo";
 import { Input } from "~/routes/editor/ui";
+import { t as localize } from "~/utils/i18n";
 import { createSelectedOrganization } from "~/utils/organization-branding";
 import { commands } from "~/utils/tauri";
 import { apiClient, protectedHeaders } from "~/utils/web-api";
@@ -158,20 +159,21 @@ export default function S3ConfigPage() {
 	return (
 		<div class="cap-settings-page flex flex-col h-full custom-scroll">
 			<SettingsPageContent>
-				<IntegrationConfigHeader title="S3 Config" />
+				<IntegrationConfigHeader title={localize("S3 Config")} />
 				<Section
-					title="Configuration"
+					title={localize("Configuration")}
 					description={
 						<>
-							It should take under 10 minutes to set up and connect your storage
-							bucket to Cap. View the{" "}
+							{localize(
+								"It should take under 10 minutes to set up and connect your storage bucket to Cap. View the",
+							)}{" "}
 							<a
 								href="https://cap.so/docs/s3-config"
 								target="_blank"
 								class="underline text-gray-12"
 								rel="noopener"
 							>
-								Storage Config Guide
+								{localize("Storage Config Guide")}
 							</a>{" "}
 							to get started.
 						</>
@@ -189,14 +191,15 @@ export default function S3ConfigPage() {
 								<Show when={managedByOrganization()}>
 									{(organization) => (
 										<p class="text-xs leading-relaxed text-gray-10">
-											Managed by your organization: {organization().name}
+											{localize("Managed by your organization:")}{" "}
+											{organization().name}
 										</p>
 									)}
 								</Show>
 
 								<div class="space-y-2">
 									<label class="text-[13px] text-gray-12">
-										Storage Provider
+										{localize("Storage Provider")}
 									</label>
 									<div class="relative">
 										<select
@@ -214,7 +217,9 @@ export default function S3ConfigPage() {
 											<option value="cloudflare">Cloudflare R2</option>
 											<option value="supabase">Supabase</option>
 											<option value="minio">MinIO</option>
-											<option value="other">Other S3-Compatible</option>
+											<option value="other">
+												{localize("Other S3-Compatible")}
+											</option>
 										</select>
 										<div class="flex absolute inset-y-0 right-0 items-center px-2 pointer-events-none">
 											<svg
@@ -288,7 +293,7 @@ export default function S3ConfigPage() {
 							variant="primary"
 							onClick={() => saveConfig.mutate(s3Config())}
 						>
-							{saveConfig.isPending ? "Saving..." : "Save"}
+							{saveConfig.isPending ? localize("Saving...") : localize("Save")}
 						</Button>
 					</fieldset>
 				</div>

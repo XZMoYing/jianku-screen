@@ -8,6 +8,7 @@ import {
 	defaultKeyboardSettings,
 	type KeyboardSettings,
 } from "~/store/keyboard";
+import { t as localize } from "~/utils/i18n";
 import type { OrganizationBrandColorSwatch } from "~/utils/organization-branding";
 import { commands } from "~/utils/tauri";
 import IconCapChevronDown from "~icons/cap/chevron-down";
@@ -146,7 +147,7 @@ export function KeyboardTab(props: {
 			});
 		} catch (e) {
 			console.error("Failed to generate keyboard segments:", e);
-			toast.error("Unable to generate keyboard events");
+			toast.error(localize("Unable to generate keyboard events"));
 		} finally {
 			setIsGenerating(false);
 		}
@@ -171,7 +172,7 @@ export function KeyboardTab(props: {
 			<div class="flex flex-row gap-2 items-center min-h-[22px]">
 				<SectionLabel name="Show keyboard" />
 				<span class="px-1.5 py-0.5 text-[10px] font-medium rounded-full bg-ed-ctl text-ed-text-2">
-					Beta
+					{localize("Beta")}
 				</span>
 				<div class="ml-auto">
 					<Toggle
@@ -237,7 +238,7 @@ export function KeyboardTab(props: {
 							</KSelect>
 						</Field>
 
-						<Field name="Size" inline>
+						<Field name={localize("Size")} inline>
 							<Slider
 								value={[getSetting("size")]}
 								onChange={(v) => updateSetting("size", v[0])}
@@ -284,7 +285,7 @@ export function KeyboardTab(props: {
 				<div class="w-full border-t border-ed-line" />
 
 				<div class="flex flex-col gap-2">
-					<Field name="Position" inline>
+					<Field name={localize("Position")} inline>
 						<KSelect<string>
 							options={KEYBOARD_POSITION_OPTIONS.map((p) => p.value)}
 							value={getSetting("position")}
@@ -458,7 +459,7 @@ export function KeyboardTab(props: {
 							/>
 						</Field>
 
-						<Field name="Uppercase" inline>
+						<Field name={localize("Uppercase")} inline>
 							<Toggle
 								checked={getSetting("uppercase")}
 								onChange={(checked) => updateSetting("uppercase", checked)}
@@ -473,7 +474,7 @@ export function KeyboardTab(props: {
 					class="w-full"
 				>
 					{isGenerating()
-						? "Generating..."
+						? localize("Generating...")
 						: hasKeyboardSegments()
 							? "Regenerate Keyboard Segments"
 							: "Generate Keyboard Segments"}
@@ -555,7 +556,7 @@ export function KeyboardTab(props: {
 											step={1}
 										/>
 									</Subfield>
-									<Subfield name="Uppercase">
+									<Subfield name={localize("Uppercase")}>
 										<Toggle
 											checked={
 												seg().uppercaseOverride ?? getSetting("uppercase")
@@ -579,10 +580,11 @@ export function KeyboardTab(props: {
 
 				<Show when={!hasKeyboardSegments()}>
 					<div class="py-2 text-center text-ed-text-2">
-						<p class="text-[13px]">No keyboard segments yet.</p>
+						<p class="text-[13px]">{localize("No keyboard segments yet.")}</p>
 						<p class="mt-1 text-[11px] text-ed-text-3">
-							Click "Generate Keyboard Segments" to create segments from
-							recorded keyboard presses.
+							{localize(
+								'Click "Generate Keyboard Segments" to create segments from recorded keyboard presses.',
+							)}
 						</p>
 					</div>
 				</Show>

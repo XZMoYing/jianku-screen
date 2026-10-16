@@ -13,6 +13,7 @@ import { produce } from "solid-js/store";
 import { Dynamic } from "solid-js/web";
 import { Toggle } from "~/components/Toggle";
 import { listSystemFonts } from "~/utils/fonts";
+import { t as localize } from "~/utils/i18n";
 import type { OrganizationBrandColorSwatch } from "~/utils/organization-branding";
 import IconLucideAlignCenter from "~icons/lucide/align-center";
 import IconLucideAlignLeft from "~icons/lucide/align-left";
@@ -521,7 +522,9 @@ export function TextSegmentConfig(props: {
 				name={`Text ${props.segmentIndex + 1}`}
 				action={
 					<div class="flex gap-2 items-center">
-						<span class="text-[11px] text-ed-text-3">Enabled</span>
+						<span class="text-[11px] text-ed-text-3">
+							{localize("Enabled")}
+						</span>
 						<Toggle
 							size="sm"
 							checked={props.segment.enabled}
@@ -536,7 +539,7 @@ export function TextSegmentConfig(props: {
 			>
 				<textarea
 					class="min-h-[72px] w-full resize-none rounded-[9px] border-0 bg-ed-ctl px-3 py-2 text-[13px] leading-[18px] text-ed-text-1 caret-ed-accent outline-hidden placeholder:text-ed-text-3 hover:bg-ed-ctl-hover focus:bg-ed-ctl-hover focus:ring-1 focus:ring-ed-accent"
-					placeholder="Type something…"
+					placeholder={localize("Type something…")}
 					value={props.segment.content}
 					onInput={(e) =>
 						updateSegment((segment) => {
@@ -547,7 +550,7 @@ export function TextSegmentConfig(props: {
 				<div class="flex gap-2 items-center">
 					<ToggleChip
 						label="I"
-						title="Italic"
+						title={localize("Italic")}
 						italic
 						active={props.segment.italic}
 						onClick={() =>
@@ -558,7 +561,7 @@ export function TextSegmentConfig(props: {
 					/>
 					<ToggleChip
 						label="AA"
-						title="Uppercase"
+						title={localize("Uppercase")}
 						active={props.segment.uppercase ?? false}
 						onClick={() =>
 							updateSegment((segment) => {
@@ -581,7 +584,7 @@ export function TextSegmentConfig(props: {
 				</div>
 			</Section>
 
-			<Section name="Style">
+			<Section name={localize("Style")}>
 				<div class="flex overflow-x-auto gap-1 hide-scroll">
 					<For each={TEXT_PRESET_GROUPS}>
 						{(group) => (
@@ -640,7 +643,7 @@ export function TextSegmentConfig(props: {
 				<div class="flex flex-col">
 					<Field
 						inline
-						name="Size"
+						name={localize("Size")}
 						value={Math.round(
 							clampNumber(
 								props.segment.fontSize,
@@ -731,7 +734,7 @@ export function TextSegmentConfig(props: {
 			</Section>
 
 			<Section name="Look">
-				<Field name="Color">
+				<Field name={localize("Color")}>
 					<HexColorInput
 						value={props.segment.color}
 						brandColorSwatches={props.brandColorSwatches}
@@ -742,7 +745,7 @@ export function TextSegmentConfig(props: {
 						}
 					/>
 				</Field>
-				<Field inline name="Gradient">
+				<Field inline name={localize("Gradient")}>
 					<Toggle
 						size="sm"
 						checked={props.segment.gradientColor != null}
@@ -766,7 +769,7 @@ export function TextSegmentConfig(props: {
 						}
 					/>
 				</Show>
-				<Field name="Background">
+				<Field name={localize("Background")}>
 					<Segmented
 						stretch
 						ariaLabel="Text background"
@@ -832,7 +835,7 @@ export function TextSegmentConfig(props: {
 					</Show>
 					<Field
 						inline
-						name="Shadow"
+						name={localize("Shadow")}
 						value={`${Math.round(clampNumber(props.segment.shadow ?? 0, 0, 1) * 100)}%`}
 					>
 						<Slider
@@ -866,7 +869,7 @@ export function TextSegmentConfig(props: {
 					</Field>
 					<Field
 						inline
-						name="Opacity"
+						name={localize("Opacity")}
 						value={`${Math.round(clampNumber(props.segment.opacity ?? 1, 0, 1) * 100)}%`}
 					>
 						<Slider
@@ -908,7 +911,11 @@ export function TextSegmentConfig(props: {
 					</For>
 				</div>
 				<Show when={edgeAnimation() !== "none"}>
-					<Field inline name="Duration" value={`${edgeDuration().toFixed(2)}s`}>
+					<Field
+						inline
+						name={localize("Duration")}
+						value={`${edgeDuration().toFixed(2)}s`}
+					>
 						<Slider
 							value={[edgeDuration()]}
 							onChange={([value]) => setEdgeDuration(value)}
@@ -921,7 +928,7 @@ export function TextSegmentConfig(props: {
 				</Show>
 			</Section>
 
-			<Section name="Layout">
+			<Section name={localize("Layout")}>
 				<Segmented
 					stretch
 					ariaLabel="Text layout"
@@ -941,8 +948,9 @@ export function TextSegmentConfig(props: {
 				/>
 				<Show when={layout() === "fullscreen"}>
 					<p class="text-[12px] leading-snug text-ed-text-3">
-						Pauses the video while the text is shown, then resumes where it left
-						off.
+						{localize(
+							"Pauses the video while the text is shown, then resumes where it left off.",
+						)}
 					</p>
 				</Show>
 				<Show when={layout() !== "overlay"}>

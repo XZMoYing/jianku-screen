@@ -2,12 +2,12 @@ import { invoke } from "@tauri-apps/api/core";
 import { type } from "@tauri-apps/plugin-os";
 import { createResource, createSignal, For, onCleanup, Show } from "solid-js";
 import { createStore } from "solid-js/store";
-
 import { generalSettingsStore } from "~/store";
 import {
 	deriveGeneralSettings,
 	type GeneralSettingsStore,
 } from "~/utils/general-settings";
+import { t as localize } from "~/utils/i18n";
 import {
 	Section,
 	SectionRows,
@@ -20,9 +20,9 @@ import {
 // The mirror of this sequence lives in `render_switch_overlay` in the native
 // app's `settings_pages.rs`.
 const SWITCH_SENTENCES = [
-	"Switching to the native Cap app.",
+	localize("Switching to the native Cap app."),
 	"It will look almost identical. That is the point.",
-	"Same Cap, rebuilt fully native for performance.",
+	localize("Same Cap, rebuilt fully native for performance."),
 	"Experimental. Your recordings and settings come with you.",
 ];
 const SENTENCE_MS = 1300;
@@ -158,11 +158,13 @@ function Inner(props: {
 		<div class="cap-settings-page flex flex-col h-full custom-scroll">
 			<SettingsPageContent>
 				<Show when={props.osType === "macos"}>
-					<Section title="Preview">
+					<Section title={localize("Preview")}>
 						<SectionRows>
 							<ToggleSettingItem
-								label="Native camera preview"
-								description="Render the camera preview using a native GPU surface instead of through the webview. Experimental and off by default."
+								label={localize("Native camera preview")}
+								description={localize(
+									"Render the camera preview using a native GPU surface instead of through the webview. Experimental and off by default.",
+								)}
 								value={!!settings.enableNativeCameraPreview}
 								onChange={(value) =>
 									handleChange("enableNativeCameraPreview", value)
@@ -172,11 +174,13 @@ function Inner(props: {
 					</Section>
 				</Show>
 
-				<Section title="Reliability">
+				<Section title={localize("Reliability")}>
 					<SectionRows>
 						<ToggleSettingItem
-							label="Out-of-process muxer"
-							description="Run the fragmented-MP4 muxer in an isolated subprocess so muxer crashes can't take down your recording. Requires the bundled cap-muxer binary."
+							label={localize("Out-of-process muxer")}
+							description={localize(
+								"Run the fragmented-MP4 muxer in an isolated subprocess so muxer crashes can't take down your recording. Requires the bundled cap-muxer binary.",
+							)}
 							value={!!settings.outOfProcessMuxer}
 							onChange={(value) => handleChange("outOfProcessMuxer", value)}
 						/>
@@ -184,11 +188,13 @@ function Inner(props: {
 				</Section>
 
 				<Show when={gpuiAvailable()}>
-					<Section title="Native app">
+					<Section title={localize("Native app")}>
 						<SectionRows>
 							<ToggleSettingItem
-								label="Cap GPUI"
-								description="Close this app and reopen the experimental fully-native version of Cap. It is unfinished, so expect missing features. Your recordings and settings are shared, and you can switch back from its Experimental settings."
+								label={localize("Cap GPUI")}
+								description={localize(
+									"Close this app and reopen the experimental fully-native version of Cap. It is unfinished, so expect missing features. Your recordings and settings are shared, and you can switch back from its Experimental settings.",
+								)}
 								value={!!settings.enableGpuiApp || takeoverActive()}
 								onChange={(value) => {
 									if (value) startTakeover();
@@ -244,7 +250,7 @@ function Inner(props: {
 							class="rounded-lg border border-white/25 px-4 py-2 text-sm text-white transition-colors hover:bg-white/10"
 							onClick={cancelTakeover}
 						>
-							Cancel
+							{localize("Cancel")}
 						</button>
 					</div>
 				)}

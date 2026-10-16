@@ -1,6 +1,7 @@
 import { DropdownMenu as KDropdownMenu } from "@kobalte/core/dropdown-menu";
 import { cx } from "cva";
 import { For, Show } from "solid-js";
+import { t as localize } from "~/utils/i18n";
 import type { OrganizationBrandColorSwatch } from "~/utils/organization-branding";
 import IconCapChevronDown from "~icons/cap/chevron-down";
 import { getColorPreviewBorderColor } from "./color-utils";
@@ -22,7 +23,9 @@ export function BrandColorsDropdown(props: {
 						props.class,
 					)}
 				>
-					<span class="min-w-0 flex-1 truncate text-left">Brand colours</span>
+					<span class="min-w-0 flex-1 truncate text-left">
+						{localize("Brand colours")}
+					</span>
 					<span class="flex shrink-0 -space-x-1">
 						<For each={props.swatches.slice(0, 4)}>
 							{(swatch) => (

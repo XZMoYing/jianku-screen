@@ -10,6 +10,7 @@ import {
 	Switch,
 } from "solid-js";
 import { Transition } from "solid-transition-group";
+import { t as localize } from "~/utils/i18n";
 import type {
 	CaptureDisplayWithThumbnail,
 	CaptureWindowWithThumbnail,
@@ -196,8 +197,10 @@ export default function TargetMenuGrid(props: TargetMenuGridProps) {
 			return (
 				<EmptyState
 					icon={<IconLucideSquarePlay class="size-5 text-gray-10" />}
-					title="No recordings yet"
-					description="Your screen recordings will appear here. Start recording to get started!"
+					title={localize("No recordings yet")}
+					description={localize(
+						"Your screen recordings will appear here. Start recording to get started!",
+					)}
 					action={
 						onViewAll
 							? { label: "View All Recordings", onClick: onViewAll }
@@ -211,8 +214,10 @@ export default function TargetMenuGrid(props: TargetMenuGridProps) {
 			return (
 				<EmptyState
 					icon={<IconLucideImage class="size-5 text-gray-10" />}
-					title="No screenshots yet"
-					description="Your screenshots will appear here. Take a screenshot to get started!"
+					title={localize("No screenshots yet")}
+					description={localize(
+						"Your screenshots will appear here. Take a screenshot to get started!",
+					)}
 					action={
 						onViewAll
 							? { label: "View All Screenshots", onClick: onViewAll }
@@ -408,7 +413,7 @@ export default function TargetMenuGrid(props: TargetMenuGridProps) {
 											{(onViewAll) => (
 												<ViewAllButton
 													onClick={onViewAll()}
-													label="View All Recordings"
+													label={localize("View All Recordings")}
 												/>
 											)}
 										</Show>
@@ -470,7 +475,7 @@ export default function TargetMenuGrid(props: TargetMenuGridProps) {
 											{(onViewAll) => (
 												<ViewAllButton
 													onClick={onViewAll()}
-													label="View All Screenshots"
+													label={localize("View All Screenshots")}
 												/>
 											)}
 										</Show>

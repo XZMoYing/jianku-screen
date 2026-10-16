@@ -1,8 +1,8 @@
 import { createEventListenerMap } from "@solid-primitives/event-listener";
 import { createMemo, createRoot, createSignal, For, Show } from "solid-js";
 import { produce } from "solid-js/store";
-
 import { cssFontFamily } from "~/utils/fonts";
+import { t as localize } from "~/utils/i18n";
 import { useEditorContext } from "../context";
 import { autoTextColorAt, defaultTextSegment } from "../text";
 import { getSegmentTrack, sortTrackSegments } from "../timelineTracks";
@@ -306,8 +306,10 @@ export function TextTrack(props: {
 						fallback={<div class="w-full rounded-lg bg-transparent" />}
 					>
 						<div class="cap-empty-lane pointer-events-none">
-							<span>Set a label over your video</span>
-							<span class="cap-empty-lane-action">· Add text</span>
+							<span>{localize("Set a label over your video")}</span>
+							<span class="cap-empty-lane-action">
+								{localize("· Add text")}
+							</span>
 						</div>
 					</Show>
 				}
@@ -454,7 +456,7 @@ export function TextTrack(props: {
 									full={() => (
 										<div class="cap-seg-labels">
 											<span class="cap-seg-label flex gap-1 items-center">
-												Text
+												{localize("Text")}
 												<Show when={segment.layout === "fullscreen"}>
 													<IconLucidePause class="size-2.5" />
 												</Show>

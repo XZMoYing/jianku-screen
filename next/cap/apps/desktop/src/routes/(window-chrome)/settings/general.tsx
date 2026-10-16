@@ -1,5 +1,4 @@
 import { Button } from "@cap/ui-solid";
-import { createWritableMemo } from "@solid-primitives/memo";
 import {
 	isPermissionGranted,
 	requestPermission,
@@ -7,6 +6,13 @@ import {
 import { type OsType, type } from "@tauri-apps/plugin-os";
 import BrandLogo from "~/components/BrandLogo";
 import ColorSchemeOptions from "~/components/ColorSchemeSettings";
+import {
+	type InterfaceLanguage,
+	interfaceLanguage,
+	t as localize,
+	setInterfaceLanguage,
+	t,
+} from "~/utils/i18n";
 import "@total-typescript/ts-reset/filter-boolean";
 import { Collapsible } from "@kobalte/core/collapsible";
 import { CheckMenuItem, Menu, MenuItem } from "@tauri-apps/api/menu";
@@ -26,11 +32,9 @@ import toast from "solid-toast";
 import { Input, Slider } from "~/routes/editor/ui";
 import {
 	audioEnhancementStore,
-	authStore,
 	generalSettingsStore,
 	recordingStartSafetyStore,
 } from "~/store";
-import { clientEnv } from "~/utils/env";
 import {
 	deriveGeneralSettings,
 	type GeneralSettingsStore,
@@ -161,8 +165,12 @@ function AppearanceSection(props: {
 		{ id: "system", name: "跟随系统" },
 	] satisfies { id: AppTheme; name: string }[];
 	return (
-		<Section title="外观">
-			<div class="jk-theme-options" role="radiogroup" aria-label="应用外观">
+		<Section title={localize("外观")}>
+			<div
+				class="jk-theme-options"
+				role="radiogroup"
+				aria-label={localize("应用外观")}
+			>
 				<For each={options}>
 					{(theme) => (
 						<button
@@ -180,7 +188,7 @@ function AppearanceSection(props: {
 									<b />
 								</span>
 							</div>
-							<span>{theme.name}</span>
+							<span>{localize(theme.name)}</span>
 						</button>
 					)}
 				</For>
@@ -439,21 +447,42 @@ function Inner(props: {
 					}}
 				/>
 
-				<Section title="配色">
+				<Section title={t("界面语言")}>
+					<SettingItem label={t("界面语言")}>
+						<select
+							aria-label={t("界面语言")}
+							value={interfaceLanguage()}
+							onChange={(event) =>
+								void setInterfaceLanguage(
+									event.currentTarget.value as InterfaceLanguage,
+								).catch((error) => toast.error(String(error)))
+							}
+						>
+							<option value="zh-CN">{localize("简体中文")}</option>
+							<option value="en">{localize("English")}</option>
+							<option value="system">{t("跟随系统")}</option>
+						</select>
+					</SettingItem>
+				</Section>
+
+				<Section title={localize("配色")}>
 					<ColorSchemeOptions />
 				</Section>
 
 				{ostype === "macos" && (
-					<Section title="应用" description="窗口与系统显示。">
+					<Section
+						title={localize("应用")}
+						description={localize("窗口与系统显示。")}
+					>
 						<SectionRows>
 							<ToggleSettingItem
-								label="始终显示 Dock 图标"
-								description="关闭所有窗口后仍在 Dock 中保留应用。"
+								label={localize("始终显示 Dock 图标")}
+								description={localize("关闭所有窗口后仍在 Dock 中保留应用。")}
 								value={!settings.hideDockIcon}
 								onChange={(v) => handleChange("hideDockIcon", !v)}
 							/>
 							<ToggleSettingItem
-								label="系统通知"
+								label={localize("系统通知")}
 								description="复制、保存等操作完成时显示通知；需在系统设置中允许通知。"
 								value={!!settings.enableNotifications}
 								onChange={async (value) => {
@@ -471,11 +500,14 @@ function Inner(props: {
 					</Section>
 				)}
 
-				<Section title="录制" description="开始录制与停止后的行为。">
+				<Section
+					title={localize("录制")}
+					description={localize("开始录制与停止后的行为。")}
+				>
 					<SectionRows>
 						<SelectSettingItem
-							label="录制倒计时"
-							description="选择开始录制前的等待时间。"
+							label={localize("录制倒计时")}
+							description={localize("选择开始录制前的等待时间。")}
 							value={settings.recordingCountdown ?? 0}
 							onChange={(value) => handleChange("recordingCountdown", value)}
 							options={[
@@ -486,20 +518,20 @@ function Inner(props: {
 							]}
 						/>
 						<ToggleSettingItem
-							label="未选择麦克风时确认"
+							label={localize("未选择麦克风时确认")}
 							description="未选择麦克风或麦克风不可用时，开始录制前提醒。"
 							value={confirmBeforeRecordingWithoutMicrophone()}
 							onChange={handleRecordingStartSafetyChange}
 						/>
 						<ToggleSettingItem
-							label="新录制默认增强声音"
+							label={localize("新录制默认增强声音")}
 							description="自动处理麦克风声音，之后仍可在编辑器关闭。"
 							value={studioSoundByDefault()}
 							onChange={handleStudioSoundByDefaultChange}
 						/>
 						<SelectSettingItem
-							label="开始录制时的主窗口"
-							description="录制开始后关闭或最小化主窗口。"
+							label={localize("开始录制时的主窗口")}
+							description={localize("录制开始后关闭或最小化主窗口。")}
 							value={settings.mainWindowRecordingStartBehaviour ?? "close"}
 							onChange={(value) =>
 								handleChange("mainWindowRecordingStartBehaviour", value)
@@ -510,8 +542,8 @@ function Inner(props: {
 							]}
 						/>
 						<SelectSettingItem
-							label="录制完成后"
-							description="停止录制后的默认操作。"
+							label={localize("录制完成后")}
+							description={localize("停止录制后的默认操作。")}
 							value={settings.postStudioRecordingBehaviour ?? "openEditor"}
 							onChange={(value) =>
 								handleChange("postStudioRecordingBehaviour", value)
@@ -522,8 +554,10 @@ function Inner(props: {
 							]}
 						/>
 						<SelectSettingItem
-							label="After deleting a recording"
-							description="Whether the recording window should reopen."
+							label={localize("After deleting a recording")}
+							description={localize(
+								"Whether the recording window should reopen.",
+							)}
 							value={settings.postDeletionBehaviour ?? "doNothing"}
 							onChange={(value) => handleChange("postDeletionBehaviour", value)}
 							options={[
@@ -535,38 +569,48 @@ function Inner(props: {
 							]}
 						/>
 						<ToggleSettingItem
-							label="Delete Instant recordings after upload"
-							description="Cap removes the local file once it has uploaded successfully."
+							label={localize("Delete Instant recordings after upload")}
+							description={localize(
+								"Cap removes the local file once it has uploaded successfully.",
+							)}
 							value={settings.deleteInstantRecordingsAfterUpload ?? false}
 							onChange={(v) =>
 								handleChange("deleteInstantRecordingsAfterUpload", v)
 							}
 						/>
 						<ToggleSettingItem
-							label="Crash-recoverable recording"
-							description="Record in fragments that can be recovered after a crash or power loss. Slightly larger files during capture."
+							label={localize("Crash-recoverable recording")}
+							description={localize(
+								"Record in fragments that can be recovered after a crash or power loss. Slightly larger files during capture.",
+							)}
 							value={settings.crashRecoveryRecording ?? true}
 							onChange={(value) =>
 								handleChange("crashRecoveryRecording", value)
 							}
 						/>
 						<ToggleSettingItem
-							label="Custom cursor capture (Studio)"
-							description="Capture cursor state separately so you can adjust size and smoothing in the editor."
+							label={localize("Custom cursor capture (Studio)")}
+							description={localize(
+								"Capture cursor state separately so you can adjust size and smoothing in the editor.",
+							)}
 							value={!!settings.custom_cursor_capture2}
 							onChange={(value) =>
 								handleChange("custom_cursor_capture2", value)
 							}
 						/>
 						<ToggleSettingItem
-							label="Auto zoom on clicks"
-							description="Automatically add zoom segments around mouse clicks in Studio recordings."
+							label={localize("Auto zoom on clicks")}
+							description={localize(
+								"Automatically add zoom segments around mouse clicks in Studio recordings.",
+							)}
 							value={!!settings.autoZoomOnClicks}
 							onChange={(value) => handleChange("autoZoomOnClicks", value)}
 						/>
 						<SettingItem
-							label="Default zoom amount"
-							description="Zoom level for newly created and auto-generated zoom segments."
+							label={localize("Default zoom amount")}
+							description={localize(
+								"Zoom level for newly created and auto-generated zoom segments.",
+							)}
 						>
 							<div class="flex gap-2 items-center w-52">
 								<Slider
@@ -585,19 +629,23 @@ function Inner(props: {
 							</div>
 						</SettingItem>
 						<ToggleSettingItem
-							label="Capture keyboard presses"
-							description="Record key presses so you can add keyboard overlays in the editor."
+							label={localize("Capture keyboard presses")}
+							description={localize(
+								"Record key presses so you can add keyboard overlays in the editor.",
+							)}
 							value={!!settings.captureKeyboardEvents}
 							onChange={(value) => handleChange("captureKeyboardEvents", value)}
 						/>
 						<ToggleSettingItem
-							label="Draw the MacBook notch on screen recordings"
-							description="Automatically restores the notch for new screen and area recordings when the selected region contains the complete notch. External displays, partial areas, and window recordings are left alone. Each recording can override it in the editor."
+							label={localize("Draw the MacBook notch on screen recordings")}
+							description={localize(
+								"Automatically restores the notch for new screen and area recordings when the selected region contains the complete notch. External displays, partial areas, and window recordings are left alone. Each recording can override it in the editor.",
+							)}
 							value={!!settings.macbookNotchOverlay}
 							onChange={(value) => handleChange("macbookNotchOverlay", value)}
 						/>
 						<SelectSettingItem
-							label="Max capture framerate"
+							label={localize("Max capture framerate")}
 							description={
 								(settings.maxFps ?? 60) > 60
 									? "Maximum framerate for screen capture. Higher values may cause drops or increased CPU usage on some systems."
@@ -669,26 +717,6 @@ function Inner(props: {
 						} catch (error) {
 							console.error("Failed to notify update channel change", error);
 						}
-					}}
-				/>
-
-				<ServerURLSetting
-					value={settings.serverUrl ?? clientEnv.VITE_SERVER_URL}
-					defaultValue={clientEnv.VITE_SERVER_URL}
-					onChange={async (v) => {
-						const url = new URL(v);
-						const origin = url.origin;
-
-						if (
-							!(await confirm(
-								`Are you sure you want to change the server URL to '${origin}'? You will need to sign in again.`,
-							))
-						)
-							return;
-
-						await authStore.set(undefined);
-						await commands.setServerUrl(origin);
-						handleChange("serverUrl", origin);
 					}}
 				/>
 
@@ -764,7 +792,10 @@ function StorageSection(props: {
 	const isCustom = () => props.recordingsPath !== null;
 
 	return (
-		<Section title="Storage" description="Where Cap saves your recordings.">
+		<Section
+			title={localize("Storage")}
+			description={localize("Where Cap saves your recordings.")}
+		>
 			<SectionCard padded>
 				<div class="flex flex-col gap-3">
 					<div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-3 border border-gray-4 min-w-0">
@@ -775,11 +806,11 @@ function StorageSection(props: {
 					<div class="flex justify-end gap-2">
 						<Show when={isCustom()}>
 							<Button size="sm" variant="gray" onClick={props.onReset}>
-								Reset to Default
+								{localize("Reset to Default")}
 							</Button>
 						</Show>
 						<Button size="sm" variant="dark" onClick={props.onPick}>
-							Choose Folder
+							{localize("Choose Folder")}
 						</Button>
 					</div>
 				</div>
@@ -793,11 +824,13 @@ function TelemetryCard(props: {
 	onChange: (value: boolean) => void;
 }) {
 	return (
-		<Section title="Privacy">
+		<Section title={localize("Privacy")}>
 			<SectionRows>
 				<ToggleSettingItem
-					label="Share anonymous telemetry"
-					description="Cap uses anonymous telemetry to improve reliability and fix bugs. We never collect recording contents, window titles, file paths, or personal information."
+					label={localize("Share anonymous telemetry")}
+					description={localize(
+						"Cap uses anonymous telemetry to improve reliability and fix bugs. We never collect recording contents, window titles, file paths, or personal information.",
+					)}
 					value={props.value}
 					onChange={props.onChange}
 				/>
@@ -837,14 +870,19 @@ function UpdatesSection(props: {
 	);
 
 	return (
-		<Section title="Updates" description="Choose which Cap builds you receive.">
+		<Section
+			title={localize("Updates")}
+			description={localize("Choose which Cap builds you receive.")}
+		>
 			<SectionCard>
 				<div class="flex flex-col gap-3 px-4 py-4">
 					<div class="flex justify-between items-start gap-4">
 						<div class="flex flex-col gap-0.5 min-w-0">
-							<p class="text-[13px] text-gray-12">Update channel</p>
+							<p class="text-[13px] text-gray-12">
+								{localize("Update channel")}
+							</p>
 							<p class="text-xs leading-snug text-gray-10">
-								Which release channel Cap updates from.
+								{localize("Which release channel Cap updates from.")}
 							</p>
 						</div>
 						<SegmentedControl
@@ -860,8 +898,9 @@ function UpdatesSection(props: {
 						<p class="text-xs text-gray-12">{currentOption().description}</p>
 						<Show when={props.value === "nightly"}>
 							<p class="text-[11px] text-gray-10 leading-snug">
-								Switching back to Stable will return you to the latest stable
-								version, which may be older than your current build.
+								{localize(
+									"Switching back to Stable will return you to the latest stable version, which may be older than your current build.",
+								)}
 							</p>
 						</Show>
 					</div>
@@ -892,68 +931,12 @@ function SegmentedControl<T extends string | number>(props: {
 									: "text-gray-10 hover:text-gray-12",
 							)}
 						>
-							{option.label}
+							{localize(option.label)}
 						</button>
 					);
 				}}
 			</For>
 		</div>
-	);
-}
-
-function ServerURLSetting(props: {
-	value: string;
-	defaultValue: string;
-	onChange: (v: string) => void;
-}) {
-	const [value, setValue] = createWritableMemo(() => props.value);
-	const isDefaultValue = () =>
-		props.value === props.defaultValue && value() === props.defaultValue;
-	const resetToDefault = () => {
-		if (props.value === props.defaultValue) {
-			setValue(props.defaultValue);
-			return;
-		}
-
-		props.onChange(props.defaultValue);
-	};
-
-	return (
-		<Section
-			title="Self-host"
-			description="Only change this if you are running your own instance of Cap Web."
-		>
-			<SectionCard padded>
-				<div class="flex flex-col gap-3">
-					<label class="flex flex-col gap-1.5">
-						<span class="text-[13px] text-gray-12">Cap Server URL</span>
-						<Input
-							class="bg-gray-3"
-							value={value()}
-							onInput={(e) => setValue(e.currentTarget.value)}
-						/>
-					</label>
-					<div class="flex justify-end gap-2">
-						<Button
-							size="sm"
-							variant="gray"
-							disabled={isDefaultValue()}
-							onClick={resetToDefault}
-						>
-							Reset to Default
-						</Button>
-						<Button
-							size="sm"
-							variant="dark"
-							disabled={props.value === value()}
-							onClick={() => props.onChange(value())}
-						>
-							Update
-						</Button>
-					</div>
-				</div>
-			</SectionCard>
-		</Section>
 	);
 }
 
@@ -1024,7 +1007,7 @@ function DefaultProjectNameCard(props: {
 		return (
 			<button
 				type="button"
-				title="Click to copy"
+				title={localize("Click to copy")}
 				class="px-1.5 py-0.5 mx-0.5 font-mono text-[11px] rounded-md transition-[background-color,color,transform] duration-150 ease-out bg-gray-3 hover:bg-gray-4 active:scale-95 text-gray-12"
 				onClick={() => commands.writeClipboardString(props.children)}
 			>
@@ -1035,8 +1018,10 @@ function DefaultProjectNameCard(props: {
 
 	return (
 		<Section
-			title="Default project name"
-			description="Template used for new recordings and exported files."
+			title={localize("Default project name")}
+			description={localize(
+				"Template used for new recordings and exported files.",
+			)}
 			right={
 				<>
 					<Button
@@ -1054,7 +1039,7 @@ function DefaultProjectNameCard(props: {
 							await updatePreview(newTemplate);
 						}}
 					>
-						Reset
+						{localize("Reset")}
 					</Button>
 					<Button
 						size="sm"
@@ -1065,7 +1050,7 @@ function DefaultProjectNameCard(props: {
 							await updatePreview();
 						}}
 					>
-						Save
+						{localize("Save")}
 					</Button>
 				</>
 			}
@@ -1092,36 +1077,40 @@ function DefaultProjectNameCard(props: {
 					<Collapsible class="w-full rounded-lg">
 						<Collapsible.Trigger class="inline-flex gap-1 items-center text-xs transition-colors text-gray-10 hover:text-gray-12 group">
 							<IconCapChevronDown class="size-3.5 data-group-expanded:rotate-180 transition-transform duration-200" />
-							<span>Available placeholders</span>
+							<span>{localize("Available placeholders")}</span>
 						</Collapsible.Trigger>
 
 						<Collapsible.Content class="space-y-3 pt-3 text-xs text-gray-12 opacity-0 transition animate-collapsible-up data-expanded:animate-collapsible-down data-expanded:opacity-100">
 							<p class="text-gray-10">
-								Click any placeholder to copy it. Time supports custom formats
-								via <code class="text-gray-12">{"{moment:HH:mm}"}</code>.
+								{localize(
+									"Click any placeholder to copy it. Time supports custom formats via",
+								)}
+								<code class="text-gray-12">{"{moment:HH:mm}"}</code>.
 							</p>
 
 							<div class="space-y-1">
-								<p class="font-medium text-gray-12">Recording mode</p>
-								<p>
-									<CodeView>{"{recording_mode}"}</CodeView> → "Studio",
-									"Instant", or "Screenshot"
+								<p class="font-medium text-gray-12">
+									{localize("Recording mode")}
 								</p>
 								<p>
-									<CodeView>{"{mode}"}</CodeView> → "studio", "instant", or
-									"screenshot"
+									<CodeView>{"{recording_mode}"}</CodeView>{" "}
+									{localize('→ "Studio", "Instant", or "Screenshot"')}
+								</p>
+								<p>
+									<CodeView>{"{mode}"}</CodeView>{" "}
+									{localize('→ "studio", "instant", or "screenshot"')}
 								</p>
 							</div>
 
 							<div class="space-y-1">
-								<p class="font-medium text-gray-12">Target</p>
+								<p class="font-medium text-gray-12">{localize("Target")}</p>
 								<p>
-									<CodeView>{"{target_kind}"}</CodeView> → "Display", "Window",
-									or "Area"
+									<CodeView>{"{target_kind}"}</CodeView>{" "}
+									{localize('→ "Display", "Window", or "Area"')}
 								</p>
 								<p>
-									<CodeView>{"{target_name}"}</CodeView> → Monitor name or
-									window title.
+									<CodeView>{"{target_name}"}</CodeView>{" "}
+									{localize("→ Monitor name or window title.")}
 								</p>
 							</div>
 
@@ -1224,10 +1213,12 @@ function ExcludedWindowsCard(props: {
 
 	return (
 		<Section
-			title="Excluded windows"
+			title={localize("Excluded windows")}
 			description={
 				props.isWindows
-					? "Hide windows from recordings. On Windows, only Cap-related windows can be excluded."
+					? localize(
+							"Hide windows from recordings. On Windows, only Cap-related windows can be excluded.",
+						)
 					: "Hide windows from recordings."
 			}
 			right={
@@ -1238,7 +1229,7 @@ function ExcludedWindowsCard(props: {
 						disabled={props.isLoading}
 						onClick={handleResetClick}
 					>
-						Reset
+						{localize("Reset")}
 					</Button>
 					<Button
 						variant="dark"
@@ -1248,7 +1239,7 @@ function ExcludedWindowsCard(props: {
 						class="flex gap-1.5 items-center"
 					>
 						<IconLucidePlus class="size-3.5" />
-						Add
+						{localize("Add")}
 					</Button>
 				</>
 			}
@@ -1260,11 +1251,13 @@ function ExcludedWindowsCard(props: {
 							<IconLucideAlertTriangle class="mt-0.5 size-4 shrink-0 text-amber-11" />
 							<div class="min-w-0 flex-1 space-y-1">
 								<p class="text-xs font-medium text-amber-11">
-									Recommended Cap windows are not excluded
+									{localize("Recommended Cap windows are not excluded")}
 								</p>
 								<p class="text-[10px] leading-snug text-amber-11">
-									Camera, settings, or recording windows can appear as black
-									boxes in screen recordings. Missing: {missingDefaultLabels()}.
+									{localize(
+										"Camera, settings, or recording windows can appear as black boxes in screen recordings. Missing:",
+									)}
+									{missingDefaultLabels()}.
 								</p>
 							</div>
 							<Button
@@ -1274,7 +1267,7 @@ function ExcludedWindowsCard(props: {
 								onClick={handleResetClick}
 								class="shrink-0"
 							>
-								Restore
+								{localize("Restore")}
 							</Button>
 						</div>
 					</div>
@@ -1284,7 +1277,7 @@ function ExcludedWindowsCard(props: {
 						when={hasExclusions()}
 						fallback={
 							<p class="text-xs text-gray-10">
-								No windows are currently excluded.
+								{localize("No windows are currently excluded.")}
 							</p>
 						}
 					>
@@ -1306,7 +1299,7 @@ function ExcludedWindowsCard(props: {
 											type="button"
 											class="flex justify-center items-center rounded-full transition-colors size-5 text-gray-10 hover:bg-gray-5 hover:text-gray-12"
 											onClick={() => void props.onRemove(index())}
-											aria-label="Remove excluded window"
+											aria-label={localize("Remove excluded window")}
 										>
 											<IconLucideX class="size-3" />
 										</button>

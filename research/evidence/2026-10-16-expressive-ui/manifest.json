@@ -10,7 +10,7 @@
 		"https://github.com/material-foundation/material-color-utilities/blob/main/concepts/color_extraction.md",
 		"https://support.google.com/android/answer/9730472?hl=en"
 	],
-	"usage": "Editor details and interaction-motion reference only. The startup workspace follows Jianku's own recording/presentation workflow. Media solvers unchanged; no DogSC source code linked into the application.",
+	"usage": "Editor interaction and wallpaper selection reference. The wallpaper provider/media-resolution logic is adapted in Rust; media motion solvers are unchanged. Startup uses Jianku recording/presentation workflow.",
 	"files": [
 		{
 			"file": "dogsc/LICENSE",
@@ -39,6 +39,10 @@
 		{
 			"file": "interface-motion.json",
 			"sha256": "f59fd5f4a4ff635decd3098ebbb782e43e4ed0c87ddf5ee39e45e99855496fec"
+		},
+		{
+			"file": "dogsc/Sources/DogSCApp/SystemWallpaperLibrary.swift",
+			"sha256": "a34d17d46dce921fe73481bcffd99d8e00efb02cc81eb0fa0cd9ca448ffb2c0a"
 		}
 	],
 	"materialColorUtilities": {

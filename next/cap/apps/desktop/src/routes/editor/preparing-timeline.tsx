@@ -1,4 +1,5 @@
 import { For, Show } from "solid-js";
+import { t as localize } from "~/utils/i18n";
 import {
 	type PreparingEditorModel,
 	preparingTime,
@@ -40,16 +41,18 @@ export function PreparingTimeline(props: { model: PreparingEditorModel }) {
 	return (
 		<div
 			class="flex flex-col h-full rounded-xl bg-ed-card shadow-ed-card overflow-hidden px-3 pt-2.5 pb-3"
-			aria-label="Recording timeline"
+			aria-label={localize("Recording timeline")}
 		>
 			<div class="flex items-end h-[26px] shrink-0">
 				<div class="w-[104px] pl-1 shrink-0 text-[11px] text-ed-text-3">
-					Timeline
+					{localize("Timeline")}
 				</div>
 				<div class="flex flex-1 justify-between gap-2 pb-1 text-[10px] tabular-nums text-ed-text-3">
 					<Show
 						when={timeline().totalDuration}
-						fallback={<span>Recording duration is being checked</span>}
+						fallback={
+							<span>{localize("Recording duration is being checked")}</span>
+						}
 					>
 						{(duration) => (
 							<For each={[0, 0.25, 0.5, 0.75, 1]}>

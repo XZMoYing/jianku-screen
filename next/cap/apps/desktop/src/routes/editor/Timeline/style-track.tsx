@@ -1,4 +1,5 @@
 import { For, onCleanup, Show } from "solid-js";
+import { t as localize } from "~/utils/i18n";
 import { useEditorContext } from "../context";
 import { editOverlayInterval } from "../style";
 import { useTimelineContext } from "./context";
@@ -201,13 +202,17 @@ export function OverlayTrack(
 						fallback={
 							<>
 								<span>
-									Change background, camera and cursor for part of your video
+									{localize(
+										"Change background, camera and cursor for part of your video",
+									)}
 								</span>
-								<span class="cap-empty-lane-action">· Add style</span>
+								<span class="cap-empty-lane-action">
+									{localize("· Add style")}
+								</span>
 							</>
 						}
 					>
-						<span>Place images and logos on your video</span>
+						<span>{localize("Place images and logos on your video")}</span>
 						<span class="cap-empty-lane-action">
 							{editorState.importingImage
 								? "· Importing image…"

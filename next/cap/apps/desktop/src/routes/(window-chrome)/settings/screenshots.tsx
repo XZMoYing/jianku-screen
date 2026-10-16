@@ -25,6 +25,7 @@ import {
 } from "~/routes/screenshot-editor/screenshotExport";
 import { trackEvent } from "~/utils/analytics";
 import { createTauriEventListener } from "~/utils/createEventListener";
+import { t as localize } from "~/utils/i18n";
 import { importImageFromPicker, showImportError } from "~/utils/importMedia";
 import { commands, events, type RecordingMeta } from "~/utils/tauri";
 
@@ -164,8 +165,8 @@ export default function Screenshots() {
 		<div class="cap-settings-page flex relative flex-col w-full h-full custom-scroll">
 			<SettingsPageContent class="max-w-none space-y-4">
 				<Section
-					title="Screenshots"
-					description="Manage your screenshots and perform actions."
+					title={localize("Screenshots")}
+					description={localize("Manage your screenshots and perform actions.")}
 					right={
 						<Button
 							variant="gray"
@@ -174,7 +175,7 @@ export default function Screenshots() {
 							onClick={handleImportImage}
 						>
 							<IconLucideImport class="size-3.5" />
-							<span>Import image</span>
+							<span>{localize("Import image")}</span>
 						</Button>
 					}
 				>
@@ -183,7 +184,7 @@ export default function Screenshots() {
 						fallback={
 							<div class="flex flex-1 items-center justify-center">
 								<p class="text-center text-(--text-tertiary)">
-									No screenshots found
+									{localize("No screenshots found")}
 								</p>
 							</div>
 						}
@@ -202,12 +203,12 @@ export default function Screenshots() {
 											setSearch("");
 										}
 									}}
-									placeholder="Search"
+									placeholder={localize("Search")}
 									autoCapitalize="off"
 									autocorrect="off"
 									autocomplete="off"
 									spellcheck={false}
-									aria-label="Search screenshots"
+									aria-label={localize("Search screenshots")}
 								/>
 							</div>
 						</div>
@@ -256,7 +257,7 @@ export default function Screenshots() {
 											)
 										}
 									>
-										Load more
+										{localize("Load more")}
 									</Button>
 								</div>
 							</Show>
@@ -293,7 +294,7 @@ function ScreenshotItem(props: {
 				>
 					<img
 						class="object-cover rounded-sm size-12"
-						alt="Screenshot thumbnail"
+						alt={localize("Screenshot thumbnail")}
 						src={convertFileSrc(props.screenshot.path)}
 						onError={() => setImageExists(false)}
 					/>
@@ -304,21 +305,21 @@ function ScreenshotItem(props: {
 			</div>
 			<div class="flex gap-2 items-center">
 				<TooltipIconButton
-					tooltipText="Open folder"
+					tooltipText={localize("Open folder")}
 					onClick={props.onOpenFolder}
 				>
 					<IconLucideFolder class="size-4" />
 				</TooltipIconButton>
 
 				<TooltipIconButton
-					tooltipText="Open in editor"
+					tooltipText={localize("Open in editor")}
 					onClick={props.onOpenEditor}
 				>
 					<IconLucideEdit class="size-4" />
 				</TooltipIconButton>
 
 				<TooltipIconButton
-					tooltipText="Copy image"
+					tooltipText={localize("Copy image")}
 					onClick={props.onCopyImageToClipboard}
 				>
 					<IconLucideCopy class="size-4" />
@@ -333,7 +334,7 @@ function ScreenshotItem(props: {
 				</TooltipIconButton>
 
 				<TooltipIconButton
-					tooltipText="Delete"
+					tooltipText={localize("Delete")}
 					onClick={async () => {
 						if (
 							!(await ask("Are you sure you want to delete this screenshot?"))

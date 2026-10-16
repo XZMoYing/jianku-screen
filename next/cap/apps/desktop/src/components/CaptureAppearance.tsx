@@ -10,22 +10,19 @@ import {
 } from "solid-js";
 import { unwrap } from "solid-js/store";
 import toast from "solid-toast";
-import {
-	ASPECT_RATIO_OPTIONS,
-	ASPECT_RATIOS,
-} from "~/routes/editor/projectConfig";
+import { FrameOptions } from "~/routes/editor/FrameButton";
 import { generalSettingsStore } from "~/store";
 import { createPresets } from "~/utils/createPresets";
+import { t as localize } from "~/utils/i18n";
 import {
-	type AspectRatio,
 	type BackgroundSource,
 	type CaptureStyle,
-	type CursorAnimationStyle,
-	type CursorType,
 	commands,
-	type FrameStyle,
 } from "~/utils/tauri";
+import { CameraSettings } from "./CameraSettings";
+import { CursorSettings } from "./CursorSettings";
 import { MotionGroup, MotionSwitch } from "./InterfaceMotion";
+import { LayoutSettings } from "./LayoutSettings";
 
 const gradients: {
 	name: string;
@@ -37,26 +34,6 @@ const gradients: {
 	{ name: "杏色", from: [228, 157, 139], to: [250, 227, 176] },
 	{ name: "清苔", from: [123, 158, 129], to: [222, 232, 196] },
 	{ name: "深空", from: [25, 31, 56], to: [102, 84, 154] },
-];
-const cursorPresets: {
-	id: CursorAnimationStyle;
-	name: string;
-	tension: number;
-	mass: number;
-	friction: number;
-}[] = [
-	{ id: "slow", name: "舒缓", tension: 200, mass: 2.25, friction: 40 },
-	{ id: "smooth", name: "平滑", tension: 80, mass: 2.5, friction: 28 },
-	{ id: "mellow", name: "自然", tension: 470, mass: 3, friction: 70 },
-	{ id: "fast", name: "灵敏", tension: 380, mass: 1, friction: 30 },
-];
-const frames: { id: FrameStyle; name: string }[] = [
-	{ id: "none", name: "无外框" },
-	{ id: "macOS", name: "桌面窗口" },
-	{ id: "browser", name: "浏览器" },
-	{ id: "macbook", name: "笔记本" },
-	{ id: "phone", name: "手机" },
-	{ id: "tablet", name: "平板" },
 ];
 const rgb = (v: readonly number[]) => `rgb(${v.join(",")})`;
 export function appearanceBackground(source: BackgroundSource): string {
@@ -176,11 +153,14 @@ export default function CaptureAppearance(props: {
 	const wallpaper = async () => {
 		props.onBusy(true);
 		try {
-			const path = await commands.getCurrentWallpaperPreview();
+			const wallpaper = await commands.getDesktopWallpaper(null);
 			if (!disposed)
 				update((s) => {
 					s.desktopWallpaper = true;
-					s.config.background.source = { type: "image", path };
+					s.config.background.source = {
+						type: "wallpaper",
+						path: wallpaper.path,
+					};
 				});
 		} catch (e) {
 			setError(String(e));
@@ -229,7 +209,7 @@ export default function CaptureAppearance(props: {
 	return (
 		<aside
 			class="jk-appearance"
-			aria-label="捕获前画面设置"
+			aria-label={localize("捕获前画面设置")}
 			data-testid="capture-appearance"
 		>
 			<Show
@@ -243,7 +223,10 @@ export default function CaptureAppearance(props: {
 				{(value) => (
 					<>
 						<fieldset class="jk-appearance-controls" disabled={props.blocked}>
-							<MotionGroup class="jk-appearance-tabs" label="画面设置分组">
+							<MotionGroup
+								class="jk-appearance-tabs"
+								label={localize("画面设置分组")}
+							>
 								<For
 									each={[
 										{ id: "background", name: "背景" },
@@ -315,7 +298,7 @@ export default function CaptureAppearance(props: {
 													class="jk-tonal-button"
 													onClick={() => void image()}
 												>
-													选择图片
+													{localize("选择图片")}
 												</button>
 												<button
 													type="button"
@@ -328,14 +311,14 @@ export default function CaptureAppearance(props: {
 														})
 													}
 												>
-													透明
+													{localize("透明")}
 												</button>
 											</div>
 											<label class="jk-control-row">
-												<span>纯色</span>
+												<span>{localize("纯色")}</span>
 												<input
 													type="color"
-													aria-label="背景颜色"
+													aria-label={localize("背景颜色")}
 													value={
 														value().config.background.source.type === "color"
 															? `#${(value().config.background.source as { value: number[] }).value.map((n) => n.toString(16).padStart(2, "0")).join("")}`
@@ -356,7 +339,7 @@ export default function CaptureAppearance(props: {
 												/>
 											</label>
 											<Range
-												name="背景模糊"
+												name={localize("背景模糊")}
 												value={value().config.background.blur}
 												max={100}
 												change={(n) =>
@@ -366,9 +349,9 @@ export default function CaptureAppearance(props: {
 												}
 											/>
 											<label class="jk-control-row">
-												<span>动态背景</span>
+												<span>{localize("动态背景")}</span>
 												<select
-													aria-label="动态背景预设"
+													aria-label={localize("动态背景预设")}
 													value=""
 													onChange={(e) => {
 														const template =
@@ -383,7 +366,7 @@ export default function CaptureAppearance(props: {
 													}}
 												>
 													<option value="" disabled>
-														选择动态背景
+														{localize("选择动态背景")}
 													</option>
 													<For each={catalog()?.templates}>
 														{(template, i) => (
@@ -419,355 +402,58 @@ export default function CaptureAppearance(props: {
 											</Show>
 											<Show when={value().desktopWallpaper}>
 												<p class="jk-appearance-footnote">
-													开始捕获时重新读取当前壁纸，并将图像保存进工程。
+													{localize(
+														"开始捕获时重新读取当前壁纸；本机视频壁纸会按时间线循环播放。",
+													)}
 												</p>
 											</Show>
 										</Show>
 										<Show when={panel() === "layout"}>
-											<label class="jk-control-row">
-												<span>画面比例</span>
-												<select
-													aria-label="捕获画面比例"
-													value={value().config.aspectRatio ?? "auto"}
-													onChange={(e) =>
+											<LayoutSettings
+												background={value().config.background}
+												aspectRatio={value().config.aspectRatio}
+												onAspectRatio={(ratio) =>
+													update((s) => {
+														s.config.aspectRatio = ratio;
+													})
+												}
+												onChange={(patch) =>
+													update((s) =>
+														Object.assign(s.config.background, patch),
+													)
+												}
+												motionBlur={
+													value().config.screenMotionBlur ??
+													value().config.cursor.motionBlur ??
+													1
+												}
+												onMotionBlur={(amount) =>
+													update((s) => {
+														s.config.screenMotionBlur = amount;
+													})
+												}
+											/>
+											<details class="jk-appearance-details">
+												<summary>{localize("画面外框")}</summary>
+												<FrameOptions
+													frame={value().config.background.frame}
+													onChange={(frame) =>
 														update((s) => {
-															s.config.aspectRatio =
-																e.currentTarget.value === "auto"
-																	? null
-																	: (e.currentTarget.value as AspectRatio);
-														})
-													}
-												>
-													<For each={ASPECT_RATIO_OPTIONS}>
-														{(r) => (
-															<option
-																value={r}
-																selected={
-																	(value().config.aspectRatio ?? "auto") === r
-																}
-															>
-																{r === "auto"
-																	? "适合屏幕"
-																	: `${ASPECT_RATIOS[r].ratio.join(":")} · ${ASPECT_RATIOS[r].name}`}
-															</option>
-														)}
-													</For>
-												</select>
-											</label>
-											<Range
-												name="留白"
-												value={value().config.background.padding}
-												max={40}
-												unit="%"
-												change={(n) =>
-													update((s) => {
-														s.config.background.padding = n;
-													})
-												}
-											/>
-											<Range
-												name="圆角"
-												value={value().config.background.rounding}
-												max={100}
-												change={(n) =>
-													update((s) => {
-														s.config.background.rounding = n;
-													})
-												}
-											/>
-											<Range
-												name="内边距"
-												value={value().config.background.inset}
-												max={100}
-												change={(n) =>
-													update((s) => {
-														s.config.background.inset = n;
-													})
-												}
-											/>
-											<Range
-												name="阴影"
-												value={value().config.background.shadow}
-												max={100}
-												change={(n) =>
-													update((s) => {
-														s.config.background.shadow = n;
-													})
-												}
-											/>
-											<details>
-												<summary class="jk-appearance-footnote">
-													阴影细节
-												</summary>
-												<For
-													each={
-														[
-															{ key: "size", name: "扩散" },
-															{ key: "opacity", name: "不透明度" },
-															{ key: "blur", name: "柔化" },
-														] as const
-													}
-												>
-													{(field) => (
-														<Range
-															name={field.name}
-															value={
-																value().config.background.advancedShadow?.[
-																	field.key
-																] ?? 50
-															}
-															max={100}
-															change={(n) =>
-																update((s) => {
-																	s.config.background.advancedShadow ??= {
-																		size: 50,
-																		opacity: 50,
-																		blur: 50,
-																	};
-																	s.config.background.advancedShadow[
-																		field.key
-																	] = n;
-																})
-															}
-														/>
-													)}
-												</For>
-											</details>
-											<label class="jk-control-row">
-												<span>外框</span>
-												<select
-													aria-label="录制外框"
-													value={
-														value().config.background.frame?.style ?? "none"
-													}
-													onChange={(e) =>
-														update((s) => {
-															s.config.background.frame = {
-																style: e.currentTarget.value as FrameStyle,
-																theme: "light",
-																title: "",
-																url: "",
-															};
-														})
-													}
-												>
-													<For each={frames}>
-														{(f) => (
-															<option
-																value={f.id}
-																selected={
-																	(value().config.background.frame?.style ??
-																		"none") === f.id
-																}
-															>
-																{f.name}
-															</option>
-														)}
-													</For>
-												</select>
-											</label>
-											<Show
-												when={
-													value().config.background.frame &&
-													value().config.background.frame?.style !== "none"
-												}
-											>
-												<Check
-													name="浅色外框"
-													value={
-														value().config.background.frame?.theme === "light"
-													}
-													change={(b) =>
-														update((s) => {
-															if (s.config.background.frame)
-																s.config.background.frame.theme = b
-																	? "light"
-																	: "dark";
+															s.config.background.frame = frame;
 														})
 													}
 												/>
-											</Show>
-											<Check
-												name="细边框"
-												value={
-													value().config.background.border?.enabled ?? false
-												}
-												change={(b) =>
-													update((s) => {
-														s.config.background.border = {
-															enabled: b,
-															width: s.config.background.border?.width ?? 1,
-															color: s.config.background.border?.color ?? [
-																255, 255, 255,
-															],
-															opacity:
-																s.config.background.border?.opacity ?? 50,
-														};
-													})
-												}
-											/>
+											</details>
 										</Show>
 										<Show when={panel() === "cursor"}>
-											<label class="jk-control-row">
-												<span>光标样式</span>
-												<select
-													aria-label="光标样式"
-													value={value().config.cursor.type}
-													onChange={(e) =>
-														update((s) => {
-															s.config.cursor.type = e.currentTarget
-																.value as CursorType;
-														})
-													}
-												>
-													<For
-														each={[
-															{ id: "auto", name: "自动" },
-															{ id: "macos", name: "经典箭头" },
-															{ id: "tahoe", name: "圆润箭头" },
-															{ id: "windows", name: "细边箭头" },
-															{ id: "pointer", name: "标准指针" },
-															{ id: "circle", name: "圆点" },
-														]}
-													>
-														{(item) => (
-															<option
-																value={item.id}
-																selected={
-																	value().config.cursor.type === item.id
-																}
-															>
-																{item.name}
-															</option>
-														)}
-													</For>
-												</select>
-											</label>
-											<Check
-												name="显示光标"
-												value={!value().config.cursor.hide}
-												change={(b) =>
-													update((s) => {
-														s.config.cursor.hide = !b;
-													})
+											<CursorSettings
+												cursor={value().config.cursor}
+												onChange={(patch) =>
+													update((s) => Object.assign(s.config.cursor, patch))
 												}
 											/>
 											<Range
-												name="光标大小"
-												min={50}
-												max={300}
-												value={value().config.cursor.size}
-												unit="%"
-												change={(n) =>
-													update((s) => {
-														s.config.cursor.size = n;
-													})
-												}
-											/>
-											<label class="jk-control-row">
-												<span>移动风格</span>
-												<select
-													aria-label="光标移动风格"
-													value={value().config.cursor.animationStyle}
-													onChange={(e) => {
-														const preset = cursorPresets.find(
-															(p) => p.id === e.currentTarget.value,
-														);
-														if (preset)
-															update((s) => {
-																Object.assign(s.config.cursor, {
-																	animationStyle: preset.id,
-																	tension: preset.tension,
-																	mass: preset.mass,
-																	friction: preset.friction,
-																});
-															});
-													}}
-												>
-													<For each={cursorPresets}>
-														{(p) => (
-															<option
-																value={p.id}
-																selected={
-																	value().config.cursor.animationStyle === p.id
-																}
-															>
-																{p.name}
-															</option>
-														)}
-													</For>
-													<option
-														value="custom"
-														selected={
-															value().config.cursor.animationStyle === "custom"
-														}
-													>
-														自定义
-													</option>
-												</select>
-											</label>
-											<Range
-												name="移动倾斜"
-												value={
-													(value().config.cursor.rotationAmount ?? 0.15) * 100
-												}
-												max={100}
-												change={(n) =>
-													update((s) => {
-														s.config.cursor.rotationAmount = n / 100;
-													})
-												}
-											/>
-											<Range
-												name="动态模糊"
-												value={value().config.cursor.motionBlur}
-												max={1}
-												step={0.01}
-												change={(n) =>
-													update((s) => {
-														s.config.cursor.motionBlur = n;
-													})
-												}
-											/>
-											<Check
-												name="静止时隐藏"
-												value={value().config.cursor.hideWhenIdle}
-												change={(b) =>
-													update((s) => {
-														s.config.cursor.hideWhenIdle = b;
-													})
-												}
-											/>
-											<Range
-												name="隐藏等待"
-												value={value().config.cursor.hideWhenIdleDelay}
-												min={0.5}
-												max={5}
-												step={0.1}
-												unit="s"
-												change={(n) =>
-													update((s) => {
-														s.config.cursor.hideWhenIdleDelay = n;
-													})
-												}
-											/>
-											<Check
-												name="点击波纹"
-												value={value().config.cursor.ripple?.enabled ?? false}
-												change={(b) =>
-													update((s) => {
-														s.config.cursor.ripple = {
-															enabled: b,
-															color: [180, 158, 255],
-															strength: 0.6,
-															size: 1,
-															duration: 0.5,
-														};
-													})
-												}
-											/>
-											<Range
-												name="画面动态模糊"
+												name={localize("画面动态模糊")}
 												value={value().config.screenMotionBlur ?? 0}
 												max={1}
 												step={0.01}
@@ -789,7 +475,7 @@ export default function CaptureAppearance(props: {
 												}}
 											/>
 											<Range
-												name="默认放大倍率"
+												name={localize("默认放大倍率")}
 												value={general.data?.defaultZoomAmount ?? 1.5}
 												min={1.1}
 												max={3}
@@ -801,44 +487,10 @@ export default function CaptureAppearance(props: {
 														.catch((e: unknown) => toast.error(String(e)));
 												}}
 											/>
-											<Check
-												name="显示摄像头"
-												value={!value().config.camera.hide}
-												change={(b) =>
-													update((s) => {
-														s.config.camera.hide = !b;
-													})
-												}
-											/>
-											<Check
-												name="摄像头镜像"
-												value={value().config.camera.mirror}
-												change={(b) =>
-													update((s) => {
-														s.config.camera.mirror = b;
-													})
-												}
-											/>
-											<Range
-												name="摄像头大小"
-												value={value().config.camera.size}
-												min={10}
-												max={100}
-												unit="%"
-												change={(n) =>
-													update((s) => {
-														s.config.camera.size = n;
-													})
-												}
-											/>
-											<Range
-												name="摄像头圆角"
-												value={value().config.camera.rounding}
-												max={100}
-												change={(n) =>
-													update((s) => {
-														s.config.camera.rounding = n;
-													})
+											<CameraSettings
+												camera={value().config.camera}
+												onChange={(patch) =>
+													update((s) => Object.assign(s.config.camera, patch))
 												}
 											/>
 											<Check
@@ -851,7 +503,7 @@ export default function CaptureAppearance(props: {
 												}
 											/>
 											<Check
-												name="声音增强"
+												name={localize("声音增强")}
 												value={value().config.audio.improve}
 												change={(b) =>
 													update((s) => {
@@ -860,14 +512,16 @@ export default function CaptureAppearance(props: {
 												}
 											/>
 											<p class="jk-appearance-footnote">
-												摄像头与声音选项作用于已选中的输入。设备录制和演示不叠加电脑摄像头。
+												{localize(
+													"摄像头与声音选项作用于已选中的输入。设备录制和演示不叠加电脑摄像头。",
+												)}
 											</p>
 										</Show>
 										<Show when={presets.query.data?.presets.length}>
 											<label class="jk-control-row">
-												<span>已有预设</span>
+												<span>{localize("已有预设")}</span>
 												<select
-													aria-label="应用已有画面预设"
+													aria-label={localize("应用已有画面预设")}
 													value=""
 													onChange={(e) => {
 														const p =
@@ -882,7 +536,7 @@ export default function CaptureAppearance(props: {
 													}}
 												>
 													<option value="" disabled>
-														选择预设
+														{localize("选择预设")}
 													</option>
 													<For each={presets.query.data?.presets}>
 														{(p, i) => <option value={i()}>{p.name}</option>}
@@ -902,7 +556,7 @@ export default function CaptureAppearance(props: {
 										? "正在保存…"
 										: "新捕获使用此设置"}
 							</span>
-							<span>录后仍可修改</span>
+							<span>{localize("录后仍可修改")}</span>
 						</div>
 						<Show when={error()}>
 							<button
@@ -918,7 +572,7 @@ export default function CaptureAppearance(props: {
 									void save();
 								}}
 							>
-								重试保存
+								{localize("重试保存")}
 							</button>
 						</Show>
 					</>

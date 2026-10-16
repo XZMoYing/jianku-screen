@@ -3,6 +3,7 @@ import { Tabs as KTabs } from "@kobalte/core/tabs";
 import { cx } from "cva";
 import { type Component, For, type JSX, Show } from "solid-js";
 import { Dynamic } from "solid-js/web";
+import { t as localize } from "~/utils/i18n";
 import type { FrameConfiguration, FrameStyle } from "~/utils/tauri";
 import IconCapChevronDown from "~icons/cap/chevron-down";
 import IconCapCircleCheck from "~icons/cap/circle-check";
@@ -86,124 +87,122 @@ function SettingRow(props: { name: string; children: JSX.Element }) {
 	);
 }
 
+export function FrameOptions(props: {
+	frame: FrameConfiguration | null;
+	onChange: (frame: FrameConfiguration) => void;
+}) {
+	const style = () => props.frame?.style ?? "none";
+	const updateFrame = (patch: Partial<FrameConfiguration>) =>
+		props.onChange({ ...(props.frame ?? DEFAULT_FRAME_CONFIG), ...patch });
+	return (
+		<div class="jk-frame-options">
+			<div class="flex flex-col gap-0.5 p-1.5">
+				<For each={FRAME_STYLES}>
+					{(option) => {
+						const selected = () => style() === option.value;
+						return (
+							<button
+								type="button"
+								onClick={() => updateFrame({ style: option.value })}
+								class="flex items-center gap-3 rounded-xl p-2 text-left outline-hidden transition-colors duration-150 hover:bg-ed-ctl-hover focus-visible:bg-ed-ctl-hover"
+							>
+								<span
+									class={cx(
+										"flex justify-center items-center rounded-[0.625rem] size-8 shrink-0 transition-colors duration-150",
+										selected()
+											? "bg-ed-accent text-white"
+											: "bg-ed-ctl text-ed-text-2",
+									)}
+								>
+									<Dynamic component={option.icon} class="size-4" />
+								</span>
+								<span class="flex flex-col flex-1 min-w-0">
+									<span class="text-[13px] font-medium leading-tight text-ed-text-1">
+										{option.label}
+									</span>
+									<span class="text-[0.6875rem] leading-snug text-ed-text-3">
+										{option.description}
+									</span>
+								</span>
+								<Show when={selected()}>
+									<IconCapCircleCheck class="size-4 shrink-0 text-ed-accent" />
+								</Show>
+							</button>
+						);
+					}}
+				</For>
+			</div>
+			<Show when={style() !== "none" && props.frame}>
+				{(frame) => (
+					<div class="flex flex-col gap-3 p-3 border-t border-ed-line">
+						<SettingRow name={localize("外观")}>
+							<KTabs
+								class="w-40"
+								value={frame().theme}
+								onChange={(v) =>
+									updateFrame({ theme: v as FrameConfiguration["theme"] })
+								}
+							>
+								<KTabs.List class="flex relative flex-row gap-0.5 items-center p-0.5 h-8 rounded-lg bg-ed-ctl">
+									<KTabs.Trigger value="light" class={THEME_TAB_TRIGGER_CLASS}>
+										{localize("浅色")}
+									</KTabs.Trigger>
+									<KTabs.Trigger value="dark" class={THEME_TAB_TRIGGER_CLASS}>
+										{localize("深色")}
+									</KTabs.Trigger>
+									<KTabs.Indicator class="overflow-hidden absolute inset-0 rounded-lg transition-transform flex p-0.5 peer-focus-visible:outline-solid outline-2 outline-ed-accent outline-offset-2">
+										<div class="flex-1 rounded-md bg-ed-card shadow-[0_1px_2px_rgba(0,0,0,0.12),0_0_0_0.5px_rgba(0,0,0,0.06)] dark:bg-white/12 dark:shadow-none" />
+									</KTabs.Indicator>
+								</KTabs.List>
+							</KTabs>
+						</SettingRow>
+						<Show when={frame().style === "browser"}>
+							<SettingRow name="URL">
+								<div class="w-40">
+									<Input
+										value={frame().url}
+										placeholder="example.com"
+										onInput={(e) => updateFrame({ url: e.currentTarget.value })}
+									/>
+								</div>
+							</SettingRow>
+						</Show>
+						<Show when={frame().style === "macOS"}>
+							<SettingRow name="窗口标题">
+								<div class="w-40">
+									<Input
+										value={frame().title}
+										placeholder={localize("输入窗口标题")}
+										onInput={(e) =>
+											updateFrame({ title: e.currentTarget.value })
+										}
+									/>
+								</div>
+							</SettingRow>
+						</Show>
+					</div>
+				)}
+			</Show>
+		</div>
+	);
+}
+
 function FrameSettings() {
 	const { project, setProject, selectedStyle } = useEditorContext();
-
-	const style = () => project.background.frame?.style ?? "none";
-	const updateFrame = (patch: Partial<FrameConfiguration>) =>
-		setProject("background", "frame", {
-			...(project.background.frame ?? DEFAULT_FRAME_CONFIG),
-			...patch,
-		});
-
 	return (
 		<>
-			<div class="flex flex-col gap-0.5 px-4 pt-3.5 pb-3 border-b shrink-0 border-ed-line">
-				<span class="text-[13px] font-semibold text-ed-text-1">画面外框</span>
-				<span class="text-[0.6875rem] leading-snug text-ed-text-3">
-					为画面添加窗口或设备外框，跟随镜头一起运动。
-				</span>
-			</div>
 			<Show when={selectedStyle()}>
-				<div class="px-4 pb-3">
+				<div class="px-4 py-3">
 					<StyleGroupToggle group="background" />
 				</div>
 			</Show>
 			<Show
 				when={!selectedStyle() || selectedStyle()?.overrides.background != null}
 			>
-				<div class="flex flex-col gap-0.5 p-1.5">
-					<For each={FRAME_STYLES}>
-						{(option) => {
-							const selected = () => style() === option.value;
-							return (
-								<button
-									type="button"
-									onClick={() => updateFrame({ style: option.value })}
-									class="flex items-center gap-3 rounded-xl p-2 text-left outline-hidden transition-colors duration-150 hover:bg-ed-ctl-hover focus-visible:bg-ed-ctl-hover"
-								>
-									<span
-										class={cx(
-											"flex justify-center items-center rounded-[0.625rem] size-8 shrink-0 transition-colors duration-150",
-											selected()
-												? "bg-ed-accent text-white"
-												: "bg-ed-ctl text-ed-text-2",
-										)}
-									>
-										<Dynamic component={option.icon} class="size-4" />
-									</span>
-									<span class="flex flex-col flex-1 min-w-0">
-										<span class="text-[13px] font-medium leading-tight text-ed-text-1">
-											{option.label}
-										</span>
-										<span class="text-[0.6875rem] leading-snug text-ed-text-3">
-											{option.description}
-										</span>
-									</span>
-									<Show when={selected()}>
-										<IconCapCircleCheck class="size-4 shrink-0 text-ed-accent" />
-									</Show>
-								</button>
-							);
-						}}
-					</For>
-				</div>
-				<Show when={style() !== "none" && project.background.frame}>
-					{(frame) => (
-						<div class="flex flex-col gap-3 p-3 border-t border-ed-line">
-							<SettingRow name="外观">
-								<KTabs
-									class="w-40"
-									value={frame().theme}
-									onChange={(v) =>
-										updateFrame({ theme: v as FrameConfiguration["theme"] })
-									}
-								>
-									<KTabs.List class="flex relative flex-row gap-0.5 items-center p-0.5 h-8 rounded-lg bg-ed-ctl">
-										<KTabs.Trigger
-											value="light"
-											class={THEME_TAB_TRIGGER_CLASS}
-										>
-											浅色
-										</KTabs.Trigger>
-										<KTabs.Trigger value="dark" class={THEME_TAB_TRIGGER_CLASS}>
-											深色
-										</KTabs.Trigger>
-										<KTabs.Indicator class="overflow-hidden absolute inset-0 rounded-lg transition-transform flex p-0.5 peer-focus-visible:outline-solid outline-2 outline-ed-accent outline-offset-2">
-											<div class="flex-1 rounded-md bg-ed-card shadow-[0_1px_2px_rgba(0,0,0,0.12),0_0_0_0.5px_rgba(0,0,0,0.06)] dark:bg-white/12 dark:shadow-none" />
-										</KTabs.Indicator>
-									</KTabs.List>
-								</KTabs>
-							</SettingRow>
-							<Show when={frame().style === "browser"}>
-								<SettingRow name="URL">
-									<div class="w-40">
-										<Input
-											value={frame().url}
-											placeholder="example.com"
-											onInput={(e) =>
-												updateFrame({ url: e.currentTarget.value })
-											}
-										/>
-									</div>
-								</SettingRow>
-							</Show>
-							<Show when={frame().style === "macOS"}>
-								<SettingRow name="窗口标题">
-									<div class="w-40">
-										<Input
-											value={frame().title}
-											placeholder="输入窗口标题"
-											onInput={(e) =>
-												updateFrame({ title: e.currentTarget.value })
-											}
-										/>
-									</div>
-								</SettingRow>
-							</Show>
-						</div>
-					)}
-				</Show>
+				<FrameOptions
+					frame={project.background.frame}
+					onChange={(frame) => setProject("background", "frame", frame)}
+				/>
 			</Show>
 		</>
 	);
@@ -242,7 +241,7 @@ function ScopedFrameButton() {
 			<EditorButton<typeof KPopover.Trigger>
 				as={KPopover.Trigger}
 				variant="text"
-				tooltipText="画面外框"
+				tooltipText={localize("画面外框")}
 				leftIcon={
 					<Dynamic
 						component={hasFrame() ? activeStyle().icon : IconLucideAppWindowMac}

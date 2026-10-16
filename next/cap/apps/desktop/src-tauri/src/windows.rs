@@ -1304,16 +1304,16 @@ impl CapWindowId {
     pub fn title(&self) -> String {
         match self {
             Self::Settings => "简库镜传 · 设置".to_string(),
-            Self::WindowCaptureOccluder { .. } => "Cap Window Capture Occluder".to_string(),
-            Self::CaptureArea => "Cap Capture Area".to_string(),
-            Self::RecordingControls => "Cap Recording Controls".to_string(),
+            Self::WindowCaptureOccluder { .. } => "简库镜传 · 窗口遮挡层".to_string(),
+            Self::CaptureArea => "简库镜传 · 区域选择".to_string(),
+            Self::RecordingControls => "简库镜传 · 录制控制".to_string(),
             Self::Editor { .. } => "简库镜传 · 视频编辑".to_string(),
             Self::ScreenshotEditor { .. } => "简库镜传 · 截图编辑".to_string(),
             Self::ModeSelect => "简库镜传 · 捕获方式".to_string(),
             Self::Onboarding => "简库镜传 Next · 权限".to_string(),
-            Self::Camera => "Cap Camera".to_string(),
-            Self::RecordingsOverlay => "Cap Recordings Overlay".to_string(),
-            Self::TargetSelectOverlay { .. } => "Cap Target Select".to_string(),
+            Self::Camera => "简库镜传 · 摄像头".to_string(),
+            Self::RecordingsOverlay => "简库镜传 · 录制悬浮层".to_string(),
+            Self::TargetSelectOverlay { .. } => "简库镜传 · 来源选择".to_string(),
             Self::Teleprompter => "简库镜传 · 提词器".to_string(),
             _ => "简库镜传 Next".to_string(),
         }
@@ -3440,7 +3440,7 @@ impl ShowCapWindow {
             .unwrap_or(None);
 
         let mut builder = WebviewWindow::builder(app, label, WebviewUrl::App(url.into()))
-            .title(id.title())
+            .title(crate::interface_language::text(app, &id.title()))
             .visible(false)
             .accept_first_mouse(true)
             .shadow(true)

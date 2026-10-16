@@ -2,6 +2,7 @@ import { Button } from "@cap/ui-solid";
 import { useMutation } from "@tanstack/solid-query";
 import { createResource, createSignal, Show, Suspense } from "solid-js";
 import BrandLogo from "~/components/BrandLogo";
+import { t as localize } from "~/utils/i18n";
 import { createSelectedOrganization } from "~/utils/organization-branding";
 import { commands } from "~/utils/tauri";
 import { apiClient, protectedHeaders } from "~/utils/web-api";
@@ -279,8 +280,10 @@ export default function GoogleDriveConfigPage() {
 			<SettingsPageContent>
 				<IntegrationConfigHeader title="Google Drive" />
 				<Section
-					title="Connection"
-					description="Google Drive stores new uploads in a private Cap folder in your Drive. Existing Cap-hosted and S3 videos keep using their current storage."
+					title={localize("Connection")}
+					description={localize(
+						"Google Drive stores new uploads in a private Cap folder in your Drive. Existing Cap-hosted and S3 videos keep using their current storage.",
+					)}
 				>
 					<SectionCard padded class="custom-scroll">
 						<Suspense
@@ -294,7 +297,8 @@ export default function GoogleDriveConfigPage() {
 								<Show when={managedByOrganization()}>
 									{(organization) => (
 										<p class="text-xs leading-relaxed text-gray-10">
-											Managed by your organization: {organization().name}
+											{localize("Managed by your organization:")}{" "}
+											{organization().name}
 										</p>
 									)}
 								</Show>
@@ -344,7 +348,9 @@ export default function GoogleDriveConfigPage() {
 											<div class="pt-3 space-y-2 border-t border-gray-3">
 												<div class="flex justify-between items-start gap-4">
 													<div class="flex flex-col gap-0.5 min-w-0">
-														<p class="text-[13px] text-gray-12">Storage</p>
+														<p class="text-[13px] text-gray-12">
+															{localize("Storage")}
+														</p>
 														<Show when={quotaUsageLabel()}>
 															{(label) => (
 																<p class="text-xs leading-snug text-gray-10">
@@ -375,7 +381,9 @@ export default function GoogleDriveConfigPage() {
 													<Show when={formatBytes(storageQuota()?.remaining)}>
 														{(remaining) => (
 															<>
-																<p class="text-gray-10">Remaining</p>
+																<p class="text-gray-10">
+																	{localize("Remaining")}
+																</p>
 																<p class="text-right text-gray-11">
 																	{remaining()}
 																</p>
@@ -387,7 +395,9 @@ export default function GoogleDriveConfigPage() {
 													>
 														{(usageInDrive) => (
 															<>
-																<p class="text-gray-10">Drive files</p>
+																<p class="text-gray-10">
+																	{localize("Drive files")}
+																</p>
 																<p class="text-right text-gray-11">
 																	{usageInDrive()}
 																</p>
@@ -401,7 +411,7 @@ export default function GoogleDriveConfigPage() {
 													>
 														{(usageInDriveTrash) => (
 															<>
-																<p class="text-gray-10">Trash</p>
+																<p class="text-gray-10">{localize("Trash")}</p>
 																<p class="text-right text-gray-11">
 																	{usageInDriveTrash()}
 																</p>
@@ -425,7 +435,7 @@ export default function GoogleDriveConfigPage() {
 													disabled={busy() || !isActive()}
 													onClick={() => setActive.mutate("s3")}
 												>
-													Use S3
+													{localize("Use S3")}
 												</Button>
 											</Show>
 											<Button
@@ -440,7 +450,7 @@ export default function GoogleDriveConfigPage() {
 												disabled={busy()}
 												onClick={() => disconnect.mutate()}
 											>
-												Disconnect
+												{localize("Disconnect")}
 											</Button>
 										</div>
 									</Show>

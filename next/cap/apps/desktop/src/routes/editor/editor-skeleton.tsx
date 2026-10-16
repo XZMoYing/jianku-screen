@@ -4,6 +4,7 @@ import { type as ostype } from "@tauri-apps/plugin-os";
 import { createSignal, For, Show } from "solid-js";
 import CaptionControlsMacOS from "~/components/titlebar/controls/CaptionControlsMacOS";
 import CaptionControlsWindows11 from "~/components/titlebar/controls/CaptionControlsWindows11";
+import { t as localize } from "~/utils/i18n";
 import { DEFAULT_TIMELINE_HEIGHT, editorVerticalLayout } from "./editor-layout";
 import { usePreparingEditorModel } from "./preparing-editor-context";
 import {
@@ -42,7 +43,7 @@ function PreparingHeader(props: { model: PreparingEditorModel }) {
 						type="button"
 						disabled
 						class={DISABLED_CONTROL}
-						aria-label="Undo"
+						aria-label={localize("Undo")}
 					>
 						↶
 					</button>
@@ -50,7 +51,7 @@ function PreparingHeader(props: { model: PreparingEditorModel }) {
 						type="button"
 						disabled
 						class={DISABLED_CONTROL}
-						aria-label="Redo"
+						aria-label={localize("Redo")}
 					>
 						↷
 					</button>
@@ -59,18 +60,18 @@ function PreparingHeader(props: { model: PreparingEditorModel }) {
 			</div>
 			<div class="flex gap-1 items-center justify-end max-[900px]:pr-1">
 				<button type="button" disabled class={DISABLED_CONTROL}>
-					Presets
+					{localize("Presets")}
 				</button>
 				<button type="button" disabled class={DISABLED_CONTROL}>
-					Clips
+					{localize("Clips")}
 				</button>
 				<button
 					type="button"
 					disabled
 					class="ml-1.5 h-[30px] px-3.5 rounded-lg bg-ed-accent/40 text-white/70 text-[13px] font-medium"
-					title="Available when your recording is ready to edit"
+					title={localize("Available when your recording is ready to edit")}
 				>
-					Export
+					{localize("Export")}
 				</button>
 			</div>
 			{ostype() === "windows" && (
@@ -86,13 +87,13 @@ function PreparingPlayer(props: { model: PreparingEditorModel }) {
 			<div class="flex flex-row items-center px-3 h-11 shrink-0">
 				<div class="flex flex-row flex-1 gap-0.5 items-center">
 					<button type="button" disabled class={DISABLED_CONTROL}>
-						Aspect ratio
+						{localize("Aspect ratio")}
 					</button>
 					<button type="button" disabled class={DISABLED_CONTROL}>
-						Captions
+						{localize("Captions")}
 					</button>
 				</div>
-				<span class="text-[11px] text-ed-text-3">Preview</span>
+				<span class="text-[11px] text-ed-text-3">{localize("Preview")}</span>
 			</div>
 			<div class="relative flex flex-1 min-h-0 justify-center items-center p-4">
 				<PreparingFrame />
@@ -107,7 +108,7 @@ function PreparingPlayer(props: { model: PreparingEditorModel }) {
 				<div class="flex gap-3.5 items-center">
 					<button
 						type="button"
-						aria-label="Go to beginning"
+						aria-label={localize("Go to beginning")}
 						disabled={!props.model.canPlay()}
 						class={DISABLED_CONTROL}
 						onClick={() => void props.model.seek(0)}
@@ -132,7 +133,7 @@ function PreparingPlayer(props: { model: PreparingEditorModel }) {
 					</button>
 					<button
 						type="button"
-						aria-label="Go to playable end"
+						aria-label={localize("Go to playable end")}
 						disabled={!props.model.canPlay()}
 						class={DISABLED_CONTROL}
 						onClick={() =>
@@ -168,9 +169,11 @@ function PreparingSidebar() {
 			</div>
 			<div class="flex flex-col gap-5 px-4 py-4">
 				<div>
-					<h2 class="text-[12px] font-medium text-ed-text-2">Background</h2>
+					<h2 class="text-[12px] font-medium text-ed-text-2">
+						{localize("Background")}
+					</h2>
 					<p class="mt-2 text-[12px] text-ed-text-3">
-						Choose a background for your recording.
+						{localize("Choose a background for your recording.")}
 					</p>
 				</div>
 				<div class="h-px bg-ed-line" />
@@ -203,7 +206,7 @@ export function EditorSkeleton() {
 		<div
 			class="flex flex-col flex-1 min-h-0"
 			aria-busy="true"
-			aria-label="Recording editor"
+			aria-label={localize("Recording editor")}
 			data-preparing-editor
 		>
 			<PreparingHeader model={model} />

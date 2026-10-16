@@ -10,6 +10,7 @@ import {
 	selectedSeed,
 } from "~/utils/color-scheme";
 import { refreshWallpaperColors } from "~/utils/dynamic-theme";
+import { t as localize } from "~/utils/i18n";
 
 export default function ColorSchemeOptions() {
 	const query = colorSchemeStore.createQuery();
@@ -50,7 +51,7 @@ export default function ColorSchemeOptions() {
 	};
 	return (
 		<fieldset class="jk-color-settings" disabled={busy()}>
-			<div class="jk-color-sources" aria-label="配色来源">
+			<div class="jk-color-sources" aria-label={localize("配色来源")}>
 				<For
 					each={
 						[
@@ -80,7 +81,11 @@ export default function ColorSchemeOptions() {
 			<Show
 				when={settings().source === "wallpaper"}
 				fallback={
-					<div class="jk-color-grid" role="radiogroup" aria-label="基本配色">
+					<div
+						class="jk-color-grid"
+						role="radiogroup"
+						aria-label={localize("基本配色")}
+					>
 						<For each={basicColors}>
 							{(color) => (
 								<button
@@ -100,7 +105,11 @@ export default function ColorSchemeOptions() {
 					</div>
 				}
 			>
-				<div class="jk-color-grid" role="radiogroup" aria-label="壁纸配色">
+				<div
+					class="jk-color-grid"
+					role="radiogroup"
+					aria-label={localize("壁纸配色")}
+				>
 					<For each={settings().wallpaperSeeds}>
 						{(seed, index) => (
 							<button
@@ -113,7 +122,9 @@ export default function ColorSchemeOptions() {
 									class="jk-color-orb"
 									style={{ background: swatches(seed) }}
 								/>
-								<span>配色 {index() + 1}</span>
+								<span>
+									{localize("配色")} {index() + 1}
+								</span>
 							</button>
 						)}
 					</For>
@@ -133,7 +144,7 @@ export default function ColorSchemeOptions() {
 					</button>
 				</div>
 			</Show>
-			<div class="jk-color-variants" aria-label="配色风格">
+			<div class="jk-color-variants" aria-label={localize("配色风格")}>
 				<For each={colorVariants}>
 					{(variant) => (
 						<button
@@ -148,21 +159,21 @@ export default function ColorSchemeOptions() {
 			</div>
 			<div class="jk-color-info">
 				<label>
-					对比度{" "}
+					{localize("对比度")}{" "}
 					<select
 						value={settings().contrast}
 						onChange={(event) =>
 							void save({ contrast: Number(event.currentTarget.value) })
 						}
 					>
-						<option value={0}>标准</option>
+						<option value={0}>{localize("标准")}</option>
 						<option value={0.5}>中</option>
 						<option value={1}>高</option>
 					</select>
 				</label>
 				<Show when={settings().source === "custom"}>
 					<label>
-						自选种子色{" "}
+						{localize("自选种子色")}{" "}
 						<input
 							type="color"
 							value={settings().seed}

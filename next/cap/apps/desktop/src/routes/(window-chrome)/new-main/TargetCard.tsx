@@ -19,6 +19,7 @@ import {
 	type ScreenshotExportStatus,
 	screenshotShareStatusText,
 } from "~/routes/screenshot-editor/screenshotExport";
+import { t as localize } from "~/utils/i18n";
 import { openRecordingFolder } from "~/utils/recording";
 import { createRecordingThumbnail } from "~/utils/recording-thumbnail";
 import {
@@ -416,7 +417,9 @@ export default function TargetCard(props: TargetCardProps) {
 						<div class="flex items-center gap-1 px-1.5 py-0.5 rounded-sm bg-red-9/20 text-red-11">
 							<IconPhWarningBold class="size-2.5" />
 							<span class="text-[10px] font-medium">
-								{recordingFailed() ? "Recording failed" : "Upload failed"}
+								{recordingFailed()
+									? localize("Recording failed")
+									: "Upload failed"}
 							</span>
 						</div>
 					</div>

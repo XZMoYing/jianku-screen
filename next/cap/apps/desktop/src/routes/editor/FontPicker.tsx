@@ -7,6 +7,7 @@ import {
 	GENERIC_FONT_OPTIONS,
 	listSystemFonts,
 } from "~/utils/fonts";
+import { t as localize } from "~/utils/i18n";
 import {
 	MenuItem,
 	MenuItemList,
@@ -46,7 +47,7 @@ export function FontPicker(props: {
 				if (option) props.onChange(option.value);
 			}}
 			defaultFilter="contains"
-			placeholder="Search fonts…"
+			placeholder={localize("Search fonts…")}
 			itemComponent={(itemProps) => (
 				<MenuItem<typeof KCombobox.Item>
 					as={KCombobox.Item}

@@ -1,107 +1,128 @@
-import { createMemo, For, Show } from "solid-js";
+import { createEffect, createSignal, onCleanup, onMount, Show } from "solid-js";
 import { ASPECT_RATIOS } from "~/routes/editor/projectConfig";
-import type { CaptureStyle } from "~/utils/tauri";
-import { appearanceBackground } from "./CaptureAppearance";
+import { t as localize } from "~/utils/i18n";
+import { type CaptureStyle, commands } from "~/utils/tauri";
 
 export default function CaptureStage(props: {
 	style: CaptureStyle | undefined;
+	cameraEnabled: boolean;
 }) {
-	const ratio = createMemo(() => {
-		const aspect = props.style?.config.aspectRatio;
-		return aspect ? ASPECT_RATIOS[aspect].ratio : [16, 10];
-	});
-	const background = () => props.style?.config.background;
-	const fill = () => {
-		const source = background()?.source;
-		return source ? appearanceBackground(source) : "var(--jk-container)";
+	let canvas!: HTMLCanvasElement;
+	let disposed = false;
+	let pending = false;
+	let rendering = false;
+	let timer: ReturnType<typeof setTimeout> | undefined;
+	let started = 0;
+	const [playing, setPlaying] = createSignal(false);
+	const [error, setError] = createSignal("");
+	const [ready, setReady] = createSignal(false);
+	const ratio = () => props.style?.config.aspectRatio;
+	const schedule = () => {
+		pending = true;
+		if (rendering || !props.style || disposed) return;
+		void render();
 	};
+	const render = async () => {
+		const style = props.style;
+		if (!style || disposed) return;
+		rendering = true;
+		pending = false;
+		try {
+			const time = playing() ? ((performance.now() - started) / 1000) % 6 : 0.7;
+			const config = structuredClone(style.config);
+			config.camera.hide = !props.cameraEnabled || config.camera.hide;
+			const result = await commands.renderCapturePreview(config, time);
+			if (disposed) return;
+			const buffer = Uint8Array.from(atob(result), (c) =>
+				c.charCodeAt(0),
+			).buffer;
+			const header = new DataView(buffer);
+			const width = header.getUint32(0, true);
+			const height = header.getUint32(4, true);
+			const stride = header.getUint32(8, true);
+			const rows = new Uint8Array(buffer, 12);
+			const pixels = new Uint8ClampedArray(width * height * 4);
+			for (let y = 0; y < height; y++)
+				pixels.set(
+					rows.subarray(y * stride, y * stride + width * 4),
+					y * width * 4,
+				);
+			canvas.width = width;
+			canvas.height = height;
+			canvas.style.setProperty("--jk-preview-ratio", String(width / height));
+			canvas
+				.getContext("2d")
+				?.putImageData(new ImageData(pixels, width, height), 0, 0);
+			setReady(true);
+			setError("");
+		} catch (error) {
+			if (!disposed) {
+				setError(String(error));
+				setPlaying(false);
+			}
+		} finally {
+			rendering = false;
+			if (!disposed && pending) schedule();
+			else if (!disposed && playing() && document.visibilityState === "visible")
+				timer = setTimeout(schedule, 1000 / 30);
+		}
+	};
+	createEffect(() => {
+		props.cameraEnabled;
+		if (props.style) schedule();
+	});
+	onMount(() => {
+		const visibility = () => {
+			if (document.visibilityState === "visible") schedule();
+		};
+		document.addEventListener("visibilitychange", visibility);
+		onCleanup(() =>
+			document.removeEventListener("visibilitychange", visibility),
+		);
+	});
+	onCleanup(() => {
+		disposed = true;
+		if (timer) clearTimeout(timer);
+	});
 	return (
-		<section class="jk-capture-stage" aria-label="捕获画面布局示意">
-			<div class="jk-stage-canvas">
-				<div
-					class="jk-stage-output"
-					style={{
-						"aspect-ratio": `${ratio()[0]} / ${ratio()[1]}`,
-						"--jk-output-ratio": String(ratio()[0] / ratio()[1]),
-					}}
-				>
-					<div
-						class="jk-preview-background"
-						style={{
-							background: fill(),
-							"background-size": "cover",
-							"background-position": "center",
-							filter: `blur(${(background()?.blur ?? 0) / 4}px)`,
-						}}
-					/>
-					<div
-						class="jk-stage-frame"
-						style={{
-							width: `${Math.min(100 - (background()?.padding ?? 10) * 2, ((100 - (background()?.padding ?? 10) * 2) * 1.6) / (ratio()[0] / ratio()[1]))}%`,
-							"border-radius": `${background()?.rounding ?? 8}px`,
-							padding: `${(background()?.inset ?? 0) / 8}px`,
-							"box-shadow": `0 ${(background()?.shadow ?? 0) / 4}px ${background()?.advancedShadow?.blur ?? background()?.shadow ?? 0}px rgb(0 0 0 / ${((background()?.shadow ?? 0) / 100) * 0.26})`,
-						}}
-					>
-						<div class="jk-stage-window" aria-hidden="true">
-							<div class="jk-stage-chrome">
-								<i />
-								<i />
-								<i />
-								<span />
-							</div>
-							<div class="jk-stage-document">
-								<div class="jk-stage-rail">
-									<b />
-									<i />
-									<i />
-									<i />
-									<i />
-								</div>
-								<div class="jk-stage-sheet">
-									<div class="jk-stage-heading">
-										<i />
-										<b />
-									</div>
-									<div class="jk-stage-chart">
-										<For each={[25, 43, 35, 62, 50, 76, 68, 88]}>
-											{(height) => <i style={{ height: `${height}%` }} />}
-										</For>
-									</div>
-									<div class="jk-stage-tiles">
-										<span />
-										<span />
-										<span />
-									</div>
-								</div>
-							</div>
-							<Show when={!props.style?.config.cursor.hide}>
-								<svg
-									class="jk-stage-cursor"
-									viewBox="0 0 24 30"
-									role="img"
-									aria-label="示意光标"
-								>
-									<path
-										d="M3 2v23l6-6 5 10 4-2-5-10h9Z"
-										fill="var(--jk-ink)"
-										stroke="var(--jk-paper)"
-										stroke-width="2"
-										stroke-linejoin="round"
-									/>
-								</svg>
-							</Show>
-						</div>
-					</div>
-				</div>
+		<section class="jk-capture-stage" aria-label={localize("捕获画面布局示意")}>
+			<div class="jk-stage-canvas jk-stage-rendered">
+				<canvas
+					ref={canvas}
+					class="jk-stage-gpu"
+					aria-label={localize("使用编辑器渲染器的画面示意")}
+					style={{ opacity: ready() ? 1 : 0 }}
+				/>
+				<Show when={error()}>
+					<button type="button" class="jk-preview-error" onClick={schedule}>
+						{localize("预览暂不可用，点击重试")}
+					</button>
+				</Show>
+				<Show when={!ready() && !error()}>
+					<span class="jk-preview-loading">{localize("正在准备画面…")}</span>
+				</Show>
 			</div>
 			<footer class="jk-stage-footer">
 				<span>
 					<i />
-					画面示意
+					{localize("画面示意")}
 				</span>
+				<button
+					type="button"
+					aria-pressed={playing()}
+					onClick={() => {
+						setPlaying(!playing());
+						started = performance.now();
+						if (timer) clearTimeout(timer);
+						schedule();
+					}}
+				>
+					{playing() ? localize("暂停动效") : localize("播放动效")}
+				</button>
 				<span>
-					{props.style?.config.aspectRatio ? ratio().join(":") : "适合屏幕"}
+					{ratio()
+						? ASPECT_RATIOS[ratio() ?? "wideScreen"].ratio.join(":")
+						: localize("适合屏幕")}
 				</span>
 			</footer>
 		</section>

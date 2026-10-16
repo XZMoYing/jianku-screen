@@ -7,18 +7,19 @@ import { Tooltip as KTooltip } from "@kobalte/core/tooltip";
 import { createElementBounds } from "@solid-primitives/bounds";
 import { createEventListener } from "@solid-primitives/event-listener";
 import { cva, cx, type VariantProps } from "cva";
-
 import {
 	type ComponentProps,
 	createRoot,
 	createSignal,
 	type JSX,
 	mergeProps,
+	onCleanup,
 	type ParentProps,
 	splitProps,
 	type ValidComponent,
 } from "solid-js";
 import Tooltip from "~/components/Tooltip";
+import { t as localize } from "~/utils/i18n";
 import { useScreenshotEditorContext } from "./context";
 import { TextInput } from "./TextInput";
 
@@ -38,7 +39,7 @@ export function Field(
 				class="flex flex-row items-center gap-1.5 text-gray-12 data-[disabled='true']:text-gray-10 font-medium text-sm"
 			>
 				{props.icon}
-				{props.name}
+				{localize(props.name)}
 				{props.value && <div class="ml-auto">{props.value}</div>}
 			</span>
 			{props.children}
@@ -52,7 +53,7 @@ export function Subfield(
 	return (
 		<div class={cx("flex flex-row justify-between items-center", props.class)}>
 			<span class="font-medium text-gray-12">
-				{props.name}
+				{localize(props.name)}
 				{props.required && (
 					<span class="ml-[2px] text-xs text-blue-500">*</span>
 				)}
@@ -71,6 +72,7 @@ export function Slider(
 
 	// Pause history when slider is being dragged
 	let resumeHistory: (() => void) | null = null;
+	onCleanup(() => resumeHistory?.());
 
 	const [thumbRef, setThumbRef] = createSignal<HTMLDivElement>();
 
@@ -82,7 +84,7 @@ export function Slider(
 		<KSlider
 			{...props}
 			class={cx(
-				"relative px-1 h-8 flex flex-row justify-stretch items-center",
+				"ed-slider relative px-1 h-8 flex flex-row justify-stretch items-center",
 				props.class,
 			)}
 			onChange={(v) => {
@@ -96,7 +98,7 @@ export function Slider(
 			}}
 		>
 			<KSlider.Track
-				class="h-[0.3rem] transition-[height] relative mx-1 bg-gray-4 rounded-full w-full before:content-[''] before:absolute before:inset-0 before:-top-3 before:-bottom-3"
+				class="jk-slider-track h-[0.3rem] transition-[height] relative mx-1 bg-gray-4 rounded-full w-full before:content-[''] before:absolute before:inset-0 before:-top-3 before:-bottom-3"
 				onPointerDown={() => {
 					setDragging(true);
 					createRoot((dispose) => {
@@ -107,7 +109,7 @@ export function Slider(
 					});
 				}}
 			>
-				<KSlider.Fill class="absolute -ml-2 h-full rounded-full bg-blue-9 data-disabled:bg-gray-8" />
+				<KSlider.Fill class="jk-slider-fill absolute h-full rounded-full bg-blue-9 data-disabled:bg-gray-8" />
 				<Tooltip
 					open={dragging() ? true : undefined}
 					getAnchorRect={() => {
@@ -137,7 +139,7 @@ export function Slider(
 							setDragging(false);
 						}}
 						class={cx(
-							"bg-gray-1 dark:bg-gray-12 border border-gray-6 shadow-md rounded-full outline-hidden size-4 -top-[6.3px] data-disabled:bg-gray-9 after:content-[''] after:absolute after:inset-0 after:-m-3",
+							"jk-slider-thumb bg-gray-1 dark:bg-gray-12 rounded-full outline-hidden size-4 -top-[6.3px] data-disabled:bg-gray-9 after:content-[''] after:absolute after:inset-0 after:-m-3",
 						)}
 					/>
 				</Tooltip>
@@ -190,7 +192,7 @@ export const Dialog = {
 	CloseButton() {
 		return (
 			<KDialog.CloseButton as={Button} variant="gray">
-				Cancel
+				{localize("Cancel")}
 			</KDialog.CloseButton>
 		);
 	},
@@ -443,7 +445,7 @@ export function ComingSoonTooltip(
 			</KTooltip.Trigger>
 			<KTooltip.Portal>
 				<KTooltip.Content class="p-2 font-medium bg-gray-12 text-gray-1 data-expanded:animate-in data-expanded:slide-in-from-bottom-1 data-expanded:fade-in data-closed:animate-out data-closed:slide-out-to-bottom-1 data-closed:fade-out rounded-lg text-xs z-1000">
-					Coming Soon
+					{localize("Coming Soon")}
 				</KTooltip.Content>
 			</KTooltip.Portal>
 		</KTooltip>

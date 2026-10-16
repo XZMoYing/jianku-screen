@@ -38,6 +38,7 @@ import {
 	createExportTask,
 	createExportToFileTask,
 } from "~/utils/export";
+import { t as localize } from "~/utils/i18n";
 import { createSelectedOrganization } from "~/utils/organization-branding";
 import {
 	commands,
@@ -107,7 +108,7 @@ export const EXPORT_TO_OPTIONS = [
 		label: "Shareable Link",
 		value: "link",
 		icon: IconCapLink,
-		description: "Share via Cap cloud",
+		description: "账号功能敬请期待",
 	},
 ] as const;
 
@@ -1033,11 +1034,11 @@ export function ExportPage() {
 						class="flex gap-1.5 items-center h-7 pl-2 pr-2.5 rounded-lg text-[12px] font-medium text-ed-text-2 transition-colors hover:bg-ed-ctl hover:text-ed-text-1 outline-hidden focus-visible:ring-1 focus-visible:ring-ed-accent"
 					>
 						<IconCapMoveLeft class="size-3.5" />
-						Back to editor
+						{localize("Back to editor")}
 					</button>
 				</div>
 				<h1 class="text-[13px] font-medium text-ed-text-1 pointer-events-none">
-					Export
+					{localize("Export")}
 				</h1>
 				<div data-tauri-drag-region class="flex flex-1 justify-end h-full">
 					{ostype() === "windows" && <CaptionControlsWindows11 />}
@@ -1047,7 +1048,7 @@ export function ExportPage() {
 			<div class="flex-1 min-h-0 flex relative">
 				<div class="flex-1 min-w-0 flex flex-col bg-ed-stage pt-4 px-6 pb-5">
 					<div class="flex items-center gap-1.5 h-[22px] text-[12px] font-medium text-ed-text-2">
-						Preview
+						{localize("Preview")}
 						<Tooltip content="This is a rendered frame from your video. Adjust the settings to see the quality of the final export.">
 							<IconLucideInfo class="size-[13px] text-ed-text-3 hover:text-ed-text-2 cursor-help transition-colors" />
 						</Tooltip>
@@ -1092,7 +1093,7 @@ export function ExportPage() {
 										<>
 											<img
 												src={url()}
-												alt="Export preview"
+												alt={localize("Export preview")}
 												class="relative z-0 size-full object-contain"
 											/>
 											<Show when={previewLoading()}>
@@ -1102,7 +1103,7 @@ export function ExportPage() {
 											</Show>
 											<button
 												type="button"
-												aria-label="Open full-size preview"
+												aria-label={localize("Open full-size preview")}
 												onClick={() => setPreviewDialogOpen(true)}
 												class="absolute bottom-3 right-3 p-2 rounded-lg bg-black/60 hover:bg-black/75 text-white opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity outline-hidden"
 											>
@@ -1118,7 +1119,7 @@ export function ExportPage() {
 					<div class="flex justify-center">
 						<div class="flex h-11 min-w-[520px] rounded-[10px] bg-ed-card shadow-ed-card">
 							<ExportStat
-								label="Duration"
+								label={localize("Duration")}
 								value={
 									previewDimensions()
 										? formatDuration(
@@ -1131,7 +1132,11 @@ export function ExportPage() {
 										: undefined
 								}
 							/>
-							<ExportStat label="Output" value={outputDescription()} divided />
+							<ExportStat
+								label={localize("Output")}
+								value={outputDescription()}
+								divided
+							/>
 							<ExportStat
 								label={
 									estimateLoading() && renderEstimate()
@@ -1187,11 +1192,12 @@ export function ExportPage() {
 								{(sharing) => (
 									<div class="p-3 rounded-[10px] bg-ed-card-2 flex flex-col gap-1">
 										<p class="text-[12.5px] font-medium text-ed-text-1">
-											Update your existing link
+											{localize("Update your existing link")}
 										</p>
 										<p class="text-[11.5px] leading-[15px] text-ed-text-3">
-											Reupload replaces the video at this link with your latest
-											edit. Everyone with the link will see the updated version.
+											{localize(
+												"Reupload replaces the video at this link with your latest edit. Everyone with the link will see the updated version.",
+											)}
 										</p>
 										<a
 											class="block text-[11.5px] text-ed-accent truncate hover:underline"
@@ -1236,7 +1242,9 @@ export function ExportPage() {
 											menu.popup();
 										}}
 									>
-										<span class="text-ed-text-2">Organization</span>
+										<span class="text-ed-text-2">
+											{localize("Organization")}
+										</span>
 										<span class="flex items-center gap-1 text-ed-text-1">
 											{
 												(
@@ -1253,7 +1261,7 @@ export function ExportPage() {
 						</ExportSection>
 
 						<ExportSection
-							name="Format"
+							name={localize("Format")}
 							icon={<IconLucideVideo class="size-3.5" />}
 							disabled={cursorOnly()}
 						>
@@ -1291,7 +1299,7 @@ export function ExportPage() {
 						</ExportSection>
 
 						<ExportSection
-							name="Resolution"
+							name={localize("Resolution")}
 							icon={<IconLucideMonitor class="size-3.5" />}
 						>
 							<ExportSegmented
@@ -1307,7 +1315,7 @@ export function ExportPage() {
 						</ExportSection>
 
 						<ExportSection
-							name="Frame rate"
+							name={localize("Frame rate")}
 							icon={<IconLucideGauge class="size-3.5" />}
 						>
 							<ExportSegmented
@@ -1322,7 +1330,7 @@ export function ExportPage() {
 
 						<Show when={showBitrateControls()}>
 							<ExportSection
-								name="Quality"
+								name={localize("Quality")}
 								icon={<IconLucideGem class="size-3.5" />}
 							>
 								<ExportSegmented
@@ -1339,12 +1347,14 @@ export function ExportPage() {
 									}}
 								/>
 								<div class="flex justify-between px-0.5 text-[10.5px] text-ed-text-3">
-									<span>Smaller file</span>
-									<span>Larger file</span>
+									<span>{localize("Smaller file")}</span>
+									<span>{localize("Larger file")}</span>
 								</div>
 								<ExportToggleRow
-									title="Optimize file size"
-									description="Re-encodes with software for much smaller files (slower)"
+									title={localize("Optimize file size")}
+									description={localize(
+										"Re-encodes with software for much smaller files (slower)",
+									)}
 									checked={settings.optimizeFilesize}
 									onChange={(value) =>
 										updateSettings("optimizeFilesize", value)
@@ -1363,7 +1373,7 @@ export function ExportPage() {
 								onClick={() => setAdvancedMode(!advancedMode())}
 							>
 								<IconLucideSlidersHorizontal class="size-3.5" />
-								Advanced
+								{localize("Advanced")}
 								<IconCapChevronDown
 									class={cx(
 										"ml-auto size-3.5 text-ed-text-3 transition-transform",
@@ -1374,8 +1384,10 @@ export function ExportPage() {
 
 							<Show when={advancedMode()}>
 								<ExportToggleRow
-									title="Export cursor only"
-									description="Keeps the same cursor motion and clicks on a transparent background"
+									title={localize("Export cursor only")}
+									description={localize(
+										"Keeps the same cursor motion and clicks on a transparent background",
+									)}
 									checked={cursorOnly()}
 									onChange={setCursorOnly}
 								/>
@@ -1384,8 +1396,9 @@ export function ExportPage() {
 									<div class="mt-1 p-3 rounded-[10px] bg-ed-card-2 flex items-start gap-2">
 										<IconLucideAlertTriangle class="mt-px size-3.5 shrink-0 text-ed-text-2" />
 										<p class="text-[11.5px] leading-[15px] text-ed-text-2">
-											Exports as a transparent MOV. Files are large and best for
-											compositing or editing.
+											{localize(
+												"Exports as a transparent MOV. Files are large and best for compositing or editing.",
+											)}
 										</p>
 									</div>
 								</Show>
@@ -1393,12 +1406,12 @@ export function ExportPage() {
 								<Show when={showBitrateControls()}>
 									<div class="flex items-center gap-2.5 h-[34px]">
 										<span class="min-w-24 shrink-0 text-[13px] text-ed-text-1">
-											Bits per pixel
+											{localize("Bits per pixel")}
 										</span>
 										<div class="flex flex-1 items-center min-w-0 px-1 h-8">
 											<input
 												type="range"
-												aria-label="Bits per pixel"
+												aria-label={localize("Bits per pixel")}
 												min="0.02"
 												max="0.5"
 												step="0.01"
@@ -1428,14 +1441,16 @@ export function ExportPage() {
 									</div>
 									<Show when={isCustomBpp()}>
 										<p class="text-[11px] text-ed-text-3">
-											Using a custom bitrate
+											{localize("Using a custom bitrate")}
 										</p>
 									</Show>
 
 									<Show when={ostype() === "macos"}>
 										<ExportToggleRow
-											title="Force FFmpeg decoder"
-											description="Skip hardware decoder (auto-fallback enabled)"
+											title={localize("Force FFmpeg decoder")}
+											description={localize(
+												"Skip hardware decoder (auto-fallback enabled)",
+											)}
 											checked={forceFfmpegDecoder()}
 											onChange={setForceFfmpegDecoder}
 										/>
@@ -1469,7 +1484,7 @@ export function ExportPage() {
 								) : (
 									<>
 										<IconCapLink class="size-4" />
-										Sign in to share
+										{localize("Sign in to share")}
 									</>
 								)}
 							</button>
@@ -1489,13 +1504,13 @@ export function ExportPage() {
 								{settings.exportTo === "file" && (
 									<>
 										<IconCapFile class="size-4" />
-										Export to File
+										{localize("Export to File")}
 									</>
 								)}
 								{settings.exportTo === "clipboard" && (
 									<>
 										<IconCapCopy class="size-4" />
-										Export to Clipboard
+										{localize("Export to Clipboard")}
 									</>
 								)}
 								{settings.exportTo === "link" && (
@@ -1521,11 +1536,11 @@ export function ExportPage() {
 				<div class="p-4">
 					<div class="flex items-center justify-between mb-4">
 						<h2 class="text-ed-text-1 text-[13px] font-medium">
-							Quality preview
+							{localize("Quality preview")}
 						</h2>
 						<button
 							type="button"
-							aria-label="Close preview"
+							aria-label={localize("Close preview")}
 							onClick={() => setPreviewDialogOpen(false)}
 							class="p-1.5 rounded-md hover:bg-ed-ctl text-ed-text-2 hover:text-ed-text-1 transition-colors outline-hidden focus-visible:ring-1 focus-visible:ring-ed-accent"
 						>
@@ -1537,7 +1552,7 @@ export function ExportPage() {
 							{(url) => (
 								<img
 									src={url()}
-									alt="Export preview full size"
+									alt={localize("Export preview full size")}
 									class="w-full h-full object-contain"
 								/>
 							)}
@@ -1550,7 +1565,8 @@ export function ExportPage() {
 						<Show when={renderEstimate()}>
 							{(est) => (
 								<span>
-									Estimated size: {formatEstimatedSize(est().size_range_mb)}
+									{localize("Estimated size:")}{" "}
+									{formatEstimatedSize(est().size_range_mb)}
 								</span>
 							)}
 						</Show>
@@ -1604,7 +1620,7 @@ export function ExportPage() {
 											</Match>
 											<Match when={copyState.type === "done"}>
 												<CompletedExport
-													title="Copied to clipboard"
+													title={localize("Copied to clipboard")}
 													subtitle={`Your ${exportMediumLabel()} is ready to paste`}
 												/>
 											</Match>
@@ -1643,7 +1659,7 @@ export function ExportPage() {
 											</Match>
 											<Match when={saveState.type === "done"}>
 												<CompletedExport
-													title="Export complete"
+													title={localize("Export complete")}
 													subtitle={`Your ${exportMediumLabel()} is ready`}
 												/>
 											</Match>
@@ -1702,7 +1718,7 @@ export function ExportPage() {
 													subtitle={
 														reuploading()
 															? "Your latest edit is ready at the same link"
-															: "Your Cap has been uploaded successfully"
+															: localize("上传完成")
 													}
 												/>
 											</Match>
@@ -1736,7 +1752,7 @@ export function ExportPage() {
 													) : (
 														<IconLucideCheck class="transition-colors duration-200 text-gray-1 size-4 svgpathanimation group-hover:text-gray-12" />
 													)}
-													<p>Copy Link</p>
+													<p>{localize("Copy Link")}</p>
 												</Button>
 												<a href={link()} target="_blank" rel="noreferrer">
 													<Button
@@ -1744,7 +1760,7 @@ export function ExportPage() {
 														class="flex gap-2 justify-center items-center"
 													>
 														<IconCapLink class="transition-colors duration-200 text-gray-1 size-4 group-hover:text-gray-12" />
-														<p>Open Link</p>
+														<p>{localize("Open Link")}</p>
 													</Button>
 												</a>
 											</div>
@@ -1764,7 +1780,7 @@ export function ExportPage() {
 												}}
 											>
 												<IconCapFile class="size-4" />
-												Open File
+												{localize("Open File")}
 											</Button>
 											<Button
 												variant="dark"
@@ -1788,7 +1804,7 @@ export function ExportPage() {
 												) : (
 													<IconLucideCheck class="size-4 svgpathanimation" />
 												)}
-												Copy to Clipboard
+												{localize("Copy to Clipboard")}
 											</Button>
 										</div>
 									</Show>
@@ -1802,16 +1818,19 @@ export function ExportPage() {
 										}}
 									>
 										<IconCapMoveLeft class="size-4" />
-										Back to editor
+										{localize("Back to editor")}
 									</Button>
 								</div>
 							</Show>
 
 							<Show when={exportState.type !== "done"}>
 								<p class="max-w-sm text-xs leading-relaxed text-center text-ed-text-2">
-									<span class="font-semibold text-ed-text-1">Tip:</span> Use
-									Instant Mode for your next recording to record and upload on
-									the fly, with no exporting required.
+									<span class="font-semibold text-ed-text-1">
+										{localize("Tip:")}
+									</span>{" "}
+									{localize(
+										"Use Instant Mode for your next recording to record and upload on the fly, with no exporting required.",
+									)}
 								</p>
 							</Show>
 						</div>
@@ -1882,7 +1901,7 @@ function ExportSegmented<T extends string | number>(props: {
 							<Show when={option.icon}>
 								{(icon) => <Dynamic component={icon()} class="size-3.5" />}
 							</Show>
-							{option.label}
+							{localize(option.label)}
 						</button>
 					);
 					return option.disabledReason ? (
@@ -2020,14 +2039,14 @@ function ActiveExport(props: {
 					{(rendered) => (
 						<p class="text-[12px] tabular-nums text-ed-text-2">
 							{rendered().renderedCount.toLocaleString()} /{" "}
-							{rendered().totalFrames.toLocaleString()} frames
+							{rendered().totalFrames.toLocaleString()} {localize("frames")}
 						</p>
 					)}
 				</Show>
 			</div>
 			<Show when={props.onCancel}>
 				<Button variant="gray" size="sm" onClick={() => props.onCancel?.()}>
-					Cancel
+					{localize("Cancel")}
 				</Button>
 			</Show>
 		</div>

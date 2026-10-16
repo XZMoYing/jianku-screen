@@ -13,6 +13,7 @@ import {
 } from "solid-js";
 import { createStore } from "solid-js/store";
 import { hotkeysStore } from "~/store";
+import { t as localize } from "~/utils/i18n";
 
 import {
 	commands,
@@ -101,8 +102,10 @@ function Inner(props: { initialStore: HotkeysStore | null }) {
 		<div class="cap-settings-page flex flex-col h-full custom-scroll">
 			<SettingsPageContent>
 				<Section
-					title="Shortcuts"
-					description="Configure system-wide keyboard shortcuts to control Cap."
+					title={localize("Shortcuts")}
+					description={localize(
+						"Configure system-wide keyboard shortcuts to control Cap.",
+					)}
 				>
 					<SectionCard class="flex flex-col gap-3 p-4">
 						<Index each={actions()}>
@@ -129,7 +132,7 @@ function Inner(props: { initialStore: HotkeysStore | null }) {
 															when={hotkeys[item()]}
 															fallback={
 																<p class="text-[13px] text-gray-11">
-																	Set hotkeys...
+																	{localize("Set hotkeys...")}
 																</p>
 															}
 														>
@@ -192,7 +195,7 @@ function Inner(props: { initialStore: HotkeysStore | null }) {
 																	class="flex items-center text-[11px] uppercase transition-colors hover:bg-gray-6 hover:border-gray-7
                         py-3 px-2.5 h-5 bg-gray-4 border border-gray-5 rounded-lg text-gray-11 hover:text-gray-12"
 																>
-																	None
+																	{localize("None")}
 																</p>
 															}
 														>

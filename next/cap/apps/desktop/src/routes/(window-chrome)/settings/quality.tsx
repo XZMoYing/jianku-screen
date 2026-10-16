@@ -14,6 +14,7 @@ import {
 	deriveGeneralSettings,
 	type GeneralSettingsStore,
 } from "~/utils/general-settings";
+import { t as localize } from "~/utils/i18n";
 import { openPricingPage } from "~/utils/pricing";
 import { commands, events, type StudioRecordingQuality } from "~/utils/tauri";
 import {
@@ -58,8 +59,9 @@ const INSTANT_OPTIONS = [
 	{
 		value: 1920,
 		label: "1080p",
-		description:
+		description: localize(
 			"Clear text and a practical upload size. Recommended with Cap Pro.",
+		),
 	},
 	{
 		value: 2560,
@@ -160,37 +162,43 @@ export default function RecordingQualitySettings() {
 		>
 			<SettingsPageContent>
 				<Section
-					title="Recording quality"
-					description="Choose how new recordings look and how much space they use."
+					title={localize("Recording quality")}
+					description={localize(
+						"Choose how new recordings look and how much space they use.",
+					)}
 				/>
 				<Show when={store.isPending}>
-					<p class="text-xs text-gray-10">Loading recording settings…</p>
+					<p class="text-xs text-gray-10">
+						{localize("Loading recording settings…")}
+					</p>
 				</Show>
 				<Show when={store.isError}>
 					<SectionCard padded>
 						<p class="mb-3 text-xs text-gray-10">
-							Couldn't load your recording settings.
+							{localize("Couldn't load your recording settings.")}
 						</p>
 						<Button
 							size="sm"
 							variant="gray"
 							onClick={() => void store.refetch()}
 						>
-							Try again
+							{localize("Try again")}
 						</Button>
 					</SectionCard>
 				</Show>
 				<Show when={!store.isPending && !store.isError}>
 					<div id="settings-section-studio-quality">
 						<Section
-							title="Studio"
-							description="Saved to your computer, ready to edit. All three quality options are available on every plan."
+							title={localize("Studio")}
+							description={localize(
+								"Saved to your computer, ready to edit. All three quality options are available on every plan.",
+							)}
 						>
 							<SectionCard padded>
 								<div
 									class="flex flex-col gap-2"
 									role="group"
-									aria-label="Studio recording quality"
+									aria-label={localize("Studio recording quality")}
 								>
 									<For each={STUDIO_OPTIONS}>
 										{(option) => (
@@ -225,7 +233,7 @@ export default function RecordingQualitySettings() {
 														{option.label}
 														<Show when={option.value === "balanced"}>
 															<span class="rounded px-1.5 py-0.5 text-[10px] font-medium text-blue-11 bg-blue-4">
-																Recommended
+																{localize("Recommended")}
 															</span>
 														</Show>
 													</span>
@@ -238,25 +246,28 @@ export default function RecordingQualitySettings() {
 									</For>
 								</div>
 								<p class="mt-3 text-xs leading-relaxed text-gray-10">
-									These options affect the original recording. Choose your final
-									export resolution and file size in the editor.
+									{localize(
+										"These options affect the original recording. Choose your final export resolution and file size in the editor.",
+									)}
 								</p>
 							</SectionCard>
 						</Section>
 					</div>
 					<div id="settings-section-instant-quality">
 						<Section
-							title="Instant"
-							description="Uploads while you record, so your share link is ready when you stop."
+							title={localize("Instant")}
+							description={localize(
+								"Uploads while you record, so your share link is ready when you stop.",
+							)}
 						>
 							<SectionCard padded>
 								<p class="mb-3 text-[13px] font-medium text-gray-12">
-									Maximum resolution
+									{localize("Maximum resolution")}
 								</p>
 								<div
 									class="grid grid-cols-4 gap-2"
 									role="group"
-									aria-label="Instant recording resolution"
+									aria-label={localize("Instant recording resolution")}
 								>
 									<For each={INSTANT_OPTIONS}>
 										{(option) => (
@@ -287,32 +298,37 @@ export default function RecordingQualitySettings() {
 									</For>
 								</div>
 								<p class="mt-3 text-xs leading-relaxed text-gray-10">
-									{instantDescription()} Resolution is limited by the screen or
-									area you record.
+									{instantDescription()}{" "}
+									{localize(
+										"Resolution is limited by the screen or area you record.",
+									)}
 								</p>
 								<Show when={!auth.isPending && !hasCapPro()}>
 									<div class="flex flex-col items-start gap-3 mt-4 pt-4 border-t border-gray-4">
 										<p class="text-xs leading-relaxed text-gray-11">
-											720p is included. Cap Pro unlocks 1080p, 1440p and 4K for
-											Instant recordings.
+											{localize(
+												"720p is included. Cap Pro unlocks 1080p, 1440p and 4K for Instant recordings.",
+											)}
 										</p>
 										<Button
 											size="sm"
 											variant="gray"
 											onClick={() => void openPricingPage()}
 										>
-											View plans ↗
+											{localize("View plans ↗")}
 										</Button>
 									</div>
 								</Show>
 							</SectionCard>
 						</Section>
 					</div>
-					<Section title="Sharing">
+					<Section title={localize("Sharing")}>
 						<SectionRows>
 							<ToggleSettingItem
-								label="Open share links automatically"
-								description="Open the link in your browser when an upload finishes."
+								label={localize("Open share links automatically")}
+								description={localize(
+									"Open the link in your browser when an upload finishes.",
+								)}
 								value={!settings().disableAutoOpenLinks}
 								onChange={(value) => void save("disableAutoOpenLinks", !value)}
 							/>

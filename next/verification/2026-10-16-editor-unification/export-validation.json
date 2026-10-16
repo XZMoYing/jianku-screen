@@ -1,0 +1,10 @@
+{
+	"backgroundChangeMAD": 22.96528153153153,
+	"backgroundLoopMAD": 1.3622128378378378,
+	"sampling": "40px outer margin; RGB channel mean absolute difference",
+	"sourceDuration": 1.2,
+	"outputDuration": 6,
+	"outputFrames": 180,
+	"resolution": [960, 600],
+	"fullDecodePassed": true
+}

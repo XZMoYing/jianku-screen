@@ -1,5 +1,6 @@
 import { Select as KSelect } from "@kobalte/core/select";
 import { createSignal, Show } from "solid-js";
+import { t as localize } from "~/utils/i18n";
 import type { AspectRatio } from "~/utils/tauri";
 import IconCapChevronDown from "~icons/cap/chevron-down";
 import IconCapLayout from "~icons/cap/layout";
@@ -45,7 +46,7 @@ export function AspectRatioSelect() {
 					<MenuItem<typeof KSelect.Item> as={KSelect.Item} item={props.item}>
 						<KSelect.ItemLabel class="flex-1">
 							{props.item.rawValue === "auto"
-								? "适合屏幕"
+								? localize("适合屏幕")
 								: ASPECT_RATIOS[props.item.rawValue].name}
 							<Show when={item()}>
 								{(item) => (
@@ -67,7 +68,7 @@ export function AspectRatioSelect() {
 			<EditorButton<typeof KSelect.Trigger>
 				as={KSelect.Trigger}
 				class="w-32"
-				tooltipText="画面比例"
+				tooltipText={localize("画面比例")}
 				leftIcon={<IconCapLayout class="size-4" />}
 				rightIcon={
 					<KSelect.Icon>

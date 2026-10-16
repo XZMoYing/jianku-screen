@@ -14,6 +14,7 @@ mod keyboard;
 mod mask;
 mod notch;
 mod text;
+mod video_background;
 
 use std::sync::OnceLock;
 

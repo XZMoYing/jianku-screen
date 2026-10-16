@@ -1,5 +1,6 @@
 import { Show } from "solid-js";
 import { Toggle } from "~/components/Toggle";
+import { t as localize } from "~/utils/i18n";
 import { useEditorContext } from "./context";
 import type { StyleGroup } from "./style";
 import { EditorButton, Field, Section, Slider } from "./ui";
@@ -50,14 +51,14 @@ export function StyleSegmentConfig() {
 						name={`Editing style · ${style().start.toFixed(2)}–${style().end.toFixed(2)}s`}
 						action={
 							<EditorButton size="sm" onClick={exitStyleScope}>
-								Global settings
+								{localize("Global settings")}
 							</EditorButton>
 						}
 					>
 						<div class="flex flex-col gap-3">
 							<div class="flex items-center gap-2">
 								<input
-									aria-label="Style name"
+									aria-label={localize("Style name")}
 									class="h-8 min-w-0 flex-1 rounded-[7px] border-0 bg-ed-ctl px-2 text-[13px] text-ed-text-1 caret-ed-accent outline-hidden transition-colors duration-150 placeholder:text-ed-text-3 hover:bg-ed-ctl-hover focus:bg-ed-ctl-hover focus:ring-1 focus:ring-ed-accent"
 									value={style().name}
 									onChange={(event) => {
@@ -108,8 +109,9 @@ export function StyleSegmentConfig() {
 								}
 							>
 								<p class="text-[11px] leading-relaxed text-ed-text-3">
-									Use a Camera Only scene. Padding reveals the background around
-									the camera.
+									{localize(
+										"Use a Camera Only scene. Padding reveals the background around the camera.",
+									)}
 								</p>
 								<Show when={style().overrides.cameraOnlyPadding != null}>
 									<Slider
@@ -140,7 +142,7 @@ export function StyleSegmentConfig() {
 										setEditorState("previewTime", null);
 									}}
 								>
-									View style
+									{localize("View style")}
 								</EditorButton>
 								<EditorButton
 									variant="danger"
@@ -150,13 +152,13 @@ export function StyleSegmentConfig() {
 											projectActions.deleteOverlaySegments("style", [i]);
 									}}
 								>
-									Delete style
+									{localize("Delete style")}
 								</EditorButton>
 							</div>
 							<p class="text-[11px] leading-relaxed text-ed-text-3">
-								Styles higher in the timeline take priority. Drag a track handle
-								to change the order. Settings you leave unchanged come from the
-								styles underneath.
+								{localize(
+									"Styles higher in the timeline take priority. Drag a track handle to change the order. Settings you leave unchanged come from the styles underneath.",
+								)}
 							</p>
 						</div>
 					</Section>

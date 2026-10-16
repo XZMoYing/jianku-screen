@@ -76,6 +76,7 @@ import {
 import { getCameraWindow } from "~/utils/camera-window";
 import { createDevicesQuery } from "~/utils/devices";
 import { shouldConfirmRecordingWithoutMicrophone } from "~/utils/general-settings";
+import { t as localize } from "~/utils/i18n";
 import {
 	createCameraMutation,
 	createMicrophoneMutation,
@@ -372,9 +373,11 @@ function Inner() {
 				<div class="relative w-screen h-screen flex flex-col items-center justify-center bg-black/70">
 					<div class="absolute inset-0 bg-black/60 -z-10" />
 					<div class="flex flex-col items-center text-white mb-4">
-						<span class="mb-2 text-3xl font-semibold">Camera Only</span>
+						<span class="mb-2 text-3xl font-semibold">
+							{localize("Camera Only")}
+						</span>
 						<span class="text-xs text-gray-11">
-							Record using only your camera and microphone
+							{localize("Record using only your camera and microphone")}
 						</span>
 					</div>
 					<div class="flex justify-center w-full px-6 mb-4">
@@ -742,7 +745,7 @@ function Inner() {
 												});
 											}}
 										>
-											Adjust recording area
+											{localize("Adjust recording area")}
 										</Button>
 										<ShowCapFreeWarning
 											isInstantMode={options.mode === "instant"}
@@ -1356,7 +1359,7 @@ function Inner() {
 												onClick={() => setAspect(null)}
 												aria-pressed={currentAspect() === null}
 											>
-												Free
+												{localize("Free")}
 											</button>
 											<For each={QUICK_AREA_RATIOS}>
 												{(ratio) => {
@@ -1384,8 +1387,8 @@ function Inner() {
 											type="button"
 											class="flex size-9 items-center justify-center rounded-xl text-gray-11 transition-colors hover:bg-gray-12/8 hover:text-gray-12"
 											onClick={showCropOptionsMenu}
-											title="More aspect ratios"
-											aria-label="More aspect ratios"
+											title={localize("More aspect ratios")}
+											aria-label={localize("More aspect ratios")}
 										>
 											<IconLucideRatio class="size-4" />
 										</button>
@@ -1396,8 +1399,8 @@ function Inner() {
 											type="button"
 											class="flex size-9 items-center justify-center rounded-xl text-gray-11 transition-colors hover:bg-gray-12/8 hover:text-gray-12"
 											onClick={resetSelection}
-											title="Reset selection"
-											aria-label="Reset selection"
+											title={localize("Reset selection")}
+											aria-label={localize("Reset selection")}
 										>
 											<IconLucideRotateCcw class="size-4" />
 										</button>
@@ -1405,8 +1408,8 @@ function Inner() {
 											type="button"
 											class="flex size-9 items-center justify-center rounded-xl text-gray-11 transition-colors hover:bg-gray-12/8 hover:text-gray-12"
 											onClick={() => cropperRef?.fill()}
-											title="Fill display"
-											aria-label="Fill display"
+											title={localize("Fill display")}
+											aria-label={localize("Fill display")}
 										>
 											<IconLucideMaximize2 class="size-4" />
 										</button>
@@ -1477,13 +1480,14 @@ function Inner() {
 									<Show when={!isValid()}>
 										<div class="flex flex-col gap-1 items-center p-2.5 my-2 rounded-xl border min-w-fit w-fit bg-red-2 shadow-xs border-red-4 text-sm">
 											<p>
-												Minimum size is {minSize().width} x {minSize().height}
+												{localize("Minimum size is")} {minSize().width} x{" "}
+												{minSize().height}
 											</p>
 											<small>
 												<code>
 													{crop().width} x {crop().height}
 												</code>{" "}
-												is too small
+												{localize("is too small")}
 											</small>
 										</div>
 									</Show>
@@ -1818,7 +1822,9 @@ function CameraPreviewInline() {
 						fallback={
 							<div class="flex flex-col items-center gap-2 text-center px-4">
 								<IconCapCamera class="size-8 text-gray-9 mb-2" />
-								<div class="text-sm text-gray-11">Please select a camera</div>
+								<div class="text-sm text-gray-11">
+									{localize("Please select a camera")}
+								</div>
 							</div>
 						}
 					>
@@ -1827,14 +1833,14 @@ function CameraPreviewInline() {
 							fallback={
 								<div class="flex flex-col items-center gap-2 text-center px-4">
 									<div class="text-sm text-red-400">
-										Camera connection failed
+										{localize("Camera connection failed")}
 									</div>
 									<button
 										type="button"
 										onClick={handleRetryConnection}
 										class="text-xs text-blue-400 hover:text-blue-300 underline"
 									>
-										Try again
+										{localize("Try again")}
 									</button>
 								</div>
 							}
@@ -1848,7 +1854,9 @@ function CameraPreviewInline() {
 								style={canvasStyle()}
 							/>
 							<Show when={!hasFrame()}>
-								<div class="text-sm text-gray-11">Loading camera...</div>
+								<div class="text-sm text-gray-11">
+									{localize("Loading camera...")}
+								</div>
 							</Show>
 						</Show>
 					</Show>
@@ -2297,7 +2305,7 @@ function RecordingControls(props: {
 								</div>
 								<button
 									type="button"
-									aria-label="Choose recording mode"
+									aria-label={localize("Choose recording mode")}
 									class="pl-2.5 pr-3 py-1.5 flex items-center border-l border-white/20 bg-white/5 transition-colors group-hover:bg-white/10"
 									onClick={(e) => showMenu(menuModes, e)}
 								>
@@ -2310,11 +2318,12 @@ function RecordingControls(props: {
 										<IconLucideAlertTriangle class="mt-0.5 size-4 shrink-0 text-amber-10" />
 										<div class="flex flex-col gap-1">
 											<p class="text-sm font-semibold">
-												No microphone detected
+												{localize("No microphone detected")}
 											</p>
 											<p class="text-xs leading-relaxed text-gray-10">
-												This recording will not include your voice. Select a
-												microphone, or continue without one.
+												{localize(
+													"This recording will not include your voice. Select a microphone, or continue without one.",
+												)}
 											</p>
 										</div>
 									</div>
@@ -2329,11 +2338,11 @@ function RecordingControls(props: {
 												)
 											}
 										/>
-										Don't show again
+										{localize("Don't show again")}
 									</label>
 									<div class="flex gap-2 justify-end mt-3">
 										<Popover.CloseButton class="px-3 h-8 text-xs font-medium rounded-lg border border-gray-4 bg-gray-2 text-gray-12 hover:bg-gray-3">
-											Go back
+											{localize("Go back")}
 										</Popover.CloseButton>
 										<button
 											type="button"
@@ -2343,7 +2352,7 @@ function RecordingControls(props: {
 												startDisabled() || confirmingWithoutMicrophone()
 											}
 										>
-											Record without microphone
+											{localize("Record without microphone")}
 										</button>
 									</div>
 								</Popover.Content>
@@ -2351,7 +2360,7 @@ function RecordingControls(props: {
 						</Popover>
 						<button
 							type="button"
-							aria-label="Recording countdown"
+							aria-label={localize("Recording countdown")}
 							class="flex justify-center items-center rounded-full border transition-opacity bg-gray-6 text-gray-12 size-9 hover:opacity-80"
 							onClick={(e) => showMenu(preRecordingMenu, e)}
 						>
@@ -2414,7 +2423,10 @@ function RecordingControls(props: {
 					<IconCapInfo class="opacity-70 will-change-transform size-3" />
 					<p class="text-sm text-white drop-shadow-md">
 						<span class="opacity-70">What is </span>
-						<span class="font-medium">{capitalize(rawOptions.mode)} Mode</span>?
+						<span class="font-medium">
+							{capitalize(rawOptions.mode)} {localize("Mode")}
+						</span>
+						?
 					</p>
 				</div>
 			</div>
@@ -2429,12 +2441,12 @@ function ShowCapFreeWarning(props: { isInstantMode: boolean }) {
 		<Suspense>
 			<Show when={props.isInstantMode && auth.data?.plan?.upgraded === false}>
 				<p class="text-sm text-center max-w-64 text-gray-3 mt-3">
-					Instant Mode recordings are limited to 5 mins,{" "}
+					{localize("Instant Mode recordings are limited to 5 mins,")}{" "}
 					<button
 						class="underline font-bold text-gray-3"
 						onClick={() => commands.showWindow("Upgrade")}
 					>
-						Upgrade to Pro
+						{localize("Upgrade to Pro")}
 					</button>
 				</p>
 			</Show>

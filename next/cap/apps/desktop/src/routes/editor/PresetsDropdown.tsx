@@ -3,6 +3,7 @@ import { cx } from "cva";
 import { For, Show, Suspense } from "solid-js";
 import { reconcile } from "solid-js/store";
 import toast from "solid-toast";
+import { t as localize } from "~/utils/i18n";
 import { commands } from "~/utils/tauri";
 import { normalizeProject, useEditorContext } from "./context";
 import {
@@ -38,10 +39,10 @@ export function PresetsDropdown() {
 				as={KDropdownMenu.Trigger}
 				leftIcon={<IconCapPresets />}
 				rightIcon={<IconCapChevronDown />}
-				title="Presets"
-				aria-label="Presets"
+				title={localize("Presets")}
+				aria-label={localize("Presets")}
 			>
-				<span class="max-[1200px]:hidden">Presets</span>
+				<span class="max-[1200px]:hidden">{localize("Presets")}</span>
 			</EditorButton>
 			<KDropdownMenu.Portal>
 				<Suspense>
@@ -61,10 +62,10 @@ export function PresetsDropdown() {
 										applyDefaultPreset();
 									}}
 								>
-									<span class="mr-auto">Default</span>
+									<span class="mr-auto">{localize("Default")}</span>
 									<Show when={(presets.query.data?.default ?? null) === null}>
 										<span class="px-2 py-1 text-[11px] rounded-full bg-ed-ctl text-ed-text-2">
-											Default
+											{localize("Default")}
 										</span>
 									</Show>
 									<IconCapSettings class="text-ed-text-3 group-hover:text-[currentColor] shrink-0" />
@@ -82,10 +83,10 @@ export function PresetsDropdown() {
 												applyDefaultPreset();
 											}}
 										>
-											Apply
+											{localize("Apply")}
 										</DropdownItem>
 										<DropdownItem onSelect={() => presets.setDefault(null)}>
-											Set as default
+											{localize("Set as default")}
 										</DropdownItem>
 									</MenuItemList>
 								</KDropdownMenu.Portal>
@@ -94,7 +95,7 @@ export function PresetsDropdown() {
 								each={presets.query.data?.presets ?? []}
 								fallback={
 									<div class="py-1 w-full text-sm text-center text-ed-text-3">
-										No saved presets
+										{localize("No saved presets")}
 									</div>
 								}
 							>
@@ -121,7 +122,7 @@ export function PresetsDropdown() {
 												<span class="mr-auto">{preset.name}</span>
 												<Show when={presets.query.data?.default === i()}>
 													<span class="px-2 py-1 text-[11px] rounded-full bg-ed-ctl text-ed-text-2">
-														Default
+														{localize("Default")}
 													</span>
 												</Show>
 												<IconCapSettings class="text-ed-text-3 group-hover:text-[currentColor] shrink-0" />
@@ -139,7 +140,7 @@ export function PresetsDropdown() {
 															applyPreset();
 														}}
 													>
-														Apply
+														{localize("Apply")}
 													</DropdownItem>
 													<DropdownItem
 														onSelect={async () => {
@@ -149,12 +150,12 @@ export function PresetsDropdown() {
 															);
 														}}
 													>
-														Save settings to preset
+														{localize("Save settings to preset")}
 													</DropdownItem>
 													<DropdownItem
 														onSelect={() => presets.setDefault(i())}
 													>
-														Set as default
+														{localize("Set as default")}
 													</DropdownItem>
 													<DropdownItem
 														onSelect={() =>
@@ -165,7 +166,7 @@ export function PresetsDropdown() {
 															})
 														}
 													>
-														Rename
+														{localize("Rename")}
 													</DropdownItem>
 													<DropdownItem
 														onClick={() =>
@@ -176,7 +177,7 @@ export function PresetsDropdown() {
 															})
 														}
 													>
-														Delete
+														{localize("Delete")}
 													</DropdownItem>
 												</MenuItemList>
 											</KDropdownMenu.Portal>
@@ -192,7 +193,7 @@ export function PresetsDropdown() {
 							<DropdownItem
 								onSelect={() => setDialog({ type: "createPreset", open: true })}
 							>
-								<span>Create new preset</span>
+								<span>{localize("Create new preset")}</span>
 								<IconCapCirclePlus class="ml-auto" />
 							</DropdownItem>
 						</MenuItemList>

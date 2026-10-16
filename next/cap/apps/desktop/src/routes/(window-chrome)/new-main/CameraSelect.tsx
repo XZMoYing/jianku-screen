@@ -9,6 +9,7 @@ import {
 	Show,
 } from "solid-js";
 import { trackEvent } from "~/utils/analytics";
+import { t as localize } from "~/utils/i18n";
 import { createCurrentRecordingQuery } from "~/utils/queries";
 import {
 	type CameraInfo,
@@ -147,8 +148,8 @@ export default function CameraSelect(props: {
 							onClick={openCameraWindow}
 							onPointerDown={(e) => e.stopPropagation()}
 							class={DEVICE_SHORTCUT_BUTTON_CLASS}
-							title="Show camera preview"
-							aria-label="Show camera preview"
+							title={localize("Show camera preview")}
+							aria-label={localize("Show camera preview")}
 						>
 							<IconLucideEyeOff class="size-3.5" />
 						</button>
@@ -163,8 +164,8 @@ export default function CameraSelect(props: {
 							}}
 							onPointerDown={(e) => e.stopPropagation()}
 							class={DEVICE_SHORTCUT_BUTTON_CLASS}
-							title="Camera settings"
-							aria-label="Camera settings"
+							title={localize("Camera settings")}
+							aria-label={localize("Camera settings")}
 						>
 							<IconLucideSettings class="size-3.5" />
 						</button>
@@ -318,7 +319,7 @@ export function CameraSelectBase(props: {
 							onClick={openCameraWindow}
 							onPointerDown={(e) => e.stopPropagation()}
 							class="flex items-center justify-center px-2 py-1 rounded-full bg-gray-6 text-gray-11 hover:bg-gray-7 transition-colors"
-							title="Show camera preview"
+							title={localize("Show camera preview")}
 						>
 							<IconLucideEyeOff class="size-3.5" />
 						</button>

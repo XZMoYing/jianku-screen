@@ -3,22 +3,12 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { type as ostype } from "@tauri-apps/plugin-os";
 import { createSignal, Match, onCleanup, onMount, Switch } from "solid-js";
 import Titlebar from "~/components/titlebar/Titlebar";
+import { t as localize } from "~/utils/i18n";
 import {
 	events,
 	type VideoImportProgress as VideoImportProgressEvent,
 } from "~/utils/tauri";
 import IconLucideAlertCircle from "~icons/lucide/alert-circle";
-
-const funMessages = [
-	"Adjusting the Cap just right...",
-	"Putting on our thinking Cap...",
-	"Cap-sizing the pixels...",
-	"Wearing our processing Cap...",
-	"Cap-tivating import in progress...",
-	"Flipping our Cap backwards...",
-	"Cap-puccino break? Almost done...",
-	"Cap-able of great things...",
-];
 
 export type ImportProgressProps = {
 	projectPath: string;
@@ -31,23 +21,14 @@ export function ImportProgress(props: ImportProgressProps) {
 		null,
 	);
 	const [failed, setFailed] = createSignal<string | null>(null);
-	const [messageIndex, setMessageIndex] = createSignal(
-		Math.floor(Math.random() * funMessages.length),
-	);
 
-	let messageInterval: ReturnType<typeof setInterval> | undefined;
 	let unlisten: (() => void) | undefined;
 
 	onCleanup(() => {
-		if (messageInterval) clearInterval(messageInterval);
 		unlisten?.();
 	});
 
 	onMount(async () => {
-		messageInterval = setInterval(() => {
-			setMessageIndex((prev) => (prev + 1) % funMessages.length);
-		}, 4000);
-
 		unlisten = await events.videoImportProgress.listen((event) => {
 			if (event.payload.project_path === props.projectPath) {
 				setProgress(event.payload);
@@ -82,12 +63,12 @@ export function ImportProgress(props: ImportProgressProps) {
 								</div>
 
 								<h2 class="text-lg font-medium text-gray-12 mb-2">
-									Import Failed
+									{localize("Import Failed")}
 								</h2>
 								<p class="text-sm text-gray-11 mb-6">{errorMessage()}</p>
 
 								<Button variant="gray" onClick={handleClose}>
-									Close
+									{localize("Close")}
 								</Button>
 							</div>
 						)}
@@ -130,10 +111,10 @@ export function ImportProgress(props: ImportProgressProps) {
 							</div>
 
 							<h2 class="text-lg font-medium text-gray-12 mb-2">
-								Importing Video
+								{localize("Importing Video")}
 							</h2>
 							<p class="text-sm text-gray-11 animate-pulse h-5 animate-pulse-slow">
-								{funMessages[messageIndex()]}
+								{localize("正在准备素材…")}
 							</p>
 						</div>
 					</Match>

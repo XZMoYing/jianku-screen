@@ -4,6 +4,7 @@ import { save } from "@tauri-apps/plugin-dialog";
 import { revealItemInDir } from "@tauri-apps/plugin-opener";
 import { createResource, createSignal, For, Show } from "solid-js";
 import toast from "solid-toast";
+import { t as localize } from "~/utils/i18n";
 import { projectCopyName } from "~/utils/project-files";
 import { commands } from "~/utils/tauri";
 import { isModalDialog, useEditorContext } from "./context";
@@ -67,7 +68,7 @@ export function ProjectMenu(props: {
 	const saveCurrent = () =>
 		action(async () => {
 			await props.flush();
-			toast.success("工程已保存");
+			toast.success(localize("工程已保存"));
 		});
 	const copy = () =>
 		action(() =>
@@ -106,9 +107,9 @@ export function ProjectMenu(props: {
 				disabled={unavailable()}
 				leftIcon={<IconLucideFolder />}
 				rightIcon={<IconCapChevronDown />}
-				aria-label="工程菜单"
+				aria-label={localize("工程菜单")}
 			>
-				工程
+				{localize("工程")}
 			</EditorButton>
 			<DropdownMenu.Portal>
 				<PopperContent<typeof DropdownMenu.Content>
@@ -120,21 +121,21 @@ export function ProjectMenu(props: {
 							as={DropdownMenu.Item}
 							onSelect={() => void pick()}
 						>
-							打开工程…{" "}
+							{localize("打开工程…")}{" "}
 							<span class="ml-auto text-xs text-ed-text-3">⌘/Ctrl O</span>
 						</MenuItem>
 						<MenuItem<typeof DropdownMenu.Item>
 							as={DropdownMenu.Item}
 							onSelect={() => void saveCurrent()}
 						>
-							保存当前工程{" "}
+							{localize("保存当前工程")}{" "}
 							<span class="ml-auto text-xs text-ed-text-3">⌘/Ctrl S</span>
 						</MenuItem>
 						<MenuItem<typeof DropdownMenu.Item>
 							as={DropdownMenu.Item}
 							onSelect={() => void copy()}
 						>
-							保存可携带副本…
+							{localize("保存可携带副本…")}
 						</MenuItem>
 						<MenuItem<typeof DropdownMenu.Item>
 							as={DropdownMenu.Item}
@@ -142,16 +143,16 @@ export function ProjectMenu(props: {
 								void action(() => revealItemInDir(editorInstance.path))
 							}
 						>
-							在文件管理器中显示
+							{localize("在文件管理器中显示")}
 						</MenuItem>
 						<div class="px-3 pt-3 pb-1 text-xs text-ed-text-3">
-							最近打开的工程
+							{localize("最近打开的工程")}
 						</div>
 						<Show
 							when={(recent()?.length ?? 0) > 0}
 							fallback={
 								<p class="px-3 py-2 text-xs text-ed-text-3">
-									还没有打开过外部工程
+									{localize("还没有打开过外部工程")}
 								</p>
 							}
 						>

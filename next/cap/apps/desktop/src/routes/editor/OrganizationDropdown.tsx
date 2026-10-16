@@ -13,6 +13,7 @@ import {
 } from "solid-js";
 import toast from "solid-toast";
 import { SignInButton } from "~/components/SignInButton";
+import { t as localize } from "~/utils/i18n";
 import {
 	createSelectedOrganization,
 	type DesktopOrganization,
@@ -151,11 +152,11 @@ function BrandSettingsDialog(props: {
 
 	const selectLogoFile = (file: File) => {
 		if (!isSupportedLogoContentType(file.type)) {
-			toast.error("Unsupported logo file type");
+			toast.error(localize("Unsupported logo file type"));
 			return;
 		}
 		if (file.size > ORGANIZATION_LOGO_MAX_BYTES) {
-			toast.error("Logo file must be less than 1MB");
+			toast.error(localize("Logo file must be less than 1MB"));
 			return;
 		}
 
@@ -197,7 +198,7 @@ function BrandSettingsDialog(props: {
 				},
 			);
 
-			toast.success("Organization branding updated");
+			toast.success(localize("Organization branding updated"));
 			props.onSaved(updatedOrganization);
 			props.onOpenChange(false);
 		} catch (error) {
@@ -223,13 +224,13 @@ function BrandSettingsDialog(props: {
 							disabled={saving()}
 							onClick={() => props.onOpenChange(false)}
 						>
-							Cancel
+							{localize("Cancel")}
 						</Button>
 						<Dialog.ConfirmButton
 							disabled={saving() || !props.organization}
 							onClick={() => void save()}
 						>
-							{saving() ? "Saving..." : "Save"}
+							{saving() ? localize("Saving...") : localize("Save")}
 						</Dialog.ConfirmButton>
 					</>
 				}
@@ -257,12 +258,12 @@ function BrandSettingsDialog(props: {
 							onClick={() => fileInput.click()}
 						>
 							<IconLucideUpload class="size-4" />
-							Upload
+							{localize("Upload")}
 						</Button>
 						<Show when={displayedLogoUrl() || logoFile()}>
 							<Button variant="gray" class="gap-1.5" onClick={removeLogo}>
 								<IconLucideTrash2 class="size-4" />
-								Remove
+								{localize("Remove")}
 							</Button>
 						</Show>
 					</div>
@@ -302,7 +303,7 @@ function BrandSettingsDialog(props: {
 														)
 													}
 												>
-													Set
+													{localize("Set")}
 												</Button>
 											}
 										>
@@ -359,23 +360,23 @@ export function OrganizationDropdown() {
 		}
 		if (availability === "loading") return "Loading...";
 		if (availability === "unavailable") return "Organization";
-		return "Sign in";
+		return localize("Sign In");
 	});
 	const fallbackTitle = createMemo(() => {
 		const availability = organizationSelection.availability();
 		if (availability === "loading") return "Loading organizations";
 		if (availability === "unavailable") return "Unable to load organizations";
-		return "Organization branding requires sign in";
+		return localize("敬请期待");
 	});
 	const fallbackDescription = createMemo(() => {
 		const availability = organizationSelection.availability();
 		if (availability === "loading") {
-			return "Fetching organization branding from Cap web.";
+			return localize("账号功能敬请期待，本地录制和编辑可正常使用。");
 		}
 		if (availability === "unavailable") {
-			return "Organization branding uses live Cap web data. Connect to Cap web to select an organization and use its colours.";
+			return localize("账号功能敬请期待，本地录制和编辑可正常使用。");
 		}
-		return "Sign in to select an organization, edit brand colours, and use those colours in Studio.";
+		return localize("账号功能敬请期待，本地录制和编辑可正常使用。");
 	});
 
 	const selectOrganization = (organization: DesktopOrganization) => {
@@ -433,7 +434,7 @@ export function OrganizationDropdown() {
 												}
 											>
 												<SignInButton class="w-full justify-center">
-													Sign In
+													{localize("Sign In")}
 												</SignInButton>
 											</Show>
 											<Show
@@ -448,7 +449,7 @@ export function OrganizationDropdown() {
 													disabled={organizationSelection.refreshing()}
 												>
 													<IconLucideRefreshCw class="size-4" />
-													Retry
+													{localize("Retry")}
 												</Button>
 											</Show>
 										</div>
@@ -463,7 +464,7 @@ export function OrganizationDropdown() {
 										each={organizationSelection.organizations()}
 										fallback={
 											<div class="py-1 text-center text-sm text-ed-text-3">
-												No organizations
+												{localize("No organizations")}
 											</div>
 										}
 									>
@@ -498,7 +499,7 @@ export function OrganizationDropdown() {
 											}
 										>
 											<IconLucidePalette class="size-4" />
-											Brand settings
+											{localize("Brand settings")}
 										</DropdownItem>
 									</MenuItemList>
 								</Show>

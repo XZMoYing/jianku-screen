@@ -14,6 +14,7 @@ import {
 import { produce } from "solid-js/store";
 import toast from "solid-toast";
 import { defaultCaptionSettings } from "~/store/captions";
+import { t as localize } from "~/utils/i18n";
 import { commands } from "~/utils/tauri";
 import {
 	getCaptionTextFromWords,
@@ -530,7 +531,9 @@ export function TranscriptPanel() {
 	return (
 		<div class="flex overflow-hidden flex-col min-h-0 h-full rounded-xl">
 			<div class="px-3 py-2 border-b border-ed-line flex items-center justify-between shrink-0">
-				<span class="text-xs font-medium text-ed-text-1">Captions</span>
+				<span class="text-xs font-medium text-ed-text-1">
+					{localize("Captions")}
+				</span>
 				<div class="flex items-center gap-1">
 					<button
 						type="button"
@@ -538,7 +541,7 @@ export function TranscriptPanel() {
 						onClick={addCaptionAtPlayhead}
 					>
 						<IconLucidePlus class="size-3" />
-						Add
+						{localize("Add")}
 					</button>
 					<button
 						type="button"
@@ -919,9 +922,9 @@ function TranscriptEditor(props: {
 				fallback={
 					<div class="flex flex-col items-center justify-center h-full text-gray-9">
 						<IconCapCaptions class="size-10 mb-3 text-gray-7" />
-						<span class="text-sm">No captions available</span>
+						<span class="text-sm">{localize("No captions available")}</span>
 						<span class="text-xs mt-1">
-							Generate captions in the editor first
+							{localize("Generate captions in the editor first")}
 						</span>
 						<button
 							type="button"
@@ -929,7 +932,7 @@ function TranscriptEditor(props: {
 							onClick={props.onAddCaption}
 						>
 							<IconLucidePlus class="size-3.5" />
-							Add caption at playhead
+							{localize("Add caption at playhead")}
 						</button>
 					</div>
 				}

@@ -1,4 +1,5 @@
 import { createMemo, createUniqueId, For, Show } from "solid-js";
+import { t as localize } from "~/utils/i18n";
 import type { OrganizationBrandColorSwatch } from "~/utils/organization-branding";
 import { BrandColorsDropdown } from "./BrandColorsDropdown";
 import { hexToRgb, RgbInput } from "./color-utils";
@@ -130,7 +131,9 @@ export function GradientEditor(props: {
 
 					<div class="flex gap-3 items-end">
 						<div class="flex-1 min-w-0">
-							<span class="text-[11px] text-ed-text-3 mb-1 block">From</span>
+							<span class="text-[11px] text-ed-text-3 mb-1 block">
+								{localize("From")}
+							</span>
 							<div class="flex flex-col gap-2">
 								<RgbInput
 									value={src().from}
@@ -145,7 +148,9 @@ export function GradientEditor(props: {
 							</div>
 						</div>
 						<div class="flex-1 min-w-0">
-							<span class="text-[11px] text-ed-text-3 mb-1 block">To</span>
+							<span class="text-[11px] text-ed-text-3 mb-1 block">
+								{localize("To")}
+							</span>
 							<div class="flex flex-col gap-2">
 								<RgbInput
 									value={src().to}
@@ -164,7 +169,11 @@ export function GradientEditor(props: {
 					<div class="w-full border-t border-ed-line" />
 
 					<div class="flex flex-col">
-						<Field inline name="Angle" value={`${Math.round(angle())}°`}>
+						<Field
+							inline
+							name={localize("Angle")}
+							value={`${Math.round(angle())}°`}
+						>
 							<Slider
 								value={[angle()]}
 								onChange={(v) => {
@@ -179,7 +188,7 @@ export function GradientEditor(props: {
 
 						<Field
 							inline
-							name="Noise"
+							name={localize("Noise")}
 							value={`${noiseIntensity().toFixed(1)}%`}
 						>
 							<Slider
@@ -221,11 +230,11 @@ export function GradientEditor(props: {
 					<div class="w-full border-t border-ed-line" />
 
 					<Section
-						name="Presets"
+						name={localize("Presets")}
 						action={
 							<EditorButton
 								size="sm"
-								title="Randomize"
+								title={localize("Randomize")}
 								leftIcon={
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
@@ -252,7 +261,7 @@ export function GradientEditor(props: {
 									});
 								}}
 							>
-								Randomize
+								{localize("Randomize")}
 							</EditorButton>
 						}
 					>

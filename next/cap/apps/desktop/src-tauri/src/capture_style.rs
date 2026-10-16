@@ -101,6 +101,7 @@ pub async fn snapshot(
     app: &AppHandle,
     project: &Path,
     target: Option<&cap_recording::sources::screen_capture::ScreenCaptureTarget>,
+    animated: bool,
 ) -> Result<(), String> {
     let Some(mut style) = saved(app)? else {
         return Ok(());
@@ -110,11 +111,17 @@ pub async fn snapshot(
         let display_id = target.and_then(|target| target.display().map(|d| d.id().to_string()));
         let path = tokio::task::spawn_blocking(move || {
             crate::recording::write_current_wallpaper_to(&path, display_id.as_deref())?;
+            if animated
+                && let Some(media) = crate::desktop_wallpaper::selected_media(display_id.as_deref())
+                    .filter(|p| crate::desktop_wallpaper::is_video(p))
+            {
+                return Ok::<_, String>(media);
+            }
             Ok::<_, String>(path)
         })
         .await
         .map_err(|error| error.to_string())??;
-        style.config.background.source = cap_project::BackgroundSource::Image {
+        style.config.background.source = cap_project::BackgroundSource::Wallpaper {
             path: Some(path.to_string_lossy().into_owned()),
         };
     } else if let cap_project::BackgroundSource::Image { path: Some(source) }

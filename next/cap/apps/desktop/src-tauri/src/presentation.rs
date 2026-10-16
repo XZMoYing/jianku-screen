@@ -403,7 +403,9 @@ pub async fn start_presentation(
         return Err("请先结束设备录制，再开始演示".into());
     }
     if crate::capture_style::saved(&app)?.is_some_and(|style| style.desktop_wallpaper) {
-        let path = crate::capture_style::get_current_wallpaper_preview(app.clone()).await?;
+        let path = crate::desktop_wallpaper::get_desktop_wallpaper(app.clone(), None)
+            .await?
+            .path;
         options.project.background.source =
             cap_project::BackgroundSource::Image { path: Some(path) };
     }
