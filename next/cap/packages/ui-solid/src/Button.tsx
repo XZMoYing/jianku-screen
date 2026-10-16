@@ -2,7 +2,7 @@ import { cva, type VariantProps } from "cva";
 import { type ComponentProps, splitProps } from "solid-js";
 
 const styles = cva(
-	"outline-offset-2 flex justify-center items-center focus-visible:outline-solid rounded-full transition-[background-color,border-color,color,box-shadow,filter,opacity,transform] active:scale-[0.98] will-change-transform duration-200",
+	"jk-button outline-offset-2 flex justify-center items-center focus-visible:outline-solid rounded-full transition-[background-color,border-color,color,box-shadow,filter,opacity,transform] active:scale-[0.98] will-change-transform duration-200",
 	{
 		defaultVariants: {
 			variant: "primary",

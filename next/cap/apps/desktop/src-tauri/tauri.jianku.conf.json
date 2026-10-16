@@ -3,7 +3,7 @@
 	"productName": "Jianku Screen Next",
 	"mainBinaryName": "Jianku Screen Next",
 	"identifier": "com.jianku.screen.next",
-	"version": "0.2.0-alpha.13",
+	"version": "0.2.0-alpha.14",
 	"build": {
 		"beforeBuildCommand": "bun run build"
 	},
@@ -35,11 +35,12 @@
 		],
 		"resources": {
 			"../../../LICENSE": "licenses/Cap-LICENSE.txt",
-			"../../../JIANKU-NOTICE.md": "licenses/JIANKU-NOTICE.md"
+			"../../../JIANKU-NOTICE.md": "licenses/JIANKU-NOTICE.md",
+			"../../../licenses/material-color-utilities-LICENSE.txt": "licenses/material-color-utilities-LICENSE.txt"
 		},
 		"macOS": {
 			"bundleName": "简库镜传 Next",
-			"bundleVersion": "2026.10.14.13",
+			"bundleVersion": "2026.10.16.14",
 			"entitlements": "Entitlements.plist"
 		},
 		"externalBin": [

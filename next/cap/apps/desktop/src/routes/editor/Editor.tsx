@@ -965,13 +965,13 @@ function Inner(props: {
 					>
 						<div
 							ref={setSplitContainerRef}
-							class="flex overflow-hidden flex-row flex-1 min-h-0 px-2"
+							class="jk-editor-stage flex overflow-hidden flex-row flex-1 min-h-0 px-2"
 							style={{
 								"min-height": `${layoutLimits().minPlayerHeight}px`,
 							}}
 						>
 							<div
-								class="flex overflow-hidden flex-col rounded-xl bg-ed-card shadow-ed-card"
+								class="jk-editor-card flex overflow-hidden flex-col rounded-xl bg-ed-card shadow-ed-card"
 								style={{
 									flex: isTranscriptMode()
 										? `0 0 ${splitRatio() * 100}%`
@@ -1051,7 +1051,7 @@ function Inner(props: {
 									}}
 								/>
 							</div>
-							<div class="overflow-hidden relative px-3 pt-2.5 pb-3 h-full rounded-xl bg-ed-card shadow-ed-card">
+							<div class="jk-timeline-card overflow-hidden relative px-3 pt-2.5 pb-3 h-full rounded-xl bg-ed-card shadow-ed-card">
 								<div class="h-full">
 									<Timeline
 										onViewportOverflowChange={setTimelineViewportOverflow}

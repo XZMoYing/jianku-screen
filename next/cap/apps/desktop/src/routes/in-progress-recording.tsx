@@ -917,7 +917,7 @@ function InProgressRecordingInner() {
 				</Show>
 				<div class="h-10 w-full flex-none rounded-2xl">
 					<div
-						class="flex h-full w-full flex-row items-stretch overflow-hidden rounded-2xl bg-gray-1 border shadow-[0_1px_3px_rgba(0,0,0,0.1)]"
+						class="jk-recording-island flex h-full w-full flex-row items-stretch overflow-hidden rounded-2xl bg-gray-1 border shadow-[0_1px_3px_rgba(0,0,0,0.1)]"
 						style={{
 							"border-color":
 								state().variant === "paused"

@@ -103,6 +103,15 @@ async importCurrentDesktopBackground(projectPath: string) : Promise<string> {
 async getDefaultProjectConfig() : Promise<ProjectConfiguration> {
     return await TAURI_INVOKE("get_default_project_config");
 },
+async getCaptureStyle() : Promise<CaptureStyle> {
+    return await TAURI_INVOKE("get_capture_style");
+},
+async setCaptureStyle(style: CaptureStyle) : Promise<null> {
+    return await TAURI_INVOKE("set_capture_style", { style });
+},
+async getCurrentWallpaperPreview() : Promise<string> {
+    return await TAURI_INVOKE("get_current_wallpaper_preview");
+},
 async listCameras() : Promise<CameraInfo[]> {
     return await TAURI_INVOKE("list_cameras");
 },
@@ -950,6 +959,7 @@ export type CaptionsData = { segments: CaptionSegment[]; settings: CaptionSettin
 sourceTimed?: boolean }
 export type CaptureDisplay = { id: DisplayId; name: string; refresh_rate: number }
 export type CaptureDisplayWithThumbnail = { id: DisplayId; name: string; refresh_rate: number; thumbnail: string | null }
+export type CaptureStyle = { config: ProjectConfiguration; desktopWallpaper?: boolean }
 export type CaptureTargetKind = "display" | "window" | "area"
 export type CaptureWindow = { id: WindowId; owner_name: string; name: string; bounds: LogicalBounds; refresh_rate: number; bundle_identifier: string | null }
 export type CaptureWindowWithThumbnail = { id: WindowId; owner_name: string; name: string; bounds: LogicalBounds; refresh_rate: number; thumbnail: string | null; app_icon: string | null; bundle_identifier: string | null }

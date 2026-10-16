@@ -6,6 +6,7 @@ import {
 } from "@tauri-apps/plugin-notification";
 import { type OsType, type } from "@tauri-apps/plugin-os";
 import BrandLogo from "~/components/BrandLogo";
+import ColorSchemeOptions from "~/components/ColorSchemeSettings";
 import "@total-typescript/ts-reset/filter-boolean";
 import { Collapsible } from "@kobalte/core/collapsible";
 import { CheckMenuItem, Menu, MenuItem } from "@tauri-apps/api/menu";
@@ -22,9 +23,6 @@ import {
 } from "solid-js";
 import { createStore, reconcile } from "solid-js/store";
 import toast from "solid-toast";
-import themePreviewAuto from "~/assets/theme-previews/auto.jpg";
-import themePreviewDark from "~/assets/theme-previews/dark.jpg";
-import themePreviewLight from "~/assets/theme-previews/light.jpg";
 import { Input, Slider } from "~/routes/editor/ui";
 import {
 	audioEnhancementStore,
@@ -158,71 +156,35 @@ function AppearanceSection(props: {
 	onThemeChange: (theme: AppTheme) => void;
 }) {
 	const options = [
-		{ id: "system", name: "System" },
-		{ id: "light", name: "Light" },
-		{ id: "dark", name: "Dark" },
+		{ id: "light", name: "浅色" },
+		{ id: "dark", name: "深色" },
+		{ id: "system", name: "跟随系统" },
 	] satisfies { id: AppTheme; name: string }[];
-
-	const previews = {
-		system: themePreviewAuto,
-		light: themePreviewLight,
-		dark: themePreviewDark,
-	};
-
 	return (
-		<Section
-			title="Appearance"
-			description="Match Cap to your system theme or pick a fixed look."
-		>
-			<SectionCard padded>
-				<div
-					class="grid grid-cols-3 gap-3"
-					onContextMenu={(e) => e.preventDefault()}
-				>
-					<For each={options}>
-						{(theme) => {
-							const isSelected = () => props.currentTheme === theme.id;
-							return (
-								<button
-									type="button"
-									aria-checked={isSelected()}
-									aria-label={`Select theme: ${theme.name}`}
-									onClick={() => props.onThemeChange(theme.id)}
-									class="flex flex-col gap-2 items-center group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-9 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-1 rounded-xl"
-								>
-									<div
-										class={cx(
-											"w-full aspect-[5/3] rounded-lg overflow-hidden border-2 transition-[border-color,box-shadow] duration-150",
-											isSelected()
-												? "border-blue-9"
-												: "border-gray-4 group-hover:border-gray-6",
-										)}
-									>
-										<Show when={previews[theme.id]} keyed>
-											{(preview) => (
-												<img
-													class="object-cover w-full h-full animate-in fade-in duration-200"
-													draggable={false}
-													src={preview}
-													alt={`Preview of ${theme.name} theme`}
-												/>
-											)}
-										</Show>
-									</div>
-									<span
-										class={cx(
-											"text-xs font-medium transition-colors",
-											isSelected() ? "text-gray-12" : "text-gray-10",
-										)}
-									>
-										{theme.name}
-									</span>
-								</button>
-							);
-						}}
-					</For>
-				</div>
-			</SectionCard>
+		<Section title="外观">
+			<div class="jk-theme-options" role="radiogroup" aria-label="应用外观">
+				<For each={options}>
+					{(theme) => (
+						<button
+							type="button"
+							role="radio"
+							aria-checked={props.currentTheme === theme.id}
+							class="jk-theme-option"
+							onClick={() => props.onThemeChange(theme.id)}
+						>
+							<div class="jk-theme-mini" data-theme={theme.id}>
+								<i />
+								<span>
+									<b />
+									<b />
+									<b />
+								</span>
+							</div>
+							<span>{theme.name}</span>
+						</button>
+					)}
+				</For>
+			</div>
 		</Section>
 	);
 }
@@ -470,28 +432,29 @@ function Inner(props: {
 		<div class="cap-settings-page flex flex-col h-full custom-scroll">
 			<SettingsPageContent>
 				<AppearanceSection
-					currentTheme={settings.theme ?? "system"}
+					currentTheme={settings.theme ?? "light"}
 					onThemeChange={(newTheme) => {
 						setSettings("theme", newTheme);
 						generalSettingsStore.set({ theme: newTheme });
 					}}
 				/>
 
+				<Section title="配色">
+					<ColorSchemeOptions />
+				</Section>
+
 				{ostype === "macos" && (
-					<Section
-						title="App"
-						description="Choose how Cap shows up on your system."
-					>
+					<Section title="应用" description="窗口与系统显示。">
 						<SectionRows>
 							<ToggleSettingItem
-								label="Always show dock icon"
-								description="Keep Cap in the dock even when no windows are open."
+								label="始终显示 Dock 图标"
+								description="关闭所有窗口后仍在 Dock 中保留应用。"
 								value={!settings.hideDockIcon}
 								onChange={(v) => handleChange("hideDockIcon", !v)}
 							/>
 							<ToggleSettingItem
-								label="System notifications"
-								description="Show notifications for clipboard copies, saved files, and more. You may need to allow Cap in your system's notification settings."
+								label="系统通知"
+								description="复制、保存等操作完成时显示通知；需在系统设置中允许通知。"
 								value={!!settings.enableNotifications}
 								onChange={async (value) => {
 									if (value) {
@@ -508,56 +471,53 @@ function Inner(props: {
 					</Section>
 				)}
 
-				<Section
-					title="Recording"
-					description="Behaviour while you record and after you stop."
-				>
+				<Section title="录制" description="开始录制与停止后的行为。">
 					<SectionRows>
 						<SelectSettingItem
-							label="Countdown"
-							description="Wait before the recording starts."
+							label="录制倒计时"
+							description="选择开始录制前的等待时间。"
 							value={settings.recordingCountdown ?? 0}
 							onChange={(value) => handleChange("recordingCountdown", value)}
 							options={[
-								{ text: "Off", value: 0 },
-								{ text: "3 seconds", value: 3 },
-								{ text: "5 seconds", value: 5 },
-								{ text: "10 seconds", value: 10 },
+								{ text: "关闭", value: 0 },
+								{ text: "3 秒", value: 3 },
+								{ text: "5 秒", value: 5 },
+								{ text: "10 秒", value: 10 },
 							]}
 						/>
 						<ToggleSettingItem
-							label="Confirm before recording without a microphone"
-							description="Require confirmation when no microphone is selected or the selected microphone is unavailable."
+							label="未选择麦克风时确认"
+							description="未选择麦克风或麦克风不可用时，开始录制前提醒。"
 							value={confirmBeforeRecordingWithoutMicrophone()}
 							onChange={handleRecordingStartSafetyChange}
 						/>
 						<ToggleSettingItem
-							label="Studio Sound on new recordings"
-							description="Clean up microphone audio automatically. You can still turn it off for any recording in the editor."
+							label="新录制默认增强声音"
+							description="自动处理麦克风声音，之后仍可在编辑器关闭。"
 							value={studioSoundByDefault()}
 							onChange={handleStudioSoundByDefaultChange}
 						/>
 						<SelectSettingItem
-							label="Main window when recording starts"
-							description="What happens to the main window once a recording begins."
+							label="开始录制时的主窗口"
+							description="录制开始后关闭或最小化主窗口。"
 							value={settings.mainWindowRecordingStartBehaviour ?? "close"}
 							onChange={(value) =>
 								handleChange("mainWindowRecordingStartBehaviour", value)
 							}
 							options={[
-								{ text: "Close", value: "close" },
-								{ text: "Minimise", value: "minimise" },
+								{ text: "关闭", value: "close" },
+								{ text: "最小化", value: "minimise" },
 							]}
 						/>
 						<SelectSettingItem
-							label="After a Studio recording"
-							description="What happens once you stop a Studio recording."
+							label="录制完成后"
+							description="停止录制后的默认操作。"
 							value={settings.postStudioRecordingBehaviour ?? "openEditor"}
 							onChange={(value) =>
 								handleChange("postStudioRecordingBehaviour", value)
 							}
 							options={[
-								{ text: "Open editor", value: "openEditor" },
+								{ text: "打开编辑器", value: "openEditor" },
 								{ text: "Show in overlay", value: "showOverlay" },
 							]}
 						/>

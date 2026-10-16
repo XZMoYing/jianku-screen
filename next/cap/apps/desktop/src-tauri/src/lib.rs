@@ -13,6 +13,7 @@ mod camera_legacy;
 #[cfg(target_os = "macos")]
 mod camera_native;
 mod captions;
+mod capture_style;
 mod clean_capture;
 mod cli;
 mod clip_thumbnails;
@@ -799,9 +800,7 @@ fn should_show_onboarding(app: &AppHandle) -> bool {
         .map(|s| s.has_completed_onboarding)
         .unwrap_or(false);
 
-    !startup_completed
-        || !onboarding_completed
-        || !permissions::do_permissions_check(false).necessary_granted()
+    !startup_completed || !onboarding_completed
 }
 
 #[cfg(target_os = "macos")]
@@ -6789,6 +6788,9 @@ fn specta_builder() -> tauri_specta::Builder {
             recording::take_screenshot,
             recording::import_current_desktop_background,
             recording::get_default_project_config,
+            capture_style::get_capture_style,
+            capture_style::set_capture_style,
+            capture_style::get_current_wallpaper_preview,
             recording::list_cameras,
             recording::get_camera_formats,
             recording::get_microphone_info,
@@ -7453,6 +7455,23 @@ pub async fn run(recording_logging_handle: LoggingHandle, logs_dir: PathBuf) {
                 app.manage(Arc::new(RwLock::new(clipboard)));
             }
 
+            #[cfg(debug_assertions)]
+            if let Some(path) = std::env::var_os("JIANKU_UI_REVIEW_OUTPUT") {
+                app.listen_any("jianku-ui-review", move |event| {
+                    use std::io::Write;
+                    if let Ok(mut output) = std::fs::OpenOptions::new().create(true).append(true).open(&path) {
+                        let _ = writeln!(output, "{}", event.payload());
+                    }
+                });
+            }
+            #[cfg(debug_assertions)]
+            if let Some(path) = std::env::var_os("JIANKU_EXPRESSIVE_SMOKE_OUTPUT") {
+                app.listen_any("jianku-expressive-smoke-result", move |event| {
+                    if let Err(error) = std::fs::write(&path, event.payload()) {
+                        tracing::warn!(%error, "Could not save interface validation metrics");
+                    }
+                });
+            }
             #[cfg(debug_assertions)]
             if let Some(path) = std::env::var_os("JIANKU_WORKSPACE_SMOKE_OUTPUT") {
                 app.listen_any("jianku-workspace-smoke-result", move |event| {
@@ -9283,6 +9302,17 @@ fn open_importable_from_path(path: &Path, app: AppHandle) -> Result<(), String> 
     open_project_from_path(path, app)
 }
 
+fn screenshot_project_source(
+    meta: &cap_project::StudioRecordingMeta,
+    project: &Path,
+) -> Option<PathBuf> {
+    let cap_project::StudioRecordingMeta::SingleSegment { segment } = meta else {
+        return None;
+    };
+    let source = segment.display.path.to_path(project);
+    (segment.display.fps == 0 && import::is_supported_image_import_path(&source)).then_some(source)
+}
+
 fn open_project_from_path(path: &Path, app: AppHandle) -> Result<(), String> {
     #[cfg(target_os = "macos")]
     {
@@ -9314,6 +9344,15 @@ fn open_project_from_path(path: &Path, app: AppHandle) -> Result<(), String> {
 
     match &meta.inner {
         RecordingMetaInner::Studio(meta) => {
+            if let Some(path) = screenshot_project_source(meta, path) {
+                tokio::spawn(async move {
+                    if let Err(error) = (ShowCapWindow::ScreenshotEditor { path }).show(&app).await
+                    {
+                        warn!(%error, "Could not show the requested screenshot editor");
+                    }
+                });
+                return Ok(());
+            }
             let status = meta.status();
             if let StudioRecordingStatus::Failed { .. } = status {
                 return Err("Unable to open failed recording".to_string());
@@ -9349,6 +9388,29 @@ mod startup_project_open_tests {
 
     fn project(name: &str) -> tauri::Url {
         tauri::Url::parse(&format!("file:///recordings/{name}.cap")).unwrap()
+    }
+
+    #[test]
+    fn routes_still_image_projects_without_misclassifying_video() {
+        let directory = tempfile::tempdir().unwrap();
+        std::fs::write(directory.path().join("original.png"), b"test fixture").unwrap();
+        std::fs::write(directory.path().join("display.mp4"), b"test fixture").unwrap();
+        for (file, fps, expected) in [
+            ("original.png", 0, true),
+            ("original.png", 30, false),
+            ("display.mp4", 0, false),
+            ("display.mp4", 60, false),
+        ] {
+            let meta = serde_json::from_value(serde_json::json!({
+                "display": {"path": file, "fps": fps}
+            }))
+            .unwrap();
+            assert_eq!(
+                super::screenshot_project_source(&meta, directory.path()).is_some(),
+                expected,
+                "{file} at {fps} fps"
+            );
+        }
     }
 
     #[test]

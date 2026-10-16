@@ -685,7 +685,7 @@ function ConfigSidebarContent() {
 					? undefined
 					: state.selectedTab
 			}
-			class="flex overflow-hidden z-10 flex-col flex-1 min-h-0 max-w-104 rounded-xl shrink-0 bg-ed-card shadow-ed-card"
+			class="jk-inspector flex overflow-hidden z-10 flex-col flex-1 min-h-0 max-w-104 rounded-xl shrink-0 bg-ed-card shadow-ed-card"
 		>
 			<KTabs.List class="flex sticky top-0 z-60 flex-row justify-around items-center px-2.5 h-[46px] border-b border-ed-line shrink-0 bg-ed-card">
 				<For
@@ -754,6 +754,19 @@ function ConfigSidebarContent() {
 							disabled={item.disabled}
 						>
 							<Dynamic component={item.icon} class="size-4" />
+							<span class="jk-tab-label">
+								{
+									{
+										background: "画面",
+										camera: "摄像",
+										audio: "声音",
+										cursor: "光标",
+										keyboard: "按键",
+										captions: "字幕",
+										hotkeys: "快捷键",
+									}[item.id]
+								}
+							</span>
 						</KTabs.Trigger>
 					)}
 				</For>

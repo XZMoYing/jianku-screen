@@ -38,7 +38,7 @@ export default function TargetSelectInfoPill<T>(props: {
 			}}
 		>
 			{!props.permissionGranted
-				? "Allow"
+				? "授权"
 				: props.disconnected
 					? "Not connected"
 					: props.value !== null

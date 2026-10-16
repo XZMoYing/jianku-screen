@@ -22,6 +22,8 @@ Copyright (c) 2023-present Cap Software, Inc.
 
 本应用不代表 Cap Software，也不连接其发布更新源。画面资源仍遵循各自许可，代码授权不自动授予系统壁纸的重新分发权。
 
+0.2.0-alpha.14 统一应用界面、录前画面配置与截图工程入口；界面动态配色使用 Google 的 Material Color Utilities 0.4.0（Apache-2.0），来源为 https://github.com/material-foundation/material-color-utilities 。其许可随应用保存在 `licenses/material-color-utilities-LICENSE.txt`。Dog SC 仅作为界面结构和交互研究参考，不把其代码链接到应用。界面动画与媒体动画保持独立，既有媒体求解器未因这次界面改造而替换。
+
 0.2.0-alpha.7 增加 macOS 实时演示：复用 ScreenCaptureKit 来源及既有 GPU 合成层，接入因果光标/镜头规划、共享窗口、副屏入口和控制页；共享渲染器增加实时样本入口并保留离线路径。演示输出以显示确认约束本地帧通道，编辑器默认传输保持。构建时清理中断签名的临时文件，签名后仍严格验证所有嵌套代码。实时与完整参考动画对照、会议软件及其他平台仍需验收。
 
 0.2.0-alpha.8 重组主窗口为录屏/演示双模式，替换演示控制布局并整理工程和工具入口，补充滚动、设置保存和窗口几何处理。继续复用 Cap 的录制、编辑与既有 GPU 合成核心；本轮不改动画求解器及着色器。上游原生更新流程原先忽略本项目禁用配置，现遵守该配置，不检查或安装上游更新。

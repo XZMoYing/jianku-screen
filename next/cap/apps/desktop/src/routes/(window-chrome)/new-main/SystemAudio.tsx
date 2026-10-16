@@ -65,16 +65,14 @@ export function SystemAudioToggleRoot(
 		>
 			{props.icon}
 			<p class={DEVICE_ROW_LABEL_CLASS}>
-				{rawOptions.captureSystemAudio
-					? "Record System Audio"
-					: "No System Audio"}
+				{rawOptions.captureSystemAudio ? "系统声音" : "系统声音"}
 			</p>
 			<div class={DEVICE_ROW_TRAILING_CLASS}>
 				<Dynamic
 					component={props.PillComponent}
 					variant={rawOptions.captureSystemAudio ? "blue" : "gray"}
 				>
-					{rawOptions.captureSystemAudio ? "On" : "Off"}
+					{rawOptions.captureSystemAudio ? "已开启" : "已关闭"}
 				</Dynamic>
 			</div>
 		</button>

@@ -105,7 +105,7 @@ export function Header(props: {
 	return (
 		<div
 			data-tauri-drag-region
-			class="flex relative shrink-0 flex-row items-center w-full h-13 pr-3 max-[900px]:grid max-[900px]:grid-cols-1 max-[900px]:grid-rows-[36px_36px] max-[900px]:h-[72px] max-[900px]:pr-2"
+			class="jk-editor-header flex relative shrink-0 flex-row items-center w-full h-13 pr-3 max-[900px]:grid max-[900px]:grid-cols-1 max-[900px]:grid-rows-[36px_36px] max-[900px]:h-[72px] max-[900px]:pr-2"
 		>
 			<div
 				data-tauri-drag-region
@@ -129,7 +129,7 @@ export function Header(props: {
 						readOnly={titleReadOnly() || props.disabled === true}
 						setReadOnly={setTitleReadOnly}
 					/>
-					<span class="shrink-0 text-[13px] text-ed-text-3">.cap</span>
+					<span class="shrink-0 text-[13px] text-ed-text-3">.jks</span>
 				</div>
 
 				<div
@@ -216,7 +216,7 @@ export function Header(props: {
 						}
 					}}
 				>
-					<span class="max-[1200px]:hidden">Clips</span>
+					<span class="max-[1200px]:hidden">片段</span>
 				</EditorButton>
 				<Show when={hasTranscript()}>
 					<EditorButton

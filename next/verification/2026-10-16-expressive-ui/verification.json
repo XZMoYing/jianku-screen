@@ -1,0 +1,123 @@
+{
+	"date": "2026-10-16",
+	"version": "0.2.0-alpha.14",
+	"bundleVersion": "2026.10.16.14",
+	"baseCommit": "09cd909",
+	"branch": "rewrite/cap-foundation",
+	"buildProfile": "debug",
+	"appPath": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.14/Jianku Screen Next.app",
+	"scope": [
+		"Global UI theme and shared controls",
+		"Compact workspace and permission guide",
+		"Pre-capture visual configuration snapshots",
+		"Actual wallpaper layer retrieval",
+		"Wallpaper-seeded Material dynamic colors",
+		"Still-image project routing"
+	],
+	"checks": {
+		"rustFormat": "cargo fmt --all passed",
+		"rustCheck": "cargo check --locked -p cap-desktop --features tauri/custom-protocol passed",
+		"nativeTests": [
+			{
+				"scope": "general_settings::tests",
+				"passed": 10
+			},
+			{
+				"scope": "window_exclusion::tests",
+				"passed": 15
+			},
+			{
+				"scope": "startup_project_open_tests",
+				"passed": 9
+			},
+			{
+				"scope": "capture_style::tests",
+				"passed": 2
+			},
+			{
+				"scope": "permissions::capture_permission_tests",
+				"passed": 1
+			},
+			{
+				"scope": "preparing_presentation",
+				"passed": 8
+			},
+			{
+				"scope": "wallpaper_layer_integration (ignored test explicitly enabled)",
+				"passed": 1
+			}
+		],
+		"frontendTests": {
+			"files": 3,
+			"passed": 9,
+			"scope": [
+				"color extraction, normalization, light/dark text contrast across five styles",
+				"UI spring continuity",
+				"editor layout"
+			]
+		},
+		"typescript": "desktop tsc --noEmit passed",
+		"scopedBiome": {
+			"exitCode": 0,
+			"filesReported": 36,
+			"warnings": 4,
+			"detail": "Reduced-motion CSS uses !important to override inherited animations; no suppressions."
+		},
+		"build": "Tauri debug .app build completed, exit 0",
+		"buildDiagnostics": "Vinxi emitted Expected ) but found : diagnostics and a missing-default entry-client warning; final frontend and app bundles completed. Main, settings, video and screenshot routes loaded in packaged app.",
+		"signature": "codesign --verify --deep --strict passed"
+	},
+	"packagedApp": {
+		"smoke": "ui-smoke.json",
+		"observations": "ui-observations.json",
+		"permissions": {
+			"accessibility": "granted",
+			"camera": "granted",
+			"microphone": "granted",
+			"screenRecording": "granted"
+		},
+		"wallpaperColors": {
+			"count": 3,
+			"seed": "#35507b"
+		},
+		"crossWindowColorSeed": "#35507b",
+		"sampleCleanupWarnings": false,
+		"sampleCleanupCheck": "No Could not clear temporary wallpaper color sample warning in packaged app log.",
+		"wallpaperLayerPixels": [3360, 2100],
+		"userScreenPixelsCommitted": false,
+		"syntheticVideoCanvas": {
+			"height": 702,
+			"parent": {
+				"height": 326,
+				"width": 183.890625
+			},
+			"rect": {
+				"height": 326,
+				"width": 183.890625
+			},
+			"width": 396
+		},
+		"syntheticScreenshotCanvas": {
+			"height": 1402,
+			"parent": {
+				"height": 704,
+				"width": 397.6875
+			},
+			"rect": {
+				"height": 704,
+				"width": 397.6875
+			},
+			"width": 792
+		}
+	},
+	"testFixtureIssue": "A still-image .jks was initially routed to the video editor and caused duration probing to fail. The generic project opener now routes valid static image projects to the screenshot editor; 9 project-open tests and packaged screenshot loading passed. The failed test-only process contained no user project and was stopped after graceful shutdown could not complete.",
+	"limitations": [
+		"Not a full real recording/screenshot/device-to-export acceptance run.",
+		"Only selected main/settings/editor/screenshot flows were executed; global UI coverage does not imply every external/account/integration flow was tested.",
+		"Pre-capture preview is explicitly a layout illustration, not a pixel-accurate live GPU preview.",
+		"Live external displays, Spaces, third-party wallpapers, long playback and output, reduced-motion manual acceptance remain in the handoff.",
+		"Android static-tail duration V2-Mobile-11 remains unresolved. iPad and Windows remain deferred."
+	],
+	"pendingHandoff": "../../../docs/待验证项目交接.md",
+	"binarySha256": "395bf67ff8ce1a8d12ac730752601b9fe7e2002e6476bfdf93c0bce922fb5306"
+}

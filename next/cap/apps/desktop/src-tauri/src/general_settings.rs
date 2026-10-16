@@ -107,6 +107,10 @@ impl MainWindowRecordingStartBehaviour {
 // NOTE: Do not add "Cap Target Select" here — on Windows, WDA_EXCLUDEFROMCAPTURE applied to that
 // hidden window causes it to reappear as a ghost overlay after recording ends.
 const DEFAULT_EXCLUDED_WINDOW_TITLES: &[&str] = &[
+    "简库镜传 Next",
+    "简库镜传 · 设置",
+    "简库镜传 · 捕获方式",
+    "简库镜传 · 提词器",
     "Cap",
     "Cap Settings",
     "Cap Recording Controls",
@@ -327,7 +331,7 @@ impl Default for GeneralSettingsStore {
             enable_notifications: true,
             disable_auto_open_links: false,
             has_completed_startup: false,
-            theme: AppTheme::System,
+            theme: AppTheme::Light,
             commercial_license: None,
             last_version: None,
             window_transparency: false,
@@ -371,8 +375,8 @@ impl Default for GeneralSettingsStore {
 #[derive(Default, Debug, Copy, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum AppTheme {
-    #[default]
     System,
+    #[default]
     Light,
     Dark,
 }
@@ -672,6 +676,16 @@ pub fn init(app: &AppHandle) {
         }
     };
 
+    const EXPRESSIVE_APPEARANCE_MIGRATION: &str = "jianku_expressive_appearance_v1";
+    if let Ok(raw_store) = app.store("store")
+        && raw_store.get(EXPRESSIVE_APPEARANCE_MIGRATION).is_none()
+    {
+        if matches!(store.theme, AppTheme::System) {
+            store.theme = AppTheme::Light;
+        }
+        raw_store.set(EXPRESSIVE_APPEARANCE_MIGRATION, json!(true));
+    }
+
     append_missing_default_excluded_windows(&mut store.excluded_windows);
 
     if store.macbook_notch_overlay.is_none() {
@@ -816,7 +830,7 @@ mod tests {
                     ] {
                         assert_eq!(saved[key], original[key], "{key}");
                     }
-                    assert_eq!(saved["theme"], "system");
+                    assert_eq!(saved["theme"], "light");
                     assert_eq!(saved["maxFps"], cap_recording::DEFAULT_STUDIO_MAX_FPS);
                     assert!(serde_json::from_value::<GeneralSettingsStore>(saved).is_ok());
                     Ok(())

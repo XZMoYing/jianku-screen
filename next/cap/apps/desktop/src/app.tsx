@@ -23,12 +23,15 @@ import "@cap/ui-solid/main.css";
 import "unfonts.css";
 import "./styles/theme.css";
 import "./styles/workspace.css";
+import "./styles/expressive.css";
 
 import { CapErrorBoundary } from "./components/CapErrorBoundary";
 import WindowChromeLayout from "./routes/(window-chrome)";
 import SettingsLayout from "./routes/(window-chrome)/settings";
 import { authStore, generalSettingsStore } from "./store";
 import { identifyUser, initAnonymousUser } from "./utils/analytics";
+import { installDynamicTheme } from "./utils/dynamic-theme";
+import { installExpressiveMotion } from "./utils/expressive-motion";
 import { type AppTheme, commands } from "./utils/tauri";
 import titlebar from "./utils/titlebar-state";
 
@@ -171,6 +174,11 @@ function Inner() {
 				<Router
 					root={(props) => {
 						const matches = useCurrentMatches();
+						createEffect(() => {
+							const path = matches().at(-1)?.path ?? "/";
+							document.documentElement.dataset.jkRoute =
+								path.split("/")[1] || "home";
+						});
 
 						onMount(() => {
 							let autoShow = true;
@@ -338,6 +346,12 @@ function createHiddenWindowQueryPause(currentWindow: WebviewWindow) {
 }
 
 function createThemeListener(currentWindow: WebviewWindow) {
+	onMount(() => {
+		const dispose = installExpressiveMotion();
+		const disposeTheme = installDynamicTheme(currentWindow);
+		onCleanup(dispose);
+		onCleanup(disposeTheme);
+	});
 	const [appTheme, setAppTheme] = createSignal<AppTheme | null | undefined>();
 	let disposed = false;
 	let stopSettingsListening: (() => void) | undefined;
@@ -351,7 +365,7 @@ function createThemeListener(currentWindow: WebviewWindow) {
 		void generalSettingsStore
 			.get()
 			.then((settings) => {
-				if (!disposed) setAppTheme(settings?.theme ?? null);
+				if (!disposed) setAppTheme(settings?.theme ?? "light");
 			})
 			.catch((error) =>
 				console.error("Failed to load general settings:", error),
@@ -359,7 +373,7 @@ function createThemeListener(currentWindow: WebviewWindow) {
 
 		void generalSettingsStore
 			.listen((settings) => {
-				setAppTheme(settings?.theme ?? null);
+				setAppTheme(settings?.theme ?? "light");
 			})
 			.then((unlisten) => {
 				if (disposed) {
@@ -403,11 +417,7 @@ function createThemeListener(currentWindow: WebviewWindow) {
 				window.matchMedia("(prefers-color-scheme: dark)").matches);
 
 		try {
-			if (appTheme === "system") {
-				localStorage.removeItem("cap-theme");
-			} else {
-				localStorage.setItem("cap-theme", appTheme);
-			}
+			localStorage.setItem("cap-theme", appTheme);
 		} catch {}
 
 		commands.setTheme(appTheme).then(() => {

@@ -1553,6 +1553,7 @@ dependencies = [
  "dotenvy_macro",
  "ffmpeg-next",
  "flume",
+ "foreign-types 0.5.0",
  "futures",
  "futures-intrusive",
  "gdkwayland-sys",

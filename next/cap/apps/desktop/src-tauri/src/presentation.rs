@@ -396,10 +396,16 @@ pub async fn start_presentation(
     app: AppHandle,
     mut options: PresentationOptions,
 ) -> Result<PresentationStatus, String> {
+    crate::permissions::require_capture_permissions(&app, true).await?;
     let capture_gate = app.state::<crate::mobile::CaptureStartGate>();
     let _capture_guard = capture_gate.0.lock().await;
     if crate::mobile::active(&app) {
         return Err("请先结束设备录制，再开始演示".into());
+    }
+    if crate::capture_style::saved(&app)?.is_some_and(|style| style.desktop_wallpaper) {
+        let path = crate::capture_style::get_current_wallpaper_preview(app.clone()).await?;
+        options.project.background.source =
+            cap_project::BackgroundSource::Image { path: Some(path) };
     }
     options.normalize(&app, None)?;
     options.validate()?;

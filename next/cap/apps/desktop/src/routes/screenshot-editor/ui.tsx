@@ -308,7 +308,7 @@ export function MenuItemList<T extends ValidComponent = "div">(
 
 const editorButtonStyles = cva(
 	[
-		"group flex flex-row items-center px-1.5 gap-1.5 h-8 rounded-lg text-[0.875rem]",
+		"jk-button group flex flex-row items-center px-1.5 gap-1.5 h-8 rounded-lg text-[0.875rem]",
 		"focus:outline-solid focus:outline-2 focus:outline-offset-2 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 transition-colors duration-100",
 		"disabled:opacity-50 disabled:text-gray-11",
 	],

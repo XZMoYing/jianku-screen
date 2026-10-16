@@ -4,6 +4,9 @@ import { type JSX, Show } from "solid-js";
 
 import { useRecordingOptions } from "~/routes/(window-chrome)/OptionsContext";
 import { commands, events, type RecordingMode } from "~/utils/tauri";
+import IconImage from "~icons/lucide/image";
+import IconInfo from "~icons/lucide/info";
+import IconVideo from "~icons/lucide/video";
 
 interface ModeProps {
 	onInfoClick?: () => void;
@@ -25,16 +28,16 @@ const MODE_BUTTONS: ModeButtonConfig[] = [
 		label: "视频",
 		description: "录制保存在本机，停止后打开编辑器。可在设置中选择录制质量。",
 		settingsSection: "studio-quality",
-		icon: (p) => <IconCapFilmCut {...p} />,
-		iconClass: "size-[0.9rem] invert dark:invert-0",
+		icon: (p) => <IconVideo {...p} />,
+		iconClass: "size-4",
 	},
 	{
 		mode: "screenshot",
 		label: "截图",
 		description: "截图后添加标注，保存或复制到剪贴板。",
 		settingsSection: null,
-		icon: (p) => <IconCapScreenshot {...p} />,
-		iconClass: "size-[0.9rem] invert dark:invert-0",
+		icon: (p) => <IconImage {...p} />,
+		iconClass: "size-4",
 	},
 ];
 
@@ -70,9 +73,9 @@ const Mode = (props: ModeProps) => {
 					"p-1.5 rounded-md w-fit text-gray-10 group focus:outline-none",
 					props.locked && "opacity-50",
 				)}
-				aria-label="Recording mode info"
+				aria-label="捕获方式说明"
 			>
-				<IconCapInfo class="invert transition-opacity duration-200 size-2.5 dark:invert-0 group-hover:opacity-50" />
+				<IconInfo class="size-3.5" />
 			</button>
 
 			{MODE_BUTTONS.map((button) => {

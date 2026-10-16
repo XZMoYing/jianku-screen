@@ -719,9 +719,32 @@ pub struct OSPermissionsCheck {
 }
 
 impl OSPermissionsCheck {
+    pub fn capture_granted(&self, cursor: bool) -> bool {
+        self.screen_recording.permitted() && (!cursor || self.accessibility.permitted())
+    }
+
     pub fn necessary_granted(&self) -> bool {
         self.screen_recording.permitted() && self.accessibility.permitted()
     }
+}
+
+pub async fn require_capture_permissions(
+    app: &tauri::AppHandle,
+    cursor: bool,
+) -> Result<(), String> {
+    if do_permissions_check(false).capture_granted(cursor) {
+        return Ok(());
+    }
+    crate::windows::ShowCapWindow::Onboarding
+        .show(app)
+        .await
+        .map_err(|error| error.to_string())?;
+    Err(if cursor {
+        "请先开启屏幕录制和辅助功能权限，再开始录制或演示。"
+    } else {
+        "请先开启屏幕录制权限，再截图。"
+    }
+    .into())
 }
 
 #[tauri::command(async)]
@@ -975,5 +998,26 @@ mod tests {
         assert!(!macos_permission_needs_settings_fallback(
             &OSPermission::Microphone
         ));
+    }
+}
+
+#[cfg(test)]
+mod capture_permission_tests {
+    use super::*;
+    #[test]
+    fn viewing_settings_does_not_replace_capture_permission_checks() {
+        let mut check = OSPermissionsCheck {
+            screen_recording: OSPermissionStatus::Denied,
+            accessibility: OSPermissionStatus::Denied,
+            camera: OSPermissionStatus::Empty,
+            microphone: OSPermissionStatus::Empty,
+        };
+        assert!(!check.capture_granted(false));
+        assert!(!check.capture_granted(true));
+        check.screen_recording = OSPermissionStatus::Granted;
+        assert!(check.capture_granted(false));
+        assert!(!check.capture_granted(true));
+        check.accessibility = OSPermissionStatus::Granted;
+        assert!(check.capture_granted(true));
     }
 }

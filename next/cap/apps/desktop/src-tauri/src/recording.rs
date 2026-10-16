@@ -72,7 +72,6 @@ use crate::{
     create_screenshot, create_screenshot_source_from_segments,
     general_settings::{GeneralSettingsStore, PostDeletionBehaviour, PostStudioRecordingBehaviour},
     open_external_link,
-    presets::PresetsStore,
     thumbnails::*,
     upload::{SegmentUploader, compress_image},
     web_api::ManagerExt,
@@ -188,6 +187,15 @@ pub async fn import_current_desktop_background(project_path: String) -> Result<S
     let project_dir = PathBuf::from(project_path);
 
     tokio::task::spawn_blocking(move || {
+        #[cfg(target_os = "macos")]
+        {
+            let output = project_dir
+                .join("assets")
+                .join(format!("desktop-wallpaper-{}.jpg", uuid::Uuid::new_v4()));
+            if write_visible_wallpaper_layer(&output, None).is_ok() {
+                return Ok(output.to_string_lossy().into_owned());
+            }
+        }
         let source_path = current_desktop_background_source_path(None)
             .ok_or_else(|| "Current desktop background path not found".to_string())?;
         import_current_desktop_background_from_source(&project_dir, &source_path)
@@ -227,6 +235,10 @@ fn write_current_desktop_background_to(
     display_id: Option<&str>,
     enforce_protected_check: bool,
 ) -> Result<CurrentDesktopBackgroundWrite, String> {
+    #[cfg(target_os = "macos")]
+    if write_visible_wallpaper_layer(output_path, display_id).is_ok() {
+        return Ok(CurrentDesktopBackgroundWrite::Stored);
+    }
     let source_path = current_desktop_background_source_path(display_id)
         .ok_or_else(|| "Current desktop background path not found".to_string())?;
 
@@ -237,6 +249,113 @@ fn write_current_desktop_background_to(
     }
 
     write_desktop_background_source_to(&source_path, output_path, pending_path)
+}
+
+pub(crate) fn write_current_wallpaper_preview(output: &Path) -> Result<(), String> {
+    write_current_wallpaper_to(output, None)
+}
+
+pub(crate) fn write_current_wallpaper_to(
+    output: &Path,
+    display_id: Option<&str>,
+) -> Result<(), String> {
+    let pending = output.with_extension("pending.jpg");
+    match write_current_desktop_background_to(output, &pending, display_id, false)? {
+        CurrentDesktopBackgroundWrite::Stored => Ok(()),
+        CurrentDesktopBackgroundWrite::SkippedProtectedLocation(_) => {
+            Err("无法读取当前壁纸".into())
+        }
+    }
+}
+
+#[cfg(target_os = "macos")]
+fn write_visible_wallpaper_layer(output: &Path, display_id: Option<&str>) -> Result<(), String> {
+    use cocoa::base::{id, nil};
+    use cocoa::foundation::{NSArray, NSAutoreleasePool, NSString};
+    use core_foundation::base::TCFType;
+    use core_graphics::display::CGDisplay;
+    use core_graphics::window::{
+        copy_window_info, create_image, kCGWindowImageBoundsIgnoreFraming,
+        kCGWindowListOptionIncludingWindow, kCGWindowListOptionOnScreenOnly,
+    };
+    use foreign_types::ForeignType;
+    use objc::{class, msg_send, sel, sel_impl};
+
+    let display = display_id
+        .and_then(|value| value.parse::<u32>().ok())
+        .map(CGDisplay::new)
+        .unwrap_or_else(CGDisplay::main);
+    let bounds = display.bounds();
+    let windows = copy_window_info(kCGWindowListOptionOnScreenOnly, 0).ok_or("无法读取壁纸图层")?;
+    unsafe {
+        let pool: id = msg_send![class!(NSAutoreleasePool), new];
+        let result = (|| {
+            let list = windows.as_concrete_TypeRef() as id;
+            let key = |name: &str| NSString::alloc(nil).init_str(name).autorelease();
+            let layer_key = key("kCGWindowLayer");
+            let number_key = key("kCGWindowNumber");
+            let bounds_key = key("kCGWindowBounds");
+            for index in 0..NSArray::count(list) {
+                let info: id = list.objectAtIndex(index);
+                let layer: id = msg_send![info, objectForKey: layer_key];
+                let layer: i64 = msg_send![layer, longLongValue];
+                // Sonoma's NSWorkspace URL can remain DefaultDesktop.heic for aerials.
+                // Wallpaper is below Finder's desktop-icon layer; never capture other windows.
+                if !(-2_147_483_625..=-2_147_483_622).contains(&layer) {
+                    continue;
+                }
+                let rect: id = msg_send![info, objectForKey: bounds_key];
+                let coordinate = |name: &str| -> f64 {
+                    let value: id = msg_send![rect, objectForKey: key(name)];
+                    msg_send![value, doubleValue]
+                };
+                if (coordinate("X") - bounds.origin.x).abs() > 1.0
+                    || (coordinate("Y") - bounds.origin.y).abs() > 1.0
+                    || coordinate("Width") < bounds.size.width - 1.0
+                    || coordinate("Height") < bounds.size.height - 1.0
+                {
+                    continue;
+                }
+                let number: id = msg_send![info, objectForKey: number_key];
+                let number: u32 = msg_send![number, unsignedIntValue];
+                let Some(image) = create_image(
+                    bounds,
+                    kCGWindowListOptionIncludingWindow,
+                    number,
+                    kCGWindowImageBoundsIgnoreFraming,
+                ) else {
+                    continue;
+                };
+                if image.width() < 2 || image.height() < 2 {
+                    continue;
+                }
+                let rep: id = msg_send![class!(NSBitmapImageRep), alloc];
+                let rep: id = msg_send![rep, initWithCGImage: image.as_ptr()];
+                if rep == nil {
+                    continue;
+                }
+                let properties: id = msg_send![class!(NSDictionary), dictionary];
+                let data: id =
+                    msg_send![rep, representationUsingType: 3usize properties: properties];
+                if let Some(parent) = output.parent() {
+                    std::fs::create_dir_all(parent).map_err(|error| error.to_string())?;
+                }
+                let destination = key(&output.to_string_lossy());
+                let written: bool = if data == nil {
+                    false
+                } else {
+                    msg_send![data, writeToFile: destination atomically: true]
+                };
+                let _: () = msg_send![rep, release];
+                if written {
+                    return Ok(());
+                }
+            }
+            Err("系统没有提供可读取的壁纸图层".to_string())
+        })();
+        let _: () = msg_send![pool, drain];
+        result
+    }
 }
 
 fn write_desktop_background_source_to(
@@ -1961,6 +2080,7 @@ async fn start_recording_inner(
     state_mtx: MutableState<'_, App>,
     inputs: StartRecordingInputs,
 ) -> Result<RecordingAction, String> {
+    crate::permissions::require_capture_permissions(&app, true).await?;
     let mut inputs = inputs;
 
     #[cfg(target_os = "linux")]
@@ -2016,6 +2136,9 @@ async fn start_recording_prepared(
     requested_inputs: crate::RequestedInputs,
     clean_generation: Option<u32>,
 ) -> Result<RecordingAction, String> {
+    crate::permissions::require_capture_permissions(&app, true)
+        .await
+        .inspect_err(|error| notify_recording_start_failed(&app, error))?;
     let requested_state = app.state::<crate::RequestedInputsState>();
     let mut _input_operation = Some(requested_state.operation.lock().await);
     if let Err(error) = requested_state.ready_snapshot() {
@@ -2265,6 +2388,13 @@ async fn start_recording_prepared(
     pending_try!(ensure_dir(&project_file_path), |e| format!(
         "Failed to create recording directory: {e}"
     ));
+    if matches!(inputs.mode, RecordingMode::Studio) {
+        pending_try!(
+            crate::capture_style::snapshot(&app, &project_file_path, Some(&inputs.capture_target))
+                .await,
+            |e| e
+        );
+    }
     if let Some(generation) = clean_generation {
         crate::clean_capture::set_start_directory(&app, generation, project_file_path.clone())?;
     }
@@ -5391,6 +5521,7 @@ pub async fn take_screenshot(
     use image::ImageEncoder;
     use std::time::Instant;
 
+    crate::permissions::require_capture_permissions(&app, false).await?;
     let general_settings = GeneralSettingsStore::get(&app).ok().flatten();
     let general_settings = general_settings.as_ref();
 
@@ -5505,12 +5636,11 @@ pub async fn take_screenshot(
     meta.save_for_project()
         .map_err(|e| format!("Failed to save recording meta: {e}"))?;
 
-    let mut screenshot_config = cap_project::ProjectConfiguration::default();
-    screenshot_config.background.source = cap_project::BackgroundSource::Color {
-        value: [255, 255, 255],
-        alpha: 0,
-    };
-    screenshot_config.background.shadow = 0.0;
+    crate::capture_style::snapshot(&app, &project_file_path, Some(&automation_target)).await?;
+    let mut screenshot_config = crate::capture_style::project_config(&project_file_path)?
+        .unwrap_or_else(default_project_config);
+    screenshot_config.camera.hide = true;
+    screenshot_config.cursor.hide = true;
     screenshot_config
         .write(&project_file_path)
         .map_err(|e| format!("Failed to save project config: {e}"))?;
@@ -6025,10 +6155,9 @@ async fn handle_recording_finish(
 
                 let app = app.clone();
                 let recording_dir_for_finalize = recording_dir.clone();
-                let default_preset = PresetsStore::get_default_preset(&app)
+                let default_preset = crate::capture_style::recording_config(&app, &recording_dir)
                     .ok()
-                    .flatten()
-                    .map(|p| p.config);
+                    .flatten();
 
                 tokio::spawn(async move {
                     let result = finalize_studio_recording(
@@ -6090,7 +6219,7 @@ async fn handle_recording_finish(
                     clean_stopped: None,
                 },
                 &recordings,
-                PresetsStore::get_default_preset(app)?.map(|p| p.config),
+                crate::capture_style::recording_config(app, &recording_dir)?,
                 Some(&capture_target),
                 stored_current_desktop_background_path(&recording_dir),
                 camera_snapshot.as_ref(),
@@ -6286,9 +6415,11 @@ async fn finalize_studio_recording(
     preparing.set_presentation(
         preparing_presentation_snapshot(default_preset.as_ref(), capture_target.as_ref()).map(
             |mut config| {
-                apply_studio_sound_default(app, &mut config);
-                if let Some(snapshot) = &camera_snapshot {
-                    snapshot.apply(&mut config);
+                if default_preset.is_none() {
+                    apply_studio_sound_default(app, &mut config);
+                    if let Some(snapshot) = &camera_snapshot {
+                        snapshot.apply(&mut config);
+                    }
                 }
                 config
             },
@@ -6514,7 +6645,7 @@ pub fn generate_zoom_segments_for_project(
     )
 }
 
-fn apply_studio_sound_default(app: &AppHandle, config: &mut ProjectConfiguration) {
+pub(crate) fn apply_studio_sound_default(app: &AppHandle, config: &mut ProjectConfiguration) {
     let audio_enhancement = app
         .store("store")
         .ok()
@@ -6551,8 +6682,8 @@ fn project_config_from_recording(
 
     let using_default_config = default_config.is_none();
     let mut config = default_config.unwrap_or_default();
-    apply_studio_sound_default(app, &mut config);
     if using_default_config {
+        apply_studio_sound_default(app, &mut config);
         let library = app
             .store("store")
             .ok()
@@ -6565,7 +6696,9 @@ fn project_config_from_recording(
             capture_target,
         );
     }
-    config.cursor.size = cap_project::CursorConfiguration::default().size;
+    if using_default_config {
+        config.cursor.size = cap_project::CursorConfiguration::default().size;
+    }
     apply_recording_presentation_defaults(
         app,
         &mut config,
@@ -6574,7 +6707,7 @@ fn project_config_from_recording(
         stored_desktop_background_path,
     );
 
-    if let Some(snapshot) = camera_snapshot {
+    if using_default_config && let Some(snapshot) = camera_snapshot {
         snapshot.apply(&mut config);
     }
 
@@ -6803,19 +6936,22 @@ fn apply_screen_recording_presentation_defaults(
         }
     }
 
-    if config.background.padding <= f64::EPSILON {
+    if using_default_config && config.background.padding <= f64::EPSILON {
         config.background.padding = 10.0;
     }
 
-    if matches!(
-        capture_target,
-        Some(ScreenCaptureTarget::Window { .. } | ScreenCaptureTarget::Display { .. })
-    ) && config.background.rounding <= f64::EPSILON
+    if using_default_config
+        && matches!(
+            capture_target,
+            Some(ScreenCaptureTarget::Window { .. } | ScreenCaptureTarget::Display { .. })
+        )
+        && config.background.rounding <= f64::EPSILON
     {
         config.background.rounding = DEFAULT_SCREEN_RECORDING_BACKGROUND_ROUNDING_PERCENT;
     }
 
-    if (config.screen_movement_spring.stiffness - 120.0).abs() < f32::EPSILON
+    if using_default_config
+        && (config.screen_movement_spring.stiffness - 120.0).abs() < f32::EPSILON
         && (config.screen_movement_spring.damping - 14.0).abs() < f32::EPSILON
         && (config.screen_movement_spring.mass - 1.0).abs() < f32::EPSILON
     {
@@ -6826,7 +6962,7 @@ fn apply_screen_recording_presentation_defaults(
 pub fn default_project_config() -> ProjectConfiguration {
     let mut config = ProjectConfiguration::default();
 
-    apply_screen_recording_presentation_defaults(&mut config, None, false, None);
+    apply_screen_recording_presentation_defaults(&mut config, None, true, None);
 
     if config.background.rounding <= f64::EPSILON {
         config.background.rounding = DEFAULT_SCREEN_RECORDING_BACKGROUND_ROUNDING_PERCENT;
@@ -10056,7 +10192,6 @@ pub(crate) fn preparing_presentation_snapshot(
     {
         return Err("Presentation requires ordinary finalization".into());
     }
-    config.cursor.size = cap_project::CursorConfiguration::default().size;
     apply_screen_recording_presentation_defaults(&mut config, capture_target, false, None);
     Ok(config)
 }
@@ -10119,7 +10254,7 @@ mod preparing_presentation_tests {
     }
 
     #[test]
-    fn static_preset_defaults_match_the_existing_screen_defaults() {
+    fn static_preset_preserves_explicit_zero_layout_and_cursor_size() {
         let target = ScreenCaptureTarget::Display {
             id: "1".parse().unwrap(),
         };
@@ -10129,7 +10264,6 @@ mod preparing_presentation_tests {
         config.background.rounding = 0.0;
         let projected = preparing_presentation_snapshot(Some(&config), Some(&target)).unwrap();
         let mut ordinary = config;
-        ordinary.cursor.size = cap_project::CursorConfiguration::default().size;
         apply_screen_recording_presentation_defaults(&mut ordinary, Some(&target), false, None);
         assert_eq!(
             serde_json::to_value(projected).unwrap(),
@@ -10188,12 +10322,7 @@ mod preparing_presentation_parity_tests {
         segments: Vec<TimelineSegment>,
     ) -> ProjectConfiguration {
         let mut config = preset.clone();
-        config.cursor.size = cap_project::CursorConfiguration::default().size;
         apply_screen_recording_presentation_defaults(&mut config, Some(target), false, None);
-        apply_recording_camera_preview_state(
-            &mut config,
-            &crate::camera::CameraPreviewState::default(),
-        );
         config.timeline = Some(recording_timeline(segments, Vec::new()));
         config
     }
@@ -10222,22 +10351,12 @@ mod preparing_presentation_parity_tests {
             let ordinary = ordinary_static_projection(&preset, &target, one_segment(6.0));
             assert_eq!(value(&projected), value(&ordinary));
             assert_eq!(value(&preset), original);
-            assert_eq!(projected.background.padding, 10.0);
-            assert_eq!(
-                projected.background.rounding,
-                if matches!(target, ScreenCaptureTarget::Area { .. }) {
-                    0.0
-                } else {
-                    7.5
-                }
-            );
-            assert_eq!(
-                projected.cursor.size,
-                cap_project::CursorConfiguration::default().size
-            );
+            assert_eq!(projected.background.padding, 0.0);
+            assert_eq!(projected.background.rounding, 0.0);
+            assert_eq!(projected.cursor.size, 173);
             assert_eq!(
                 serde_json::to_value(projected.screen_movement_spring).unwrap(),
-                serde_json::to_value(ScreenMovementSpring::default()).unwrap()
+                serde_json::to_value(preset.screen_movement_spring).unwrap()
             );
             assert!(matches!(
                 projected.background.source,
@@ -10409,5 +10528,19 @@ mod preparing_presentation_parity_tests {
                 assert!(config.camera.mirror);
             }
         }
+    }
+}
+
+#[cfg(all(test, target_os = "macos"))]
+mod wallpaper_layer_integration {
+    #[test]
+    #[ignore = "requires a logged-in Mac desktop and screen-recording permission"]
+    fn captures_the_visible_wallpaper_layer_without_the_desktop_file_fallback() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("wallpaper.jpg");
+        super::write_visible_wallpaper_layer(&path, None).unwrap();
+        let image = image::open(&path).unwrap();
+        assert!(image.width() >= 2 && image.height() >= 2);
+        println!("wallpaper-layer={}x{}", image.width(), image.height());
     }
 }

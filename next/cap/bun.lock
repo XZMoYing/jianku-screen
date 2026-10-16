@@ -59,6 +59,7 @@
         "@cap/web-api-contract": "workspace:*",
         "@corvu/tooltip": "^0.2.1",
         "@kobalte/core": "^0.13.11",
+        "@material/material-color-utilities": "0.4.0",
         "@openpanel/web": "^1.4.1",
         "@radix-ui/colors": "^3.0.0",
         "@rive-app/canvas": "^2.32.2",
@@ -1417,6 +1418,8 @@
     "@lukeed/csprng": ["@lukeed/csprng@1.1.0", "", {}, "sha512-Z7C/xXCiGWsg0KuKsHTKJxbWhpI3Vs5GwLfOean7MGyVFGqdRgBbAjOCh6u4bbjPc/8MJ2pZmK/0DLdCbivLDA=="],
 
     "@mapbox/node-pre-gyp": ["@mapbox/node-pre-gyp@2.0.3", "", { "dependencies": { "consola": "3.4.2", "detect-libc": "2.1.2", "https-proxy-agent": "7.0.6", "node-fetch": "2.7.0", "nopt": "8.1.0", "semver": "7.8.5", "tar": "7.5.19" }, "bin": { "node-pre-gyp": "bin/node-pre-gyp" } }, "sha512-uwPAhccfFJlsfCxMYTwOdVfOz3xqyj8xYL3zJj8f0pb30tLohnnFPhLuqp4/qoEz8sNxe4SESZedcBojRefIzg=="],
+
+    "@material/material-color-utilities": ["@material/material-color-utilities@0.4.0", "", {}, "sha512-dlq6VExJReb8dhjj3a/yTigr3ncNwoFmL5Iy2ENtbDX03EmNeOEdZ+vsaGrj7RTuO+mB7L58II4LCsl4NpM8uw=="],
 
     "@mattrax/mysql-planetscale": ["@mattrax/mysql-planetscale@0.0.3", "", { "dependencies": { "@planetscale/database": "1.20.1", "mysql2": "3.22.5" } }, "sha512-A6M1qF1RxlwAWLY7ETKH/t3yaH6FVHlr5YkYfjNPMKL+c7T9HDtYyI05/0j7HeEwTOtsltedRVLl7yAQSHSU7Q=="],
 

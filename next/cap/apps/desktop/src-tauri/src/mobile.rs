@@ -391,19 +391,23 @@ fn finalize_project(project: &Path, source: &str, name: &str) -> Result<(), Stri
                 .map_err(|error| format!("已有编辑设置无法读取，文件已保留：{error}"))?;
         config.validate().map_err(|error| error.to_string())?;
     } else {
-        let mut config = crate::recording::default_project_config();
+        let capture_style = crate::capture_style::project_config(project)?;
+        let has_capture_style = capture_style.is_some();
+        let mut config = capture_style.unwrap_or_else(crate::recording::default_project_config);
         config.cursor.hide = true;
         config.camera.hide = true;
         let short_edge = size.0.min(size.1).max(1);
         let aspect = f64::from(size.0.max(size.1)) / f64::from(short_edge);
-        config.background.frame = Some(cap_project::FrameConfiguration {
-            style: if aspect >= 1.7 {
-                cap_project::FrameStyle::Phone
-            } else {
-                cap_project::FrameStyle::Tablet
-            },
-            ..Default::default()
-        });
+        if !has_capture_style {
+            config.background.frame = Some(cap_project::FrameConfiguration {
+                style: if aspect >= 1.7 {
+                    cap_project::FrameStyle::Phone
+                } else {
+                    cap_project::FrameStyle::Tablet
+                },
+                ..Default::default()
+            });
+        }
         config.write(project).map_err(|error| error.to_string())?;
     }
     inner.segments[0].display.fps = fps;
@@ -781,6 +785,7 @@ pub async fn start_mobile_recording(
     )
     .save_for_project()
     .map_err(|error| error.to_string())?;
+    crate::capture_style::snapshot(&app, &project, None).await?;
     let command = recording_command(&device, &options, &project.join(source))?;
     let capture_settings = (device.platform == MobilePlatform::Android).then_some(options.capture);
     std::fs::write(project.join("mobile-source.json"), serde_json::to_vec_pretty(&serde_json::json!({"platform":device.platform, "deviceName":device.name, "touchEventsAvailable":false, "source":source, "capture": capture_settings})).map_err(|error| error.to_string())?).map_err(|error| error.to_string())?;

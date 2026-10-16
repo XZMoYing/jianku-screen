@@ -1,4 +1,4 @@
-pub(crate) const SIZE: (f64, f64) = (860.0, 740.0);
+pub(crate) const SIZE: (f64, f64) = (1120.0, 800.0);
 pub(crate) const MINIMUM: (f64, f64) = (620.0, 500.0);
 const PADDING: f64 = 12.0;
 

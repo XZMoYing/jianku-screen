@@ -3,6 +3,10 @@ import { Store } from "@tauri-apps/plugin-store";
 import { onCleanup } from "solid-js";
 import type { AutomationsStore } from "~/utils/automations";
 import {
+	type ColorSchemeSettings,
+	colorSchemeDefaults,
+} from "~/utils/color-scheme";
+import {
 	type GeneralSettingsStore,
 	RECORDING_START_SAFETY_DEFAULTS,
 	type RecordingStartSafetySettings,
@@ -127,6 +131,10 @@ export const userProfileStore = declareStore<UserProfileStore>("user_profile");
 export const hotkeysStore = declareStore<HotkeysStore>("hotkeys");
 export const generalSettingsStore =
 	declareStore<GeneralSettingsStore>("general_settings");
+export const colorSchemeStore = declareStore<ColorSchemeSettings>(
+	"color_scheme",
+	colorSchemeDefaults,
+);
 export const recordingStartSafetyStore =
 	declareStore<RecordingStartSafetySettings>(
 		"recording_start_safety",

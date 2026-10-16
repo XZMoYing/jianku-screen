@@ -198,17 +198,17 @@ export default function Settings(props: RouteSectionProps) {
 	const settingsItems = [
 		{
 			href: "general",
-			name: "General",
+			name: "通用",
 			icon: IconCapSettings,
 		},
 		{
 			href: "quality",
-			name: "Recording quality",
+			name: "录制画质",
 			icon: IconLucideSlidersHorizontal,
 		},
 		{
 			href: "hotkeys",
-			name: "Shortcuts",
+			name: "快捷键",
 			icon: IconCapHotkeys,
 		},
 		{
@@ -218,47 +218,47 @@ export default function Settings(props: RouteSectionProps) {
 		},
 		{
 			href: "recordings",
-			name: "Recordings",
+			name: "录制库",
 			icon: IconLucideSquarePlay,
 		},
 		{
 			href: "screenshots",
-			name: "Screenshots",
+			name: "截图库",
 			icon: IconLucideImage,
 		},
 		{
 			href: "automations",
-			name: "Automations",
+			name: "自动化",
 			icon: IconLucideZap,
 		},
 		{
 			href: "transcription",
-			name: "Transcription",
+			name: "转录",
 			icon: IconCapCaptions,
 		},
 		{
 			href: "integrations",
-			name: "Integrations",
+			name: "集成",
 			icon: IconLucideUnplug,
 		},
 		{
 			href: "license",
-			name: "Plan & license",
+			name: "许可",
 			icon: IconLucideGift,
 		},
 		{
 			href: "experimental",
-			name: "Experimental",
+			name: "实验功能",
 			icon: IconCapSettings,
 		},
 		{
 			href: "feedback",
-			name: "Feedback",
+			name: "反馈",
 			icon: IconLucideMessageSquarePlus,
 		},
 		{
 			href: "changelog",
-			name: "Changelog",
+			name: "更新记录",
 			icon: IconLucideBell,
 		},
 	];

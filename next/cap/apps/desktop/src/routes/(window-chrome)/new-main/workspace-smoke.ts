@@ -2,6 +2,7 @@ import { emit } from "@tauri-apps/api/event";
 import { getAllWebviewWindows } from "@tauri-apps/api/webviewWindow";
 import { getCurrentWindow, LogicalSize } from "@tauri-apps/api/window";
 import { commands } from "~/utils/tauri";
+import { runExpressiveSmoke } from "./expressive-smoke";
 import { runMobileRecoverySmoke } from "./mobile-recovery-smoke";
 
 async function waitFor<T>(
@@ -18,6 +19,7 @@ async function waitFor<T>(
 }
 
 export async function runWorkspaceSmoke() {
+	if (await runExpressiveSmoke()) return;
 	if (
 		(window as typeof window & { __CAP__?: { mobileRecoverySmoke?: boolean } })
 			.__CAP__?.mobileRecoverySmoke

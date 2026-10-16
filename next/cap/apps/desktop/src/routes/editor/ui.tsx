@@ -417,7 +417,7 @@ export function MenuItemList<T extends ValidComponent = "div">(
 
 const editorButtonStyles = cva(
 	[
-		"group flex flex-row items-center justify-center shrink-0 gap-1.5 rounded-[7px] font-medium",
+		"jk-button group flex flex-row items-center justify-center shrink-0 gap-1.5 rounded-[7px] font-medium",
 		"focus:outline-solid focus:outline-2 focus:outline-offset-2 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 transition-colors duration-100",
 		"disabled:opacity-45",
 		"[&_svg]:shrink-0",

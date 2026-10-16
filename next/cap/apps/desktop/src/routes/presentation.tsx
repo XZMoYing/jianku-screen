@@ -3,9 +3,11 @@ import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { open } from "@tauri-apps/plugin-dialog";
 import {
 	createEffect,
+	createMemo,
 	createResource,
 	createSignal,
 	For,
+	on,
 	onCleanup,
 	Show,
 } from "solid-js";
@@ -16,6 +18,7 @@ import {
 } from "~/routes/editor/projectConfig";
 import {
 	type AspectRatio,
+	type CaptureStyle,
 	commands,
 	type PresentationOptions,
 	type PresentationStatus,
@@ -45,6 +48,7 @@ const focusModes = [
 
 export default function Presentation(props: {
 	blocked?: boolean;
+	captureStyle?: CaptureStyle;
 	onStatus?: (status: PresentationStatus) => void;
 	onBusy?: (busy: boolean) => void;
 }) {
@@ -68,6 +72,19 @@ export default function Presentation(props: {
 		const value = setup();
 		if (value && !options()) setOptions(value.options);
 	});
+	const optionsReady = createMemo(() => !!options());
+	createEffect(
+		on([() => props.captureStyle, optionsReady], ([style, ready]) => {
+			if (!style || !ready) return;
+			const current = options();
+			if (!current) return;
+			update({
+				...current,
+				project: structuredClone(style.config),
+				outputAspectRatio: style.config.aspectRatio,
+			});
+		}),
+	);
 	const setActivity = (value: boolean) => {
 		setBusy(value);
 		props.onBusy?.(value);
@@ -285,7 +302,10 @@ export default function Presentation(props: {
 									{status()?.active ? "正在演示" : "待机"}
 								</span>
 							</div>
-							<div class="presentation-grid">
+							<div
+								class="presentation-grid"
+								classList={{ "jk-presentation-shared": !!props.captureStyle }}
+							>
 								<div class="presentation-primary">
 									<section class="studio-card">
 										<div class="studio-card-heading">
@@ -530,7 +550,10 @@ export default function Presentation(props: {
 										</Show>
 									</section>
 								</div>
-								<aside class="studio-card presentation-appearance">
+								<aside
+									class="studio-card presentation-appearance"
+									style={{ display: props.captureStyle ? "none" : undefined }}
+								>
 									<div class="studio-card-heading">
 										<IconSlidersHorizontal />
 										<div>

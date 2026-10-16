@@ -21,7 +21,7 @@ import InfoPill from "./InfoPill";
 import TargetSelectInfoPill from "./TargetSelectInfoPill";
 import useRequestPermission from "./useRequestPermission";
 
-const NO_MICROPHONE = "No Microphone";
+const NO_MICROPHONE = "未选择麦克风";
 
 export default function MicrophoneSelect(props: {
 	disabled?: boolean;

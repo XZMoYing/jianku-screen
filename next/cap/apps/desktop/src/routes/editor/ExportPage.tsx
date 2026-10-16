@@ -1018,7 +1018,7 @@ export function ExportPage() {
 	const showBitrateControls = () => settings.format === "Mp4" && !cursorOnly();
 
 	return (
-		<div class="flex flex-col h-full bg-ed-window text-ed-text-1 overflow-hidden">
+		<div class="jk-export flex flex-col h-full bg-ed-window text-ed-text-1 overflow-hidden">
 			<div
 				data-tauri-drag-region
 				class={cx(

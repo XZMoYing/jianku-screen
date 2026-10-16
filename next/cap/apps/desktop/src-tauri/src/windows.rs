@@ -1303,19 +1303,19 @@ impl CapWindowId {
 
     pub fn title(&self) -> String {
         match self {
-            Self::Settings => "Cap Settings".to_string(),
+            Self::Settings => "简库镜传 · 设置".to_string(),
             Self::WindowCaptureOccluder { .. } => "Cap Window Capture Occluder".to_string(),
             Self::CaptureArea => "Cap Capture Area".to_string(),
             Self::RecordingControls => "Cap Recording Controls".to_string(),
-            Self::Editor { .. } => "Cap Editor".to_string(),
-            Self::ScreenshotEditor { .. } => "Cap Screenshot Editor".to_string(),
-            Self::ModeSelect => "Cap Mode Selection".to_string(),
-            Self::Onboarding => "Welcome to Cap".to_string(),
+            Self::Editor { .. } => "简库镜传 · 视频编辑".to_string(),
+            Self::ScreenshotEditor { .. } => "简库镜传 · 截图编辑".to_string(),
+            Self::ModeSelect => "简库镜传 · 捕获方式".to_string(),
+            Self::Onboarding => "简库镜传 Next · 权限".to_string(),
             Self::Camera => "Cap Camera".to_string(),
             Self::RecordingsOverlay => "Cap Recordings Overlay".to_string(),
             Self::TargetSelectOverlay { .. } => "Cap Target Select".to_string(),
-            Self::Teleprompter => "Cap Teleprompter".to_string(),
-            _ => "Cap".to_string(),
+            Self::Teleprompter => "简库镜传 · 提词器".to_string(),
+            _ => "简库镜传 Next".to_string(),
         }
     }
 
@@ -1932,10 +1932,6 @@ impl ShowCapWindow {
 
         let window = match self {
             Self::Main { init_target_mode } => {
-                if !permissions::do_permissions_check(false).necessary_granted() {
-                    return Box::pin(Self::Onboarding.show(app)).await;
-                }
-
                 let title = CapWindowId::Main.title();
                 let should_protect = should_protect_window(app, &title);
 
@@ -1958,12 +1954,15 @@ impl ShowCapWindow {
                         window.__CAP__ = window.__CAP__ ?? {{}};
                         window.__CAP__.initialTargetMode = {};
                         window.__CAP__.workspaceSmoke = {};
+                        window.__CAP__.expressiveSmoke = {};
                         window.__CAP__.mobileRecoverySmoke = {};
                     ",
                         serde_json::to_string(init_target_mode)
                             .expect("Failed to serialize initial target mode"),
                         cfg!(debug_assertions)
                             && std::env::var_os("JIANKU_WORKSPACE_SMOKE_OUTPUT").is_some(),
+                        cfg!(debug_assertions)
+                            && std::env::var_os("JIANKU_EXPRESSIVE_SMOKE_OUTPUT").is_some(),
                         cfg!(debug_assertions)
                             && std::env::var_os("JIANKU_MOBILE_RECOVERY_SMOKE_OUTPUT").is_some()
                     ))
@@ -3462,7 +3461,7 @@ impl ShowCapWindow {
                 None | Some(_) => is_system_dark_mode(),
             };
 
-            let bg_color = if is_dark { "#141414" } else { "#ffffff" };
+            let bg_color = if is_dark { "#11120f" } else { "#fafaf5" };
             let init_script = format!(
                 r#"(function(){{var s=document.createElement('style');s.textContent='html,body{{background-color:{bg_color}}}';document.documentElement.appendChild(s);}})();"#
             );
@@ -3502,6 +3501,11 @@ impl ShowCapWindow {
             } else {
                 builder = builder.decorations(false)
             }
+        }
+
+        #[cfg(debug_assertions)]
+        if std::env::var_os("JIANKU_UI_REVIEW_OUTPUT").is_some() {
+            builder = builder.initialization_script(include_str!("ui-review.js"));
         }
 
         #[cfg(windows)]

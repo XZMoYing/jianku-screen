@@ -1,0 +1,127 @@
+{
+	"latestByRoute": {
+		"/": {
+			"body": {
+				"height": 800,
+				"width": 1120
+			},
+			"canvas": null,
+			"colorSeed": "#35507b",
+			"colorSource": "wallpaper",
+			"dark": false,
+			"height": 800,
+			"images": [
+				{
+					"complete": true,
+					"height": 256,
+					"width": 256
+				}
+			],
+			"phase": "dom",
+			"primary": "#46608a",
+			"route": "/",
+			"title": "",
+			"visibility": "hidden",
+			"width": 1120
+		},
+		"/settings/general": {
+			"body": {
+				"height": 775,
+				"width": 782
+			},
+			"canvas": null,
+			"colorSeed": "#35507b",
+			"colorSource": "wallpaper",
+			"dark": false,
+			"height": 775,
+			"images": [
+				{
+					"complete": true,
+					"height": 256,
+					"width": 256
+				}
+			],
+			"phase": "dom",
+			"primary": "#46608a",
+			"route": "/settings/general",
+			"title": "",
+			"visibility": "hidden",
+			"width": 782
+		},
+		"/editor": {
+			"body": {
+				"height": 800,
+				"width": 1275
+			},
+			"busy": "false",
+			"canvas": {
+				"height": 702,
+				"parent": {
+					"height": 326,
+					"width": 183.890625
+				},
+				"rect": {
+					"height": 326,
+					"width": 183.890625
+				},
+				"width": 396
+			},
+			"colorSeed": "#35507b",
+			"colorSource": "wallpaper",
+			"dark": false,
+			"height": 800,
+			"images": [],
+			"phase": "dom",
+			"primary": "#46608a",
+			"route": "/editor",
+			"title": "",
+			"visibility": "visible",
+			"width": 1275
+		},
+		"/screenshot-editor": {
+			"body": {
+				"height": 800,
+				"width": 1240
+			},
+			"canvas": {
+				"height": 1402,
+				"parent": {
+					"height": 704,
+					"width": 397.6875
+				},
+				"rect": {
+					"height": 704,
+					"width": 397.6875
+				},
+				"width": 792
+			},
+			"colorSeed": "#35507b",
+			"colorSource": "wallpaper",
+			"dark": false,
+			"height": 800,
+			"images": [],
+			"phase": "dom",
+			"primary": "#46608a",
+			"route": "/screenshot-editor",
+			"title": "",
+			"visibility": "visible",
+			"width": 1240
+		}
+	},
+	"themeSwitch": [
+		{
+			"dark": true,
+			"ink": "#e3e5ef",
+			"phase": "theme-dark",
+			"route": "/settings/general"
+		},
+		{
+			"dark": false,
+			"phase": "theme-restored",
+			"restored": "light",
+			"route": "/settings/general"
+		}
+	],
+	"errors": [],
+	"notes": "Metrics from packaged app. Synthetic media only. Native image captures of hidden WebViews may retain an old backing; foreground layout and playback must be assessed separately."
+}

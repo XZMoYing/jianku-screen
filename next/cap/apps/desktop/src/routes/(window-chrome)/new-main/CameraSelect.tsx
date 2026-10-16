@@ -27,7 +27,7 @@ import InfoPill from "./InfoPill";
 import TargetSelectInfoPill from "./TargetSelectInfoPill";
 import useRequestPermission from "./useRequestPermission";
 
-const NO_CAMERA = "No Camera";
+const NO_CAMERA = "未选择摄像头";
 
 export default function CameraSelect(props: {
 	disabled?: boolean;
