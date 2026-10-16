@@ -1217,3 +1217,176 @@
 	border-radius: 50%;
 	background: var(--jk-paper);
 }
+
+:root .jk-background-settings {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	min-width: 0;
+	font-size: 13px;
+}
+:root .jk-background-heading {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	color: var(--jk-muted);
+	font-weight: 600;
+}
+:root .jk-background-tabs,
+:root .jk-background-collections {
+	display: flex;
+	gap: 2px;
+	padding: 4px;
+	border-radius: 20px;
+	background: var(--jk-container-low);
+	flex-wrap: nowrap;
+}
+:root .jk-background-tabs > button,
+:root .jk-background-collections > button {
+	flex: 1;
+	min-width: 0;
+	padding: 9px 3px;
+	border-radius: 16px;
+	font-size: 12px;
+	white-space: nowrap;
+	color: var(--jk-muted);
+}
+:root .jk-background-collections > button {
+	font-size: 11px;
+	padding: 7px 2px;
+}
+:root .jk-background-settings .jk-selection-pill {
+	border-radius: 16px;
+}
+:root .jk-background-grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 10px;
+	padding: 3px;
+}
+:root .jk-background-tile {
+	position: relative;
+	min-width: 0;
+	aspect-ratio: 1.5;
+	overflow: hidden;
+	border-radius: 14px;
+	background: var(--jk-container-low);
+}
+:root .jk-background-tile > img,
+:root .jk-desktop-background > img,
+:root .jk-desktop-background > video {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+:root .jk-background-tile > span:not(.jk-material-loading) {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	padding: 14px 6px 5px;
+	background: linear-gradient(transparent, #0009);
+	color: white;
+	font-size: 10px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+}
+:root .jk-background-tile[aria-pressed="true"],
+:root .jk-desktop-background[aria-pressed="true"] {
+	outline: 2px solid var(--jk-primary);
+	outline-offset: 3px;
+}
+:root .jk-desktop-background {
+	position: relative;
+	width: 100%;
+	aspect-ratio: 1.7;
+	overflow: hidden;
+	border-radius: 18px;
+	background: var(--jk-container-low);
+	margin-bottom: 10px;
+}
+:root .jk-desktop-background > span {
+	position: absolute;
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	bottom: 10px;
+	right: 10px;
+	padding: 7px 10px;
+	border-radius: 20px;
+	color: white;
+	background: #0009;
+	font-size: 11px;
+}
+:root .jk-background-colors {
+	display: grid;
+	grid-template-columns: repeat(8, minmax(0, 1fr));
+	gap: 8px;
+}
+:root .jk-background-colors button {
+	aspect-ratio: 1;
+	border-radius: 12px;
+	border: 1px solid var(--jk-outline-soft);
+}
+:root .jk-motion-content {
+	min-width: 0;
+	transform-origin: top center;
+}
+:root [data-motion-section] {
+	transform-origin: top center;
+}
+:root .jk-inspector-tab-motion {
+	justify-content: center;
+	height: 52px;
+}
+:root .jk-inspector > [role="tablist"] .jk-inspector-tab-motion [role="tab"] {
+	flex: 0 1 auto;
+	min-width: 40px;
+	width: auto;
+	height: 44px;
+	flex-direction: row;
+	gap: 7px;
+	padding: 0 10px;
+}
+:root .jk-inspector > [role="tablist"] .jk-inspector-tab-motion .jk-tab-label {
+	display: block;
+	font-size: 12px;
+	max-width: 0;
+	opacity: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	transition:
+		max-width 380ms cubic-bezier(0.2, 0, 0, 1),
+		opacity 160ms ease-out;
+}
+:root
+	.jk-inspector
+	> [role="tablist"]
+	.jk-inspector-tab-motion
+	[data-selected]
+	.jk-tab-label {
+	max-width: 80px;
+	opacity: 1;
+	filter: blur(0);
+	transform: scale(1);
+	transition:
+		max-width 380ms cubic-bezier(0.2, 0, 0, 1),
+		opacity 240ms ease-out 60ms,
+		filter 240ms ease-out 60ms,
+		transform 240ms ease-out 60ms;
+}
+:root .jk-settings-navigation {
+	flex: 1;
+	min-height: 0;
+}
+:root .jk-settings-navigation .jk-selection-pill {
+	border-radius: 18px;
+}
+:root .jk-settings-navigation a[aria-current="page"] {
+	background: transparent;
+}
+
+:root .jk-motion-group > button[aria-selected="true"] {
+	background: transparent;
+}

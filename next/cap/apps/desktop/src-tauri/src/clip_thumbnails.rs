@@ -71,7 +71,7 @@ pub async fn get_clip_thumbnail(
     Ok(cache_path.to_string_lossy().into_owned())
 }
 
-fn decode_clip_thumbnail(input: &Path, time: f64, output: &Path) -> Result<(), String> {
+pub(crate) fn decode_clip_thumbnail(input: &Path, time: f64, output: &Path) -> Result<(), String> {
     decode_clip_thumbnail_with_budget(
         input,
         time,

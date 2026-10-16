@@ -1,0 +1,108 @@
+{
+	"startup-visibility": {
+		"phase": "startup-visibility",
+		"route": "/",
+		"visibility": "visible"
+	},
+	"category-browse": {
+		"categories": 7,
+		"ok": true,
+		"phase": "category-browse",
+		"route": "/"
+	},
+	"desktop-restore": {
+		"ok": true,
+		"pattern": "/Users/moyingxz/Library/Caches/com.jianku.screen.next/background-materials-v1/pattern-obsidian-grid.png",
+		"phase": "desktop-restore",
+		"route": "/"
+	},
+	"preview-cadence": {
+		"fps": 54.924681344148325,
+		"frames": 712,
+		"gapsOver50Ms": 0,
+		"maxMs": 45,
+		"medianMs": 18,
+		"p95Ms": 21.000000000003638,
+		"phase": "preview-cadence",
+		"resolution": [960, 600],
+		"route": "/",
+		"visibility": "visible"
+	},
+	"legacy-serial-baseline": {
+		"averageIntervalMs": 144.7333333333337,
+		"fpsUpperBound": 6.909258406264377,
+		"phase": "legacy-serial-baseline",
+		"route": "/",
+		"samples": [
+			243.33333333333334, 156.33333333333334, 153.33333333333698,
+			141.3333333333297, 144.33333333333334, 145.33333333333334,
+			140.33333333333334, 144.33333333333334, 146.33333333333334,
+			144.33333333333698, 139.3333333333297, 148.33333333333698
+		]
+	},
+	"home-complete": {
+		"ok": true,
+		"phase": "home-complete",
+		"route": "/"
+	},
+	"editor-tabs": {
+		"metrics": [
+			{
+				"tab": "cursor",
+				"text": [
+					"显示光标光标样式\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n默认录制时的光标默认\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nmacOS\n\n\n"
+				],
+				"visible": [null]
+			},
+			{
+				"tab": "audio",
+				"text": ["声音静音"],
+				"visible": [null]
+			},
+			{
+				"tab": "background",
+				"text": [
+					"背景无桌面壁纸网格图片颜色渐变动态从到角度135°噪点0.0%预设随机生成布局画面比例适合屏幕16:9 · 宽屏16:1"
+				],
+				"visible": [null]
+			},
+			{
+				"tab": "keyboard",
+				"text": [
+					"Show keyboard测试版Font settingsFont FamilySystem Sans-Serif大小T"
+				],
+				"visible": [null]
+			},
+			{
+				"tab": "background",
+				"text": [
+					"背景无桌面壁纸网格图片颜色渐变动态从到角度135°噪点0.0%预设随机生成布局画面比例适合屏幕16:9 · 宽屏16:1"
+				],
+				"visible": [null]
+			}
+		],
+		"ok": true,
+		"phase": "editor-tabs",
+		"route": "/editor"
+	},
+	"editor-background-browse": {
+		"categories": 7,
+		"ok": true,
+		"phase": "editor-background-browse",
+		"route": "/editor"
+	},
+	"editor-background-restore": {
+		"ok": true,
+		"phase": "editor-background-restore",
+		"route": "/editor",
+		"source": "wallpaper"
+	},
+	"preview-rgba-parity": {
+		"bytes": 2304000,
+		"height": 600,
+		"ok": true,
+		"phase": "preview-rgba-parity",
+		"route": "/editor",
+		"width": 960
+	}
+}

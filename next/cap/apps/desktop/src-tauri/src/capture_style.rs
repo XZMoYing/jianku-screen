@@ -129,16 +129,23 @@ pub async fn snapshot(
         &mut style.config.background.source
     {
         let source_path = PathBuf::from(&*source);
-        if source_path.is_file() {
+        if source_path.is_file() && !crate::background_materials::is_system_material(&source_path) {
             let assets = project.join("assets");
             std::fs::create_dir_all(&assets).map_err(|error| error.to_string())?;
-            let name = format!(
-                "capture-background.{}",
-                source_path
-                    .extension()
-                    .and_then(|v| v.to_str())
-                    .unwrap_or("png")
-            );
+            let name = source_path
+                .file_name()
+                .and_then(|value| value.to_str())
+                .filter(|name| name.starts_with("pattern-"))
+                .map(str::to_owned)
+                .unwrap_or_else(|| {
+                    format!(
+                        "capture-background.{}",
+                        source_path
+                            .extension()
+                            .and_then(|value| value.to_str())
+                            .unwrap_or("png")
+                    )
+                });
             let destination = assets.join(name);
             std::fs::copy(source_path, &destination).map_err(|error| error.to_string())?;
             *source = destination.to_string_lossy().into_owned();

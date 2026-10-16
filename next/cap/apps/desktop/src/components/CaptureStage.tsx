@@ -1,5 +1,6 @@
 import { createEffect, createSignal, onCleanup, onMount, Show } from "solid-js";
 import { ASPECT_RATIOS } from "~/routes/editor/projectConfig";
+import FrameWorker from "~/utils/frame-worker?worker";
 import { t as localize } from "~/utils/i18n";
 import { type CaptureStyle, commands } from "~/utils/tauri";
 
@@ -8,82 +9,136 @@ export default function CaptureStage(props: {
 	cameraEnabled: boolean;
 }) {
 	let canvas!: HTMLCanvasElement;
-	let disposed = false;
-	let pending = false;
-	let rendering = false;
-	let timer: ReturnType<typeof setTimeout> | undefined;
-	let started = 0;
 	const [playing, setPlaying] = createSignal(false);
 	const [error, setError] = createSignal("");
 	const [ready, setReady] = createSignal(false);
+	const [connected, setConnected] = createSignal(false);
+	const [visible, setVisible] = createSignal(
+		document.visibilityState === "visible",
+	);
 	const ratio = () => props.style?.config.aspectRatio;
-	const schedule = () => {
-		pending = true;
-		if (rendering || !props.style || disposed) return;
-		void render();
+	let disposed = false;
+	let starting = false;
+	let socket: WebSocket | undefined;
+	let worker: Worker | undefined;
+	let pending: ArrayBuffer | undefined;
+	let available = false;
+	const config = () => {
+		if (!props.style) return;
+		const value = structuredClone(props.style.config);
+		value.camera.hide = !props.cameraEnabled || value.camera.hide;
+		return value;
 	};
-	const render = async () => {
-		const style = props.style;
-		if (!style || disposed) return;
-		rendering = true;
-		pending = false;
+	const send = () => {
+		if (!available || !pending || !worker || disposed) return;
+		const buffer = pending;
+		pending = undefined;
+		available = false;
+		worker.postMessage({ type: "frame", buffer }, [buffer]);
+	};
+	const schedule = async () => {
+		const value = config();
+		if (!value || disposed || starting) return;
 		try {
-			const time = playing() ? ((performance.now() - started) / 1000) % 6 : 0.7;
-			const config = structuredClone(style.config);
-			config.camera.hide = !props.cameraEnabled || config.camera.hide;
-			const result = await commands.renderCapturePreview(config, time);
-			if (disposed) return;
-			const buffer = Uint8Array.from(atob(result), (c) =>
-				c.charCodeAt(0),
-			).buffer;
-			const header = new DataView(buffer);
-			const width = header.getUint32(0, true);
-			const height = header.getUint32(4, true);
-			const stride = header.getUint32(8, true);
-			const rows = new Uint8Array(buffer, 12);
-			const pixels = new Uint8ClampedArray(width * height * 4);
-			for (let y = 0; y < height; y++)
-				pixels.set(
-					rows.subarray(y * stride, y * stride + width * 4),
-					y * width * 4,
+			if (connected()) {
+				await commands.updateCapturePreview(value, playing() && visible());
+			} else {
+				starting = true;
+				const port = await commands.startCapturePreview(
+					value,
+					playing() && visible(),
 				);
-			canvas.width = width;
-			canvas.height = height;
-			canvas.style.setProperty("--jk-preview-ratio", String(width / height));
-			canvas
-				.getContext("2d")
-				?.putImageData(new ImageData(pixels, width, height), 0, 0);
-			setReady(true);
-			setError("");
-		} catch (error) {
-			if (!disposed) {
-				setError(String(error));
-				setPlaying(false);
+				if (disposed) {
+					await commands.stopCapturePreview();
+					return;
+				}
+				socket?.close();
+				socket = new WebSocket(`ws://127.0.0.1:${port}/?paced=true`);
+				socket.binaryType = "arraybuffer";
+				socket.onmessage = (event: MessageEvent<ArrayBuffer>) => {
+					pending = event.data;
+					send();
+				};
+				socket.onopen = () => {
+					setConnected(true);
+					setError("");
+				};
+				socket.onerror = () => setError("画面连接失败，请重试");
+				socket.onclose = () => {
+					if (!disposed) {
+						setConnected(false);
+						setError("画面连接已断开，点击重试");
+					}
+				};
 			}
+		} catch (e) {
+			if (!disposed) setError(String(e));
 		} finally {
-			rendering = false;
-			if (!disposed && pending) schedule();
-			else if (!disposed && playing() && document.visibilityState === "visible")
-				timer = setTimeout(schedule, 1000 / 30);
+			starting = false;
 		}
 	};
 	createEffect(() => {
+		props.style;
 		props.cameraEnabled;
-		if (props.style) schedule();
+		playing();
+		visible();
+		if (connected()) void schedule();
 	});
 	onMount(() => {
-		const visibility = () => {
-			if (document.visibilityState === "visible") schedule();
+		worker = new FrameWorker();
+		worker.onmessage = (
+			event: MessageEvent<{
+				type: string;
+				message?: string;
+				width?: number;
+				height?: number;
+			}>,
+		) => {
+			const data = event.data;
+			if (data.type === "frame-rendered") {
+				if (socket?.readyState === WebSocket.OPEN) socket.send("presented");
+				if (data.width && data.height)
+					canvas.style.setProperty(
+						"--jk-preview-ratio",
+						String(data.width / data.height),
+					);
+				setReady(true);
+				setError("");
+				canvas.dispatchEvent(
+					new CustomEvent("preview-presented", {
+						detail: { time: performance.now(), ...data },
+					}),
+				);
+			}
+			if (["ready", "frame-rendered", "request-frame"].includes(data.type)) {
+				available = true;
+				send();
+			} else if (data.type === "error")
+				setError(data.message ?? "输出画面暂时不可用");
 		};
+		const offscreen = canvas.transferControlToOffscreen();
+		worker.postMessage(
+			{ type: "init-canvas", canvas: offscreen, preserveAlpha: true },
+			[offscreen],
+		);
+		void schedule();
+		const visibility = () => setVisible(document.visibilityState === "visible");
 		document.addEventListener("visibilitychange", visibility);
 		onCleanup(() =>
 			document.removeEventListener("visibilitychange", visibility),
 		);
 	});
+	createEffect(() => {
+		if (props.style && worker && !connected() && !error()) void schedule();
+	});
 	onCleanup(() => {
 		disposed = true;
-		if (timer) clearTimeout(timer);
+		socket?.close();
+		worker?.postMessage({ type: "cleanup" });
+		worker?.terminate();
+		void commands.stopCapturePreview();
 	});
+
 	return (
 		<section class="jk-capture-stage" aria-label={localize("捕获画面布局示意")}>
 			<div class="jk-stage-canvas jk-stage-rendered">
@@ -112,9 +167,6 @@ export default function CaptureStage(props: {
 					aria-pressed={playing()}
 					onClick={() => {
 						setPlaying(!playing());
-						started = performance.now();
-						if (timer) clearTimeout(timer);
-						schedule();
 					}}
 				>
 					{playing() ? localize("暂停动效") : localize("播放动效")}

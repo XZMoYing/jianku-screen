@@ -9,7 +9,8 @@ import {
 	onCleanup,
 	Show,
 } from "solid-js";
-import { produce } from "solid-js/store";
+import { unwrap } from "solid-js/store";
+import { MotionGroup, MotionSwitch } from "~/components/InterfaceMotion";
 import { animatedGradientsStore } from "~/store";
 import { t as localize } from "~/utils/i18n";
 import type { OrganizationBrandColorSwatch } from "~/utils/organization-branding";
@@ -32,7 +33,6 @@ import {
 } from "./animated-gradient-drag";
 import { BrandColorsDropdown } from "./BrandColorsDropdown";
 import { hexToRgb, RgbInput } from "./color-utils";
-import { useEditorContext } from "./context";
 import { EditorButton, Field, Input, Section, Slider } from "./ui";
 
 const MAX_STOPS = 5;
@@ -144,8 +144,10 @@ function ControlRow(props: {
 
 export function AnimatedGradientEditor(props: {
 	brandColorSwatches?: OrganizationBrandColorSwatch[];
+	config: AnimatedGradientConfig;
+	onChange: (config: AnimatedGradientConfig) => void;
+	pauseHistory?: () => () => void;
 }) {
-	const { project, setProject, projectHistory } = useEditorContext();
 	const catalog = createQuery(() => ({
 		queryKey: ["animated-gradient-catalog"],
 		queryFn: () => commands.animatedGradientCatalog(),
@@ -172,23 +174,26 @@ export function AnimatedGradientEditor(props: {
 	});
 
 	const config = createMemo(() => {
-		const source = project.background.source;
-		return source.type === "animatedGradient" ? source.config : null;
+		return props.config;
 	});
 	const stops = () => config()?.colorStops ?? [];
 	const stopIndex = createMemo(() =>
 		clamp(selectedStop(), 0, Math.max(0, stops().length - 1)),
 	);
-	const savedPresets = () => library.data?.presets ?? [];
+	const savedPresets = () =>
+		(library.isPending ? undefined : library.data)?.presets ?? [];
 	const serializedConfig = createMemo(() => JSON.stringify(config()));
 	const isSelected = (preset: AnimatedGradientPreset) =>
 		serializedConfig() === JSON.stringify(preset.config);
 	const motionControl = createMemo(() =>
-		catalog.data?.controls.find((control) => control.key === MOTION_KEY),
+		(catalog.isPending ? undefined : catalog.data)?.controls.find(
+			(control) => control.key === MOTION_KEY,
+		),
 	);
 	const groups = createMemo(() => {
 		const grouped = new Map<string, AnimatedGradientControl[]>();
-		for (const control of catalog.data?.controls ?? []) {
+		for (const control of (catalog.isPending ? undefined : catalog.data)
+			?.controls ?? []) {
 			if (control.key === MOTION_KEY) continue;
 			const controls = grouped.get(control.group) ?? [];
 			controls.push(control);
@@ -203,13 +208,9 @@ export function AnimatedGradientEditor(props: {
 	const updateConfig = (update: (value: AnimatedGradientConfig) => void) => {
 		if (disposed || !config()) return;
 		revision += 1;
-		setProject(
-			"background",
-			"source",
-			produce((source) => {
-				if (source.type === "animatedGradient") update(source.config);
-			}),
-		);
+		const next = structuredClone(unwrap(props.config));
+		update(next);
+		props.onChange(next);
 	};
 
 	const applyConfig = (value: AnimatedGradientConfig) => {
@@ -285,7 +286,7 @@ export function AnimatedGradientEditor(props: {
 		activeDrag = startPointerDrag({
 			target,
 			pointerId: event.pointerId,
-			pauseHistory: projectHistory.pause,
+			pauseHistory: props.pauseHistory ?? (() => () => {}),
 			pauseImmediately: options?.pauseImmediately,
 			onStart: options?.onStart,
 			onMove: (moveEvent) => {
@@ -298,7 +299,8 @@ export function AnimatedGradientEditor(props: {
 	};
 
 	const resetFineTune = () => {
-		const defaults = catalog.data?.defaultConfig;
+		const defaults = (catalog.isPending ? undefined : catalog.data)
+			?.defaultConfig;
 		if (!defaults) return;
 		updateConfig((current) => {
 			for (const group of groups())
@@ -415,7 +417,12 @@ export function AnimatedGradientEditor(props: {
 								>
 									<IconLucideShuffle class="size-4" />
 								</button>
-								<For each={catalog.data?.templates ?? []}>
+								<For
+									each={
+										(catalog.isPending ? undefined : catalog.data)?.templates ??
+										[]
+									}
+								>
 									{(preset) => (
 										<button
 											type="button"
@@ -714,8 +721,8 @@ export function AnimatedGradientEditor(props: {
 						</div>
 						<KCollapsible.Content class="overflow-hidden opacity-0 transition-opacity animate-collapsible-up data-expanded:animate-collapsible-down data-expanded:opacity-100">
 							<div class="flex flex-col gap-3 pt-4">
-								<div
-									role="tablist"
+								<MotionGroup
+									label={localize("动态背景参数分类")}
 									class="flex flex-row rounded-lg bg-ed-ctl p-0.5"
 								>
 									<For each={groups()}>
@@ -736,21 +743,34 @@ export function AnimatedGradientEditor(props: {
 											</button>
 										)}
 									</For>
-								</div>
+								</MotionGroup>
 								<div class="flex flex-col">
-									<For each={activeGroup()?.controls ?? []}>
-										{(control) => (
-											<ControlRow
-												control={control}
-												value={current()[control.key]}
-												onChange={(next) =>
-													updateConfig((value) => {
-														value[control.key] = next;
-													})
+									<MotionSwitch
+										value={activeGroup()?.name}
+										kind="subpage"
+										order={groups().map((group) => group.name)}
+									>
+										{(name) => (
+											<For
+												each={
+													groups().find((group) => group.name === name())
+														?.controls ?? []
 												}
-											/>
+											>
+												{(control) => (
+													<ControlRow
+														control={control}
+														value={current()[control.key]}
+														onChange={(next) =>
+															updateConfig((value) => {
+																value[control.key] = next;
+															})
+														}
+													/>
+												)}
+											</For>
 										)}
-									</For>
+									</MotionSwitch>
 								</div>
 							</div>
 						</KCollapsible.Content>

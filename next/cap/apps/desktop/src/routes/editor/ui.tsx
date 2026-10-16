@@ -29,7 +29,7 @@ export function Section(
 	props: ParentProps<{ name: string; action?: JSX.Element; class?: string }>,
 ) {
 	return (
-		<div class={cx("flex flex-col gap-2.5", props.class)}>
+		<div data-motion-section class={cx("flex flex-col gap-2.5", props.class)}>
 			<div class="flex flex-row gap-2 items-center min-h-[22px]">
 				<SectionLabel name={localize(props.name)} />
 				<Show when={props.action}>

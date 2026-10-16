@@ -8,6 +8,7 @@ mod audio_library;
 mod audio_meter;
 mod auth;
 mod automation;
+mod background_materials;
 mod camera;
 mod camera_legacy;
 #[cfg(target_os = "macos")]
@@ -6799,10 +6800,15 @@ fn specta_builder() -> tauri_specta::Builder {
             recording::import_current_desktop_background,
             recording::get_default_project_config,
             capture_preview::render_capture_preview,
+            capture_preview::start_capture_preview,
+            capture_preview::update_capture_preview,
+            capture_preview::stop_capture_preview,
             capture_style::get_capture_style,
             capture_style::set_capture_style,
             capture_style::get_current_wallpaper_preview,
             desktop_wallpaper::get_desktop_wallpaper,
+            background_materials::list_background_materials,
+            background_materials::prepare_background_media,
             recording::list_cameras,
             recording::get_camera_formats,
             recording::get_microphone_info,
@@ -7301,6 +7307,7 @@ pub async fn run(recording_logging_handle: LoggingHandle, logs_dir: PathBuf) {
             app.manage(http_client::RetryableHttpClient::default());
             app.manage(PendingScreenshots::default());
             app.manage(presentation::PresentationState::default());
+            app.manage(capture_preview::CapturePreviewState::default());
             app.manage(mobile::MobileState::default());
             app.manage(mobile::CaptureStartGate::default());
             app.manage(FinalizingRecordings::default());

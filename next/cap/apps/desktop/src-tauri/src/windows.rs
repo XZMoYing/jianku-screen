@@ -3505,7 +3505,16 @@ impl ShowCapWindow {
 
         #[cfg(debug_assertions)]
         if std::env::var_os("JIANKU_UI_REVIEW_OUTPUT").is_some() {
-            builder = builder.initialization_script(include_str!("ui-review.js"));
+            let script = std::env::var_os("JIANKU_UI_REVIEW_SCRIPT")
+                .and_then(|path| std::fs::read_to_string(path).ok())
+                .unwrap_or_else(|| {
+                    if std::env::var_os("JIANKU_BACKGROUND_REVIEW").is_some() {
+                        include_str!("background-review.js").into()
+                    } else {
+                        include_str!("ui-review.js").into()
+                    }
+                });
+            builder = builder.initialization_script(script);
         }
 
         #[cfg(windows)]

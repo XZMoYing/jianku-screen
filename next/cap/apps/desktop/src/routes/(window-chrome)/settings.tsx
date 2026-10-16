@@ -18,6 +18,7 @@ import {
 } from "solid-js";
 import toast from "solid-toast";
 import { CapErrorBoundary } from "~/components/CapErrorBoundary";
+import { MotionGroup, transitionContent } from "~/components/InterfaceMotion";
 import { SignInButton } from "~/components/SignInButton";
 import { authStore, userProfileStore } from "~/store";
 import { resetUser, trackEvent } from "~/utils/analytics";
@@ -134,6 +135,7 @@ function SettingsContentSkeleton() {
 
 export default function Settings(props: RouteSectionProps) {
 	const navigate = useNavigate();
+	let content!: HTMLDivElement;
 	const queryClient = useQueryClient();
 	const [auth, setAuth] =
 		createSignal<Awaited<ReturnType<typeof authStore.get>>>();
@@ -484,22 +486,37 @@ export default function Settings(props: RouteSectionProps) {
 						</p>
 					</div>
 				</button>
-				<ul class="cap-settings-nav min-w-48 h-full p-2.5 space-y-1 text-gray-12">
-					<For each={settingsItems}>
-						{(item) => (
-							<li>
-								<A
-									href={item.href}
-									activeClass="bg-gray-5 pointer-events-none"
-									class="cap-settings-nav-item rounded-lg h-8 hover:bg-gray-3 text-[13px] px-2 flex flex-row items-center gap-1.5 transition-colors"
-								>
-									<item.icon class="opacity-60 size-4" aria-hidden="true" />
-									<span>{localize(item.name)}</span>
-								</A>
-							</li>
-						)}
-					</For>
-				</ul>
+				<MotionGroup class="jk-settings-navigation" label={localize("设置")}>
+					<ul class="cap-settings-nav min-w-48 h-full p-2.5 space-y-1 text-gray-12">
+						<For each={settingsItems}>
+							{(item) => (
+								<li>
+									<A
+										href={item.href}
+										onClick={(event) => {
+											if (
+												event.metaKey ||
+												event.ctrlKey ||
+												event.shiftKey ||
+												event.altKey
+											)
+												return;
+											event.preventDefault();
+											void transitionContent(content, () =>
+												navigate(item.href),
+											);
+										}}
+										activeClass="bg-gray-5 pointer-events-none"
+										class="cap-settings-nav-item rounded-lg h-8 hover:bg-gray-3 text-[13px] px-2 flex flex-row items-center gap-1.5 transition-colors"
+									>
+										<item.icon class="opacity-60 size-4" aria-hidden="true" />
+										<span>{localize(item.name)}</span>
+									</A>
+								</li>
+							)}
+						</For>
+					</ul>
+				</MotionGroup>
 				<div class="cap-settings-account p-2.5 text-left flex flex-col">
 					<Show when={version()}>
 						{(v) => (
@@ -551,7 +568,10 @@ export default function Settings(props: RouteSectionProps) {
 					</Show>
 				</div>
 			</div>
-			<div class="cap-settings-content overflow-y-hidden flex-1 min-w-0">
+			<div
+				ref={content}
+				class="cap-settings-content overflow-y-hidden flex-1 min-w-0"
+			>
 				<CapErrorBoundary>
 					<Suspense fallback={<SettingsContentSkeleton />}>
 						{props.children}

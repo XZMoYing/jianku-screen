@@ -1,41 +1,22 @@
 import { NumberField } from "@kobalte/core";
-import {
-	Collapsible,
-	Collapsible as KCollapsible,
-} from "@kobalte/core/collapsible";
-import {
-	RadioGroup as KRadioGroup,
-	RadioGroup,
-} from "@kobalte/core/radio-group";
+import { Collapsible as KCollapsible } from "@kobalte/core/collapsible";
+import { RadioGroup } from "@kobalte/core/radio-group";
 import { Select as KSelect } from "@kobalte/core/select";
 import { Tabs as KTabs } from "@kobalte/core/tabs";
 import { createElementBounds } from "@solid-primitives/bounds";
 import { createEventListenerMap } from "@solid-primitives/event-listener";
-import { createQuery } from "@tanstack/solid-query";
 import { convertFileSrc } from "@tauri-apps/api/core";
-import { appDataDir, resolveResource } from "@tauri-apps/api/path";
-import {
-	BaseDirectory,
-	exists,
-	readDir,
-	stat,
-	writeFile,
-} from "@tauri-apps/plugin-fs";
-import { type as ostype } from "@tauri-apps/plugin-os";
 import { cx } from "cva";
 import {
 	batch,
 	createEffect,
 	createMemo,
-	createResource,
 	createRoot,
 	createSignal,
 	For,
 	Index,
 	lazy,
 	on,
-	onCleanup,
-	onMount,
 	Show,
 	Suspense,
 	type ValidComponent,
@@ -43,41 +24,32 @@ import {
 import { createStore, produce } from "solid-js/store";
 import { Dynamic } from "solid-js/web";
 import toast from "solid-toast";
+import { BackgroundSettings } from "~/components/BackgroundSettings";
 import { CameraSettings } from "~/components/CameraSettings";
 import { CursorSettings } from "~/components/CursorSettings";
-import { MotionGroup } from "~/components/InterfaceMotion";
+import { MotionGroup, MotionSwitch } from "~/components/InterfaceMotion";
 import { LayoutSettings } from "~/components/LayoutSettings";
 import { Toggle } from "~/components/Toggle";
-import {
-	animatedGradientsStore,
-	audioEnhancementStore,
-	generalSettingsStore,
-} from "~/store";
+import { audioEnhancementStore, generalSettingsStore } from "~/store";
 import { t as localize } from "~/utils/i18n";
-import { springFrames } from "~/utils/interface-spring";
 import {
 	createSelectedOrganization,
 	getOrganizationBrandColorSwatches,
 	type OrganizationBrandColorSwatch,
 } from "~/utils/organization-branding";
-import { projectAssetPath } from "~/utils/project-files";
-import {
-	type AnimatedGradientConfig,
-	type AnimatedGradientLibrary,
-	type BackgroundSource,
-	type CaptionTrackSegment,
-	type ClipOffsets,
-	commands,
-	type KeyboardTrackSegment,
-	type NotchConfiguration,
-	type SceneMode,
-	type SceneSegment,
-	type SplitLayout,
-	type StereoMode,
-	type TimelineSegment,
-	type VoiceIsolation,
-	type XY,
-	type ZoomSegment,
+import type {
+	CaptionTrackSegment,
+	ClipOffsets,
+	KeyboardTrackSegment,
+	NotchConfiguration,
+	SceneMode,
+	SceneSegment,
+	SplitLayout,
+	StereoMode,
+	TimelineSegment,
+	VoiceIsolation,
+	XY,
+	ZoomSegment,
 } from "~/utils/tauri";
 import IconLucideColumns2 from "~icons/lucide/columns-2";
 import IconLucideEyeOff from "~icons/lucide/eye-off";
@@ -85,10 +57,6 @@ import IconLucideKeyboard from "~icons/lucide/keyboard";
 import IconLucideMonitor from "~icons/lucide/monitor";
 import IconLucideVideo from "~icons/lucide/video";
 import IconLucideX from "~icons/lucide/x";
-import {
-	AnimatedGradientEditor,
-	copyAnimatedGradientConfig,
-} from "./AnimatedGradientEditor";
 import { AudioLibraryPanel } from "./AudioLibrary";
 import {
 	AUDIO_TRACK_BG_CLASS,
@@ -96,14 +64,11 @@ import {
 	MAX_VOLUME_DB,
 	MIN_VOLUME_DB,
 } from "./audio";
-import { BrandColorsDropdown } from "./BrandColorsDropdown";
 import { ColorCorrectionSection } from "./ColorCorrectionSection";
 import { recordedCursorFamily } from "./CursorStylePicker";
 import { syncCaptionWordsWithText } from "./captions";
 import { type ClipTransition, clipSourceTimeAt } from "./clip-transitions";
-import { hexToRgb, RgbInput } from "./color-utils";
 import { EditorStyleContext, useEditorContext } from "./context";
-import { GradientEditor } from "./GradientEditor";
 import { ImageSegmentConfig } from "./image-segment-config";
 import { KeyboardTab } from "./KeyboardTab";
 import {
@@ -115,10 +80,6 @@ import {
 	type MaskSegment,
 } from "./masks";
 import {
-	DEFAULT_BACKGROUND_PADDING,
-	DEFAULT_BACKGROUND_ROUNDING,
-	DEFAULT_GRADIENT_FROM,
-	DEFAULT_GRADIENT_TO,
 	DEFAULT_SCENE_TRANSITION,
 	DEFAULT_SPLIT_LAYOUT,
 } from "./projectConfig";
@@ -153,119 +114,6 @@ const CaptionsTab = lazy(() =>
 	import("./CaptionsTab").then((m) => ({ default: m.CaptionsTab })),
 );
 
-type BackgroundSourceTab = BackgroundSource["type"] | "desktop" | "none";
-
-const BACKGROUND_SOURCES = {
-	desktop: "Desktop",
-	wallpaper: "Wallpaper",
-	image: "Image",
-	color: "Color",
-	gradient: "Gradient",
-	animatedGradient: "Animated",
-	none: "None",
-} satisfies Record<BackgroundSourceTab, string>;
-
-const BACKGROUND_SOURCE_TABS = [
-	"desktop",
-	"wallpaper",
-	"image",
-	"color",
-	"gradient",
-	"animatedGradient",
-] satisfies Array<BackgroundSourceTab>;
-
-const BACKGROUND_IMAGE_ACCEPT =
-	"image/apng, image/avif, image/jpeg, image/png, image/webp";
-const BACKGROUND_IMAGE_EXTENSIONS = [
-	"jpg",
-	"jpeg",
-	"png",
-	"gif",
-	"webp",
-	"bmp",
-] as const;
-
-const BACKGROUND_COLORS = [
-	"#FF0000", // Red
-	"#FF4500", // Orange-Red
-	"#FF8C00", // Orange
-	"#FFD700", // Gold
-	"#FFFF00", // Yellow
-	"#ADFF2F", // Green-Yellow
-	"#32CD32", // Lime Green
-	"#008000", // Green
-	"#00CED1", // Dark Turquoise
-	"#4785FF", // Dodger Blue
-	"#0000FF", // Blue
-	"#4B0082", // Indigo
-	"#800080", // Purple
-	"#A9A9A9", // Dark Gray
-	"#FFFFFF", // White
-	"#000000", // Black
-	"#00000000", // Transparent
-];
-
-const WALLPAPER_NAMES = [
-	// macOS wallpapers
-	"macOS/tahoe-dusk-min",
-	"macOS/tahoe-dawn-min",
-	"macOS/tahoe-day-min",
-	"macOS/tahoe-night-min",
-	"macOS/tahoe-dark",
-	"macOS/tahoe-light",
-	"macOS/sequoia-dark",
-	"macOS/sequoia-light",
-	"macOS/sonoma-clouds",
-	"macOS/sonoma-dark",
-	"macOS/sonoma-evening",
-	"macOS/sonoma-fromabove",
-	"macOS/sonoma-horizon",
-	"macOS/sonoma-light",
-	"macOS/sonoma-river",
-	"macOS/ventura-dark",
-	"macOS/ventura-semi-dark",
-	"macOS/ventura",
-	// Blue wallpapers
-	"blue/1",
-	"blue/2",
-	"blue/3",
-	"blue/4",
-	"blue/5",
-	"blue/6",
-	// Purple wallpapers
-	"purple/1",
-	"purple/2",
-	"purple/3",
-	"purple/4",
-	"purple/5",
-	"purple/6",
-	"cities/liverpool",
-	"cities/santorini",
-	"cities/miami",
-	"cities/monaco",
-	"cities/london",
-	"cities/rome",
-	"cities/sf",
-	"cities/nyc",
-	// Dark wallpapers
-	"dark/1",
-	"dark/2",
-	"dark/3",
-	"dark/4",
-	"dark/5",
-	"dark/6",
-	// Orange wallpapers
-	"orange/1",
-	"orange/2",
-	"orange/3",
-	"orange/4",
-	"orange/5",
-	"orange/6",
-	"orange/7",
-	"orange/8",
-	"orange/9",
-] as const;
-
 // Null placement means "use the recording's own measurements", so untouched
 // sliders must stay null rather than being written out at their displayed value.
 const UNPLACED_NOTCH = {
@@ -275,49 +123,11 @@ const UNPLACED_NOTCH = {
 	height: null,
 } satisfies NotchConfiguration;
 
-const CURRENT_DESKTOP_BACKGROUND_ID = "current-desktop-background";
-const CURRENT_DESKTOP_BACKGROUND_BASENAME = "current-desktop-background";
-const getCurrentDesktopBackgroundLabel = () => {
-	const os = ostype();
-	if (os === "macos") return localize("This Mac");
-	if (os === "windows") return localize("This PC");
-	return localize("This device");
-};
-
-type WallpaperOption = {
-	id: string;
-	url: string;
-	thumbnailUrl: string;
-	rawPath: string;
-	label?: string;
-};
-
-const isCurrentDesktopBackgroundPath = (path: string | null | undefined) => {
-	if (!path) return false;
-	const filename = path.split(/[\\/]/).pop();
-	if (!filename) return false;
-	return (
-		/\.(mov|mp4|m4v)$/i.test(filename) ||
-		filename === "capture-wallpaper.jpg" ||
-		filename.startsWith(`${CURRENT_DESKTOP_BACKGROUND_BASENAME}.`) ||
-		filename.startsWith(`${CURRENT_DESKTOP_BACKGROUND_BASENAME}-`)
-	);
-};
-
 const STEREO_MODES = [
 	{ name: "Stereo", value: "stereo" },
 	{ name: "Mono L", value: "monoL" },
 	{ name: "Mono R", value: "monoR" },
 ] satisfies Array<{ name: string; value: StereoMode }>;
-
-const BACKGROUND_THEMES = {
-	macOS: "macOS",
-	dark: "Dark",
-	blue: "Blue",
-	cities: "Cities",
-	purple: "Purple",
-	orange: "Orange",
-};
 
 const formatVolumeDb = (value: number) =>
 	value <= -30 ? "Muted" : `${value > 0 ? "+" : ""}${value.toFixed(1)} dB`;
@@ -522,33 +332,6 @@ function ConfigSidebarContent() {
 			setState("selectedTab", "background");
 	});
 	let scrollRef!: HTMLDivElement;
-	let inspectorAnimation: Animation | undefined;
-	createEffect(() => {
-		const tab = state.selectedTab;
-		queueMicrotask(() => {
-			inspectorAnimation?.cancel();
-			if (
-				document.visibilityState !== "visible" ||
-				matchMedia("(prefers-reduced-motion: reduce)").matches
-			)
-				return;
-			const panel =
-				scrollRef?.querySelector<HTMLElement>(
-					`[role="tabpanel"][data-value="${tab}"]`,
-				) ??
-				scrollRef?.querySelector<HTMLElement>("[role=tabpanel]:not([hidden])");
-			if (panel)
-				inspectorAnimation = panel.animate(
-					springFrames(0.42, 0.86, 0.65).map(({ offset, progress }) => ({
-						offset,
-						opacity: Math.min(1, Math.max(0, progress)),
-						transform: `translateY(${10 * (1 - progress)}px)`,
-					})),
-					{ duration: 650, easing: "linear" },
-				);
-		});
-	});
-	onCleanup(() => inspectorAnimation?.cancel());
 
 	let selectionScrollRef!: HTMLDivElement;
 	let previousStyle: number | null = null;
@@ -683,163 +466,181 @@ function ConfigSidebarContent() {
 						editorState.timeline.audioReplace !== null,
 				}}
 			>
-				<StyleSegmentConfig />
-				<BackgroundConfig
-					scrollRef={scrollRef}
-					brandColorSwatches={brandColorSwatches()}
-				/>
-				<CameraConfig scrollRef={scrollRef} />
-				<KTabs.Content
-					value="audio"
-					class="flex flex-col flex-1 gap-3.5 pt-3.5 px-4 pb-4 min-h-0"
-				>
-					<Section name={localize("Audio")}>
-						<Subfield name={localize("Mute Audio")}>
-							<Toggle
-								checked={project.audio.mute}
-								onChange={(v) => setProject("audio", "mute", v)}
+				<MotionSwitch value={state.selectedTab}>
+					{(displayed) => (
+						<KTabs value={displayed()}>
+							<StyleSegmentConfig />
+							<BackgroundConfig
+								scrollRef={scrollRef}
+								brandColorSwatches={brandColorSwatches()}
 							/>
-						</Subfield>
-						{editorInstance.recordings.segments[0].mic?.channels === 2 && (
-							<Subfield name={localize("Microphone Stereo Mode")}>
-								<KSelect<{ name: string; value: StereoMode }>
-									options={STEREO_MODES}
-									optionValue="value"
-									optionTextValue="name"
-									value={STEREO_MODES.find(
-										(v) => v.value === project.audio.micStereoMode,
-									)}
-									onChange={(v) => {
-										if (v) setProject("audio", "micStereoMode", v.value);
-									}}
-									disallowEmptySelection
-									itemComponent={(props) => (
-										<MenuItem<typeof KSelect.Item>
-											as={KSelect.Item}
-											item={props.item}
-										>
-											<KSelect.ItemLabel class="flex-1">
-												{props.item.rawValue.name}
-											</KSelect.ItemLabel>
-										</MenuItem>
-									)}
-								>
-									<KSelect.Trigger class="flex flex-row gap-1.5 items-center px-2 w-full h-[26px] rounded-[7px] transition-colors bg-ed-ctl hover:bg-ed-ctl-hover outline-hidden disabled:text-ed-text-3">
-										<KSelect.Value<{
-											name: string;
-											value: StereoMode;
-										}> class="flex-1 text-[12px] text-left truncate text-ed-text-1 font-normal">
-											{(state) => <span>{state.selectedOption().name}</span>}
-										</KSelect.Value>
-										<KSelect.Icon<ValidComponent>
-											as={(props) => (
-												<IconCapChevronDown
-													{...props}
-													class="size-3.5 shrink-0 transform transition-transform data-expanded:rotate-180 text-ed-text-3"
-												/>
-											)}
+							<CameraConfig scrollRef={scrollRef} />
+							<KTabs.Content
+								value="audio"
+								class="flex flex-col flex-1 gap-3.5 pt-3.5 px-4 pb-4 min-h-0"
+							>
+								<Section name={localize("Audio")}>
+									<Subfield name={localize("Mute Audio")}>
+										<Toggle
+											checked={project.audio.mute}
+											onChange={(v) => setProject("audio", "mute", v)}
 										/>
-									</KSelect.Trigger>
-									<KSelect.Portal>
-										<PopperContent<typeof KSelect.Content>
-											as={KSelect.Content}
-											class={cx(topSlideAnimateClasses, "z-50")}
-										>
-											<MenuItemList<typeof KSelect.Listbox>
-												class="overflow-y-auto max-h-32"
-												as={KSelect.Listbox}
-											/>
-										</PopperContent>
-									</KSelect.Portal>
-								</KSelect>
-							</Subfield>
-						)}
+									</Subfield>
+									{editorInstance.recordings.segments[0].mic?.channels ===
+										2 && (
+										<Subfield name={localize("Microphone Stereo Mode")}>
+											<KSelect<{ name: string; value: StereoMode }>
+												options={STEREO_MODES}
+												optionValue="value"
+												optionTextValue="name"
+												value={STEREO_MODES.find(
+													(v) => v.value === project.audio.micStereoMode,
+												)}
+												onChange={(v) => {
+													if (v) setProject("audio", "micStereoMode", v.value);
+												}}
+												disallowEmptySelection
+												itemComponent={(props) => (
+													<MenuItem<typeof KSelect.Item>
+														as={KSelect.Item}
+														item={props.item}
+													>
+														<KSelect.ItemLabel class="flex-1">
+															{props.item.rawValue.name}
+														</KSelect.ItemLabel>
+													</MenuItem>
+												)}
+											>
+												<KSelect.Trigger class="flex flex-row gap-1.5 items-center px-2 w-full h-[26px] rounded-[7px] transition-colors bg-ed-ctl hover:bg-ed-ctl-hover outline-hidden disabled:text-ed-text-3">
+													<KSelect.Value<{
+														name: string;
+														value: StereoMode;
+													}> class="flex-1 text-[12px] text-left truncate text-ed-text-1 font-normal">
+														{(state) => (
+															<span>{state.selectedOption().name}</span>
+														)}
+													</KSelect.Value>
+													<KSelect.Icon<ValidComponent>
+														as={(props) => (
+															<IconCapChevronDown
+																{...props}
+																class="size-3.5 shrink-0 transform transition-transform data-expanded:rotate-180 text-ed-text-3"
+															/>
+														)}
+													/>
+												</KSelect.Trigger>
+												<KSelect.Portal>
+													<PopperContent<typeof KSelect.Content>
+														as={KSelect.Content}
+														class={cx(topSlideAnimateClasses, "z-50")}
+													>
+														<MenuItemList<typeof KSelect.Listbox>
+															class="overflow-y-auto max-h-32"
+															as={KSelect.Listbox}
+														/>
+													</PopperContent>
+												</KSelect.Portal>
+											</KSelect>
+										</Subfield>
+									)}
 
-						<Show when={meta().hasMicrophone}>
-							<StudioSoundCard />
-						</Show>
-					</Section>
-					{meta().hasMicrophone && (
-						<Field
-							inline
-							name={localize("Microphone Volume")}
-							value={formatVolumeDb(project.audio.micVolumeDb ?? 0)}
-						>
-							<Slider
-								disabled={project.audio.mute}
-								value={[project.audio.micVolumeDb ?? 0]}
-								onChange={(v) => setProject("audio", "micVolumeDb", v[0])}
-								minValue={-30}
-								maxValue={10}
-								step={0.1}
-								formatTooltip={(v) =>
-									v <= -30 ? "Muted" : `${v > 0 ? "+" : ""}${v.toFixed(1)} dB`
-								}
-							/>
-						</Field>
+									<Show when={meta().hasMicrophone}>
+										<StudioSoundCard />
+									</Show>
+								</Section>
+								{meta().hasMicrophone && (
+									<Field
+										inline
+										name={localize("Microphone Volume")}
+										value={formatVolumeDb(project.audio.micVolumeDb ?? 0)}
+									>
+										<Slider
+											disabled={project.audio.mute}
+											value={[project.audio.micVolumeDb ?? 0]}
+											onChange={(v) => setProject("audio", "micVolumeDb", v[0])}
+											minValue={-30}
+											maxValue={10}
+											step={0.1}
+											formatTooltip={(v) =>
+												v <= -30
+													? "Muted"
+													: `${v > 0 ? "+" : ""}${v.toFixed(1)} dB`
+											}
+										/>
+									</Field>
+								)}
+								{meta().hasSystemAudio && (
+									<Field
+										inline
+										name={localize("System Audio Volume")}
+										value={formatVolumeDb(project.audio.systemVolumeDb ?? 0)}
+									>
+										<Slider
+											disabled={project.audio.mute}
+											value={[project.audio.systemVolumeDb ?? 0]}
+											onChange={(v) =>
+												setProject("audio", "systemVolumeDb", v[0])
+											}
+											minValue={-30}
+											maxValue={10}
+											step={0.1}
+											formatTooltip={(v) =>
+												v <= -30
+													? "Muted"
+													: `${v > 0 ? "+" : ""}${v.toFixed(1)} dB`
+											}
+										/>
+									</Field>
+								)}
+								<SyncOffsetsConfig />
+							</KTabs.Content>
+							<KTabs.Content
+								value="cursor"
+								class="flex flex-col flex-1 gap-3.5 pt-3.5 px-4 pb-4 min-h-0"
+							>
+								<StyleGroupToggle group="cursor" />
+								<Show
+									when={
+										!selectedStyle() ||
+										selectedStyle()?.overrides.cursor != null
+									}
+								>
+									<CursorSettings
+										cursor={project.cursor}
+										recorded={recordedCursorFamily(meta())}
+										onChange={(patch) => setProject("cursor", patch)}
+									/>
+								</Show>
+							</KTabs.Content>
+							<KTabs.Content
+								value="hotkeys"
+								class="flex flex-1 pt-3.5 px-4 pb-4 min-h-0"
+							>
+								<Section name="Hotkeys">
+									<ComingSoonTooltip>
+										<Subfield name="Show hotkeys">
+											<Toggle disabled />
+										</Subfield>
+									</ComingSoonTooltip>
+								</Section>
+							</KTabs.Content>
+							<KTabs.Content
+								value={TAB_IDS.captions}
+								class="flex flex-col flex-1 gap-3.5 pt-3.5 px-4 pb-4 min-h-0"
+							>
+								<Suspense>
+									<CaptionsTab brandColorSwatches={brandColorSwatches()} />
+								</Suspense>
+							</KTabs.Content>
+							<KTabs.Content
+								value={TAB_IDS.keyboard}
+								class="flex flex-col flex-1 gap-3.5 pt-3.5 px-4 pb-4 min-h-0"
+							>
+								<KeyboardTab brandColorSwatches={brandColorSwatches()} />
+							</KTabs.Content>
+						</KTabs>
 					)}
-					{meta().hasSystemAudio && (
-						<Field
-							inline
-							name={localize("System Audio Volume")}
-							value={formatVolumeDb(project.audio.systemVolumeDb ?? 0)}
-						>
-							<Slider
-								disabled={project.audio.mute}
-								value={[project.audio.systemVolumeDb ?? 0]}
-								onChange={(v) => setProject("audio", "systemVolumeDb", v[0])}
-								minValue={-30}
-								maxValue={10}
-								step={0.1}
-								formatTooltip={(v) =>
-									v <= -30 ? "Muted" : `${v > 0 ? "+" : ""}${v.toFixed(1)} dB`
-								}
-							/>
-						</Field>
-					)}
-					<SyncOffsetsConfig />
-				</KTabs.Content>
-				<KTabs.Content
-					value="cursor"
-					class="flex flex-col flex-1 gap-3.5 pt-3.5 px-4 pb-4 min-h-0"
-				>
-					<StyleGroupToggle group="cursor" />
-					<Show
-						when={!selectedStyle() || selectedStyle()?.overrides.cursor != null}
-					>
-						<CursorSettings
-							cursor={project.cursor}
-							recorded={recordedCursorFamily(meta())}
-							onChange={(patch) => setProject("cursor", patch)}
-						/>
-					</Show>
-				</KTabs.Content>
-				<KTabs.Content
-					value="hotkeys"
-					class="flex flex-1 pt-3.5 px-4 pb-4 min-h-0"
-				>
-					<Section name="Hotkeys">
-						<ComingSoonTooltip>
-							<Subfield name="Show hotkeys">
-								<Toggle disabled />
-							</Subfield>
-						</ComingSoonTooltip>
-					</Section>
-				</KTabs.Content>
-				<KTabs.Content
-					value={TAB_IDS.captions}
-					class="flex flex-col flex-1 gap-3.5 pt-3.5 px-4 pb-4 min-h-0"
-				>
-					<Suspense>
-						<CaptionsTab brandColorSwatches={brandColorSwatches()} />
-					</Suspense>
-				</KTabs.Content>
-				<KTabs.Content
-					value={TAB_IDS.keyboard}
-					class="flex flex-col flex-1 gap-3.5 pt-3.5 px-4 pb-4 min-h-0"
-				>
-					<KeyboardTab brandColorSwatches={brandColorSwatches()} />
-				</KTabs.Content>
+				</MotionSwitch>
 			</div>
 			<div
 				ref={selectionScrollRef}
@@ -1555,504 +1356,6 @@ function BackgroundConfig(props: {
 			project.background.notch?.width ?? editorInstance.notchBase.width;
 		return 1 - Math.min(Math.max(width, 0), 1);
 	};
-	const isNoneBackground = () =>
-		project.background.padding === 0 && project.background.rounding === 0;
-	const initialCurrentDesktopBackgroundPath = () => {
-		const source = project.background.source;
-		if (source.type !== "wallpaper" || !source.path) return null;
-		return isCurrentDesktopBackgroundPath(source.path) ? source.path : null;
-	};
-	const [desktopPreviewPath, setDesktopPreviewPath] = createSignal<string>();
-	const [currentDesktopBackgroundPath, setCurrentDesktopBackgroundPath] =
-		createSignal<string | null>(initialCurrentDesktopBackgroundPath());
-
-	const [backgroundTab, setBackgroundTab] =
-		createSignal<keyof typeof BACKGROUND_THEMES>("macOS");
-	const projectBackgroundSourceTab = createMemo<BackgroundSourceTab>(() => {
-		const source = project.background.source;
-		if (
-			source.type === "wallpaper" &&
-			isCurrentDesktopBackgroundPath(source.path)
-		) {
-			return "desktop";
-		}
-
-		return source.type;
-	});
-	const [backgroundSourceTab, setBackgroundSourceTab] =
-		createSignal<BackgroundSourceTab>(
-			isNoneBackground() ? "none" : projectBackgroundSourceTab(),
-		);
-	const animatedGradientCatalog = createQuery(() => ({
-		queryKey: ["animated-gradient-catalog"],
-		queryFn: () => commands.animatedGradientCatalog(),
-		staleTime: Number.POSITIVE_INFINITY,
-	}));
-	const animatedGradientLibrary = animatedGradientsStore.createQuery();
-	let lastAnimatedGradient: AnimatedGradientConfig | null =
-		project.background.source.type === "animatedGradient"
-			? copyAnimatedGradientConfig(project.background.source.config)
-			: null;
-	let pendingGradientPreference: Partial<
-		Pick<AnimatedGradientLibrary, "lastUsed" | "selected">
-	> | null = null;
-	let gradientPreferenceTimer: ReturnType<typeof setTimeout> | undefined;
-	let previousSourceType = project.background.source.type;
-	let previouslySelected =
-		previousSourceType === "animatedGradient" &&
-		backgroundSourceTab() !== "none";
-
-	const flushGradientPreference = () => {
-		clearTimeout(gradientPreferenceTimer);
-		gradientPreferenceTimer = undefined;
-		const preference = pendingGradientPreference;
-		pendingGradientPreference = null;
-		if (!preference) return;
-		void animatedGradientsStore.set(preference).catch(() => {
-			toast.error(
-				localize("Could not remember your animated gradient settings"),
-			);
-		});
-	};
-	const gradientPreferenceFingerprint = createMemo(() => {
-		const source = project.background.source;
-		const value =
-			source.type === "wallpaper" || source.type === "image"
-				? source.type
-				: JSON.stringify(source);
-		return `${backgroundSourceTab() === "none"}:${value}`;
-	});
-	createEffect(
-		on(
-			gradientPreferenceFingerprint,
-			() => {
-				const source = project.background.source;
-				const selected =
-					source.type === "animatedGradient" &&
-					backgroundSourceTab() !== "none";
-				const selectionChanged =
-					previousSourceType !== source.type || previouslySelected !== selected;
-				previousSourceType = source.type;
-				previouslySelected = selected;
-				if (source.type === "animatedGradient") {
-					lastAnimatedGradient = copyAnimatedGradientConfig(source.config);
-					pendingGradientPreference = {
-						lastUsed: lastAnimatedGradient,
-						selected,
-					};
-				} else {
-					pendingGradientPreference = {
-						...pendingGradientPreference,
-						selected,
-					};
-				}
-				clearTimeout(gradientPreferenceTimer);
-				if (selectionChanged) flushGradientPreference();
-				else gradientPreferenceTimer = setTimeout(flushGradientPreference, 200);
-			},
-			{ defer: true },
-		),
-	);
-	onCleanup(flushGradientPreference);
-
-	// "None" is a sticky selection: nudging the padding/rounding sliders must not
-	// reflow the panel under the slider. Undo/presets restoring an animated source
-	// must expose its controls again because None removes that source entirely.
-	createEffect(
-		on(projectBackgroundSourceTab, (tab) => {
-			if (
-				backgroundSourceTab() !== "none" ||
-				(tab === "animatedGradient" && !isNoneBackground())
-			)
-				setBackgroundSourceTab(tab);
-		}),
-	);
-
-	const [wallpapers] = createResource(async () => {
-		// Only load visible wallpapers initially
-		const visibleWallpaperPaths = WALLPAPER_NAMES.map(async (id) => {
-			try {
-				const path = await resolveResource(`assets/backgrounds/${id}.jpg`);
-				return { id, path };
-			} catch (_err) {
-				return { id, path: null };
-			}
-		});
-
-		// Load initial batch
-		const initialPaths = await Promise.all(visibleWallpaperPaths);
-
-		return initialPaths.flatMap(({ id, path }) => {
-			if (path === null) return [];
-			return {
-				id,
-				url: convertFileSrc(path),
-				thumbnailUrl: convertFileSrc(path.replace(/\.jpg$/, "-thumbnail.jpg")),
-				rawPath: path,
-			} satisfies WallpaperOption;
-		});
-	});
-
-	const currentDesktopBackground = createMemo<WallpaperOption | null>(() => {
-		const path = currentDesktopBackgroundPath();
-		if (!path) return null;
-
-		return {
-			id: CURRENT_DESKTOP_BACKGROUND_ID,
-			url: convertFileSrc(desktopPreviewPath() ?? path),
-			thumbnailUrl: convertFileSrc(desktopPreviewPath() ?? path),
-			rawPath: path,
-			label: /\.(mov|mp4|m4v)$/i.test(path)
-				? localize("当前桌面 · 动态壁纸")
-				: getCurrentDesktopBackgroundLabel(),
-		};
-	});
-
-	const findStoredCurrentDesktopBackgroundPath = async () => {
-		const selected = currentDesktopBackgroundPath();
-		if (selected && !/\.(mov|mp4|m4v)$/i.test(selected)) return selected;
-
-		const assetsDir = `${editorInstance.path}/assets`;
-
-		try {
-			const importedPrefix = `${CURRENT_DESKTOP_BACKGROUND_BASENAME}-`;
-			let newest: { path: string; timestamp: number } | null = null;
-			for (const entry of await readDir(assetsDir)) {
-				if (!entry.isFile || entry.name.includes(".pending.")) continue;
-				if (!entry.name.startsWith(importedPrefix)) continue;
-				const timestamp =
-					(await stat(`${assetsDir}/${entry.name}`)).mtime?.getTime() ?? 0;
-				if (!newest || timestamp > newest.timestamp) {
-					newest = { path: `${assetsDir}/${entry.name}`, timestamp };
-				}
-			}
-			if (newest) {
-				setDesktopPreviewPath(newest.path);
-				return selected ?? newest.path;
-			}
-		} catch {}
-
-		for (const name of [
-			"capture-wallpaper.jpg",
-			...BACKGROUND_IMAGE_EXTENSIONS.map(
-				(extension) => `${CURRENT_DESKTOP_BACKGROUND_BASENAME}.${extension}`,
-			),
-		]) {
-			const path = `${assetsDir}/${name}`;
-			if (await exists(path).catch(() => false)) {
-				setDesktopPreviewPath(path);
-				return selected ?? path;
-			}
-		}
-
-		return selected ?? null;
-	};
-
-	const wallpaperOptions = createMemo(() => wallpapers() ?? []);
-
-	const selectedWallpaper = createMemo(() => {
-		if (project.background.source.type !== "wallpaper") return null;
-
-		const path = project.background.source.path;
-		if (!path) return null;
-		if (isCurrentDesktopBackgroundPath(path)) return null;
-
-		return wallpapers()?.find((w) => path.includes(w.id)) ?? null;
-	});
-
-	// Leaving "None" seeds default padding AND rounding; real→real switches only
-	// ensure padding so an intentionally-square background keeps rounding 0. Keyed
-	// off `fromNone` because rounding is already 0 once the slider has left None.
-	const ensureBackgroundPresentation = (fromNone = false) => {
-		batch(() => {
-			if (project.background.padding === 0)
-				setProject("background", "padding", DEFAULT_BACKGROUND_PADDING);
-			if (fromNone && project.background.rounding === 0)
-				setProject("background", "rounding", DEFAULT_BACKGROUND_ROUNDING);
-		});
-	};
-
-	onMount(async () => {
-		const storedCurrentDesktopBackgroundPath =
-			await findStoredCurrentDesktopBackgroundPath();
-		if (storedCurrentDesktopBackgroundPath) {
-			setCurrentDesktopBackgroundPath(storedCurrentDesktopBackgroundPath);
-		}
-
-		if (
-			project.background.source.type === "wallpaper" ||
-			project.background.source.type === "image"
-		) {
-			const path = project.background.source.path;
-
-			if (path) {
-				if (project.background.source.type === "wallpaper") {
-					if (
-						WALLPAPER_NAMES.includes(path as (typeof WALLPAPER_NAMES)[number])
-					) {
-						const loadedWallpapers = wallpapers();
-						if (!loadedWallpapers) return;
-
-						const wallpaper = loadedWallpapers.find((w) => w.id === path);
-						if (!wallpaper?.url) return;
-
-						const radioGroupOnChange = async (photoUrl: string) => {
-							try {
-								const wallpaper = wallpapers()?.find((w) => w.url === photoUrl);
-								if (!wallpaper) return;
-
-								const rawPath = decodeURIComponent(
-									photoUrl.replace("file://", ""),
-								);
-
-								setWallpaperSource(rawPath);
-							} catch (_err) {
-								toast.error(localize("Failed to set wallpaper"));
-							}
-						};
-
-						await radioGroupOnChange(wallpaper.url);
-					}
-				} else if (project.background.source.type === "image") {
-					(async () => {
-						try {
-							const convertedPath = convertFileSrc(
-								projectAssetPath(editorInstance.path, path),
-							);
-							await fetch(convertedPath, { method: "HEAD" });
-						} catch (_err) {
-							setProject("background", "source", {
-								type: "image",
-								path: null,
-							});
-						}
-					})();
-				}
-			}
-		}
-	});
-
-	const filteredWallpapers = createMemo(() => {
-		const currentTab = backgroundTab();
-		return wallpapers()?.filter((wp) => wp.id.startsWith(currentTab)) || [];
-	});
-
-	const [scrollX, setScrollX] = createSignal(0);
-	const [reachedEndOfScroll, setReachedEndOfScroll] = createSignal(false);
-
-	const [backgroundRef, setBackgroundRef] = createSignal<HTMLDivElement>();
-
-	createEventListenerMap(
-		() => backgroundRef() ?? [],
-		{
-			/** Handle background tabs overflowing to show fade */
-			scroll: () => {
-				const el = backgroundRef();
-				if (el) {
-					setScrollX(el.scrollLeft);
-					const reachedEnd = el.scrollWidth - el.clientWidth - el.scrollLeft;
-					setReachedEndOfScroll(reachedEnd === 0);
-				}
-			},
-			//Mouse wheel and touchpad support
-			wheel: (e: WheelEvent) => {
-				const el = backgroundRef();
-				if (el) {
-					e.preventDefault();
-					el.scrollLeft +=
-						Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-				}
-			},
-		},
-		{ passive: false },
-	);
-
-	let fileInput!: HTMLInputElement;
-
-	const setWallpaperSource = (wallpaperPath: string) => {
-		const resumeHistory = projectHistory.pause();
-		batch(() => {
-			setProject("background", "source", {
-				type: "wallpaper",
-				path: wallpaperPath,
-			} as const);
-			resumeHistory();
-		});
-	};
-
-	const getValidBackgroundImageExtension = (file: File) => {
-		const extension = file.name.split(".").pop()?.toLowerCase();
-		return (
-			BACKGROUND_IMAGE_EXTENSIONS.find((value) => value === extension) ?? null
-		);
-	};
-
-	const [importingDesktopBackground, setImportingDesktopBackground] =
-		createSignal(false);
-
-	const importDesktopBackground = async () => {
-		if (importingDesktopBackground()) return;
-		setImportingDesktopBackground(true);
-		try {
-			const wallpaper = await commands.getDesktopWallpaper(editorInstance.path);
-			const path = wallpaper.path;
-			setDesktopPreviewPath(wallpaper.previewPath);
-			const addingFromBlankBackground = isNoneBackground();
-			batch(() => {
-				setCurrentDesktopBackgroundPath(path);
-				setBackgroundSourceTab("desktop");
-				setWallpaperSource(path);
-				ensureBackgroundPresentation(addingFromBlankBackground);
-			});
-		} catch (_err) {
-			toast.error(localize("Couldn't import your desktop wallpaper"));
-		} finally {
-			setImportingDesktopBackground(false);
-		}
-	};
-
-	const BackgroundSourceTrigger = (props: {
-		item: BackgroundSourceTab;
-		class?: string;
-	}) => (
-		<KTabs.Trigger
-			value={props.item}
-			disabled={
-				props.item === "animatedGradient" &&
-				(!animatedGradientCatalog.data ||
-					animatedGradientLibrary.isPending ||
-					animatedGradientLibrary.isError)
-			}
-			class={cx(
-				"flex flex-1 justify-center items-center h-[26px] px-1 text-[11.5px] font-medium whitespace-nowrap text-ed-text-2 rounded-md border-0 transition-colors duration-200 outline-hidden data-selected:bg-ed-card data-selected:text-ed-text-1 data-selected:shadow-[0_1px_2px_rgba(0,0,0,.12),0_0_0_.5px_rgba(0,0,0,.06)] dark:data-selected:bg-white/11 dark:data-selected:shadow-none not-data-selected:hover:text-ed-text-1 disabled:opacity-40",
-				props.class,
-			)}
-		>
-			{localize(BACKGROUND_SOURCES[props.item])}
-		</KTabs.Trigger>
-	);
-
-	let colorBackground: Extract<BackgroundSource, { type: "color" }> = {
-		type: "color",
-		value: DEFAULT_GRADIENT_FROM,
-	};
-
-	const setColorBackgroundSource = (color: string) => {
-		const rgbValue = hexToRgb(color);
-		if (!rgbValue) return;
-
-		const [r, g, b, a] = rgbValue;
-		colorBackground = {
-			type: "color",
-			value: [r, g, b],
-			alpha: a,
-		};
-
-		setProject("background", "source", colorBackground);
-	};
-
-	const selectBackgroundSourceTab = (v: string) => {
-		const tab = v as BackgroundSourceTab;
-		if (
-			tab === "animatedGradient" &&
-			(!animatedGradientCatalog.data ||
-				animatedGradientLibrary.isPending ||
-				animatedGradientLibrary.isError)
-		)
-			return;
-		const fromNone = backgroundSourceTab() === "none";
-		if (tab === "none") {
-			batch(() => {
-				const source = project.background.source;
-				if (source.type === "animatedGradient") {
-					lastAnimatedGradient = copyAnimatedGradientConfig(source.config);
-					pendingGradientPreference = {
-						lastUsed: lastAnimatedGradient,
-						selected: false,
-					};
-					setProject("background", "source", {
-						type: "color",
-						value: [255, 255, 255],
-						alpha: 255,
-					});
-				}
-				setBackgroundSourceTab(tab);
-				setProject("background", "padding", 0);
-				setProject("background", "rounding", 0);
-			});
-			return;
-		}
-		setBackgroundSourceTab(tab);
-		if (tab === "desktop") {
-			void importDesktopBackground();
-			return;
-		}
-		ensureBackgroundPresentation(fromNone);
-		switch (tab) {
-			case "animatedGradient": {
-				const config =
-					lastAnimatedGradient ??
-					animatedGradientLibrary.data?.lastUsed ??
-					animatedGradientCatalog.data?.defaultConfig;
-				if (!config) return;
-				setProject("background", "source", {
-					type: "animatedGradient",
-					config: copyAnimatedGradientConfig(config),
-				});
-				break;
-			}
-			case "image": {
-				setProject("background", "source", {
-					type: "image",
-					path:
-						project.background.source.type === "image"
-							? project.background.source.path
-							: null,
-				});
-				break;
-			}
-			case "color": {
-				setProject("background", "source", {
-					type: "color",
-					value:
-						project.background.source.type === "color"
-							? project.background.source.value
-							: DEFAULT_GRADIENT_FROM,
-				});
-				break;
-			}
-			case "gradient": {
-				setProject("background", "source", {
-					type: "gradient",
-					from:
-						project.background.source.type === "gradient"
-							? project.background.source.from
-							: DEFAULT_GRADIENT_FROM,
-					to:
-						project.background.source.type === "gradient"
-							? project.background.source.to
-							: DEFAULT_GRADIENT_TO,
-					angle:
-						project.background.source.type === "gradient"
-							? project.background.source.angle
-							: 90,
-				});
-				break;
-			}
-			case "wallpaper": {
-				const path =
-					project.background.source.type === "wallpaper" &&
-					!isCurrentDesktopBackgroundPath(project.background.source.path)
-						? project.background.source.path
-						: null;
-				setProject("background", "source", {
-					type: "wallpaper",
-					path,
-				});
-				break;
-			}
-		}
-	};
 
 	return (
 		<KTabs.Content
@@ -2063,425 +1366,13 @@ function BackgroundConfig(props: {
 			<Show
 				when={!selectedStyle() || selectedStyle()?.overrides.background != null}
 			>
-				<Section
-					name={localize("Background")}
-					action={
-						<EditorButton
-							size="sm"
-							leftIcon={<IconLucideX />}
-							class={
-								backgroundSourceTab() === "none"
-									? "bg-ed-ctl-hover text-ed-text-1"
-									: undefined
-							}
-							onClick={() => selectBackgroundSourceTab("none")}
-						>
-							{localize("None")}
-						</EditorButton>
-					}
-				>
-					<KTabs
-						value={backgroundSourceTab()}
-						onChange={selectBackgroundSourceTab}
-					>
-						<KTabs.List class="flex flex-row gap-0.5 p-0.5 rounded-lg bg-ed-ctl">
-							<For each={BACKGROUND_SOURCE_TABS}>
-								{(item) => <BackgroundSourceTrigger item={item} />}
-							</For>
-							{/* Kobalte resets a Tabs value that matches no trigger to the
-							    first tab (and fires onChange), which would silently replace
-							    a "None" background. The None action lives on the section
-							    header, so the tab itself stays registered but hidden. */}
-							<KTabs.Trigger
-								value="none"
-								aria-hidden="true"
-								tabIndex={-1}
-								class="sr-only"
-							/>
-						</KTabs.List>
-						<Show
-							when={
-								animatedGradientCatalog.isError ||
-								animatedGradientLibrary.isError
-							}
-						>
-							<div class="mt-2 flex items-center justify-between gap-2 text-xs">
-								<span role="alert" class="text-red-11">
-									{localize("Could not load animated gradients.")}
-								</span>
-								<button
-									type="button"
-									class="text-gray-12 underline"
-									onClick={() => {
-										void animatedGradientCatalog.refetch();
-										void animatedGradientLibrary.refetch();
-									}}
-								>
-									{localize("Retry")}
-								</button>
-							</div>
-						</Show>
-						<div class="my-3.5 w-full border-t border-ed-line" />
-						<KTabs.Content value="desktop">
-							<Show
-								when={currentDesktopBackground()}
-								fallback={
-									<div class="flex flex-col gap-3 items-center justify-center p-6 w-full rounded-xl border border-dashed bg-ed-card-2 border-ed-line-strong">
-										<IconLucideMonitor class="size-6 text-ed-text-3" />
-										<span class="text-[13px] text-center text-ed-text-1">
-											{localize("Use the wallpaper from your desktop")}
-										</span>
-										<EditorButton
-											onClick={importDesktopBackground}
-											disabled={importingDesktopBackground()}
-											leftIcon={<IconLucideMonitor />}
-										>
-											{importingDesktopBackground()
-												? localize("Importing...")
-												: "Import desktop background"}
-										</EditorButton>
-									</div>
-								}
-							>
-								{(photo) => (
-									<div class="flex flex-col gap-3">
-										<button
-											type="button"
-											onClick={() => {
-												setWallpaperSource(photo().rawPath);
-												ensureBackgroundPresentation();
-											}}
-											class={cx(
-												"overflow-hidden relative w-full h-48 rounded-lg transition group",
-												project.background.source.type === "wallpaper" &&
-													project.background.source.path === photo().rawPath
-													? "ring-2 ring-ed-accent ring-offset-2 ring-offset-ed-card"
-													: "ring-1 ring-ed-line hover:ring-ed-line-strong",
-											)}
-										>
-											<img
-												src={photo().url}
-												loading="eager"
-												class="object-cover w-full h-full"
-												alt={
-													photo().label ?? getCurrentDesktopBackgroundLabel()
-												}
-											/>
-											<span class="flex absolute right-2 bottom-2 justify-center items-center w-7 h-7 rounded-full text-white/95 bg-black/55 backdrop-blur-sm">
-												<IconLucideMonitor class="size-4" />
-											</span>
-										</button>
-										<div class="flex justify-end">
-											<EditorButton
-												onClick={importDesktopBackground}
-												disabled={importingDesktopBackground()}
-												leftIcon={<IconLucideMonitor />}
-											>
-												{importingDesktopBackground()
-													? localize("Importing...")
-													: localize("Re-import")}
-											</EditorButton>
-										</div>
-									</div>
-								)}
-							</Show>
-						</KTabs.Content>
-						<KTabs.Content value="wallpaper">
-							{/** Background Tabs */}
-							<KTabs class="overflow-hidden relative" value={backgroundTab()}>
-								<KTabs.List
-									ref={setBackgroundRef}
-									class="flex overflow-x-auto overscroll-contain relative z-10 flex-row gap-2 items-center mb-3 text-xs hide-scroll"
-									style={{
-										"-webkit-mask-image": `linear-gradient(to right, transparent, black ${
-											scrollX() > 0 ? "24px" : "0"
-										}, black calc(100% - ${
-											reachedEndOfScroll() ? "0px" : "24px"
-										}), transparent)`,
-
-										"mask-image": `linear-gradient(to right, transparent, black ${
-											scrollX() > 0 ? "24px" : "0"
-										}, black calc(100% - ${
-											reachedEndOfScroll() ? "0px" : "24px"
-										}), transparent);`,
-									}}
-								>
-									<For each={Object.entries(BACKGROUND_THEMES)}>
-										{([key, value]) => (
-											<>
-												<KTabs.Trigger
-													onClick={() =>
-														setBackgroundTab(
-															key as keyof typeof BACKGROUND_THEMES,
-														)
-													}
-													value={key}
-													class="flex relative z-10 flex-1 justify-center items-center px-2.5 h-6 text-[12px] font-medium bg-transparent rounded-[7px] border-0 transition-colors duration-200 text-ed-text-2 not-data-selected:hover:text-ed-text-1 data-selected:bg-ed-ctl-hover group data-selected:text-ed-text-1 disabled:opacity-50 focus:outline-hidden"
-												>
-													{value}
-												</KTabs.Trigger>
-											</>
-										)}
-									</For>
-								</KTabs.List>
-							</KTabs>
-							{/** End of Background Tabs */}
-							<KRadioGroup
-								value={
-									project.background.source.type === "wallpaper"
-										? (selectedWallpaper()?.url ?? undefined)
-										: undefined
-								}
-								onChange={(photoUrl) => {
-									try {
-										const wallpaper = wallpaperOptions().find(
-											(w) => w.url === photoUrl,
-										);
-										if (!wallpaper) return;
-
-										// Get the raw path without any URL prefixes
-
-										setWallpaperSource(wallpaper.rawPath);
-
-										ensureBackgroundPresentation();
-									} catch (_err) {
-										toast.error(localize("Failed to set wallpaper"));
-									}
-								}}
-								class="grid grid-cols-6 gap-1.5 h-auto"
-							>
-								<Show
-									when={!wallpapers.loading}
-									fallback={
-										<div class="flex col-span-6 justify-center items-center h-32 text-ed-text-2">
-											<div class="flex flex-col gap-2 items-center">
-												<div class="w-6 h-6 rounded-full border-2 animate-spin border-gray-5 border-t-blue-400" />
-												<span>{localize("Loading wallpapers...")}</span>
-											</div>
-										</div>
-									}
-								>
-									<For each={filteredWallpapers().slice(0, 18)}>
-										{(photo) => (
-											<KRadioGroup.Item
-												value={photo.url}
-												class="relative h-[34px] group"
-											>
-												<KRadioGroup.ItemInput class="peer" />
-												<KRadioGroup.ItemControl class="overflow-hidden w-full h-full rounded-md transition not-data-checked:hover:ring-1 not-data-checked:hover:ring-ed-line-strong data-checked:ring-2 data-checked:ring-ed-accent data-checked:ring-offset-2 data-checked:ring-offset-ed-card">
-													<img
-														src={photo.thumbnailUrl}
-														loading="eager"
-														class="object-cover w-full h-full"
-														alt={localize("Wallpaper option")}
-													/>
-												</KRadioGroup.ItemControl>
-											</KRadioGroup.Item>
-										)}
-									</For>
-									<Collapsible class="col-span-6">
-										<Collapsible.Content class="animate-in slide-in-from-top-2 fade-in">
-											<div class="grid grid-cols-6 gap-1.5">
-												<For each={filteredWallpapers()}>
-													{(photo) => (
-														<KRadioGroup.Item
-															value={photo.url}
-															class="relative h-[34px] group"
-														>
-															<KRadioGroup.ItemInput class="peer" />
-															<KRadioGroup.ItemControl class="overflow-hidden w-full h-full rounded-md transition data-checked:ring-2 data-checked:ring-ed-accent data-checked:ring-offset-2 data-checked:ring-offset-ed-card">
-																<img
-																	src={photo.thumbnailUrl}
-																	alt={localize("Wallpaper option")}
-																	class="object-cover w-full h-full"
-																	loading="lazy"
-																/>
-															</KRadioGroup.ItemControl>
-														</KRadioGroup.Item>
-													)}
-												</For>
-											</div>
-										</Collapsible.Content>
-									</Collapsible>
-								</Show>
-							</KRadioGroup>
-						</KTabs.Content>
-						<KTabs.Content value="image">
-							<Show
-								when={
-									project.background.source.type === "image" &&
-									project.background.source.path
-								}
-								fallback={
-									<button
-										type="button"
-										onClick={() => fileInput.click()}
-										class="p-6 bg-ed-card-2 text-[13px] w-full rounded-xl border border-ed-line-strong border-dashed flex flex-col items-center justify-center gap-2 hover:bg-ed-ctl transition-colors duration-100"
-									>
-										<IconCapImage class="text-ed-text-3 size-6" />
-										<span class="text-ed-text-1">
-											{localize("Click to select or drag and drop image")}
-										</span>
-									</button>
-								}
-							>
-								{(source) => (
-									<div class="overflow-hidden relative w-full h-48 rounded-md border border-gray-3 group">
-										<img
-											src={convertFileSrc(
-												projectAssetPath(editorInstance.path, source()),
-											)}
-											class="object-cover w-full h-full"
-											alt={localize("Selected background")}
-										/>
-										<div class="absolute top-2 right-2">
-											<button
-												type="button"
-												onClick={() =>
-													setProject("background", "source", {
-														type: "image",
-														path: null,
-													})
-												}
-												class="p-2 text-white rounded-full transition-colors bg-black/50 hover:bg-black/70"
-											>
-												<IconCapCircleX class="w-4 h-4" />
-											</button>
-										</div>
-									</div>
-								)}
-							</Show>
-							<input
-								type="file"
-								ref={fileInput}
-								class="hidden"
-								accept={BACKGROUND_IMAGE_ACCEPT}
-								onChange={async (e) => {
-									const file = e.currentTarget.files?.[0];
-									if (!file) return;
-
-									const extension = getValidBackgroundImageExtension(file);
-									if (!extension) {
-										toast.error(localize("Invalid image file type"));
-										return;
-									}
-
-									try {
-										const fileName = `bg-${Date.now()}-${file.name}`;
-										const arrayBuffer = await file.arrayBuffer();
-										const uint8Array = new Uint8Array(arrayBuffer);
-
-										const fullPath = `${await appDataDir()}/${fileName}`;
-
-										await writeFile(fileName, uint8Array, {
-											baseDir: BaseDirectory.AppData,
-										});
-
-										setProject("background", "source", {
-											type: "image",
-											path: fullPath,
-										});
-									} catch (_err) {
-										toast.error(localize("Failed to save image"));
-									}
-								}}
-							/>
-						</KTabs.Content>
-						<KTabs.Content value="color">
-							<Show
-								when={
-									project.background.source.type === "color" &&
-									project.background.source
-								}
-							>
-								<div class="flex flex-col flex-wrap gap-3">
-									<div class="flex flex-col gap-2">
-										<RgbInput
-											value={
-												project.background.source.type === "color"
-													? project.background.source.value
-													: [0, 0, 0]
-											}
-											onChange={(value) => {
-												setProject("background", "source", {
-													type: "color",
-													value,
-												});
-											}}
-										/>
-										<BrandColorsDropdown
-											swatches={props.brandColorSwatches}
-											onSelect={setColorBackgroundSource}
-										/>
-									</div>
-
-									<div class="flex flex-wrap gap-2">
-										<For each={BACKGROUND_COLORS}>
-											{(color) => (
-												<label class="relative">
-													<input
-														type="radio"
-														class="sr-only peer"
-														name="colorPicker"
-														onChange={(e) => {
-															if (!e.target.checked) return;
-
-															const rgbValue = hexToRgb(color);
-															if (!rgbValue) return;
-
-															const [r, g, b, a] = rgbValue;
-															colorBackground = {
-																type: "color",
-																value: [r, g, b],
-																alpha: a,
-															};
-
-															setProject(
-																"background",
-																"source",
-																colorBackground,
-															);
-														}}
-													/>
-													<div
-														class="rounded-lg transition-all duration-200 size-8 hover:peer-checked:opacity-100 peer-hover:opacity-70 peer-checked:ring-2 peer-checked:ring-ed-accent peer-checked:ring-offset-2 peer-checked:ring-offset-ed-card"
-														style={{
-															background:
-																color === "#00000000"
-																	? CHECKERED_BUTTON_BACKGROUND
-																	: color,
-														}}
-													/>
-												</label>
-											)}
-										</For>
-									</div>
-									{/* <Tooltip content="Add custom color">
-                      <button
-                        class="flex justify-center items-center w-6 h-6 rounded-lg border border-gray-400 border-dashed text-gray-12 hover:border-gray-500"
-                        onClick={() => {
-                          // Function to add a new color (you can modify this)
-                          console.log(
-                            "Open color picker or modal to add a color"
-                          );
-                        }}
-                      >
-                        +
-                      </button>
-                    </Tooltip> */}
-								</div>
-							</Show>
-						</KTabs.Content>
-						<KTabs.Content value="gradient">
-							<GradientEditor brandColorSwatches={props.brandColorSwatches} />
-						</KTabs.Content>
-						<KTabs.Content value="animatedGradient">
-							<AnimatedGradientEditor
-								brandColorSwatches={props.brandColorSwatches}
-							/>
-						</KTabs.Content>
-					</KTabs>
-				</Section>
+				<BackgroundSettings
+					background={project.background}
+					onChange={(patch) => setProject("background", patch)}
+					projectPath={editorInstance.path}
+					brandColorSwatches={props.brandColorSwatches}
+					pauseHistory={projectHistory.pause}
+				/>
 
 				<div class="w-full border-t border-ed-line" />
 				<SectionLabel name={localize("Layout")} />
@@ -2489,19 +1380,7 @@ function BackgroundConfig(props: {
 					background={project.background}
 					aspectRatio={project.aspectRatio}
 					onAspectRatio={(ratio) => setProject("aspectRatio", ratio)}
-					onChange={(patch) => {
-						if (
-							(patch.padding ?? patch.rounding ?? 0) > 0 &&
-							backgroundSourceTab() === "none" &&
-							isNoneBackground()
-						)
-							setProject("background", "source", {
-								type: "color",
-								value: [255, 255, 255],
-								alpha: 255,
-							});
-						setProject("background", patch);
-					}}
+					onChange={(patch) => setProject("background", patch)}
 					motionBlur={
 						project.screenMotionBlur ?? project.cursor.motionBlur ?? 1
 					}
@@ -4263,4 +3142,4 @@ function SceneSegmentConfig(props: {
 	);
 }
 
-const CHECKERED_BUTTON_BACKGROUND = `url("data:image/svg+xml,%3Csvg width='16' height='16' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='8' height='8' fill='%23a0a0a0'/%3E%3Crect x='8' y='8' width='8' height='8' fill='%23a0a0a0'/%3E%3C/svg%3E")`;
+const _CHECKERED_BUTTON_BACKGROUND = `url("data:image/svg+xml,%3Csvg width='16' height='16' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='8' height='8' fill='%23a0a0a0'/%3E%3Crect x='8' y='8' width='8' height='8' fill='%23a0a0a0'/%3E%3C/svg%3E")`;

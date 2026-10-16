@@ -1,0 +1,74 @@
+{
+	"repository": "https://github.com/laogou717/dogsc",
+	"commit": "167fde3ffb3c0ecb32c9b09c1777ec27b7243e07",
+	"verifiedHead": "2026-10-16",
+	"files": [
+		{
+			"path": "Sources/DogSCApp/EditorInspectorMotion.swift",
+			"sha256": "21e27aa7efaf52bd441a06b807e7f0540e1e67e3666dbb9a91644d4d66dc1d47"
+		},
+		{
+			"path": "Sources/DogSCApp/EditorInspectorTabBar.swift",
+			"sha256": "db04a0080490e882af17c66178f61c8c670bc5c66b59055400c1f21746db9860"
+		},
+		{
+			"path": "Sources/DogSCApp/EditorBackgroundInspector.swift",
+			"sha256": "08dcafe07edb8c5f98f4a316ec405e649b5208efe29c7fbfa63140242a5958cc"
+		},
+		{
+			"path": "Sources/DogSCApp/EditorWorkspaceSurface.swift",
+			"sha256": "e6dc70ad2f66247634bca6823f74d3acc21159c3a621935e0bfbf285a03eb15e"
+		},
+		{
+			"path": "Sources/DogSCApp/AppSettingsComponents.swift",
+			"sha256": "89c0a730c69a277e710be1ff8a34847719d322b6b933bc4cfd8941015dc11c48"
+		},
+		{
+			"path": "Sources/DogSCApp/SystemWallpaperLibrary.swift",
+			"sha256": "a34d17d46dce921fe73481bcffd99d8e00efb02cc81eb0fa0cd9ca448ffb2c0a"
+		},
+		{
+			"path": "LICENSE",
+			"sha256": "af8b353671e48b110269ab4b89c909ca580710044691f1c6c0da419c6e9b8ab4"
+		},
+		{
+			"path": "Sources/DogSCApp/SharedFrameRenderer.swift",
+			"sha256": "58a1e4d08afd945f88e08fad67a733999be76a5f31c832be611e93606f62f92e"
+		},
+		{
+			"path": "Sources/RecorderCore/ProjectModel.swift",
+			"sha256": "a0ab8e6ef109889259d8dcd02e4ec12686147b3be1e32d369db010d4390faf3f"
+		}
+	],
+	"motion": {
+		"selection": {
+			"response": 0.38,
+			"dampingFraction": 1
+		},
+		"pageExit": {
+			"duration": 0.14,
+			"bezier": [0.5, 0, 0.9, 0.5],
+			"translateY": 26,
+			"scale": 0.985
+		},
+		"pageArrival": {
+			"response": 0.42,
+			"dampingFraction": 0.86,
+			"translateY": 14
+		},
+		"sectionArrival": {
+			"response": 0.62,
+			"dampingFraction": 0.82,
+			"translateY": 40,
+			"scale": 0.96,
+			"staggerByVerticalPositionMaxSeconds": 0.3
+		},
+		"subpage": {
+			"response": 0.4,
+			"dampingFraction": 0.84,
+			"incomingX": 26,
+			"outgoingX": -18,
+			"scale": 0.985
+		}
+	}
+}

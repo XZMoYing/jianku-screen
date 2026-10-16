@@ -1,0 +1,28 @@
+{
+	"frontend": {
+		"typecheck": "passed",
+		"biomeTouched": "passed",
+		"tests": 13
+	},
+	"native": {
+		"check": "passed",
+		"bindingGeneration": "passed",
+		"backgroundMaterialTest": 1
+	},
+	"preview": {
+		"rgbaBytesCompared": 2304000,
+		"pixelSHA256Equal": true,
+		"resolution": [960, 600],
+		"fps": 54.924681344148325,
+		"p95FrameIntervalMs": 21,
+		"gapsOver50Ms": 0
+	},
+	"backgroundBrowsing": {
+		"homeCategories": 7,
+		"editorCategories": 7,
+		"desktopRestore": "passed"
+	},
+	"referenceCommit": "167fde3ffb3c0ecb32c9b09c1777ec27b7243e07",
+	"version": "0.2.0-alpha.17",
+	"profile": "debug"
+}

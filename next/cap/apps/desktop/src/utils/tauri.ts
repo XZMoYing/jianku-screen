@@ -106,6 +106,15 @@ async getDefaultProjectConfig() : Promise<ProjectConfiguration> {
 async renderCapturePreview(config: ProjectConfiguration, time: number) : Promise<string> {
     return await TAURI_INVOKE("render_capture_preview", { config, time });
 },
+async startCapturePreview(config: ProjectConfiguration, playing: boolean) : Promise<number> {
+    return await TAURI_INVOKE("start_capture_preview", { config, playing });
+},
+async updateCapturePreview(config: ProjectConfiguration, playing: boolean) : Promise<null> {
+    return await TAURI_INVOKE("update_capture_preview", { config, playing });
+},
+async stopCapturePreview() : Promise<null> {
+    return await TAURI_INVOKE("stop_capture_preview");
+},
 async getCaptureStyle() : Promise<CaptureStyle> {
     return await TAURI_INVOKE("get_capture_style");
 },
@@ -117,6 +126,12 @@ async getCurrentWallpaperPreview() : Promise<string> {
 },
 async getDesktopWallpaper(projectPath: string | null) : Promise<DesktopWallpaper> {
     return await TAURI_INVOKE("get_desktop_wallpaper", { projectPath });
+},
+async listBackgroundMaterials() : Promise<BackgroundMaterial[]> {
+    return await TAURI_INVOKE("list_background_materials");
+},
+async prepareBackgroundMedia(path: string, thumbnail: boolean) : Promise<string> {
+    return await TAURI_INVOKE("prepare_background_media", { path, thumbnail });
 },
 async listCameras() : Promise<CameraInfo[]> {
     return await TAURI_INVOKE("list_cameras");
@@ -820,6 +835,7 @@ frame: FrameConfiguration | null;
  * something the capture really did hide, and the two are independent.
  */
 notch: NotchConfiguration | null }
+export type BackgroundMaterial = { id: string; name: string; path: string; animated: boolean }
 export type BackgroundSource = { type: "wallpaper"; path: string | null } | { type: "image"; path: string | null } | { type: "color"; value: [number, number, number]; alpha?: number } | { type: "gradient"; from: [number, number, number]; to: [number, number, number]; angle?: number; noise_intensity?: number | null; noise_scale?: number | null; animated?: boolean | null; animation_speed?: number | null } | { type: "animatedGradient"; config: AnimatedGradientConfig }
 export type BorderConfiguration = { enabled: boolean; width: number; color: [number, number, number]; opacity: number }
 export type Camera = { hide: boolean; mirror: boolean; position: CameraPosition;

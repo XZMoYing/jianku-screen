@@ -3,7 +3,6 @@ import { t as localize } from "~/utils/i18n";
 import type { OrganizationBrandColorSwatch } from "~/utils/organization-branding";
 import { BrandColorsDropdown } from "./BrandColorsDropdown";
 import { hexToRgb, RgbInput } from "./color-utils";
-import { useEditorContext } from "./context";
 import type { RGBColor } from "./projectConfig";
 import { EditorButton, Field, Section, Slider } from "./ui";
 
@@ -50,13 +49,13 @@ function randomColor(): RGBColor {
 
 export function GradientEditor(props: {
 	brandColorSwatches: OrganizationBrandColorSwatch[];
+	source: GradientSourceFields;
+	onChange: (source: GradientSourceFields) => void;
 }) {
-	const { project, setProject } = useEditorContext();
 	const filterId = createUniqueId();
 
 	const source = createMemo(() => {
-		if (project.background.source.type !== "gradient") return null;
-		return project.background.source as unknown as GradientSourceFields;
+		return props.source;
 	});
 
 	const angle = () => source()?.angle ?? 90;
@@ -64,7 +63,7 @@ export function GradientEditor(props: {
 	const noiseScale = () => source()?.noise_scale ?? DEFAULT_NOISE_SCALE;
 
 	const updateGradient = (updates: Partial<GradientSourceFields>) => {
-		setProject("background", "source", updates as Record<string, unknown>);
+		props.onChange({ ...props.source, ...updates });
 	};
 
 	const updateGradientColor = (key: "from" | "to", color: string) => {

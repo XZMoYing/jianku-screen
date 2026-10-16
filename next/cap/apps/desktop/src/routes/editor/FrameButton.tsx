@@ -3,6 +3,7 @@ import { Tabs as KTabs } from "@kobalte/core/tabs";
 import { cx } from "cva";
 import { type Component, For, type JSX, Show } from "solid-js";
 import { Dynamic } from "solid-js/web";
+import { MotionGroup } from "~/components/InterfaceMotion";
 import { t as localize } from "~/utils/i18n";
 import type { FrameConfiguration, FrameStyle } from "~/utils/tauri";
 import IconCapChevronDown from "~icons/cap/chevron-down";
@@ -143,16 +144,21 @@ export function FrameOptions(props: {
 									updateFrame({ theme: v as FrameConfiguration["theme"] })
 								}
 							>
-								<KTabs.List class="flex relative flex-row gap-0.5 items-center p-0.5 h-8 rounded-lg bg-ed-ctl">
-									<KTabs.Trigger value="light" class={THEME_TAB_TRIGGER_CLASS}>
-										{localize("浅色")}
-									</KTabs.Trigger>
-									<KTabs.Trigger value="dark" class={THEME_TAB_TRIGGER_CLASS}>
-										{localize("深色")}
-									</KTabs.Trigger>
-									<KTabs.Indicator class="overflow-hidden absolute inset-0 rounded-lg transition-transform flex p-0.5 peer-focus-visible:outline-solid outline-2 outline-ed-accent outline-offset-2">
-										<div class="flex-1 rounded-md bg-ed-card shadow-[0_1px_2px_rgba(0,0,0,0.12),0_0_0_0.5px_rgba(0,0,0,0.06)] dark:bg-white/12 dark:shadow-none" />
-									</KTabs.Indicator>
+								<KTabs.List>
+									<MotionGroup
+										label={localize("外观")}
+										class="flex relative flex-row gap-0.5 items-center p-0.5 h-8 rounded-lg bg-ed-ctl"
+									>
+										<KTabs.Trigger
+											value="light"
+											class={THEME_TAB_TRIGGER_CLASS}
+										>
+											{localize("浅色")}
+										</KTabs.Trigger>
+										<KTabs.Trigger value="dark" class={THEME_TAB_TRIGGER_CLASS}>
+											{localize("深色")}
+										</KTabs.Trigger>
+									</MotionGroup>
 								</KTabs.List>
 							</KTabs>
 						</SettingRow>
