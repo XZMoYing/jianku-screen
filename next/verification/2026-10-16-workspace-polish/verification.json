@@ -1,0 +1,32 @@
+{
+	"version": "0.2.0-alpha.15",
+	"date": "2026-10-16",
+	"checks": {
+		"desktopTypeScript": "passed",
+		"biome": "passed with four existing reduced-motion important-style warnings",
+		"frontendTests": {
+			"passed": 12,
+			"motion": 4,
+			"colorScheme": 5,
+			"windowGeometry": 3
+		},
+		"nativeCheck": "passed",
+		"nativeWindowTests": {
+			"passed": 61
+		},
+		"applicationBuild": "passed",
+		"strictCodeSignature": "passed",
+		"layoutAndSettingsSmoke": "passed",
+		"mobileLoadingPreservesWorkspace": "passed",
+		"foregroundAnimationFrames": "pending; runtime WebViews reported hidden"
+	},
+	"runtimeErrors": [],
+	"nativeSourceChangesRetained": false,
+	"userCaptureAndColorPreferencesRestored": true,
+	"realUserMediaRecorded": false,
+	"limitations": [
+		"Layout illustration is not pixel-equivalent GPU preview.",
+		"Foreground motion feel, full recording workflows, external monitors and multi-Space interaction still need manual validation.",
+		"V2-Mobile-11 remains P0; iPad and Windows deferred."
+	]
+}

@@ -10,7 +10,7 @@
 		"https://github.com/material-foundation/material-color-utilities/blob/main/concepts/color_extraction.md",
 		"https://support.google.com/android/answer/9730472?hl=en"
 	],
-	"usage": "UI structure and interaction reference; media animation solvers unchanged; no DogSC code linked into the application.",
+	"usage": "Editor details and interaction-motion reference only. The startup workspace follows Jianku's own recording/presentation workflow. Media solvers unchanged; no DogSC source code linked into the application.",
 	"files": [
 		{
 			"file": "dogsc/LICENSE",
@@ -35,6 +35,10 @@
 		{
 			"file": "dogsc/Sources/DogSCApp/EditorInspectorPalette.swift",
 			"sha256": "bec421c1887c6c34973154cad13c513bf74a8a674f1391d3f5c254c133de7966"
+		},
+		{
+			"file": "interface-motion.json",
+			"sha256": "f59fd5f4a4ff635decd3098ebbb782e43e4ed0c87ddf5ee39e45e99855496fec"
 		}
 	],
 	"materialColorUtilities": {

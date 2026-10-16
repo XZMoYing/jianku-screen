@@ -291,10 +291,6 @@ export default function Presentation(props: {
 					<>
 						<div class="presentation-scroll" data-testid="presentation-scroll">
 							<div class="presentation-heading">
-								<div>
-									<h2>把操作变成一场演示</h2>
-									<p>操作原屏幕，将平滑的画面输出给观众。</p>
-								</div>
 								<span
 									class={`studio-status ${status()?.active ? "is-live" : ""}`}
 								>

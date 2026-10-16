@@ -22,7 +22,6 @@ import {
 	type MobileStatus,
 } from "~/utils/tauri";
 import IconRefresh from "~icons/lucide/refresh-cw";
-import IconSmartphone from "~icons/lucide/smartphone";
 import IconSquare from "~icons/lucide/square";
 
 export default function MobileRecorder(props: {
@@ -167,15 +166,6 @@ export default function MobileRecorder(props: {
 			style={{ display: props.visible ? "flex" : "none" }}
 			data-testid="mobile-recorder"
 		>
-			<div class="mobile-heading">
-				<span class="mobile-symbol">
-					<IconSmartphone />
-				</span>
-				<div>
-					<h2>录制移动设备</h2>
-					<p>用 USB 连接手机或平板，录完继续编辑镜头与画面。</p>
-				</div>
-			</div>
 			<div class="mobile-device-card">
 				<div class="flex items-center justify-between gap-3">
 					<label for="mobile-device">录制设备</label>

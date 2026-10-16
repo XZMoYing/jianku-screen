@@ -24,6 +24,7 @@ import "unfonts.css";
 import "./styles/theme.css";
 import "./styles/workspace.css";
 import "./styles/expressive.css";
+import "./styles/workspace-polish.css";
 
 import { CapErrorBoundary } from "./components/CapErrorBoundary";
 import WindowChromeLayout from "./routes/(window-chrome)";

@@ -1,0 +1,56 @@
+{
+	"referenceCommit": "167fde3ffb3c0ecb32c9b09c1777ec27b7243e07",
+	"scope": "Interaction motion parameters only. The startup workspace uses Jianku's own recording and presentation workflow, not DogSC's recorder layout.",
+	"referenceFiles": [
+		"dogsc/Sources/DogSCApp/EditorDesignTokens.swift",
+		"dogsc/Sources/DogSCApp/RecorderSurfaceStyle.swift",
+		"dogsc/Sources/DogSCApp/EditorInspectorMotion.swift"
+	],
+	"observed": {
+		"editorSettle": {
+			"response": 0.38,
+			"damping": 1
+		},
+		"editorInteractive": {
+			"response": 0.3,
+			"damping": 1
+		},
+		"recorderQuick": {
+			"response": 0.26,
+			"damping": 0.86
+		},
+		"recorderPressedScale": 0.96,
+		"inspectorOutgoingSeconds": 0.14,
+		"inspectorReveal": {
+			"response": 0.62,
+			"damping": 0.82
+		},
+		"pageEnter": {
+			"response": 0.42,
+			"damping": 0.86
+		}
+	},
+	"adaptation": {
+		"press": {
+			"response": 0.26,
+			"damping": 0.86,
+			"scale": 0.96
+		},
+		"release": {
+			"response": 0.3,
+			"damping": 1
+		},
+		"selection": {
+			"response": 0.38,
+			"damping": 1
+		},
+		"outgoingSeconds": 0.12,
+		"incoming": {
+			"response": 0.42,
+			"damping": 0.86,
+			"translateYPixels": 14,
+			"scale": 0.985
+		},
+		"implementation": "Independently implemented analytic damped oscillator, preserving current position and velocity on retarget; finite active animation frames only. WebView and SwiftUI frame equivalence is not claimed."
+	}
+}
