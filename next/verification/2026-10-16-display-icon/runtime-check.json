@@ -1,0 +1,17 @@
+[
+	{
+		"color": "rgb(255, 255, 255)",
+		"filters": 0,
+		"height": 80,
+		"phase": "display-icon",
+		"route": "/target-select-overlay",
+		"strokes": ["rgb(255, 255, 255)", "rgb(255, 255, 255)"],
+		"text": "Built-in Retina Display\n3360x2100 · 60FPS\n",
+		"viewBox": "0 0 96 80",
+		"viewportHeight": 1050,
+		"viewportWidth": 1680,
+		"width": 80,
+		"x": 799.984375,
+		"y": 341
+	}
+]
