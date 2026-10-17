@@ -62,7 +62,10 @@ export default function PresentationOutput() {
 				setError(event.data.message ?? "输出画面暂时不可用");
 		};
 		const offscreen = canvas.transferControlToOffscreen();
-		worker.postMessage({ type: "init-canvas", canvas: offscreen }, [offscreen]);
+		worker.postMessage(
+			{ type: "init-canvas", canvas: offscreen, renderOnArrival: true },
+			[offscreen],
+		);
 		void (async () => {
 			for (let attempt = 0; attempt < 80 && !disposed; attempt++) {
 				const status = await commands.getPresentationStatus();
@@ -91,6 +94,7 @@ export default function PresentationOutput() {
 	return (
 		<div class="fixed inset-0 cursor-none" style={{ background: background() }}>
 			<canvas
+				data-testid="presentation-output-canvas"
 				data-tauri-drag-region
 				ref={canvas}
 				class="w-full h-full object-contain"

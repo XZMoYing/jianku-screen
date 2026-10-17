@@ -12,7 +12,7 @@ use crate::{ProjectUniforms, RenderVideoConstants, RenderingError, create_shader
 
 use super::{
     AnimatedGradientLayer,
-    video_background::{VideoBackground, is_video},
+    video_background::{VideoBackground, VideoFrame, is_video},
 };
 
 const MAX_BACKGROUND_DIMENSION: u32 = 2560;
@@ -364,23 +364,133 @@ pub enum Inner {
     },
 }
 
+fn create_video_texture(device: &wgpu::Device, width: u32, height: u32) -> wgpu::Texture {
+    device.create_texture(&wgpu::TextureDescriptor {
+        label: Some("Wallpaper Video Frame"),
+        size: wgpu::Extent3d {
+            width,
+            height,
+            depth_or_array_layers: 1,
+        },
+        mip_level_count: 1,
+        sample_count: 1,
+        dimension: wgpu::TextureDimension::D2,
+        format: wgpu::TextureFormat::Rgba8Unorm,
+        usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::COPY_DST,
+        view_formats: &[],
+    })
+}
+
 pub struct BackgroundLayer {
+    pub(crate) realtime: Option<bool>,
     inner: Option<Inner>,
     image_pipeline: ImageBackgroundPipeline,
     video: Option<VideoBackground>,
     video_texture: Option<wgpu::Texture>,
+    #[cfg(target_os = "macos")]
+    video_converter: Option<crate::yuv_converter::YuvToRgbaConverter>,
+    #[cfg(target_os = "macos")]
+    video_pipelines: Arc<crate::yuv_converter::YuvConverterPipelines>,
+    #[cfg(target_os = "macos")]
+    native_identity: Option<crate::decoder::DecodedFrameStorageIdentity>,
+    #[cfg(target_os = "macos")]
+    native_gpu_failed: bool,
     color_pipeline: GradientOrColorPipeline,
 }
 
 impl BackgroundLayer {
+    #[cfg(test)]
     pub fn new(device: &wgpu::Device) -> Self {
+        Self::new_with_shared_pipelines(
+            device,
+            Arc::new(crate::yuv_converter::YuvConverterPipelines::new(device)),
+        )
+    }
+
+    pub(crate) fn new_with_shared_pipelines(
+        device: &wgpu::Device,
+        video_pipelines: Arc<crate::yuv_converter::YuvConverterPipelines>,
+    ) -> Self {
+        #[cfg(not(target_os = "macos"))]
+        let _ = video_pipelines;
         Self {
+            #[cfg(target_os = "macos")]
+            video_pipelines,
+            #[cfg(target_os = "macos")]
+            video_converter: None,
+            #[cfg(target_os = "macos")]
+            native_identity: None,
+            #[cfg(target_os = "macos")]
+            native_gpu_failed: false,
+            realtime: None,
             inner: None,
             video: None,
             video_texture: None,
             image_pipeline: ImageBackgroundPipeline::new(device),
             color_pipeline: GradientOrColorPipeline::new(device),
         }
+    }
+
+    #[cfg(target_os = "macos")]
+    fn prepare_native_texture(
+        &mut self,
+        constants: &RenderVideoConstants,
+        frame: &crate::DecodedFrame,
+    ) -> Result<(), String> {
+        let identity = frame.storage_identity();
+        if self
+            .native_identity
+            .as_ref()
+            .is_some_and(|previous| previous.matches(&identity))
+        {
+            return Ok(());
+        }
+        let converter = self.video_converter.get_or_insert_with(|| {
+            crate::yuv_converter::YuvToRgbaConverter::new_with_shared_pipelines(
+                &constants.device,
+                self.video_pipelines.clone(),
+            )
+        });
+        frame
+            .with_image_buf(|image| {
+                converter
+                    .convert_nv12_from_iosurface(&constants.device, &constants.queue, image)
+                    .map(|_| ())
+            })
+            .ok_or("壁纸 IOSurface 未就绪")?
+            .map_err(|error| error.to_string())?;
+        let converted = converter.output_texture().ok_or("壁纸转换纹理未就绪")?;
+        let (width, height) = (frame.width(), frame.height());
+        if converted.width() < width || converted.height() < height {
+            return Err("壁纸超过 GPU 转换尺寸上限".into());
+        }
+        if self
+            .video_texture
+            .as_ref()
+            .is_none_or(|texture| texture.width() != width || texture.height() != height)
+        {
+            self.video_texture = Some(create_video_texture(&constants.device, width, height));
+            self.inner = None;
+        }
+        let texture = self.video_texture.as_ref().ok_or("壁纸纹理未就绪")?;
+        let mut encoder =
+            constants
+                .device
+                .create_command_encoder(&wgpu::CommandEncoderDescriptor {
+                    label: Some("Wallpaper GPU Copy"),
+                });
+        encoder.copy_texture_to_texture(
+            converted.as_image_copy(),
+            texture.as_image_copy(),
+            wgpu::Extent3d {
+                width,
+                height,
+                depth_or_array_layers: 1,
+            },
+        );
+        constants.queue.submit(Some(encoder.finish()));
+        self.native_identity = Some(identity);
+        Ok(())
     }
 
     pub async fn prepare(
@@ -397,62 +507,85 @@ impl BackgroundLayer {
         {
             if self.video.as_ref().is_none_or(|video| video.path != *path) {
                 self.video_texture = None;
+                #[cfg(target_os = "macos")]
+                {
+                    self.native_identity = None;
+                    self.native_gpu_failed = false;
+                }
                 self.video = Some(
-                    VideoBackground::new(path.clone()).map_err(RenderingError::ImageLoadError)?,
+                    VideoBackground::new(path.clone(), self.realtime.is_some())
+                        .map_err(RenderingError::ImageLoadError)?,
                 );
             }
-            let frame = self
+            let mut frame = self
                 .video
-                .as_ref()
+                .as_mut()
                 .ok_or_else(|| RenderingError::ImageLoadError("壁纸视频未就绪".into()))?
-                .frame(f64::from(uniforms.frame_number) / f64::from(uniforms.frame_rate.max(1)))
+                .source(
+                    f64::from(uniforms.frame_number) / f64::from(uniforms.frame_rate.max(1)),
+                    self.realtime.unwrap_or(false),
+                )
                 .await
                 .map_err(RenderingError::ImageLoadError)?;
-            let new_texture = self.video_texture.as_ref().is_none_or(|texture| {
-                texture.width() != frame.width || texture.height() != frame.height
-            });
+            #[cfg(target_os = "macos")]
+            if let VideoFrame::Native(native) = &frame {
+                let result = if self.native_gpu_failed {
+                    Err("壁纸 GPU 通道不可用".to_string())
+                } else {
+                    self.prepare_native_texture(constants, native)
+                };
+                if let Err(error) = result {
+                    if !self.native_gpu_failed {
+                        tracing::warn!(%error, "Using CPU wallpaper conversion fallback");
+                        self.native_gpu_failed = true;
+                    }
+                    frame = VideoFrame::Rgba(
+                        self.video
+                            .as_ref()
+                            .ok_or("壁纸未就绪")
+                            .map_err(|e| RenderingError::ImageLoadError(e.into()))?
+                            .materialize(frame)
+                            .await
+                            .map_err(RenderingError::ImageLoadError)?,
+                    );
+                }
+            }
+            let (width, height) = frame.size();
+            let new_texture = self
+                .video_texture
+                .as_ref()
+                .is_none_or(|texture| texture.width() != width || texture.height() != height);
             if new_texture {
-                self.video_texture = Some(device.create_texture(&wgpu::TextureDescriptor {
-                    label: Some("Wallpaper Video Frame"),
-                    size: wgpu::Extent3d {
-                        width: frame.width,
-                        height: frame.height,
-                        depth_or_array_layers: 1,
-                    },
-                    mip_level_count: 1,
-                    sample_count: 1,
-                    dimension: wgpu::TextureDimension::D2,
-                    format: wgpu::TextureFormat::Rgba8Unorm,
-                    usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::COPY_DST,
-                    view_formats: &[],
-                }));
+                self.video_texture = Some(create_video_texture(device, width, height));
             }
             let texture = self
                 .video_texture
                 .as_ref()
                 .ok_or_else(|| RenderingError::ImageLoadError("无法创建壁纸纹理".into()))?;
-            queue.write_texture(
-                wgpu::TexelCopyTextureInfo {
-                    texture: &texture,
-                    mip_level: 0,
-                    origin: wgpu::Origin3d::ZERO,
-                    aspect: wgpu::TextureAspect::All,
-                },
-                &frame.data,
-                wgpu::TexelCopyBufferLayout {
-                    offset: 0,
-                    bytes_per_row: Some(frame.width * 4),
-                    rows_per_image: Some(frame.height),
-                },
-                texture.size(),
-            );
+            if let VideoFrame::Rgba(frame) = &frame {
+                queue.write_texture(
+                    wgpu::TexelCopyTextureInfo {
+                        texture,
+                        mip_level: 0,
+                        origin: wgpu::Origin3d::ZERO,
+                        aspect: wgpu::TextureAspect::All,
+                    },
+                    &frame.data,
+                    wgpu::TexelCopyBufferLayout {
+                        offset: 0,
+                        bytes_per_row: Some(width * 4),
+                        rows_per_image: Some(height),
+                    },
+                    texture.size(),
+                );
+            }
             if !new_texture
                 && matches!(&self.inner,Some(Inner::Image { path: current, output_size, .. }) if current == path && *output_size == uniforms.output_size)
             {
                 return Ok(());
             }
             let output_ar = uniforms.output_size.0 as f32 / uniforms.output_size.1 as f32;
-            let image_ar = frame.width as f32 / frame.height as f32;
+            let image_ar = width as f32 / height as f32;
             let image_uniforms = ImageBackgroundUniforms {
                 output_size: [uniforms.output_size.0 as f32, uniforms.output_size.1 as f32],
                 padding: 0.0,
@@ -486,6 +619,11 @@ impl BackgroundLayer {
         }
         self.video = None;
         self.video_texture = None;
+        #[cfg(target_os = "macos")]
+        {
+            self.video_converter = None;
+            self.native_identity = None;
+        }
         match background {
             Background::AnimatedGradient(config) => match &mut self.inner {
                 Some(Inner::AnimatedGradient(layer)) => {

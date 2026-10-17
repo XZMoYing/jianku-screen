@@ -480,7 +480,7 @@ pub async fn start_presentation(
             .map_err(|e| e.to_string())?;
         let preview_scale =
             (960.0 / f64::from(options.output_width)).min(680.0 / f64::from(options.output_height));
-        let output = match WebviewWindowBuilder::new(
+        let output_builder = WebviewWindowBuilder::new(
             &app,
             "presentation-output",
             WebviewUrl::App("/presentation-output".into()),
@@ -488,13 +488,19 @@ pub async fn start_presentation(
         .title("简库演示输出")
         .visible(false)
         .focused(false)
+        .background_throttling(tauri::utils::config::BackgroundThrottlingPolicy::Disabled)
         .inner_size(
             f64::from(options.output_width) * preview_scale,
             f64::from(options.output_height) * preview_scale,
         )
-        .decorations(false)
-        .build()
-        {
+        .decorations(false);
+        #[cfg(debug_assertions)]
+        let output_builder = if let Some(script) = crate::windows::ui_review_script() {
+            output_builder.initialization_script(script)
+        } else {
+            output_builder
+        };
+        let output = match output_builder.build() {
             Ok(window) => window,
             Err(error) => {
                 let _ = app.global_shortcut().unregister(shortcut);
@@ -753,6 +759,7 @@ mod macos {
         .map_err(|e| e.to_string())?;
         let mut renderer = FrameRenderer::new(&constants);
         let mut layers = RendererLayers::new(&constants.device, &constants.queue);
+        layers.use_realtime_background(true);
         let mut motion = LiveMotion::new(
             size,
             &initial.project.cursor,
@@ -888,16 +895,19 @@ mod macos {
                         .elapsed()
                         .as_secs_f64()
                         * 1000.0;
-                    output.send_replace(Some(Arc::new(crate::frame_ws::WSFrame {
-                        data: frame.data.into(),
-                        width: frame.width,
-                        height: frame.height,
-                        stride: frame.padded_bytes_per_row,
-                        frame_number: frame.frame_number,
-                        target_time_ns: frame.target_time_ns,
-                        format: crate::frame_ws::WSFrameFormat::Rgba,
-                        created_at: Instant::now(),
-                    })));
+                    output.send_replace(Some(Arc::new(
+                        crate::frame_ws::WSFrame {
+                            data: frame.data.into(),
+                            width: frame.width,
+                            height: frame.height,
+                            stride: frame.padded_bytes_per_row,
+                            frame_number: frame.frame_number,
+                            target_time_ns: frame.target_time_ns,
+                            format: crate::frame_ws::WSFrameFormat::Rgba,
+                            created_at: Instant::now(),
+                        }
+                        .into_packed(),
+                    )));
                     let mut state = status.lock().unwrap();
                     state.frames += 1;
                     state.processing_ms = age;

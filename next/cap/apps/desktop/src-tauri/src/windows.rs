@@ -52,6 +52,22 @@ const TELEPROMPTER_PANEL_LEVEL: objc2_app_kit::NSWindowLevel = 101;
 const DEFAULT_FALLBACK_DISPLAY_WIDTH: f64 = 1920.0;
 const DEFAULT_FALLBACK_DISPLAY_HEIGHT: f64 = 1080.0;
 
+#[cfg(debug_assertions)]
+pub(crate) fn ui_review_script() -> Option<String> {
+    std::env::var_os("JIANKU_UI_REVIEW_OUTPUT")?;
+    Some(
+        std::env::var_os("JIANKU_UI_REVIEW_SCRIPT")
+            .and_then(|path| std::fs::read_to_string(path).ok())
+            .unwrap_or_else(|| {
+                if std::env::var_os("JIANKU_BACKGROUND_REVIEW").is_some() {
+                    include_str!("background-review.js").into()
+                } else {
+                    include_str!("ui-review.js").into()
+                }
+            }),
+    )
+}
+
 #[tauri::command]
 #[specta::specta]
 pub(crate) async fn restore_main_window_geometry(window: WebviewWindow) -> Result<bool, String> {
@@ -3447,9 +3463,8 @@ impl ShowCapWindow {
             .theme(theme)
             .devtools(cfg!(debug_assertions));
 
-        #[cfg(all(target_os = "macos", debug_assertions))]
+        #[cfg(target_os = "macos")]
         if matches!(id, CapWindowId::Main) {
-            // Main stays hidden until its frontend mounts; WebKit must finish loading Vite first.
             builder = builder
                 .background_throttling(tauri::utils::config::BackgroundThrottlingPolicy::Disabled);
         }
@@ -3504,16 +3519,7 @@ impl ShowCapWindow {
         }
 
         #[cfg(debug_assertions)]
-        if std::env::var_os("JIANKU_UI_REVIEW_OUTPUT").is_some() {
-            let script = std::env::var_os("JIANKU_UI_REVIEW_SCRIPT")
-                .and_then(|path| std::fs::read_to_string(path).ok())
-                .unwrap_or_else(|| {
-                    if std::env::var_os("JIANKU_BACKGROUND_REVIEW").is_some() {
-                        include_str!("background-review.js").into()
-                    } else {
-                        include_str!("ui-review.js").into()
-                    }
-                });
+        if let Some(script) = ui_review_script() {
             builder = builder.initialization_script(script);
         }
 

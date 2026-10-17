@@ -6966,6 +6966,10 @@ pub struct RendererLayers {
 }
 
 impl RendererLayers {
+    pub fn use_realtime_background(&mut self, playing: bool) {
+        self.background.realtime = Some(playing);
+    }
+
     pub fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> Self {
         Self::new_with_options(device, queue, false)
     }
@@ -7008,7 +7012,9 @@ impl RendererLayers {
         });
 
         let layers = Self {
-            background: readiness::measure("layers.background", || BackgroundLayer::new(device)),
+            background: readiness::measure("layers.background", || {
+                BackgroundLayer::new_with_shared_pipelines(device, shared_yuv_pipelines.clone())
+            }),
             background_blur: readiness::measure("layers.background_blur", || {
                 BlurLayer::new(device)
             }),

@@ -16,6 +16,7 @@ interface FrameMessage {
 interface InitCanvasMessage {
 	type: "init-canvas";
 	preserveAlpha?: boolean;
+	renderOnArrival?: boolean;
 	canvas: OffscreenCanvas;
 }
 
@@ -171,6 +172,7 @@ const FRAME_QUEUE_SIZE = 5;
 let frameQueue: PendingFrame[] = [];
 let _rafId: number | null = null;
 let rafRunning = false;
+let renderOnArrival = false;
 
 let playbackStartTime: number | null = null;
 let playbackStartTargetTimeNs: bigint | null = null;
@@ -817,8 +819,6 @@ function startRenderLoop() {
 	if (rafRunning) return;
 
 	if (renderMode === "pending") {
-		rafRunning = true;
-		_rafId = requestAnimationFrame(renderLoop);
 		return;
 	}
 
@@ -830,7 +830,11 @@ function startRenderLoop() {
 	if (!hasRenderer) return;
 
 	rafRunning = true;
-	_rafId = requestAnimationFrame(renderLoop);
+	if (renderOnArrival && !useSharedBuffer) {
+		renderLoop();
+	} else {
+		_rafId = requestAnimationFrame(renderLoop);
+	}
 }
 
 function stopRenderLoop() {
@@ -1178,6 +1182,7 @@ self.onmessage = async (e: MessageEvent<IncomingMessage>) => {
 	}
 
 	if (e.data.type === "init-canvas") {
+		renderOnArrival = e.data.renderOnArrival ?? false;
 		if (!workerReady) {
 			pendingCanvasInit = e.data;
 			return;

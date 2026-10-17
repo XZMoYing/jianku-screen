@@ -1,0 +1,302 @@
+[
+	{
+		"background": "wallpaper",
+		"phase": "configuration",
+		"route": "/",
+		"source": "5C987900-AD53-469C-8210-CABBCCDDFCAE.mov",
+		"visibility": "visible"
+	},
+	{
+		"elapsedMs": 12000,
+		"last": {
+			"at": 17685,
+			"height": 600,
+			"number": 900,
+			"width": 960
+		},
+		"phase": "home-wallpaper-visible",
+		"received": {
+			"fps": 60,
+			"frames": 720,
+			"gapsOver50": 0,
+			"max": 22,
+			"p95": 19
+		},
+		"rendered": {
+			"fps": 60,
+			"frames": 720,
+			"gapsOver50": 0,
+			"max": 22,
+			"p95": 19
+		},
+		"route": "/",
+		"uniqueFrames": 720,
+		"visibility": "visible"
+	},
+	{
+		"coldMs": 1038,
+		"phase": "presentation-started",
+		"route": "/",
+		"status": {
+			"active": true,
+			"error": null,
+			"frames": 1,
+			"outputDetached": false,
+			"processingMs": 577.7324160000001,
+			"wsPort": 59522
+		}
+	},
+	{
+		"elapsedMs": 5001,
+		"last": {
+			"at": 7574,
+			"height": 1080,
+			"number": 444,
+			"width": 1728
+		},
+		"phase": "output-0",
+		"received": {
+			"fps": 53.38932213557288,
+			"frames": 267,
+			"gapsOver50": 2,
+			"max": 158.99999999999955,
+			"p95": 25
+		},
+		"rendered": {
+			"fps": 53.38932213557288,
+			"frames": 267,
+			"gapsOver50": 2,
+			"max": 160,
+			"p95": 26.999999999999545
+		},
+		"route": "/presentation-output",
+		"uniqueFrames": 261,
+		"visibility": "visible"
+	},
+	{
+		"elapsedMs": 5001,
+		"last": {
+			"at": 12504,
+			"height": 1080,
+			"number": 736,
+			"width": 1728
+		},
+		"phase": "output-1",
+		"received": {
+			"fps": 53.78924215156969,
+			"frames": 269,
+			"gapsOver50": 1,
+			"max": 53,
+			"p95": 23
+		},
+		"rendered": {
+			"fps": 53.78924215156969,
+			"frames": 269,
+			"gapsOver50": 1,
+			"max": 56,
+			"p95": 23.00000000000182
+		},
+		"route": "/presentation-output",
+		"uniqueFrames": 267,
+		"visibility": "visible"
+	},
+	{
+		"elapsedMs": 12000.999999999996,
+		"last": {
+			"at": 17718,
+			"height": 600,
+			"number": 902,
+			"width": 960
+		},
+		"phase": "presentation-only-main",
+		"received": {
+			"fps": 0,
+			"frames": 0,
+			"gapsOver50": 0,
+			"max": null,
+			"p95": null
+		},
+		"rendered": {
+			"fps": 0,
+			"frames": 0,
+			"gapsOver50": 0,
+			"max": null,
+			"p95": null
+		},
+		"route": "/",
+		"uniqueFrames": 0,
+		"visibility": "visible"
+	},
+	{
+		"frames": 645,
+		"phase": "presentation-throughput",
+		"route": "/",
+		"status": {
+			"active": true,
+			"error": null,
+			"frames": 646,
+			"outputDetached": false,
+			"processingMs": 26.508457999999997,
+			"wsPort": 59522
+		}
+	},
+	{
+		"elapsedMs": 5001,
+		"last": {
+			"at": 17612.000000000004,
+			"height": 1080,
+			"number": 1045,
+			"width": 1728
+		},
+		"phase": "output-2",
+		"received": {
+			"fps": 35.792841431713654,
+			"frames": 179,
+			"gapsOver50": 0,
+			"max": 49.99999999999818,
+			"p95": 38.00000000000364
+		},
+		"rendered": {
+			"fps": 35.792841431713654,
+			"frames": 179,
+			"gapsOver50": 4,
+			"max": 55,
+			"p95": 40
+		},
+		"route": "/presentation-output",
+		"uniqueFrames": 179,
+		"visibility": "visible"
+	},
+	{
+		"elapsedMs": 8000,
+		"last": {
+			"at": 40250,
+			"height": 600,
+			"number": 1305,
+			"width": 960
+		},
+		"phase": "home-and-presentation",
+		"received": {
+			"fps": 44.375,
+			"frames": 355,
+			"gapsOver50": 2,
+			"max": 101,
+			"p95": 36
+		},
+		"rendered": {
+			"fps": 44.375,
+			"frames": 355,
+			"gapsOver50": 2,
+			"max": 101,
+			"p95": 36
+		},
+		"route": "/",
+		"uniqueFrames": 355,
+		"visibility": "visible"
+	},
+	{
+		"elapsedMs": 5001,
+		"last": {
+			"at": 22612.000000000004,
+			"height": 1080,
+			"number": 1345,
+			"width": 1728
+		},
+		"phase": "output-3",
+		"received": {
+			"fps": 36.19276144771046,
+			"frames": 181,
+			"gapsOver50": 3,
+			"max": 96,
+			"p95": 42
+		},
+		"rendered": {
+			"fps": 36.19276144771046,
+			"frames": 181,
+			"gapsOver50": 4,
+			"max": 101,
+			"p95": 44
+		},
+		"route": "/presentation-output",
+		"uniqueFrames": 181,
+		"visibility": "hidden"
+	},
+	{
+		"elapsedMs": 5001,
+		"last": {
+			"at": 27568,
+			"height": 1080,
+			"number": 1640,
+			"width": 1728
+		},
+		"phase": "output-4",
+		"received": {
+			"fps": 46.790641871625674,
+			"frames": 234,
+			"gapsOver50": 6,
+			"max": 93,
+			"p95": 32
+		},
+		"rendered": {
+			"fps": 46.590681863627275,
+			"frames": 233,
+			"gapsOver50": 5,
+			"max": 85,
+			"p95": 30
+		},
+		"route": "/presentation-output",
+		"uniqueFrames": 232,
+		"visibility": "hidden"
+	},
+	{
+		"elapsedMs": 6000,
+		"last": {
+			"at": 40317,
+			"height": 600,
+			"number": 1307,
+			"width": 960
+		},
+		"phase": "presentation-hidden-main",
+		"received": {
+			"fps": 0.3333333333333333,
+			"frames": 2,
+			"gapsOver50": 0,
+			"max": 14,
+			"p95": 14
+		},
+		"rendered": {
+			"fps": 0.3333333333333333,
+			"frames": 2,
+			"gapsOver50": 0,
+			"max": 10,
+			"p95": 10
+		},
+		"route": "/",
+		"uniqueFrames": 2,
+		"visibility": "visible"
+	},
+	{
+		"frames": 277,
+		"phase": "presentation-hidden-throughput",
+		"route": "/",
+		"status": {
+			"active": true,
+			"error": null,
+			"frames": 1238,
+			"outputDetached": false,
+			"processingMs": 47.194958,
+			"wsPort": 59522
+		}
+	},
+	{
+		"bytes": 2304000,
+		"different": 0,
+		"identical": true,
+		"phase": "compositor-pixels",
+		"route": "/"
+	},
+	{
+		"phase": "finished",
+		"route": "/"
+	}
+]

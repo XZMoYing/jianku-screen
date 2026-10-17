@@ -118,7 +118,12 @@ export default function CaptureStage(props: {
 		};
 		const offscreen = canvas.transferControlToOffscreen();
 		worker.postMessage(
-			{ type: "init-canvas", canvas: offscreen, preserveAlpha: true },
+			{
+				type: "init-canvas",
+				canvas: offscreen,
+				preserveAlpha: true,
+				renderOnArrival: true,
+			},
 			[offscreen],
 		);
 		void schedule();

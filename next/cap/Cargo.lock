@@ -2002,6 +2002,7 @@ dependencies = [
  "cidre",
  "clap",
  "dirs 5.0.1",
+ "dispatch2",
  "ffmpeg-hw-device",
  "ffmpeg-next",
  "foreign-types 0.5.0",
@@ -2012,6 +2013,9 @@ dependencies = [
  "log",
  "metal 0.31.0",
  "objc2 0.6.2",
+ "objc2-av-foundation",
+ "objc2-core-media",
+ "objc2-foundation 0.3.1",
  "pollster",
  "pretty_assertions",
  "rayon",
@@ -6905,6 +6909,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f0b7afa6822e2fa20dfc88d10186b2432bf8560b5ed73ec9d31efd78277bc878"
 dependencies = [
  "bitflags 2.13.1",
+ "block2 0.6.1",
  "dispatch2",
  "objc2 0.6.2",
  "objc2-core-audio",

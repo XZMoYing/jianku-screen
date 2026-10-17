@@ -1,0 +1,39 @@
+{
+	"version": "0.2.0-alpha.19",
+	"hardware": {
+		"chip": "Apple M1",
+		"memoryGb": 16,
+		"macOS": "14.7.4"
+	},
+	"wallpaper": {
+		"width": 3840,
+		"height": 2160,
+		"fps": 239.76,
+		"format": "10-bit SDR HEVC",
+		"keyframeIntervalSeconds": 5.005,
+		"sourceCopied": false
+	},
+	"output": {
+		"home": [960, 600],
+		"presentation": [1728, 1080],
+		"format": "RGBA",
+		"qualityReduced": false
+	},
+	"checks": {
+		"cargoCheckDesktop": "passed",
+		"videoBackgroundTests": 4,
+		"deferredDecodePixelComparisonFrames": 12,
+		"frameWorkerTests": 3,
+		"typescript": "passed",
+		"biome": "passed",
+		"strictSignature": "passed",
+		"captureStylePreserved": true,
+		"rgbaComparisonBytes": 2304000,
+		"rgbaDifferentBytes": 0
+	},
+	"limitations": [
+		"Simultaneous home/presentation frame rate is below 60 fps on this M1.",
+		"HDR/alpha/non-420 video retains precise fallback; its live performance is unverified.",
+		"Long sessions, external displays, 4K output and real meeting sharing are not validated in this run."
+	]
+}

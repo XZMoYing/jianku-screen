@@ -395,7 +395,25 @@ impl FFmpegDecoder {
             decoder: &mut self.decoder,
             stream_index: self.stream_index,
             hw_device: self.hw_device.as_mut(),
+            download_frames: true,
         }
+    }
+
+    pub fn native_frames(&mut self) -> FramesIter<'_> {
+        FramesIter {
+            packets: self.input.packets(),
+            decoder: &mut self.decoder,
+            stream_index: self.stream_index,
+            hw_device: self.hw_device.as_mut(),
+            download_frames: false,
+        }
+    }
+
+    pub fn download_frame(&self, frame: &avframe::Video) -> avframe::Video {
+        self.hw_device
+            .as_ref()
+            .and_then(|device| device.get_hwframe(frame))
+            .unwrap_or_else(|| frame.clone())
     }
 
     pub fn decoder(&self) -> &avcodec::decoder::Video {
@@ -418,6 +436,7 @@ pub struct FramesIter<'a> {
     packets: DecoderPackets<'a>,
     stream_index: usize,
     hw_device: Option<&'a mut HwDevice>,
+    download_frames: bool,
 }
 
 impl FramesIter<'_> {
@@ -435,6 +454,9 @@ impl<'a> Iterator for FramesIter<'a> {
         loop {
             match self.decoder.receive_frame(&mut frame) {
                 Ok(()) => {
+                    if !self.download_frames {
+                        return Some(Ok(frame));
+                    }
                     return match &self.hw_device {
                         Some(hw_device) => {
                             let hw_result = hw_device.get_hwframe(&frame);
@@ -474,6 +496,46 @@ mod tests {
     use super::*;
     use cap_enc_ffmpeg::segmented_stream::{SegmentedVideoEncoder, SegmentedVideoEncoderConfig};
     use std::{fs::File, time::Duration};
+
+    #[test]
+    fn deferred_download_preserves_decoded_pixels_and_timestamps() {
+        let Some(path) = std::env::var_os("JIANKU_TEST_NATIVE_VIDEO") else {
+            return;
+        };
+        #[cfg(target_os = "macos")]
+        let hw = Some(AVHWDeviceType::AV_HWDEVICE_TYPE_VIDEOTOOLBOX);
+        #[cfg(not(target_os = "macos"))]
+        let hw = None;
+        let mut reference = FFmpegDecoder::new(Path::new(&path), hw).unwrap();
+        let mut deferred = FFmpegDecoder::new(Path::new(&path), hw).unwrap();
+        let rgba = |frame: &avframe::Video| {
+            let mut scaler = ffmpeg::software::scaling::Context::get(
+                frame.format(),
+                frame.width(),
+                frame.height(),
+                avformat::Pixel::RGBA,
+                64,
+                36,
+                ffmpeg::software::scaling::Flags::BILINEAR,
+            )
+            .unwrap();
+            let mut output = avframe::Video::new(avformat::Pixel::RGBA, 64, 36);
+            scaler.run(frame, &mut output).unwrap();
+            output.data(0).to_vec()
+        };
+        for _ in 0..12 {
+            let expected = reference.frames().next().unwrap().unwrap();
+            let native = deferred.native_frames().next().unwrap().unwrap();
+            let actual = deferred.download_frame(&native);
+            assert_eq!(actual.pts(), expected.pts());
+            assert_eq!(
+                (actual.width(), actual.height()),
+                (expected.width(), expected.height())
+            );
+            assert_eq!(actual.format(), expected.format());
+            assert_eq!(rgba(&actual), rgba(&expected));
+        }
+    }
 
     fn encode_segments(directory: &std::path::Path) {
         ffmpeg::init().unwrap();

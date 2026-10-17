@@ -51,7 +51,7 @@ async fn resources(app: &AppHandle) -> Result<&'static PreviewResources, String>
         let events = CursorEvents {
             moves: (0..=360).map(|i| {
                 let t = f64::from(i) / 60.0;
-                cap_project::CursorMoveEvent { time_ms: t*1000.0, x: 0.57 + 0.18*(t*1.2).sin(), y: 0.55 + 0.13*(t*1.8).cos(), cursor_id: "MacOS|Arrow".into(), active_modifiers: Vec::new() }
+                cap_project::CursorMoveEvent { time_ms: t*1000.0, x: 0.57 + 0.18*(t*std::f64::consts::TAU/6.0).sin(), y: 0.55 + 0.13*(t*std::f64::consts::TAU/3.0).cos(), cursor_id: "MacOS|Arrow".into(), active_modifiers: Vec::new() }
             }).collect(),
             clicks: [1.0,3.0,5.0].into_iter().flat_map(|t| [true,false].map(move |down| cap_project::CursorClickEvent { time_ms: (t + if down {0.0} else {0.12})*1000.0, down, cursor_num:0, active_modifiers:Vec::new(),cursor_id:"MacOS|Arrow".into() })).collect(),
             ..Default::default()
@@ -112,6 +112,8 @@ async fn render_frame(
     zoom: &mut ZoomTransformTimeline,
 ) -> Result<cap_rendering::RenderedFrame, String> {
     let constants = &resources.constants;
+    let background_time = time;
+    let time = time.rem_euclid(6.0);
     let frames = DecodedSegmentFrames {
         screen_size: constants.options.screen_size,
         screen_frame: Some(DecodedFrame::new_with_arc(
@@ -135,7 +137,7 @@ async fn render_frame(
         ((f64::from(width) * scale) as u32).max(2),
         ((f64::from(height) * scale) as u32).max(2),
     );
-    let uniforms = ProjectUniforms::new(
+    let mut uniforms = ProjectUniforms::new(
         constants,
         config,
         (time * 60.0) as u32,
@@ -146,6 +148,7 @@ async fn render_frame(
         time,
         zoom,
     );
+    uniforms.frame_number = (background_time * 60.0) as u32;
     let frame = renderer
         .render_immediate(frames, uniforms, &resources.events, true, layers)
         .await
@@ -244,10 +247,11 @@ pub async fn start_capture_preview(
                 continue;
             }
             let time = if current.playing {
-                started.elapsed().as_secs_f64() % 6.0
+                started.elapsed().as_secs_f64()
             } else {
                 0.7
             };
+            layers.use_realtime_background(current.playing);
             let created_at = Instant::now();
             let frame = tokio::select! {
                 _ = cancel.cancelled() => break,
