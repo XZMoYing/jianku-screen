@@ -399,6 +399,19 @@ pub struct BackgroundLayer {
 }
 
 impl BackgroundLayer {
+    pub(crate) fn set_realtime(&mut self, state: Option<bool>) {
+        if self.realtime.is_some() != state.is_some() {
+            self.video = None;
+            self.video_texture = None;
+            self.inner = None;
+            #[cfg(target_os = "macos")]
+            {
+                self.native_identity = None;
+            }
+        }
+        self.realtime = state;
+    }
+
     #[cfg(test)]
     pub fn new(device: &wgpu::Device) -> Self {
         Self::new_with_shared_pipelines(
@@ -489,6 +502,10 @@ impl BackgroundLayer {
             },
         );
         constants.queue.submit(Some(encoder.finish()));
+        let retained_frame = frame.clone();
+        constants
+            .queue
+            .on_submitted_work_done(move || drop(retained_frame));
         self.native_identity = Some(identity);
         Ok(())
     }

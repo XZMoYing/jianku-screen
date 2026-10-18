@@ -23,6 +23,13 @@ pub struct KeyframeIndex {
 
 impl KeyframeIndex {
     pub fn build(path: &Path) -> Result<Self, String> {
+        Self::build_with_pixel_format(path, None)
+    }
+
+    fn build_with_pixel_format(
+        path: &Path,
+        output_format: Option<cv::PixelFormat>,
+    ) -> Result<Self, String> {
         let build_start = std::time::Instant::now();
 
         let mut input = avformat::input(path)
@@ -60,7 +67,8 @@ impl KeyframeIndex {
                 .video()
                 .map_err(|e| format!("video decoder / {e}"))?;
 
-            let pixel_format = pixel_to_pixel_format(decoder.format()).ok();
+            let pixel_format =
+                output_format.or_else(|| pixel_to_pixel_format(decoder.format()).ok());
             let width = decoder.width();
             let height = decoder.height();
 
@@ -235,6 +243,30 @@ pub struct AVAssetReaderDecoder {
 }
 
 impl AVAssetReaderDecoder {
+    pub fn new_nv12(path: PathBuf, tokio_handle: TokioHandle) -> Result<Self, String> {
+        let pixel_format = cv::PixelFormat::_420V;
+        let index = Arc::new(KeyframeIndex::build_with_pixel_format(
+            &path,
+            Some(pixel_format),
+        )?);
+        let (_, width, height) = index
+            .cached_video_info()
+            .ok_or("Video dimensions unavailable")?;
+        let (track_output, reader) =
+            Self::get_reader_track_output(&path, 0.0, &tokio_handle, pixel_format, width, height)?;
+        Ok(Self {
+            path,
+            pixel_format,
+            tokio_handle,
+            track_output,
+            reader,
+            width,
+            height,
+            keyframe_index: Some(index),
+            current_position_secs: 0.0,
+        })
+    }
+
     pub fn new(path: PathBuf, tokio_handle: TokioHandle) -> Result<Self, String> {
         Self::new_at_position(path, tokio_handle, 0.0)
     }
@@ -385,7 +417,7 @@ impl AVAssetReaderDecoder {
             .map_err(|e| format!("AssetReader::with_asset: {e}"))?;
 
         let time_range = cm::TimeRange {
-            start: cm::Time::with_secs(time as f64, 100),
+            start: cm::Time::with_secs(time as f64, 600_000),
             duration: cm::Time::infinity(),
         };
 

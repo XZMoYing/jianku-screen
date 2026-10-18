@@ -51,7 +51,10 @@ impl LiveVideoBackground {
             });
             let _ = send.send(result);
         });
-        receive.await.map_err(|error| error.to_string())?
+        tokio::time::timeout(std::time::Duration::from_secs(1), receive)
+            .await
+            .map_err(|error| error.to_string())?
+            .map_err(|error| error.to_string())?
     }
 }
 

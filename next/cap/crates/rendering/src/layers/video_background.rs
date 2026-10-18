@@ -26,7 +26,7 @@ impl VideoFrame {
 }
 type Reply = oneshot::Sender<Result<VideoPixels, String>>;
 enum Request {
-    Accurate(f64, Reply),
+    Accurate(f64, oneshot::Sender<Result<VideoFrame, String>>),
     #[cfg(target_os = "macos")]
     Native(crate::DecodedFrame, Reply),
 }
@@ -79,24 +79,57 @@ impl VideoBackground {
     pub fn new(path: String, realtime: bool) -> Result<Self, String> {
         let (sender, receiver) = mpsc::channel::<Request>();
         let worker_path = PathBuf::from(&path);
+        #[cfg(target_os = "macos")]
+        let compatible = native_video_compatible(&path);
+        #[cfg(target_os = "macos")]
+        let handle = tokio::runtime::Handle::current();
         std::thread::Builder::new()
             .name("wallpaper-video".into())
             .spawn(move || {
                 let mut reader = None;
                 #[cfg(target_os = "macos")]
                 let mut scaler = None;
+                #[cfg(target_os = "macos")]
+                let mut native_reader = None;
+                #[cfg(target_os = "macos")]
+                let mut prefer_native = compatible && !realtime;
                 for request in receiver {
                     match request {
                         Request::Accurate(time, reply) => {
                             if reply.is_closed() {
                                 continue;
                             }
+                            #[cfg(target_os = "macos")]
+                            if prefer_native {
+                                let result = objc2::rc::autoreleasepool(|_| {
+                                    if native_reader.is_none() {
+                                        native_reader = Some(super::precise_video_background::PreciseVideoBackground::open(&worker_path, handle.clone())?);
+                                    }
+                                    native_reader.as_mut().ok_or("精确壁纸解码器未就绪")?.frame(time)
+                                });
+                                match result {
+                                    Ok(frame) => {
+                                        let _ = reply.send(Ok(VideoFrame::Native(frame)));
+                                        objc2::rc::autoreleasepool(|_| {
+                                            if let Some(reader) = &mut native_reader {
+                                                reader.prefetch();
+                                            }
+                                        });
+                                        continue;
+                                    }
+                                    Err(error) => {
+                                        tracing::warn!(%error, "Precise native wallpaper unavailable; using FFmpeg");
+                                        native_reader = None;
+                                        prefer_native = false;
+                                    }
+                                }
+                            }
                             let reader = reader.get_or_insert_with(|| Reader::open(&worker_path));
                             let result = match reader {
                                 Ok(reader) => reader.frame(time),
                                 Err(error) => Err(error.clone()),
                             };
-                            let _ = reply.send(result);
+                            let _ = reply.send(result.map(VideoFrame::Rgba));
                         }
                         #[cfg(target_os = "macos")]
                         Request::Native(frame, reply) => {
@@ -112,7 +145,7 @@ impl VideoBackground {
         let _ = realtime;
         Ok(Self {
             #[cfg(target_os = "macos")]
-            native: (realtime && native_video_compatible(&path))
+            native: (realtime && compatible)
                 .then(|| super::live_video_background::LiveVideoBackground::new(path.clone())),
             #[cfg(target_os = "macos")]
             native_frame: None,
@@ -156,11 +189,11 @@ impl VideoBackground {
         self.sender
             .send(Request::Accurate(time, reply))
             .map_err(|e| e.to_string())?;
-        let pixels = tokio::time::timeout(std::time::Duration::from_secs(15), receive)
+        let frame = tokio::time::timeout(std::time::Duration::from_secs(15), receive)
             .await
             .map_err(|e| e.to_string())?
             .map_err(|e| e.to_string())??;
-        Ok(VideoFrame::Rgba(pixels))
+        Ok(frame)
     }
 
     pub async fn materialize(&self, frame: VideoFrame) -> Result<VideoPixels, String> {
@@ -329,6 +362,91 @@ fn native_pixels(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[cfg(target_os = "macos")]
+    #[tokio::test]
+    async fn native_precise_sampling_matches_seek_loop_and_prefetch_reference() {
+        let Some(path) = std::env::var_os("JIANKU_TEST_WALLPAPER_VIDEO") else {
+            return;
+        };
+        let handle = tokio::runtime::Handle::current();
+        tokio::task::spawn_blocking(move || {
+            objc2::rc::autoreleasepool(|_| {
+                let mut native =
+                    super::super::precise_video_background::PreciseVideoBackground::open(
+                        Path::new(&path),
+                        handle,
+                    )
+                    .unwrap();
+                let mut reference = Reader::open(Path::new(&path)).unwrap();
+                for time in [
+                    0.0,
+                    1.0 / 60.0,
+                    2.0 / 60.0,
+                    3.0 / 60.0,
+                    0.3,
+                    1.18,
+                    1.2,
+                    1.2 + 1.0 / 60.0,
+                    0.017,
+                    0.3,
+                    0.0,
+                    0.0,
+                ] {
+                    let frame = native.frame(time).unwrap();
+                    let actual = native_pixels(&frame, &mut None).unwrap();
+                    let expected = reference.frame(time).unwrap();
+                    assert_eq!(
+                        (actual.width, actual.height),
+                        (expected.width, expected.height)
+                    );
+                    let differences: Vec<_> = actual
+                        .data
+                        .iter()
+                        .zip(expected.data.iter())
+                        .map(|(a, b)| a.abs_diff(*b))
+                        .collect();
+                    let mean = differences.iter().map(|d| f64::from(*d)).sum::<f64>()
+                        / differences.len() as f64;
+                    println!(
+                        "time={time} native_pts={} reference_pts={} mean pixel difference={mean}",
+                        native.decoded_time(),
+                        reference.last_time
+                    );
+                    assert!((native.decoded_time() - reference.last_time).abs() < 0.0001);
+                    assert!(mean < 3.0, "time={time}, mean pixel difference={mean}");
+                    native.prefetch();
+                }
+            })
+        })
+        .await
+        .unwrap();
+    }
+
+    #[cfg(target_os = "macos")]
+    #[tokio::test]
+    async fn high_rate_precise_source_returns_native_surface() {
+        let Some(path) = std::env::var_os("JIANKU_TEST_HIGH_RATE_WALLPAPER") else {
+            return;
+        };
+        let mut reader = VideoBackground::new(path.to_string_lossy().into_owned(), false).unwrap();
+        let start = std::time::Instant::now();
+        for number in 0..=30 {
+            let VideoFrame::Native(frame) = reader
+                .source(0.7 + f64::from(number) / 60.0, false)
+                .await
+                .unwrap()
+            else {
+                panic!("Precise path fell back to CPU")
+            };
+            assert_eq!((frame.width(), frame.height()), (3840, 2160));
+            assert_eq!(
+                frame.with_image_buf(|image| image.io_surf().is_some()),
+                Some(true)
+            );
+        }
+        println!("31 precise native wallpaper frames: {:?}", start.elapsed());
+    }
 
     #[cfg(target_os = "macos")]
     #[test]

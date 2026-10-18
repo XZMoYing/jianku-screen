@@ -1,0 +1,13 @@
+time=0 native_pts=0 reference_pts=0 mean pixel difference=0
+time=0.016666666666666666 native_pts=0.016666666666666666 reference_pts=0.016666666666666666 mean pixel difference=0
+time=0.03333333333333333 native_pts=0.03333333333333333 reference_pts=0.03333333333333333 mean pixel difference=0
+time=0.05 native_pts=0.05 reference_pts=0.05 mean pixel difference=0
+time=0.3 native_pts=0.3 reference_pts=0.3 mean pixel difference=1.758544921875
+time=1.18 native_pts=1.1833333333333333 reference_pts=1.1833333333333333 mean pixel difference=1.9687174479166667
+time=1.2 native_pts=0 reference_pts=0 mean pixel difference=0
+time=1.2166666666666666 native_pts=0.016666666666666666 reference_pts=0.016666666666666666 mean pixel difference=0
+time=0.017 native_pts=0.03333333333333333 reference_pts=0.03333333333333333 mean pixel difference=0
+time=0.3 native_pts=0.3 reference_pts=0.3 mean pixel difference=1.758544921875
+time=0 native_pts=0 reference_pts=0 mean pixel difference=0
+time=0 native_pts=0 reference_pts=0 mean pixel difference=0
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 323 filtered out; finished in 6.55s

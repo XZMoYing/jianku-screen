@@ -1,0 +1,42 @@
+[
+	{
+		"phase": "before",
+		"case": "gradient",
+		"version": "0.2.0-alpha.19",
+		"seconds": 2.1531207080115564,
+		"exit": 0,
+		"resolutionBase": [1920, 1080],
+		"fps": 60,
+		"compression": "maximum"
+	},
+	{
+		"phase": "before",
+		"case": "wallpaper",
+		"version": "0.2.0-alpha.19",
+		"seconds": 34.17017337499419,
+		"exit": 0,
+		"resolutionBase": [1920, 1080],
+		"fps": 60,
+		"compression": "maximum"
+	},
+	{
+		"phase": "after",
+		"case": "gradient",
+		"version": "0.2.0-alpha.20",
+		"seconds": 1.8956337079871446,
+		"exit": 0,
+		"resolutionBase": [1920, 1080],
+		"fps": 60,
+		"compression": "maximum"
+	},
+	{
+		"phase": "after",
+		"case": "wallpaper",
+		"version": "0.2.0-alpha.20",
+		"seconds": 3.5671570830163546,
+		"exit": 0,
+		"resolutionBase": [1920, 1080],
+		"fps": 60,
+		"compression": "maximum"
+	}
+]

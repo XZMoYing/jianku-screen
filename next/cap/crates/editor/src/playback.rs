@@ -886,6 +886,7 @@ impl Playback {
         ));
         diagnostic.stage("preparing_playback");
         let playback_body = move || {
+            let _background_playback = self.renderer.begin_background_playback();
             let mut adopted_guard = AdoptedPlaybackGuard(adopted);
             let adopted = &mut adopted_guard.0;
             let duration = self
@@ -1981,6 +1982,7 @@ impl Playback {
             drop(transitioned_audio);
             stop_tx.send(true).ok();
 
+            drop(_background_playback);
             event_tx.send(PlaybackEvent::Stop).ok();
         };
 

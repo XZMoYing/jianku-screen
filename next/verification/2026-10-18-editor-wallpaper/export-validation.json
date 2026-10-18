@@ -1,0 +1,75 @@
+{
+	"effectsExportSeconds": 8.716821125010028,
+	"checks": [
+		{
+			"case": "before-wallpaper",
+			"codec_name": "h264",
+			"width": 340,
+			"height": 600,
+			"avg_frame_rate": "60/1",
+			"duration": "2.000000",
+			"nb_frames": "120",
+			"fullDecode": true
+		},
+		{
+			"case": "after-wallpaper",
+			"codec_name": "h264",
+			"width": 340,
+			"height": 600,
+			"avg_frame_rate": "60/1",
+			"duration": "2.000000",
+			"nb_frames": "120",
+			"fullDecode": true
+		},
+		{
+			"case": "before-wide-gradient",
+			"codec_name": "h264",
+			"width": 1920,
+			"height": 1080,
+			"avg_frame_rate": "60/1",
+			"duration": "2.000000",
+			"nb_frames": "120",
+			"fullDecode": true
+		},
+		{
+			"case": "before-wide-wallpaper",
+			"codec_name": "h264",
+			"width": 1920,
+			"height": 1080,
+			"avg_frame_rate": "60/1",
+			"duration": "2.000000",
+			"nb_frames": "120",
+			"fullDecode": true
+		},
+		{
+			"case": "after-wide-gradient",
+			"codec_name": "h264",
+			"width": 1920,
+			"height": 1080,
+			"avg_frame_rate": "60/1",
+			"duration": "2.000000",
+			"nb_frames": "120",
+			"fullDecode": true
+		},
+		{
+			"case": "after-wide-wallpaper",
+			"codec_name": "h264",
+			"width": 1920,
+			"height": 1080,
+			"avg_frame_rate": "60/1",
+			"duration": "2.000000",
+			"nb_frames": "120",
+			"fullDecode": true
+		},
+		{
+			"case": "effects-export",
+			"codec_name": "h264",
+			"width": 1920,
+			"height": 1080,
+			"avg_frame_rate": "60/1",
+			"duration": "6.000000",
+			"nb_frames": "360",
+			"fullDecode": true
+		}
+	]
+}

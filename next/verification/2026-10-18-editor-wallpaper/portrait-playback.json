@@ -1,0 +1,57 @@
+[
+	{
+		"controls": 2,
+		"originalQuality": "一半 preview quality",
+		"path": "/tmp/jianku20-fixtures/editor.jks",
+		"phase": "ready",
+		"quality": "full",
+		"route": "/editor"
+	},
+	{
+		"fps": 56.57142857142858,
+		"frames": 198,
+		"last": {
+			"at": 7400,
+			"height": 1080,
+			"number": 271,
+			"width": 608
+		},
+		"max": 35,
+		"p95": 33,
+		"phase": "playback",
+		"route": "/editor",
+		"uniqueFrames": 192,
+		"visibility": "visible"
+	},
+	{
+		"elapsedMs": 2216,
+		"last": {
+			"at": 10217,
+			"height": 1080,
+			"number": 90,
+			"width": 608
+		},
+		"phase": "paused-seek",
+		"route": "/editor"
+	},
+	{
+		"fps": 55.177928828468616,
+		"frames": 138,
+		"last": {
+			"at": 13418.000000000002,
+			"height": 1080,
+			"number": 257,
+			"width": 608
+		},
+		"max": 36,
+		"p95": 33,
+		"phase": "resume",
+		"route": "/editor",
+		"uniqueFrames": 129,
+		"visibility": "visible"
+	},
+	{
+		"phase": "finished",
+		"route": "/editor"
+	}
+]

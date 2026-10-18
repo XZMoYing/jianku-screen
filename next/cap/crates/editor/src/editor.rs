@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Instant;
 
 use cap_project::{ClipTransitionType, CursorEvents, ProjectConfiguration};
@@ -14,6 +15,10 @@ use crate::telemetry::{PlaybackRenderOutputFormat, PlaybackTelemetry, PlaybackTe
 
 #[allow(clippy::large_enum_variant)]
 pub enum RendererMessage {
+    BackgroundPlayback {
+        token: u64,
+        playing: bool,
+    },
     PrepareOutputSize {
         width: u32,
         height: u32,
@@ -79,6 +84,38 @@ pub struct Renderer {
 pub struct RendererHandle {
     tx: mpsc::Sender<RendererMessage>,
     telemetry: Option<PlaybackTelemetry>,
+}
+
+pub(crate) struct BackgroundPlaybackGuard {
+    renderer: Arc<RendererHandle>,
+    token: u64,
+}
+
+impl Drop for BackgroundPlaybackGuard {
+    fn drop(&mut self) {
+        let _ = self
+            .renderer
+            .tx
+            .blocking_send(RendererMessage::BackgroundPlayback {
+                token: self.token,
+                playing: false,
+            });
+    }
+}
+
+fn update_background_playback(
+    active: &mut Option<u64>,
+    token: u64,
+    playing: bool,
+    layers: &mut RendererLayers,
+) {
+    if playing {
+        *active = Some(token);
+        layers.use_realtime_background(true);
+    } else if *active == Some(token) {
+        *active = None;
+        layers.use_precise_background();
+    }
 }
 
 pub fn start_renderer_layers_creation(
@@ -241,24 +278,42 @@ impl Renderer {
         }
 
         let mut pending_frame: Option<PendingFrame> = None;
+        let mut background_playback = None;
+        let mut thumbnail_layers = None;
 
         loop {
             let frame_to_render = if let Some(pending) = pending_frame.take() {
                 Some(pending)
             } else {
                 match rx.recv().await {
+                    Some(RendererMessage::BackgroundPlayback { token, playing }) => {
+                        update_background_playback(
+                            &mut background_playback,
+                            token,
+                            playing,
+                            &mut layers,
+                        );
+                        continue;
+                    }
                     Some(RendererMessage::PrepareOutputSize { width, height }) => {
                         Self::prepare_output_size(&telemetry, &mut frame_renderer, width, height);
                         continue;
                     }
                     Some(RendererMessage::RenderThumbnail { input, finished }) => {
+                        let thumbnail_layers = thumbnail_layers.get_or_insert_with(|| {
+                            RendererLayers::new_with_options(
+                                &render_constants.device,
+                                &render_constants.queue,
+                                render_constants.is_software_adapter,
+                            )
+                        });
                         let result = frame_renderer
                             .render_immediate(
                                 input.segment_frames,
                                 input.uniforms,
                                 &input.cursor,
                                 true,
-                                &mut layers,
+                                thumbnail_layers,
                             )
                             .await
                             .map_err(|error| error.to_string());
@@ -313,14 +368,29 @@ impl Renderer {
             let queue_drain_start = Instant::now();
             while let Ok(msg) = rx.try_recv() {
                 match msg {
+                    RendererMessage::BackgroundPlayback { token, playing } => {
+                        update_background_playback(
+                            &mut background_playback,
+                            token,
+                            playing,
+                            &mut layers,
+                        );
+                    }
                     RendererMessage::RenderThumbnail { input, finished } => {
+                        let thumbnail_layers = thumbnail_layers.get_or_insert_with(|| {
+                            RendererLayers::new_with_options(
+                                &render_constants.device,
+                                &render_constants.queue,
+                                render_constants.is_software_adapter,
+                            )
+                        });
                         let result = frame_renderer
                             .render_immediate(
                                 input.segment_frames,
                                 input.uniforms,
                                 &input.cursor,
                                 true,
-                                &mut layers,
+                                thumbnail_layers,
                             )
                             .await
                             .map_err(|error| error.to_string());
@@ -572,6 +642,19 @@ impl Renderer {
 }
 
 impl RendererHandle {
+    pub(crate) fn begin_background_playback(self: &Arc<Self>) -> BackgroundPlaybackGuard {
+        static NEXT_TOKEN: AtomicU64 = AtomicU64::new(1);
+        let token = NEXT_TOKEN.fetch_add(1, Ordering::Relaxed);
+        let _ = self.tx.blocking_send(RendererMessage::BackgroundPlayback {
+            token,
+            playing: true,
+        });
+        BackgroundPlaybackGuard {
+            renderer: self.clone(),
+            token,
+        }
+    }
+
     pub(crate) async fn render_thumbnail(
         &self,
         input: RendererTransitionInput,

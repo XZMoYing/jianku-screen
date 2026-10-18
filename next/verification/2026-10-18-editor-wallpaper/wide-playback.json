@@ -1,0 +1,71 @@
+[
+	{
+		"canvasBounds": {
+			"bottom": 452,
+			"height": 329,
+			"left": 109.0625,
+			"right": 693.9375,
+			"top": 123,
+			"width": 584.875,
+			"x": 109.0625,
+			"y": 123
+		},
+		"controls": 2,
+		"originalQuality": "一半 preview quality",
+		"path": "/tmp/jianku20-fixtures/editor.jks",
+		"phase": "ready",
+		"quality": "full",
+		"route": "/editor",
+		"viewport": {
+			"height": 800,
+			"width": 1275
+		}
+	},
+	{
+		"fps": 56.269637246501,
+		"frames": 197,
+		"last": {
+			"at": 7473,
+			"height": 1080,
+			"number": 269,
+			"width": 1920
+		},
+		"max": 34.00000000000091,
+		"p95": 32,
+		"phase": "playback",
+		"route": "/editor",
+		"uniqueFrames": 197,
+		"visibility": "visible"
+	},
+	{
+		"elapsedMs": 2168.999999999999,
+		"last": {
+			"at": 10256,
+			"height": 1080,
+			"number": 90,
+			"width": 1920
+		},
+		"phase": "paused-seek",
+		"route": "/editor"
+	},
+	{
+		"fps": 55.95523581135092,
+		"frames": 140,
+		"last": {
+			"at": 13457,
+			"height": 1080,
+			"number": 266,
+			"width": 1920
+		},
+		"max": 34,
+		"p95": 32,
+		"phase": "resume",
+		"route": "/editor",
+		"uniqueFrames": 140,
+		"visibility": "visible"
+	},
+	{
+		"phase": "finished",
+		"route": "/editor"
+	}
+]

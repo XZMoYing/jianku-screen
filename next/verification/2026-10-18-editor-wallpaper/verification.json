@@ -1,0 +1,52 @@
+{
+	"version": "0.2.0-alpha.20",
+	"hardware": {
+		"chip": "Apple M1",
+		"memoryGb": 16,
+		"macOS": "14.7.4"
+	},
+	"wallpaper": {
+		"dimensions": [3840, 2160],
+		"fps": 239.76,
+		"codec": "10-bit SDR HEVC",
+		"keyframeSeconds": 5.005,
+		"redistributed": false
+	},
+	"preview": {
+		"quality": "full",
+		"dimensions": [1920, 1080],
+		"continuousFps": 56.269637246501,
+		"resumeFps": 55.95523581135092,
+		"maxGapMs": 34,
+		"pausedSeekMs": 2169,
+		"originalQualityRestored": "half",
+		"effectParametersReduced": false
+	},
+	"export": {
+		"durationSeconds": 2,
+		"fps": 60,
+		"dimensions": [1920, 1080],
+		"quality": "Maximum",
+		"beforeSeconds": 34.17017337499419,
+		"afterSeconds": 3.5671570830163546,
+		"speedup": 9.579105315457602,
+		"completeFrames": 120,
+		"effectsDurationSeconds": 6,
+		"effectsFrames": 360,
+		"fullDecodePassed": true
+	},
+	"checks": {
+		"preciseVideoBackgroundTests": 6,
+		"sourceTimestampCases": 12,
+		"cargoCheckDesktopEditor": "passed",
+		"fullBuildIncludingSidecars": "passed",
+		"strictSignature": "passed",
+		"finalCargoCheckRendering": "passed",
+		"cargoFmt": "passed",
+		"biome": "passed"
+	},
+	"remaining": [
+		"Precise seeking still takes about 2.2 seconds for the tested target.",
+		"Long sessions, different dynamic wallpapers during transitions, HDR/alpha fallback, 4K output and multi-display behavior need verification."
+	]
+}

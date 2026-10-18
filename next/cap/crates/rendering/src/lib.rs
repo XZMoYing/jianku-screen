@@ -6967,7 +6967,11 @@ pub struct RendererLayers {
 
 impl RendererLayers {
     pub fn use_realtime_background(&mut self, playing: bool) {
-        self.background.realtime = Some(playing);
+        self.background.set_realtime(Some(playing));
+    }
+
+    pub fn use_precise_background(&mut self) {
+        self.background.set_realtime(None);
     }
 
     pub fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> Self {

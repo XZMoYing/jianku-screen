@@ -15,6 +15,8 @@ mod keyboard;
 mod live_video_background;
 mod mask;
 mod notch;
+#[cfg(target_os = "macos")]
+mod precise_video_background;
 mod text;
 mod video_background;
 
