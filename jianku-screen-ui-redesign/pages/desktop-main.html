@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desktop - 主控台</title>
+    <style id="theme-vars">
+/* Source: structured-spec */
+/* Brand profile: google / dashboard / clean / analytical / modern */
+/* Theme mode: light-dark */
+/* Alias layer: enabled */
+
+/* Light mode source tokens */
+:root {
+  /* Core surface colors */
+  --background: #ffffff;
+  --foreground: #0e1115;
+  --card: #ffffff;
+  --card-foreground: #0e1115;
+  --popover: #f9f9fa;
+  --popover-foreground: #0e1115;
+
+  /* Semantic action colors */
+  --primary: #4285f4;
+  --primary-foreground: #ffffff;
+  --secondary: #dbeafe;
+  --secondary-foreground: #333942;
+  --muted: #eff1f4;
+  --muted-foreground: #7f8d9f;
+  --accent: #dbeafe;
+  --accent-foreground: #003e8f;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  /* Borders, inputs, focus */
+  --border: #ebebeb;
+  --input: #e2e3e4;
+  --ring: #4285f4;
+
+  /* Data visualization */
+  --chart-1: #4285f4;
+  --chart-2: #ea4335;
+  --chart-3: #fbbc05;
+  --chart-4: #0043ad;
+  --chart-5: #34a853;
+
+  /* Sidebar */
+  --sidebar: #f0f6ff;
+  --sidebar-foreground: #0e1115;
+  --sidebar-primary: #4285f4;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #dbeafe;
+  --sidebar-accent-foreground: #003e8f;
+  --sidebar-border: #e7eaef;
+  --sidebar-ring: #4285f4;
+
+  /* Typography */
+  --font-sans: DM Sans, ui-sans-serif, sans-serif, system-ui;
+  --font-serif: DM Sans, ui-sans-serif, sans-serif, system-ui;
+  --font-mono: JetBrains Mono, monospace;
+
+  /* Radius */
+  --radius: 0.5rem;
+
+  /* Shadow primitives */
+  --shadow-x: 0;
+  --shadow-y: 3px;
+  --shadow-blur: 0px;
+  --shadow-spread: 0px;
+  --shadow-opacity: 0;
+  --shadow-color: #0e1115;
+
+  /* Elevation */
+  --shadow-2xs: 0 3px 0px 0px rgba(14, 17, 21, 0);
+  --shadow-xs: 0 3px 0px 0px rgba(14, 17, 21, 0);
+  --shadow-sm: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 1px 2px -1px rgba(14, 17, 21, 0);
+  --shadow: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 1px 2px -1px rgba(14, 17, 21, 0);
+  --shadow-md: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 2px 4px -1px rgba(14, 17, 21, 0);
+  --shadow-lg: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 4px 6px -1px rgba(14, 17, 21, 0);
+  --shadow-xl: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 8px 10px -1px rgba(14, 17, 21, 0);
+  --shadow-2xl: 0 3px 0px 0px rgba(14, 17, 21, 0);
+
+  /* Rhythm */
+  --tracking-normal: 0em;
+  --spacing: 0.24rem;
+  /* Patched radius aliases for head-contract compatibility */
+  --google-radius-sm: calc(var(--radius) - 4px);
+  --google-radius-md: calc(var(--radius) - 2px);
+  --google-radius-lg: var(--radius);
+
+}
+
+/* Dark mode source tokens */
+.dark {
+  /* Core surface colors */
+  --background: #161616;
+  --foreground: #eff1f4;
+  --card: #1d1d1c;
+  --card-foreground: #eff1f4;
+  --popover: #2e2e2e;
+  --popover-foreground: #e5e5e5;
+
+  /* Semantic action colors */
+  --primary: #fc2c50;
+  --primary-foreground: #ffffff;
+  --secondary: #383838;
+  --secondary-foreground: #e5e5e5;
+  --muted: #383838;
+  --muted-foreground: #949494;
+  --accent: #4a2026;
+  --accent-foreground: #fc2c50;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  /* Borders, inputs, focus */
+  --border: #1d1d1c;
+  --input: #000000;
+  --ring: #ffffff;
+
+  /* Data visualization */
+  --chart-1: #2dccd3;
+  --chart-2: #f1204a;
+  --chart-3: #edbbe8;
+  --chart-4: #fbeb35;
+  --chart-5: #baf6f0;
+
+  /* Sidebar */
+  --sidebar: #171717;
+  --sidebar-foreground: #e5e5e5;
+  --sidebar-primary: #0065fd;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #00266b;
+  --sidebar-accent-foreground: #bfdbfe;
+  --sidebar-border: #404040;
+  --sidebar-ring: #00266b;
+
+  /* Typography */
+  --font-sans: DM Sans, ui-sans-serif, sans-serif, system-ui;
+  --font-serif: DM Sans, ui-sans-serif, sans-serif, system-ui;
+  --font-mono: JetBrains Mono, monospace;
+
+  /* Radius */
+  --radius: 0.5rem;
+
+  /* Shadow primitives */
+  --shadow-x: 0;
+  --shadow-y: 3px;
+  --shadow-blur: 0px;
+  --shadow-spread: 0px;
+  --shadow-opacity: 0;
+  --shadow-color: #000000;
+
+  /* Elevation */
+  --shadow-2xs: 0 3px 0px 0px rgba(0, 0, 0, 0);
+  --shadow-xs: 0 3px 0px 0px rgba(0, 0, 0, 0);
+  --shadow-sm: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 1px 2px -1px rgba(0, 0, 0, 0);
+  --shadow: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 1px 2px -1px rgba(0, 0, 0, 0);
+  --shadow-md: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 2px 4px -1px rgba(0, 0, 0, 0);
+  --shadow-lg: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 4px 6px -1px rgba(0, 0, 0, 0);
+  --shadow-xl: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 8px 10px -1px rgba(0, 0, 0, 0);
+  --shadow-2xl: 0 3px 0px 0px rgba(0, 0, 0, 0);
+}
+
+/* Alias layer */
+@theme inline {
+  /* Color aliases */
+  --google-color-background: var(--background);
+  --google-color-foreground: var(--foreground);
+  --google-color-card: var(--card);
+  --google-color-card-foreground: var(--card-foreground);
+  --google-color-popover: var(--popover);
+  --google-color-popover-foreground: var(--popover-foreground);
+  --google-color-primary: var(--primary);
+  --google-color-primary-foreground: var(--primary-foreground);
+  --google-color-secondary: var(--secondary);
+  --google-color-secondary-foreground: var(--secondary-foreground);
+  --google-color-muted: var(--muted);
+  --google-color-muted-foreground: var(--muted-foreground);
+  --google-color-accent: var(--accent);
+  --google-color-accent-foreground: var(--accent-foreground);
+  --google-color-destructive: var(--destructive);
+  --google-color-destructive-foreground: var(--destructive-foreground);
+  --google-color-border: var(--border);
+  --google-color-input: var(--input);
+  --google-color-ring: var(--ring);
+  --google-color-chart-1: var(--chart-1);
+  --google-color-chart-2: var(--chart-2);
+  --google-color-chart-3: var(--chart-3);
+  --google-color-chart-4: var(--chart-4);
+  --google-color-chart-5: var(--chart-5);
+  --google-color-sidebar: var(--sidebar);
+  --google-color-sidebar-foreground: var(--sidebar-foreground);
+  --google-color-sidebar-primary: var(--sidebar-primary);
+  --google-color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --google-color-sidebar-accent: var(--sidebar-accent);
+  --google-color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --google-color-sidebar-border: var(--sidebar-border);
+  --google-color-sidebar-ring: var(--sidebar-ring);
+
+  /* Typography aliases */
+  --google-font-sans: var(--font-sans);
+  --google-font-serif: var(--font-serif);
+  --google-font-mono: var(--font-mono);
+
+  /* Radius aliases */
+  --google-radius: var(--radius);
+  --google-radius-sm: calc(var(--radius) - 4px);
+  --google-radius-md: calc(var(--radius) - 2px);
+  --google-radius-lg: var(--radius);
+  --google-radius-xl: calc(var(--radius) + 4px);
+
+  /* Shadow aliases */
+  --google-shadow-x: var(--shadow-x);
+  --google-shadow-y: var(--shadow-y);
+  --google-shadow-blur: var(--shadow-blur);
+  --google-shadow-spread: var(--shadow-spread);
+  --google-shadow-opacity: var(--shadow-opacity);
+  --google-shadow-color: var(--shadow-color);
+  --google-shadow-2xs: var(--shadow-2xs);
+  --google-shadow-xs: var(--shadow-xs);
+  --google-shadow-sm: var(--shadow-sm);
+  --google-shadow: var(--shadow);
+  --google-shadow-md: var(--shadow-md);
+  --google-shadow-lg: var(--shadow-lg);
+  --google-shadow-xl: var(--shadow-xl);
+  --google-shadow-2xl: var(--shadow-2xl);
+
+  /* Rhythm aliases */
+  --google-tracking-normal: var(--tracking-normal);
+  --google-spacing: var(--spacing);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --radius-sm: var(--google-radius-sm);
+    --radius-md: var(--google-radius-md);
+    --radius-lg: var(--google-radius-lg);
+  }
+  @layer base {
+    body { background: var(--background); color: var(--foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--background); }
+      .text-background { color: var(--background); }
+      .border-background { border-color: var(--background); }
+      .ring-background { --tw-ring-color: var(--background); }
+      .bg-foreground { background-color: var(--foreground); }
+      .text-foreground { color: var(--foreground); }
+      .border-foreground { border-color: var(--foreground); }
+      .ring-foreground { --tw-ring-color: var(--foreground); }
+      .bg-card { background-color: var(--card); }
+      .text-card { color: var(--card); }
+      .border-card { border-color: var(--card); }
+      .ring-card { --tw-ring-color: var(--card); }
+      .bg-card-foreground { background-color: var(--card-foreground); }
+      .text-card-foreground { color: var(--card-foreground); }
+      .border-card-foreground { border-color: var(--card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--card-foreground); }
+      .bg-popover { background-color: var(--popover); }
+      .text-popover { color: var(--popover); }
+      .border-popover { border-color: var(--popover); }
+      .ring-popover { --tw-ring-color: var(--popover); }
+      .bg-popover-foreground { background-color: var(--popover-foreground); }
+      .text-popover-foreground { color: var(--popover-foreground); }
+      .border-popover-foreground { border-color: var(--popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--popover-foreground); }
+      .bg-primary { background-color: var(--primary); }
+      .text-primary { color: var(--primary); }
+      .border-primary { border-color: var(--primary); }
+      .ring-primary { --tw-ring-color: var(--primary); }
+      .bg-primary-foreground { background-color: var(--primary-foreground); }
+      .text-primary-foreground { color: var(--primary-foreground); }
+      .border-primary-foreground { border-color: var(--primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--primary-foreground); }
+      .bg-secondary { background-color: var(--secondary); }
+      .text-secondary { color: var(--secondary); }
+      .border-secondary { border-color: var(--secondary); }
+      .ring-secondary { --tw-ring-color: var(--secondary); }
+      .bg-secondary-foreground { background-color: var(--secondary-foreground); }
+      .text-secondary-foreground { color: var(--secondary-foreground); }
+      .border-secondary-foreground { border-color: var(--secondary-foreground); }
+      .ring-secondary-foreground { --tw-ring-color: var(--secondary-foreground); }
+      .bg-muted { background-color: var(--muted); }
+      .text-muted { color: var(--muted); }
+      .border-muted { border-color: var(--muted); }
+      .ring-muted { --tw-ring-color: var(--muted); }
+      .bg-muted-foreground { background-color: var(--muted-foreground); }
+      .text-muted-foreground { color: var(--muted-foreground); }
+      .border-muted-foreground { border-color: var(--muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--muted-foreground); }
+      .bg-accent { background-color: var(--accent); }
+      .text-accent { color: var(--accent); }
+      .border-accent { border-color: var(--accent); }
+      .ring-accent { --tw-ring-color: var(--accent); }
+      .bg-accent-foreground { background-color: var(--accent-foreground); }
+      .text-accent-foreground { color: var(--accent-foreground); }
+      .border-accent-foreground { border-color: var(--accent-foreground); }
+      .ring-accent-foreground { --tw-ring-color: var(--accent-foreground); }
+      .bg-destructive { background-color: var(--destructive); }
+      .text-destructive { color: var(--destructive); }
+      .border-destructive { border-color: var(--destructive); }
+      .ring-destructive { --tw-ring-color: var(--destructive); }
+      .bg-destructive-foreground { background-color: var(--destructive-foreground); }
+      .text-destructive-foreground { color: var(--destructive-foreground); }
+      .border-destructive-foreground { border-color: var(--destructive-foreground); }
+      .ring-destructive-foreground { --tw-ring-color: var(--destructive-foreground); }
+      .bg-border { background-color: var(--border); }
+      .text-border { color: var(--border); }
+      .border-border { border-color: var(--border); }
+      .ring-border { --tw-ring-color: var(--border); }
+      .bg-input { background-color: var(--input); }
+      .text-input { color: var(--input); }
+      .border-input { border-color: var(--input); }
+      .ring-input { --tw-ring-color: var(--input); }
+      .bg-ring { background-color: var(--ring); }
+      .text-ring { color: var(--ring); }
+      .border-ring { border-color: var(--ring); }
+      .ring-ring { --tw-ring-color: var(--ring); }
+      .bg-chart-1 { background-color: var(--chart-1); }
+      .text-chart-1 { color: var(--chart-1); }
+      .border-chart-1 { border-color: var(--chart-1); }
+      .ring-chart-1 { --tw-ring-color: var(--chart-1); }
+      .bg-chart-2 { background-color: var(--chart-2); }
+      .text-chart-2 { color: var(--chart-2); }
+      .border-chart-2 { border-color: var(--chart-2); }
+      .ring-chart-2 { --tw-ring-color: var(--chart-2); }
+      .bg-chart-3 { background-color: var(--chart-3); }
+      .text-chart-3 { color: var(--chart-3); }
+      .border-chart-3 { border-color: var(--chart-3); }
+      .ring-chart-3 { --tw-ring-color: var(--chart-3); }
+      .bg-chart-4 { background-color: var(--chart-4); }
+      .text-chart-4 { color: var(--chart-4); }
+      .border-chart-4 { border-color: var(--chart-4); }
+      .ring-chart-4 { --tw-ring-color: var(--chart-4); }
+      .bg-chart-5 { background-color: var(--chart-5); }
+      .text-chart-5 { color: var(--chart-5); }
+      .border-chart-5 { border-color: var(--chart-5); }
+      .ring-chart-5 { --tw-ring-color: var(--chart-5); }
+      .bg-sidebar { background-color: var(--sidebar); }
+      .text-sidebar { color: var(--sidebar); }
+      .border-sidebar { border-color: var(--sidebar); }
+      .ring-sidebar { --tw-ring-color: var(--sidebar); }
+      .bg-sidebar-foreground { background-color: var(--sidebar-foreground); }
+      .text-sidebar-foreground { color: var(--sidebar-foreground); }
+      .border-sidebar-foreground { border-color: var(--sidebar-foreground); }
+      .ring-sidebar-foreground { --tw-ring-color: var(--sidebar-foreground); }
+      .bg-sidebar-primary { background-color: var(--sidebar-primary); }
+      .text-sidebar-primary { color: var(--sidebar-primary); }
+      .border-sidebar-primary { border-color: var(--sidebar-primary); }
+      .ring-sidebar-primary { --tw-ring-color: var(--sidebar-primary); }
+      .bg-sidebar-primary-foreground { background-color: var(--sidebar-primary-foreground); }
+      .text-sidebar-primary-foreground { color: var(--sidebar-primary-foreground); }
+      .border-sidebar-primary-foreground { border-color: var(--sidebar-primary-foreground); }
+      .ring-sidebar-primary-foreground { --tw-ring-color: var(--sidebar-primary-foreground); }
+      .bg-sidebar-accent { background-color: var(--sidebar-accent); }
+      .text-sidebar-accent { color: var(--sidebar-accent); }
+      .border-sidebar-accent { border-color: var(--sidebar-accent); }
+      .ring-sidebar-accent { --tw-ring-color: var(--sidebar-accent); }
+      .bg-sidebar-accent-foreground { background-color: var(--sidebar-accent-foreground); }
+      .text-sidebar-accent-foreground { color: var(--sidebar-accent-foreground); }
+      .border-sidebar-accent-foreground { border-color: var(--sidebar-accent-foreground); }
+      .ring-sidebar-accent-foreground { --tw-ring-color: var(--sidebar-accent-foreground); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="app-shell">
+      <!-- Sidebar -->
+      <aside class="sidebar-frame" aria-label="主导航边栏">
+        <div class="flex items-center gap-3 p-4 pb-2">
+          <span class="inline-flex h-8 w-8 items-center justify-center rounded-md bg-[var(--sidebar-primary)] text-[var(--sidebar-primary-foreground)] text-sm font-bold">JK</span>
+          <span class="text-sm font-semibold tracking-tight truncate">Jianku Screen</span>
+        </div>
+        <nav class="flex flex-col gap-1 px-3 py-2" aria-label="应用层级">
+          <a href="#record" class="group flex items-center justify-between rounded-[var(--radius)] px-3 py-2.5 text-sm font-medium text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)] focus-visible:outline-2 focus-visible:outline-[var(--sidebar-ring)] focus-visible:outline-offset-1">
+            <span class="flex items-center gap-3">
+              <span data-icon class="h-4.5 w-4.5" style="-webkit-mask-image: url('../assets/icons/google/circle-play.svg'); mask-image: url('../assets/icons/google/circle-play.svg');"></span>
+              录屏
+            </span>
+          </a>
+          <a href="#present" class="group flex items-center justify-between rounded-[var(--radius)] px-3 py-2.5 text-sm font-medium text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)] focus-visible:outline-2 focus-visible:outline-[var(--sidebar-ring)] focus-visible:outline-offset-1">
+            <span class="flex items-center gap-3">
+              <span data-icon class="h-4.5 w-4.5" style="-webkit-mask-image: url('../assets/icons/google/external-link.svg'); mask-image: url('../assets/icons/google/external-link.svg');"></span>
+              演示输出
+            </span>
+          </a>
+          <a href="#edit" class="group flex items-center justify-between rounded-[var(--radius)] px-3 py-2.5 text-sm font-medium text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)] focus-visible:outline-2 focus-visible:outline-[var(--sidebar-ring)] focus-visible:outline-offset-1">
+            <span class="flex items-center gap-3">
+              <span data-icon class="h-4.5 w-4.5" style="-webkit-mask-image: url('../assets/icons/google/pen-line.svg'); mask-image: url('../assets/icons/google/pen-line.svg');"></span>
+              时间轴编辑
+            </span>
+          </a>
+          <a href="#library" class="group flex items-center justify-between rounded-[var(--radius)] px-3 py-2.5 text-sm font-medium text-[var(--sidebar-primary-foreground)] bg-[var(--sidebar-primary)] focus-visible:outline-2 focus-visible:outline-[var(--sidebar-ring)] focus-visible:outline-offset-1" aria-current="page">
+            <span class="flex items-center gap-3">
+              <span data-icon class="h-4.5 w-4.5" style="-webkit-mask-image: url('../assets/icons/google/folder-open.svg'); mask-image: url('../assets/icons/google/folder-open.svg');"></span>
+              素材库
+            </span>
+          </a>
+          <a href="#settings" class="group flex items-center justify-between rounded-[var(--radius)] px-3 py-2.5 text-sm font-medium text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)] focus-visible:outline-2 focus-visible:outline-[var(--sidebar-ring)] focus-visible:outline-offset-1">
+            <span class="flex items-center gap-3">
+              <span data-icon class="h-4.5 w-4.5" style="-webkit-mask-image: url('../assets/icons/google/chevrons-up-down.svg'); mask-image: url('../assets/icons/google/chevrons-up-down.svg');"></span>
+              设置
+            </span>
+          </a>
+        </nav>
+        <div class="mt-auto p-4 border-t border-[var(--sidebar-border)]">
+          <div class="rounded-[var(--radius)] bg-[var(--sidebar-accent)] p-3">
+            <p class="text-xs font-medium text-[var(--sidebar-accent-foreground)] mb-1">Pro 套餐</p>
+            <p class="text-[11px] text-[var(--muted-foreground)] mb-2">云同步与 4K 导出已启用</p>
+            <button type="button" class="w-full inline-flex items-center justify-center rounded-[var(--radius)] bg-[var(--sidebar-primary)] text-[var(--sidebar-primary-foreground)] text-xs font-semibold h-8 hover:brightness-95 focus-visible:outline-2 focus-visible:outline-[var(--sidebar-ring)] focus-visible:outline-offset-1">管理订阅</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main content -->
+      <section class="content-frame">
+        <!-- Top app bar -->
+        <header class="topbar-frame">
+          <div class="flex items-center gap-4 min-w-0">
+            <h1 class="text-base font-semibold text-[var(--foreground)] truncate">主控台</h1>
+            <div class="hidden md:flex items-center rounded-[var(--radius)] border border-[var(--border)] bg-[var(--background)] px-3 h-9 w-80">
+              <span data-icon class="h-4 w-4 text-[var(--muted-foreground)] mr-2" style="-webkit-mask-image: url('../assets/icons/google/funnel.svg'); mask-image: url('../assets/icons/google/funnel.svg');"></span>
+              <input type="search" placeholder="搜索录制、项目或标签..." aria-label="搜索" class="bg-transparent text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] outline-none w-full" />
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <button type="button" class="relative inline-flex h-9 w-9 items-center justify-center rounded-[var(--radius)] border border-[var(--border)] bg-[var(--popover)] text-[var(--popover-foreground)] hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)] focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-1" aria-label="通知">
+              <span data-icon class="h-4 w-4" style="-webkit-mask-image: url('../assets/icons/google/mail.svg'); mask-image: url('../assets/icons/google/mail.svg');"></span>
+              <span class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[var(--chart-2)]"></span>
+            </button>
+            <button type="button" class="inline-flex h-9 w-9 items-center justify-center rounded-[var(--radius)] bg-[var(--primary)] text-[var(--primary-foreground)] text-sm font-semibold hover:brightness-95 focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-1" aria-label="账户">
+              <span data-icon class="h-4 w-4" style="-webkit-mask-image: url('../assets/icons/google/user.svg'); mask-image: url('../assets/icons/google/user.svg');"></span>
+            </button>
+          </div>
+        </header>
+
+        <!-- Dashboard body -->
+        <div class="dashboard-body">
+          <!-- Page header -->
+          <div class="flex items-center justify-between gap-4 mb-6">
+            <div>
+              <p class="text-xs font-medium uppercase tracking-wider text-[var(--muted-foreground)] mb-1">Jianku Screen Next</p>
+              <h2 class="text-xl font-semibold text-[var(--foreground)]">欢迎回来，继续你的创作</h2>
+            </div>
+            <div class="flex items-center gap-3">
+              <button type="button" class="inline-flex items-center justify-center gap-2 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--background)] text-[var(--foreground)] text-sm font-medium h-9 px-4 hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)] focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-1">
+                <span data-icon class="h-4 w-4" style="-webkit-mask-image: url('../assets/icons/google/folder.svg'); mask-image: url('../assets/icons/google/folder.svg');"></span>
+                导入素材
+              </button>
+              <button type="button" class="inline-flex items-center justify-center gap-2 rounded-[var(--radius)] bg-[var(--primary)] text-[var(--primary-foreground)] text-sm font-semibold h-9 px-4 hover:brightness-95 focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-1">
+                <span data-icon class="h-4 w-4" style="-webkit-mask-image: url('../assets/icons/google/circle-plus.svg'); mask-image: url('../assets/icons/google/circle-plus.svg');"></span>
+                新建录制
+              </button>
+            </div>
+          </div>
+
+          <!-- Stat cards -->
+          <div class="stat-grid">
+            <article class="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--card)] p-5 flex flex-col gap-2">
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">本周录制</span>
+              <strong class="text-3xl font-bold text-[var(--foreground)]">24</strong>
+              <span class="inline-flex items-center gap-1.5 w-max px-2.5 py-1 rounded-full bg-[var(--accent)] text-[var(--accent-foreground)] text-xs font-semibold">+12.4% 较上周</span>
+            </article>
+            <article class="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--card)] p-5 flex flex-col gap-2">
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">总录制时长</span>
+              <strong class="text-3xl font-bold text-[var(--foreground)] font-mono">04:32:18</strong>
+              <span class="inline-flex items-center gap-1.5 w-max px-2.5 py-1 rounded-full bg-[var(--accent)] text-[var(--accent-foreground)] text-xs font-semibold">+2h 15m</span>
+            </article>
+            <article class="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--card)] p-5 flex flex-col gap-2">
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">已导出项目</span>
+              <strong class="text-3xl font-bold text-[var(--foreground)]">18</strong>
+              <span class="inline-flex items-center gap-1.5 w-max px-2.5 py-1 rounded-full bg-[var(--muted)] text-[var(--muted-foreground)] text-xs font-semibold">目标 25</span>
+            </article>
+            <article class="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--card)] p-5 flex flex-col gap-2">
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">存储使用</span>
+              <strong class="text-3xl font-bold text-[var(--foreground)] font-mono">62%</strong>
+              <span class="inline-flex items-center gap-1.5 w-max px-2.5 py-1 rounded-full bg-[var(--accent)] text-[var(--accent-foreground)] text-xs font-semibold">124 GB / 200 GB</span>
+            </article>
+          </div>
+
+          <!-- Recent recordings table -->
+          <section class="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--card)] overflow-hidden mb-6" aria-labelledby="recordings-heading">
+            <div class="flex items-center justify-between gap-3 px-4 py-3 border-b border-[var(--border)]">
+              <div class="flex items-center gap-3">
+                <h3 id="recordings-heading" class="text-sm font-semibold text-[var(--foreground)]">最近录制</h3>
+                <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-[var(--muted)] text-[var(--muted-foreground)] text-xs font-semibold">6</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <button type="button" class="inline-flex items-center justify-center gap-1.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--background)] text-[var(--foreground)] text-xs font-medium h-8 px-3 hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)] focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-1">
+                  <span data-icon class="h-3.5 w-3.5" style="-webkit-mask-image: url('../assets/icons/google/funnel.svg'); mask-image: url('../assets/icons/google/funnel.svg');"></span>
+                  筛选
+                </button>
+                <button type="button" class="inline-flex items-center justify-center rounded-[var(--radius)] border border-[var(--border)] bg-[var(--background)] text-[var(--foreground)] text-xs font-medium h-8 px-3 hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)] focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-1">
+                  <span data-icon class="h-3.5 w-3.5" style="-webkit-mask-image: url('../assets/icons/google/external-link.svg'); mask-image: url('../assets/icons/google/external-link.svg');"></span>
+                </button>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="recordings-table">
+                <thead>
+                  <tr>
+                    <th scope="col">项目名称</th>
+                    <th scope="col">时长</th>
+                    <th scope="col">分辨率</th>
+                    <th scope="col">状态</th>
+                    <th scope="col">修改时间</th>
+                    <th scope="col" class="text-right">操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="text-sm font-medium text-[var(--foreground)]">
+                      <div class="flex items-center gap-2">
+                        <span data-icon class="h-4 w-4 text-[var(--primary)]" style="-webkit-mask-image: url('../assets/icons/google/file.svg'); mask-image: url('../assets/icons/google/file.svg');"></span>
+                        产品演示_v3
+                      </div>
+                    </td>
+                    <td class="text-sm text-[var(--muted-foreground)] font-mono">08:42</td>
+                    <td class="text-sm text-[var(--muted-foreground)]">2560×1440</td>
+                    <td><span class="inline-flex items-center px-2 py-0.5 rounded-full bg-[color-mix(in_srgb,var(--chart-5)_18%,var(--background))] text-[var(--foreground)] text-xs font-medium">已导出</span></td>
+                    <td class="text-sm text-[var(--muted-foreground)]">10 分钟前</td>
+                    <td class="text-right">
+                      <button type="button" class="inline-flex items-center justify-center rounded-[var(--radius)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--accent)] h-7 w-7 focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-1" aria-label="编辑">
+                        <span data-icon class="h-4 w-4" style="-webkit-mask-image: url('../assets/icons/google/pen-line.svg'); mask-image: url('../assets/icons/google/pen-line.svg');"></span>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-sm font-medium text-[var(--foreground)]">
+                      <div class="flex items-center gap-2">
+                        <span data-icon class="h-4 w-4 text-[var(--primary)]" style="-webkit-mask-image: url('../assets/icons/google/file.svg'); mask-image: url('../assets/icons/google/file.svg');"></span>
+                        用户引导录屏
+                      </div>
+                    </td>
+                    <td class="text-sm text-[var(--muted-foreground)] font-mono">04:15</td>
+                    <td class="text-sm text-[var(--muted-foreground)]">1920×1080</td>
+                    <td><span class="inline-flex items-center px-2 py-0.5 rounded-full bg-[color-mix(in_srgb,var(--chart-3)_18%,var(--background))] text-[var(--foreground)] text-xs font-medium">渲染中</span></td>
+                    <td class="text-sm text-[var(--muted-foreground)]">2 小时前</td>
+                    <td class="text-right">
+                      <button type="button" class="inline-flex items-center justify-center rounded-[var(--radius)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--accent)] h-7 w-7 focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-1" aria-label="编辑">
+                        <span data-icon class="h-4 w-4" style="-webkit-mask-image: url('../assets/icons/google/pen-line.svg'); mask-image: url('../assets/icons/google/pen-line.svg');"></span>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-sm font-medium text-[var(--foreground)]">
+                      <div class="flex items-center gap-2">
+                        <span data-icon class="h-4 w-4 text-[var(--primary)]" style="-webkit-mask-image: url('../assets/icons/google/file.svg'); mask-image: url('../assets/icons/google/file.svg');"></span>
+                        季度汇报关键帧
+                      </div>
+                    </td>
+                    <td class="text-sm text-[var(--muted-foreground)] font-mono">12:08</td>
+                    <td class="text-sm text-[var(--muted-foreground)]">3840×2160</td>
+                    <td><span class="inline-flex items-center px-2 py-0.5 rounded-full bg-[color-mix(in_srgb,var(--chart-1)_18%,var(--background))] text-[var(--foreground)] text-xs font-medium">可编辑</span></td>
+                    <td class="text-sm text-[var(--muted-foreground)]">昨天</td>
+                    <td class="text-right">
+                      <button type="button" class="inline-flex items-center justify-center rounded-[var(--radius)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--accent)] h-7 w-7 focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-1" aria-label="编辑">
+                        <span data-icon class="h-4 w-4" style="-webkit-mask-image: url('../assets/icons/google/pen-line.svg'); mask-image: url('../assets/icons/google/pen-line.svg');"></span>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-sm font-medium text-[var(--foreground)]">
+                      <div class="flex items-center gap-2">
+                        <span data-icon class="h-4 w-4 text-[var(--primary)]" style="-webkit-mask-image: url('../assets/icons/google/file.svg'); mask-image: url('../assets/icons/google/file.svg');"></span>
+                        功能内测反馈
+                      </div>
+                    </td>
+                    <td class="text-sm text-[var(--muted-foreground)] font-mono">02:37</td>
+                    <td class="text-sm text-[var(--muted-foreground)]">1920×1080</td>
+                    <td><span class="inline-flex items-center px-2 py-0.5 rounded-full bg-[color-mix(in_srgb,var(--chart-5)_18%,var(--background))] text-[var(--foreground)] text-xs font-medium">已导出</span></td>
+                    <td class="text-sm text-[var(--muted-foreground)]">2 天前</td>
+                    <td class="text-right">
+                      <button type="button" class="inline-flex items-center justify-center rounded-[var(--radius)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--accent)] h-7 w-7 focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-1" aria-label="编辑">
+                        <span data-icon class="h-4 w-4" style="-webkit-mask-image: url('../assets/icons/google/pen-line.svg'); mask-image: url('../assets/icons/google/pen-line.svg');"></span>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-sm font-medium text-[var(--foreground)]">
+                      <div class="flex items-center gap-2">
+                        <span data-icon class="h-4 w-4 text-[var(--primary)]" style="-webkit-mask-image: url('../assets/icons/google/file.svg'); mask-image: url('../assets/icons/google/file.svg');"></span>
+                        动态模糊对比
+                      </div>
+                    </td>
+                    <td class="text-sm text-[var(--muted-foreground)] font-mono">06:50</td>
+                    <td class="text-sm text-[var(--muted-foreground)]">2560×1440</td>
+                    <td><span class="inline-flex items-center px-2 py-0.5 rounded-full bg-[color-mix(in_srgb,var(--chart-2)_18%,var(--background))] text-[var(--foreground)] text-xs font-medium">待处理</span></td>
+                    <td class="text-sm text-[var(--muted-foreground)]">3 天前</td>
+                    <td class="text-right">
+                      <button type="button" class="inline-flex items-center justify-center rounded-[var(--radius)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--accent)] h-7 w-7 focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-1" aria-label="编辑">
+                        <span data-icon class="h-4 w-4" style="-webkit-mask-image: url('../assets/icons/google/pen-line.svg'); mask-image: url('../assets/icons/google/pen-line.svg');"></span>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-sm font-medium text-[var(--foreground)]">
+                      <div class="flex items-center gap-2">
+                        <span data-icon class="h-4 w-4 text-[var(--primary)]" style="-webkit-mask-image: url('../assets/icons/google/file.svg'); mask-image: url('../assets/icons/google/file.svg');"></span>
+                        指针平滑测试
+                      </div>
+                    </td>
+                    <td class="text-sm text-[var(--muted-foreground)] font-mono">03:22</td>
+                    <td class="text-sm text-[var(--muted-foreground)]">1920×1080</td>
+                    <td><span class="inline-flex items-center px-2 py-0.5 rounded-full bg-[color-mix(in_srgb,var(--chart-1)_18%,var(--background))] text-[var(--foreground)] text-xs font-medium">可编辑</span></td>
+                    <td class="text-sm text-[var(--muted-foreground)]">4 天前</td>
+                    <td class="text-right">
+                      <button type="button" class="inline-flex items-center justify-center rounded-[var(--radius)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--accent)] h-7 w-7 focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-1" aria-label="编辑">
+                        <span data-icon class="h-4 w-4" style="-webkit-mask-image: url('../assets/icons/google/pen-line.svg'); mask-image: url('../assets/icons/google/pen-line.svg');"></span>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="flex items-center justify-between px-4 py-3 border-t border-[var(--border)]">
+              <span class="text-xs text-[var(--muted-foreground)]">显示 1-6 共 6 条</span>
+              <div class="flex items-center gap-1.5">
+                <button type="button" disabled class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] text-xs font-semibold">1</button>
+                <button type="button" class="inline-flex h-7 w-7 items-center justify-center rounded-full text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)] text-xs">2</button>
+                <button type="button" class="inline-flex h-7 w-7 items-center justify-center rounded-full text-[var(--muted-foreground)] hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)] text-xs">3</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- Quick actions -->
+          <section aria-labelledby="quick-actions-heading">
+            <h3 id="quick-actions-heading" class="text-sm font-semibold text-[var(--foreground)] mb-3">快捷操作</h3>
+            <div class="quick-actions-grid">
+              <button type="button" class="group flex items-center gap-3 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--card)] p-4 text-left hover:border-[var(--primary)] focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-1">
+                <span class="inline-flex h-9 w-9 items-center justify-center rounded-[var(--radius)] bg-[var(--accent)] text-[var(--accent-foreground)] group-hover:bg-[var(--primary)] group-hover:text-[var(--primary-foreground)] transition-colors">
+                  <span data-icon class="h-4.5 w-4.5" style="-webkit-mask-image: url('../assets/icons/google/mouse-pointer-click.svg'); mask-image: url('../assets/icons/google/mouse-pointer-click.svg');"></span>
+                </span>
+                <div>
+                  <p class="text-sm font-semibold text-[var(--foreground)]">平滑指针</p>
+                  <p class="text-xs text-[var(--muted-foreground)]">优化光标轨迹与点击高亮</p>
+                </div>
+              </button>
+              <button type="button" class="group flex items-center gap-3 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--card)] p-4 text-left hover:border-[var(--primary)] focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-1">
+                <span class="inline-flex h-9 w-9 items-center justify-center rounded-[var(--radius)] bg-[var(--accent)] text-[var(--accent-foreground)] group-hover:bg-[var(--primary)] group-hover:text-[var(--primary-foreground)] transition-colors">
+                  <span data-icon class="h-4.5 w-4.5" style="-webkit-mask-image: url('../assets/icons/google/circle-play.svg'); mask-image: url('../assets/icons/google/circle-play.svg');"></span>
+                </span>
+                <div>
+                  <p class="text-sm font-semibold text-[var(--foreground)]">聚焦缩放</p>
+                  <p class="text-xs text-[var(--muted-foreground)]">自动跟随关键操作区域</p>
+                </div>
+              </button>
+              <button type="button" class="group flex items-center gap-3 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--card)] p-4 text-left hover:border-[var(--primary)] focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-1">
+                <span class="inline-flex h-9 w-9 items-center justify-center rounded-[var(--radius)] bg-[var(--accent)] text-[var(--accent-foreground)] group-hover:bg-[var(--primary)] group-hover:text-[var(--primary-foreground)] transition-colors">
+                  <span data-icon class="h-4.5 w-4.5" style="-webkit-mask-image: url('../assets/icons/google/folder-open.svg'); mask-image: url('../assets/icons/google/folder-open.svg');"></span>
+                </span>
+                <div>
+                  <p class="text-sm font-semibold text-[var(--foreground)]">帧封装</p>
+                  <p class="text-xs text-[var(--muted-foreground)]">打包为可复用片段</p>
+                </div>
+              </button>
+              <button type="button" class="group flex items-center gap-3 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--card)] p-4 text-left hover:border-[var(--primary)] focus-visible:outline-2 focus-visible:outline-[var(--ring)] focus-visible:outline-offset-1">
+                <span class="inline-flex h-9 w-9 items-center justify-center rounded-[var(--radius)] bg-[var(--accent)] text-[var(--accent-foreground)] group-hover:bg-[var(--primary)] group-hover:text-[var(--primary-foreground)] transition-colors">
+                  <span data-icon class="h-4.5 w-4.5" style="-webkit-mask-image: url('../assets/icons/google/external-link.svg'); mask-image: url('../assets/icons/google/external-link.svg');"></span>
+                </span>
+                <div>
+                  <p class="text-sm font-semibold text-[var(--foreground)]">直播演示</p>
+                  <p class="text-xs text-[var(--muted-foreground)]">输出到 OBS / 会议窗口</p>
+                </div>
+              </button>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+    <script>lucide.createIcons();</script>
+
+    <style id="critical-layout">
+      .app-shell { display: flex; min-height: 100vh; }
+      .sidebar-frame {
+        width: 236px;
+        flex: 0 0 236px;
+        display: flex;
+        flex-direction: column;
+        background: var(--sidebar);
+        color: var(--sidebar-foreground);
+        border-right: 1px solid var(--sidebar-border);
+      }
+      .content-frame {
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        overflow-x: hidden;
+      }
+      .topbar-frame {
+        height: 60px;
+        flex: 0 0 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 0 24px;
+        background: var(--card);
+        color: var(--card-foreground);
+        border-bottom: 1px solid var(--border);
+      }
+      .dashboard-body {
+        flex: 1 1 auto;
+        padding: 24px;
+        overflow-y: auto;
+        min-width: 0;
+      }
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      .quick-actions-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+      }
+      .recordings-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .recordings-table th,
+      .recordings-table td {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+      }
+      .recordings-table th {
+        background: var(--muted);
+        color: var(--muted-foreground);
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+      .recordings-table td:last-child,
+      .recordings-table th:last-child { text-align: right; }
+      .recordings-table tbody tr:hover { background: var(--accent); }
+      @media (max-width: 1280px) {
+        .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .quick-actions-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+      @media (max-width: 900px) {
+        .sidebar-frame { width: 76px; flex: 0 0 76px; }
+        .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .quick-actions-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+      @media (max-width: 640px) {
+        .stat-grid { grid-template-columns: 1fr; }
+        .quick-actions-grid { grid-template-columns: 1fr; }
+      }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</body>
+</html>

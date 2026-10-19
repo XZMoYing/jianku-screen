@@ -411,7 +411,7 @@ function Inner(props: {
 						const currentValue = props.value;
 						const items = props.options.map((option) =>
 							CheckMenuItem.new({
-								text: option.text,
+								text: localize(option.text),
 								checked: currentValue === option.value,
 								action: () => props.onChange(option.value),
 							}),
@@ -428,7 +428,7 @@ function Inner(props: {
 						const option = props.options.find(
 							(opt) => opt.value === currentValue,
 						);
-						return option ? option.text : currentValue;
+						return option ? localize(option.text) : currentValue;
 					})()}
 					<IconCapChevronDown class="size-3.5 text-gray-10" />
 				</button>
@@ -550,7 +550,7 @@ function Inner(props: {
 							}
 							options={[
 								{ text: "打开编辑器", value: "openEditor" },
-								{ text: "Show in overlay", value: "showOverlay" },
+								{ text: "在浮层中显示", value: "showOverlay" },
 							]}
 						/>
 						<SelectSettingItem
@@ -561,9 +561,9 @@ function Inner(props: {
 							value={settings.postDeletionBehaviour ?? "doNothing"}
 							onChange={(value) => handleChange("postDeletionBehaviour", value)}
 							options={[
-								{ text: "Do nothing", value: "doNothing" },
+								{ text: "不执行操作", value: "doNothing" },
 								{
-									text: "Reopen recording window",
+									text: "重新打开录制窗口",
 									value: "reopenRecordingWindow",
 								},
 							]}
@@ -571,7 +571,7 @@ function Inner(props: {
 						<ToggleSettingItem
 							label={localize("Delete Instant recordings after upload")}
 							description={localize(
-								"Cap removes the local file once it has uploaded successfully.",
+								"The local file is removed after a successful upload.",
 							)}
 							value={settings.deleteInstantRecordingsAfterUpload ?? false}
 							onChange={(v) =>
@@ -648,13 +648,15 @@ function Inner(props: {
 							label={localize("Max capture framerate")}
 							description={
 								(settings.maxFps ?? 60) > 60
-									? "Maximum framerate for screen capture. Higher values may cause drops or increased CPU usage on some systems."
-									: "Maximum framerate for screen capture."
+								? localize(
+										"屏幕录制的最高帧率。较高帧率可能导致部分设备丢帧或增加处理器占用。",
+									)
+								: localize("屏幕录制的最高帧率。")
 							}
 							value={settings.maxFps ?? 60}
 							onChange={(value) => handleChange("maxFps", value)}
 							options={MAX_FPS_OPTIONS.map((option) => ({
-								text: option.label,
+								text: localize(option.label),
 								value: option.value,
 							}))}
 						/>
@@ -672,7 +674,7 @@ function Inner(props: {
 							}
 						} catch (e) {
 							toast.error(
-								`Failed to choose recordings folder: ${e instanceof Error ? e.message : String(e)}`,
+								localize("选择录制文件夹失败：{reason}", { reason: e instanceof Error ? e.message : String(e) }),
 							);
 						}
 					}}
@@ -794,7 +796,7 @@ function StorageSection(props: {
 	return (
 		<Section
 			title={localize("Storage")}
-			description={localize("Where Cap saves your recordings.")}
+			description={localize("选择新录制内容的保存位置。")}
 		>
 			<SectionCard padded>
 				<div class="flex flex-col gap-3">
@@ -829,7 +831,7 @@ function TelemetryCard(props: {
 				<ToggleSettingItem
 					label={localize("Share anonymous telemetry")}
 					description={localize(
-						"Cap uses anonymous telemetry to improve reliability and fix bugs. We never collect recording contents, window titles, file paths, or personal information.",
+							"Share anonymous usage data to help improve reliability and fix bugs. Recording contents, window titles, file paths, and personal information are never collected.",
 					)}
 					value={props.value}
 					onChange={props.onChange}
@@ -872,7 +874,7 @@ function UpdatesSection(props: {
 	return (
 		<Section
 			title={localize("Updates")}
-			description={localize("Choose which Cap builds you receive.")}
+			description={localize("选择接收哪个版本通道的更新。")}
 		>
 			<SectionCard>
 				<div class="flex flex-col gap-3 px-4 py-4">
@@ -882,7 +884,7 @@ function UpdatesSection(props: {
 								{localize("Update channel")}
 							</p>
 							<p class="text-xs leading-snug text-gray-10">
-								{localize("Which release channel Cap updates from.")}
+				{localize("设置应用使用的更新通道。")}
 							</p>
 						</div>
 						<SegmentedControl
@@ -1115,7 +1117,7 @@ function DefaultProjectNameCard(props: {
 							</div>
 
 							<div class="space-y-1">
-								<p class="font-medium text-gray-12">Date &amp; time</p>
+								<p class="font-medium text-gray-12">{localize("Date & time")}</p>
 								<p>
 									<CodeView>{"{date}"}</CodeView> → {dateString}
 								</p>
@@ -1217,7 +1219,7 @@ function ExcludedWindowsCard(props: {
 			description={
 				props.isWindows
 					? localize(
-							"Hide windows from recordings. On Windows, only Cap-related windows can be excluded.",
+							"Hide windows from recordings. On Windows, only application windows can be excluded.",
 						)
 					: "Hide windows from recordings."
 			}
@@ -1251,7 +1253,7 @@ function ExcludedWindowsCard(props: {
 							<IconLucideAlertTriangle class="mt-0.5 size-4 shrink-0 text-amber-11" />
 							<div class="min-w-0 flex-1 space-y-1">
 								<p class="text-xs font-medium text-amber-11">
-									{localize("Recommended Cap windows are not excluded")}
+							{localize("Some recommended app windows are not excluded")}
 								</p>
 								<p class="text-[10px] leading-snug text-amber-11">
 									{localize(

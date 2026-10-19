@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile - 设置</title>
+    <style id="theme-vars">
+/* Source: structured-spec */
+/* Brand profile: google / dashboard / clean / analytical / modern */
+/* Theme mode: light-dark */
+/* Alias layer: enabled */
+
+/* Light mode source tokens */
+:root {
+  /* Core surface colors */
+  --background: #ffffff;
+  --foreground: #0e1115;
+  --card: #ffffff;
+  --card-foreground: #0e1115;
+  --popover: #f9f9fa;
+  --popover-foreground: #0e1115;
+
+  /* Semantic action colors */
+  --primary: #4285f4;
+  --primary-foreground: #ffffff;
+  --secondary: #dbeafe;
+  --secondary-foreground: #333942;
+  --muted: #eff1f4;
+  --muted-foreground: #7f8d9f;
+  --accent: #dbeafe;
+  --accent-foreground: #003e8f;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  /* Borders, inputs, focus */
+  --border: #ebebeb;
+  --input: #e2e3e4;
+  --ring: #4285f4;
+
+  /* Data visualization */
+  --chart-1: #4285f4;
+  --chart-2: #ea4335;
+  --chart-3: #fbbc05;
+  --chart-4: #0043ad;
+  --chart-5: #34a853;
+
+  /* Sidebar */
+  --sidebar: #f0f6ff;
+  --sidebar-foreground: #0e1115;
+  --sidebar-primary: #4285f4;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #dbeafe;
+  --sidebar-accent-foreground: #003e8f;
+  --sidebar-border: #e7eaef;
+  --sidebar-ring: #4285f4;
+
+  /* Typography */
+  --font-sans: DM Sans, ui-sans-serif, sans-serif, system-ui;
+  --font-serif: DM Sans, ui-sans-serif, sans-serif, system-ui;
+  --font-mono: JetBrains Mono, monospace;
+
+  /* Radius */
+  --radius: 0.5rem;
+
+  /* Shadow primitives */
+  --shadow-x: 0;
+  --shadow-y: 3px;
+  --shadow-blur: 0px;
+  --shadow-spread: 0px;
+  --shadow-opacity: 0;
+  --shadow-color: #0e1115;
+
+  /* Elevation */
+  --shadow-2xs: 0 3px 0px 0px rgba(14, 17, 21, 0);
+  --shadow-xs: 0 3px 0px 0px rgba(14, 17, 21, 0);
+  --shadow-sm: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 1px 2px -1px rgba(14, 17, 21, 0);
+  --shadow: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 1px 2px -1px rgba(14, 17, 21, 0);
+  --shadow-md: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 2px 4px -1px rgba(14, 17, 21, 0);
+  --shadow-lg: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 4px 6px -1px rgba(14, 17, 21, 0);
+  --shadow-xl: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 8px 10px -1px rgba(14, 17, 21, 0);
+  --shadow-2xl: 0 3px 0px 0px rgba(14, 17, 21, 0);
+
+  /* Rhythm */
+  --tracking-normal: 0em;
+  --spacing: 0.24rem;
+  /* Patched radius aliases for head-contract compatibility */
+  --google-radius-sm: calc(var(--radius) - 4px);
+  --google-radius-md: calc(var(--radius) - 2px);
+  --google-radius-lg: var(--radius);
+
+}
+
+/* Dark mode source tokens */
+.dark {
+  /* Core surface colors */
+  --background: #161616;
+  --foreground: #eff1f4;
+  --card: #1d1d1c;
+  --card-foreground: #eff1f4;
+  --popover: #2e2e2e;
+  --popover-foreground: #e5e5e5;
+
+  /* Semantic action colors */
+  --primary: #fc2c50;
+  --primary-foreground: #ffffff;
+  --secondary: #383838;
+  --secondary-foreground: #e5e5e5;
+  --muted: #383838;
+  --muted-foreground: #949494;
+  --accent: #4a2026;
+  --accent-foreground: #fc2c50;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  /* Borders, inputs, focus */
+  --border: #1d1d1c;
+  --input: #000000;
+  --ring: #ffffff;
+
+  /* Data visualization */
+  --chart-1: #2dccd3;
+  --chart-2: #f1204a;
+  --chart-3: #edbbe8;
+  --chart-4: #fbeb35;
+  --chart-5: #baf6f0;
+
+  /* Sidebar */
+  --sidebar: #171717;
+  --sidebar-foreground: #e5e5e5;
+  --sidebar-primary: #0065fd;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #00266b;
+  --sidebar-accent-foreground: #bfdbfe;
+  --sidebar-border: #404040;
+  --sidebar-ring: #00266b;
+
+  /* Typography */
+  --font-sans: DM Sans, ui-sans-serif, sans-serif, system-ui;
+  --font-serif: DM Sans, ui-sans-serif, sans-serif, system-ui;
+  --font-mono: JetBrains Mono, monospace;
+
+  /* Radius */
+  --radius: 0.5rem;
+
+  /* Shadow primitives */
+  --shadow-x: 0;
+  --shadow-y: 3px;
+  --shadow-blur: 0px;
+  --shadow-spread: 0px;
+  --shadow-opacity: 0;
+  --shadow-color: #000000;
+
+  /* Elevation */
+  --shadow-2xs: 0 3px 0px 0px rgba(0, 0, 0, 0);
+  --shadow-xs: 0 3px 0px 0px rgba(0, 0, 0, 0);
+  --shadow-sm: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 1px 2px -1px rgba(0, 0, 0, 0);
+  --shadow: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 1px 2px -1px rgba(0, 0, 0, 0);
+  --shadow-md: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 2px 4px -1px rgba(0, 0, 0, 0);
+  --shadow-lg: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 4px 6px -1px rgba(0, 0, 0, 0);
+  --shadow-xl: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 8px 10px -1px rgba(0, 0, 0, 0);
+  --shadow-2xl: 0 3px 0px 0px rgba(0, 0, 0, 0);
+}
+
+/* Alias layer */
+@theme inline {
+  /* Color aliases */
+  --google-color-background: var(--background);
+  --google-color-foreground: var(--foreground);
+  --google-color-card: var(--card);
+  --google-color-card-foreground: var(--card-foreground);
+  --google-color-popover: var(--popover);
+  --google-color-popover-foreground: var(--popover-foreground);
+  --google-color-primary: var(--primary);
+  --google-color-primary-foreground: var(--primary-foreground);
+  --google-color-secondary: var(--secondary);
+  --google-color-secondary-foreground: var(--secondary-foreground);
+  --google-color-muted: var(--muted);
+  --google-color-muted-foreground: var(--muted-foreground);
+  --google-color-accent: var(--accent);
+  --google-color-accent-foreground: var(--accent-foreground);
+  --google-color-destructive: var(--destructive);
+  --google-color-destructive-foreground: var(--destructive-foreground);
+  --google-color-border: var(--border);
+  --google-color-input: var(--input);
+  --google-color-ring: var(--ring);
+  --google-color-chart-1: var(--chart-1);
+  --google-color-chart-2: var(--chart-2);
+  --google-color-chart-3: var(--chart-3);
+  --google-color-chart-4: var(--chart-4);
+  --google-color-chart-5: var(--chart-5);
+  --google-color-sidebar: var(--sidebar);
+  --google-color-sidebar-foreground: var(--sidebar-foreground);
+  --google-color-sidebar-primary: var(--sidebar-primary);
+  --google-color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --google-color-sidebar-accent: var(--sidebar-accent);
+  --google-color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --google-color-sidebar-border: var(--sidebar-border);
+  --google-color-sidebar-ring: var(--sidebar-ring);
+
+  /* Typography aliases */
+  --google-font-sans: var(--font-sans);
+  --google-font-serif: var(--font-serif);
+  --google-font-mono: var(--font-mono);
+
+  /* Radius aliases */
+  --google-radius: var(--radius);
+  --google-radius-sm: calc(var(--radius) - 4px);
+  --google-radius-md: calc(var(--radius) - 2px);
+  --google-radius-lg: var(--radius);
+  --google-radius-xl: calc(var(--radius) + 4px);
+
+  /* Shadow aliases */
+  --google-shadow-x: var(--shadow-x);
+  --google-shadow-y: var(--shadow-y);
+  --google-shadow-blur: var(--shadow-blur);
+  --google-shadow-spread: var(--shadow-spread);
+  --google-shadow-opacity: var(--shadow-opacity);
+  --google-shadow-color: var(--shadow-color);
+  --google-shadow-2xs: var(--shadow-2xs);
+  --google-shadow-xs: var(--shadow-xs);
+  --google-shadow-sm: var(--shadow-sm);
+  --google-shadow: var(--shadow);
+  --google-shadow-md: var(--shadow-md);
+  --google-shadow-lg: var(--shadow-lg);
+  --google-shadow-xl: var(--shadow-xl);
+  --google-shadow-2xl: var(--shadow-2xl);
+
+  /* Rhythm aliases */
+  --google-tracking-normal: var(--tracking-normal);
+  --google-spacing: var(--spacing);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --radius-sm: var(--google-radius-sm);
+    --radius-md: var(--google-radius-md);
+    --radius-lg: var(--google-radius-lg);
+  }
+  @layer base {
+    body { background: var(--background); color: var(--foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--background); }
+      .text-background { color: var(--background); }
+      .border-background { border-color: var(--background); }
+      .ring-background { --tw-ring-color: var(--background); }
+      .bg-foreground { background-color: var(--foreground); }
+      .text-foreground { color: var(--foreground); }
+      .border-foreground { border-color: var(--foreground); }
+      .ring-foreground { --tw-ring-color: var(--foreground); }
+      .bg-card { background-color: var(--card); }
+      .text-card { color: var(--card); }
+      .border-card { border-color: var(--card); }
+      .ring-card { --tw-ring-color: var(--card); }
+      .bg-card-foreground { background-color: var(--card-foreground); }
+      .text-card-foreground { color: var(--card-foreground); }
+      .border-card-foreground { border-color: var(--card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--card-foreground); }
+      .bg-popover { background-color: var(--popover); }
+      .text-popover { color: var(--popover); }
+      .border-popover { border-color: var(--popover); }
+      .ring-popover { --tw-ring-color: var(--popover); }
+      .bg-popover-foreground { background-color: var(--popover-foreground); }
+      .text-popover-foreground { color: var(--popover-foreground); }
+      .border-popover-foreground { border-color: var(--popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--popover-foreground); }
+      .bg-primary { background-color: var(--primary); }
+      .text-primary { color: var(--primary); }
+      .border-primary { border-color: var(--primary); }
+      .ring-primary { --tw-ring-color: var(--primary); }
+      .bg-primary-foreground { background-color: var(--primary-foreground); }
+      .text-primary-foreground { color: var(--primary-foreground); }
+      .border-primary-foreground { border-color: var(--primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--primary-foreground); }
+      .bg-secondary { background-color: var(--secondary); }
+      .text-secondary { color: var(--secondary); }
+      .border-secondary { border-color: var(--secondary); }
+      .ring-secondary { --tw-ring-color: var(--secondary); }
+      .bg-secondary-foreground { background-color: var(--secondary-foreground); }
+      .text-secondary-foreground { color: var(--secondary-foreground); }
+      .border-secondary-foreground { border-color: var(--secondary-foreground); }
+      .ring-secondary-foreground { --tw-ring-color: var(--secondary-foreground); }
+      .bg-muted { background-color: var(--muted); }
+      .text-muted { color: var(--muted); }
+      .border-muted { border-color: var(--muted); }
+      .ring-muted { --tw-ring-color: var(--muted); }
+      .bg-muted-foreground { background-color: var(--muted-foreground); }
+      .text-muted-foreground { color: var(--muted-foreground); }
+      .border-muted-foreground { border-color: var(--muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--muted-foreground); }
+      .bg-accent { background-color: var(--accent); }
+      .text-accent { color: var(--accent); }
+      .border-accent { border-color: var(--accent); }
+      .ring-accent { --tw-ring-color: var(--accent); }
+      .bg-accent-foreground { background-color: var(--accent-foreground); }
+      .text-accent-foreground { color: var(--accent-foreground); }
+      .border-accent-foreground { border-color: var(--accent-foreground); }
+      .ring-accent-foreground { --tw-ring-color: var(--accent-foreground); }
+      .bg-destructive { background-color: var(--destructive); }
+      .text-destructive { color: var(--destructive); }
+      .border-destructive { border-color: var(--destructive); }
+      .ring-destructive { --tw-ring-color: var(--destructive); }
+      .bg-destructive-foreground { background-color: var(--destructive-foreground); }
+      .text-destructive-foreground { color: var(--destructive-foreground); }
+      .border-destructive-foreground { border-color: var(--destructive-foreground); }
+      .ring-destructive-foreground { --tw-ring-color: var(--destructive-foreground); }
+      .bg-border { background-color: var(--border); }
+      .text-border { color: var(--border); }
+      .border-border { border-color: var(--border); }
+      .ring-border { --tw-ring-color: var(--border); }
+      .bg-input { background-color: var(--input); }
+      .text-input { color: var(--input); }
+      .border-input { border-color: var(--input); }
+      .ring-input { --tw-ring-color: var(--input); }
+      .bg-ring { background-color: var(--ring); }
+      .text-ring { color: var(--ring); }
+      .border-ring { border-color: var(--ring); }
+      .ring-ring { --tw-ring-color: var(--ring); }
+      .bg-chart-1 { background-color: var(--chart-1); }
+      .text-chart-1 { color: var(--chart-1); }
+      .border-chart-1 { border-color: var(--chart-1); }
+      .ring-chart-1 { --tw-ring-color: var(--chart-1); }
+      .bg-chart-2 { background-color: var(--chart-2); }
+      .text-chart-2 { color: var(--chart-2); }
+      .border-chart-2 { border-color: var(--chart-2); }
+      .ring-chart-2 { --tw-ring-color: var(--chart-2); }
+      .bg-chart-3 { background-color: var(--chart-3); }
+      .text-chart-3 { color: var(--chart-3); }
+      .border-chart-3 { border-color: var(--chart-3); }
+      .ring-chart-3 { --tw-ring-color: var(--chart-3); }
+      .bg-chart-4 { background-color: var(--chart-4); }
+      .text-chart-4 { color: var(--chart-4); }
+      .border-chart-4 { border-color: var(--chart-4); }
+      .ring-chart-4 { --tw-ring-color: var(--chart-4); }
+      .bg-chart-5 { background-color: var(--chart-5); }
+      .text-chart-5 { color: var(--chart-5); }
+      .border-chart-5 { border-color: var(--chart-5); }
+      .ring-chart-5 { --tw-ring-color: var(--chart-5); }
+      .bg-sidebar { background-color: var(--sidebar); }
+      .text-sidebar { color: var(--sidebar); }
+      .border-sidebar { border-color: var(--sidebar); }
+      .ring-sidebar { --tw-ring-color: var(--sidebar); }
+      .bg-sidebar-foreground { background-color: var(--sidebar-foreground); }
+      .text-sidebar-foreground { color: var(--sidebar-foreground); }
+      .border-sidebar-foreground { border-color: var(--sidebar-foreground); }
+      .ring-sidebar-foreground { --tw-ring-color: var(--sidebar-foreground); }
+      .bg-sidebar-primary { background-color: var(--sidebar-primary); }
+      .text-sidebar-primary { color: var(--sidebar-primary); }
+      .border-sidebar-primary { border-color: var(--sidebar-primary); }
+      .ring-sidebar-primary { --tw-ring-color: var(--sidebar-primary); }
+      .bg-sidebar-primary-foreground { background-color: var(--sidebar-primary-foreground); }
+      .text-sidebar-primary-foreground { color: var(--sidebar-primary-foreground); }
+      .border-sidebar-primary-foreground { border-color: var(--sidebar-primary-foreground); }
+      .ring-sidebar-primary-foreground { --tw-ring-color: var(--sidebar-primary-foreground); }
+      .bg-sidebar-accent { background-color: var(--sidebar-accent); }
+      .text-sidebar-accent { color: var(--sidebar-accent); }
+      .border-sidebar-accent { border-color: var(--sidebar-accent); }
+      .ring-sidebar-accent { --tw-ring-color: var(--sidebar-accent); }
+      .bg-sidebar-accent-foreground { background-color: var(--sidebar-accent-foreground); }
+      .text-sidebar-accent-foreground { color: var(--sidebar-accent-foreground); }
+      .border-sidebar-accent-foreground { border-color: var(--sidebar-accent-foreground); }
+      .ring-sidebar-accent-foreground { --tw-ring-color: var(--sidebar-accent-foreground); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="mobile-frame bg-background text-foreground">
+        <header class="mobile-header flex items-center justify-between gap-3 border-b border-border bg-card px-4 py-3">
+            <button type="button" aria-label="返回" class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2">
+                <span data-icon class="h-5 w-5" style="-webkit-mask-image:url(../assets/icons/google/arrow-left.svg);mask-image:url(../assets/icons/google/arrow-left.svg);"></span>
+            </button>
+            <h1 class="text-base font-semibold">设置</h1>
+            <div class="h-9 w-9" aria-hidden="true"></div>
+        </header>
+
+        <div class="mobile-scroll px-4 py-4">
+            <section class="mb-5 rounded-lg border border-border bg-card p-4">
+                <button type="button" class="flex w-full items-center gap-3 text-left focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2">
+                    <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">AJ</div>
+                    <div class="min-w-0 flex-1">
+                        <p class="truncate text-sm font-semibold">Alex Jianku</p>
+                        <p class="truncate text-xs text-muted-foreground">alex@jianku.app</p>
+                    </div>
+                    <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/chevron-right.svg);mask-image:url(../assets/icons/google/chevron-right.svg);"></span>
+                </button>
+            </section>
+
+            <section class="settings-group">
+                <h2 class="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">账户</h2>
+                <div class="overflow-hidden rounded-lg border border-border bg-card">
+                    <button type="button" class="flex w-full items-center gap-3 border-b border-border px-4 py-3 text-left transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2">
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/user.svg);mask-image:url(../assets/icons/google/user.svg);"></span>
+                        <span class="flex-1 text-sm">个人信息</span>
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/chevron-right.svg);mask-image:url(../assets/icons/google/chevron-right.svg);"></span>
+                    </button>
+                    <button type="button" class="flex w-full items-center gap-3 border-b border-border px-4 py-3 text-left transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2">
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/mail.svg);mask-image:url(../assets/icons/google/mail.svg);"></span>
+                        <span class="flex-1 text-sm">账户安全</span>
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/chevron-right.svg);mask-image:url(../assets/icons/google/chevron-right.svg);"></span>
+                    </button>
+                    <button type="button" class="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2">
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/star.svg);mask-image:url(../assets/icons/google/star.svg);"></span>
+                        <span class="flex-1 text-sm">订阅计划</span>
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/chevron-right.svg);mask-image:url(../assets/icons/google/chevron-right.svg);"></span>
+                    </button>
+                </div>
+            </section>
+
+            <section class="settings-group">
+                <h2 class="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">通知</h2>
+                <div class="overflow-hidden rounded-lg border border-border bg-card">
+                    <div class="flex items-center gap-3 border-b border-border px-4 py-3">
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/message-circle-more.svg);mask-image:url(../assets/icons/google/message-circle-more.svg);"></span>
+                        <span class="flex-1 text-sm">推送通知</span>
+                        <label for="toggle-push" class="ml-auto inline-flex cursor-pointer items-center">
+                            <input id="toggle-push" type="checkbox" role="switch" class="sr-only peer" checked>
+                            <span class="relative h-6 w-11 rounded-full bg-muted transition-colors peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2" aria-hidden="true">
+                                <span class="absolute left-1 top-1 h-4 w-4 rounded-full bg-primary-foreground transition-transform peer-checked:translate-x-5"></span>
+                            </span>
+                        </label>
+                    </div>
+                    <div class="flex items-center gap-3 border-b border-border px-4 py-3">
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/mail.svg);mask-image:url(../assets/icons/google/mail.svg);"></span>
+                        <span class="flex-1 text-sm">邮件更新</span>
+                        <label for="toggle-email" class="ml-auto inline-flex cursor-pointer items-center">
+                            <input id="toggle-email" type="checkbox" role="switch" class="sr-only peer">
+                            <span class="relative h-6 w-11 rounded-full bg-muted transition-colors peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2" aria-hidden="true">
+                                <span class="absolute left-1 top-1 h-4 w-4 rounded-full bg-primary-foreground transition-transform peer-checked:translate-x-5"></span>
+                            </span>
+                        </label>
+                    </div>
+                    <div class="flex items-center gap-3 px-4 py-3">
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/tag.svg);mask-image:url(../assets/icons/google/tag.svg);"></span>
+                        <span class="flex-1 text-sm">营销消息</span>
+                        <label for="toggle-marketing" class="ml-auto inline-flex cursor-pointer items-center">
+                            <input id="toggle-marketing" type="checkbox" role="switch" class="sr-only peer">
+                            <span class="relative h-6 w-11 rounded-full bg-muted transition-colors peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2" aria-hidden="true">
+                                <span class="absolute left-1 top-1 h-4 w-4 rounded-full bg-primary-foreground transition-transform peer-checked:translate-x-5"></span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <section class="settings-group">
+                <h2 class="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">存储</h2>
+                <div class="overflow-hidden rounded-lg border border-border bg-card">
+                    <button type="button" class="flex w-full items-center gap-3 border-b border-border px-4 py-3 text-left transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2">
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/folder-open.svg);mask-image:url(../assets/icons/google/folder-open.svg);"></span>
+                        <span class="flex-1 text-sm">存储空间</span>
+                        <span class="text-xs text-muted-foreground">2.4 GB</span>
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/chevron-right.svg);mask-image:url(../assets/icons/google/chevron-right.svg);"></span>
+                    </button>
+                    <button type="button" class="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2">
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/trash-2.svg);mask-image:url(../assets/icons/google/trash-2.svg);"></span>
+                        <span class="flex-1 text-sm">清除缓存</span>
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/chevron-right.svg);mask-image:url(../assets/icons/google/chevron-right.svg);"></span>
+                    </button>
+                </div>
+            </section>
+
+            <section class="settings-group">
+                <h2 class="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">画质</h2>
+                <div class="overflow-hidden rounded-lg border border-border bg-card">
+                    <div class="flex items-center gap-3 border-b border-border px-4 py-3">
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/circle-play.svg);mask-image:url(../assets/icons/google/circle-play.svg);"></span>
+                        <span class="flex-1 text-sm">高清录制</span>
+                        <label for="toggle-hd" class="ml-auto inline-flex cursor-pointer items-center">
+                            <input id="toggle-hd" type="checkbox" role="switch" class="sr-only peer" checked>
+                            <span class="relative h-6 w-11 rounded-full bg-muted transition-colors peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2" aria-hidden="true">
+                                <span class="absolute left-1 top-1 h-4 w-4 rounded-full bg-primary-foreground transition-transform peer-checked:translate-x-5"></span>
+                            </span>
+                        </label>
+                    </div>
+                    <div class="flex items-center gap-3 border-b border-border px-4 py-3">
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/chevrons-up-down.svg);mask-image:url(../assets/icons/google/chevrons-up-down.svg);"></span>
+                        <span class="flex-1 text-sm">动态模糊</span>
+                        <label for="toggle-blur" class="ml-auto inline-flex cursor-pointer items-center">
+                            <input id="toggle-blur" type="checkbox" role="switch" class="sr-only peer" checked>
+                            <span class="relative h-6 w-11 rounded-full bg-muted transition-colors peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2" aria-hidden="true">
+                                <span class="absolute left-1 top-1 h-4 w-4 rounded-full bg-primary-foreground transition-transform peer-checked:translate-x-5"></span>
+                            </span>
+                        </label>
+                    </div>
+                    <div class="flex items-center gap-3 px-4 py-3">
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/external-link.svg);mask-image:url(../assets/icons/google/external-link.svg);"></span>
+                        <span class="flex-1 text-sm">实时预览</span>
+                        <label for="toggle-preview" class="ml-auto inline-flex cursor-pointer items-center">
+                            <input id="toggle-preview" type="checkbox" role="switch" class="sr-only peer" checked>
+                            <span class="relative h-6 w-11 rounded-full bg-muted transition-colors peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2" aria-hidden="true">
+                                <span class="absolute left-1 top-1 h-4 w-4 rounded-full bg-primary-foreground transition-transform peer-checked:translate-x-5"></span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <section class="settings-group">
+                <h2 class="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">帮助</h2>
+                <div class="overflow-hidden rounded-lg border border-border bg-card">
+                    <button type="button" class="flex w-full items-center gap-3 border-b border-border px-4 py-3 text-left transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2">
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/circle-question-mark.svg);mask-image:url(../assets/icons/google/circle-question-mark.svg);"></span>
+                        <span class="flex-1 text-sm">帮助中心</span>
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/chevron-right.svg);mask-image:url(../assets/icons/google/chevron-right.svg);"></span>
+                    </button>
+                    <button type="button" class="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2">
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/message-circle-more.svg);mask-image:url(../assets/icons/google/message-circle-more.svg);"></span>
+                        <span class="flex-1 text-sm">反馈问题</span>
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/chevron-right.svg);mask-image:url(../assets/icons/google/chevron-right.svg);"></span>
+                    </button>
+                </div>
+            </section>
+
+            <section class="settings-group">
+                <h2 class="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">关于</h2>
+                <div class="overflow-hidden rounded-lg border border-border bg-card">
+                    <button type="button" class="flex w-full items-center gap-3 border-b border-border px-4 py-3 text-left transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2">
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/file.svg);mask-image:url(../assets/icons/google/file.svg);"></span>
+                        <span class="flex-1 text-sm">关于我们</span>
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/chevron-right.svg);mask-image:url(../assets/icons/google/chevron-right.svg);"></span>
+                    </button>
+                    <button type="button" class="flex w-full items-center gap-3 border-b border-border px-4 py-3 text-left transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2">
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/folder.svg);mask-image:url(../assets/icons/google/folder.svg);"></span>
+                        <span class="flex-1 text-sm">隐私政策</span>
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/chevron-right.svg);mask-image:url(../assets/icons/google/chevron-right.svg);"></span>
+                    </button>
+                    <button type="button" class="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2">
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/external-link.svg);mask-image:url(../assets/icons/google/external-link.svg);"></span>
+                        <span class="flex-1 text-sm">服务条款</span>
+                        <span data-icon class="h-5 w-5 flex-shrink-0 text-muted-foreground" style="-webkit-mask-image:url(../assets/icons/google/chevron-right.svg);mask-image:url(../assets/icons/google/chevron-right.svg);"></span>
+                    </button>
+                </div>
+            </section>
+        </div>
+
+        <nav class="bottom-nav" aria-label="主导航">
+            <ul class="flex items-center justify-around px-2 py-2">
+                <li class="flex-1">
+                    <button type="button" class="flex w-full flex-col items-center justify-center gap-1 rounded-lg py-1 text-xs text-muted-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2">
+                        <span data-icon class="h-5 w-5" style="-webkit-mask-image:url(../assets/icons/google/circle-play.svg);mask-image:url(../assets/icons/google/circle-play.svg);"></span>
+                        <span>录制</span>
+                    </button>
+                </li>
+                <li class="flex-1">
+                    <button type="button" class="flex w-full flex-col items-center justify-center gap-1 rounded-lg py-1 text-xs text-muted-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2">
+                        <span data-icon class="h-5 w-5" style="-webkit-mask-image:url(../assets/icons/google/send-horizontal.svg);mask-image:url(../assets/icons/google/send-horizontal.svg);"></span>
+                        <span>演示</span>
+                    </button>
+                </li>
+                <li class="flex-1">
+                    <button type="button" class="flex w-full flex-col items-center justify-center gap-1 rounded-lg py-1 text-xs text-muted-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2">
+                        <span data-icon class="h-5 w-5" style="-webkit-mask-image:url(../assets/icons/google/pen-line.svg);mask-image:url(../assets/icons/google/pen-line.svg);"></span>
+                        <span>编辑</span>
+                    </button>
+                </li>
+                <li class="flex-1">
+                    <button type="button" class="flex w-full flex-col items-center justify-center gap-1 rounded-lg py-1 text-xs text-muted-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2">
+                        <span data-icon class="h-5 w-5" style="-webkit-mask-image:url(../assets/icons/google/folder-open.svg);mask-image:url(../assets/icons/google/folder-open.svg);"></span>
+                        <span>管理</span>
+                    </button>
+                </li>
+                <li class="flex-1">
+                    <button type="button" aria-current="page" class="flex w-full flex-col items-center justify-center gap-1 rounded-lg py-1 text-xs font-medium text-primary hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2">
+                        <span data-icon class="h-5 w-5" style="-webkit-mask-image:url(../assets/icons/google/user.svg);mask-image:url(../assets/icons/google/user.svg);"></span>
+                        <span>设置</span>
+                    </button>
+                </li>
+            </ul>
+        </nav>
+    </main>
+    <script>lucide.createIcons();</script>
+
+    <style id="critical-layout">
+      .mobile-frame {
+        max-width: 430px;
+        margin: 0 auto;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow-x: hidden;
+      }
+      .mobile-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        padding-top: env(safe-area-inset-top, 0px);
+      }
+      .mobile-scroll {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+      }
+      .settings-group + .settings-group {
+        margin-top: 1.25rem;
+      }
+      .bottom-nav {
+        position: sticky;
+        bottom: 0;
+        z-index: 10;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        background: var(--card);
+        border-top: 1px solid var(--border);
+      }
+      @media (max-width: 640px) {
+        .mobile-frame { max-width: 100%; }
+      }
+    </style>
+</body>
+</html>

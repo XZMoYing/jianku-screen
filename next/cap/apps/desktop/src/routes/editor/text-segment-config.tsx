@@ -114,7 +114,7 @@ function Segmented<T extends string>(props: {
 	return (
 		<div
 			role="group"
-			aria-label={props.ariaLabel}
+			aria-label={localize(props.ariaLabel)}
 			class={cx(
 				"gap-0.5 p-0.5 rounded-lg bg-ed-ctl",
 				props.stretch ? "flex w-full" : "inline-flex shrink-0",
@@ -126,8 +126,8 @@ function Segmented<T extends string>(props: {
 					return (
 						<button
 							type="button"
-							title={option.label}
-							aria-label={option.label}
+							title={localize(option.label)}
+							aria-label={localize(option.label)}
 							aria-pressed={selected()}
 							onClick={() => props.onChange(option.value)}
 							class={cx(
@@ -138,7 +138,7 @@ function Segmented<T extends string>(props: {
 									: "text-ed-text-2 hover:text-ed-text-1",
 							)}
 						>
-							<Show when={option.icon} fallback={option.label}>
+							<Show when={option.icon} fallback={localize(option.label)}>
 								{(icon) => <Dynamic component={icon()} class="size-3.5" />}
 							</Show>
 						</button>
@@ -176,7 +176,7 @@ function TextStyleSelect<T extends string | number>(props: {
 					item={selectItemProps.item}
 				>
 					<KSelect.ItemLabel class="flex-1">
-						{selectItemProps.item.rawValue.label}
+						{localize(selectItemProps.item.rawValue.label)}
 					</KSelect.ItemLabel>
 					<KSelect.ItemIndicator class="ml-auto text-ed-accent">
 						<IconCapCircleCheck />
@@ -186,7 +186,7 @@ function TextStyleSelect<T extends string | number>(props: {
 		>
 			<KSelect.Trigger class="flex justify-between items-center px-2.5 w-full h-[30px] text-[12px] rounded-[7px] border-0 transition-colors duration-150 bg-ed-ctl text-ed-text-1 hover:bg-ed-ctl-hover focus:outline-hidden focus:ring-1 focus:ring-ed-accent">
 				<KSelect.Value<{ label: string; value: T }> class="truncate">
-					{(state) => state.selectedOption()?.label ?? selected().label}
+					{(state) => localize(state.selectedOption()?.label ?? selected().label)}
 				</KSelect.Value>
 				<KSelect.Icon>
 					<IconCapChevronDown class="transition-transform transform size-3.5 shrink-0 data-expanded:rotate-180 text-ed-text-3" />
@@ -310,7 +310,7 @@ function TextPresetCard(props: {
 				</span>
 			</span>
 			<span class="absolute inset-x-0 bottom-1.5 text-center text-[10px] font-medium text-white/55">
-				{props.preset.name}
+				{localize(props.preset.name)}
 			</span>
 		</button>
 	);
@@ -903,7 +903,7 @@ export function TextSegmentConfig(props: {
 						{(option) => (
 							<AnimationTile
 								value={option.value}
-								label={option.label}
+									label={localize(option.label)}
 								active={edgeAnimation() === option.value}
 								onSelect={() => setEdgeAnimation(option.value)}
 							/>

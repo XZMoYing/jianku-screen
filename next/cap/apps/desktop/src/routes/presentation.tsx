@@ -200,7 +200,7 @@ export default function Presentation(props: {
 	) => (
 		<label class="studio-range">
 			<span class="studio-range-label">
-				<span>{label}</span>
+				<span>{localize(label)}</span>
 				<span class="studio-range-value">
 					{value.toFixed(step < 1 ? 1 : 0)}
 					{unit}
@@ -212,7 +212,7 @@ export default function Presentation(props: {
 				max={max}
 				step={step}
 				value={value}
-				aria-label={label}
+				aria-label={localize(label)}
 				onInput={(event) => onValue(Number(event.currentTarget.value))}
 			/>
 		</label>
@@ -244,7 +244,10 @@ export default function Presentation(props: {
 		const path = await open({
 			multiple: false,
 			filters: [
-				{ name: "背景图片", extensions: ["png", "jpg", "jpeg", "webp"] },
+				{
+					name: localize("背景图片"),
+					extensions: ["png", "jpg", "jpeg", "webp"],
+				},
 			],
 		});
 		const value = options();
@@ -283,7 +286,7 @@ export default function Presentation(props: {
 								</button>
 							</>
 						) : (
-							"正在准备演示…"
+							localize("正在准备演示…")
 						)}
 					</div>
 				}
@@ -296,7 +299,9 @@ export default function Presentation(props: {
 									class={`studio-status ${status()?.active ? "is-live" : ""}`}
 								>
 									<i />
-									{status()?.active ? "正在演示" : "待机"}
+									{status()?.active
+										? localize("正在演示")
+										: localize("待机")}
 								</span>
 							</div>
 							<div
@@ -366,8 +371,8 @@ export default function Presentation(props: {
 											</div>
 											<small>
 												{value().outputMonitor == null
-													? "在会议软件中共享「简库演示输出」窗口。"
-													: "输出铺满所选副屏，原屏幕保持原样。"}
+												? localize("在会议软件中共享「简库演示输出」窗口。")
+												: localize("输出铺满所选副屏，原屏幕保持原样。")}
 											</small>
 										</label>
 
@@ -392,8 +397,8 @@ export default function Presentation(props: {
 														{(aspect) => (
 															<option value={aspect}>
 																{aspect === "auto"
-																	? "适合屏幕 · 默认"
-																	: `${ASPECT_RATIOS[aspect].ratio[0]}:${ASPECT_RATIOS[aspect].ratio[1]} · ${ASPECT_RATIOS[aspect].name}`}
+											? localize("适合屏幕 · 默认")
+												: `${ASPECT_RATIOS[aspect].ratio[0]}:${ASPECT_RATIOS[aspect].ratio[1]} · ${localize(ASPECT_RATIOS[aspect].name)}`}
 															</option>
 														)}
 													</For>
@@ -402,8 +407,8 @@ export default function Presentation(props: {
 											</div>
 											<small>
 												{status()?.active
-													? "停止演示后可更改比例。"
-													: "适合屏幕按来源或副屏比例计算；固定比例保持画布形状。"}
+											? localize("停止演示后可更改比例。")
+												: localize("适合屏幕按来源或副屏比例计算；固定比例保持画布形状。")}
 											</small>
 										</label>
 										<label class="studio-field">
@@ -430,7 +435,7 @@ export default function Presentation(props: {
 													<option value={2560}>
 														{localize("1440p · 高清")}
 													</option>
-													<option value={3840}>2160p · 4K</option>
+								<option value={3840}>{localize("2160p · 4K")}</option>
 												</select>
 												<IconChevronDown />
 											</div>
@@ -465,18 +470,18 @@ export default function Presentation(props: {
 															update({ ...value(), focusMode: mode.id })
 														}
 													>
-														<span>{mode.name}</span>
-														<small>{mode.description}</small>
+										<span>{localize(mode.name)}</span>
+										<small>{localize(mode.description)}</small>
 													</button>
 												)}
 											</For>
 										</div>
 										<p class="studio-hint">
 											{value().focusMode === "automatic"
-												? "点击、滚动或输入时放大，持续操作保持焦点，空闲后返回全景。"
+								? localize("点击、滚动或输入时放大，持续操作保持焦点，空闲后返回全景。")
 												: value().focusMode === "manual"
-													? "按下快捷键放大，再按一次返回全景。"
-													: "保留完整画面，光标平滑与画面外观继续生效。"}
+									? localize("按下快捷键放大，再按一次返回全景。")
+									: localize("保留完整画面，光标平滑与画面外观继续生效。")}
 										</p>
 										<Show when={value().focusMode !== "off"}>
 											{range(
@@ -497,7 +502,7 @@ export default function Presentation(props: {
 												(idleSeconds) => update({ ...value(), idleSeconds }),
 												1,
 												0.5,
-												" 秒",
+								localize(" 秒"),
 											)}
 										</Show>
 										<label class="studio-field">
@@ -511,7 +516,7 @@ export default function Presentation(props: {
 													.replace("Control", "Ctrl")
 													.replace("Shift", "⇧")
 													.replace("Alt", "⌥")
-													.replace("Space", "空格")}
+								.replace("Space", localize("空格"))}
 												readOnly
 												disabled={status()?.active || busy()}
 												title={localize("点击后按下组合键")}
@@ -584,9 +589,9 @@ export default function Presentation(props: {
 												return (
 													<button
 														type="button"
-														aria-label={`背景：${preset.name}`}
+								aria-label={`${localize("背景：")}${localize(preset.name)}`}
 														aria-pressed={selected()}
-														title={preset.name}
+								title={localize(preset.name)}
 														class={selected() ? "is-selected" : ""}
 														style={{
 															background: `linear-gradient(${preset.angle}deg, rgb(${preset.from.join(",")}), rgb(${preset.to.join(",")}))`,
@@ -608,8 +613,8 @@ export default function Presentation(props: {
 									>
 										<IconImage />
 										{value().project.background.source.type === "image"
-											? "更换背景图片"
-											: "选择背景图片"}
+							? localize("更换背景图片")
+							: localize("选择背景图片")}
 									</button>
 									<div class="studio-divider" />
 									{range(
@@ -687,15 +692,15 @@ export default function Presentation(props: {
 								>
 									<i />
 									{busy()
-										? "正在处理…"
+										? localize("正在处理…")
 										: status()?.active
-											? "输出已开启"
-											: "准备开始"}
+											? localize("输出已开启")
+											: localize("准备开始")}
 								</span>
 								<small>
 									{status()?.active
-										? "设置会实时应用，源屏幕不受影响"
-										: "开始后生成独立的演示输出窗口"}
+									? localize("设置会实时应用，源屏幕不受影响")
+									: localize("开始后生成独立的演示输出窗口")}
 								</small>
 							</div>
 							<div class="presentation-footer-actions">
@@ -718,7 +723,9 @@ export default function Presentation(props: {
 									<Show when={status()?.active} fallback={<IconPlay />}>
 										<IconSquare />
 									</Show>
-									{status()?.active ? "停止演示" : "开始演示"}
+									{status()?.active
+										? localize("停止演示")
+										: localize("开始演示")}
 								</button>
 							</div>
 						</footer>

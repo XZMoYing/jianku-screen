@@ -10,7 +10,6 @@ import {
 	type PhysicalPosition,
 	type PhysicalSize,
 } from "@tauri-apps/api/dpi";
-import { emit } from "@tauri-apps/api/event";
 import {
 	CheckMenuItem,
 	Menu,
@@ -410,7 +409,7 @@ function Inner() {
 								<div class="flex flex-col items-center text-white">
 									<IconCapMonitor class="size-20 mb-3" />
 									<span class="mb-2 text-3xl font-semibold">
-										{display.name || "Monitor"}
+										{display.name || localize("显示器")}
 									</span>
 									<Show when={display.physical_size}>
 										{(size) => (
@@ -449,7 +448,7 @@ function Inner() {
 								commands.closeTargetSelectOverlays();
 							}}
 						/>
-						<ShowCapFreeWarning isInstantMode={options.mode === "instant"} />
+						<ShowInstantModeNote isInstantMode={options.mode === "instant"} />
 					</div>
 				)}
 			</Match>
@@ -747,7 +746,7 @@ function Inner() {
 										>
 											{localize("Adjust recording area")}
 										</Button>
-										<ShowCapFreeWarning
+												<ShowInstantModeNote
 											isInstantMode={options.mode === "instant"}
 										/>
 									</div>
@@ -1159,7 +1158,7 @@ function Inner() {
 						e.stopPropagation();
 						const items = [
 							{
-								text: "Reset selection",
+								text: localize("重置选区"),
 								action: resetSelection,
 							},
 							await PredefinedMenuItem.new({
@@ -1341,7 +1340,7 @@ function Inner() {
 										<div class="min-w-28 px-2 text-base font-normal leading-none tracking-[-0.01em] tabular-nums">
 											{isValid()
 												? `${Math.round(crop().width)} × ${Math.round(crop().height)}`
-												: "Draw an area"}
+											: localize("拖动框选区域")}
 										</div>
 
 										<div class="h-6 w-px bg-gray-5" />
@@ -1427,12 +1426,12 @@ function Inner() {
 												aria-pressed={isSelectionLocked()}
 												title={
 													isSelectionLocked()
-														? "Stop reusing this area"
-														: "Reuse this area for future recordings"
+									? localize("取消固定此录制区域")
+								: localize("后续录制继续使用此区域")
 												}
 											>
 												<IconLucideLock class="size-3.5" />
-												{isSelectionLocked() ? "Locked" : "Lock"}
+								{isSelectionLocked() ? localize("已固定") : localize("固定区域")}
 											</button>
 										</Show>
 									</div>
@@ -1492,7 +1491,7 @@ function Inner() {
 										</div>
 									</Show>
 									<Show when={isValid()}>
-										<ShowCapFreeWarning
+												<ShowInstantModeNote
 											isInstantMode={options.mode === "instant"}
 										/>
 									</Show>
@@ -1997,7 +1996,7 @@ function RecordingControls(props: {
 	const startRecording = async (confirmedWithoutMicrophone = false) => {
 		if (confirmingWithoutMicrophone() && !confirmedWithoutMicrophone) return;
 		if (rawOptions.mode === "instant" && !auth.data) {
-			emit("start-sign-in");
+			toast("实时模式的账号功能敬请期待，目前可先使用录制模式。");
 			return;
 		}
 		if (startDisabled()) return;
@@ -2049,7 +2048,7 @@ function RecordingControls(props: {
 			await commands.suspendTargetSelectOverlays();
 		} catch (error) {
 			setDismissingPicker(false);
-			toast.error("Could not dismiss the target picker. Please try again.");
+			toast.error(localize("Could not dismiss the target picker. Please try again."));
 			console.error("Failed to suspend target select overlays", error);
 			return;
 		}
@@ -2101,10 +2100,10 @@ function RecordingControls(props: {
 					msg.includes("DeviceNotFound")
 				) {
 					toast.error(
-						"Selected microphone is not available. Please select a different microphone in settings.",
+						localize("所选麦克风不可用，请在设置中选择其他麦克风。"),
 					);
 				} else if (!isRecordingStartCancelled(e)) {
-					toast.error(`Failed to start recording: ${msg}`);
+					toast.error(localize("录制启动失败：{reason}", { reason: msg }));
 				}
 				// An IPC-level rejection never reaches the backend, so no
 				// StartFailed event fires; the picker flow hid the main
@@ -2132,7 +2131,7 @@ function RecordingControls(props: {
 					return;
 				setConfirmingWithoutMicrophone(false);
 				toast.error(
-					"Could not save your preference. Try again or leave the box unchecked.",
+					localize("无法保存此设置，请重试，或取消勾选后继续。"),
 				);
 				return;
 			}
@@ -2160,7 +2159,7 @@ function RecordingControls(props: {
 		await Menu.new({
 			items: [
 				await CheckMenuItem.new({
-					text: "Studio Mode",
+					text: localize("录制模式"),
 					action: () => {
 						setOptions("mode", "studio");
 						commands.setRecordingMode("studio");
@@ -2168,7 +2167,7 @@ function RecordingControls(props: {
 					checked: rawOptions.mode === "studio",
 				}),
 				await CheckMenuItem.new({
-					text: "Instant Mode",
+					text: localize("实时模式"),
 					action: () => {
 						setOptions("mode", "instant");
 						commands.setRecordingMode("instant");
@@ -2176,7 +2175,7 @@ function RecordingControls(props: {
 					checked: rawOptions.mode === "instant",
 				}),
 				await CheckMenuItem.new({
-					text: "Screenshot Mode",
+					text: localize("截图模式"),
 					action: () => {
 						setOptions("mode", "screenshot");
 						commands.setRecordingMode("screenshot");
@@ -2188,24 +2187,24 @@ function RecordingControls(props: {
 
 	const countdownItems = async () => [
 		await CheckMenuItem.new({
-			text: "Off",
+			text: localize("关闭"),
 			action: () => generalSettingsStore.set({ recordingCountdown: 0 }),
 			checked:
 				!generalSetings.data?.recordingCountdown ||
 				generalSetings.data?.recordingCountdown === 0,
 		}),
 		await CheckMenuItem.new({
-			text: "3 seconds",
+			text: localize("3 秒"),
 			action: () => generalSettingsStore.set({ recordingCountdown: 3 }),
 			checked: generalSetings.data?.recordingCountdown === 3,
 		}),
 		await CheckMenuItem.new({
-			text: "5 seconds",
+			text: localize("5 秒"),
 			action: () => generalSettingsStore.set({ recordingCountdown: 5 }),
 			checked: generalSetings.data?.recordingCountdown === 5,
 		}),
 		await CheckMenuItem.new({
-			text: "10 seconds",
+			text: localize("10 秒"),
 			action: () => generalSettingsStore.set({ recordingCountdown: 10 }),
 			checked: generalSetings.data?.recordingCountdown === 10,
 		}),
@@ -2215,7 +2214,7 @@ function RecordingControls(props: {
 		return await Menu.new({
 			items: [
 				await MenuItem.new({
-					text: "Recording Countdown",
+			text: localize("录制倒计时"),
 					enabled: false,
 				}),
 				...(await countdownItems()),
@@ -2231,7 +2230,7 @@ function RecordingControls(props: {
 		void popupRecordingMenu(
 			createMenu,
 			new LogicalPosition(rect.x, rect.y + 40),
-		).catch(() => toast.error("Could not open recording menu"));
+		).catch(() => toast.error(localize("Could not open recording menu")));
 	}
 
 	return (
@@ -2292,14 +2291,18 @@ function RecordingControls(props: {
 										<span class="text-[0.95rem] font-medium text-white text-nowrap">
 											{(() => {
 												if (rawOptions.mode === "instant" && !auth.data)
-													return "Sign In To Use";
+													return localize("敬请期待");
 												if (rawOptions.mode === "screenshot")
-													return "Take Screenshot";
-												return "Start Recording";
+													return localize("截图");
+												return localize("开始录制");
 											})()}
 										</span>
 										<span class="text-[11px] flex items-center text-nowrap gap-1 transition-opacity duration-200 text-white/90 font-light -mt-0.5">
-											{`${capitalize(rawOptions.mode)} Mode`}
+												{rawOptions.mode === "instant"
+													? localize("实时模式")
+													: rawOptions.mode === "screenshot"
+														? localize("截图模式")
+														: localize("录制模式")}
 										</span>
 									</div>
 								</div>
@@ -2422,9 +2425,13 @@ function RecordingControls(props: {
 				>
 					<IconCapInfo class="opacity-70 will-change-transform size-3" />
 					<p class="text-sm text-white drop-shadow-md">
-						<span class="opacity-70">What is </span>
+						<span class="opacity-70">{localize("About")} </span>
 						<span class="font-medium">
-							{capitalize(rawOptions.mode)} {localize("Mode")}
+							{rawOptions.mode === "instant"
+								? localize("实时模式")
+								: rawOptions.mode === "screenshot"
+									? localize("截图模式")
+									: localize("录制模式")}
 						</span>
 						?
 					</p>
@@ -2434,20 +2441,12 @@ function RecordingControls(props: {
 	);
 }
 
-function ShowCapFreeWarning(props: { isInstantMode: boolean }) {
-	const auth = authStore.createQuery();
-
+function ShowInstantModeNote(props: { isInstantMode: boolean }) {
 	return (
 		<Suspense>
-			<Show when={props.isInstantMode && auth.data?.plan?.upgraded === false}>
+			<Show when={props.isInstantMode}>
 				<p class="text-sm text-center max-w-64 text-gray-3 mt-3">
-					{localize("Instant Mode recordings are limited to 5 mins,")}{" "}
-					<button
-						class="underline font-bold text-gray-3"
-						onClick={() => commands.showWindow("Upgrade")}
-					>
-						{localize("Upgrade to Pro")}
-					</button>
+					{localize("实时模式目前限时 5 分钟，更多功能敬请期待。")}
 				</p>
 			</Show>
 		</Suspense>

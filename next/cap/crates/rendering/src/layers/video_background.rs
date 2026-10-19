@@ -105,8 +105,11 @@ impl VideoBackground {
                                     if native_reader.is_none() {
                                         native_reader = Some(super::precise_video_background::PreciseVideoBackground::open(&worker_path, handle.clone())?);
                                     }
-                                    native_reader.as_mut().ok_or("精确壁纸解码器未就绪")?.frame(time)
+                                    native_reader.as_mut().ok_or("精确壁纸解码器未就绪")?.frame_with_cancel(time, || reply.is_closed())
                                 });
+                                if reply.is_closed() {
+                                    continue;
+                                }
                                 match result {
                                     Ok(frame) => {
                                         let _ = reply.send(Ok(VideoFrame::Native(frame)));
@@ -259,8 +262,8 @@ impl Reader {
     }
     fn frame(&mut self, time: f64) -> Result<VideoPixels, String> {
         let time = loop_time(time, self.duration);
-        if self.last_request >= 0.0
-            && (time < self.last_request - 0.0001 || time > self.last_time + 2.0)
+        if (self.last_request >= 0.0 && time < self.last_request - 0.0001)
+            || time > self.last_time + 2.0
         {
             self.decoder.reset(time as f32).map_err(|e| e.to_string())?;
             self.last_frame = None;
@@ -446,6 +449,79 @@ mod tests {
             );
         }
         println!("31 precise native wallpaper frames: {:?}", start.elapsed());
+    }
+
+    #[cfg(target_os = "macos")]
+    #[tokio::test]
+    async fn first_wallpaper_request_after_pause_preserves_exact_pixels_and_rewind() {
+        let Some(path) = std::env::var_os("JIANKU_TEST_HIGH_RATE_WALLPAPER") else {
+            return;
+        };
+        let handle = tokio::runtime::Handle::current();
+        tokio::task::spawn_blocking(move || {
+            objc2::rc::autoreleasepool(|_| {
+                let mut native =
+                    super::super::precise_video_background::PreciseVideoBackground::open(
+                        Path::new(&path),
+                        handle,
+                    )
+                    .unwrap();
+                let started = std::time::Instant::now();
+                let late = native.frame(30.1).unwrap();
+                let elapsed = started.elapsed();
+                assert!((native.decoded_time() - 30.1).abs() < 0.01);
+                let mut reference = Reader::open(Path::new(&path)).unwrap();
+                let expected = reference.frame(30.1).unwrap();
+                let actual = native_pixels(&late, &mut None).unwrap();
+                let mean = actual
+                    .data
+                    .iter()
+                    .zip(expected.data.iter())
+                    .map(|(a, b)| f64::from(a.abs_diff(*b)))
+                    .sum::<f64>()
+                    / actual.data.len() as f64;
+                assert!((native.decoded_time() - reference.last_time).abs() < 0.0001);
+                assert!(mean < 3.0, "late seek pixel difference={mean}");
+                let rewound = native.frame(0.0).unwrap();
+                assert!(native.decoded_time() < 0.01);
+                assert_eq!(
+                    (rewound.width(), rewound.height()),
+                    (late.width(), late.height())
+                );
+                println!("late initial seek={elapsed:?}, mean pixel difference={mean}");
+            })
+        })
+        .await
+        .unwrap();
+    }
+
+    #[cfg(target_os = "macos")]
+    #[tokio::test]
+    async fn discarded_wallpaper_seek_can_rewind_without_publishing_the_old_frame() {
+        let Some(path) = std::env::var_os("JIANKU_TEST_HIGH_RATE_WALLPAPER") else {
+            return;
+        };
+        let handle = tokio::runtime::Handle::current();
+        tokio::task::spawn_blocking(move || {
+            objc2::rc::autoreleasepool(|_| {
+                let mut native =
+                    super::super::precise_video_background::PreciseVideoBackground::open(
+                        Path::new(&path),
+                        handle,
+                    )
+                    .unwrap();
+                let started = std::time::Instant::now();
+                let result = native.frame_with_cancel(30.0, || {
+                    started.elapsed() > std::time::Duration::from_millis(100)
+                });
+                assert!(result.is_err());
+                let rewound = native.frame(0.0).unwrap();
+                assert!(native.decoded_time() < 0.01);
+                assert!(rewound.width() > 0);
+            });
+        })
+        .await
+        .unwrap();
     }
 
     #[cfg(target_os = "macos")]

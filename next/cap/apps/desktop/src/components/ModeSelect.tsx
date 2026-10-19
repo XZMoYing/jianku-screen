@@ -1,6 +1,7 @@
 import { cx } from "cva";
 import { type JSX, Show } from "solid-js";
 import { createOptionsQuery } from "~/utils/queries";
+import { t as localize } from "~/utils/i18n";
 import { commands, type RecordingMode } from "~/utils/tauri";
 
 interface ModeOptionProps {
@@ -100,8 +101,8 @@ const ModeSelect = (props: { onClose?: () => void; standalone?: boolean }) => {
 				{modeOptions.map((option) => (
 					<ModeOption
 						mode={option.mode}
-						title={option.title}
-						description={option.description}
+						title={localize(option.title)}
+						description={localize(option.description)}
 						icon={option.icon}
 						isSelected={rawOptions.mode === option.mode}
 						onSelect={handleModeChange}

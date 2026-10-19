@@ -1,6 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import * as dialog from "@tauri-apps/plugin-dialog";
 import { hideCurrentWindow } from "~/utils/hide-window";
+import { t as localize } from "~/utils/i18n";
 import { commands } from "~/utils/tauri";
 
 const videoExtensions = [
@@ -59,7 +60,7 @@ export const importVideoFromPicker = async (options?: ImportOptions) => {
 	const result = await dialog.open({
 		filters: [
 			{
-				name: "Video Files",
+				name: localize("视频文件"),
 				extensions: videoExtensions,
 			},
 		],
@@ -74,7 +75,7 @@ export const importImageFromPicker = async (options?: ImportOptions) => {
 	const result = await dialog.open({
 		filters: [
 			{
-				name: "Image Files",
+				name: localize("图片文件"),
 				extensions: imageExtensions,
 			},
 		],
@@ -90,8 +91,14 @@ export const showImportError = async (
 	error: unknown,
 ) => {
 	const message = error instanceof Error ? error.message : String(error);
-	await dialog.message(`Failed to import ${mediaType}: ${message}`, {
-		title: "Import Error",
+	await dialog.message(
+		localize("导入{mediaType}失败：{reason}", {
+			mediaType: localize(mediaType === "video" ? "视频" : "图片"),
+			reason: message,
+		}),
+		{
+		title: localize("导入失败"),
 		kind: "error",
-	});
+		},
+	);
 };

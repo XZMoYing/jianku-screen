@@ -2,16 +2,13 @@ import { writeFile } from "@tauri-apps/plugin-fs";
 import { createSignal, onCleanup } from "solid-js";
 import { unwrap } from "solid-js/store";
 import toast from "solid-toast";
+import { t as localize } from "~/utils/i18n";
 import { commands } from "~/utils/tauri";
 import { useScreenshotEditorContext } from "./context";
 import {
 	canvasNeedsTransparency,
 	canvasToBlob,
-	copyCurrentScreenshotShareLink,
 	renderScreenshotExportCanvas,
-	type ScreenshotExportStatus,
-	screenshotProjectFingerprint,
-	uploadScreenshotShareBlob,
 } from "./screenshotExport";
 
 function withWhiteBackground(source: HTMLCanvasElement): HTMLCanvasElement {
@@ -44,8 +41,6 @@ export function useScreenshotExport() {
 		originalImageSize,
 	} = editorCtx;
 	const [isExporting, setIsExporting] = createSignal(false);
-	const [exportStatus, setExportStatus] =
-		createSignal<ScreenshotExportStatus>("idle");
 
 	const canUsePreviewFrameForExport = (
 		frame: ReturnType<typeof latestFrame>,
@@ -85,7 +80,7 @@ export function useScreenshotExport() {
 					}
 
 					if (Date.now() >= deadline) {
-						reject(new Error("Preview is still updating. Try again."));
+						reject(new Error("预览仍在更新，请稍后重试。"));
 						return;
 					}
 
@@ -139,67 +134,24 @@ export function useScreenshotExport() {
 		}
 	};
 
-	const exportImage = async (destination: "file" | "clipboard" | "share") => {
+	const exportImage = async (destination: "file" | "clipboard") => {
 		if (disposed || isExporting()) return;
 
 		const owner = editorCtx.editorInstance();
 		setIsExporting(true);
 		let toastId: string | undefined;
-		let shareContext: { projectPath: string; contentHash: string } | null =
-			null;
 
 		try {
-			if (destination === "share") {
-				const projectPath = editorCtx.editorInstance()?.path;
-				if (!projectPath) throw new Error("Screenshot is still loading");
-
-				setExportStatus("encoding");
-				toastId = toast.loading("Preparing upload");
-
-				const contentHash = await screenshotProjectFingerprint({
-					...unwrap(project),
-					annotations: unwrap(annotations),
-				});
-				const copiedLink = await copyCurrentScreenshotShareLink(
-					projectPath,
-					contentHash,
-				);
-				if (copiedLink) {
-					toast.success("Share link copied to clipboard", { id: toastId });
-					setDialog({ ...dialog(), open: false });
-					return;
-				}
-
-				shareContext = { projectPath, contentHash };
-				setExportStatus("rendering");
-				toast.loading("Rendering screenshot", { id: toastId });
-			} else {
-				setExportStatus("rendering");
-			}
-
+			toastId = toast.loading(localize("正在渲染图片…"));
 			const outputCanvas = await renderExportCanvas();
-			setExportStatus("encoding");
-
-			if (destination === "share" && toastId) {
-				toast.loading("Preparing upload", { id: toastId });
-			}
-
-			const needsAlpha =
-				destination === "share" || destination === "clipboard"
-					? canvasNeedsTransparency(outputCanvas, project)
-					: false;
+			const needsAlpha = destination === "clipboard"
+				? canvasNeedsTransparency(outputCanvas, project)
+				: false;
 			const blobCanvas =
 				destination === "clipboard" && !needsAlpha
 					? withWhiteBackground(outputCanvas)
 					: outputCanvas;
-			const blob =
-				destination === "share"
-					? await canvasToBlob(
-							blobCanvas,
-							needsAlpha ? "image/png" : "image/jpeg",
-							0.9,
-						)
-					: await canvasToBlob(blobCanvas, "image/png");
+			const blob = await canvasToBlob(blobCanvas, "image/png");
 
 			if (destination === "file") {
 				const buffer = await blob.arrayBuffer();
@@ -212,8 +164,10 @@ export function useScreenshotExport() {
 				if (disposed || editorCtx.editorInstance() !== owner) return;
 				if (savePath) {
 					await writeFile(savePath, uint8Array);
-					toast.success("Screenshot saved!");
+					toast.success(localize("Screenshot saved"), { id: toastId });
 					setDialog({ ...dialog(), open: false });
+				} else {
+					toast.dismiss(toastId);
 				}
 			} else if (destination === "clipboard") {
 				const clipboardItem =
@@ -231,32 +185,22 @@ export function useScreenshotExport() {
 					const uint8Array = new Uint8Array(buffer);
 					await commands.copyImageToClipboard(Array.from(uint8Array));
 				}
-				toast.success("Screenshot copied to clipboard!");
-				setDialog({ ...dialog(), open: false });
-			} else {
-				setExportStatus("uploading");
-				if (toastId) toast.loading("Uploading screenshot", { id: toastId });
-				if (!shareContext) throw new Error("Screenshot is still loading");
-				await uploadScreenshotShareBlob(
-					blob,
-					shareContext.projectPath,
-					shareContext.contentHash,
-				);
-				toast.success("Share link copied to clipboard", { id: toastId });
+				toast.success(localize("Screenshot copied to clipboard"), {
+					id: toastId,
+				});
 				setDialog({ ...dialog(), open: false });
 			}
 		} catch (err) {
 			console.error(err);
 			const message = err instanceof Error ? err.message : String(err);
 			toast.error(
-				message || "Failed to export",
+				localize(message || "导出失败"),
 				toastId ? { id: toastId } : {},
 			);
 		} finally {
-			setExportStatus("idle");
 			setIsExporting(false);
 		}
 	};
 
-	return { exportImage, exportStatus, isExporting };
+	return { exportImage, isExporting };
 }

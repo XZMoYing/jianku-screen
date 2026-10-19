@@ -38,6 +38,7 @@
 		"jianku:frontend": "node scripts/jianku.mjs frontend",
 		"jianku:check": "node scripts/jianku.mjs check",
 		"jianku:build": "node scripts/jianku.mjs build",
+		"jianku:install": "node scripts/jianku-install.mjs",
 		"typecheck": "bun run --cwd apps/web next typegen && bun run tsc -b",
 		"test": "turbo run test",
 		"test:web": "bun run --filter=@cap/web test",

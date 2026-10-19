@@ -470,7 +470,7 @@ function Inner(props: {
 	});
 
 	const appendRecordedClip = async (recordingPath: string) => {
-		const toastId = toast.loading("Adding clip…");
+		const toastId = toast.loading(localize("正在添加片段…"));
 		try {
 			const pending = requestHandoffPlayback(false);
 			if (pending && !(await pending)) {
@@ -484,11 +484,11 @@ function Inner(props: {
 			await flushProjectConfig();
 			await commands.addExistingRecordingToEditor(recordingPath);
 			await commands.deleteRecordingDirectory(recordingPath).catch(() => {});
-			toast.success("Clip added", { id: toastId });
+			toast.success(localize("Clip added"), { id: toastId });
 			window.location.reload();
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error);
-			toast.error(`Failed to add clip: ${message}`, { id: toastId });
+			toast.error(localize("添加片段失败：{reason}", { reason: message }), { id: toastId });
 		}
 	};
 
@@ -551,7 +551,7 @@ function Inner(props: {
 				} catch (error) {
 					console.error("Failed to save the project before closing", error);
 					toast.error(
-						"Could not save your edits. Keep the editor open and try again.",
+						localize("无法保存编辑内容，请保持编辑器打开并重试。"),
 					);
 					return;
 				}
@@ -563,12 +563,12 @@ function Inner(props: {
 				}
 
 				const resumeExport = await ask(
-					"An export is currently running. Keep this editor open to continue it, or quit the editor and cancel the export.",
+					localize("导出仍在进行中。保持编辑器打开可继续导出；关闭编辑器将取消导出。"),
 					{
-						title: "Export in Progress",
+						title: localize("正在导出"),
 						kind: "warning",
-						okLabel: "Resume Export",
-						cancelLabel: "Quit Editor",
+						okLabel: localize("继续导出"),
+						cancelLabel: localize("关闭编辑器"),
 					},
 				);
 
@@ -1547,7 +1547,7 @@ function Dialogs() {
 										return;
 									if (!cropTargetValid()) {
 										toast.error(
-											"Crop target changed. Reopen Crop to continue.",
+											localize("裁切对象已变化，请重新打开裁切工具。"),
 										);
 										return;
 									}
@@ -1853,7 +1853,7 @@ function Dialogs() {
 													fallback={
 														<p role="alert" class="text-orange-11">
 															{localize(
-																"Crop target changed. Close and reopen Crop to continue.",
+																localize("裁切对象已变化，请关闭并重新打开裁切工具。"),
 															)}
 														</p>
 													}

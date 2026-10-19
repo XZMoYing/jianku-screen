@@ -32,7 +32,7 @@ export default function () {
 			setUpdateError(
 				typeof error === "string"
 					? error
-					: localize("Unable to restart Cap safely."),
+					: localize("暂时无法安全重启应用。"),
 			);
 		}
 	};
@@ -44,7 +44,7 @@ export default function () {
 			setUpdateError(
 				typeof error === "string"
 					? error
-					: localize("Unable to return to Cap GPUI safely."),
+					: localize("暂时无法安全切回原生界面。"),
 			);
 		}
 	};
@@ -70,7 +70,7 @@ export default function () {
 					<p class="text-(--text-primary)">{updateError()}</p>
 					<p class="text-(--text-tertiary)">
 						{localize(
-							"Please download the latest version manually from cap.so/download. Your data will not be lost.",
+							"Download and reinstall the latest app version. Your recordings and settings will not be lost.",
 						)}
 					</p>
 					<p class="text-(--text-tertiary) text-xs">
@@ -81,7 +81,7 @@ export default function () {
 							fromGpui ? void returnSafelyToGpui() : navigate("/")
 						}
 					>
-						{fromGpui ? localize("Return to Cap GPUI") : "Go Back"}
+						{fromGpui ? localize("返回原生界面") : localize("返回")}
 					</Button>
 				</div>
 			</Show>
@@ -99,7 +99,7 @@ export default function () {
 							</span>
 							<Show when={fromGpui}>
 								<Button onClick={() => void returnSafelyToGpui()}>
-									{localize("Return to Cap GPUI")}
+									{localize("返回原生界面")}
 								</Button>
 							</Show>
 						</div>
@@ -177,7 +177,7 @@ export default function () {
 									<div class="flex flex-col gap-4 items-center">
 										<p class="text-(--text-tertiary)">
 											{localize(
-												"Update has been installed. Restart Cap to finish updating.",
+											"更新已安装，请重启应用以完成更新。",
 											)}
 										</p>
 										<Button onClick={restart}>{localize("Restart Now")}</Button>

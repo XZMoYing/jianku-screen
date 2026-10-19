@@ -47,7 +47,7 @@ export function AspectRatioSelect() {
 						<KSelect.ItemLabel class="flex-1">
 							{props.item.rawValue === "auto"
 								? localize("适合屏幕")
-								: ASPECT_RATIOS[props.item.rawValue].name}
+								: localize(ASPECT_RATIOS[props.item.rawValue].name)}
 							<Show when={item()}>
 								{(item) => (
 									<span class="text-gray-11">

@@ -263,7 +263,7 @@ function createCaptionsStore() {
 					id,
 					start: time,
 					end: time + 2,
-					text: "New caption",
+					text: "新字幕",
 				},
 			]);
 		},

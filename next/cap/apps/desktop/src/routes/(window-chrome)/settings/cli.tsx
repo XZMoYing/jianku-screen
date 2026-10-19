@@ -38,8 +38,10 @@ export default function CliSettings() {
 
 	const installButtonLabel = () => {
 		if (isInstalling())
-			return status()?.installed ? "Repairing..." : "Installing...";
-		return status()?.installed ? "Repair" : "Install CLI";
+			return status()?.installed
+				? localize("Repairing...")
+				: localize("Installing...");
+		return status()?.installed ? localize("Repair") : localize("Install CLI");
 	};
 
 	const handleInstall = async () => {
@@ -47,9 +49,9 @@ export default function CliSettings() {
 
 		try {
 			mutate(await installCli());
-			toast.success(localize("Cap CLI installed"));
+			toast.success(localize("命令行工具已安装"));
 		} catch (error) {
-			toast.error(errorMessage(error, "Failed to install CLI"));
+			toast.error(errorMessage(error, localize("Failed to install CLI")));
 			await refetch();
 		} finally {
 			setIsInstalling(false);
@@ -61,9 +63,9 @@ export default function CliSettings() {
 
 		try {
 			mutate(await uninstallCli());
-			toast.success(localize("Cap CLI removed"));
+			toast.success(localize("命令行工具已移除"));
 		} catch (error) {
-			toast.error(errorMessage(error, "Failed to remove CLI"));
+			toast.error(errorMessage(error, localize("Failed to remove CLI")));
 			await refetch();
 		} finally {
 			setIsUninstalling(false);
@@ -81,7 +83,7 @@ export default function CliSettings() {
 				<Section
 					title={localize("Command Line")}
 					description={localize(
-						"Install the Cap command for terminals, agents, scripts, and local automation.",
+						"Install the command-line tool for terminals, agents, scripts, and local automation.",
 					)}
 				>
 					<SectionCard padded>
@@ -96,8 +98,8 @@ export default function CliSettings() {
 								>
 									<div class="flex flex-col gap-2">
 										<p class="text-xs leading-relaxed text-red-11">
-											Couldn't load CLI status:{" "}
-											{errorMessage(status.error, "unknown error")}
+											{localize("Couldn't load CLI status:")}{" "}
+											{errorMessage(status.error, localize("Unknown error"))}
 										</p>
 										<Button
 											size="sm"
@@ -117,12 +119,12 @@ export default function CliSettings() {
 										<div class="flex flex-col gap-1 min-w-0">
 											<p class="text-[13px] text-gray-12">
 												{currentStatus().installed
-													? "Installed"
-													: "Not installed"}
+													? localize("Installed")
+													: localize("Not installed")}
 											</p>
 											<p class="text-xs leading-snug text-gray-10">
-												{localize("The desktop app installs a local")}{" "}
-												<code class="font-mono text-gray-12">cap</code>{" "}
+												{localize("本应用会安装一个本地命令")}{" "}
+												<code class="font-mono text-gray-12">jianku</code>{" "}
 												{localize(
 													"command that points back to the bundled CLI.",
 												)}
@@ -137,7 +139,7 @@ export default function CliSettings() {
 													onClick={handleUninstall}
 												>
 													{isUninstalling()
-														? "Removing..."
+													? localize("Removing...")
 														: localize("Remove")}
 												</Button>
 											</Show>
@@ -156,10 +158,6 @@ export default function CliSettings() {
 										<PathRow
 											label={localize("Command")}
 											value={currentStatus().shimPath}
-										/>
-										<PathRow
-											label={localize("Target")}
-											value={currentStatus().targetPath}
 										/>
 									</div>
 
@@ -184,13 +182,13 @@ export default function CliSettings() {
 															<code class="font-mono text-gray-12">
 																{currentStatus().pathEntry}
 															</code>{" "}
-															to your PATH to use{" "}
-															<code class="font-mono text-gray-12">cap</code>{" "}
-															from a new terminal.
+										{localize("to your PATH to use")} {" "}
+															<code class="font-mono text-gray-12">jianku</code>{" "}
+										{localize("from a new terminal.")}
 														</>
 													}
 												>
-													Added <code class="font-mono text-gray-12">cap</code>{" "}
+										{localize("Added")} <code class="font-mono text-gray-12">jianku</code>{" "}
 													{localize(
 														"to your PATH. Restart your terminal to use it, or run this now:",
 													)}

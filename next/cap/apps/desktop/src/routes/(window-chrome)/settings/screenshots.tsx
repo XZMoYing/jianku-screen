@@ -18,11 +18,6 @@ import {
 } from "solid-js";
 import toast from "solid-toast";
 import { Input } from "~/routes/editor/ui";
-import {
-	createScreenshotShareLinkFromProjectPath,
-	type ScreenshotExportStatus,
-	screenshotShareStatusText,
-} from "~/routes/screenshot-editor/screenshotExport";
 import { trackEvent } from "~/utils/analytics";
 import { createTauriEventListener } from "~/utils/createEventListener";
 import { t as localize } from "~/utils/i18n";
@@ -58,9 +53,6 @@ export default function Screenshots() {
 	const trimmedSearch = createMemo(() => search().trim());
 	const normalizedSearch = createMemo(() => trimmedSearch().toLowerCase());
 	const [visibleCount, setVisibleCount] = createSignal(PAGE_SIZE);
-	const [sharingPath, setSharingPath] = createSignal<string | null>(null);
-	const [shareStatus, setShareStatus] =
-		createSignal<ScreenshotExportStatus>("idle");
 
 	const screenshots = createQuery(() => screenshotsQuery);
 
@@ -126,30 +118,9 @@ export default function Screenshots() {
 		commands.copyScreenshotToClipboard(path);
 	};
 
-	const handleCreateShareableLink = async (path: string) => {
-		if (sharingPath()) return;
-
+	const handleCreateShareableLink = () => {
 		trackEvent("screenshot_share_clicked");
-		setSharingPath(path);
-		setShareStatus("rendering");
-		const toastId = toast.loading(screenshotShareStatusText("rendering"));
-
-		try {
-			await createScreenshotShareLinkFromProjectPath(path, (status) => {
-				setShareStatus(status);
-				if (status !== "idle") {
-					toast.loading(screenshotShareStatusText(status), { id: toastId });
-				}
-			});
-			toast.success("Share link copied to clipboard", { id: toastId });
-		} catch (error) {
-			console.error("Failed to create screenshot share link:", error);
-			const message = error instanceof Error ? error.message : String(error);
-			toast.error(message || "Failed to create share link", { id: toastId });
-		} finally {
-			setSharingPath(null);
-			setShareStatus("idle");
-		}
+		toast(localize("在线分享功能敬请期待"));
 	};
 
 	const handleImportImage = async () => {
@@ -230,15 +201,9 @@ export default function Screenshots() {
 											onCopyImageToClipboard={() =>
 												handleCopyImageToClipboard(screenshot.path)
 											}
-											onCreateShareableLink={() =>
-												handleCreateShareableLink(screenshot.path)
-											}
-											isSharing={sharingPath() === screenshot.path}
-											shareTooltipText={
-												sharingPath() === screenshot.path
-													? screenshotShareStatusText(shareStatus())
-													: screenshotShareStatusText("idle")
-											}
+											onCreateShareableLink={handleCreateShareableLink}
+											isSharing={false}
+											shareTooltipText={localize("在线分享功能敬请期待")}
 										/>
 									)}
 								</For>
@@ -336,10 +301,7 @@ function ScreenshotItem(props: {
 				<TooltipIconButton
 					tooltipText={localize("Delete")}
 					onClick={async () => {
-						if (
-							!(await ask("Are you sure you want to delete this screenshot?"))
-						)
-							return;
+						if (!(await ask(localize("确定要删除这张截图吗？")))) return;
 						const parent = props.screenshot.path.replace(/[/\\][^/\\]+$/, "");
 						await remove(parent, { recursive: true });
 

@@ -14,13 +14,8 @@ import {
 } from "solid-js";
 import toast from "solid-toast";
 import Tooltip from "~/components/Tooltip";
-import {
-	createScreenshotShareLinkFromProjectPath,
-	type ScreenshotExportStatus,
-	screenshotShareStatusText,
-} from "~/routes/screenshot-editor/screenshotExport";
 import { t as localize } from "~/utils/i18n";
-import { openRecordingFolder } from "~/utils/recording";
+import { displayRecordingName, openRecordingFolder } from "~/utils/recording";
 import { createRecordingThumbnail } from "~/utils/recording-thumbnail";
 import {
 	type CaptureDisplayWithThumbnail,
@@ -97,9 +92,6 @@ export default function TargetCard(props: TargetCardProps) {
 		"highlightQuery",
 	]);
 	const [imageExists, setImageExists] = createSignal(true);
-	const [isSharingScreenshot, setIsSharingScreenshot] = createSignal(false);
-	const [screenshotShareStatus, setScreenshotShareStatus] =
-		createSignal<ScreenshotExportStatus>("idle");
 
 	const recordingProps = () => {
 		if (local.variant !== "recording") return undefined;
@@ -143,7 +135,7 @@ export default function TargetCard(props: TargetCardProps) {
 		const target = windowTarget();
 		if (target) return target.name || target.owner_name;
 		const recording = recordingTarget();
-		if (recording) return recording.pretty_name;
+		if (recording) return displayRecordingName(recording.pretty_name);
 		const screenshot = screenshotTarget();
 		return screenshot?.pretty_name;
 	});
@@ -153,7 +145,9 @@ export default function TargetCard(props: TargetCardProps) {
 		if (target) return target.owner_name;
 		const recording = recordingTarget();
 		if (recording) {
-			return recording.mode === "studio" ? "Studio Mode" : "Instant Mode";
+			return localize(
+				recording.mode === "studio" ? "Studio Mode" : "Instant Mode",
+			);
 		}
 		return undefined;
 	});
@@ -244,10 +238,10 @@ export default function TargetCard(props: TargetCardProps) {
 		if (!screenshot) return;
 		try {
 			await commands.copyScreenshotToClipboard(screenshot.path);
-			toast.success("Screenshot copied to clipboard");
+			toast.success(localize("Screenshot copied to clipboard"));
 		} catch (error) {
 			console.error("Failed to copy screenshot:", error);
-			toast.error("Failed to copy screenshot");
+			toast.error(localize("Failed to copy screenshot"));
 		}
 	};
 
@@ -262,43 +256,16 @@ export default function TargetCard(props: TargetCardProps) {
 			);
 			if (!path) return;
 			await commands.copyFileToPath(screenshot.path, path);
-			toast.success("Screenshot saved");
+			toast.success(localize("Screenshot saved"));
 		} catch (error) {
 			console.error("Failed to save screenshot:", error);
-			toast.error("Failed to save screenshot");
+			toast.error(localize("Failed to save screenshot"));
 		}
 	};
 
 	const handleShareScreenshot = async (e: MouseEvent) => {
 		e.stopPropagation();
-		if (isSharingScreenshot()) return;
-
-		const screenshot = screenshotTarget();
-		if (!screenshot) return;
-
-		setIsSharingScreenshot(true);
-		setScreenshotShareStatus("rendering");
-		const toastId = toast.loading(screenshotShareStatusText("rendering"));
-
-		try {
-			await createScreenshotShareLinkFromProjectPath(
-				screenshot.path,
-				(status) => {
-					setScreenshotShareStatus(status);
-					if (status !== "idle") {
-						toast.loading(screenshotShareStatusText(status), { id: toastId });
-					}
-				},
-			);
-			toast.success("Share link copied to clipboard", { id: toastId });
-		} catch (error) {
-			console.error("Failed to create screenshot share link:", error);
-			const message = error instanceof Error ? error.message : String(error);
-			toast.error(message || "Failed to create share link", { id: toastId });
-		} finally {
-			setIsSharingScreenshot(false);
-			setScreenshotShareStatus("idle");
-		}
+		toast(localize("在线分享功能敬请期待"));
 	};
 
 	const handleOpenRecordingEditor = (e: MouseEvent) => {
@@ -323,7 +290,7 @@ export default function TargetCard(props: TargetCardProps) {
 		if (!recording) return;
 		openRecordingFolder(recording.path, recording.mode).catch((error) => {
 			console.error("Failed to open recording folder:", error);
-			toast.error("Failed to open folder");
+			toast.error(localize("Failed to open folder"));
 		});
 	};
 
@@ -331,7 +298,7 @@ export default function TargetCard(props: TargetCardProps) {
 		e.stopPropagation();
 		const recording = recordingTarget();
 		if (!recording) return;
-		if (!(await ask("Are you sure you want to delete this recording?"))) return;
+		if (!(await ask(localize("确定要删除这段录制吗？")))) return;
 		await remove(recording.path, { recursive: true });
 		recordingProps()?.onRefetch?.();
 	};
@@ -445,7 +412,7 @@ export default function TargetCard(props: TargetCardProps) {
 				</div>
 				<Show when={local.variant === "screenshot"}>
 					<div class="flex items-center justify-between px-2 pb-1.5 pt-0.5 gap-1">
-						<Tooltip content="Edit">
+						<Tooltip content={localize("Edit")}>
 							<div
 								role="button"
 								tabIndex={-1}
@@ -455,7 +422,7 @@ export default function TargetCard(props: TargetCardProps) {
 								<IconLucideEdit class="size-3.5" />
 							</div>
 						</Tooltip>
-						<Tooltip content="Copy to clipboard">
+						<Tooltip content={localize("Copy to clipboard")}>
 							<div
 								role="button"
 								tabIndex={-1}
@@ -465,7 +432,7 @@ export default function TargetCard(props: TargetCardProps) {
 								<IconLucideCopy class="size-3.5" />
 							</div>
 						</Tooltip>
-						<Tooltip content="Save as...">
+						<Tooltip content={localize("Save as...")}>
 							<div
 								role="button"
 								tabIndex={-1}
@@ -475,32 +442,15 @@ export default function TargetCard(props: TargetCardProps) {
 								<IconLucideSave class="size-3.5" />
 							</div>
 						</Tooltip>
-						<Tooltip
-							content={screenshotShareStatusText(screenshotShareStatus())}
-						>
+						<Tooltip content={localize("在线分享功能敬请期待")}>
 							<div
 								role="button"
 								tabIndex={-1}
-								aria-disabled={isSharingScreenshot()}
+								aria-disabled="true"
 								onClick={handleShareScreenshot}
-								class={cx(
-									"flex-1 flex items-center justify-center p-1 rounded-sm hover:bg-gray-5 text-gray-11 hover:text-gray-12 transition-colors",
-									isSharingScreenshot() &&
-										"pointer-events-none opacity-60 hover:bg-transparent",
-								)}
+								class="flex-1 flex items-center justify-center p-1 rounded-sm text-gray-11 transition-colors"
 							>
-								<Show
-									when={isSharingScreenshot()}
-									fallback={<IconCapLink class="size-3.5" />}
-								>
-									<ProgressCircle
-										variant="primary"
-										progress={
-											screenshotShareStatus() === "uploading" ? 0.65 : 0.25
-										}
-										size="xs"
-									/>
-								</Show>
+								<IconCapLink class="size-3.5" />
 							</div>
 						</Tooltip>
 					</div>
@@ -518,7 +468,7 @@ export default function TargetCard(props: TargetCardProps) {
 						return (
 							<div class="flex items-center justify-between px-2 pb-1.5 pt-0.5 gap-1">
 								<Show when={isStudio}>
-									<Tooltip content="Edit">
+									<Tooltip content={localize("Edit")}>
 										<div
 											role="button"
 											tabIndex={-1}
@@ -557,7 +507,7 @@ export default function TargetCard(props: TargetCardProps) {
 									</Show>
 								</Show>
 								<Show when={recording.sharing}>
-									<Tooltip content="Open link">
+									<Tooltip content={localize("Open link")}>
 										<div
 											role="button"
 											tabIndex={-1}
@@ -568,7 +518,7 @@ export default function TargetCard(props: TargetCardProps) {
 										</div>
 									</Tooltip>
 								</Show>
-								<Tooltip content="Open folder">
+								<Tooltip content={localize("Open folder")}>
 									<div
 										role="button"
 										tabIndex={-1}
@@ -578,7 +528,7 @@ export default function TargetCard(props: TargetCardProps) {
 										<IconLucideFolder class="size-3.5" />
 									</div>
 								</Tooltip>
-								<Tooltip content="Delete">
+								<Tooltip content={localize("Delete")}>
 									<div
 										role="button"
 										tabIndex={-1}

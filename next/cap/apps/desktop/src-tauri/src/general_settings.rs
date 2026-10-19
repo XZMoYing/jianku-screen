@@ -306,7 +306,7 @@ fn default_crash_recovery_recording() -> bool {
 
 fn default_transcription_hints() -> Vec<String> {
     vec![
-        "Cap".to_string(),
+        "简库镜传".to_string(),
         "TypeScript".to_string(),
         "My Brand Name".to_string(),
         "mywebsite.com".to_string(),

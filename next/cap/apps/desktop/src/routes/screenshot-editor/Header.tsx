@@ -45,7 +45,7 @@ export function Header() {
 	} = ctx;
 	const path = () => ctx.editorInstance()?.path ?? "";
 
-	const { exportImage, exportStatus, isExporting } = useScreenshotExport();
+	const { exportImage, isExporting } = useScreenshotExport();
 
 	createEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
@@ -94,19 +94,6 @@ export function Header() {
 	};
 
 	const isCropDisabled = () => !originalImageSize() || !isImageFileReady();
-	const shareTooltip = () => {
-		switch (exportStatus()) {
-			case "rendering":
-				return "Rendering screenshot";
-			case "encoding":
-				return "Preparing upload";
-			case "uploading":
-				return "Uploading screenshot";
-			default:
-				return "Create shareable link";
-		}
-	};
-
 	return (
 		<div
 			data-tauri-drag-region
@@ -160,9 +147,8 @@ export function Header() {
 				/>
 
 				<EditorButton
-					tooltipText={shareTooltip()}
-					onClick={() => exportImage("share")}
-					disabled={isExporting()}
+					tooltipText={localize("敬请期待")}
+					disabled
 					leftIcon={<IconLucideLink class="size-4" />}
 				/>
 
@@ -195,7 +181,7 @@ export function Header() {
 										onSelect={async () => {
 											if (
 												await ask(
-													"Are you sure you want to delete this screenshot?",
+													localize("确定要删除这张截图吗？"),
 												)
 											) {
 												await remove(path());

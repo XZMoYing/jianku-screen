@@ -218,9 +218,7 @@ const TEMPLATES: Template[] = [
 	{
 		id: "ocr-screenshot",
 		name: "Pull the text out of screenshots",
-		description: localize(
-			"Cap reads the text in your screenshot and copies it for you.",
-		),
+		description: localize("识别截图中的文字并复制到剪贴板。"),
 		icon: IconLucideScanText,
 		build: () =>
 			buildRule({
@@ -290,7 +288,7 @@ const TEMPLATES: Template[] = [
 				actions: [
 					{
 						type: "notify",
-						titleTemplate: localize("Cap"),
+						titleTemplate: localize("简库镜传"),
 						bodyTemplate: "Your recording is ready to share.",
 					},
 				],
@@ -469,7 +467,7 @@ export default function AutomationsSettings() {
 			});
 		} catch (e) {
 			console.error("Failed to save automations", e);
-			toast.error("Failed to save automations");
+			toast.error(localize("Failed to save automations"));
 		}
 	};
 
@@ -487,7 +485,9 @@ export default function AutomationsSettings() {
 
 	const addFromTemplate = (template: Template) => {
 		addRule(template.build());
-		toast.success(`Added "${template.name}"`);
+		toast.success(
+			localize('已添加“{name}”', { name: localize(template.name) }),
+		);
 	};
 
 	const removeRule = (id: string) => {
@@ -504,7 +504,7 @@ export default function AutomationsSettings() {
 			setTestReports(ruleId, report);
 			const unsupported = report.actionChecks.filter((c) => !c.supported);
 			if (unsupported.length === 0) {
-				toast.success("All actions supported on this device");
+			toast.success(localize("All actions supported on this device"));
 			} else {
 				toast(
 					`${unsupported.length} action(s) not supported here: ${unsupported
@@ -514,7 +514,7 @@ export default function AutomationsSettings() {
 			}
 		} catch (e) {
 			console.error("Failed to test automation", e);
-			toast.error("Failed to test automation");
+			toast.error(localize("Failed to test automation"));
 		}
 	};
 
@@ -524,7 +524,7 @@ export default function AutomationsSettings() {
 				<Section
 					title={localize("Automations")}
 					description={localize(
-						"Run actions automatically when something happens in Cap. Rules are shared with the Cap CLI.",
+					"根据指定事件自动执行操作。规则也可通过命令行工具管理。",
 					)}
 				>
 					<Suspense
@@ -638,10 +638,10 @@ function TemplateCard(props: { template: Template; onAdd: () => void }) {
 			</div>
 			<div class="flex-1 min-w-0">
 				<p class="text-[13px] font-medium text-gray-12">
-					{props.template.name}
+					{localize(props.template.name)}
 				</p>
 				<p class="mt-0.5 text-[11px] leading-snug text-gray-10">
-					{props.template.description}
+					{localize(props.template.description)}
 				</p>
 			</div>
 		</button>
@@ -1016,7 +1016,7 @@ function ConditionValue(props: {
 			return (
 				<TextInput
 					value={c.pattern}
-					placeholder="e.g. Slack"
+					placeholder={localize("e.g. Slack")}
 					onInput={(v) =>
 						props.onChange((cond) => {
 							if (cond.type === "windowTitleContains") cond.pattern = v;

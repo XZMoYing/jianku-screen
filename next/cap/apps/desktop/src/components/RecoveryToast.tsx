@@ -2,6 +2,7 @@ import { Button } from "@cap/ui-solid";
 import { createMutation } from "@tanstack/solid-query";
 import { createSignal, onMount, Show } from "solid-js";
 import { t as localize } from "~/utils/i18n";
+import { displayRecordingName } from "~/utils/recording";
 import { commands, type IncompleteRecordingInfo } from "~/utils/tauri";
 
 function formatDuration(secs: number): string {
@@ -82,7 +83,7 @@ export function RecoveryToast() {
 								{localize("Incomplete Recording")}
 							</p>
 							<p class="text-gray-12 text-xs font-medium truncate">
-								{rec().prettyName}
+								{displayRecordingName(rec().prettyName)}
 							</p>
 							<p class="text-gray-11 text-[10px]">
 								{rec().segmentCount} segment
@@ -95,7 +96,7 @@ export function RecoveryToast() {
 										const e = error();
 										if (e instanceof Error) return e.message;
 										if (typeof e === "string") return e;
-										return "Recovery failed. The recording may be corrupted.";
+										return localize("恢复失败，录制文件可能已损坏。");
 									};
 									return (
 										<p class="text-red-11 text-[10px] mt-1">{errorMessage()}</p>
@@ -110,7 +111,7 @@ export function RecoveryToast() {
 								variant="primary"
 								size="xs"
 							>
-								{recoverMutation.isPending ? "..." : "Recover"}
+								{recoverMutation.isPending ? "..." : localize("恢复录制")}
 							</Button>
 							<Button
 								onClick={() => discardMutation.mutate(rec().projectPath)}

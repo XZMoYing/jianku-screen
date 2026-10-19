@@ -189,7 +189,7 @@ export default function CaptureAppearance(props: {
 											aria-pressed={tab() === item.id}
 											onClick={() => setTab(item.id)}
 										>
-											{item.name}
+															{localize(item.name)}
 										</button>
 									)}
 								</For>

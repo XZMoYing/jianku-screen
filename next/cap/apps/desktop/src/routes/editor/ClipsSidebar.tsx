@@ -270,9 +270,12 @@ export function ClipsSidebar(props: { class?: string }) {
 			}
 			await flushProjectConfig();
 			const count = await commands.addExistingRecordingToEditor(sourcePath);
-			toast.success(count === 1 ? "Clip imported" : `${count} clips imported`, {
-				id: toastId,
-			});
+			toast.success(
+				count === 1
+					? localize("Clip imported")
+					: localize("{count} clips imported", { count }),
+				{ id: toastId },
+			);
 			window.location.reload();
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error);
@@ -283,13 +286,13 @@ export function ClipsSidebar(props: { class?: string }) {
 
 	const pickMp4 = async () => {
 		const path = await open({
-			filters: [{ name: "MP4 Video", extensions: ["mp4"] }],
+			filters: [{ name: localize("MP4 视频"), extensions: ["mp4"] }],
 			multiple: false,
 		});
 		if (typeof path === "string") await importRecordingPath(path);
 	};
 
-	const pickCapRecording = async () => {
+	const pickExistingRecording = async () => {
 		const recordingsPath = await join(await appDataDir(), "recordings");
 		const path = await open(
 			getExistingRecordingPickerOptions(ostype(), recordingsPath),
@@ -302,11 +305,11 @@ export function ClipsSidebar(props: { class?: string }) {
 		const menu = await Menu.new({
 			items: [
 				await MenuItem.new({
-					text: "Existing recording",
-					action: () => void pickCapRecording(),
+					text: localize("导入录制工程"),
+					action: () => void pickExistingRecording(),
 				}),
 				await MenuItem.new({
-					text: "MP4 Video…",
+					text: localize("导入 MP4 视频…"),
 					action: () => void pickMp4(),
 				}),
 			],

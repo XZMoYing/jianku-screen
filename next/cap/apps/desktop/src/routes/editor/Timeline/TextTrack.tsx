@@ -341,13 +341,13 @@ export function TextTrack(props: {
 									"font-weight": segment.fontWeight ?? 700,
 								}}
 							>
-								{segment.content || "Label"}
+								{segment.content || localize("文本")}
 							</span>
 						</div>
 					);
 
 					const textTitle = () => {
-						const base = `Text · ${segment.content || "Label"}`;
+						const base = `${localize("文本")} · ${segment.content || localize("文本")}`;
 						return segment.layout === "fullscreen"
 							? `${base} · Fullscreen: pauses the video while shown`
 							: base;

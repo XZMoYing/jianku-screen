@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 use std::collections::HashMap;
 use std::sync::Arc;
-use tokio::sync::{Mutex, RwLock};
+use tokio::sync::{Mutex, RwLock, watch};
 use wgpu::{include_wgsl, util::DeviceExt};
 
 use crate::{ProjectUniforms, RenderVideoConstants, RenderingError, create_shader_render_pipeline};
@@ -383,6 +383,7 @@ fn create_video_texture(device: &wgpu::Device, width: u32, height: u32) -> wgpu:
 
 pub struct BackgroundLayer {
     pub(crate) realtime: Option<bool>,
+    pub(crate) playback_requests: Option<watch::Receiver<Option<u64>>>,
     inner: Option<Inner>,
     image_pipeline: ImageBackgroundPipeline,
     video: Option<VideoBackground>,
@@ -436,6 +437,7 @@ impl BackgroundLayer {
             #[cfg(target_os = "macos")]
             native_gpu_failed: false,
             realtime: None,
+            playback_requests: None,
             inner: None,
             video: None,
             video_texture: None,
@@ -534,16 +536,25 @@ impl BackgroundLayer {
                         .map_err(RenderingError::ImageLoadError)?,
                 );
             }
-            let mut frame = self
+            let source = self
                 .video
                 .as_mut()
                 .ok_or_else(|| RenderingError::ImageLoadError("壁纸视频未就绪".into()))?
                 .source(
                     f64::from(uniforms.frame_number) / f64::from(uniforms.frame_rate.max(1)),
                     self.realtime.unwrap_or(false),
-                )
-                .await
-                .map_err(RenderingError::ImageLoadError)?;
+                );
+            let mut frame = if self.realtime.is_none()
+                && let Some(mut requests) = self.playback_requests.clone()
+            {
+                // Only the background await is interruptible; GPU readback must finish normally.
+                tokio::select! {
+                    frame = source => frame.map_err(RenderingError::ImageLoadError)?,
+                    _ = requests.wait_for(Option::is_some) => return Err(RenderingError::PreviewSuperseded),
+                }
+            } else {
+                source.await.map_err(RenderingError::ImageLoadError)?
+            };
             #[cfg(target_os = "macos")]
             if let VideoFrame::Native(native) = &frame {
                 let result = if self.native_gpu_failed {

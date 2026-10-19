@@ -67,8 +67,6 @@ declare global {
 }
 
 const MAX_RECORDING_FOR_FREE = 5 * 60 * 1000;
-const NO_MICROPHONE = "No Microphone";
-const NO_WEBCAM = "No Webcam";
 const FAKE_WINDOW_BOUNDS_NAME = "recording-controls-interactive-area";
 
 export default function () {
@@ -205,7 +203,7 @@ function InProgressRecordingInner() {
 			);
 		if (disconnectedInputs.camera)
 			issues.push(
-				"Camera disconnected. Recording continues without camera overlay.",
+				localize("摄像头已断开，录制仍将继续，但不会显示摄像头画面。"),
 			);
 		const failure = recordingFailure();
 		if (failure) issues.push(failure);
@@ -230,10 +228,10 @@ function InProgressRecordingInner() {
 	const dismissIssuePanel = () => setIssuePanelVisible(false);
 	const hasCameraInput = () => optionsQuery.rawOptions.cameraID != null;
 	const microphoneTitle = createMemo(() => {
-		if (disconnectedInputs.microphone) return "Microphone disconnected";
+		if (disconnectedInputs.microphone) return localize("麦克风已断开");
 		if (optionsQuery.rawOptions.micName)
-			return `Microphone: ${optionsQuery.rawOptions.micName}`;
-		return "Microphone not configured";
+			return `${localize("麦克风")}: ${optionsQuery.rawOptions.micName}`;
+		return localize("未配置麦克风");
 	});
 
 	const [pauseResumes, setPauseResumes] = createStore<
@@ -579,7 +577,9 @@ function InProgressRecordingInner() {
 			const request = { start: start(), resume: state().variant === "paused" };
 			pauseRequest = request;
 			setPauseError(null);
-			setPausePendingAction(request.resume ? "Resuming…" : "Pausing…");
+			setPausePendingAction(
+				request.resume ? localize("正在继续录制…") : localize("正在暂停录制…"),
+			);
 			try {
 				if (request.resume) await commands.resumeRecording();
 				else await commands.pauseRecording();
@@ -591,8 +591,11 @@ function InProgressRecordingInner() {
 				) {
 					setPauseError(
 						String(error).startsWith("Could not ")
-							? String(error)
-							: `Could not ${request.resume ? "resume" : "pause"} recording: ${String(error)}`,
+							? localize("录制操作失败：{error}", { error: String(error) })
+							: localize("{action}录制失败：{error}", {
+									action: request.resume ? localize("继续") : localize("暂停"),
+									error: String(error),
+								}),
 					);
 				}
 				throw error;
@@ -633,8 +636,12 @@ function InProgressRecordingInner() {
 	const restartRecording = createMutation(() => ({
 		mutationFn: async () => {
 			const shouldRestart = await dialog.confirm(
-				"Are you sure you want to restart the recording? The current recording will be discarded.",
-				{ title: "Confirm Restart", okLabel: "Restart", cancelLabel: "Cancel" },
+				localize("Are you sure you want to restart the recording? The current recording will be discarded."),
+				{
+					title: localize("Confirm Restart"),
+					okLabel: localize("Restart"),
+					cancelLabel: localize("Cancel"),
+				},
 			);
 
 			if (!shouldRestart) return;
@@ -652,8 +659,12 @@ function InProgressRecordingInner() {
 	const deleteRecording = createMutation(() => ({
 		mutationFn: async () => {
 			const shouldDelete = await dialog.confirm(
-				"Are you sure you want to delete the recording?",
-				{ title: "Confirm Delete", okLabel: "Delete", cancelLabel: "Cancel" },
+				localize("Are you sure you want to delete the recording?"),
+				{
+					title: localize("Confirm Delete"),
+					okLabel: localize("Delete"),
+					cancelLabel: localize("Cancel"),
+				},
 			);
 
 			if (!shouldDelete) return;
@@ -756,7 +767,7 @@ function InProgressRecordingInner() {
 			)[] = [];
 			items.push(
 				await CheckMenuItem.new({
-					text: "Show Camera Preview",
+					text: localize("显示摄像头预览"),
 					checked: cameraWindowOpen(),
 					enabled: startedWithCameraInput && hasCameraInput(),
 					action: () => {
@@ -769,14 +780,14 @@ function InProgressRecordingInner() {
 			items.push(
 				await MenuItem.new({
 					text: startedWithMicrophone
-						? "Microphone"
-						: "Microphone (locked for this recording)",
+						? localize("麦克风")
+						: localize("麦克风已锁定，录制期间无法切换"),
 					enabled: false,
 				}),
 			);
 			items.push(
 				await CheckMenuItem.new({
-					text: NO_MICROPHONE,
+					text: localize("不使用麦克风"),
 					checked: optionsQuery.rawOptions.micName == null,
 					enabled: startedWithMicrophone,
 					action: () => updateMicInput.mutate(null),
@@ -796,14 +807,14 @@ function InProgressRecordingInner() {
 			items.push(
 				await MenuItem.new({
 					text: startedWithCameraInput
-						? "Webcam"
-						: "Webcam (locked for this recording)",
+						? localize("摄像头")
+						: localize("摄像头已锁定，录制期间无法切换"),
 					enabled: false,
 				}),
 			);
 			items.push(
 				await CheckMenuItem.new({
-					text: NO_WEBCAM,
+					text: localize("不使用摄像头"),
 					checked: !hasCameraInput(),
 					enabled: startedWithCameraInput,
 					action: () => updateCameraInput.mutate(null),
@@ -1023,7 +1034,7 @@ function InProgressRecordingInner() {
 													}
 												>
 													<span role="status" aria-live="polite">
-														{pausePendingAction() ?? "Paused"}
+														{pausePendingAction() ?? localize("已暂停")}
 													</span>
 												</Show>
 											</Show>
@@ -1074,11 +1085,15 @@ function InProgressRecordingInner() {
 											disabled={toggleMicMute.isPending}
 											onClick={() => toggleMicMute.mutate()}
 											title={
-												micMuted() ? "Unmute microphone" : "Mute microphone"
+												micMuted()
+													? localize("取消麦克风静音")
+													: localize("麦克风静音")
 											}
 											aria-pressed={micMuted() ? "true" : "false"}
 											aria-label={
-												micMuted() ? "Unmute microphone" : "Mute microphone"
+												micMuted()
+													? localize("取消麦克风静音")
+													: localize("麦克风静音")
 											}
 										>
 											{micMuted() ? (
@@ -1148,13 +1163,13 @@ function InProgressRecordingInner() {
 												)}
 												title={
 													state().variant === "paused"
-														? "Resume recording"
-														: "Pause recording"
+										? localize("继续录制")
+										: localize("暂停录制")
 												}
 												aria-label={
 													state().variant === "paused"
-														? "Resume recording"
-														: "Pause recording"
+										? localize("继续录制")
+										: localize("暂停录制")
 												}
 											>
 												<Show
@@ -1223,7 +1238,7 @@ function recordingIssueMessage(message: string): string {
 		message.includes("Insufficient disk space") &&
 		message.includes("Your recording is still paused")
 	) {
-		return "Not enough disk space to resume. Free up space and try again, or press Stop to save.";
+		return localize("存储空间不足，无法继续录制。请清理空间后重试，或点击“停止”保存录制。" );
 	}
 	return message;
 }

@@ -45,7 +45,9 @@ export function AnnotationConfigBar() {
 					>
 						<div class="flex items-center justify-center gap-6 px-4 h-11">
 							<Show when={!isMask()}>
-								<ConfigItem label={type() === "text" ? "Color" : "Stroke"}>
+								<ConfigItem
+									label={type() === "text" ? localize("文字颜色") : localize("描边")}
+								>
 									<ColorPickerButton
 										value={ann().strokeColor}
 										onChange={(c) => update("strokeColor", c)}
@@ -236,7 +238,7 @@ function ColorPickerButton(props: {
 
 						<div class="grid grid-cols-6 gap-1.5">
 							<Show when={props.allowTransparent}>
-								<Tooltip content="Transparent">
+							<Tooltip content={localize("Transparent")}>
 									<button
 										type="button"
 										onClick={() => props.onChange("transparent")}

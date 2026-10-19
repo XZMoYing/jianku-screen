@@ -164,18 +164,7 @@ export default function S3ConfigPage() {
 					title={localize("Configuration")}
 					description={
 						<>
-							{localize(
-								"It should take under 10 minutes to set up and connect your storage bucket to Cap. View the",
-							)}{" "}
-							<a
-								href="https://cap.so/docs/s3-config"
-								target="_blank"
-								class="underline text-gray-12"
-								rel="noopener"
-							>
-								{localize("Storage Config Guide")}
-							</a>{" "}
-							to get started.
+							{localize("按提示填写并连接存储空间。配置指南敬请期待。")}
 						</>
 					}
 				>

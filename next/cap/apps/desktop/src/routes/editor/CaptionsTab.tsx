@@ -149,10 +149,6 @@ const LANGUAGE_OPTIONS: LanguageOption[] = [
 	{ code: "ur", label: "Urdu" },
 	{ code: "fa", label: "Persian" },
 	{ code: "he", label: "Hebrew" },
-	{ code: "ar", label: "Arabic" },
-	{ code: "hi", label: "Hindi" },
-	{ code: "bn", label: "Bengali" },
-	{ code: "ta", label: "Tamil" },
 ];
 
 const STYLE_PRESET_KEYS = new Set<keyof EditorCaptionSettings>([
@@ -188,7 +184,7 @@ function clampDownloadProgress(progress: number) {
 
 function CaptionPresetPreview(props: { preset: CaptionStylePreset }) {
 	const style = () => props.preset.style;
-	const words = ["Make", "it", "pop"];
+	const words = () => localize("让 字幕 出彩").split(" ");
 	const emphasizeIndex = 2;
 
 	const textShadow = () => {
@@ -212,7 +208,7 @@ function CaptionPresetPreview(props: { preset: CaptionStylePreset }) {
 							: "transparent",
 				}}
 			>
-				<For each={words}>
+				<For each={words()}>
 					{(word, index) => {
 						const isEmphasized = () =>
 							style().activeWordHighlight && index() === emphasizeIndex;
@@ -679,14 +675,14 @@ export function CaptionsTab(props: {
 
 			await syncModelDownloadStatus(modelToDownload);
 			addDownloadedModel(modelToDownload);
-			toast.success("Caption model downloaded");
+			toast.success(localize("Caption model downloaded"));
 		} catch (error) {
 			console.error("Error downloading model:", error);
 			const active = await syncModelDownloadStatus(modelToDownload).catch(
 				() => false,
 			);
 			if (!active) {
-				toast.error("Failed to download caption model");
+				toast.error(localize("Failed to download caption model"));
 				setDownloadProgress(0);
 				setIsDownloading(false);
 				setDownloadingModel(null);
@@ -709,10 +705,10 @@ export function CaptionsTab(props: {
 			}
 
 			removeDownloadedModel(modelToDelete);
-			toast.success("Caption model deleted");
+			toast.success(localize("Caption model deleted"));
 		} catch (error) {
 			console.error("Error deleting model:", error);
-			toast.error("Failed to delete caption model");
+			toast.error(localize("Failed to delete caption model"));
 			await refreshDownloadedModels();
 		} finally {
 			setDeletingModel(null);
@@ -721,7 +717,7 @@ export function CaptionsTab(props: {
 
 	const generateCaptions = async () => {
 		if (!editorInstance) {
-			toast.error("Editor instance not found");
+			toast.error(localize("Editor instance not found"));
 			return;
 		}
 
@@ -748,16 +744,20 @@ export function CaptionsTab(props: {
 				setEditorState("timeline", "tracks", "caption", true);
 				setEditorState("captions", "isStale", false);
 
-				toast.success("Captions generated successfully!");
+				toast.success(localize("Captions generated successfully!"));
 			} else {
 				toast.error(
-					"No captions were generated. The audio might be too quiet or unclear.",
+					localize(
+						"No captions were generated. The audio might be too quiet or unclear.",
+					),
 				);
 			}
 		} catch (error) {
 			console.error("Error generating captions:", error);
 			const errorMessage = getCaptionGenerationErrorMessage(error);
-			toast.error(`Failed to generate captions: ${errorMessage}`);
+			toast.error(
+				localize("字幕生成失败：{error}", { error: localize(errorMessage) }),
+			);
 		} finally {
 			setIsGenerating(false);
 		}
@@ -800,7 +800,7 @@ export function CaptionsTab(props: {
 										<div class="flex-1 min-w-0">
 											<div class="flex gap-1.5 items-center text-ed-text-1">
 												<KSelect.ItemLabel class="font-medium truncate">
-													{model?.label ?? props.item.rawValue}
+													{localize(model?.label ?? props.item.rawValue)}
 												</KSelect.ItemLabel>
 												<Show when={model}>
 													<Tooltip openDelay={0} content={model?.modelName}>
@@ -817,7 +817,7 @@ export function CaptionsTab(props: {
 											</div>
 											<Show when={model}>
 												<div class="text-[11px] truncate text-ed-text-2">
-													{model?.description}
+													{localize(model?.description ?? "")}
 												</div>
 											</Show>
 										</div>
@@ -835,7 +835,7 @@ export function CaptionsTab(props: {
 							<div class="flex-1 min-w-0 text-left">
 								<div class="flex gap-1.5 items-center">
 									<span class="text-[13px] font-medium truncate">
-										{selectedModelOption()?.label || "Select a model"}
+										{localize(selectedModelOption()?.label || "选择模型")}
 									</span>
 									<Show when={selectedModelOption()}>
 										<Tooltip
@@ -855,7 +855,7 @@ export function CaptionsTab(props: {
 								</div>
 								<Show when={selectedModelOption()}>
 									<div class="text-[11px] truncate text-ed-text-2">
-										{selectedModelOption()?.description}
+										{localize(selectedModelOption()?.description ?? "")}
 									</div>
 								</Show>
 							</div>
@@ -893,7 +893,7 @@ export function CaptionsTab(props: {
 					)}
 				</p>
 
-				<Field name={localize("Language")} inline>
+				<Field name={localize("识别语言")} inline>
 					<KSelect<string>
 						options={LANGUAGE_OPTIONS.map((l) => l.code)}
 						value={selectedLanguage()}
@@ -906,10 +906,10 @@ export function CaptionsTab(props: {
 								item={props.item}
 							>
 								<KSelect.ItemLabel class="flex-1">
-									{
+									{localize(
 										LANGUAGE_OPTIONS.find((l) => l.code === props.item.rawValue)
-											?.label
-									}
+											?.label ?? "",
+									)}
 								</KSelect.ItemLabel>
 							</MenuItem>
 						)}
@@ -920,7 +920,7 @@ export function CaptionsTab(props: {
 									const language = LANGUAGE_OPTIONS.find(
 										(l) => l.code === state.selectedOption(),
 									);
-									return <span>{language?.label || "Select a language"}</span>;
+									return <span>{localize(language?.label || "选择语言")}</span>;
 								}}
 							</KSelect.Value>
 							<KSelect.Icon>
@@ -955,19 +955,16 @@ export function CaptionsTab(props: {
 									fallback={
 										<>
 											<IconLucideDownload class="size-4" />
-											{localize("Download")}{" "}
-											{
-												availableModelOptions().find(
-													(m) => m.name === selectedModel(),
-												)?.label
-											}{" "}
-											{localize("Model")}
+											{localize("下载{model}模型", {
+												model: localize(selectedModelOption()?.label ?? "字幕"),
+											})}
 										</>
 									}
 								>
-									{`Downloading ${
-										downloadingModelOption()?.label ?? "model"
-									}... ${downloadPercent()}%`}
+									{localize("正在下载{model}模型… {progress}%", {
+										model: localize(downloadingModelOption()?.label ?? "字幕"),
+										progress: downloadPercent(),
+									})}
 								</Show>
 							</Button>
 							<Show when={isDownloading()}>
@@ -987,10 +984,11 @@ export function CaptionsTab(props: {
 										/>
 									</div>
 									<p class="text-[11px] leading-relaxed text-ed-text-3">
-										{downloadMessage() ||
-											localize(
-												"Keep Cap open while the model downloads. Editor reloads will reconnect automatically.",
-											)}
+										{downloadMessage() === "Preparing model download"
+											? localize("正在准备模型下载…")
+											: localize(
+													"下载模型期间请保持应用开启。编辑器重新加载后会自动连接。",
+												)}
 									</p>
 								</div>
 							</Show>
@@ -1007,15 +1005,15 @@ export function CaptionsTab(props: {
 								{isGenerating()
 									? localize("Generating...")
 									: hasCaptions()
-										? "Regenerate Captions"
-										: "Generate Captions"}
+										? localize("重新生成字幕")
+										: localize("生成字幕")}
 							</Button>
 						</Show>
 						<div class="flex gap-2 justify-between items-center text-[11px] text-ed-text-3">
 							<span class="flex gap-1.5 items-center min-w-0">
 								<IconCapCircleCheck class="shrink-0 size-3.5 text-ed-text-3" />
 								<span class="truncate">
-									{selectedModelOption()?.label ?? "Caption"}{" "}
+									{localize(selectedModelOption()?.label ?? "字幕")}{" "}
 									{localize("model downloaded")}
 								</span>
 							</span>
@@ -1030,7 +1028,7 @@ export function CaptionsTab(props: {
 								}
 							>
 								{deletingModel() === selectedModel()
-									? "Deleting..."
+									? localize("正在删除…")
 									: localize("Delete")}
 							</EditorButton>
 						</div>
@@ -1052,7 +1050,7 @@ export function CaptionsTab(props: {
 							{(preset) => (
 								<button
 									type="button"
-									title={preset.description}
+									title={localize(preset.description)}
 									onClick={() => applyCaptionPreset(preset)}
 									disabled={!hasCaptions()}
 									class={cx(
@@ -1064,7 +1062,7 @@ export function CaptionsTab(props: {
 								>
 									<CaptionPresetPreview preset={preset} />
 									<span class="px-0.5 text-[11px] font-medium text-ed-text-1">
-										{preset.label}
+										{localize(preset.label)}
 									</span>
 								</button>
 							)}
@@ -1101,11 +1099,13 @@ export function CaptionsTab(props: {
 										item={props.item}
 									>
 										<KSelect.ItemLabel class="flex-1">
-											{
-												FONT_OPTIONS.find(
-													(f) => f.value === props.item.rawValue,
-												)?.label
-											}
+											{localize(
+												localize(
+													FONT_OPTIONS.find(
+														(f) => f.value === props.item.rawValue,
+													)?.label ?? "",
+												) ?? "",
+											)}
 										</KSelect.ItemLabel>
 									</MenuItem>
 								)}
@@ -1113,9 +1113,13 @@ export function CaptionsTab(props: {
 								<KSelect.Trigger class={selectTriggerClass}>
 									<KSelect.Value<string> class="truncate">
 										{(state) =>
-											FONT_OPTIONS.find(
-												(f) => f.value === state.selectedOption(),
-											)?.label
+											localize(
+												localize(
+													FONT_OPTIONS.find(
+														(f) => f.value === state.selectedOption(),
+													)?.label ?? "",
+												) ?? "",
+											)
 										}
 									</KSelect.Value>
 									<KSelect.Icon>
@@ -1168,7 +1172,7 @@ export function CaptionsTab(props: {
 						</Field>
 						<p class="text-[11px] leading-relaxed text-ed-text-3">
 							{localize(
-								"This is the first version of captions in Cap. Active word highlighting may be inaccurate in some situations. We're working on a fix for this and it will be released in upcoming versions.",
+								"Word highlighting may be inaccurate in some situations. We are working to improve it.",
 							)}
 						</p>
 
@@ -1191,11 +1195,13 @@ export function CaptionsTab(props: {
 											item={itemProps.item}
 										>
 											<KSelect.ItemLabel class="flex-1">
-												{
-													CAPTION_HIGHLIGHT_STYLE_OPTIONS.find(
-														(o) => o.value === itemProps.item.rawValue,
-													)?.label
-												}
+												{localize(
+													localize(
+														CAPTION_HIGHLIGHT_STYLE_OPTIONS.find(
+															(o) => o.value === itemProps.item.rawValue,
+														)?.label ?? "",
+													) ?? "",
+												)}
 											</KSelect.ItemLabel>
 										</MenuItem>
 									)}
@@ -1203,9 +1209,13 @@ export function CaptionsTab(props: {
 									<KSelect.Trigger class={selectTriggerClass}>
 										<KSelect.Value<string> class="truncate">
 											{(state) =>
-												CAPTION_HIGHLIGHT_STYLE_OPTIONS.find(
-													(o) => o.value === state.selectedOption(),
-												)?.label
+												localize(
+													localize(
+														CAPTION_HIGHLIGHT_STYLE_OPTIONS.find(
+															(o) => o.value === state.selectedOption(),
+														)?.label ?? "",
+													) ?? "",
+												)
 											}
 										</KSelect.Value>
 										<KSelect.Icon>
@@ -1283,11 +1293,13 @@ export function CaptionsTab(props: {
 									item={props.item}
 								>
 									<KSelect.ItemLabel class="flex-1">
-										{
-											CAPTION_POSITION_OPTIONS.find(
-												(p) => p.value === props.item.rawValue,
-											)?.label
-										}
+										{localize(
+											localize(
+												CAPTION_POSITION_OPTIONS.find(
+													(p) => p.value === props.item.rawValue,
+												)?.label ?? "",
+											) ?? "",
+										)}
 									</KSelect.ItemLabel>
 								</MenuItem>
 							)}
@@ -1296,11 +1308,13 @@ export function CaptionsTab(props: {
 								<KSelect.Value<string> class="truncate">
 									{(state) => (
 										<span>
-											{
-												CAPTION_POSITION_OPTIONS.find(
-													(p) => p.value === state.selectedOption(),
-												)?.label
-											}
+											{localize(
+												localize(
+													CAPTION_POSITION_OPTIONS.find(
+														(p) => p.value === state.selectedOption(),
+													)?.label ?? "",
+												) ?? "",
+											)}
 										</span>
 									)}
 								</KSelect.Value>
@@ -1339,7 +1353,7 @@ export function CaptionsTab(props: {
 									item={selectItemProps.item}
 								>
 									<KSelect.ItemLabel class="flex-1">
-										{selectItemProps.item.rawValue.label}
+										{localize(selectItemProps.item.rawValue.label)}
 									</KSelect.ItemLabel>
 									<KSelect.ItemIndicator class="ml-auto text-ed-accent">
 										<IconCapCircleCheck />
@@ -1353,8 +1367,10 @@ export function CaptionsTab(props: {
 									value: number;
 								}> class="truncate">
 									{(state) =>
-										state.selectedOption()?.label ??
-										getTextWeightLabel(getSetting("fontWeight"))
+										localize(
+											state.selectedOption()?.label ??
+												getTextWeightLabel(getSetting("fontWeight")),
+										)
 									}
 								</KSelect.Value>
 								<KSelect.Icon>
@@ -1395,11 +1411,11 @@ export function CaptionsTab(props: {
 										item={itemProps.item}
 									>
 										<KSelect.ItemLabel class="flex-1">
-											{
+											{localize(
 												CAPTION_ANIMATION_OPTIONS.find(
 													(o) => o.value === itemProps.item.rawValue,
-												)?.label
-											}
+												)?.label ?? "",
+											)}
 										</KSelect.ItemLabel>
 									</MenuItem>
 								)}
@@ -1407,9 +1423,11 @@ export function CaptionsTab(props: {
 								<KSelect.Trigger class={selectTriggerClass}>
 									<KSelect.Value<string> class="truncate">
 										{(state) =>
-											CAPTION_ANIMATION_OPTIONS.find(
-												(o) => o.value === state.selectedOption(),
-											)?.label
+											localize(
+												CAPTION_ANIMATION_OPTIONS.find(
+													(o) => o.value === state.selectedOption(),
+												)?.label ?? "",
+											)
 										}
 									</KSelect.Value>
 									<KSelect.Icon>

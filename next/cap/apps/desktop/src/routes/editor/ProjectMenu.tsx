@@ -76,13 +76,14 @@ export function ProjectMenu(props: {
 				flush: props.flush,
 				pickDestination: () =>
 					save({
-						title: "保存可携带工程副本（请选择新名称）",
+						title: localize("保存可携带工程副本（请选择新名称）"),
 						defaultPath: projectCopyName(meta().prettyName),
-						filters: [{ name: "录制工程", extensions: ["jks"] }],
+						filters: [{ name: localize("录制工程"), extensions: ["jks"] }],
 					}),
 				copy: (destination) => commands.copyEditorProject(destination),
 				open: (path) => commands.openLocalProject(path),
-				onSaved: (path) => toast.success(`工程副本已保存：${path}`),
+				onSaved: (path) =>
+					toast.success(localize("工程副本已保存：{path}", { path })),
 			}),
 		);
 	createEventListener(window, "keydown", (event) => {

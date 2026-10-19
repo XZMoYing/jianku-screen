@@ -30,7 +30,7 @@ use std::sync::{
     atomic::{AtomicBool, Ordering},
 };
 use std::{path::PathBuf, time::Instant};
-use tokio::sync::mpsc;
+use tokio::sync::{mpsc, watch};
 
 pub mod camera3d;
 pub mod composite_frame;
@@ -591,6 +591,8 @@ pub enum RenderingError {
     ChannelSendNv12FrameFailed(#[from] mpsc::error::SendError<(Nv12RenderedFrame, u32)>),
     #[error("Failed to load image: {0}")]
     ImageLoadError(String),
+    #[error("Paused preview superseded by playback")]
+    PreviewSuperseded,
     #[error("Error polling wgpu: {0}")]
     PollError(#[from] wgpu::PollError),
     #[error("Failed to upload display frame {frame_number} at recording time {recording_time}")]
@@ -6966,6 +6968,13 @@ pub struct RendererLayers {
 }
 
 impl RendererLayers {
+    pub fn interrupt_paused_background_on_playback(
+        &mut self,
+        requests: watch::Receiver<Option<u64>>,
+    ) {
+        self.background.playback_requests = Some(requests);
+    }
+
     pub fn use_realtime_background(&mut self, playing: bool) {
         self.background.set_realtime(Some(playing));
     }

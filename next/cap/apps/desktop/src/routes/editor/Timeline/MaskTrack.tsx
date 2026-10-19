@@ -349,7 +349,9 @@ export function MaskTrack(props: {
 					});
 
 					const contentLabel = () =>
-						segment.maskType === "sensitive" ? "Sensitive" : "Highlight";
+						segment.maskType === "sensitive"
+							? localize("隐私遮挡")
+							: localize("重点标记");
 
 					const segmentWidth = () => segment.end - segment.start;
 
@@ -360,7 +362,7 @@ export function MaskTrack(props: {
 							segColor="var(--track-mask)"
 							class="group"
 							selected={isSelected()}
-							title={`Mask · ${contentLabel()}`}
+							title={`${localize("遮罩")} · ${contentLabel()}`}
 							segment={segment}
 							onMouseEnter={(e) => {
 								setHoveredSegmentState(e, index, segment);

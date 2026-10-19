@@ -130,7 +130,7 @@ const STEREO_MODES = [
 ] satisfies Array<{ name: string; value: StereoMode }>;
 
 const formatVolumeDb = (value: number) =>
-	value <= -30 ? "Muted" : `${value > 0 ? "+" : ""}${value.toFixed(1)} dB`;
+	value <= -30 ? localize("静音") : `${value > 0 ? "+" : ""}${value.toFixed(1)} dB`;
 
 const TAB_IDS = {
 	background: "background",
@@ -407,12 +407,12 @@ function ConfigSidebarContent() {
 								data-inspector-tab={item.id}
 								aria-label={localize(
 									item.id === "background"
-										? "Background"
+										? "背景"
 										: item.id.charAt(0).toUpperCase() + item.id.slice(1),
 								)}
 								title={localize(
 									item.id === "background"
-										? "Background"
+										? "背景"
 										: item.id.charAt(0).toUpperCase() + item.id.slice(1),
 								)}
 								class="flex justify-center items-center w-10 h-[30px] rounded-[9px] transition-colors shrink-0 outline-hidden focus-visible:ring-1 focus-visible:ring-ed-accent text-ed-text-2 hover:bg-ed-ctl hover:text-ed-text-1 data-selected:bg-ed-ctl-hover data-selected:text-ed-text-1 disabled:text-ed-text-3 disabled:opacity-60 disabled:hover:bg-transparent"
@@ -563,7 +563,7 @@ function ConfigSidebarContent() {
 											step={0.1}
 											formatTooltip={(v) =>
 												v <= -30
-													? "Muted"
+								? localize("静音")
 													: `${v > 0 ? "+" : ""}${v.toFixed(1)} dB`
 											}
 										/>
@@ -586,7 +586,7 @@ function ConfigSidebarContent() {
 											step={0.1}
 											formatTooltip={(v) =>
 												v <= -30
-													? "Muted"
+								? localize("静音")
 													: `${v > 0 ? "+" : ""}${v.toFixed(1)} dB`
 											}
 										/>
@@ -1717,7 +1717,7 @@ function KeyboardSegmentConfig(props: {
 								}
 							/>
 						</div>
-						<div class="pt-10 text-[11px] font-medium text-ed-text-3">to</div>
+						<div class="pt-10 text-[11px] font-medium text-ed-text-3">{localize("to")}</div>
 						<div class="rounded-lg bg-ed-card p-2.5 space-y-2">
 							<div class="flex items-center justify-between text-[10px] uppercase tracking-[0.08em] text-ed-text-3">
 								<span>{localize("End")}</span>
@@ -1837,7 +1837,7 @@ function CaptionSegmentConfig(props: {
 								}
 							/>
 						</div>
-						<div class="pt-10 text-[11px] font-medium text-ed-text-3">to</div>
+						<div class="pt-10 text-[11px] font-medium text-ed-text-3">{localize("to")}</div>
 						<div class="rounded-lg bg-ed-card p-2.5 space-y-2">
 							<div class="flex items-center justify-between text-[10px] uppercase tracking-[0.08em] text-ed-text-3">
 								<span>{localize("End")}</span>
@@ -2005,7 +2005,7 @@ function MaskSegmentConfig(props: {
 			<Show when={props.segment.maskType === "sensitive"}>
 				<Field
 					inline
-					name={maskEffect() === "blur" ? "Blur" : "Pixel Size"}
+					name={maskEffect() === "blur" ? localize("模糊强度") : localize("像素大小")}
 					value={`${Math.round(maskEffectAmount())}px`}
 				>
 					<Slider
@@ -2607,8 +2607,8 @@ function ZoomMultiSegmentConfig(props: {
 			<div class="flex flex-col gap-3.5 p-4 rounded-xl bg-ed-card-2">
 				<Field
 					inline
-					name="Zoom Amount"
-					badge={sharedAmount() === null ? "Mixed" : undefined}
+					name={localize("缩放幅度")}
+					badge={sharedAmount() === null ? localize("数值不一") : undefined}
 					value={`${(sharedAmount() ?? averageAmount()).toFixed(2)}x`}
 				>
 					<Slider
@@ -2621,8 +2621,8 @@ function ZoomMultiSegmentConfig(props: {
 					/>
 				</Field>
 				<Field
-					name="Zoom Mode"
-					badge={sharedMode() === "mixed" ? "Mixed" : undefined}
+					name={localize("缩放方式")}
+					badge={sharedMode() === "mixed" ? localize("选项不一") : undefined}
 				>
 					<div class="flex flex-row gap-0.5 items-center p-0.5 rounded-lg bg-ed-ctl">
 						<button
@@ -2753,7 +2753,7 @@ function SyncOffsetsConfig() {
 							<Show when={clipConfig(index())?.offsetsAutoCalculated === true}>
 								<p class="text-[11px] text-ed-text-3">
 									{localize(
-										"Cap calculated these offsets automatically to keep audio in sync with the video. Adjust them if anything still sounds off.",
+										"These offsets were calculated automatically to keep audio in sync with the video. Adjust them if anything still sounds off.",
 									)}
 								</p>
 							</Show>
@@ -2815,7 +2815,7 @@ function SourceOffsetField(props: {
 	return (
 		<Field
 			name={props.name}
-			badge={props.autoCalculated ? "Auto-synced" : undefined}
+			badge={props.autoCalculated ? localize("自动同步") : undefined}
 		>
 			<div class="flex flex-row justify-between items-center -mt-2 w-full">
 				<div class="flex flex-row items-end space-x-1">

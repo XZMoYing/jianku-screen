@@ -188,10 +188,10 @@ export function EditorErrorScreen(props: {
 						</div>
 						<h2 class="text-xl font-semibold text-gray-12">
 							{storageShortage()
-								? "More space needed"
+								? localize("需要更多存储空间")
 								: needsRecovery()
-									? "Recording Needs Recovery"
-									: "Unable to Open Recording"}
+									? localize("需要恢复录制文件")
+									: localize("无法打开录制文件")}
 						</h2>
 						<p class="text-sm text-gray-11">{props.error}</p>
 					</div>
@@ -212,14 +212,14 @@ export function EditorErrorScreen(props: {
 							<div class="space-y-2">
 								<h3 class="font-medium text-gray-12 text-sm">
 									{storageShortage()
-										? "Finish saving your recording"
-										: "Automatic Recovery"}
+										? localize("完成录制文件保存")
+										: localize("自动恢复")}
 								</h3>
 								<p class="text-xs text-gray-11">
 									{storageShortage()
-										? "Free up space on the recording drive, then click Recover Recording. Your recording files have been kept."
+										? localize("请先清理录制磁盘空间，再点击“恢复录制”。录制文件已为你保留。")
 										: localize(
-												"Cap can attempt to recover your recording automatically. This will reconstruct the recording from available segment data.",
+												"简库镜传可以尝试自动恢复录制，并根据已有片段重建工程。",
 											)}
 								</p>
 							</div>
@@ -289,7 +289,7 @@ export function EditorErrorScreen(props: {
 								>
 									<p class="text-xs text-gray-10 italic">
 										{localize(
-											'Tip: Right-click and select "Show Enclosing Folder" to see the .cap bundle contents.',
+											'Tip: Right-click and select "Show Enclosing Folder" to see the .jks project contents.',
 										)}
 									</p>
 								</Show>

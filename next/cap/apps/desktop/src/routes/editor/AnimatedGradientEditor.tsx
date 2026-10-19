@@ -468,7 +468,7 @@ export function AnimatedGradientEditor(props: {
 										disabled={!presetName().trim() || saving()}
 										onClick={() => void savePreset()}
 									>
-										{saving() ? "Saving…" : localize("Save")}
+										{saving() ? localize("正在保存…") : localize("Save")}
 									</button>
 									<button
 										type="button"

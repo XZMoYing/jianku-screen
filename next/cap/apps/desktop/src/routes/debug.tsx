@@ -39,9 +39,9 @@ export default function Debug() {
 		setUpdateStatus(`Simulating update to v${fakeVersion}...`);
 
 		const shouldUpdate = await dialog.confirm(
-			`Version ${fakeVersion} of Cap is available, would you like to install it?`,
+			localize("发现新版本：{version}。现在安装吗？", { version: fakeVersion }),
 			{
-				title: localize("Update Cap"),
+				title: localize("应用更新"),
 				okLabel: "Update",
 				cancelLabel: "Ignore",
 			},

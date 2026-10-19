@@ -4,7 +4,6 @@ import { debounce } from "@solid-primitives/scheduled";
 import { makePersisted } from "@solid-primitives/storage";
 import { createMutation } from "@tanstack/solid-query";
 import { Channel } from "@tauri-apps/api/core";
-import { CheckMenuItem, Menu } from "@tauri-apps/api/menu";
 import { ask } from "@tauri-apps/plugin-dialog";
 import { remove } from "@tauri-apps/plugin-fs";
 import { type as ostype } from "@tauri-apps/plugin-os";
@@ -20,7 +19,6 @@ import {
 	onCleanup,
 	type ParentProps,
 	Show,
-	Suspense,
 	Switch,
 	type ValidComponent,
 } from "solid-js";
@@ -30,22 +28,18 @@ import toast from "solid-toast";
 import { Toggle } from "~/components/Toggle";
 import Tooltip from "~/components/Tooltip";
 import CaptionControlsWindows11 from "~/components/titlebar/controls/CaptionControlsWindows11";
-import { authStore } from "~/store";
 import { trackEvent } from "~/utils/analytics";
-import { createSignInMutation } from "~/utils/auth";
 import {
 	beginExportSessionGuard,
 	createExportTask,
 	createExportToFileTask,
 } from "~/utils/export";
 import { t as localize } from "~/utils/i18n";
-import { createSelectedOrganization } from "~/utils/organization-branding";
 import {
 	commands,
 	type ExportCompression,
 	type ExportSettings,
 	type FramesRendered,
-	type UploadProgress,
 } from "~/utils/tauri";
 import IconLucideGem from "~icons/lucide/gem";
 import IconLucideSlidersHorizontal from "~icons/lucide/sliders-horizontal";
@@ -64,10 +58,10 @@ export const COMPRESSION_OPTIONS: Array<{
 	value: ExportCompression;
 	bpp: number;
 }> = [
-	{ label: "Maximum", value: "Maximum", bpp: 0.3 },
-	{ label: "Social Media", value: "Social", bpp: 0.15 },
-	{ label: "Web", value: "Web", bpp: 0.08 },
-	{ label: "Potato", value: "Potato", bpp: 0.04 },
+	{ label: "Highest quality", value: "Maximum", bpp: 0.3 },
+	{ label: "Social platforms", value: "Social", bpp: 0.15 },
+	{ label: "Web sharing", value: "Web", bpp: 0.08 },
+	{ label: "Save space", value: "Potato", bpp: 0.04 },
 ];
 
 const COMPRESSION_TO_BPP: Record<ExportCompression, number> = {
@@ -105,10 +99,10 @@ export const EXPORT_TO_OPTIONS = [
 		description: "Copy to paste anywhere",
 	},
 	{
-		label: "Shareable Link",
+		label: "Online sharing (Coming soon)",
 		value: "link",
 		icon: IconCapLink,
-		description: "账号功能敬请期待",
+		description: "Online sharing is coming soon",
 	},
 ] as const;
 
@@ -128,7 +122,6 @@ interface Settings {
 	resolution: { label: string; value: string; width: number; height: number };
 	compression: ExportCompression;
 	optimizeFilesize: boolean;
-	organizationId?: string | null;
 }
 
 function buildExportSettings(
@@ -180,19 +173,13 @@ export function ExportPage() {
 		setExportState,
 		exportState,
 		meta,
-		refetchMeta,
 		flushProjectConfig,
 		projectRevision,
 		project,
 	} = useEditorContext();
 
 	const projectPath = editorInstance.path;
-	const [reuploading, setReuploading] = createSignal(false);
-
-	const auth = authStore.createQuery();
-	const signIn = createSignInMutation();
-	const organizationSelection = createSelectedOrganization();
-	const organisations = organizationSelection.organizations;
+	const [reuploading] = createSignal(false);
 
 	const hasTransparentBackground = () => {
 		const backgroundSource = project.background.source;
@@ -226,7 +213,8 @@ export function ExportPage() {
 	if (
 		"type" in initialDialog &&
 		initialDialog.type === "export" &&
-		initialDialog.destination
+		initialDialog.destination &&
+		initialDialog.destination !== "link"
 	) {
 		setSettings("exportTo", initialDialog.destination);
 	}
@@ -268,9 +256,6 @@ export function ExportPage() {
 				ret.format = "Mp4";
 		}
 
-		if (disablesLinkExport() && _settings.exportTo === "link")
-			ret.exportTo = "file";
-
 		if (shouldUseGifMode()) {
 			if (!["720p", "1080p"].includes(_settings.resolution.value)) {
 				ret.resolution = { ...RESOLUTION_OPTIONS._720p };
@@ -284,23 +269,7 @@ export function ExportPage() {
 
 		if (!VALID_COMPRESSIONS.includes(_settings.compression))
 			ret.compression = "Maximum";
-
-		Object.defineProperty(ret, "organizationId", {
-			get() {
-				const selectedOrganizationId =
-					organizationSelection.selectedOrganizationId();
-				if (!_settings.organizationId) return selectedOrganizationId;
-				if (
-					organisations().some(
-						(organization) => organization.id === _settings.organizationId,
-					)
-				) {
-					return _settings.organizationId;
-				}
-
-				return selectedOrganizationId;
-			},
-		});
+		if (_settings.exportTo === "link") ret.exportTo = "file";
 
 		return ret;
 	});
@@ -320,16 +289,16 @@ export function ExportPage() {
 		return estimate
 			? formatEstimatedSize(estimate.size_range_mb)
 			: estimateLoading()
-				? "Calculating…"
-				: "Unavailable";
+				? localize("正在计算…")
+				: localize("暂不可用");
 	};
 	const estimatedTimeLabel = () => {
 		const estimate = renderEstimate();
 		return estimate
 			? formatEstimatedTime(estimate.time_range_seconds)
 			: estimateLoading()
-				? "Calculating…"
-				: "Unavailable";
+				? localize("正在计算…")
+				: localize("暂不可用");
 	};
 
 	const updateSettings: typeof setSettings = ((
@@ -699,21 +668,21 @@ export function ExportPage() {
 		isMovCursorOnlyExport() ? "mov" : settings.format === "Gif" ? "gif" : "mp4";
 	const exportedAssetLabel = () =>
 		isMovCursorOnlyExport()
-			? "Cursor track"
+		? localize("Cursor track")
 			: settings.format === "Gif"
 				? "GIF"
-				: "Recording";
+				: localize("Recording");
 	const exportMediumLabel = () =>
 		isMovCursorOnlyExport()
-			? "cursor track"
+		? localize("cursor track")
 			: settings.format === "Gif"
 				? "GIF"
-				: "video";
+				: localize("video");
 
 	const handleCancel = async () => {
 		if (
-			await ask("Are you sure you want to cancel the export?", {
-				title: "Cancel Export",
+			await ask(localize("确定要取消导出吗？"), {
+				title: localize("取消导出"),
 				kind: "warning",
 			})
 		) {
@@ -761,14 +730,18 @@ export function ExportPage() {
 				return;
 			}
 			commands.globalMessageDialog(
-				error instanceof Error ? error.message : "Failed to copy recording",
+					error instanceof Error
+						? localize(error.message)
+						: localize("复制录制内容失败"),
 			);
 			setExportState(reconcile({ type: "idle" }));
 		},
 		onSuccess() {
 			if (previewDisposed) return;
 			setExportState({ type: "done" });
-			toast.success(`${exportedAssetLabel()} exported to clipboard`);
+			toast.success(
+				localize("{asset}已导出到剪贴板", { asset: exportedAssetLabel() }),
+			);
 		},
 	}));
 
@@ -822,115 +795,16 @@ export function ExportPage() {
 			}
 			commands.globalMessageDialog(
 				error instanceof Error
-					? error.message
-					: `Failed to export recording: ${error}`,
+					? localize(error.message)
+					: localize("导出失败：{error}", { error: String(error) }),
 			);
 			setExportState({ type: "idle" });
 		},
 		onSuccess() {
 			if (previewDisposed) return;
-			toast.success(`${exportedAssetLabel()} exported to file`);
-		},
-	}));
-
-	const upload = createMutation(() => ({
-		mutationFn: async () => {
-			setIsCancelled(false);
-			if (exportState.type !== "idle") return;
-			const releaseExportSession = await beginExportSessionGuard();
-			try {
-				setExportState(reconcile({ action: "upload", type: "starting" }));
-				await refetchMeta();
-				setReuploading(!!meta().sharing);
-
-				const existingAuth = await authStore.get();
-				if (!existingAuth) createSignInMutation();
-				trackEvent("create_shareable_link_clicked", {
-					resolution: settings.resolution,
-					fps: settings.fps,
-					has_existing_auth: !!existingAuth,
-				});
-
-				const metadata = await commands.getVideoMetadata(projectPath);
-				const plan = await commands.checkUpgradedAndUpdate();
-				const canShare = {
-					allowed: plan || metadata.duration < 300,
-					reason: !plan && metadata.duration >= 300 ? "upgrade_required" : null,
-				};
-
-				if (!canShare.allowed) {
-					if (canShare.reason === "upgrade_required") {
-						await commands.showWindow("Upgrade");
-						await new Promise((resolve) => setTimeout(resolve, 1000));
-						throw new SilentError();
-					}
-				}
-
-				await exportWithSettings((progress) => {
-					if (isCancelled()) throw new SilentError("Cancelled");
-					setExportState({ type: "rendering", progress });
-				});
-
-				if (isCancelled()) throw new SilentError("Cancelled");
-
-				const uploadChannel = new Channel<UploadProgress>((progress) => {
-					console.log("Upload progress:", progress);
-					setExportState(
-						produce((state) => {
-							if (state.type !== "uploading") return;
-
-							state.progress = Math.round(progress.progress * 100);
-						}),
-					);
-				});
-
-				setExportState({ type: "uploading", progress: 0 });
-
-				console.log({ organizationId: settings.organizationId });
-
-				const result = meta().sharing
-					? await commands.uploadExportedVideo(
-							projectPath,
-							"Reupload",
-							uploadChannel,
-							null,
-						)
-					: await commands.uploadExportedVideo(
-							projectPath,
-							{ Initial: { pre_created_video: null } },
-							uploadChannel,
-							settings.organizationId ?? null,
-						);
-
-				if (result === "NotAuthenticated")
-					throw new Error("You need to sign in to share recordings");
-				else if (result === "PlanCheckFailed")
-					throw new Error("Failed to verify your subscription status");
-				else if (result === "UpgradeRequired")
-					throw new Error("This feature requires an upgraded plan");
-			} finally {
-				await releaseExportSession();
-			}
-		},
-		onSuccess: async () => {
-			await refetchMeta();
-			if (previewDisposed) return;
-			setExportState({ type: "done" });
-		},
-		onError: (error) => {
-			if (previewDisposed) return;
-			if (isCancelled() || isCancellationError(error)) {
-				setExportState(reconcile({ type: "idle" }));
-				return;
-			}
-			console.error(error);
-			if (!(error instanceof SilentError)) {
-				commands.globalMessageDialog(
-					error instanceof Error ? error.message : "Failed to upload recording",
-				);
-			}
-
-			setExportState(reconcile({ type: "idle" }));
+			toast.success(
+				localize("{asset}已导出到文件", { asset: exportedAssetLabel() }),
+			);
 		},
 	}));
 
@@ -960,15 +834,16 @@ export function ExportPage() {
 	const destinationOptions = () =>
 		EXPORT_TO_OPTIONS.map((option) => ({
 			value: option.value,
-			label:
-				option.value === "link" && meta().sharing ? "Reupload" : option.label,
+			label: option.label,
 			icon: option.icon,
-			disabled: option.value === "link" && disablesLinkExport(),
+			disabled: option.value === "link",
 			disabledReason:
-				option.value === "link" && disablesLinkExport()
-					? cursorOnly()
-						? "Cursor-only exports can only be saved to a file or clipboard"
-						: "Transparent exports can only be saved to a file or clipboard"
+				option.value === "link"
+					? "在线分享功能敬请期待"
+					: disablesLinkExport()
+						? cursorOnly()
+									? "仅光标导出目前只能保存为文件或复制到剪贴板"
+									: "透明背景导出目前只能保存为文件或复制到剪贴板"
 					: undefined,
 		}));
 
@@ -983,11 +858,11 @@ export function ExportPage() {
 				label: option.label,
 				disabled,
 				disabledReason: cursorOnly()
-					? "Cursor-only export always uses transparent MOV"
+					? "仅光标导出固定使用透明背景 MOV 格式"
 					: option.value === "Mp4" && requiresTransparentExport()
-						? "MP4 doesn't support transparency"
+						? "MP4 格式不支持透明背景"
 						: option.value === "Gif" && settings.exportTo === "link"
-							? "Links require MP4 format"
+							? "在线分享目前仅支持 MP4 格式"
 							: undefined,
 			};
 		});
@@ -1011,7 +886,7 @@ export function ExportPage() {
 	const qualityOptions = () =>
 		[...COMPRESSION_OPTIONS].reverse().map((option) => ({
 			value: option.value,
-			label: option.label === "Social Media" ? "Social" : option.label,
+			label: option.label,
 		}));
 
 	const selectedQuality = () => (isCustomBpp() ? null : settings.compression);
@@ -1049,7 +924,7 @@ export function ExportPage() {
 				<div class="flex-1 min-w-0 flex flex-col bg-ed-stage pt-4 px-6 pb-5">
 					<div class="flex items-center gap-1.5 h-[22px] text-[12px] font-medium text-ed-text-2">
 						{localize("Preview")}
-						<Tooltip content="This is a rendered frame from your video. Adjust the settings to see the quality of the final export.">
+						<Tooltip content={localize("This is a rendered frame from your video. Adjust the settings to see the quality of the final export.")}>
 							<IconLucideInfo class="size-[13px] text-ed-text-3 hover:text-ed-text-2 cursor-help transition-colors" />
 						</Tooltip>
 					</div>
@@ -1077,8 +952,8 @@ export function ExportPage() {
 													<span class="text-[12px] text-center text-ed-text-2 break-words">
 														{previewError() ??
 															(previewUnavailable()
-																? "Preview unavailable"
-																: "Generating preview...")}
+																? localize("Preview unavailable")
+																: localize("Generating preview..."))}
 													</span>
 												}
 											>
@@ -1140,8 +1015,8 @@ export function ExportPage() {
 							<ExportStat
 								label={
 									estimateLoading() && renderEstimate()
-										? "Refining size…"
-										: "Estimated size"
+										? localize("正在细化估算…")
+										: localize("预计文件大小")
 								}
 								value={estimatedSizeLabel()}
 								divided
@@ -1149,8 +1024,8 @@ export function ExportPage() {
 							<ExportStat
 								label={
 									estimateLoading() && renderEstimate()
-										? "Refining time…"
-										: "Export time"
+										? localize("正在细化估算…")
+										: localize("预计导出用时")
 								}
 								value={estimatedTimeLabel()}
 								divided
@@ -1173,9 +1048,6 @@ export function ExportPage() {
 									setSettings(
 										produce((newSettings) => {
 											newSettings.exportTo = value;
-											if (value === "link" && settings.format === "Gif") {
-												newSettings.format = "Mp4";
-											}
 										}),
 									);
 								}}
@@ -1183,81 +1055,11 @@ export function ExportPage() {
 							<Show when={disablesLinkExport()}>
 								<p class="text-[11px] text-ed-text-3">
 									{cursorOnly()
-										? "Cursor-only exports can only be saved to a file or clipboard."
-										: "Transparent exports can only be saved to a file or clipboard."}
+										? localize("Cursor-only exports can only be saved to a file or clipboard.")
+										: localize("Transparent exports can only be saved to a file or clipboard.")}
 								</p>
 							</Show>
 
-							<Show when={settings.exportTo === "link" && meta().sharing}>
-								{(sharing) => (
-									<div class="p-3 rounded-[10px] bg-ed-card-2 flex flex-col gap-1">
-										<p class="text-[12.5px] font-medium text-ed-text-1">
-											{localize("Update your existing link")}
-										</p>
-										<p class="text-[11.5px] leading-[15px] text-ed-text-3">
-											{localize(
-												"Reupload replaces the video at this link with your latest edit. Everyone with the link will see the updated version.",
-											)}
-										</p>
-										<a
-											class="block text-[11.5px] text-ed-accent truncate hover:underline"
-											href={sharing().link}
-											target="_blank"
-											rel="noreferrer"
-										>
-											{sharing().link}
-										</a>
-									</div>
-								)}
-							</Show>
-
-							<Suspense>
-								<Show
-									when={
-										settings.exportTo === "link" &&
-										!meta().sharing &&
-										organisations().length > 1
-									}
-								>
-									<button
-										type="button"
-										class="w-full flex items-center justify-between h-[30px] px-2.5 rounded-[7px] bg-ed-ctl hover:bg-ed-ctl-hover transition-colors text-[12px] outline-hidden focus-visible:ring-1 focus-visible:ring-ed-accent"
-										onClick={async () => {
-											const menu = await Menu.new({
-												items: await Promise.all(
-													organisations().map((org) =>
-														CheckMenuItem.new({
-															text: org.name,
-															action: () => {
-																setSettings("organizationId", org.id);
-																void organizationSelection
-																	.setSelectedOrganizationId(org.id)
-																	.catch(console.error);
-															},
-															checked: settings.organizationId === org.id,
-														}),
-													),
-												),
-											});
-											menu.popup();
-										}}
-									>
-										<span class="text-ed-text-2">
-											{localize("Organization")}
-										</span>
-										<span class="flex items-center gap-1 text-ed-text-1">
-											{
-												(
-													organisations().find(
-														(o) => o.id === settings.organizationId,
-													) ?? organisations()[0]
-												)?.name
-											}
-											<IconCapChevronDown class="size-3.5 text-ed-text-3" />
-										</span>
-									</button>
-								</Show>
-							</Suspense>
 						</ExportSection>
 
 						<ExportSection
@@ -1461,35 +1263,7 @@ export function ExportPage() {
 					</div>
 
 					<div class="px-4 pt-3 pb-4 border-t border-ed-line">
-						{settings.exportTo === "link" && !auth.data ? (
-							<button
-								type="button"
-								class={cx(
-									EXPORT_CTA_CLASS,
-									signIn.isPending
-										? "bg-ed-ctl text-ed-text-1 hover:bg-ed-ctl-hover"
-										: "bg-ed-accent text-white hover:bg-ed-accent-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]",
-								)}
-								onClick={() => {
-									if (signIn.isPending) {
-										signIn.variables?.abort();
-										signIn.reset();
-									} else {
-										signIn.mutate(new AbortController());
-									}
-								}}
-							>
-								{signIn.isPending ? (
-									"Cancel Sign In"
-								) : (
-									<>
-										<IconCapLink class="size-4" />
-										{localize("Sign in to share")}
-									</>
-								)}
-							</button>
-						) : (
-							<button
+						<button
 								type="button"
 								class={cx(
 									EXPORT_CTA_CLASS,
@@ -1497,7 +1271,8 @@ export function ExportPage() {
 								)}
 								onClick={() => {
 									if (settings.exportTo === "file") save.mutate();
-									else if (settings.exportTo === "link") upload.mutate();
+									else if (settings.exportTo === "link")
+										toast.info(localize("在线分享功能敬请期待"));
 									else copy.mutate();
 								}}
 							>
@@ -1513,16 +1288,8 @@ export function ExportPage() {
 										{localize("Export to Clipboard")}
 									</>
 								)}
-								{settings.exportTo === "link" && (
-									<>
-										<IconCapLink class="size-4" />
-										{meta().sharing
-											? "Reupload to same link"
-											: "Create shareable link"}
-									</>
-								)}
+								{settings.exportTo === "link" && localize("在线分享功能敬请期待")}
 							</button>
-						)}
 					</div>
 				</div>
 			</div>
@@ -1607,8 +1374,8 @@ export function ExportPage() {
 													<ActiveExport
 														heading={
 															renderState.type === "rendering"
-																? `Rendering ${exportMediumLabel()}`
-																: "Preparing export"
+												? localize("正在渲染{asset}", { asset: exportMediumLabel() })
+												: localize("正在准备导出")
 														}
 														state={renderState}
 														onCancel={handleCancel}
@@ -1616,12 +1383,12 @@ export function ExportPage() {
 												)}
 											</Match>
 											<Match when={copyState.type === "copying"}>
-												<ActiveExport heading="Copying to clipboard" />
+											<ActiveExport heading={localize("正在复制到剪贴板")} />
 											</Match>
 											<Match when={copyState.type === "done"}>
 												<CompletedExport
 													title={localize("Copied to clipboard")}
-													subtitle={`Your ${exportMediumLabel()} is ready to paste`}
+													subtitle={localize("{asset}已准备好，可以粘贴", { asset: exportMediumLabel() })}
 												/>
 											</Match>
 										</Switch>
@@ -1646,8 +1413,8 @@ export function ExportPage() {
 													<ActiveExport
 														heading={
 															renderState.type === "rendering"
-																? `Rendering ${exportMediumLabel()}`
-																: "Preparing export"
+												? localize("正在渲染{asset}", { asset: exportMediumLabel() })
+												: localize("正在准备导出")
 														}
 														state={renderState}
 														onCancel={handleCancel}
@@ -1655,12 +1422,12 @@ export function ExportPage() {
 												)}
 											</Match>
 											<Match when={saveState.type === "copying"}>
-												<ActiveExport heading="Saving to file" />
+											<ActiveExport heading={localize("正在保存到文件")} />
 											</Match>
 											<Match when={saveState.type === "done"}>
 												<CompletedExport
 													title={localize("Export complete")}
-													subtitle={`Your ${exportMediumLabel()} is ready`}
+												subtitle={localize("{asset}已准备就绪", { asset: exportMediumLabel() })}
 												/>
 											</Match>
 										</Switch>
@@ -1681,8 +1448,8 @@ export function ExportPage() {
 													<ActiveExport
 														heading={
 															reuploading()
-																? "Reuploading to your link"
-																: "Uploading"
+												? localize("正在更新分享链接")
+												: localize("正在上传")
 														}
 														percent={uploading.progress}
 													/>
@@ -1700,8 +1467,8 @@ export function ExportPage() {
 													<ActiveExport
 														heading={
 															renderState.type === "rendering"
-																? `Rendering ${exportMediumLabel()}`
-																: "Preparing export"
+													? localize("正在渲染{asset}", { asset: exportMediumLabel() })
+													: localize("正在准备导出")
 														}
 														state={renderState}
 														onCancel={handleCancel}
@@ -1712,12 +1479,12 @@ export function ExportPage() {
 												<CompletedExport
 													title={
 														reuploading()
-															? "Reupload complete"
-															: "Upload complete"
+													? localize("链接已更新")
+													: localize("上传完成")
 													}
 													subtitle={
 														reuploading()
-															? "Your latest edit is ready at the same link"
+													? localize("最新版本已更新到原分享链接")
 															: localize("上传完成")
 													}
 												/>
@@ -1828,9 +1595,9 @@ export function ExportPage() {
 									<span class="font-semibold text-ed-text-1">
 										{localize("Tip:")}
 									</span>{" "}
-									{localize(
-										"Use Instant Mode for your next recording to record and upload on the fly, with no exporting required.",
-									)}
+					{localize(
+						"下次可使用实时模式边录边看，无需等待导出。",
+					)}
 								</p>
 							</Show>
 						</div>
@@ -1853,7 +1620,7 @@ function ExportSection(
 				)}
 			>
 				{props.icon}
-				{props.name}
+				{localize(props.name)}
 			</div>
 			{props.children}
 		</div>
@@ -1905,7 +1672,7 @@ function ExportSegmented<T extends string | number>(props: {
 						</button>
 					);
 					return option.disabledReason ? (
-						<Tooltip content={option.disabledReason}>{button}</Tooltip>
+						<Tooltip content={localize(option.disabledReason)}>{button}</Tooltip>
 					) : (
 						button
 					);
@@ -1925,15 +1692,15 @@ function ExportToggleRow(props: {
 		<div class="flex items-center gap-3 min-h-[34px]">
 			<div class="flex flex-col flex-1 min-w-0 gap-px">
 				<span class="text-[12.5px] font-medium text-ed-text-1">
-					{props.title}
+					{localize(props.title)}
 				</span>
 				<span class="text-[11px] leading-[14px] text-ed-text-3">
-					{props.description}
+					{localize(props.description)}
 				</span>
 			</div>
 			<Toggle
 				size="sm"
-				aria-label={props.title}
+					aria-label={localize(props.title)}
 				checked={props.checked}
 				onChange={props.onChange}
 			/>
@@ -1954,7 +1721,7 @@ function ExportStat(props: {
 			)}
 		>
 			<span class="text-[10.5px] font-medium text-ed-text-3">
-				{props.label}
+				{localize(props.label)}
 			</span>
 			<Show
 				when={props.value}
@@ -2034,7 +1801,7 @@ function ActiveExport(props: {
 				indeterminate={percent() === undefined}
 			/>
 			<div class="flex flex-col gap-1 items-center">
-				<h2 class="text-base font-medium text-ed-text-1">{props.heading}</h2>
+				<h2 class="text-base font-medium text-ed-text-1">{localize(props.heading)}</h2>
 				<Show when={frames()}>
 					{(rendered) => (
 						<p class="text-[12px] tabular-nums text-ed-text-2">
@@ -2060,8 +1827,8 @@ function CompletedExport(props: { title: string; subtitle: string }) {
 				<IconLucideCheck class="size-8 text-ed-accent" />
 			</div>
 			<div class="flex flex-col gap-1 items-center">
-				<h2 class="text-base font-medium text-ed-text-1">{props.title}</h2>
-				<p class="text-[12px] text-ed-text-2">{props.subtitle}</p>
+				<h2 class="text-base font-medium text-ed-text-1">{localize(props.title)}</h2>
+				<p class="text-[12px] text-ed-text-2">{localize(props.subtitle)}</p>
 			</div>
 		</div>
 	);

@@ -2,6 +2,7 @@ import { convertFileSrc } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { createSignal, onCleanup, onMount, Show } from "solid-js";
 import FrameWorker from "~/utils/frame-worker?worker";
+import { t as localize } from "~/utils/i18n";
 import { commands, type PresentationOptions } from "~/utils/tauri";
 
 export default function PresentationOutput() {
@@ -59,7 +60,7 @@ export default function PresentationOutput() {
 				available = true;
 				send();
 			} else if (event.data.type === "error")
-				setError(event.data.message ?? "输出画面暂时不可用");
+				setError(event.data.message ?? localize("输出画面暂时不可用"));
 		};
 		const offscreen = canvas.transferControlToOffscreen();
 		worker.postMessage(
@@ -76,12 +77,13 @@ export default function PresentationOutput() {
 						pending = event.data;
 						send();
 					};
-					socket.onerror = () => setError("画面连接失败，请重新开始演示");
+					socket.onerror = () =>
+						setError(localize("画面连接失败，请重新开始演示"));
 					return;
 				}
 				await new Promise((resolve) => setTimeout(resolve, 250));
 			}
-			if (!disposed) setError("等待演示画面超时，请重新开始");
+			if (!disposed) setError(localize("等待演示画面超时，请重新开始"));
 		})().catch((cause: unknown) => setError(String(cause)));
 		onCleanup(() => {
 			disposed = true;

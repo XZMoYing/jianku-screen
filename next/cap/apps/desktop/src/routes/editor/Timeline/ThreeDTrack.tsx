@@ -660,9 +660,9 @@ export function ThreeDTrack(props: {
 										<button
 											type="button"
 											aria-label={
-												end ? "Edit the end pose" : "Edit the start pose"
+												end ? localize("编辑结束镜头") : localize("编辑开始镜头")
 											}
-											title={end ? "End pose" : "Start pose"}
+											title={end ? localize("结束镜头") : localize("开始镜头")}
 											class="cap-pose-dot"
 											data-active={
 												(editorState.timeline.camera3dPose === "end") === end
@@ -728,9 +728,11 @@ function AddShotGhost(props: {
 			<Show when={props.labelled}>
 				<span class="truncate">
 					{width() >= GHOST_FULL_LABEL_PX
-						? `+ Add shot · Glide across · ${seconds().toFixed(1)}s`
+						? localize("添加镜头 · 平滑移动 · {seconds} 秒", {
+								seconds: seconds().toFixed(1),
+							})
 						: width() >= GHOST_LABEL_PX
-							? "+ Add shot"
+							? localize("添加镜头")
 							: "+"}
 				</span>
 			</Show>

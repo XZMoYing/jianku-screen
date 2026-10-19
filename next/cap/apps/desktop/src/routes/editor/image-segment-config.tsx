@@ -80,7 +80,9 @@ export function ImageSegmentConfig(props: { index: number }) {
 								)
 							}
 						>
-							{editorState.importingImage ? "Importing…" : "Replace image"}
+					{editorState.importingImage
+						? localize("正在导入…")
+						: localize("替换图片")}
 						</EditorButton>
 						<EditorButton
 							variant="danger"

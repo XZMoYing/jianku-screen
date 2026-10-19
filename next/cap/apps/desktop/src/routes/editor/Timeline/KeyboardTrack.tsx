@@ -179,7 +179,7 @@ export function KeyboardTrack(props: {
 							segColor="var(--track-keyboard)"
 							class="group"
 							selected={isSelected()}
-							title={segment.displayText || "Keyboard"}
+							title={segment.displayText || localize("按键")}
 							segment={{
 								start: segment.start,
 								end: Math.min(segment.end, totalDuration()),

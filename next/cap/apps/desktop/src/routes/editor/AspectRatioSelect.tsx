@@ -19,7 +19,7 @@ function AspectRatioSelect() {
 	let triggerSelect: HTMLDivElement | undefined;
 
 	return (
-		<Tooltip content="画面比例">
+		<Tooltip content={localize("画面比例")}>
 			<KSelect<AspectRatio | "auto">
 				open={open()}
 				onOpenChange={setOpen}
@@ -43,7 +43,7 @@ function AspectRatioSelect() {
 							<KSelect.ItemLabel class="flex-1">
 								{props.item.rawValue === "auto"
 									? localize("适合屏幕")
-									: ASPECT_RATIOS[props.item.rawValue].name}
+									: localize(ASPECT_RATIOS[props.item.rawValue].name)}
 								<Show when={item()}>
 									{(item) => (
 										<span class="text-ed-text-3">
@@ -76,8 +76,8 @@ function AspectRatioSelect() {
 							const text = () => {
 								const option = state.selectedOption();
 								return option === "auto"
-									? "适合屏幕"
-									: ASPECT_RATIOS[option].name;
+									? localize("适合屏幕")
+									: localize(ASPECT_RATIOS[option].name);
 							};
 							return <span class="max-[1200px]:hidden">{text()}</span>;
 						}}

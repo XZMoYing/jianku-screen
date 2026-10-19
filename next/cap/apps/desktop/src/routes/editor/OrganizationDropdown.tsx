@@ -356,16 +356,16 @@ export function OrganizationDropdown() {
 	const triggerLabel = createMemo(() => {
 		const availability = organizationSelection.availability();
 		if (availability === "available") {
-			return selectedOrganization()?.name ?? "Organization";
+			return selectedOrganization()?.name ?? localize("组织");
 		}
-		if (availability === "loading") return "Loading...";
-		if (availability === "unavailable") return "Organization";
-		return localize("Sign In");
+		if (availability === "loading") return localize("正在载入…");
+		if (availability === "unavailable") return localize("组织");
+		return localize("敬请期待");
 	});
 	const fallbackTitle = createMemo(() => {
 		const availability = organizationSelection.availability();
-		if (availability === "loading") return "Loading organizations";
-		if (availability === "unavailable") return "Unable to load organizations";
+		if (availability === "loading") return localize("正在载入组织…");
+		if (availability === "unavailable") return localize("暂时无法载入组织");
 		return localize("敬请期待");
 	});
 	const fallbackDescription = createMemo(() => {
@@ -403,7 +403,7 @@ export function OrganizationDropdown() {
 					leftIcon={<IconLucideBuilding2 class="size-4" />}
 					rightIcon={<IconCapChevronDown />}
 					title={triggerLabel()}
-					aria-label={`Organization: ${triggerLabel()}`}
+					aria-label={`${localize("组织")}：${triggerLabel()}`}
 				>
 					<span class="block max-w-32 truncate max-[1200px]:hidden">
 						{triggerLabel()}
@@ -434,7 +434,7 @@ export function OrganizationDropdown() {
 												}
 											>
 												<SignInButton class="w-full justify-center">
-													{localize("Sign In")}
+													{localize("敬请期待")}
 												</SignInButton>
 											</Show>
 											<Show

@@ -11,7 +11,7 @@ export function StyleGroupToggle(props: { group: StyleGroup }) {
 		<Show when={selectedStyle()}>
 			{(style) => (
 				<Field
-					name={`Customize ${props.group}`}
+					name={localize("自定义{group}", { group: localize(props.group) })}
 					value={
 						<Toggle
 							checked={style().overrides[props.group] != null}
@@ -21,8 +21,8 @@ export function StyleGroupToggle(props: { group: StyleGroup }) {
 				>
 					<p class="text-[11px] leading-relaxed text-ed-text-3">
 						{style().overrides[props.group] == null
-							? "Uses the styles underneath, then your global settings. Turn on to customize."
-							: "Changes apply only during this style. Turn off to use the styles underneath."}
+							? localize("使用下方样式和全局设置；开启后可单独自定义。")
+							: localize("更改仅应用于此样式；关闭后恢复使用下方样式。")}
 					</p>
 				</Field>
 			)}

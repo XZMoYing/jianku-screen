@@ -31,8 +31,12 @@ import {
 import { defaultKeyboardSettings } from "~/store/keyboard";
 import { createTauriEventListener } from "~/utils/createEventListener";
 import { createPresets } from "~/utils/createPresets";
+import { t as localize } from "~/utils/i18n";
 import { createCustomDomainQuery } from "~/utils/queries";
-import { isRecordingStorageError } from "~/utils/recording";
+import {
+	displayRecordingName,
+	isRecordingStorageError,
+} from "~/utils/recording";
 import {
 	type CanvasControls,
 	createImageDataWS,
@@ -192,7 +196,7 @@ export const OUTPUT_SIZE = {
 
 export const DEFAULT_PREVIEW_QUALITY: EditorPreviewQuality = "half";
 
-const previewQualityScale: Record<EditorPreviewQuality, number> = {
+export const PREVIEW_QUALITY_SCALE: Record<EditorPreviewQuality, number> = {
 	full: 1,
 	half: 0.65,
 	quarter: 0.25,
@@ -201,7 +205,7 @@ const previewQualityScale: Record<EditorPreviewQuality, number> = {
 export const getPreviewResolution = (
 	quality: EditorPreviewQuality,
 ): XY<number> => {
-	const scale = previewQualityScale[quality];
+	const scale = PREVIEW_QUALITY_SCALE[quality];
 	const width = (Math.max(4, Math.round(OUTPUT_SIZE.x * scale)) + 3) & ~3;
 	const height = (Math.max(2, Math.round(OUTPUT_SIZE.y * scale)) + 1) & ~1;
 
@@ -944,7 +948,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 						totalDuration(),
 					);
 					if (!placement) {
-						toast.error("No room for another 3D shot");
+						toast.error(localize("No room for another 3D shot"));
 						return;
 					}
 					insertCamera3DShots([
@@ -962,7 +966,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				applyCamera3DAutoScene: (count: number) => {
 					const generated = camera3DAutoSceneSegments(count);
 					if (generated.length === 0) {
-						toast.error("This recording is too short for a 3D scene");
+						toast.error(localize("This recording is too short for a 3D scene"));
 						return;
 					}
 					batch(() => {
@@ -2176,7 +2180,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 
 						if (!segments) {
 							toast.error(
-								"The timeline changed while keyboard events were generated. Try again.",
+								localize("生成按键事件时，时间线发生了变化，请重试。"),
 							);
 							return;
 						}
@@ -2192,7 +2196,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 						});
 					} catch (error) {
 						console.error("Failed to initialize keyboard segments", error);
-						toast.error("Unable to generate keyboard events");
+						toast.error(localize("Unable to generate keyboard events"));
 					}
 				})();
 			});
@@ -2556,7 +2560,7 @@ function transformMeta({ pretty_name, ...rawMeta }: RecordingMeta) {
 	return {
 		...rawMeta,
 		...meta,
-		prettyName: pretty_name,
+		prettyName: displayRecordingName(pretty_name),
 		hasCamera: (() => {
 			if (meta.type === "single") return !!meta.camera;
 			return !!meta.segments[0].camera;

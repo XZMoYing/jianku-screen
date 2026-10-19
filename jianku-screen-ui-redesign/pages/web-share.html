@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web - 分享页</title>
+    <style id="theme-vars">
+/* Source: structured-spec */
+/* Brand profile: google / dashboard / clean / analytical / modern */
+/* Theme mode: light-dark */
+/* Alias layer: enabled */
+
+/* Light mode source tokens */
+:root {
+  /* Core surface colors */
+  --background: #ffffff;
+  --foreground: #0e1115;
+  --card: #ffffff;
+  --card-foreground: #0e1115;
+  --popover: #f9f9fa;
+  --popover-foreground: #0e1115;
+
+  /* Semantic action colors */
+  --primary: #4285f4;
+  --primary-foreground: #ffffff;
+  --secondary: #dbeafe;
+  --secondary-foreground: #333942;
+  --muted: #eff1f4;
+  --muted-foreground: #7f8d9f;
+  --accent: #dbeafe;
+  --accent-foreground: #003e8f;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  /* Borders, inputs, focus */
+  --border: #ebebeb;
+  --input: #e2e3e4;
+  --ring: #4285f4;
+
+  /* Data visualization */
+  --chart-1: #4285f4;
+  --chart-2: #ea4335;
+  --chart-3: #fbbc05;
+  --chart-4: #0043ad;
+  --chart-5: #34a853;
+
+  /* Sidebar */
+  --sidebar: #f0f6ff;
+  --sidebar-foreground: #0e1115;
+  --sidebar-primary: #4285f4;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #dbeafe;
+  --sidebar-accent-foreground: #003e8f;
+  --sidebar-border: #e7eaef;
+  --sidebar-ring: #4285f4;
+
+  /* Typography */
+  --font-sans: DM Sans, ui-sans-serif, sans-serif, system-ui;
+  --font-serif: DM Sans, ui-sans-serif, sans-serif, system-ui;
+  --font-mono: JetBrains Mono, monospace;
+
+  /* Radius */
+  --radius: 0.5rem;
+
+  /* Shadow primitives */
+  --shadow-x: 0;
+  --shadow-y: 3px;
+  --shadow-blur: 0px;
+  --shadow-spread: 0px;
+  --shadow-opacity: 0;
+  --shadow-color: #0e1115;
+
+  /* Elevation */
+  --shadow-2xs: 0 3px 0px 0px rgba(14, 17, 21, 0);
+  --shadow-xs: 0 3px 0px 0px rgba(14, 17, 21, 0);
+  --shadow-sm: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 1px 2px -1px rgba(14, 17, 21, 0);
+  --shadow: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 1px 2px -1px rgba(14, 17, 21, 0);
+  --shadow-md: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 2px 4px -1px rgba(14, 17, 21, 0);
+  --shadow-lg: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 4px 6px -1px rgba(14, 17, 21, 0);
+  --shadow-xl: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 8px 10px -1px rgba(14, 17, 21, 0);
+  --shadow-2xl: 0 3px 0px 0px rgba(14, 17, 21, 0);
+
+  /* Rhythm */
+  --tracking-normal: 0em;
+  --spacing: 0.24rem;
+  /* Patched radius aliases for head-contract compatibility */
+  --google-radius-sm: calc(var(--radius) - 4px);
+  --google-radius-md: calc(var(--radius) - 2px);
+  --google-radius-lg: var(--radius);
+
+}
+
+/* Dark mode source tokens */
+.dark {
+  /* Core surface colors */
+  --background: #161616;
+  --foreground: #eff1f4;
+  --card: #1d1d1c;
+  --card-foreground: #eff1f4;
+  --popover: #2e2e2e;
+  --popover-foreground: #e5e5e5;
+
+  /* Semantic action colors */
+  --primary: #fc2c50;
+  --primary-foreground: #ffffff;
+  --secondary: #383838;
+  --secondary-foreground: #e5e5e5;
+  --muted: #383838;
+  --muted-foreground: #949494;
+  --accent: #4a2026;
+  --accent-foreground: #fc2c50;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  /* Borders, inputs, focus */
+  --border: #1d1d1c;
+  --input: #000000;
+  --ring: #ffffff;
+
+  /* Data visualization */
+  --chart-1: #2dccd3;
+  --chart-2: #f1204a;
+  --chart-3: #edbbe8;
+  --chart-4: #fbeb35;
+  --chart-5: #baf6f0;
+
+  /* Sidebar */
+  --sidebar: #171717;
+  --sidebar-foreground: #e5e5e5;
+  --sidebar-primary: #0065fd;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #00266b;
+  --sidebar-accent-foreground: #bfdbfe;
+  --sidebar-border: #404040;
+  --sidebar-ring: #00266b;
+
+  /* Typography */
+  --font-sans: DM Sans, ui-sans-serif, sans-serif, system-ui;
+  --font-serif: DM Sans, ui-sans-serif, sans-serif, system-ui;
+  --font-mono: JetBrains Mono, monospace;
+
+  /* Radius */
+  --radius: 0.5rem;
+
+  /* Shadow primitives */
+  --shadow-x: 0;
+  --shadow-y: 3px;
+  --shadow-blur: 0px;
+  --shadow-spread: 0px;
+  --shadow-opacity: 0;
+  --shadow-color: #000000;
+
+  /* Elevation */
+  --shadow-2xs: 0 3px 0px 0px rgba(0, 0, 0, 0);
+  --shadow-xs: 0 3px 0px 0px rgba(0, 0, 0, 0);
+  --shadow-sm: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 1px 2px -1px rgba(0, 0, 0, 0);
+  --shadow: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 1px 2px -1px rgba(0, 0, 0, 0);
+  --shadow-md: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 2px 4px -1px rgba(0, 0, 0, 0);
+  --shadow-lg: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 4px 6px -1px rgba(0, 0, 0, 0);
+  --shadow-xl: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 8px 10px -1px rgba(0, 0, 0, 0);
+  --shadow-2xl: 0 3px 0px 0px rgba(0, 0, 0, 0);
+}
+
+/* Alias layer */
+@theme inline {
+  /* Color aliases */
+  --google-color-background: var(--background);
+  --google-color-foreground: var(--foreground);
+  --google-color-card: var(--card);
+  --google-color-card-foreground: var(--card-foreground);
+  --google-color-popover: var(--popover);
+  --google-color-popover-foreground: var(--popover-foreground);
+  --google-color-primary: var(--primary);
+  --google-color-primary-foreground: var(--primary-foreground);
+  --google-color-secondary: var(--secondary);
+  --google-color-secondary-foreground: var(--secondary-foreground);
+  --google-color-muted: var(--muted);
+  --google-color-muted-foreground: var(--muted-foreground);
+  --google-color-accent: var(--accent);
+  --google-color-accent-foreground: var(--accent-foreground);
+  --google-color-destructive: var(--destructive);
+  --google-color-destructive-foreground: var(--destructive-foreground);
+  --google-color-border: var(--border);
+  --google-color-input: var(--input);
+  --google-color-ring: var(--ring);
+  --google-color-chart-1: var(--chart-1);
+  --google-color-chart-2: var(--chart-2);
+  --google-color-chart-3: var(--chart-3);
+  --google-color-chart-4: var(--chart-4);
+  --google-color-chart-5: var(--chart-5);
+  --google-color-sidebar: var(--sidebar);
+  --google-color-sidebar-foreground: var(--sidebar-foreground);
+  --google-color-sidebar-primary: var(--sidebar-primary);
+  --google-color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --google-color-sidebar-accent: var(--sidebar-accent);
+  --google-color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --google-color-sidebar-border: var(--sidebar-border);
+  --google-color-sidebar-ring: var(--sidebar-ring);
+
+  /* Typography aliases */
+  --google-font-sans: var(--font-sans);
+  --google-font-serif: var(--font-serif);
+  --google-font-mono: var(--font-mono);
+
+  /* Radius aliases */
+  --google-radius: var(--radius);
+  --google-radius-sm: calc(var(--radius) - 4px);
+  --google-radius-md: calc(var(--radius) - 2px);
+  --google-radius-lg: var(--radius);
+  --google-radius-xl: calc(var(--radius) + 4px);
+
+  /* Shadow aliases */
+  --google-shadow-x: var(--shadow-x);
+  --google-shadow-y: var(--shadow-y);
+  --google-shadow-blur: var(--shadow-blur);
+  --google-shadow-spread: var(--shadow-spread);
+  --google-shadow-opacity: var(--shadow-opacity);
+  --google-shadow-color: var(--shadow-color);
+  --google-shadow-2xs: var(--shadow-2xs);
+  --google-shadow-xs: var(--shadow-xs);
+  --google-shadow-sm: var(--shadow-sm);
+  --google-shadow: var(--shadow);
+  --google-shadow-md: var(--shadow-md);
+  --google-shadow-lg: var(--shadow-lg);
+  --google-shadow-xl: var(--shadow-xl);
+  --google-shadow-2xl: var(--shadow-2xl);
+
+  /* Rhythm aliases */
+  --google-tracking-normal: var(--tracking-normal);
+  --google-spacing: var(--spacing);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --radius-sm: var(--google-radius-sm);
+    --radius-md: var(--google-radius-md);
+    --radius-lg: var(--google-radius-lg);
+  }
+  @layer base {
+    body { background: var(--background); color: var(--foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--background); }
+      .text-background { color: var(--background); }
+      .border-background { border-color: var(--background); }
+      .ring-background { --tw-ring-color: var(--background); }
+      .bg-foreground { background-color: var(--foreground); }
+      .text-foreground { color: var(--foreground); }
+      .border-foreground { border-color: var(--foreground); }
+      .ring-foreground { --tw-ring-color: var(--foreground); }
+      .bg-card { background-color: var(--card); }
+      .text-card { color: var(--card); }
+      .border-card { border-color: var(--card); }
+      .ring-card { --tw-ring-color: var(--card); }
+      .bg-card-foreground { background-color: var(--card-foreground); }
+      .text-card-foreground { color: var(--card-foreground); }
+      .border-card-foreground { border-color: var(--card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--card-foreground); }
+      .bg-popover { background-color: var(--popover); }
+      .text-popover { color: var(--popover); }
+      .border-popover { border-color: var(--popover); }
+      .ring-popover { --tw-ring-color: var(--popover); }
+      .bg-popover-foreground { background-color: var(--popover-foreground); }
+      .text-popover-foreground { color: var(--popover-foreground); }
+      .border-popover-foreground { border-color: var(--popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--popover-foreground); }
+      .bg-primary { background-color: var(--primary); }
+      .text-primary { color: var(--primary); }
+      .border-primary { border-color: var(--primary); }
+      .ring-primary { --tw-ring-color: var(--primary); }
+      .bg-primary-foreground { background-color: var(--primary-foreground); }
+      .text-primary-foreground { color: var(--primary-foreground); }
+      .border-primary-foreground { border-color: var(--primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--primary-foreground); }
+      .bg-secondary { background-color: var(--secondary); }
+      .text-secondary { color: var(--secondary); }
+      .border-secondary { border-color: var(--secondary); }
+      .ring-secondary { --tw-ring-color: var(--secondary); }
+      .bg-secondary-foreground { background-color: var(--secondary-foreground); }
+      .text-secondary-foreground { color: var(--secondary-foreground); }
+      .border-secondary-foreground { border-color: var(--secondary-foreground); }
+      .ring-secondary-foreground { --tw-ring-color: var(--secondary-foreground); }
+      .bg-muted { background-color: var(--muted); }
+      .text-muted { color: var(--muted); }
+      .border-muted { border-color: var(--muted); }
+      .ring-muted { --tw-ring-color: var(--muted); }
+      .bg-muted-foreground { background-color: var(--muted-foreground); }
+      .text-muted-foreground { color: var(--muted-foreground); }
+      .border-muted-foreground { border-color: var(--muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--muted-foreground); }
+      .bg-accent { background-color: var(--accent); }
+      .text-accent { color: var(--accent); }
+      .border-accent { border-color: var(--accent); }
+      .ring-accent { --tw-ring-color: var(--accent); }
+      .bg-accent-foreground { background-color: var(--accent-foreground); }
+      .text-accent-foreground { color: var(--accent-foreground); }
+      .border-accent-foreground { border-color: var(--accent-foreground); }
+      .ring-accent-foreground { --tw-ring-color: var(--accent-foreground); }
+      .bg-destructive { background-color: var(--destructive); }
+      .text-destructive { color: var(--destructive); }
+      .border-destructive { border-color: var(--destructive); }
+      .ring-destructive { --tw-ring-color: var(--destructive); }
+      .bg-destructive-foreground { background-color: var(--destructive-foreground); }
+      .text-destructive-foreground { color: var(--destructive-foreground); }
+      .border-destructive-foreground { border-color: var(--destructive-foreground); }
+      .ring-destructive-foreground { --tw-ring-color: var(--destructive-foreground); }
+      .bg-border { background-color: var(--border); }
+      .text-border { color: var(--border); }
+      .border-border { border-color: var(--border); }
+      .ring-border { --tw-ring-color: var(--border); }
+      .bg-input { background-color: var(--input); }
+      .text-input { color: var(--input); }
+      .border-input { border-color: var(--input); }
+      .ring-input { --tw-ring-color: var(--input); }
+      .bg-ring { background-color: var(--ring); }
+      .text-ring { color: var(--ring); }
+      .border-ring { border-color: var(--ring); }
+      .ring-ring { --tw-ring-color: var(--ring); }
+      .bg-chart-1 { background-color: var(--chart-1); }
+      .text-chart-1 { color: var(--chart-1); }
+      .border-chart-1 { border-color: var(--chart-1); }
+      .ring-chart-1 { --tw-ring-color: var(--chart-1); }
+      .bg-chart-2 { background-color: var(--chart-2); }
+      .text-chart-2 { color: var(--chart-2); }
+      .border-chart-2 { border-color: var(--chart-2); }
+      .ring-chart-2 { --tw-ring-color: var(--chart-2); }
+      .bg-chart-3 { background-color: var(--chart-3); }
+      .text-chart-3 { color: var(--chart-3); }
+      .border-chart-3 { border-color: var(--chart-3); }
+      .ring-chart-3 { --tw-ring-color: var(--chart-3); }
+      .bg-chart-4 { background-color: var(--chart-4); }
+      .text-chart-4 { color: var(--chart-4); }
+      .border-chart-4 { border-color: var(--chart-4); }
+      .ring-chart-4 { --tw-ring-color: var(--chart-4); }
+      .bg-chart-5 { background-color: var(--chart-5); }
+      .text-chart-5 { color: var(--chart-5); }
+      .border-chart-5 { border-color: var(--chart-5); }
+      .ring-chart-5 { --tw-ring-color: var(--chart-5); }
+      .bg-sidebar { background-color: var(--sidebar); }
+      .text-sidebar { color: var(--sidebar); }
+      .border-sidebar { border-color: var(--sidebar); }
+      .ring-sidebar { --tw-ring-color: var(--sidebar); }
+      .bg-sidebar-foreground { background-color: var(--sidebar-foreground); }
+      .text-sidebar-foreground { color: var(--sidebar-foreground); }
+      .border-sidebar-foreground { border-color: var(--sidebar-foreground); }
+      .ring-sidebar-foreground { --tw-ring-color: var(--sidebar-foreground); }
+      .bg-sidebar-primary { background-color: var(--sidebar-primary); }
+      .text-sidebar-primary { color: var(--sidebar-primary); }
+      .border-sidebar-primary { border-color: var(--sidebar-primary); }
+      .ring-sidebar-primary { --tw-ring-color: var(--sidebar-primary); }
+      .bg-sidebar-primary-foreground { background-color: var(--sidebar-primary-foreground); }
+      .text-sidebar-primary-foreground { color: var(--sidebar-primary-foreground); }
+      .border-sidebar-primary-foreground { border-color: var(--sidebar-primary-foreground); }
+      .ring-sidebar-primary-foreground { --tw-ring-color: var(--sidebar-primary-foreground); }
+      .bg-sidebar-accent { background-color: var(--sidebar-accent); }
+      .text-sidebar-accent { color: var(--sidebar-accent); }
+      .border-sidebar-accent { border-color: var(--sidebar-accent); }
+      .ring-sidebar-accent { --tw-ring-color: var(--sidebar-accent); }
+      .bg-sidebar-accent-foreground { background-color: var(--sidebar-accent-foreground); }
+      .text-sidebar-accent-foreground { color: var(--sidebar-accent-foreground); }
+      .border-sidebar-accent-foreground { border-color: var(--sidebar-accent-foreground); }
+      .ring-sidebar-accent-foreground { --tw-ring-color: var(--sidebar-accent-foreground); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main>
+      <header class="topbar" role="banner">
+        <div class="brand">Jianku Screen Next</div>
+        <nav class="nav" aria-label="主导航">
+          <button class="item active" type="button">分享</button>
+          <button class="item" type="button">编辑</button>
+          <button class="item" type="button">库</button>
+        </nav>
+        <div class="utils">
+          <button class="util" type="button" aria-label="返回首页">
+            <span data-icon="house" aria-hidden="true"></span>
+          </button>
+        </div>
+      </header>
+
+      <div class="share-layout">
+        <article class="player-card" aria-label="视频播放器">
+          <div class="player-placeholder">
+            <button class="play-button" type="button" aria-label="播放视频">
+              <span data-icon="circle-play" aria-hidden="true"></span>
+            </button>
+          </div>
+        </article>
+
+        <section class="meta-section" aria-labelledby="video-title">
+          <h1 id="video-title">产品演示：平滑指针与焦点缩放</h1>
+          <div class="meta-row">
+            <span>2026-10-15</span>
+            <span>12:34</span>
+            <span>1,240 次观看</span>
+          </div>
+        </section>
+
+        <section class="actions-grid" aria-label="分享与嵌入">
+          <article class="action-card">
+            <h2>分享链接</h2>
+            <p class="copy">复制公开链接发送给观众。</p>
+            <div class="action-row">
+              <input type="text" readonly value="https://jianku.io/s/aBcDeFgH" class="share-input" aria-label="分享链接">
+              <button class="btn primary sm" type="button">
+                <span data-icon="send-horizontal" aria-hidden="true"></span>
+                复制
+              </button>
+            </div>
+          </article>
+          <article class="action-card">
+            <h2>嵌入代码</h2>
+            <p class="copy">将视频嵌入到你的网站或博客。</p>
+            <div class="action-row">
+              <code class="embed-code" aria-label="嵌入代码">&lt;iframe src="https://jianku.io/embed/aBcDeFgH"&gt;&lt;/iframe&gt;</code>
+              <button class="btn secondary sm" type="button">
+                <span data-icon="file" aria-hidden="true"></span>
+                复制
+              </button>
+            </div>
+          </article>
+        </section>
+
+        <div class="stats-sidebar">
+          <section class="stats-grid" aria-label="观看统计">
+            <article class="stat-card">
+              <span class="eyebrow">总观看</span>
+              <strong class="metric">1,240</strong>
+              <span class="trend">+12% 本周</span>
+            </article>
+            <article class="stat-card">
+              <span class="eyebrow">平均观看时长</span>
+              <strong class="metric">8:42</strong>
+              <span class="trend">高于平均</span>
+            </article>
+            <article class="stat-card">
+              <span class="eyebrow">完成率</span>
+              <strong class="metric">68%</strong>
+              <span class="trend">+5% 本月</span>
+            </article>
+          </section>
+
+          <aside class="related-panel" aria-labelledby="related-heading">
+            <h2 id="related-heading">相关视频</h2>
+            <ul class="related-list">
+              <li>
+                <button class="related-item" type="button">
+                  <span class="thumb" aria-hidden="true"></span>
+                  <span class="related-title">动态模糊效果教程</span>
+                  <span class="related-meta">5:20</span>
+                </button>
+              </li>
+              <li>
+                <button class="related-item" type="button">
+                  <span class="thumb" aria-hidden="true"></span>
+                  <span class="related-title">多轨时间线编辑入门</span>
+                  <span class="related-meta">8:15</span>
+                </button>
+              </li>
+              <li>
+                <button class="related-item" type="button">
+                  <span class="thumb" aria-hidden="true"></span>
+                  <span class="related-title">实时演示输出设置</span>
+                  <span class="related-meta">6:40</span>
+                </button>
+              </li>
+            </ul>
+          </aside>
+        </div>
+      </div>
+    </main>
+    <script>lucide.createIcons();</script>
+
+    <style id="critical-layout">
+      /* Public share page critical layout */
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: calc(var(--spacing) * 3);
+        width: 100%;
+        padding: calc(var(--spacing) * 2) calc(var(--spacing) * 4);
+        border-bottom: 1px solid var(--border);
+        background: var(--card);
+      }
+      .brand { font-size: 0.875rem; font-weight: 600; color: var(--foreground); }
+      .nav, .utils { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+      .nav .item, .util {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 8px 12px;
+        border: 1px solid transparent;
+        border-radius: var(--radius);
+        background: transparent;
+        color: var(--muted-foreground);
+        font: inherit;
+        cursor: pointer;
+      }
+      .nav .item.active { background: var(--primary); color: var(--primary-foreground); }
+      .nav .item:hover, .util:hover { background: var(--accent); color: var(--accent-foreground); }
+      .nav .item:focus-visible, .util:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+      .util { min-width: 34px; padding: 8px 10px; border-color: var(--border); background: var(--popover); color: var(--popover-foreground); }
+
+      .share-layout {
+        width: 100%;
+        max-width: 1184px;
+        margin: 0 auto;
+        padding: calc(var(--spacing) * 6) calc(var(--spacing) * 4);
+        display: flex;
+        flex-direction: column;
+        gap: calc(var(--spacing) * 6);
+      }
+
+      .player-card {
+        width: 100%;
+        max-width: 960px;
+        margin: 0 auto;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--card);
+        overflow: hidden;
+      }
+      .player-placeholder {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        background: linear-gradient(135deg, var(--muted) 0%, #e4e8ed 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .play-button {
+        width: 72px;
+        height: 72px;
+        border: 0;
+        border-radius: 50%;
+        background: var(--primary);
+        color: var(--primary-foreground);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .play-button:hover { filter: brightness(0.96); }
+      .play-button:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+
+      .meta-section { text-align: center; }
+      .meta-section h1 { margin: 0 0 calc(var(--spacing) * 2); font-size: 1.5rem; font-weight: 700; line-height: 1.2; color: var(--foreground); }
+      .meta-row { display: flex; align-items: center; justify-content: center; gap: calc(var(--spacing) * 4); color: var(--muted-foreground); font-size: 0.875rem; flex-wrap: wrap; }
+
+      .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: calc(var(--spacing) * 4);
+      }
+      @media (max-width: 640px) {
+        .actions-grid { grid-template-columns: 1fr; }
+      }
+      .action-card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--card);
+        padding: calc(var(--spacing) * 5);
+        display: grid;
+        gap: calc(var(--spacing) * 2);
+      }
+      .action-card h2 { margin: 0; font-size: 1rem; font-weight: 600; color: var(--foreground); }
+      .action-card .copy { margin: 0; font-size: 0.8125rem; color: var(--muted-foreground); }
+      .action-row { display: flex; gap: calc(var(--spacing) * 2); margin-top: calc(var(--spacing) * 1); }
+      .share-input, .embed-code {
+        flex: 1 1 auto;
+        min-width: 0;
+        padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--muted);
+        color: var(--foreground);
+        font-family: var(--font-mono);
+        font-size: 0.8125rem;
+        line-height: 1.4;
+      }
+      .embed-code { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+      .stats-sidebar {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: calc(var(--spacing) * 6);
+      }
+      @media (max-width: 900px) {
+        .stats-sidebar { grid-template-columns: 1fr; }
+      }
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: calc(var(--spacing) * 4);
+        align-content: start;
+      }
+      @media (max-width: 640px) {
+        .stats-grid { grid-template-columns: 1fr; }
+      }
+      .stat-card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--card);
+        padding: calc(var(--spacing) * 5);
+        display: grid;
+        gap: calc(var(--spacing) * 2);
+      }
+      .stat-card .eyebrow { font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted-foreground); }
+      .stat-card .metric { font-size: 1.875rem; line-height: 1; font-weight: 700; color: var(--foreground); font-family: var(--font-mono); }
+      .stat-card .trend { display: inline-flex; align-items: center; gap: calc(var(--spacing) * 1.5); width: max-content; padding: calc(var(--spacing) * 1.5) calc(var(--spacing) * 3); border-radius: 999px; background: var(--accent); color: var(--accent-foreground); font-size: 0.75rem; font-weight: 600; }
+
+      .related-panel {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--card);
+        padding: calc(var(--spacing) * 4);
+      }
+      .related-panel h2 { margin: 0 0 calc(var(--spacing) * 3); font-size: 1rem; font-weight: 600; color: var(--foreground); }
+      .related-list { list-style: none; margin: 0; padding: 0; display: grid; gap: calc(var(--spacing) * 2); }
+      .related-item { width: 100%; display: grid; grid-template-columns: 64px 1fr auto; align-items: center; gap: calc(var(--spacing) * 3); padding: calc(var(--spacing) * 2); border: 1px solid transparent; border-radius: var(--radius); background: transparent; color: var(--foreground); font: inherit; text-align: left; cursor: pointer; }
+      .related-item:hover { background: var(--accent); color: var(--accent-foreground); }
+      .related-item:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+      .thumb { width: 64px; height: 36px; border-radius: calc(var(--radius) - 4px); background: var(--muted); }
+      .related-title { font-size: 0.875rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .related-meta { font-size: 0.75rem; color: var(--muted-foreground); }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        height: 36px;
+        padding: 0 14px;
+        border: 1px solid transparent;
+        border-radius: var(--radius);
+        font: 500 13px/1 var(--font-sans);
+        white-space: nowrap;
+        cursor: pointer;
+        transition: background-color .15s, border-color .15s, color .15s;
+      }
+      .btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+      .btn:active { transform: translateY(1px); }
+      .btn.primary { background: var(--primary); color: var(--primary-foreground); }
+      .btn.primary:hover { filter: brightness(.96); }
+      .btn.secondary { background: var(--secondary); color: var(--secondary-foreground); border-color: var(--border); }
+      .btn.secondary:hover { background: var(--accent); color: var(--accent-foreground); }
+      .btn.sm { height: 32px; padding: 0 12px; font-size: 12px; }
+
+      [data-icon] { display: inline-flex; align-items: center; justify-content: center; width: 1.25rem; height: 1.25rem; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; background-color: currentColor; }
+      [data-icon="house"] { -webkit-mask-image: url(../assets/icons/google/house.svg); mask-image: url(../assets/icons/google/house.svg); }
+      [data-icon="circle-play"] { -webkit-mask-image: url(../assets/icons/google/circle-play.svg); mask-image: url(../assets/icons/google/circle-play.svg); width: 2rem; height: 2rem; }
+      [data-icon="send-horizontal"] { -webkit-mask-image: url(../assets/icons/google/send-horizontal.svg); mask-image: url(../assets/icons/google/send-horizontal.svg); }
+      [data-icon="external-link"] { -webkit-mask-image: url(../assets/icons/google/external-link.svg); mask-image: url(../assets/icons/google/external-link.svg); }
+      [data-icon="file"] { -webkit-mask-image: url(../assets/icons/google/file.svg); mask-image: url(../assets/icons/google/file.svg); }
+    </style>
+</body>
+</html>

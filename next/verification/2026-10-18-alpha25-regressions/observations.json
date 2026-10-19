@@ -1,0 +1,248 @@
+{
+	"before": {
+		"version": "0.2.0-alpha.23 debug",
+		"observations": [
+			{
+				"frames": 5,
+				"phase": "ready",
+				"route": "/editor",
+				"time": ["0:00.00", " / ", "0:59.30"],
+				"visibility": "visible"
+			},
+			{
+				"frames": 1860,
+				"phase": "before-pause",
+				"route": "/editor",
+				"time": ["0:30.53", " / ", "0:59.30"],
+				"visibility": "visible"
+			},
+			{
+				"frames": 1861,
+				"phase": "paused",
+				"route": "/editor",
+				"time": ["0:30.55", " / ", "0:59.30"],
+				"visibility": "visible"
+			},
+			{
+				"frames": 1861,
+				"phase": "ruler-rewound",
+				"route": "/editor",
+				"time": ["0:19.43", " / ", "0:59.30"],
+				"visibility": "visible"
+			},
+			{
+				"frames": 1861,
+				"phase": "rewound",
+				"route": "/editor",
+				"time": ["0:00.00", " / ", "0:59.30"],
+				"visibility": "visible"
+			},
+			{
+				"frames": 1861,
+				"phase": "resumed-0",
+				"route": "/editor",
+				"time": ["0:00.00", " / ", "0:59.30"],
+				"visibility": "visible"
+			},
+			{
+				"frames": 1861,
+				"phase": "resumed-1",
+				"route": "/editor",
+				"time": ["0:00.00", " / ", "0:59.30"],
+				"visibility": "visible"
+			},
+			{
+				"frames": 1861,
+				"phase": "resumed-2",
+				"route": "/editor",
+				"time": ["0:00.00", " / ", "0:59.30"],
+				"visibility": "visible"
+			},
+			{
+				"frames": 1861,
+				"phase": "resumed-3",
+				"route": "/editor",
+				"time": ["0:00.00", " / ", "0:59.30"],
+				"visibility": "visible"
+			},
+			{
+				"frames": 1861,
+				"phase": "resumed-4",
+				"route": "/editor",
+				"time": ["0:00.00", " / ", "0:59.30"],
+				"visibility": "visible"
+			},
+			{
+				"frames": 1861,
+				"phase": "resumed-5",
+				"route": "/editor",
+				"time": ["0:00.00", " / ", "0:59.30"],
+				"visibility": "visible"
+			},
+			{
+				"frames": 1861,
+				"phase": "resumed-6",
+				"route": "/editor",
+				"time": ["0:00.00", " / ", "0:59.30"],
+				"visibility": "visible"
+			},
+			{
+				"frames": 1861,
+				"phase": "resumed-7",
+				"route": "/editor",
+				"time": ["0:00.00", " / ", "0:59.30"],
+				"visibility": "visible"
+			},
+			{
+				"frames": 1861,
+				"phase": "complete",
+				"route": "/editor",
+				"time": ["0:00.00", " / ", "0:59.30"],
+				"visibility": "visible"
+			}
+		]
+	},
+	"after": {
+		"version": "0.2.0-alpha.25 debug",
+		"observations": [
+			{
+				"name": "简库镜传 Next 2026-10-18 19.16.30",
+				"phase": "localization",
+				"quality": ["100%", "65%", "25%"],
+				"route": "/editor",
+				"zoom": ["缩放", "自动缩放"]
+			},
+			{
+				"phase": "keyboard",
+				"route": "/editor",
+				"text": "\n\n\n\n\n按键\n\n显示键盘\n测试版\n\n字体设置\n字体\n\n系统无衬线字体\n大小\n文字颜色\n\n背景设置\n背景颜色\n\n背景不透明度\n位置\n\n底部居中\n字重\n\n常规\n动画\n淡入淡出时长\n150ms\n停留时长\n800ms\n合并间隔\n500ms\n行为\n显示修饰键\n\n显示功能键\n\n大写\n\n生成按键片段\n还没有按键片段。\n点击“生成按键片段”，从录制的按键数据生成片段。\n"
+			},
+			{
+				"phase": "captions",
+				"route": "/editor",
+				"text": "\n\n\n\n\n\n字幕\n字幕\n测试版\n模型\n\n推荐\n\n适合大多数录制场景的均衡方案\n~640MB\n模型只需下载一次，所有字幕均保存在本机。\n识别语言\n\n自动检测\n下载推荐模型\n样式\n\n让\n字幕\n出彩\n经典\n\n让\n字幕\n出彩\n卡拉 OK\n\n让\n字幕\n出彩\n重点标记\n\n让\n字幕\n出彩\n弹出\n\n让\n字幕\n出彩\n极简\n字体设置\n字体\n\n系统无衬线字体\n大小\n大写\n\n高亮当前词\n\n部分情况下逐词高亮可能不准确，我们会继续改进。\n文字颜色\n\n背景设置\n背景颜色\n\n背景不透明度\n位置\n\n底部居中\n字重\n\n粗体\n动画\n动效样式\n\n弹跳\n高亮颜色\n\n淡入淡出时长\n200ms\n导出选项\n导出时包含字幕\n\n"
+			},
+			{
+				"frames": 4,
+				"phase": "ready",
+				"route": "/editor",
+				"time": ["0:00.00", " / ", "0:59.30"],
+				"visibility": "visible"
+			},
+			{
+				"frames": 1856,
+				"phase": "before-pause",
+				"route": "/editor",
+				"time": ["0:30.53", " / ", "0:59.30"],
+				"visibility": "visible"
+			},
+			{
+				"frames": 1858,
+				"phase": "rewound",
+				"route": "/editor",
+				"time": ["0:00.00", " / ", "0:59.30"],
+				"visibility": "visible"
+			},
+			{
+				"frames": 1912,
+				"phase": "resumed-0",
+				"route": "/editor",
+				"time": ["0:00.54", " / ", "0:59.30"],
+				"visibility": "visible"
+			},
+			{
+				"frames": 1972,
+				"phase": "resumed-1",
+				"route": "/editor",
+				"time": ["0:01.53", " / ", "0:59.30"],
+				"visibility": "visible"
+			},
+			{
+				"frames": 2032,
+				"phase": "resumed-2",
+				"route": "/editor",
+				"time": ["0:02.53", " / ", "0:59.30"],
+				"visibility": "visible"
+			},
+			{
+				"frames": 2092,
+				"phase": "resumed-3",
+				"route": "/editor",
+				"time": ["0:03.53", " / ", "0:59.30"],
+				"visibility": "visible"
+			},
+			{
+				"frames": 2152,
+				"phase": "resumed-4",
+				"route": "/editor",
+				"time": ["0:04.54", " / ", "0:59.30"],
+				"visibility": "visible"
+			},
+			{
+				"frames": 2212,
+				"phase": "resumed-5",
+				"route": "/editor",
+				"time": ["0:05.54", " / ", "0:59.30"],
+				"visibility": "visible"
+			},
+			{
+				"phase": "playback-complete",
+				"route": "/editor"
+			},
+			{
+				"active": "通用",
+				"clientHeight": 522,
+				"deltaX": 0,
+				"deltaY": 0,
+				"heightDelta": 0,
+				"listScroll": 0,
+				"phase": "settings-before-scroll",
+				"route": "/settings/general",
+				"scroll": 0,
+				"scrollHeight": 614
+			},
+			{
+				"active": "通用",
+				"clientHeight": 522,
+				"deltaX": 0,
+				"deltaY": 0,
+				"heightDelta": 0,
+				"listScroll": 0,
+				"phase": "settings-scrolled",
+				"route": "/settings/general",
+				"scroll": 70,
+				"scrollHeight": 614
+			},
+			{
+				"active": "录制画质",
+				"clientHeight": 522,
+				"deltaX": 0,
+				"deltaY": -0.002777099609375,
+				"heightDelta": 0,
+				"listScroll": 0,
+				"phase": "settings-switched",
+				"route": "/settings/quality",
+				"scroll": 70,
+				"scrollHeight": 614
+			},
+			{
+				"active": "通用",
+				"clientHeight": 522,
+				"deltaX": 0,
+				"deltaY": 0.00299835205078125,
+				"heightDelta": 7.62939453125e-6,
+				"listScroll": 0,
+				"phase": "settings-restored",
+				"route": "/settings/general",
+				"scroll": 0,
+				"scrollHeight": 614
+			},
+			{
+				"account": "敬请期待\n账号\n",
+				"phase": "settings-complete",
+				"route": "/settings/general",
+				"updates": "v0.2.0-alpha.25\n查看历史版本\n检查更新\n敬请期待\n"
+			}
+		]
+	}
+}

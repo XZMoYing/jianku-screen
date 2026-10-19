@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desktop - 设置-通用</title>
+    <style id="theme-vars">
+/* Source: structured-spec */
+/* Brand profile: google / dashboard / clean / analytical / modern */
+/* Theme mode: light-dark */
+/* Alias layer: enabled */
+
+/* Light mode source tokens */
+:root {
+  /* Core surface colors */
+  --background: #ffffff;
+  --foreground: #0e1115;
+  --card: #ffffff;
+  --card-foreground: #0e1115;
+  --popover: #f9f9fa;
+  --popover-foreground: #0e1115;
+
+  /* Semantic action colors */
+  --primary: #4285f4;
+  --primary-foreground: #ffffff;
+  --secondary: #dbeafe;
+  --secondary-foreground: #333942;
+  --muted: #eff1f4;
+  --muted-foreground: #7f8d9f;
+  --accent: #dbeafe;
+  --accent-foreground: #003e8f;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  /* Borders, inputs, focus */
+  --border: #ebebeb;
+  --input: #e2e3e4;
+  --ring: #4285f4;
+
+  /* Data visualization */
+  --chart-1: #4285f4;
+  --chart-2: #ea4335;
+  --chart-3: #fbbc05;
+  --chart-4: #0043ad;
+  --chart-5: #34a853;
+
+  /* Sidebar */
+  --sidebar: #f0f6ff;
+  --sidebar-foreground: #0e1115;
+  --sidebar-primary: #4285f4;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #dbeafe;
+  --sidebar-accent-foreground: #003e8f;
+  --sidebar-border: #e7eaef;
+  --sidebar-ring: #4285f4;
+
+  /* Typography */
+  --font-sans: DM Sans, ui-sans-serif, sans-serif, system-ui;
+  --font-serif: DM Sans, ui-sans-serif, sans-serif, system-ui;
+  --font-mono: JetBrains Mono, monospace;
+
+  /* Radius */
+  --radius: 0.5rem;
+
+  /* Shadow primitives */
+  --shadow-x: 0;
+  --shadow-y: 3px;
+  --shadow-blur: 0px;
+  --shadow-spread: 0px;
+  --shadow-opacity: 0;
+  --shadow-color: #0e1115;
+
+  /* Elevation */
+  --shadow-2xs: 0 3px 0px 0px rgba(14, 17, 21, 0);
+  --shadow-xs: 0 3px 0px 0px rgba(14, 17, 21, 0);
+  --shadow-sm: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 1px 2px -1px rgba(14, 17, 21, 0);
+  --shadow: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 1px 2px -1px rgba(14, 17, 21, 0);
+  --shadow-md: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 2px 4px -1px rgba(14, 17, 21, 0);
+  --shadow-lg: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 4px 6px -1px rgba(14, 17, 21, 0);
+  --shadow-xl: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 8px 10px -1px rgba(14, 17, 21, 0);
+  --shadow-2xl: 0 3px 0px 0px rgba(14, 17, 21, 0);
+
+  /* Rhythm */
+  --tracking-normal: 0em;
+  --spacing: 0.24rem;
+  /* Patched radius aliases for head-contract compatibility */
+  --google-radius-sm: calc(var(--radius) - 4px);
+  --google-radius-md: calc(var(--radius) - 2px);
+  --google-radius-lg: var(--radius);
+
+}
+
+/* Dark mode source tokens */
+.dark {
+  /* Core surface colors */
+  --background: #161616;
+  --foreground: #eff1f4;
+  --card: #1d1d1c;
+  --card-foreground: #eff1f4;
+  --popover: #2e2e2e;
+  --popover-foreground: #e5e5e5;
+
+  /* Semantic action colors */
+  --primary: #fc2c50;
+  --primary-foreground: #ffffff;
+  --secondary: #383838;
+  --secondary-foreground: #e5e5e5;
+  --muted: #383838;
+  --muted-foreground: #949494;
+  --accent: #4a2026;
+  --accent-foreground: #fc2c50;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  /* Borders, inputs, focus */
+  --border: #1d1d1c;
+  --input: #000000;
+  --ring: #ffffff;
+
+  /* Data visualization */
+  --chart-1: #2dccd3;
+  --chart-2: #f1204a;
+  --chart-3: #edbbe8;
+  --chart-4: #fbeb35;
+  --chart-5: #baf6f0;
+
+  /* Sidebar */
+  --sidebar: #171717;
+  --sidebar-foreground: #e5e5e5;
+  --sidebar-primary: #0065fd;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #00266b;
+  --sidebar-accent-foreground: #bfdbfe;
+  --sidebar-border: #404040;
+  --sidebar-ring: #00266b;
+
+  /* Typography */
+  --font-sans: DM Sans, ui-sans-serif, sans-serif, system-ui;
+  --font-serif: DM Sans, ui-sans-serif, sans-serif, system-ui;
+  --font-mono: JetBrains Mono, monospace;
+
+  /* Radius */
+  --radius: 0.5rem;
+
+  /* Shadow primitives */
+  --shadow-x: 0;
+  --shadow-y: 3px;
+  --shadow-blur: 0px;
+  --shadow-spread: 0px;
+  --shadow-opacity: 0;
+  --shadow-color: #000000;
+
+  /* Elevation */
+  --shadow-2xs: 0 3px 0px 0px rgba(0, 0, 0, 0);
+  --shadow-xs: 0 3px 0px 0px rgba(0, 0, 0, 0);
+  --shadow-sm: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 1px 2px -1px rgba(0, 0, 0, 0);
+  --shadow: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 1px 2px -1px rgba(0, 0, 0, 0);
+  --shadow-md: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 2px 4px -1px rgba(0, 0, 0, 0);
+  --shadow-lg: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 4px 6px -1px rgba(0, 0, 0, 0);
+  --shadow-xl: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 8px 10px -1px rgba(0, 0, 0, 0);
+  --shadow-2xl: 0 3px 0px 0px rgba(0, 0, 0, 0);
+}
+
+/* Alias layer */
+@theme inline {
+  /* Color aliases */
+  --google-color-background: var(--background);
+  --google-color-foreground: var(--foreground);
+  --google-color-card: var(--card);
+  --google-color-card-foreground: var(--card-foreground);
+  --google-color-popover: var(--popover);
+  --google-color-popover-foreground: var(--popover-foreground);
+  --google-color-primary: var(--primary);
+  --google-color-primary-foreground: var(--primary-foreground);
+  --google-color-secondary: var(--secondary);
+  --google-color-secondary-foreground: var(--secondary-foreground);
+  --google-color-muted: var(--muted);
+  --google-color-muted-foreground: var(--muted-foreground);
+  --google-color-accent: var(--accent);
+  --google-color-accent-foreground: var(--accent-foreground);
+  --google-color-destructive: var(--destructive);
+  --google-color-destructive-foreground: var(--destructive-foreground);
+  --google-color-border: var(--border);
+  --google-color-input: var(--input);
+  --google-color-ring: var(--ring);
+  --google-color-chart-1: var(--chart-1);
+  --google-color-chart-2: var(--chart-2);
+  --google-color-chart-3: var(--chart-3);
+  --google-color-chart-4: var(--chart-4);
+  --google-color-chart-5: var(--chart-5);
+  --google-color-sidebar: var(--sidebar);
+  --google-color-sidebar-foreground: var(--sidebar-foreground);
+  --google-color-sidebar-primary: var(--sidebar-primary);
+  --google-color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --google-color-sidebar-accent: var(--sidebar-accent);
+  --google-color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --google-color-sidebar-border: var(--sidebar-border);
+  --google-color-sidebar-ring: var(--sidebar-ring);
+
+  /* Typography aliases */
+  --google-font-sans: var(--font-sans);
+  --google-font-serif: var(--font-serif);
+  --google-font-mono: var(--font-mono);
+
+  /* Radius aliases */
+  --google-radius: var(--radius);
+  --google-radius-sm: calc(var(--radius) - 4px);
+  --google-radius-md: calc(var(--radius) - 2px);
+  --google-radius-lg: var(--radius);
+  --google-radius-xl: calc(var(--radius) + 4px);
+
+  /* Shadow aliases */
+  --google-shadow-x: var(--shadow-x);
+  --google-shadow-y: var(--shadow-y);
+  --google-shadow-blur: var(--shadow-blur);
+  --google-shadow-spread: var(--shadow-spread);
+  --google-shadow-opacity: var(--shadow-opacity);
+  --google-shadow-color: var(--shadow-color);
+  --google-shadow-2xs: var(--shadow-2xs);
+  --google-shadow-xs: var(--shadow-xs);
+  --google-shadow-sm: var(--shadow-sm);
+  --google-shadow: var(--shadow);
+  --google-shadow-md: var(--shadow-md);
+  --google-shadow-lg: var(--shadow-lg);
+  --google-shadow-xl: var(--shadow-xl);
+  --google-shadow-2xl: var(--shadow-2xl);
+
+  /* Rhythm aliases */
+  --google-tracking-normal: var(--tracking-normal);
+  --google-spacing: var(--spacing);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --radius-sm: var(--google-radius-sm);
+    --radius-md: var(--google-radius-md);
+    --radius-lg: var(--google-radius-lg);
+  }
+  @layer base {
+    body { background: var(--background); color: var(--foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--background); }
+      .text-background { color: var(--background); }
+      .border-background { border-color: var(--background); }
+      .ring-background { --tw-ring-color: var(--background); }
+      .bg-foreground { background-color: var(--foreground); }
+      .text-foreground { color: var(--foreground); }
+      .border-foreground { border-color: var(--foreground); }
+      .ring-foreground { --tw-ring-color: var(--foreground); }
+      .bg-card { background-color: var(--card); }
+      .text-card { color: var(--card); }
+      .border-card { border-color: var(--card); }
+      .ring-card { --tw-ring-color: var(--card); }
+      .bg-card-foreground { background-color: var(--card-foreground); }
+      .text-card-foreground { color: var(--card-foreground); }
+      .border-card-foreground { border-color: var(--card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--card-foreground); }
+      .bg-popover { background-color: var(--popover); }
+      .text-popover { color: var(--popover); }
+      .border-popover { border-color: var(--popover); }
+      .ring-popover { --tw-ring-color: var(--popover); }
+      .bg-popover-foreground { background-color: var(--popover-foreground); }
+      .text-popover-foreground { color: var(--popover-foreground); }
+      .border-popover-foreground { border-color: var(--popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--popover-foreground); }
+      .bg-primary { background-color: var(--primary); }
+      .text-primary { color: var(--primary); }
+      .border-primary { border-color: var(--primary); }
+      .ring-primary { --tw-ring-color: var(--primary); }
+      .bg-primary-foreground { background-color: var(--primary-foreground); }
+      .text-primary-foreground { color: var(--primary-foreground); }
+      .border-primary-foreground { border-color: var(--primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--primary-foreground); }
+      .bg-secondary { background-color: var(--secondary); }
+      .text-secondary { color: var(--secondary); }
+      .border-secondary { border-color: var(--secondary); }
+      .ring-secondary { --tw-ring-color: var(--secondary); }
+      .bg-secondary-foreground { background-color: var(--secondary-foreground); }
+      .text-secondary-foreground { color: var(--secondary-foreground); }
+      .border-secondary-foreground { border-color: var(--secondary-foreground); }
+      .ring-secondary-foreground { --tw-ring-color: var(--secondary-foreground); }
+      .bg-muted { background-color: var(--muted); }
+      .text-muted { color: var(--muted); }
+      .border-muted { border-color: var(--muted); }
+      .ring-muted { --tw-ring-color: var(--muted); }
+      .bg-muted-foreground { background-color: var(--muted-foreground); }
+      .text-muted-foreground { color: var(--muted-foreground); }
+      .border-muted-foreground { border-color: var(--muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--muted-foreground); }
+      .bg-accent { background-color: var(--accent); }
+      .text-accent { color: var(--accent); }
+      .border-accent { border-color: var(--accent); }
+      .ring-accent { --tw-ring-color: var(--accent); }
+      .bg-accent-foreground { background-color: var(--accent-foreground); }
+      .text-accent-foreground { color: var(--accent-foreground); }
+      .border-accent-foreground { border-color: var(--accent-foreground); }
+      .ring-accent-foreground { --tw-ring-color: var(--accent-foreground); }
+      .bg-destructive { background-color: var(--destructive); }
+      .text-destructive { color: var(--destructive); }
+      .border-destructive { border-color: var(--destructive); }
+      .ring-destructive { --tw-ring-color: var(--destructive); }
+      .bg-destructive-foreground { background-color: var(--destructive-foreground); }
+      .text-destructive-foreground { color: var(--destructive-foreground); }
+      .border-destructive-foreground { border-color: var(--destructive-foreground); }
+      .ring-destructive-foreground { --tw-ring-color: var(--destructive-foreground); }
+      .bg-border { background-color: var(--border); }
+      .text-border { color: var(--border); }
+      .border-border { border-color: var(--border); }
+      .ring-border { --tw-ring-color: var(--border); }
+      .bg-input { background-color: var(--input); }
+      .text-input { color: var(--input); }
+      .border-input { border-color: var(--input); }
+      .ring-input { --tw-ring-color: var(--input); }
+      .bg-ring { background-color: var(--ring); }
+      .text-ring { color: var(--ring); }
+      .border-ring { border-color: var(--ring); }
+      .ring-ring { --tw-ring-color: var(--ring); }
+      .bg-chart-1 { background-color: var(--chart-1); }
+      .text-chart-1 { color: var(--chart-1); }
+      .border-chart-1 { border-color: var(--chart-1); }
+      .ring-chart-1 { --tw-ring-color: var(--chart-1); }
+      .bg-chart-2 { background-color: var(--chart-2); }
+      .text-chart-2 { color: var(--chart-2); }
+      .border-chart-2 { border-color: var(--chart-2); }
+      .ring-chart-2 { --tw-ring-color: var(--chart-2); }
+      .bg-chart-3 { background-color: var(--chart-3); }
+      .text-chart-3 { color: var(--chart-3); }
+      .border-chart-3 { border-color: var(--chart-3); }
+      .ring-chart-3 { --tw-ring-color: var(--chart-3); }
+      .bg-chart-4 { background-color: var(--chart-4); }
+      .text-chart-4 { color: var(--chart-4); }
+      .border-chart-4 { border-color: var(--chart-4); }
+      .ring-chart-4 { --tw-ring-color: var(--chart-4); }
+      .bg-chart-5 { background-color: var(--chart-5); }
+      .text-chart-5 { color: var(--chart-5); }
+      .border-chart-5 { border-color: var(--chart-5); }
+      .ring-chart-5 { --tw-ring-color: var(--chart-5); }
+      .bg-sidebar { background-color: var(--sidebar); }
+      .text-sidebar { color: var(--sidebar); }
+      .border-sidebar { border-color: var(--sidebar); }
+      .ring-sidebar { --tw-ring-color: var(--sidebar); }
+      .bg-sidebar-foreground { background-color: var(--sidebar-foreground); }
+      .text-sidebar-foreground { color: var(--sidebar-foreground); }
+      .border-sidebar-foreground { border-color: var(--sidebar-foreground); }
+      .ring-sidebar-foreground { --tw-ring-color: var(--sidebar-foreground); }
+      .bg-sidebar-primary { background-color: var(--sidebar-primary); }
+      .text-sidebar-primary { color: var(--sidebar-primary); }
+      .border-sidebar-primary { border-color: var(--sidebar-primary); }
+      .ring-sidebar-primary { --tw-ring-color: var(--sidebar-primary); }
+      .bg-sidebar-primary-foreground { background-color: var(--sidebar-primary-foreground); }
+      .text-sidebar-primary-foreground { color: var(--sidebar-primary-foreground); }
+      .border-sidebar-primary-foreground { border-color: var(--sidebar-primary-foreground); }
+      .ring-sidebar-primary-foreground { --tw-ring-color: var(--sidebar-primary-foreground); }
+      .bg-sidebar-accent { background-color: var(--sidebar-accent); }
+      .text-sidebar-accent { color: var(--sidebar-accent); }
+      .border-sidebar-accent { border-color: var(--sidebar-accent); }
+      .ring-sidebar-accent { --tw-ring-color: var(--sidebar-accent); }
+      .bg-sidebar-accent-foreground { background-color: var(--sidebar-accent-foreground); }
+      .text-sidebar-accent-foreground { color: var(--sidebar-accent-foreground); }
+      .border-sidebar-accent-foreground { border-color: var(--sidebar-accent-foreground); }
+      .ring-sidebar-accent-foreground { --tw-ring-color: var(--sidebar-accent-foreground); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="settings-shell">
+      <aside class="settings-sidebar" aria-label="设置分类">
+        <div class="settings-brand">
+          <span class="settings-brand-mark">JK</span>
+          <span>Jianku Screen</span>
+        </div>
+        <nav class="settings-nav" aria-label="设置导航">
+          <a class="settings-nav-item active" href="./desktop-settings-general.html" aria-current="page">
+            <span data-icon style="width:18px;height:18px;mask-image:url(../assets/icons/google/house.svg)"></span>
+            通用
+          </a>
+          <a class="settings-nav-item" href="#">
+            <span data-icon style="width:18px;height:18px;mask-image:url(../assets/icons/google/circle-play.svg)"></span>
+            录制
+          </a>
+          <a class="settings-nav-item" href="#">
+            <span data-icon style="width:18px;height:18px;mask-image:url(../assets/icons/google/external-link.svg)"></span>
+            集成
+          </a>
+          <a class="settings-nav-item" href="#">
+            <span data-icon style="width:18px;height:18px;mask-image:url(../assets/icons/google/user.svg)"></span>
+            账户
+          </a>
+        </nav>
+      </aside>
+
+      <section class="settings-main">
+        <div class="settings-scroll">
+          <h1 class="settings-title">通用设置</h1>
+          <div class="settings-cards">
+            <article class="settings-card">
+              <header class="settings-card-header">
+                <h2 class="settings-card-title">语言与地区</h2>
+                <p class="settings-card-desc">选择界面显示语言、日期和数字格式。</p>
+              </header>
+              <div class="settings-row">
+                <div class="settings-row-body">
+                  <span class="settings-row-label">显示语言</span>
+                  <span class="settings-row-hint">用于菜单、标签和提示文本。</span>
+                </div>
+                <select class="settings-select" aria-label="显示语言">
+                  <option value="zh-CN" selected>简体中文</option>
+                  <option value="zh-TW">繁体中文</option>
+                  <option value="en-US">English (US)</option>
+                  <option value="ja-JP">日本語</option>
+                </select>
+              </div>
+              <div class="settings-row">
+                <div class="settings-row-body">
+                  <span class="settings-row-label">地区格式</span>
+                  <span class="settings-row-hint">影响日期、时间和数字的显示方式。</span>
+                </div>
+                <select class="settings-select" aria-label="地区格式">
+                  <option value="zh-CN" selected>中国（公制、24小时制）</option>
+                  <option value="en-US">美国（英制、12小时制）</option>
+                  <option value="en-GB">英国（公制、24小时制）</option>
+                </select>
+              </div>
+            </article>
+
+            <article class="settings-card">
+              <header class="settings-card-header">
+                <h2 class="settings-card-title">外观</h2>
+                <p class="settings-card-desc">调整应用的主题和强调色。</p>
+              </header>
+              <div class="settings-row">
+                <div class="settings-row-body">
+                  <span class="settings-row-label">主题模式</span>
+                  <span class="settings-row-hint">选择浅色、深色或跟随系统设置。</span>
+                </div>
+                <div class="settings-radio-group" role="radiogroup" aria-label="主题模式">
+                  <label class="settings-radio-option">
+                    <input type="radio" name="theme" value="light" checked>
+                    浅色
+                  </label>
+                  <label class="settings-radio-option">
+                    <input type="radio" name="theme" value="dark">
+                    深色
+                  </label>
+                  <label class="settings-radio-option">
+                    <input type="radio" name="theme" value="system">
+                    跟随系统
+                  </label>
+                </div>
+              </div>
+              <div class="settings-row">
+                <div class="settings-row-body">
+                  <span class="settings-row-label">强调色</span>
+                  <span class="settings-row-hint">用于按钮、开关和焦点高亮。</span>
+                </div>
+                <div class="settings-radio-group" role="radiogroup" aria-label="强调色">
+                  <label class="settings-radio-option">
+                    <input type="radio" name="accent" value="blue" checked>
+                    蓝色
+                  </label>
+                  <label class="settings-radio-option">
+                    <input type="radio" name="accent" value="green">
+                    绿色
+                  </label>
+                  <label class="settings-radio-option">
+                    <input type="radio" name="accent" value="purple">
+                    紫色
+                  </label>
+                </div>
+              </div>
+            </article>
+
+            <article class="settings-card">
+              <header class="settings-card-header">
+                <h2 class="settings-card-title">通知</h2>
+                <p class="settings-card-desc">控制应用何时以及如何发送提醒。</p>
+              </header>
+              <div class="settings-row">
+                <div class="settings-row-body">
+                  <span class="settings-row-label">启用桌面通知</span>
+                  <span class="settings-row-hint">在录制完成或导出成功时弹出系统通知。</span>
+                </div>
+                <label class="settings-toggle" aria-label="启用桌面通知">
+                  <input type="checkbox" checked>
+                  <span class="settings-toggle-track" aria-hidden="true"><span class="settings-toggle-thumb"></span></span>
+                </label>
+              </div>
+              <div class="settings-row">
+                <div class="settings-row-body">
+                  <span class="settings-row-label">声音反馈</span>
+                  <span class="settings-row-hint">在关键操作（如开始/停止录制）时播放提示音。</span>
+                </div>
+                <label class="settings-toggle" aria-label="声音反馈">
+                  <input type="checkbox" checked>
+                  <span class="settings-toggle-track" aria-hidden="true"><span class="settings-toggle-thumb"></span></span>
+                </label>
+              </div>
+              <div class="settings-row">
+                <div class="settings-row-body">
+                  <span class="settings-row-label">每周摘要邮件</span>
+                  <span class="settings-row-hint">每周一发送使用时长与存储空间摘要。</span>
+                </div>
+                <label class="settings-toggle" aria-label="每周摘要邮件">
+                  <input type="checkbox">
+                  <span class="settings-toggle-track" aria-hidden="true"><span class="settings-toggle-thumb"></span></span>
+                </label>
+              </div>
+            </article>
+
+            <article class="settings-card">
+              <header class="settings-card-header">
+                <h2 class="settings-card-title">启动与更新</h2>
+                <p class="settings-card-desc">配置开机行为与自动更新策略。</p>
+              </header>
+              <div class="settings-row">
+                <div class="settings-row-body">
+                  <span class="settings-row-label">开机自动启动</span>
+                  <span class="settings-row-hint">登录系统后自动在后台运行 Jianku Screen。</span>
+                </div>
+                <label class="settings-toggle" aria-label="开机自动启动">
+                  <input type="checkbox" checked>
+                  <span class="settings-toggle-track" aria-hidden="true"><span class="settings-toggle-thumb"></span></span>
+                </label>
+              </div>
+              <div class="settings-row">
+                <div class="settings-row-body">
+                  <span class="settings-row-label">自动检查更新</span>
+                  <span class="settings-row-hint">每天检查一次新版本，并在可用时显示提示。</span>
+                </div>
+                <label class="settings-toggle" aria-label="自动检查更新">
+                  <input type="checkbox" checked>
+                  <span class="settings-toggle-track" aria-hidden="true"><span class="settings-toggle-thumb"></span></span>
+                </label>
+              </div>
+              <div class="settings-row">
+                <div class="settings-row-body">
+                  <span class="settings-row-label">自动下载更新</span>
+                  <span class="settings-row-hint">在检测到新版本时自动下载安装包。</span>
+                </div>
+                <label class="settings-toggle" aria-label="自动下载更新">
+                  <input type="checkbox">
+                  <span class="settings-toggle-track" aria-hidden="true"><span class="settings-toggle-thumb"></span></span>
+                </label>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <footer class="settings-save-bar" aria-label="保存更改">
+          <span class="text-sm text-muted-foreground" id="save-status">有未保存的更改</span>
+          <div class="settings-save-actions">
+            <button class="settings-btn settings-btn-secondary" type="button">重置</button>
+            <button class="settings-btn settings-btn-primary" type="button">保存设置</button>
+          </div>
+        </footer>
+      </section>
+    </main>
+    <script>lucide.createIcons();</script>
+
+    <style id="critical-layout">
+      .settings-shell {
+        display: flex;
+        min-height: 100vh;
+        background: var(--background);
+        color: var(--foreground);
+      }
+      .settings-sidebar {
+        width: 260px;
+        flex: 0 0 260px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 16px;
+        background: var(--sidebar);
+        color: var(--sidebar-foreground);
+        border-right: 1px solid var(--sidebar-border);
+      }
+      .settings-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px 16px;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--sidebar-foreground);
+      }
+      .settings-brand-mark {
+        width: 28px;
+        height: 28px;
+        border-radius: var(--radius);
+        background: var(--sidebar-primary);
+        color: var(--sidebar-primary-foreground);
+        display: grid;
+        place-items: center;
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .settings-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .settings-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: var(--radius);
+        color: inherit;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+      }
+      .settings-nav-item:hover {
+        background: var(--sidebar-accent);
+        color: var(--sidebar-accent-foreground);
+      }
+      .settings-nav-item.active {
+        background: var(--sidebar-primary);
+        color: var(--sidebar-primary-foreground);
+      }
+      .settings-nav-item:focus-visible {
+        outline: 2px solid var(--sidebar-ring);
+        outline-offset: 2px;
+      }
+      .settings-main {
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        padding-bottom: 80px;
+      }
+      .settings-scroll {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        padding: 28px 32px 32px;
+      }
+      .settings-title {
+        font-size: 24px;
+        line-height: 1.2;
+        font-weight: 700;
+        margin: 0 0 24px;
+        color: var(--foreground);
+      }
+      .settings-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        max-width: 720px;
+      }
+      .settings-card {
+        background: var(--card);
+        color: var(--card-foreground);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+        padding: 20px;
+      }
+      .settings-card-header {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-bottom: 16px;
+      }
+      .settings-card-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--foreground);
+      }
+      .settings-card-desc {
+        font-size: 13px;
+        line-height: 1.4;
+        color: var(--muted-foreground);
+      }
+      .settings-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 0;
+        border-top: 1px solid var(--border);
+      }
+      .settings-row:first-of-type {
+        border-top: none;
+        padding-top: 0;
+      }
+      .settings-row:last-child {
+        padding-bottom: 0;
+      }
+      .settings-row-body {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+      }
+      .settings-row-label {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--foreground);
+      }
+      .settings-row-hint {
+        font-size: 12px;
+        line-height: 1.4;
+        color: var(--muted-foreground);
+      }
+      .settings-select,
+      .settings-input {
+        min-width: 180px;
+        height: 36px;
+        padding: 0 12px;
+        border: 1px solid var(--input);
+        border-radius: var(--radius);
+        background: var(--background);
+        color: var(--foreground);
+        font: inherit;
+        font-size: 13px;
+      }
+      .settings-select:focus-visible,
+      .settings-input:focus-visible {
+        outline: 2px solid var(--ring);
+        outline-offset: 2px;
+      }
+      .settings-select {
+        appearance: none;
+        background-image: url("../assets/icons/google/chevron-down.svg");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 16px 16px;
+        padding-right: 34px;
+      }
+      .settings-radio-group {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .settings-radio-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--background);
+        color: var(--foreground);
+        font-size: 13px;
+        cursor: pointer;
+      }
+      .settings-radio-option:has(input:checked) {
+        border-color: var(--primary);
+        background: var(--secondary);
+        color: var(--secondary-foreground);
+      }
+      .settings-radio-option input {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--primary);
+      }
+      .settings-toggle {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+      }
+      .settings-toggle input {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .settings-toggle-track {
+        width: 40px;
+        height: 22px;
+        border-radius: 999px;
+        background: var(--input);
+        position: relative;
+        transition: background-color 0.15s ease;
+      }
+      .settings-toggle-thumb {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 18px;
+        height: 18px;
+        border-radius: 999px;
+        background: var(--background);
+        transition: transform 0.15s ease;
+      }
+      .settings-toggle input:checked + .settings-toggle-track {
+        background: var(--primary);
+      }
+      .settings-toggle input:checked + .settings-toggle-track .settings-toggle-thumb {
+        transform: translateX(18px);
+      }
+      .settings-toggle input:focus-visible + .settings-toggle-track {
+        outline: 2px solid var(--ring);
+        outline-offset: 2px;
+      }
+      .settings-save-bar {
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 32px;
+        background: var(--card);
+        border-top: 1px solid var(--border);
+        box-shadow: var(--shadow-sm);
+      }
+      .settings-save-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .settings-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        height: 36px;
+        padding: 0 16px;
+        border: 1px solid transparent;
+        border-radius: var(--radius);
+        font: 500 13px/1 var(--font-sans);
+        cursor: pointer;
+        transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+      }
+      .settings-btn:focus-visible {
+        outline: 2px solid var(--ring);
+        outline-offset: 2px;
+      }
+      .settings-btn-primary {
+        background: var(--primary);
+        color: var(--primary-foreground);
+      }
+      .settings-btn-primary:hover {
+        filter: brightness(0.96);
+      }
+      .settings-btn-secondary {
+        background: var(--secondary);
+        color: var(--secondary-foreground);
+        border-color: var(--border);
+      }
+      .settings-btn-secondary:hover {
+        background: var(--accent);
+        color: var(--accent-foreground);
+      }
+      @media (max-width: 960px) {
+        .settings-sidebar {
+          width: 220px;
+          flex: 0 0 220px;
+        }
+        .settings-scroll {
+          padding: 20px 24px 28px;
+        }
+        .settings-save-bar {
+          padding: 12px 24px;
+        }
+      }
+    </style>
+</body>
+</html>

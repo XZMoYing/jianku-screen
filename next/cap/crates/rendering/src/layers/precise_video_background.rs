@@ -42,7 +42,16 @@ impl PreciseVideoBackground {
         })
     }
 
+    #[cfg(test)]
     pub fn frame(&mut self, time: f64) -> Result<DecodedFrame, String> {
+        self.frame_with_cancel(time, || false)
+    }
+
+    pub fn frame_with_cancel(
+        &mut self,
+        time: f64,
+        cancelled: impl Fn() -> bool,
+    ) -> Result<DecodedFrame, String> {
         if let Some((previous, frame)) = &self.last
             && self.same_request(time, *previous)
         {
@@ -60,7 +69,7 @@ impl PreciseVideoBackground {
             self.ahead.take().ok_or("预取壁纸未就绪")?.1
         } else {
             self.ahead = None;
-            self.sample(time)?
+            self.sample(time, &cancelled)?
         };
         self.last = Some((time, frame.clone()));
         Ok(frame)
@@ -76,7 +85,7 @@ impl PreciseVideoBackground {
             && let Some((previous, _)) = &self.last
         {
             let target = previous + step;
-            if let Ok(frame) = self.sample(target) {
+            if let Ok(frame) = self.sample(target, &|| false) {
                 self.ahead = Some((target, frame));
             }
         }
@@ -87,11 +96,15 @@ impl PreciseVideoBackground {
         self.decoded_time
     }
 
-    fn sample(&mut self, time: f64) -> Result<DecodedFrame, String> {
+    fn sample(&mut self, time: f64, cancelled: &impl Fn() -> bool) -> Result<DecodedFrame, String> {
+        if cancelled() {
+            return Err("壁纸定位已取消".into());
+        }
         let time = loop_time(time, self.duration);
         if self
             .decode_request
-            .is_some_and(|previous| time < previous - 0.0001 || time > self.decoded_time + 2.0)
+            .is_some_and(|previous| time < previous - 0.0001)
+            || time > self.decoded_time + 2.0
         {
             self.decoder.reset(time as f32)?;
             self.decoded_time = -1.0;
@@ -99,6 +112,9 @@ impl PreciseVideoBackground {
         }
         self.decode_request = Some(time);
         while self.decoded_frame.is_none() || self.decoded_time + 0.0001 < time {
+            if cancelled() {
+                return Err("壁纸定位已取消".into());
+            }
             let Some(sample) = self.decoder.frames().next() else {
                 break;
             };

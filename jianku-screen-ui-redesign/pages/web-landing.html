@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web - 官网首页</title>
+    <style id="theme-vars">
+/* Source: structured-spec */
+/* Brand profile: google / dashboard / clean / analytical / modern */
+/* Theme mode: light-dark */
+/* Alias layer: enabled */
+
+/* Light mode source tokens */
+:root {
+  /* Core surface colors */
+  --background: #ffffff;
+  --foreground: #0e1115;
+  --card: #ffffff;
+  --card-foreground: #0e1115;
+  --popover: #f9f9fa;
+  --popover-foreground: #0e1115;
+
+  /* Semantic action colors */
+  --primary: #4285f4;
+  --primary-foreground: #ffffff;
+  --secondary: #dbeafe;
+  --secondary-foreground: #333942;
+  --muted: #eff1f4;
+  --muted-foreground: #7f8d9f;
+  --accent: #dbeafe;
+  --accent-foreground: #003e8f;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  /* Borders, inputs, focus */
+  --border: #ebebeb;
+  --input: #e2e3e4;
+  --ring: #4285f4;
+
+  /* Data visualization */
+  --chart-1: #4285f4;
+  --chart-2: #ea4335;
+  --chart-3: #fbbc05;
+  --chart-4: #0043ad;
+  --chart-5: #34a853;
+
+  /* Sidebar */
+  --sidebar: #f0f6ff;
+  --sidebar-foreground: #0e1115;
+  --sidebar-primary: #4285f4;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #dbeafe;
+  --sidebar-accent-foreground: #003e8f;
+  --sidebar-border: #e7eaef;
+  --sidebar-ring: #4285f4;
+
+  /* Typography */
+  --font-sans: DM Sans, ui-sans-serif, sans-serif, system-ui;
+  --font-serif: DM Sans, ui-sans-serif, sans-serif, system-ui;
+  --font-mono: JetBrains Mono, monospace;
+
+  /* Radius */
+  --radius: 0.5rem;
+
+  /* Shadow primitives */
+  --shadow-x: 0;
+  --shadow-y: 3px;
+  --shadow-blur: 0px;
+  --shadow-spread: 0px;
+  --shadow-opacity: 0;
+  --shadow-color: #0e1115;
+
+  /* Elevation */
+  --shadow-2xs: 0 3px 0px 0px rgba(14, 17, 21, 0);
+  --shadow-xs: 0 3px 0px 0px rgba(14, 17, 21, 0);
+  --shadow-sm: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 1px 2px -1px rgba(14, 17, 21, 0);
+  --shadow: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 1px 2px -1px rgba(14, 17, 21, 0);
+  --shadow-md: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 2px 4px -1px rgba(14, 17, 21, 0);
+  --shadow-lg: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 4px 6px -1px rgba(14, 17, 21, 0);
+  --shadow-xl: 0 3px 0px 0px rgba(14, 17, 21, 0), 0 8px 10px -1px rgba(14, 17, 21, 0);
+  --shadow-2xl: 0 3px 0px 0px rgba(14, 17, 21, 0);
+
+  /* Rhythm */
+  --tracking-normal: 0em;
+  --spacing: 0.24rem;
+  /* Patched radius aliases for head-contract compatibility */
+  --google-radius-sm: calc(var(--radius) - 4px);
+  --google-radius-md: calc(var(--radius) - 2px);
+  --google-radius-lg: var(--radius);
+
+}
+
+/* Dark mode source tokens */
+.dark {
+  /* Core surface colors */
+  --background: #161616;
+  --foreground: #eff1f4;
+  --card: #1d1d1c;
+  --card-foreground: #eff1f4;
+  --popover: #2e2e2e;
+  --popover-foreground: #e5e5e5;
+
+  /* Semantic action colors */
+  --primary: #fc2c50;
+  --primary-foreground: #ffffff;
+  --secondary: #383838;
+  --secondary-foreground: #e5e5e5;
+  --muted: #383838;
+  --muted-foreground: #949494;
+  --accent: #4a2026;
+  --accent-foreground: #fc2c50;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  /* Borders, inputs, focus */
+  --border: #1d1d1c;
+  --input: #000000;
+  --ring: #ffffff;
+
+  /* Data visualization */
+  --chart-1: #2dccd3;
+  --chart-2: #f1204a;
+  --chart-3: #edbbe8;
+  --chart-4: #fbeb35;
+  --chart-5: #baf6f0;
+
+  /* Sidebar */
+  --sidebar: #171717;
+  --sidebar-foreground: #e5e5e5;
+  --sidebar-primary: #0065fd;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #00266b;
+  --sidebar-accent-foreground: #bfdbfe;
+  --sidebar-border: #404040;
+  --sidebar-ring: #00266b;
+
+  /* Typography */
+  --font-sans: DM Sans, ui-sans-serif, sans-serif, system-ui;
+  --font-serif: DM Sans, ui-sans-serif, sans-serif, system-ui;
+  --font-mono: JetBrains Mono, monospace;
+
+  /* Radius */
+  --radius: 0.5rem;
+
+  /* Shadow primitives */
+  --shadow-x: 0;
+  --shadow-y: 3px;
+  --shadow-blur: 0px;
+  --shadow-spread: 0px;
+  --shadow-opacity: 0;
+  --shadow-color: #000000;
+
+  /* Elevation */
+  --shadow-2xs: 0 3px 0px 0px rgba(0, 0, 0, 0);
+  --shadow-xs: 0 3px 0px 0px rgba(0, 0, 0, 0);
+  --shadow-sm: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 1px 2px -1px rgba(0, 0, 0, 0);
+  --shadow: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 1px 2px -1px rgba(0, 0, 0, 0);
+  --shadow-md: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 2px 4px -1px rgba(0, 0, 0, 0);
+  --shadow-lg: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 4px 6px -1px rgba(0, 0, 0, 0);
+  --shadow-xl: 0 3px 0px 0px rgba(0, 0, 0, 0), 0 8px 10px -1px rgba(0, 0, 0, 0);
+  --shadow-2xl: 0 3px 0px 0px rgba(0, 0, 0, 0);
+}
+
+/* Alias layer */
+@theme inline {
+  /* Color aliases */
+  --google-color-background: var(--background);
+  --google-color-foreground: var(--foreground);
+  --google-color-card: var(--card);
+  --google-color-card-foreground: var(--card-foreground);
+  --google-color-popover: var(--popover);
+  --google-color-popover-foreground: var(--popover-foreground);
+  --google-color-primary: var(--primary);
+  --google-color-primary-foreground: var(--primary-foreground);
+  --google-color-secondary: var(--secondary);
+  --google-color-secondary-foreground: var(--secondary-foreground);
+  --google-color-muted: var(--muted);
+  --google-color-muted-foreground: var(--muted-foreground);
+  --google-color-accent: var(--accent);
+  --google-color-accent-foreground: var(--accent-foreground);
+  --google-color-destructive: var(--destructive);
+  --google-color-destructive-foreground: var(--destructive-foreground);
+  --google-color-border: var(--border);
+  --google-color-input: var(--input);
+  --google-color-ring: var(--ring);
+  --google-color-chart-1: var(--chart-1);
+  --google-color-chart-2: var(--chart-2);
+  --google-color-chart-3: var(--chart-3);
+  --google-color-chart-4: var(--chart-4);
+  --google-color-chart-5: var(--chart-5);
+  --google-color-sidebar: var(--sidebar);
+  --google-color-sidebar-foreground: var(--sidebar-foreground);
+  --google-color-sidebar-primary: var(--sidebar-primary);
+  --google-color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --google-color-sidebar-accent: var(--sidebar-accent);
+  --google-color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --google-color-sidebar-border: var(--sidebar-border);
+  --google-color-sidebar-ring: var(--sidebar-ring);
+
+  /* Typography aliases */
+  --google-font-sans: var(--font-sans);
+  --google-font-serif: var(--font-serif);
+  --google-font-mono: var(--font-mono);
+
+  /* Radius aliases */
+  --google-radius: var(--radius);
+  --google-radius-sm: calc(var(--radius) - 4px);
+  --google-radius-md: calc(var(--radius) - 2px);
+  --google-radius-lg: var(--radius);
+  --google-radius-xl: calc(var(--radius) + 4px);
+
+  /* Shadow aliases */
+  --google-shadow-x: var(--shadow-x);
+  --google-shadow-y: var(--shadow-y);
+  --google-shadow-blur: var(--shadow-blur);
+  --google-shadow-spread: var(--shadow-spread);
+  --google-shadow-opacity: var(--shadow-opacity);
+  --google-shadow-color: var(--shadow-color);
+  --google-shadow-2xs: var(--shadow-2xs);
+  --google-shadow-xs: var(--shadow-xs);
+  --google-shadow-sm: var(--shadow-sm);
+  --google-shadow: var(--shadow);
+  --google-shadow-md: var(--shadow-md);
+  --google-shadow-lg: var(--shadow-lg);
+  --google-shadow-xl: var(--shadow-xl);
+  --google-shadow-2xl: var(--shadow-2xl);
+
+  /* Rhythm aliases */
+  --google-tracking-normal: var(--tracking-normal);
+  --google-spacing: var(--spacing);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --radius-sm: var(--google-radius-sm);
+    --radius-md: var(--google-radius-md);
+    --radius-lg: var(--google-radius-lg);
+  }
+  @layer base {
+    body { background: var(--background); color: var(--foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--background); }
+      .text-background { color: var(--background); }
+      .border-background { border-color: var(--background); }
+      .ring-background { --tw-ring-color: var(--background); }
+      .bg-foreground { background-color: var(--foreground); }
+      .text-foreground { color: var(--foreground); }
+      .border-foreground { border-color: var(--foreground); }
+      .ring-foreground { --tw-ring-color: var(--foreground); }
+      .bg-card { background-color: var(--card); }
+      .text-card { color: var(--card); }
+      .border-card { border-color: var(--card); }
+      .ring-card { --tw-ring-color: var(--card); }
+      .bg-card-foreground { background-color: var(--card-foreground); }
+      .text-card-foreground { color: var(--card-foreground); }
+      .border-card-foreground { border-color: var(--card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--card-foreground); }
+      .bg-popover { background-color: var(--popover); }
+      .text-popover { color: var(--popover); }
+      .border-popover { border-color: var(--popover); }
+      .ring-popover { --tw-ring-color: var(--popover); }
+      .bg-popover-foreground { background-color: var(--popover-foreground); }
+      .text-popover-foreground { color: var(--popover-foreground); }
+      .border-popover-foreground { border-color: var(--popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--popover-foreground); }
+      .bg-primary { background-color: var(--primary); }
+      .text-primary { color: var(--primary); }
+      .border-primary { border-color: var(--primary); }
+      .ring-primary { --tw-ring-color: var(--primary); }
+      .bg-primary-foreground { background-color: var(--primary-foreground); }
+      .text-primary-foreground { color: var(--primary-foreground); }
+      .border-primary-foreground { border-color: var(--primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--primary-foreground); }
+      .bg-secondary { background-color: var(--secondary); }
+      .text-secondary { color: var(--secondary); }
+      .border-secondary { border-color: var(--secondary); }
+      .ring-secondary { --tw-ring-color: var(--secondary); }
+      .bg-secondary-foreground { background-color: var(--secondary-foreground); }
+      .text-secondary-foreground { color: var(--secondary-foreground); }
+      .border-secondary-foreground { border-color: var(--secondary-foreground); }
+      .ring-secondary-foreground { --tw-ring-color: var(--secondary-foreground); }
+      .bg-muted { background-color: var(--muted); }
+      .text-muted { color: var(--muted); }
+      .border-muted { border-color: var(--muted); }
+      .ring-muted { --tw-ring-color: var(--muted); }
+      .bg-muted-foreground { background-color: var(--muted-foreground); }
+      .text-muted-foreground { color: var(--muted-foreground); }
+      .border-muted-foreground { border-color: var(--muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--muted-foreground); }
+      .bg-accent { background-color: var(--accent); }
+      .text-accent { color: var(--accent); }
+      .border-accent { border-color: var(--accent); }
+      .ring-accent { --tw-ring-color: var(--accent); }
+      .bg-accent-foreground { background-color: var(--accent-foreground); }
+      .text-accent-foreground { color: var(--accent-foreground); }
+      .border-accent-foreground { border-color: var(--accent-foreground); }
+      .ring-accent-foreground { --tw-ring-color: var(--accent-foreground); }
+      .bg-destructive { background-color: var(--destructive); }
+      .text-destructive { color: var(--destructive); }
+      .border-destructive { border-color: var(--destructive); }
+      .ring-destructive { --tw-ring-color: var(--destructive); }
+      .bg-destructive-foreground { background-color: var(--destructive-foreground); }
+      .text-destructive-foreground { color: var(--destructive-foreground); }
+      .border-destructive-foreground { border-color: var(--destructive-foreground); }
+      .ring-destructive-foreground { --tw-ring-color: var(--destructive-foreground); }
+      .bg-border { background-color: var(--border); }
+      .text-border { color: var(--border); }
+      .border-border { border-color: var(--border); }
+      .ring-border { --tw-ring-color: var(--border); }
+      .bg-input { background-color: var(--input); }
+      .text-input { color: var(--input); }
+      .border-input { border-color: var(--input); }
+      .ring-input { --tw-ring-color: var(--input); }
+      .bg-ring { background-color: var(--ring); }
+      .text-ring { color: var(--ring); }
+      .border-ring { border-color: var(--ring); }
+      .ring-ring { --tw-ring-color: var(--ring); }
+      .bg-chart-1 { background-color: var(--chart-1); }
+      .text-chart-1 { color: var(--chart-1); }
+      .border-chart-1 { border-color: var(--chart-1); }
+      .ring-chart-1 { --tw-ring-color: var(--chart-1); }
+      .bg-chart-2 { background-color: var(--chart-2); }
+      .text-chart-2 { color: var(--chart-2); }
+      .border-chart-2 { border-color: var(--chart-2); }
+      .ring-chart-2 { --tw-ring-color: var(--chart-2); }
+      .bg-chart-3 { background-color: var(--chart-3); }
+      .text-chart-3 { color: var(--chart-3); }
+      .border-chart-3 { border-color: var(--chart-3); }
+      .ring-chart-3 { --tw-ring-color: var(--chart-3); }
+      .bg-chart-4 { background-color: var(--chart-4); }
+      .text-chart-4 { color: var(--chart-4); }
+      .border-chart-4 { border-color: var(--chart-4); }
+      .ring-chart-4 { --tw-ring-color: var(--chart-4); }
+      .bg-chart-5 { background-color: var(--chart-5); }
+      .text-chart-5 { color: var(--chart-5); }
+      .border-chart-5 { border-color: var(--chart-5); }
+      .ring-chart-5 { --tw-ring-color: var(--chart-5); }
+      .bg-sidebar { background-color: var(--sidebar); }
+      .text-sidebar { color: var(--sidebar); }
+      .border-sidebar { border-color: var(--sidebar); }
+      .ring-sidebar { --tw-ring-color: var(--sidebar); }
+      .bg-sidebar-foreground { background-color: var(--sidebar-foreground); }
+      .text-sidebar-foreground { color: var(--sidebar-foreground); }
+      .border-sidebar-foreground { border-color: var(--sidebar-foreground); }
+      .ring-sidebar-foreground { --tw-ring-color: var(--sidebar-foreground); }
+      .bg-sidebar-primary { background-color: var(--sidebar-primary); }
+      .text-sidebar-primary { color: var(--sidebar-primary); }
+      .border-sidebar-primary { border-color: var(--sidebar-primary); }
+      .ring-sidebar-primary { --tw-ring-color: var(--sidebar-primary); }
+      .bg-sidebar-primary-foreground { background-color: var(--sidebar-primary-foreground); }
+      .text-sidebar-primary-foreground { color: var(--sidebar-primary-foreground); }
+      .border-sidebar-primary-foreground { border-color: var(--sidebar-primary-foreground); }
+      .ring-sidebar-primary-foreground { --tw-ring-color: var(--sidebar-primary-foreground); }
+      .bg-sidebar-accent { background-color: var(--sidebar-accent); }
+      .text-sidebar-accent { color: var(--sidebar-accent); }
+      .border-sidebar-accent { border-color: var(--sidebar-accent); }
+      .ring-sidebar-accent { --tw-ring-color: var(--sidebar-accent); }
+      .bg-sidebar-accent-foreground { background-color: var(--sidebar-accent-foreground); }
+      .text-sidebar-accent-foreground { color: var(--sidebar-accent-foreground); }
+      .border-sidebar-accent-foreground { border-color: var(--sidebar-accent-foreground); }
+      .ring-sidebar-accent-foreground { --tw-ring-color: var(--sidebar-accent-foreground); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main>
+      <header class="google-topbar">
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-semibold text-foreground">Jianku Screen Next</span>
+        </div>
+        <nav class="google-topbar-nav hidden md:flex" aria-label="主导航">
+          <a class="inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" href="#features">功能</a>
+          <a class="inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" href="#how-it-works">流程</a>
+          <a class="inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" href="#testimonials">评价</a>
+          <a class="inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" href="#pricing">价格</a>
+        </nav>
+        <div class="flex items-center gap-2">
+          <button class="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-border bg-transparent px-3 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" type="button">登录</button>
+          <button class="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" type="button">免费试用</button>
+        </div>
+      </header>
+
+      <section aria-labelledby="hero-title" class="google-hero">
+        <div class="flex flex-col gap-6">
+          <span class="google-eyebrow">Jianku Screen Next</span>
+          <h1 class="text-4xl font-bold leading-tight tracking-tight text-foreground md:text-5xl" id="hero-title">让屏幕演示像脚本一样精准</h1>
+          <p class="max-w-xl text-base text-muted-foreground md:text-lg">从录制、聚焦到动态模糊与多轨剪辑，为产品演示、在线教学与远程汇报打造一气呵成的屏幕叙事工具。</p>
+          <div class="flex flex-wrap items-center gap-3">
+            <button class="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground transition-colors hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" type="button">
+              <span data-icon="" style="mask-image: url(../assets/icons/google/circle-play.svg); -webkit-mask-image: url(../assets/icons/google/circle-play.svg); width: 16px; height: 16px;"></span>
+              免费开始使用
+            </button>
+            <button class="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-border bg-transparent px-5 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" type="button">查看演示</button>
+          </div>
+        </div>
+        <div aria-label="抽象产品界面示意图" class="google-hero-canvas" role="img">
+          <div class="shape-screen"></div>
+          <div class="shape-blur"></div>
+          <div class="shape-frame"></div>
+          <div class="shape-pointer"></div>
+          <div class="absolute right-[22%] top-[28%] h-[3%] w-[18%] rounded bg-primary/20"></div>
+          <div class="absolute bottom-[26%] right-[24%] h-[2%] w-[14%] rounded bg-muted-foreground/20"></div>
+        </div>
+      </section>
+
+      <section aria-labelledby="features-title" class="px-7 py-16" id="features">
+        <div class="mx-auto max-w-6xl">
+          <div class="mb-10">
+            <span class="google-eyebrow">核心能力</span>
+            <h2 class="mt-2 text-2xl font-bold text-foreground md:text-3xl" id="features-title">为演示而生的六件利器</h2>
+          </div>
+          <div class="google-feature-grid">
+            <article class="flex flex-col gap-4 rounded-lg border border-border bg-card p-6 text-card-foreground transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <span data-icon="" style="mask-image: url(../assets/icons/google/mouse-pointer-click.svg); -webkit-mask-image: url(../assets/icons/google/mouse-pointer-click.svg); width: 20px; height: 20px;"></span>
+              </div>
+              <h3 class="font-semibold">丝滑指针</h3>
+              <p class="text-sm leading-relaxed text-muted-foreground">自动平滑鼠标轨迹，去除抖动，让观众目光始终跟随关键操作。</p>
+            </article>
+            <article class="flex flex-col gap-4 rounded-lg border border-border bg-card p-6 text-card-foreground transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <span data-icon="" style="mask-image: url(../assets/icons/google/circle-plus.svg); -webkit-mask-image: url(../assets/icons/google/circle-plus.svg); width: 20px; height: 20px;"></span>
+              </div>
+              <h3 class="font-semibold">聚焦放大</h3>
+              <p class="text-sm leading-relaxed text-muted-foreground">一键放大点击区域，突出重点步骤，复杂流程也能讲得清楚。</p>
+            </article>
+            <article class="flex flex-col gap-4 rounded-lg border border-border bg-card p-6 text-card-foreground transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <span data-icon="" style="mask-image: url(../assets/icons/google/funnel.svg); -webkit-mask-image: url(../assets/icons/google/funnel.svg); width: 20px; height: 20px;"></span>
+              </div>
+              <h3 class="font-semibold">动态模糊</h3>
+              <p class="text-sm leading-relaxed text-muted-foreground">智能隐藏敏感信息，同时保持画面动感，安全与美感兼得。</p>
+            </article>
+            <article class="flex flex-col gap-4 rounded-lg border border-border bg-card p-6 text-card-foreground transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <span data-icon="" style="mask-image: url(../assets/icons/google/folder-open.svg); -webkit-mask-image: url(../assets/icons/google/folder-open.svg); width: 20px; height: 20px;"></span>
+              </div>
+              <h3 class="font-semibold">帧包装</h3>
+              <p class="text-sm leading-relaxed text-muted-foreground">将关键帧自动打包成可复用组件，统一风格，提升制作效率。</p>
+            </article>
+            <article class="flex flex-col gap-4 rounded-lg border border-border bg-card p-6 text-card-foreground transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <span data-icon="" style="mask-image: url(../assets/icons/google/circle-play.svg); -webkit-mask-image: url(../assets/icons/google/circle-play.svg); width: 20px; height: 20px;"></span>
+              </div>
+              <h3 class="font-semibold">实时演示输出</h3>
+              <p class="text-sm leading-relaxed text-muted-foreground">边编辑边预览最终效果，一键输出适合直播与会议的演示流。</p>
+            </article>
+            <article class="flex flex-col gap-4 rounded-lg border border-border bg-card p-6 text-card-foreground transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <span data-icon="" style="mask-image: url(../assets/icons/google/grip.svg); -webkit-mask-image: url(../assets/icons/google/grip.svg); width: 20px; height: 20px;"></span>
+              </div>
+              <h3 class="font-semibold">多轨时间线</h3>
+              <p class="text-sm leading-relaxed text-muted-foreground">独立控制画面、旁白与标注轨道，精准对齐每一句讲解。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="how-title" class="bg-muted px-7 py-16" id="how-it-works">
+        <div class="mx-auto max-w-5xl">
+          <div class="mb-10">
+            <span class="google-eyebrow">使用流程</span>
+            <h2 class="mt-2 text-2xl font-bold text-foreground md:text-3xl" id="how-title">三步完成专业演示</h2>
+          </div>
+          <div class="grid gap-6 md:grid-cols-3">
+            <article class="rounded-lg border border-border bg-card p-6 text-card-foreground">
+              <span class="google-step-number">01</span>
+              <h3 class="mt-4 font-semibold">录制素材</h3>
+              <p class="mt-2 text-sm leading-relaxed text-muted-foreground">一键捕获屏幕、摄像头与系统音频，自动生成可编辑时间线。</p>
+            </article>
+            <article class="rounded-lg border border-border bg-card p-6 text-card-foreground">
+              <span class="google-step-number">02</span>
+              <h3 class="mt-4 font-semibold">打磨叙事</h3>
+              <p class="mt-2 text-sm leading-relaxed text-muted-foreground">添加指针平滑、聚焦放大与动态模糊，让节奏恰到好处。</p>
+            </article>
+            <article class="rounded-lg border border-border bg-card p-6 text-card-foreground">
+              <span class="google-step-number">03</span>
+              <h3 class="mt-4 font-semibold">输出分享</h3>
+              <p class="mt-2 text-sm leading-relaxed text-muted-foreground">导出高清视频或实时演示流，直接用于会议、课程与社媒。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="testimonials-title" class="px-7 py-16" id="testimonials">
+        <div class="mx-auto max-w-6xl">
+          <div class="mb-10">
+            <span class="google-eyebrow">用户反馈</span>
+            <h2 class="mt-2 text-2xl font-bold text-foreground md:text-3xl" id="testimonials-title">被创作者信赖</h2>
+          </div>
+          <div class="grid gap-6 md:grid-cols-3">
+            <article class="rounded-lg border border-border bg-card p-6 text-card-foreground">
+              <div class="flex gap-1 text-primary">
+                <span data-icon="" style="mask-image: url(../assets/icons/google/star.svg); -webkit-mask-image: url(../assets/icons/google/star.svg); width: 14px; height: 14px;"></span>
+                <span data-icon="" style="mask-image: url(../assets/icons/google/star.svg); -webkit-mask-image: url(../assets/icons/google/star.svg); width: 14px; height: 14px;"></span>
+                <span data-icon="" style="mask-image: url(../assets/icons/google/star.svg); -webkit-mask-image: url(../assets/icons/google/star.svg); width: 14px; height: 14px;"></span>
+                <span data-icon="" style="mask-image: url(../assets/icons/google/star.svg); -webkit-mask-image: url(../assets/icons/google/star.svg); width: 14px; height: 14px;"></span>
+                <span data-icon="" style="mask-image: url(../assets/icons/google/star.svg); -webkit-mask-image: url(../assets/icons/google/star.svg); width: 14px; height: 14px;"></span>
+              </div>
+              <blockquote class="mt-4 text-sm leading-relaxed text-foreground">“指针平滑和聚焦放大功能让我的产品演示看起来专业了好几个等级。”</blockquote>
+              <p class="mt-4 text-xs font-medium text-muted-foreground">— 李明，独立产品经理</p>
+            </article>
+            <article class="rounded-lg border border-border bg-card p-6 text-card-foreground">
+              <div class="flex gap-1 text-primary">
+                <span data-icon="" style="mask-image: url(../assets/icons/google/star.svg); -webkit-mask-image: url(../assets/icons/google/star.svg); width: 14px; height: 14px;"></span>
+                <span data-icon="" style="mask-image: url(../assets/icons/google/star.svg); -webkit-mask-image: url(../assets/icons/google/star.svg); width: 14px; height: 14px;"></span>
+                <span data-icon="" style="mask-image: url(../assets/icons/google/star.svg); -webkit-mask-image: url(../assets/icons/google/star.svg); width: 14px; height: 14px;"></span>
+                <span data-icon="" style="mask-image: url(../assets/icons/google/star.svg); -webkit-mask-image: url(../assets/icons/google/star.svg); width: 14px; height: 14px;"></span>
+                <span data-icon="" style="mask-image: url(../assets/icons/google/star.svg); -webkit-mask-image: url(../assets/icons/google/star.svg); width: 14px; height: 14px;"></span>
+              </div>
+              <blockquote class="mt-4 text-sm leading-relaxed text-foreground">“多轨时间线让我能在同一画布上对齐讲解和标注，课程制作效率翻倍。”</blockquote>
+              <p class="mt-4 text-xs font-medium text-muted-foreground">— 王芳，在线教育讲师</p>
+            </article>
+            <article class="rounded-lg border border-border bg-card p-6 text-card-foreground">
+              <div class="flex gap-1 text-primary">
+                <span data-icon="" style="mask-image: url(../assets/icons/google/star.svg); -webkit-mask-image: url(../assets/icons/google/star.svg); width: 14px; height: 14px;"></span>
+                <span data-icon="" style="mask-image: url(../assets/icons/google/star.svg); -webkit-mask-image: url(../assets/icons/google/star.svg); width: 14px; height: 14px;"></span>
+                <span data-icon="" style="mask-image: url(../assets/icons/google/star.svg); -webkit-mask-image: url(../assets/icons/google/star.svg); width: 14px; height: 14px;"></span>
+                <span data-icon="" style="mask-image: url(../assets/icons/google/star.svg); -webkit-mask-image: url(../assets/icons/google/star.svg); width: 14px; height: 14px;"></span>
+                <span data-icon="" style="mask-image: url(../assets/icons/google/star.svg); -webkit-mask-image: url(../assets/icons/google/star.svg); width: 14px; height: 14px;"></span>
+              </div>
+              <blockquote class="mt-4 text-sm leading-relaxed text-foreground">“动态模糊在保护客户隐私的同时，画面依然流畅自然。”</blockquote>
+              <p class="mt-4 text-xs font-medium text-muted-foreground">— 张伟，企业解决方案顾问</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="pricing-title" class="px-7 py-16">
+        <div class="mx-auto max-w-4xl">
+          <div class="flex flex-col items-center justify-between gap-6 rounded-lg border border-border bg-card p-8 md:flex-row">
+            <div>
+              <span class="google-eyebrow">定价</span>
+              <h2 class="mt-1 text-2xl font-bold text-foreground" id="pricing-title">免费开始，按团队扩展</h2>
+              <p class="mt-2 text-sm text-muted-foreground">个人创作永久免费；团队版解锁云端协作、品牌模板与高级导出。</p>
+            </div>
+            <div class="flex flex-col items-center gap-4 sm:flex-row">
+              <span class="text-3xl font-bold text-foreground">¥0<span class="text-sm font-normal text-muted-foreground">/月起</span></span>
+              <button class="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground transition-colors hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" type="button">立即试用</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="google-footer">
+        <div>
+          <strong class="text-sm font-semibold text-foreground">Jianku Screen Next</strong>
+          <p class="mt-2 text-xs text-muted-foreground">精准屏幕演示，从这里开始。</p>
+        </div>
+        <div>
+          <h4 class="text-xs font-semibold uppercase text-muted-foreground">产品</h4>
+          <ul class="mt-3 space-y-2 text-sm text-muted-foreground">
+            <li><a class="transition-colors hover:text-foreground" href="#features">功能特性</a></li>
+            <li><a class="transition-colors hover:text-foreground" href="#how-it-works">使用流程</a></li>
+            <li><a class="transition-colors hover:text-foreground" href="#pricing">价格方案</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-xs font-semibold uppercase text-muted-foreground">资源</h4>
+          <ul class="mt-3 space-y-2 text-sm text-muted-foreground">
+            <li><a class="transition-colors hover:text-foreground" href="#">帮助中心</a></li>
+            <li><a class="transition-colors hover:text-foreground" href="#">更新日志</a></li>
+            <li><a class="transition-colors hover:text-foreground" href="#">联系我们</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-xs font-semibold uppercase text-muted-foreground">法律</h4>
+          <ul class="mt-3 space-y-2 text-sm text-muted-foreground">
+            <li><a class="transition-colors hover:text-foreground" href="#">隐私政策</a></li>
+            <li><a class="transition-colors hover:text-foreground" href="#">服务条款</a></li>
+          </ul>
+        </div>
+        <div class="text-xs text-muted-foreground md:col-span-4">© 2026 Jianku Screen Next. All rights reserved.</div>
+      </footer>
+    </main>
+    <script>lucide.createIcons();</script>
+
+    <style id="critical-layout">
+      .google-topbar { position: sticky; top: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; gap: calc(var(--spacing) * 4); padding: calc(var(--spacing) * 3.5) calc(var(--spacing) * 7); border-bottom: 1px solid var(--border); background: var(--background); }
+      .google-topbar-nav { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+      .google-hero { display: grid; grid-template-columns: 1fr; gap: calc(var(--spacing) * 10); align-items: center; padding: calc(var(--spacing) * 16) calc(var(--spacing) * 7); }
+      @media (min-width: 1024px) { .google-hero { grid-template-columns: 1.05fr 0.95fr; } }
+      .google-feature-grid { display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: calc(var(--spacing) * 6); }
+      @media (min-width: 640px) { .google-feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+      @media (min-width: 1024px) { .google-feature-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+      .google-footer { display: grid; gap: calc(var(--spacing) * 6); padding: calc(var(--spacing) * 10) calc(var(--spacing) * 7); border-top: 1px solid var(--border); }
+      @media (min-width: 768px) { .google-footer { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+      .google-hero-canvas { position: relative; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius); aspect-ratio: 16 / 10; background: linear-gradient(135deg, rgba(66, 133, 244, 0.08) 0%, rgba(219, 234, 254, 0.35) 100%); }
+      .google-hero-canvas .shape-screen { position: absolute; inset: 12%; border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); }
+      .google-hero-canvas .shape-pointer { position: absolute; top: 38%; left: 46%; width: 24px; height: 24px; border-radius: 50%; background: var(--primary); opacity: 0.9; }
+      .google-hero-canvas .shape-blur { position: absolute; top: 20%; right: 18%; width: 28%; height: 28%; border-radius: 50%; background: rgba(66, 133, 244, 0.18); filter: blur(24px); }
+      .google-hero-canvas .shape-frame { position: absolute; bottom: 18%; left: 20%; width: 18%; height: 22%; border: 2px dashed var(--primary); border-radius: var(--radius); opacity: 0.5; }
+      .google-step-number { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: var(--muted); color: var(--muted-foreground); font-family: var(--font-mono); font-size: 13px; font-weight: 700; }
+      .google-eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted-foreground); font-family: var(--font-mono); }
+    </style>
+</body>
+</html>

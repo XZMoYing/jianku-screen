@@ -27,7 +27,7 @@ import { trackEvent } from "~/utils/analytics";
 import { createTauriEventListener } from "~/utils/createEventListener";
 import { t as localize } from "~/utils/i18n";
 import { importVideoFromPicker, showImportError } from "~/utils/importMedia";
-import { openRecordingFolder } from "~/utils/recording";
+import { displayRecordingName, openRecordingFolder } from "~/utils/recording";
 import { createRecordingThumbnail } from "~/utils/recording-thumbnail";
 import {
 	commands,
@@ -85,7 +85,7 @@ const recordingsQuery = queryOptions<Recording[]>({
 				return {
 					meta,
 					path,
-					prettyName: meta.pretty_name,
+					prettyName: displayRecordingName(meta.pretty_name),
 				};
 			}),
 		);
@@ -449,9 +449,11 @@ function RecordingItem(props: {
 							if (
 								props.recording.meta.status.status === "Failed" &&
 								!(await confirm(
-									"The recording failed so this file may have issues in the editor! If your having issues recovering the file please reach out to support!",
+									localize(
+										"录制失败，文件在编辑器中可能无法正常打开。如果无法恢复，请联系支持团队。",
+									),
 									{
-										title: "Recording is potentially corrupted",
+										title: localize("录制文件可能已损坏"),
 										kind: "warning",
 									},
 								))
@@ -521,8 +523,7 @@ function RecordingItem(props: {
 				<TooltipIconButton
 					tooltipText={localize("Delete")}
 					onClick={async () => {
-						if (!(await ask("Are you sure you want to delete this recording?")))
-							return;
+						if (!(await ask(localize("确定要删除这段录制吗？")))) return;
 						await remove(props.recording.path, { recursive: true });
 
 						queryClient.refetchQueries(recordingsQuery);

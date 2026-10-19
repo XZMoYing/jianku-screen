@@ -102,10 +102,10 @@ export default function ModeInfoPanel(props: ModeInfoPanelProps) {
 															isSelected() ? "text-blue-11" : "text-gray-12",
 														)}
 													>
-														{option.title}
+									{localize(option.title)}
 													</h3>
 													<p class="text-xs leading-relaxed text-gray-11">
-														{option.description}
+									{localize(option.description)}
 													</p>
 												</div>
 											</button>

@@ -35,9 +35,9 @@ function PreparingHeader(props: { model: PreparingEditorModel }) {
 				)}
 				{ostype() === "windows" && <div class="w-3 shrink-0" />}
 				<span class="truncate text-[13px] font-medium">
-					{props.model.seed().title || "Recording"}
+					{props.model.seed().title || localize("Recording")}
 				</span>
-				<span class="ml-1.5 text-[13px] text-ed-text-3">.cap</span>
+				<span class="ml-1.5 text-[13px] text-ed-text-3">.jks</span>
 				<div class="flex gap-1 ml-3">
 					<button
 						type="button"
@@ -117,7 +117,11 @@ function PreparingPlayer(props: { model: PreparingEditorModel }) {
 					</button>
 					<button
 						type="button"
-						aria-label={props.model.playback().playing ? "Pause" : "Play"}
+						aria-label={
+							props.model.playback().playing
+								? localize("Pause")
+								: localize("Play")
+						}
 						disabled={!props.model.canPlay()}
 						class="flex items-center justify-center size-8 rounded-full bg-ed-ctl-hover text-ed-text-1 disabled:opacity-40"
 						onClick={() =>
@@ -144,7 +148,7 @@ function PreparingPlayer(props: { model: PreparingEditorModel }) {
 					</button>
 				</div>
 				<div class="flex-1 text-right text-[11px] text-ed-text-3" role="status">
-					{props.model.playback().buffering ? "Preparing playback" : ""}
+					{props.model.playback().buffering ? localize("正在准备播放") : ""}
 				</div>
 			</div>
 		</div>
@@ -162,7 +166,7 @@ function PreparingSidebar() {
 							disabled
 							class="px-1 text-[10px] text-ed-text-3 opacity-50"
 						>
-							{name}
+											{localize(name)}
 						</button>
 					)}
 				</For>

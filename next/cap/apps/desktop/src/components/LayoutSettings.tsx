@@ -76,7 +76,7 @@ export function LayoutSettings(props: {
 							<option value={ratio}>
 								{ratio === "auto"
 									? localize("适合屏幕")
-									: `${ASPECT_RATIOS[ratio].ratio.join(":")} · ${ASPECT_RATIOS[ratio].name}`}
+									: `${ASPECT_RATIOS[ratio].ratio.join(":")} · ${localize(ASPECT_RATIOS[ratio].name)}`}
 							</option>
 						)}
 					</For>

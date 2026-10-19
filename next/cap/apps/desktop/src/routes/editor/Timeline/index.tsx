@@ -1297,7 +1297,7 @@ export function Timeline(props: {
 
 			setEditorState("timeline", "tracks", "caption", true);
 			setEditorState("captions", "isStale", false);
-			toast.success("Captions generated successfully!");
+			toast.success(localize("Captions generated successfully!"));
 		} catch (error) {
 			console.error("Error generating captions:", error);
 			const errorMessage = getCaptionGenerationErrorMessage(error);
@@ -1924,11 +1924,11 @@ function TrackRow(props: {
 			indicator.style.width = `${bounds.width - 4}px`;
 			indicator.textContent = visual
 				? target === 0
-					? "Front"
+					? localize("置于最前")
 					: target === rows.length
-						? "Back"
-						: "Place here"
-				: "Place here";
+						? localize("置于最后")
+						: localize("放置于此")
+				: localize("放置于此");
 		};
 		const tick = (now: number) => {
 			const bounds = scroll.getBoundingClientRect();
@@ -2074,13 +2074,13 @@ function TrackRow(props: {
 					<button
 						type="button"
 						class="absolute right-0 top-1/2 z-30 flex size-5 -translate-y-1/2 items-center justify-center rounded-md text-ed-text-3 opacity-0 transition-opacity hover:bg-ed-ctl-active hover:text-red-9 group-hover/icon:opacity-100 focus-visible:opacity-100"
-						aria-label={props.deleteTitle ?? "Delete track"}
+						aria-label={props.deleteTitle ?? localize("删除轨道")}
 						onClick={(e) => {
 							e.stopPropagation();
 							props.onDelete?.();
 						}}
 						onMouseDown={(e) => e.stopPropagation()}
-						title={props.deleteTitle ?? "Delete track"}
+						title={props.deleteTitle ?? localize("删除轨道")}
 					>
 						<IconCapTrash class="size-3.5" />
 					</button>

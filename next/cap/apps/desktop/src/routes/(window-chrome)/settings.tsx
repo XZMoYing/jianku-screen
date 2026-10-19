@@ -263,8 +263,8 @@ export default function Settings(props: RouteSectionProps) {
 		},
 	];
 	const accountName = createMemo(() => {
-		if (!auth()) return "Click to sign in";
-		if (!userProfile.isSuccess) return "Signed in";
+		if (!auth()) return localize("敬请期待");
+		if (!userProfile.isSuccess) return localize("Signed in");
 
 		const name = userProfile.data?.name?.trim();
 		if (name) return name;
@@ -272,7 +272,7 @@ export default function Settings(props: RouteSectionProps) {
 		const email = userProfile.data?.email?.trim();
 		if (email) return email;
 
-		return "Signed in";
+		return localize("Signed in");
 	});
 	const accountRemoteImageUrl = createMemo(() => {
 		if (!userProfile.isSuccess) return null;
@@ -400,10 +400,10 @@ export default function Settings(props: RouteSectionProps) {
 	const copyVersion = async (appVersion: string) => {
 		try {
 			await writeText(appVersion);
-			toast.success("Version copied to clipboard");
+			toast.success(localize("Version copied to clipboard"));
 		} catch (error) {
 			console.error("Failed to copy app version:", error);
-			toast.error("Failed to copy version");
+			toast.error(localize("Failed to copy version"));
 		}
 	};
 
@@ -415,7 +415,7 @@ export default function Settings(props: RouteSectionProps) {
 
 			if (!update) {
 				await dialog.message(localize("当前已是最新版本。"), {
-					title: "No Update Available",
+					title: localize("暂无可用更新"),
 					kind: "info",
 				});
 				return;
@@ -423,7 +423,11 @@ export default function Settings(props: RouteSectionProps) {
 
 			const shouldUpdate = await dialog.confirm(
 				`${localize("发现新版本")} ${update.version}`,
-				{ title: "简库镜传 Next", okLabel: "Update", cancelLabel: "Ignore" },
+				{
+					title: "简库镜传 Next",
+					okLabel: localize("立即更新"),
+					cancelLabel: localize("暂不更新"),
+				},
 			);
 
 			if (shouldUpdate) navigate("/update");
@@ -432,8 +436,8 @@ export default function Settings(props: RouteSectionProps) {
 			const openDownload = await dialog
 				.confirm(localize("暂时无法检查更新，请稍后重试。"), {
 					title: "简库镜传 Next",
-					okLabel: "Download",
-					cancelLabel: "Later",
+					okLabel: localize("Download"),
+					cancelLabel: localize("Later"),
 				})
 				.catch(() => false);
 			if (openDownload) showAccountComingSoon();
@@ -486,8 +490,11 @@ export default function Settings(props: RouteSectionProps) {
 						</p>
 					</div>
 				</button>
-				<MotionGroup class="jk-settings-navigation" label={localize("设置")}>
-					<ul class="cap-settings-nav min-w-48 h-full p-2.5 space-y-1 text-gray-12">
+				<MotionGroup
+					class="jk-settings-navigation custom-scroll"
+					label={localize("设置")}
+				>
+					<ul class="cap-settings-nav min-w-48 p-2.5 space-y-1 text-gray-12">
 						<For each={settingsItems}>
 							{(item) => (
 								<li>
@@ -544,9 +551,11 @@ export default function Settings(props: RouteSectionProps) {
 										disabled={isCheckingForUpdates()}
 										onClick={checkForUpdates}
 									>
-										{isCheckingForUpdates()
-											? "Checking..."
-											: "Check for updates"}
+										{localize(
+											isCheckingForUpdates()
+												? "Checking..."
+												: "Check for Updates",
+										)}
 									</button>
 								</div>
 							</div>
@@ -563,7 +572,7 @@ export default function Settings(props: RouteSectionProps) {
 								{localize("Sign Out")}
 							</Button>
 						) : (
-							<SignInButton>{localize("Sign In")}</SignInButton>
+							<SignInButton>{localize("敬请期待")}</SignInButton>
 						)}
 					</Show>
 				</div>

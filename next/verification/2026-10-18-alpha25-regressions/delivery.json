@@ -1,0 +1,15 @@
+{
+	"version": "0.2.0-alpha.25",
+	"bundleVersion": "2026.25.0",
+	"profile": "release",
+	"installedPath": "/Applications/Jianku Screen Next.app",
+	"codeSignature": "ad-hoc, verified deep and strict",
+	"sourceBinarySha256": "405dc5a792d7eed0788c6b2e37d97c54d4d6a7528d34208761c713c2c9b55933",
+	"installedBinarySha256": "405dc5a792d7eed0788c6b2e37d97c54d4d6a7528d34208761c713c2c9b55933",
+	"runningPid": 20895,
+	"editorWindow": 11739,
+	"coldLaunch": "no process running, opened existing .jks via LaunchServices, editor window appeared",
+	"defaultByBundleId": "/Applications/Jianku Screen Next.app",
+	"defaultProjectHandler": "/Applications/Jianku Screen Next.app",
+	"historicalBuildRediscoveryCheck": "re-registered alpha.20; both defaults remained /Applications/Jianku Screen Next.app; then unregistered alpha.20"
+}

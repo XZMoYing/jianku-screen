@@ -127,7 +127,7 @@ export function ColorCorrectionSection(props: {
 						{(preset) => (
 							<button
 								type="button"
-								title={preset.description}
+								title={localize(preset.description)}
 								onClick={() => applyPreset(preset)}
 								class={cx(
 									"flex flex-col gap-1.5 rounded-lg p-1.5 text-left transition-shadow duration-150",
@@ -138,7 +138,7 @@ export function ColorCorrectionSection(props: {
 							>
 								<ColorPresetPreview preset={preset} />
 								<span class="px-0.5 text-[11px] text-ed-text-2">
-									{preset.label}
+									{localize(preset.label)}
 								</span>
 							</button>
 						)}

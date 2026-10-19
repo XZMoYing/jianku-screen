@@ -37,7 +37,7 @@ const MIN_ZOOM_SEGMENT_PIXEL_WIDTH = 40;
 const MIN_NEW_SEGMENT_PIXEL_WIDTH = 80;
 const MIN_NEW_SEGMENT_SECS_WIDTH = 1;
 const NO_AUTO_ZOOM_CLICKS_MESSAGE =
-	"No clicks found to zoom into. Drag across the lane to add one.";
+	"未检测到可缩放的点击操作。可在轨道上拖动以添加缩放片段。";
 
 export function ZoomTrack(props: {
 	onDragStateChanged: (v: ZoomSegmentDragState) => void;
@@ -89,13 +89,13 @@ export function ZoomTrack(props: {
 		try {
 			const zoomSegments = await commands.generateZoomSegmentsFromClicks();
 			if (zoomSegments.length === 0) {
-				toast.error(NO_AUTO_ZOOM_CLICKS_MESSAGE);
+			toast.error(localize(NO_AUTO_ZOOM_CLICKS_MESSAGE));
 				return;
 			}
 			setProject("timeline", "zoomSegments", zoomSegments);
 		} catch (error) {
 			console.error("Failed to generate zoom segments:", error);
-			toast.error("Failed to generate zoom segments");
+			toast.error(localize("Failed to generate zoom segments"));
 		} finally {
 			setIsGeneratingAutoZoom(false);
 		}
@@ -186,7 +186,7 @@ export function ZoomTrack(props: {
 					items: [
 						{
 							id: "generateZoomSegments",
-							text: "Generate zoom segments from clicks",
+							text: localize("根据点击自动添加缩放片段"),
 							action: handleGenerateZoomSegments,
 						},
 					],
@@ -360,7 +360,9 @@ export function ZoomTrack(props: {
 						};
 
 						const zoomModeLabel = () =>
-							segment().mode === "auto" ? "Automatic Zoom" : "Manual Zoom";
+							segment().mode === "auto"
+								? localize("自动缩放")
+								: localize("手动缩放");
 
 						const zoomSegments = () => project.timeline?.zoomSegments ?? [];
 
@@ -604,7 +606,7 @@ export function ZoomTrack(props: {
 										items: [
 											{
 												id: "selectAllZoomSegments",
-												text: "Select all zoom segments",
+								text: localize("全选缩放片段"),
 												enabled: allIndices.length > 1,
 												action: () =>
 													setEditorState("timeline", "selection", {
@@ -616,8 +618,8 @@ export function ZoomTrack(props: {
 												id: "deleteZoomSegments",
 												text:
 													targetIndices.length > 1
-														? `Delete ${targetIndices.length} zoom segments`
-														: "Delete zoom segment",
+	? localize("删除 {count} 个缩放片段", { count: targetIndices.length })
+									: localize("删除缩放片段"),
 												action: () =>
 													projectActions.deleteZoomSegments(targetIndices),
 											},

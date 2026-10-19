@@ -822,16 +822,12 @@ fn build_macos_app_menu(app_handle: &AppHandle) -> tauri::Result<Menu<tauri::Wry
             .map(|publisher| vec![publisher]),
         ..Default::default()
     };
-    let quit_label = config
-        .product_name
-        .as_ref()
-        .map(|name| format!("Quit {name}"))
-        .unwrap_or_else(|| "Quit Cap".to_string());
+    let quit_label = crate::interface_language::text(app_handle, "退出简库镜传 Next");
 
     let window_menu = Submenu::with_id_and_items(
         app_handle,
         WINDOW_SUBMENU_ID,
-        "Window",
+        crate::interface_language::text(app_handle, "Window"),
         true,
         &[
             &PredefinedMenuItem::minimize(app_handle, None)?,
@@ -841,7 +837,13 @@ fn build_macos_app_menu(app_handle: &AppHandle) -> tauri::Result<Menu<tauri::Wry
         ],
     )?;
 
-    let help_menu = Submenu::with_id_and_items(app_handle, HELP_SUBMENU_ID, "Help", true, &[])?;
+    let help_menu = Submenu::with_id_and_items(
+        app_handle,
+        HELP_SUBMENU_ID,
+        crate::interface_language::text(app_handle, "Help"),
+        true,
+        &[],
+    )?;
 
     Menu::with_items(
         app_handle,
@@ -869,13 +871,13 @@ fn build_macos_app_menu(app_handle: &AppHandle) -> tauri::Result<Menu<tauri::Wry
             )?,
             &Submenu::with_items(
                 app_handle,
-                "File",
+                crate::interface_language::text(app_handle, "File"),
                 true,
                 &[&PredefinedMenuItem::close_window(app_handle, None)?],
             )?,
             &Submenu::with_items(
                 app_handle,
-                "Edit",
+                crate::interface_language::text(app_handle, "Edit"),
                 true,
                 &[
                     &PredefinedMenuItem::undo(app_handle, None)?,
@@ -889,7 +891,7 @@ fn build_macos_app_menu(app_handle: &AppHandle) -> tauri::Result<Menu<tauri::Wry
             )?,
             &Submenu::with_items(
                 app_handle,
-                "View",
+                crate::interface_language::text(app_handle, "View"),
                 true,
                 &[&PredefinedMenuItem::fullscreen(app_handle, None)?],
             )?,
@@ -3659,7 +3661,7 @@ fn show_exit_blocked(app: &AppHandle, reason: ExitBlocked) {
     );
     app.dialog()
         .message(reason.message())
-        .title("Cap is still busy")
+        .title("简库镜传 Next 正在运行")
         .kind(tauri_plugin_dialog::MessageDialogKind::Warning)
         .show(|_| {});
 }
@@ -3762,7 +3764,7 @@ fn restart_app(app: AppHandle) -> Result<(), String> {
             app.request_restart();
             Ok(())
         }
-        Ok(false) => Err("Cap is already shutting down.".into()),
+        Ok(false) => Err("The app is already shutting down.".into()),
         Err(reason) => Err(reason.message().into()),
     }
 }
@@ -3788,7 +3790,7 @@ pub async fn request_app_exit(app: AppHandle) {
             warn!(%error, "Quit canceled because an editor title could not be saved");
             app.dialog()
                 .message(format!(
-                    "{error}\n\nCap is still open. Your title is still in the editor."
+                    "{error}\n\nThe app is still open. Your title is still in the editor."
                 ))
                 .title("Title not saved")
                 .kind(tauri_plugin_dialog::MessageDialogKind::Warning)
@@ -7151,7 +7153,6 @@ pub async fn run(recording_logging_handle: LoggingHandle, logs_dir: PathBuf) {
     #[cfg(target_os = "macos")]
     let builder = builder
         .manage(StartupOpenGate::default())
-        .menu(build_macos_app_menu)
         .on_menu_event(|app, event| {
             if event.id() == APP_MENU_QUIT_ID {
                 let app = app.clone();
@@ -7233,6 +7234,8 @@ pub async fn run(recording_logging_handle: LoggingHandle, logs_dir: PathBuf) {
         })
         .setup(move |app| {
             let app = app.handle().clone();
+            #[cfg(target_os = "macos")]
+            app.set_menu(build_macos_app_menu(&app)?)?;
             #[cfg(debug_assertions)]
             stop_editor_benchmark::validate_app_identifier(&app.config().identifier)?;
             #[cfg(target_os = "macos")]
@@ -8070,7 +8073,7 @@ fn handle_single_instance(app: &AppHandle, args: Vec<String>) {
             .show(&app)
             .await
             {
-                warn!(%error, "Could not show Cap recording controls");
+                warn!(%error, "Could not show the recording controls");
             }
         });
         return;
@@ -8157,7 +8160,7 @@ struct StartupOpenQueue {
 impl StartupOpenQueue {
     fn request(&mut self, urls: Vec<tauri::Url>) -> Result<Option<StartupOpenDispatch>, String> {
         if self.cancelled {
-            return Err("Cap startup stopped before the project could be opened".into());
+            return Err("App startup stopped before the project could be opened".into());
         }
         if self.destination == Some(StartupOpenDestination::Desktop) {
             return Ok(Some(StartupOpenDispatch {
@@ -8174,7 +8177,7 @@ impl StartupOpenQueue {
                 continue;
             }
             if self.urls.len() + self.gpui_dispatched.len() + additions.len() >= 64 {
-                return Err("Too many projects were requested while Cap was starting".into());
+                return Err("Too many projects were requested while the app was starting".into());
             }
             additions.push(url);
         }
@@ -8250,11 +8253,11 @@ impl Drop for StartupOpenGuard {
 fn queue_macos_startup_urls(app: &AppHandle, urls: Vec<tauri::Url>) -> Result<(), String> {
     let gate = app
         .try_state::<StartupOpenGate>()
-        .ok_or_else(|| "Cap startup is not ready to receive projects".to_string())?;
+        .ok_or_else(|| "App startup is not ready to receive projects".to_string())?;
     let dispatch = gate
         .0
         .lock()
-        .map_err(|_| "Cap startup file-open state is unavailable".to_string())?
+        .map_err(|_| "App startup file-open state is unavailable".to_string())?
         .request(urls)?;
     if let Some(dispatch) = dispatch {
         dispatch_macos_startup_urls(app, dispatch);
@@ -9337,12 +9340,12 @@ fn open_project_from_path(path: &Path, app: AppHandle) -> Result<(), String> {
     {
         let gate = app
             .try_state::<StartupOpenGate>()
-            .ok_or_else(|| "Cap startup is not ready to receive projects".to_string())?;
+            .ok_or_else(|| "App startup is not ready to receive projects".to_string())?;
         let ready = {
             let queue = gate
                 .0
                 .lock()
-                .map_err(|_| "Cap startup file-open state is unavailable".to_string())?;
+                .map_err(|_| "App startup file-open state is unavailable".to_string())?;
             !queue.cancelled && queue.destination == Some(StartupOpenDestination::Desktop)
         };
         if !ready {

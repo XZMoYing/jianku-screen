@@ -699,16 +699,15 @@ export function CanvasElementsOverlay(props: { size: Size }) {
 							locked={
 								selectedStyle() && selectedStyle()?.overrides.background == null
 									? {
-											message:
-												"Enable a Background override to edit this Style's screen",
-											actionLabel: "Enable override",
+									message: localize("启用背景自定义后即可编辑此样式中的屏幕画面"),
+									actionLabel: localize("启用自定义"),
 											onAction: () => toggleStyleGroup("background", true),
 										}
 									: displayDraggable()
 										? null
 										: {
-												message: "Screen is locked while a zoom is active",
-												actionLabel: "Edit zoom",
+										message: localize("缩放片段生效时，屏幕画面不可移动"),
+										actionLabel: localize("编辑缩放"),
 												onAction: selectActiveZoom,
 											}
 							}
@@ -733,16 +732,15 @@ export function CanvasElementsOverlay(props: { size: Size }) {
 							locked={
 								selectedStyle() && selectedStyle()?.overrides.camera == null
 									? {
-											message:
-												"Enable a Camera override to edit this Style's camera",
-											actionLabel: "Enable override",
+									message: localize("启用摄像头自定义后即可编辑此样式中的摄像头"),
+									actionLabel: localize("启用自定义"),
 											onAction: () => toggleStyleGroup("camera", true),
 										}
 									: cameraResizable()
 										? null
 										: {
-												message: "Camera size follows the zoom — drag to move",
-												actionLabel: "Edit zoom",
+											message: localize("摄像头尺寸会随缩放变化；可拖动调整位置"),
+											actionLabel: localize("编辑缩放"),
 												onAction: selectActiveZoom,
 											}
 							}

@@ -1,5 +1,6 @@
 import { type as ostype } from "@tauri-apps/plugin-os";
 import { Match, Show, Switch } from "solid-js";
+import { t as localize } from "~/utils/i18n";
 
 export type SelectionHintProps = {
 	show: boolean;
@@ -38,7 +39,7 @@ export default function SelectionHint(props: SelectionHintProps) {
 						</div>
 					</div>
 					<p class="text-base font-medium max-w-xs">
-						{props.message ?? "Click and drag to select an area"}
+						{props.message ?? localize("拖动鼠标框选录制区域")}
 					</p>
 				</div>
 			</div>

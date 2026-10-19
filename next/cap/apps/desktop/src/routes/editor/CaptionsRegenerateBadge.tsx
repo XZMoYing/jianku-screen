@@ -1,5 +1,6 @@
 import { cx } from "cva";
 import { createMemo, Show } from "solid-js";
+import { t as localize } from "~/utils/i18n";
 import { produce } from "solid-js/store";
 import toast from "solid-toast";
 import {
@@ -49,10 +50,10 @@ export function CaptionsRegenerateBadge(props: { class?: string }) {
 			);
 
 			setEditorState("captions", "isStale", false);
-			toast.success("Captions regenerated!");
+				toast.success(localize("Captions regenerated!"));
 		} catch (error) {
 			console.error("Error regenerating captions:", error);
-			toast.error("Failed to regenerate captions");
+			toast.error(localize("Failed to regenerate captions"));
 		} finally {
 			setEditorState("captions", "isGenerating", false);
 		}
@@ -100,8 +101,8 @@ export function CaptionsRegenerateBadge(props: { class?: string }) {
 						<IconCapCaptions class="size-3.5" />
 					</Show>
 					{editorState.captions.isGenerating
-						? "Regenerating..."
-						: "Regenerate captions"}
+						? localize("正在重新生成字幕…")
+						: localize("重新生成字幕")}
 				</button>
 				<Show when={!editorState.captions.isGenerating}>
 					<div class="w-px h-4 bg-gray-6" />

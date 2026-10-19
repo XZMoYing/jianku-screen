@@ -20,10 +20,10 @@ import {
 // The mirror of this sequence lives in `render_switch_overlay` in the native
 // app's `settings_pages.rs`.
 const SWITCH_SENTENCES = [
-	localize("Switching to the native Cap app."),
-	"It will look almost identical. That is the point.",
-	localize("Same Cap, rebuilt fully native for performance."),
-	"Experimental. Your recordings and settings come with you.",
+	localize("正在切换到简库镜传原生界面。"),
+	"界面基本一致，录制和设置会继续保留。",
+	localize("简库镜传原生界面针对性能重新构建。"),
+	"这是实验版本，录制和设置可在两个版本间共用。",
 ];
 const SENTENCE_MS = 1300;
 const COUNTDOWN_FROM = 5;
@@ -191,9 +191,9 @@ function Inner(props: {
 					<Section title={localize("Native app")}>
 						<SectionRows>
 							<ToggleSettingItem
-								label={localize("Cap GPUI")}
+								label={localize("原生界面预览")}
 								description={localize(
-									"Close this app and reopen the experimental fully-native version of Cap. It is unfinished, so expect missing features. Your recordings and settings are shared, and you can switch back from its Experimental settings.",
+								"关闭当前应用并切换到实验版原生界面。该版本功能尚未齐全；录制和设置会共用，也可在实验功能设置中切回。",
 								)}
 								value={!!settings.enableGpuiApp || takeoverActive()}
 								onChange={(value) => {

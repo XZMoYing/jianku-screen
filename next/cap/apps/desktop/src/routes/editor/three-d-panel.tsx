@@ -196,7 +196,7 @@ function MiniSegmented<T extends string>(props: {
 						onClick={() => props.onChange(option.value)}
 						class="flex-1 px-2.5 h-[22px] rounded-md text-[11px] font-medium whitespace-nowrap transition-colors duration-100 outline-hidden text-ed-text-2 data-[selected='true']:bg-ed-card data-[selected='true']:text-ed-text-1 data-[selected='true']:shadow-[0_1px_2px_rgba(0,0,0,.12),0_0_0_.5px_rgba(0,0,0,.06)] dark:data-[selected='true']:bg-white/11 dark:data-[selected='true']:shadow-none not-data-[selected='true']:hover:text-ed-text-1 disabled:opacity-40"
 					>
-						{option.label}
+						{localize(option.label)}
 					</button>
 				)}
 			</For>
@@ -289,7 +289,7 @@ function LookTile(props: {
 			onFocus={() => setHovered(true)}
 			onBlur={() => setHovered(false)}
 			aria-pressed={props.selected}
-			title={props.look.name}
+			title={localize(props.look.name)}
 			class="flex flex-col gap-1.5 items-center outline-hidden group"
 		>
 			<div
@@ -320,7 +320,7 @@ function LookTile(props: {
 						: "text-ed-text-2 group-hover:text-ed-text-1",
 				)}
 			>
-				{props.look.name}
+				{localize(props.look.name)}
 			</span>
 		</button>
 	);
@@ -331,11 +331,11 @@ function SequenceCard(props: { scene: Camera3DScene; onClick: () => void }) {
 		<button
 			type="button"
 			onClick={() => props.onClick()}
-			title={CAMERA3D_SCENE_DESCRIPTIONS[props.scene.id]}
+			title={localize(CAMERA3D_SCENE_DESCRIPTIONS[props.scene.id])}
 			class="flex flex-col gap-[3px] items-start px-2.5 py-2 text-left rounded-lg transition-colors outline-hidden bg-ed-ctl hover:bg-ed-ctl-hover"
 		>
 			<span class="text-[11px] font-medium text-ed-text-1">
-				{props.scene.name}
+				{localize(props.scene.name)}
 			</span>
 			<span class="text-[10px] text-ed-text-2">
 				{props.scene.shots.length} {localize("shots")}
@@ -851,7 +851,7 @@ export function Camera3DShotPanel(props: {
 						onClick={makeStill}
 						disabled={isStill()}
 						tooltipText={
-							isStill() ? "Already a still shot" : "Hold on the start pose"
+							isStill() ? localize("当前已是静帧") : localize("保持开始镜头姿态")
 						}
 						leftIcon={<IconLucidePause />}
 					>

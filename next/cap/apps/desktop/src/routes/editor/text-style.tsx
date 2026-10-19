@@ -8,6 +8,7 @@ import { BrandColorsDropdown } from "./BrandColorsDropdown";
 import { getColorPreviewBorderColor } from "./color-utils";
 import { TextInput } from "./TextInput";
 import type { TextAnimation, TextBackgroundStyle } from "./text";
+import { t as localize } from "~/utils/i18n";
 
 export const FONT_OPTIONS = [
 	{ value: "System Sans-Serif", label: "System Sans-Serif" },
@@ -92,9 +93,9 @@ export const CAPTION_HIGHLIGHT_STYLE_OPTIONS = [
 
 export function getTextWeightLabel(weight: number | null | undefined) {
 	const option = TEXT_WEIGHT_OPTIONS.find((option) => option.value === weight);
-	if (option) return option.label;
-	if (weight != null) return `Custom (${weight})`;
-	return "Normal";
+	if (option) return localize(option.label);
+	if (weight != null) return localize("Custom ({weight})", { weight });
+	return localize("Normal");
 }
 
 export function HexColorInput(props: {

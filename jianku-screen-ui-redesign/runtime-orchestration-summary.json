@@ -1,0 +1,1334 @@
+{
+  "skillProvenance": {
+    "name": "solo-design",
+    "version": "2026.08.06.19.15.08",
+    "version_source": "skill-release-manifest.json",
+    "lane": "library_bound",
+    "resolvedAt": "2026-10-15T00:00:00.000Z"
+  },
+  "project": {
+    "name": "Jianku Screen Next UI Redesign",
+    "resolvedLane": "library_bound",
+    "selectedIntentWorkflowRead": true,
+    "contextRequirementsLoaded": [
+      {
+        "path": "shared-runtime/runtime-boundaries/lane-runtime-contracts.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      },
+      {
+        "path": "shared-runtime/agent-dispatch-runtime/lane-dispatch-index.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      },
+      {
+        "path": "delivery-quality/page-rendering-quality-gate.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      },
+      {
+        "path": "delivery-quality/design-artifact-validation.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      },
+      {
+        "path": "delivery-quality/delivery-evidence-contract.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      },
+      {
+        "path": "intent-workflows/intent-page-library-bound/start-library-bound-project.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      },
+      {
+        "path": "intent-workflows/intent-page-library-bound/library-bound-page-runtime.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      },
+      {
+        "path": "intent-workflows/intent-page-library-bound/dispatch-contract.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      },
+      {
+        "path": "intent-workflows/intent-page-library-bound/design-library-ingestion.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      }
+    ],
+    "contextReadScope": "library-bound",
+    "validationRunDiscipline": {
+      "maxFullValidationRuns": 2,
+      "softWarningsTriggerRepair": false,
+      "blockingRepairMode": "targeted-once",
+      "forbiddenRepairTriggers": [
+        "soft-warning-only",
+        "provenance-warning-only",
+        "style-warning-only"
+      ]
+    },
+    "designSource": {
+      "operatingMode": "library-bound",
+      "libraryIdentity": {
+        "name": "Google",
+        "id": "dl_builtin_google",
+        "version": 0,
+        "scope": "builtin-global",
+        "path": "/Users/moyingxz/.trae-cn/design_libraries/Google",
+        "versionSource": "metadata.json"
+      },
+      "actualTokenNameReference": [
+        "--background",
+        "--foreground",
+        "--card",
+        "--card-foreground",
+        "--popover",
+        "--popover-foreground",
+        "--primary",
+        "--primary-foreground",
+        "--secondary",
+        "--secondary-foreground",
+        "--muted",
+        "--muted-foreground",
+        "--accent",
+        "--accent-foreground",
+        "--destructive",
+        "--destructive-foreground",
+        "--border",
+        "--input",
+        "--ring",
+        "--chart-1",
+        "--chart-2",
+        "--chart-3",
+        "--chart-4",
+        "--chart-5",
+        "--sidebar",
+        "--sidebar-foreground",
+        "--sidebar-primary",
+        "--sidebar-primary-foreground",
+        "--sidebar-accent",
+        "--sidebar-accent-foreground",
+        "--sidebar-border",
+        "--sidebar-ring",
+        "--font-sans",
+        "--font-serif",
+        "--font-mono",
+        "--radius",
+        "--spacing",
+        "--tracking-normal"
+      ],
+      "componentIndexSummary": [
+        {
+          "slug": "button",
+          "category": "action",
+          "keyInsight": "Actions feel crisp and flat, with color carrying emphasis instead of elevation."
+        },
+        {
+          "slug": "card",
+          "category": "container",
+          "keyInsight": "Cards are low-noise containers that rely on border and tonal contrast more than depth."
+        },
+        {
+          "slug": "table",
+          "category": "data-display",
+          "keyInsight": "Tables should stay airy despite dense information, using muted text and clear row separators."
+        },
+        {
+          "slug": "chart",
+          "category": "data-visualization",
+          "keyInsight": "Charts bring the strongest brand color energy and should contrast against otherwise quiet surfaces."
+        },
+        {
+          "slug": "navigation",
+          "category": "navigation",
+          "keyInsight": "Navigation stays restrained, letting the active state and focused ring do the work."
+        },
+        {
+          "slug": "sidebar",
+          "category": "navigation",
+          "keyInsight": "The dedicated sidebar palette makes navigation feel like a branded workspace shell, not a generic list."
+        }
+      ],
+      "tokenFidelity": "strict",
+      "iconAssets": {
+        "source": "assets/icons",
+        "projectIconDir": "assets/icons/google",
+        "libraryKey": "google",
+        "renderMethod": "css-mask",
+        "pathTemplate": "../assets/icons/google/{name}.svg",
+        "availableNames": [
+          "arrow-down",
+          "arrow-left",
+          "arrow-right",
+          "arrow-up",
+          "box",
+          "check",
+          "chevron-down",
+          "chevron-left",
+          "chevron-right",
+          "chevron-up",
+          "chevrons-down-up",
+          "chevrons-up-down",
+          "circle-alert",
+          "circle-check",
+          "circle-minus",
+          "circle-pause",
+          "circle-play",
+          "circle-plus",
+          "circle-question-mark",
+          "external-link",
+          "file",
+          "folder-open",
+          "folder",
+          "funnel",
+          "grip",
+          "heart",
+          "house",
+          "mail",
+          "map-pin",
+          "message-circle-more",
+          "mouse-pointer-click",
+          "pen-line",
+          "send-horizontal",
+          "star",
+          "tag",
+          "thumbs-down",
+          "thumbs-up",
+          "trash-2",
+          "triangle-alert",
+          "user"
+        ],
+        "totalCount": 40,
+        "coloringRule": "currentColor by default; override with Library token when needed"
+      },
+      "forbiddenInventedComponents": [
+        "layout",
+        "space"
+      ],
+      "allowedComponents": [
+        "button",
+        "card",
+        "table",
+        "chart",
+        "navigation",
+        "sidebar"
+      ],
+      "styleConstraints": {
+        "radiusMax": "12px",
+        "spacingBase": "3.84px",
+        "fontSizeBody": 14,
+        "controlHeightDefault": 32
+      }
+    },
+    "productContext": {
+      "appName": "Jianku Screen Next",
+      "description": "Screen recording and presentation tool with desktop (Tauri+Solid), web (Next.js), and mobile (Expo) surfaces.",
+      "coreFeatures": [
+        "smooth pointer",
+        "focus zoom",
+        "dynamic blur",
+        "frame packaging",
+        "live presentation output",
+        "multi-track timeline editing"
+      ],
+      "hierarchy": [
+        {
+          "level": 1,
+          "name": "录制",
+          "surfaces": [
+            "desktop-recording-setup",
+            "desktop-recording-progress",
+            "mobile-recording"
+          ],
+          "description": "Choose source, control recording, pause/stop."
+        },
+        {
+          "level": 2,
+          "name": "演示",
+          "surfaces": [
+            "desktop-presentation-output"
+          ],
+          "description": "Live output window for focused presentations."
+        },
+        {
+          "level": 3,
+          "name": "编辑",
+          "surfaces": [
+            "desktop-editor"
+          ],
+          "description": "Multi-track timeline editing with cuts, zoom, cursor."
+        },
+        {
+          "level": 4,
+          "name": "库与管理",
+          "surfaces": [
+            "desktop-main",
+            "web-dashboard",
+            "mobile-home"
+          ],
+          "description": "Browse recordings, share links, analytics."
+        },
+        {
+          "level": 5,
+          "name": "设置",
+          "surfaces": [
+            "desktop-settings-general",
+            "desktop-settings-recording",
+            "desktop-settings-integrations",
+            "mobile-settings"
+          ],
+          "description": "Preferences, quality, integrations, account."
+        }
+      ]
+    },
+    "sharedProjectShellContract": {
+      "continuityAnchors": [
+        "Google flat dashboard language",
+        "8px radius",
+        "sidebar shell on desktop",
+        "primary blue #4285f4",
+        "dense data-forward layout"
+      ],
+      "headerBehavior": "Topbar with search, notifications, and account; desktop uses branded sidebar",
+      "navigationPattern": "Sidebar on desktop, top nav on marketing, bottom nav on mobile",
+      "surfaceModel": "Flat white/light surfaces with thin border separators; dark mode switches to #161616 with red accent #fc2c50",
+      "radiusScale": [
+        4,
+        6,
+        8,
+        12
+      ],
+      "ctaStyle": "Primary filled button on blue/red; secondary outlined; ghost for tertiary"
+    },
+    "dispatchPreflightManifest": [
+      {
+        "nodeId": "desktop-main",
+        "packetType": "LibraryBoundPagePacket",
+        "pageRuntimeGuide": "intent-workflows/intent-page-library-bound/library-bound-page-runtime.md",
+        "dispatchContract": "intent-workflows/intent-page-library-bound/dispatch-contract.md",
+        "htmlSrc": "pages/desktop-main.html",
+        "title": "Desktop - 主控台",
+        "deviceType": "desktop",
+        "viewportMode": "app-shell",
+        "cssPath": "/Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css",
+        "brandPrefix": "google",
+        "fillHtmlHeadCommand": "node /Users/moyingxz/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/apply-html-head-contract.mjs /Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/jianku-screen-ui-redesign/pages/desktop-main.html --title=\"Desktop - 主控台\" --lang=zh-CN --prefix=google --theme=light",
+        "pageType": "information-dense",
+        "qualityRisks": [
+          "dense-dashboard",
+          "sidebar-shell"
+        ],
+        "componentPlan": [
+          {
+            "slug": "sidebar",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-sidebar.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/sidebar.json"
+          },
+          {
+            "slug": "card",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-card.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/card.json"
+          },
+          {
+            "slug": "table",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-table.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/table.json"
+          },
+          {
+            "slug": "chart",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-chart.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/chart.json"
+          },
+          {
+            "slug": "button",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-button.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/button.json"
+          },
+          {
+            "slug": "navigation",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-navigation.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/navigation.json"
+          }
+        ],
+        "visualNorthStar": "A focused command center for managing screen recordings: branded sidebar, recent recordings table, quick stats, and clear CTAs.",
+        "allowedWritePaths": [
+          "pages/desktop-main.html"
+        ],
+        "forbiddenWriteRoots": [
+          "*.design",
+          "runtime-orchestration-summary.json",
+          "validation-report.json",
+          "finish-readiness-report.json"
+        ],
+        "toolPolicy": {
+          "todoWriteAllowed": false,
+          "validationScriptsAllowed": false,
+          "previewAllowed": false,
+          "helperScriptsAllowed": false,
+          "designFileWriteAllowed": false,
+          "allowedWritePaths": [
+            "pages/desktop-main.html"
+          ]
+        }
+      },
+      {
+        "nodeId": "desktop-recording-setup",
+        "packetType": "LibraryBoundPagePacket",
+        "pageRuntimeGuide": "intent-workflows/intent-page-library-bound/library-bound-page-runtime.md",
+        "dispatchContract": "intent-workflows/intent-page-library-bound/dispatch-contract.md",
+        "htmlSrc": "pages/desktop-recording-setup.html",
+        "title": "Desktop - 录制设置",
+        "deviceType": "desktop",
+        "viewportMode": "app-shell",
+        "cssPath": "/Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css",
+        "brandPrefix": "google",
+        "fillHtmlHeadCommand": "node /Users/moyingxz/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/apply-html-head-contract.mjs /Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/jianku-screen-ui-redesign/pages/desktop-recording-setup.html --title=\"Desktop - 录制设置\" --lang=zh-CN --prefix=google --theme=light",
+        "pageType": "task-driven",
+        "qualityRisks": [
+          "selection-cards",
+          "modal-risk"
+        ],
+        "componentPlan": [
+          {
+            "slug": "card",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-card.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/card.json"
+          },
+          {
+            "slug": "button",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-button.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/button.json"
+          },
+          {
+            "slug": "navigation",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-navigation.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/navigation.json"
+          }
+        ],
+        "visualNorthStar": "A calm, decisive setup screen: choose screen/camera/window source, configure audio, and start recording with one primary action.",
+        "allowedWritePaths": [
+          "pages/desktop-recording-setup.html"
+        ],
+        "forbiddenWriteRoots": [
+          "*.design",
+          "runtime-orchestration-summary.json",
+          "validation-report.json",
+          "finish-readiness-report.json"
+        ],
+        "toolPolicy": {
+          "todoWriteAllowed": false,
+          "validationScriptsAllowed": false,
+          "previewAllowed": false,
+          "helperScriptsAllowed": false,
+          "designFileWriteAllowed": false,
+          "allowedWritePaths": [
+            "pages/desktop-recording-setup.html"
+          ]
+        }
+      },
+      {
+        "nodeId": "desktop-recording-progress",
+        "packetType": "LibraryBoundPagePacket",
+        "pageRuntimeGuide": "intent-workflows/intent-page-library-bound/library-bound-page-runtime.md",
+        "dispatchContract": "intent-workflows/intent-page-library-bound/dispatch-contract.md",
+        "htmlSrc": "pages/desktop-recording-progress.html",
+        "title": "Desktop - 录制中",
+        "deviceType": "desktop",
+        "viewportMode": "app-shell",
+        "cssPath": "/Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css",
+        "brandPrefix": "google",
+        "fillHtmlHeadCommand": "node /Users/moyingxz/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/apply-html-head-contract.mjs /Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/jianku-screen-ui-redesign/pages/desktop-recording-progress.html --title=\"Desktop - 录制中\" --lang=zh-CN --prefix=google --theme=light",
+        "pageType": "task-driven",
+        "qualityRisks": [
+          "floating-toolbar",
+          "recording-indicator"
+        ],
+        "componentPlan": [
+          {
+            "slug": "button",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-button.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/button.json"
+          },
+          {
+            "slug": "navigation",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-navigation.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/navigation.json"
+          }
+        ],
+        "visualNorthStar": "A minimal, always-accessible recording control bar: elapsed time, pause/resume, stop, and source indicator.",
+        "allowedWritePaths": [
+          "pages/desktop-recording-progress.html"
+        ],
+        "forbiddenWriteRoots": [
+          "*.design",
+          "runtime-orchestration-summary.json",
+          "validation-report.json",
+          "finish-readiness-report.json"
+        ],
+        "toolPolicy": {
+          "todoWriteAllowed": false,
+          "validationScriptsAllowed": false,
+          "previewAllowed": false,
+          "helperScriptsAllowed": false,
+          "designFileWriteAllowed": false,
+          "allowedWritePaths": [
+            "pages/desktop-recording-progress.html"
+          ]
+        }
+      },
+      {
+        "nodeId": "desktop-editor",
+        "packetType": "LibraryBoundPagePacket",
+        "pageRuntimeGuide": "intent-workflows/intent-page-library-bound/library-bound-page-runtime.md",
+        "dispatchContract": "intent-workflows/intent-page-library-bound/dispatch-contract.md",
+        "htmlSrc": "pages/desktop-editor.html",
+        "title": "Desktop - 编辑器",
+        "deviceType": "desktop",
+        "viewportMode": "app-shell",
+        "cssPath": "/Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css",
+        "brandPrefix": "google",
+        "fillHtmlHeadCommand": "node /Users/moyingxz/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/apply-html-head-contract.mjs /Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/jianku-screen-ui-redesign/pages/desktop-editor.html --title=\"Desktop - 编辑器\" --lang=zh-CN --prefix=google --theme=light",
+        "pageType": "information-dense",
+        "qualityRisks": [
+          "timeline-layout",
+          "dense-toolbar"
+        ],
+        "componentPlan": [
+          {
+            "slug": "sidebar",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-sidebar.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/sidebar.json"
+          },
+          {
+            "slug": "button",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-button.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/button.json"
+          },
+          {
+            "slug": "navigation",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-navigation.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/navigation.json"
+          },
+          {
+            "slug": "card",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-card.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/card.json"
+          }
+        ],
+        "visualNorthStar": "A non-linear editor workspace: preview canvas, multi-track timeline, tool sidebar, and export controls arranged for efficient video editing.",
+        "allowedWritePaths": [
+          "pages/desktop-editor.html"
+        ],
+        "forbiddenWriteRoots": [
+          "*.design",
+          "runtime-orchestration-summary.json",
+          "validation-report.json",
+          "finish-readiness-report.json"
+        ],
+        "toolPolicy": {
+          "todoWriteAllowed": false,
+          "validationScriptsAllowed": false,
+          "previewAllowed": false,
+          "helperScriptsAllowed": false,
+          "designFileWriteAllowed": false,
+          "allowedWritePaths": [
+            "pages/desktop-editor.html"
+          ]
+        }
+      },
+      {
+        "nodeId": "desktop-presentation-output",
+        "packetType": "LibraryBoundPagePacket",
+        "pageRuntimeGuide": "intent-workflows/intent-page-library-bound/library-bound-page-runtime.md",
+        "dispatchContract": "intent-workflows/intent-page-library-bound/dispatch-contract.md",
+        "htmlSrc": "pages/desktop-presentation-output.html",
+        "title": "Desktop - 演示输出",
+        "deviceType": "desktop",
+        "viewportMode": "app-shell",
+        "cssPath": "/Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css",
+        "brandPrefix": "google",
+        "fillHtmlHeadCommand": "node /Users/moyingxz/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/apply-html-head-contract.mjs /Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/jianku-screen-ui-redesign/pages/desktop-presentation-output.html --title=\"Desktop - 演示输出\" --lang=zh-CN --prefix=google --theme=light",
+        "pageType": "task-driven",
+        "qualityRisks": [
+          "output-stage",
+          "floating-controls"
+        ],
+        "componentPlan": [
+          {
+            "slug": "button",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-button.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/button.json"
+          },
+          {
+            "slug": "card",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-card.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/card.json"
+          }
+        ],
+        "visualNorthStar": "A clean presentation stage with the shared content front-and-center, unobtrusive control bar, and live pointer/zoom status.",
+        "allowedWritePaths": [
+          "pages/desktop-presentation-output.html"
+        ],
+        "forbiddenWriteRoots": [
+          "*.design",
+          "runtime-orchestration-summary.json",
+          "validation-report.json",
+          "finish-readiness-report.json"
+        ],
+        "toolPolicy": {
+          "todoWriteAllowed": false,
+          "validationScriptsAllowed": false,
+          "previewAllowed": false,
+          "helperScriptsAllowed": false,
+          "designFileWriteAllowed": false,
+          "allowedWritePaths": [
+            "pages/desktop-presentation-output.html"
+          ]
+        }
+      },
+      {
+        "nodeId": "desktop-settings-general",
+        "packetType": "LibraryBoundPagePacket",
+        "pageRuntimeGuide": "intent-workflows/intent-page-library-bound/library-bound-page-runtime.md",
+        "dispatchContract": "intent-workflows/intent-page-library-bound/dispatch-contract.md",
+        "htmlSrc": "pages/desktop-settings-general.html",
+        "title": "Desktop - 设置-通用",
+        "deviceType": "desktop",
+        "viewportMode": "app-shell",
+        "cssPath": "/Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css",
+        "brandPrefix": "google",
+        "fillHtmlHeadCommand": "node /Users/moyingxz/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/apply-html-head-contract.mjs /Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/jianku-screen-ui-redesign/pages/desktop-settings-general.html --title=\"Desktop - 设置-通用\" --lang=zh-CN --prefix=google --theme=light",
+        "pageType": "information-dense",
+        "qualityRisks": [
+          "settings-list",
+          "form-density"
+        ],
+        "componentPlan": [
+          {
+            "slug": "sidebar",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-sidebar.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/sidebar.json"
+          },
+          {
+            "slug": "navigation",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-navigation.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/navigation.json"
+          },
+          {
+            "slug": "button",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-button.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/button.json"
+          },
+          {
+            "slug": "card",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-card.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/card.json"
+          }
+        ],
+        "visualNorthStar": "Settings shell: branded sidebar with category list, content cards with toggles/inputs, and a sticky save bar.",
+        "allowedWritePaths": [
+          "pages/desktop-settings-general.html"
+        ],
+        "forbiddenWriteRoots": [
+          "*.design",
+          "runtime-orchestration-summary.json",
+          "validation-report.json",
+          "finish-readiness-report.json"
+        ],
+        "toolPolicy": {
+          "todoWriteAllowed": false,
+          "validationScriptsAllowed": false,
+          "previewAllowed": false,
+          "helperScriptsAllowed": false,
+          "designFileWriteAllowed": false,
+          "allowedWritePaths": [
+            "pages/desktop-settings-general.html"
+          ]
+        }
+      },
+      {
+        "nodeId": "desktop-settings-recording",
+        "packetType": "LibraryBoundPagePacket",
+        "pageRuntimeGuide": "intent-workflows/intent-page-library-bound/library-bound-page-runtime.md",
+        "dispatchContract": "intent-workflows/intent-page-library-bound/dispatch-contract.md",
+        "htmlSrc": "pages/desktop-settings-recording.html",
+        "title": "Desktop - 设置-录制",
+        "deviceType": "desktop",
+        "viewportMode": "app-shell",
+        "cssPath": "/Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css",
+        "brandPrefix": "google",
+        "fillHtmlHeadCommand": "node /Users/moyingxz/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/apply-html-head-contract.mjs /Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/jianku-screen-ui-redesign/pages/desktop-settings-recording.html --title=\"Desktop - 设置-录制\" --lang=zh-CN --prefix=google --theme=light",
+        "pageType": "information-dense",
+        "qualityRisks": [
+          "settings-list",
+          "form-density"
+        ],
+        "componentPlan": [
+          {
+            "slug": "sidebar",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-sidebar.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/sidebar.json"
+          },
+          {
+            "slug": "navigation",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-navigation.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/navigation.json"
+          },
+          {
+            "slug": "button",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-button.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/button.json"
+          },
+          {
+            "slug": "card",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-card.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/card.json"
+          }
+        ],
+        "visualNorthStar": "Recording quality settings: resolution, frame rate, audio source, cursor smoothing, and dynamic blur options in grouped cards.",
+        "allowedWritePaths": [
+          "pages/desktop-settings-recording.html"
+        ],
+        "forbiddenWriteRoots": [
+          "*.design",
+          "runtime-orchestration-summary.json",
+          "validation-report.json",
+          "finish-readiness-report.json"
+        ],
+        "toolPolicy": {
+          "todoWriteAllowed": false,
+          "validationScriptsAllowed": false,
+          "previewAllowed": false,
+          "helperScriptsAllowed": false,
+          "designFileWriteAllowed": false,
+          "allowedWritePaths": [
+            "pages/desktop-settings-recording.html"
+          ]
+        }
+      },
+      {
+        "nodeId": "desktop-settings-integrations",
+        "packetType": "LibraryBoundPagePacket",
+        "pageRuntimeGuide": "intent-workflows/intent-page-library-bound/library-bound-page-runtime.md",
+        "dispatchContract": "intent-workflows/intent-page-library-bound/dispatch-contract.md",
+        "htmlSrc": "pages/desktop-settings-integrations.html",
+        "title": "Desktop - 设置-集成",
+        "deviceType": "desktop",
+        "viewportMode": "app-shell",
+        "cssPath": "/Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css",
+        "brandPrefix": "google",
+        "fillHtmlHeadCommand": "node /Users/moyingxz/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/apply-html-head-contract.mjs /Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/jianku-screen-ui-redesign/pages/desktop-settings-integrations.html --title=\"Desktop - 设置-集成\" --lang=zh-CN --prefix=google --theme=light",
+        "pageType": "information-dense",
+        "qualityRisks": [
+          "settings-list",
+          "table-of-integrations"
+        ],
+        "componentPlan": [
+          {
+            "slug": "sidebar",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-sidebar.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/sidebar.json"
+          },
+          {
+            "slug": "navigation",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-navigation.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/navigation.json"
+          },
+          {
+            "slug": "button",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-button.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/button.json"
+          },
+          {
+            "slug": "card",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-card.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/card.json"
+          },
+          {
+            "slug": "table",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-table.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/table.json"
+          }
+        ],
+        "visualNorthStar": "Integrations directory: connected services as a clean table or cards, with connect/disconnect actions and status badges.",
+        "allowedWritePaths": [
+          "pages/desktop-settings-integrations.html"
+        ],
+        "forbiddenWriteRoots": [
+          "*.design",
+          "runtime-orchestration-summary.json",
+          "validation-report.json",
+          "finish-readiness-report.json"
+        ],
+        "toolPolicy": {
+          "todoWriteAllowed": false,
+          "validationScriptsAllowed": false,
+          "previewAllowed": false,
+          "helperScriptsAllowed": false,
+          "designFileWriteAllowed": false,
+          "allowedWritePaths": [
+            "pages/desktop-settings-integrations.html"
+          ]
+        }
+      },
+      {
+        "nodeId": "web-landing",
+        "packetType": "LibraryBoundPagePacket",
+        "pageRuntimeGuide": "intent-workflows/intent-page-library-bound/library-bound-page-runtime.md",
+        "dispatchContract": "intent-workflows/intent-page-library-bound/dispatch-contract.md",
+        "htmlSrc": "pages/web-landing.html",
+        "title": "Web - 官网首页",
+        "deviceType": "web",
+        "viewportMode": "document-scroll",
+        "cssPath": "/Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css",
+        "brandPrefix": "google",
+        "fillHtmlHeadCommand": "node /Users/moyingxz/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/apply-html-head-contract.mjs /Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/jianku-screen-ui-redesign/pages/web-landing.html --title=\"Web - 官网首页\" --lang=zh-CN --prefix=google --theme=light",
+        "pageType": "showcase",
+        "qualityRisks": [
+          "hero-imagery",
+          "marketing-copy"
+        ],
+        "componentPlan": [
+          {
+            "slug": "navigation",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-navigation.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/navigation.json"
+          },
+          {
+            "slug": "button",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-button.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/button.json"
+          },
+          {
+            "slug": "card",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-card.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/card.json"
+          }
+        ],
+        "visualNorthStar": "A crisp marketing landing page for Jianku Screen: hero with product value, feature cards, pricing CTA, and social proof, all in Google flat analytical style.",
+        "allowedWritePaths": [
+          "pages/web-landing.html"
+        ],
+        "forbiddenWriteRoots": [
+          "*.design",
+          "runtime-orchestration-summary.json",
+          "validation-report.json",
+          "finish-readiness-report.json"
+        ],
+        "toolPolicy": {
+          "todoWriteAllowed": false,
+          "validationScriptsAllowed": false,
+          "previewAllowed": false,
+          "helperScriptsAllowed": false,
+          "designFileWriteAllowed": false,
+          "allowedWritePaths": [
+            "pages/web-landing.html"
+          ]
+        }
+      },
+      {
+        "nodeId": "web-dashboard",
+        "packetType": "LibraryBoundPagePacket",
+        "pageRuntimeGuide": "intent-workflows/intent-page-library-bound/library-bound-page-runtime.md",
+        "dispatchContract": "intent-workflows/intent-page-library-bound/dispatch-contract.md",
+        "htmlSrc": "pages/web-dashboard.html",
+        "title": "Web - 内容库",
+        "deviceType": "web",
+        "viewportMode": "document-scroll",
+        "cssPath": "/Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css",
+        "brandPrefix": "google",
+        "fillHtmlHeadCommand": "node /Users/moyingxz/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/apply-html-head-contract.mjs /Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/jianku-screen-ui-redesign/pages/web-dashboard.html --title=\"Web - 内容库\" --lang=zh-CN --prefix=google --theme=light",
+        "pageType": "information-dense",
+        "qualityRisks": [
+          "content-grid",
+          "table-or-list"
+        ],
+        "componentPlan": [
+          {
+            "slug": "navigation",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-navigation.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/navigation.json"
+          },
+          {
+            "slug": "card",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-card.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/card.json"
+          },
+          {
+            "slug": "table",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-table.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/table.json"
+          },
+          {
+            "slug": "button",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-button.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/button.json"
+          }
+        ],
+        "visualNorthStar": "Web library dashboard: grid of recordings, quick filters, status badges, and share/export actions.",
+        "allowedWritePaths": [
+          "pages/web-dashboard.html"
+        ],
+        "forbiddenWriteRoots": [
+          "*.design",
+          "runtime-orchestration-summary.json",
+          "validation-report.json",
+          "finish-readiness-report.json"
+        ],
+        "toolPolicy": {
+          "todoWriteAllowed": false,
+          "validationScriptsAllowed": false,
+          "previewAllowed": false,
+          "helperScriptsAllowed": false,
+          "designFileWriteAllowed": false,
+          "allowedWritePaths": [
+            "pages/web-dashboard.html"
+          ]
+        }
+      },
+      {
+        "nodeId": "web-share",
+        "packetType": "LibraryBoundPagePacket",
+        "pageRuntimeGuide": "intent-workflows/intent-page-library-bound/library-bound-page-runtime.md",
+        "dispatchContract": "intent-workflows/intent-page-library-bound/dispatch-contract.md",
+        "htmlSrc": "pages/web-share.html",
+        "title": "Web - 分享页",
+        "deviceType": "web",
+        "viewportMode": "document-scroll",
+        "cssPath": "/Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css",
+        "brandPrefix": "google",
+        "fillHtmlHeadCommand": "node /Users/moyingxz/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/apply-html-head-contract.mjs /Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/jianku-screen-ui-redesign/pages/web-share.html --title=\"Web - 分享页\" --lang=zh-CN --prefix=google --theme=light",
+        "pageType": "information-dense",
+        "qualityRisks": [
+          "video-player",
+          "embed-code"
+        ],
+        "componentPlan": [
+          {
+            "slug": "navigation",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-navigation.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/navigation.json"
+          },
+          {
+            "slug": "card",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-card.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/card.json"
+          },
+          {
+            "slug": "button",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-button.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/button.json"
+          }
+        ],
+        "visualNorthStar": "Public share page: centered video player, title/meta, share/embed actions, and viewer analytics in a clean card layout.",
+        "allowedWritePaths": [
+          "pages/web-share.html"
+        ],
+        "forbiddenWriteRoots": [
+          "*.design",
+          "runtime-orchestration-summary.json",
+          "validation-report.json",
+          "finish-readiness-report.json"
+        ],
+        "toolPolicy": {
+          "todoWriteAllowed": false,
+          "validationScriptsAllowed": false,
+          "previewAllowed": false,
+          "helperScriptsAllowed": false,
+          "designFileWriteAllowed": false,
+          "allowedWritePaths": [
+            "pages/web-share.html"
+          ]
+        }
+      },
+      {
+        "nodeId": "mobile-home",
+        "packetType": "LibraryBoundPagePacket",
+        "pageRuntimeGuide": "intent-workflows/intent-page-library-bound/library-bound-page-runtime.md",
+        "dispatchContract": "intent-workflows/intent-page-library-bound/dispatch-contract.md",
+        "htmlSrc": "pages/mobile-home.html",
+        "title": "Mobile - 首页",
+        "deviceType": "mobile",
+        "viewportMode": "app-shell",
+        "cssPath": "/Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css",
+        "brandPrefix": "google",
+        "fillHtmlHeadCommand": "node /Users/moyingxz/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/apply-html-head-contract.mjs /Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/jianku-screen-ui-redesign/pages/mobile-home.html --title=\"Mobile - 首页\" --lang=zh-CN --prefix=google --theme=light",
+        "pageType": "information-dense",
+        "qualityRisks": [
+          "mobile-frame",
+          "bottom-nav"
+        ],
+        "componentPlan": [
+          {
+            "slug": "navigation",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-navigation.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/navigation.json"
+          },
+          {
+            "slug": "card",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-card.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/card.json"
+          },
+          {
+            "slug": "button",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-button.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/button.json"
+          }
+        ],
+        "visualNorthStar": "Mobile home: list of recent recordings, floating new-record action, bottom tab bar, and compact search/filter.",
+        "allowedWritePaths": [
+          "pages/mobile-home.html"
+        ],
+        "forbiddenWriteRoots": [
+          "*.design",
+          "runtime-orchestration-summary.json",
+          "validation-report.json",
+          "finish-readiness-report.json"
+        ],
+        "toolPolicy": {
+          "todoWriteAllowed": false,
+          "validationScriptsAllowed": false,
+          "previewAllowed": false,
+          "helperScriptsAllowed": false,
+          "designFileWriteAllowed": false,
+          "allowedWritePaths": [
+            "pages/mobile-home.html"
+          ]
+        }
+      },
+      {
+        "nodeId": "mobile-recording",
+        "packetType": "LibraryBoundPagePacket",
+        "pageRuntimeGuide": "intent-workflows/intent-page-library-bound/library-bound-page-runtime.md",
+        "dispatchContract": "intent-workflows/intent-page-library-bound/dispatch-contract.md",
+        "htmlSrc": "pages/mobile-recording.html",
+        "title": "Mobile - 录制",
+        "deviceType": "mobile",
+        "viewportMode": "app-shell",
+        "cssPath": "/Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css",
+        "brandPrefix": "google",
+        "fillHtmlHeadCommand": "node /Users/moyingxz/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/apply-html-head-contract.mjs /Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/jianku-screen-ui-redesign/pages/mobile-recording.html --title=\"Mobile - 录制\" --lang=zh-CN --prefix=google --theme=light",
+        "pageType": "task-driven",
+        "qualityRisks": [
+          "mobile-frame",
+          "camera-stage",
+          "bottom-controls"
+        ],
+        "componentPlan": [
+          {
+            "slug": "navigation",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-navigation.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/navigation.json"
+          },
+          {
+            "slug": "button",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-button.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/button.json"
+          }
+        ],
+        "visualNorthStar": "Mobile recorder: camera preview fills the frame, mode switcher, large record/stop button, and timer pill.",
+        "allowedWritePaths": [
+          "pages/mobile-recording.html"
+        ],
+        "forbiddenWriteRoots": [
+          "*.design",
+          "runtime-orchestration-summary.json",
+          "validation-report.json",
+          "finish-readiness-report.json"
+        ],
+        "toolPolicy": {
+          "todoWriteAllowed": false,
+          "validationScriptsAllowed": false,
+          "previewAllowed": false,
+          "helperScriptsAllowed": false,
+          "designFileWriteAllowed": false,
+          "allowedWritePaths": [
+            "pages/mobile-recording.html"
+          ]
+        }
+      },
+      {
+        "nodeId": "mobile-settings",
+        "packetType": "LibraryBoundPagePacket",
+        "pageRuntimeGuide": "intent-workflows/intent-page-library-bound/library-bound-page-runtime.md",
+        "dispatchContract": "intent-workflows/intent-page-library-bound/dispatch-contract.md",
+        "htmlSrc": "pages/mobile-settings.html",
+        "title": "Mobile - 设置",
+        "deviceType": "mobile",
+        "viewportMode": "app-shell",
+        "cssPath": "/Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css",
+        "brandPrefix": "google",
+        "fillHtmlHeadCommand": "node /Users/moyingxz/.trae-cn/builtin/design/default/skills/solo-design/shared-runtime/deterministic-tooling/apply-html-head-contract.mjs /Users/moyingxz/.trae-cn/design_libraries/Google/colors_and_type.css /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/jianku-screen-ui-redesign/pages/mobile-settings.html --title=\"Mobile - 设置\" --lang=zh-CN --prefix=google --theme=light",
+        "pageType": "information-dense",
+        "qualityRisks": [
+          "mobile-frame",
+          "settings-list"
+        ],
+        "componentPlan": [
+          {
+            "slug": "navigation",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-navigation.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/navigation.json"
+          },
+          {
+            "slug": "card",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-card.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/card.json"
+          },
+          {
+            "slug": "button",
+            "previewFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/preview/component-button.html",
+            "contractFile": "/Users/moyingxz/.trae-cn/design_libraries/Google/components/button.json"
+          }
+        ],
+        "visualNorthStar": "Mobile settings: grouped list rows with toggles, account card, and bottom tab bar for quick navigation.",
+        "allowedWritePaths": [
+          "pages/mobile-settings.html"
+        ],
+        "forbiddenWriteRoots": [
+          "*.design",
+          "runtime-orchestration-summary.json",
+          "validation-report.json",
+          "finish-readiness-report.json"
+        ],
+        "toolPolicy": {
+          "todoWriteAllowed": false,
+          "validationScriptsAllowed": false,
+          "previewAllowed": false,
+          "helperScriptsAllowed": false,
+          "designFileWriteAllowed": false,
+          "allowedWritePaths": [
+            "pages/mobile-settings.html"
+          ]
+        }
+      }
+    ],
+    "expectedDispatches": [
+      {
+        "nodeId": "desktop-main",
+        "packetType": "LibraryBoundPagePacket",
+        "status": "completed",
+        "changedFiles": [
+          "pages/desktop-main.html"
+        ],
+        "toolCallLedger": {
+          "todoWriteCalls": 0,
+          "previewCalls": 0,
+          "validationScriptCalls": 0,
+          "helperScriptWrites": 0,
+          "source": "main-agent-runtime-trace",
+          "traceDigest": "dispatch-completed"
+        }
+      },
+      {
+        "nodeId": "desktop-recording-setup",
+        "packetType": "LibraryBoundPagePacket",
+        "status": "completed",
+        "changedFiles": [
+          "pages/desktop-recording-setup.html"
+        ],
+        "toolCallLedger": {
+          "todoWriteCalls": 0,
+          "previewCalls": 0,
+          "validationScriptCalls": 0,
+          "helperScriptWrites": 0,
+          "source": "main-agent-runtime-trace",
+          "traceDigest": "dispatch-completed"
+        }
+      },
+      {
+        "nodeId": "desktop-recording-progress",
+        "packetType": "LibraryBoundPagePacket",
+        "status": "completed",
+        "changedFiles": [
+          "pages/desktop-recording-progress.html"
+        ],
+        "toolCallLedger": {
+          "todoWriteCalls": 0,
+          "previewCalls": 0,
+          "validationScriptCalls": 0,
+          "helperScriptWrites": 0,
+          "source": "main-agent-runtime-trace",
+          "traceDigest": "dispatch-completed"
+        }
+      },
+      {
+        "nodeId": "desktop-editor",
+        "packetType": "LibraryBoundPagePacket",
+        "status": "completed",
+        "changedFiles": [
+          "pages/desktop-editor.html"
+        ],
+        "toolCallLedger": {
+          "todoWriteCalls": 0,
+          "previewCalls": 0,
+          "validationScriptCalls": 0,
+          "helperScriptWrites": 0,
+          "source": "main-agent-runtime-trace",
+          "traceDigest": "dispatch-completed"
+        }
+      },
+      {
+        "nodeId": "desktop-presentation-output",
+        "packetType": "LibraryBoundPagePacket",
+        "status": "completed",
+        "changedFiles": [
+          "pages/desktop-presentation-output.html"
+        ],
+        "toolCallLedger": {
+          "todoWriteCalls": 0,
+          "previewCalls": 0,
+          "validationScriptCalls": 0,
+          "helperScriptWrites": 0,
+          "source": "main-agent-runtime-trace",
+          "traceDigest": "dispatch-completed"
+        }
+      },
+      {
+        "nodeId": "desktop-settings-general",
+        "packetType": "LibraryBoundPagePacket",
+        "status": "completed",
+        "changedFiles": [
+          "pages/desktop-settings-general.html"
+        ],
+        "toolCallLedger": {
+          "todoWriteCalls": 0,
+          "previewCalls": 0,
+          "validationScriptCalls": 0,
+          "helperScriptWrites": 0,
+          "source": "main-agent-runtime-trace",
+          "traceDigest": "dispatch-completed"
+        }
+      },
+      {
+        "nodeId": "desktop-settings-recording",
+        "packetType": "LibraryBoundPagePacket",
+        "status": "completed",
+        "changedFiles": [
+          "pages/desktop-settings-recording.html"
+        ],
+        "toolCallLedger": {
+          "todoWriteCalls": 0,
+          "previewCalls": 0,
+          "validationScriptCalls": 0,
+          "helperScriptWrites": 0,
+          "source": "main-agent-runtime-trace",
+          "traceDigest": "dispatch-completed"
+        }
+      },
+      {
+        "nodeId": "desktop-settings-integrations",
+        "packetType": "LibraryBoundPagePacket",
+        "status": "completed",
+        "changedFiles": [
+          "pages/desktop-settings-integrations.html"
+        ],
+        "toolCallLedger": {
+          "todoWriteCalls": 0,
+          "previewCalls": 0,
+          "validationScriptCalls": 0,
+          "helperScriptWrites": 0,
+          "source": "main-agent-runtime-trace",
+          "traceDigest": "dispatch-completed"
+        }
+      },
+      {
+        "nodeId": "web-landing",
+        "packetType": "LibraryBoundPagePacket",
+        "status": "completed",
+        "changedFiles": [
+          "pages/web-landing.html"
+        ],
+        "toolCallLedger": {
+          "todoWriteCalls": 0,
+          "previewCalls": 0,
+          "validationScriptCalls": 0,
+          "helperScriptWrites": 0,
+          "source": "main-agent-runtime-trace",
+          "traceDigest": "dispatch-completed"
+        }
+      },
+      {
+        "nodeId": "web-dashboard",
+        "packetType": "LibraryBoundPagePacket",
+        "status": "completed",
+        "changedFiles": [
+          "pages/web-dashboard.html"
+        ],
+        "toolCallLedger": {
+          "todoWriteCalls": 0,
+          "previewCalls": 0,
+          "validationScriptCalls": 0,
+          "helperScriptWrites": 0,
+          "source": "main-agent-runtime-trace",
+          "traceDigest": "dispatch-completed"
+        }
+      },
+      {
+        "nodeId": "web-share",
+        "packetType": "LibraryBoundPagePacket",
+        "status": "completed",
+        "changedFiles": [
+          "pages/web-share.html"
+        ],
+        "toolCallLedger": {
+          "todoWriteCalls": 0,
+          "previewCalls": 0,
+          "validationScriptCalls": 0,
+          "helperScriptWrites": 0,
+          "source": "main-agent-runtime-trace",
+          "traceDigest": "dispatch-completed"
+        }
+      },
+      {
+        "nodeId": "mobile-home",
+        "packetType": "LibraryBoundPagePacket",
+        "status": "completed",
+        "changedFiles": [
+          "pages/mobile-home.html"
+        ],
+        "toolCallLedger": {
+          "todoWriteCalls": 0,
+          "previewCalls": 0,
+          "validationScriptCalls": 0,
+          "helperScriptWrites": 0,
+          "source": "main-agent-runtime-trace",
+          "traceDigest": "dispatch-completed"
+        }
+      },
+      {
+        "nodeId": "mobile-recording",
+        "packetType": "LibraryBoundPagePacket",
+        "status": "completed",
+        "changedFiles": [
+          "pages/mobile-recording.html"
+        ],
+        "toolCallLedger": {
+          "todoWriteCalls": 0,
+          "previewCalls": 0,
+          "validationScriptCalls": 0,
+          "helperScriptWrites": 0,
+          "source": "main-agent-runtime-trace",
+          "traceDigest": "dispatch-completed"
+        }
+      },
+      {
+        "nodeId": "mobile-settings",
+        "packetType": "LibraryBoundPagePacket",
+        "status": "completed",
+        "changedFiles": [
+          "pages/mobile-settings.html"
+        ],
+        "toolCallLedger": {
+          "todoWriteCalls": 0,
+          "previewCalls": 0,
+          "validationScriptCalls": 0,
+          "helperScriptWrites": 0,
+          "source": "main-agent-runtime-trace",
+          "traceDigest": "dispatch-completed"
+        }
+      }
+    ]
+  }
+}

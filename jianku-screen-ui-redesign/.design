@@ -1,0 +1,319 @@
+{
+  "data": [
+    {
+      "id": "page-desktop-main",
+      "title": "Desktop - 主控台",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1792066615973,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-d7b0e8a7",
+          "measuredAt": 1792066846109
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/desktop-main.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-desktop-recording-setup",
+      "title": "Desktop - 录制设置",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1792066615974,
+      "canvasData": {
+        "x": 480,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-b65bf4c1",
+          "measuredAt": 1792066846109
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/desktop-recording-setup.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-desktop-recording-progress",
+      "title": "Desktop - 录制中",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1792066615975,
+      "canvasData": {
+        "x": 960,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-890d2642",
+          "measuredAt": 1792066846109
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/desktop-recording-progress.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-desktop-editor",
+      "title": "Desktop - 编辑器",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1792066615976,
+      "canvasData": {
+        "x": 1440,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-12ebd561",
+          "measuredAt": 1792066846109
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/desktop-editor.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-desktop-presentation-output",
+      "title": "Desktop - 演示输出",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1792066615977,
+      "canvasData": {
+        "x": 1920,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-290d5842",
+          "measuredAt": 1792066846109
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/desktop-presentation-output.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-desktop-settings-general",
+      "title": "Desktop - 设置-通用",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1792066615978,
+      "canvasData": {
+        "x": 2400,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/desktop-settings-general.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-desktop-settings-recording",
+      "title": "Desktop - 设置-录制",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1792066615979,
+      "canvasData": {
+        "x": 2880,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/desktop-settings-recording.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-desktop-settings-integrations",
+      "title": "Desktop - 设置-集成",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1792066615980,
+      "canvasData": {
+        "x": 3360,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/desktop-settings-integrations.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-web-landing",
+      "title": "Web - 官网首页",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1792066615981,
+      "canvasData": {
+        "x": 0,
+        "y": 373,
+        "group": 1,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 2490,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-08d09953",
+          "measuredAt": 1792066846109
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/web-landing.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-web-dashboard",
+      "title": "Web - 内容库",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1792066615982,
+      "canvasData": {
+        "x": 480,
+        "y": 373,
+        "group": 1,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-1b9a5556",
+          "measuredAt": 1792066846109
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/web-dashboard.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-web-share",
+      "title": "Web - 分享页",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1792066615983,
+      "canvasData": {
+        "x": 960,
+        "y": 373,
+        "group": 1,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1155,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-c2c7b84b",
+          "measuredAt": 1792066846109
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/web-share.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-mobile-home",
+      "title": "Mobile - 首页",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1792066615984,
+      "canvasData": {
+        "x": 0,
+        "y": 746,
+        "group": 2,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-45e8f769",
+          "measuredAt": 1792066846109
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/mobile-home.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-mobile-recording",
+      "title": "Mobile - 录制",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1792066615985,
+      "canvasData": {
+        "x": 480,
+        "y": 746,
+        "group": 2,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-77784cb3",
+          "measuredAt": 1792066846109
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/mobile-recording.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-mobile-settings",
+      "title": "Mobile - 设置",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1792066615986,
+      "canvasData": {
+        "x": 960,
+        "y": 746,
+        "group": 2,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 1259,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-29967733",
+          "measuredAt": 1792066846109
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/mobile-settings.html",
+        "interactions": []
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": true,
+    "deviceType": "desktop",
+    "designLibrary": {
+      "name": "Google",
+      "id": "dl_builtin_google",
+      "version": 0,
+      "scope": "builtin-global",
+      "path": "/Users/moyingxz/.trae-cn/design_libraries/Google",
+      "versionSource": "metadata.json"
+    },
+    "visualEditorEnabled": false,
+    "projectName": "Jianku Screen Next UI Redesign"
+  }
+}

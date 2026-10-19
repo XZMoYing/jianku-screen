@@ -37,26 +37,26 @@ async function fetchDiagnostics(): Promise<SystemDiagnostics | null> {
 }
 
 const DIAGNOSTIC_MODES = [
-	{ text: "Studio and Instant", value: "both" },
-	{ text: "Studio only", value: "studio" },
-	{ text: "Instant only", value: "instant" },
+	{ text: "录制与实时模式", value: "both" },
+	{ text: "仅录制模式", value: "studio" },
+	{ text: "仅实时模式", value: "instant" },
 ];
 
 const DIAGNOSTIC_DURATIONS = [
-	{ text: "20 seconds", value: 20 },
-	{ text: "40 seconds", value: 40 },
-	{ text: "60 seconds", value: 60 },
+	{ text: "20 秒", value: 20 },
+	{ text: "40 秒", value: 40 },
+	{ text: "60 秒", value: 60 },
 ];
 
 /** Stage names come from the CLI verbatim; unknown ones are shown as-is. */
 const SYNC_STAGE_LABELS: Record<string, string> = {
-	collecting: "Preparing the test",
-	recording: "Recording the test pattern",
-	"pattern-run": "Playing the flash and beep pattern",
-	remuxing: "Finalizing the recording",
-	analyzing: "Analyzing flash and beep timing",
-	exporting: "Exporting the test recording",
-	done: "Wrapping up the sync test",
+	collecting: "正在准备诊断",
+	recording: "正在录制测试画面",
+	"pattern-run": "正在播放闪烁与提示音",
+	remuxing: "正在整理录制文件",
+	analyzing: "正在分析画面与声音的时间差",
+	exporting: "正在导出诊断录制",
+	done: "正在完成音画同步诊断",
 };
 
 const VERDICT_STYLES: Record<string, string> = {
@@ -67,12 +67,18 @@ const VERDICT_STYLES: Record<string, string> = {
 };
 
 function progressLabel(payload: DiagnosticProgress) {
-	if (payload.phase === "collecting") return "Collecting system info...";
-	if (payload.phase === "done") return "Finishing up...";
+	if (payload.phase === "collecting") return localize("正在收集系统信息…");
+	if (payload.phase === "done") return localize("正在收尾…");
 	const stage = payload.stage
 		? (SYNC_STAGE_LABELS[payload.stage] ?? payload.stage)
-		: "Running sync test";
-	return payload.mode ? `${stage} (${payload.mode})...` : `${stage}...`;
+		: localize("正在运行音画同步诊断");
+	const mode =
+		payload.mode === "studio"
+			? localize("录制模式")
+			: payload.mode === "instant"
+				? localize("实时模式")
+				: undefined;
+	return `${localize(stage)}${mode ? `（${mode}）` : ""}…`;
 }
 
 function SelectDiagnosticItem<T extends string | number>(props: {
@@ -91,7 +97,7 @@ function SelectDiagnosticItem<T extends string | number>(props: {
 					const currentValue = props.value;
 					const items = props.options.map((option) =>
 						CheckMenuItem.new({
-							text: option.text,
+						text: localize(option.text),
 							checked: currentValue === option.value,
 							action: () => props.onChange(option.value),
 						}),
@@ -101,8 +107,10 @@ function SelectDiagnosticItem<T extends string | number>(props: {
 					await menu.close();
 				}}
 			>
-				{props.options.find((option) => option.value === props.value)?.text ??
-					String(props.value)}
+				{localize(
+					props.options.find((option) => option.value === props.value)?.text ??
+						String(props.value),
+				)}
 				<IconCapChevronDown class="size-3.5 text-gray-10" />
 			</button>
 		</SettingItem>
@@ -129,7 +137,11 @@ export default function FeedbackTab() {
 				"诊断将显示闪烁测试图案并播放提示音，每种录制流程约 {seconds} 秒。请摘下耳机、保持音量可听见，并在完成前暂停操作。",
 				{ seconds: durationSecs() },
 			),
-			{ title: "Run diagnostic?", kind: "warning", okLabel: "Run Diagnostic" },
+			{
+				title: localize("开始运行诊断？"),
+				kind: "warning",
+				okLabel: localize("开始诊断"),
+			},
 		);
 		if (!confirmed) return;
 
@@ -153,7 +165,7 @@ export default function FeedbackTab() {
 				}),
 			);
 		} catch (error) {
-			toast.error("Failed to run diagnostic");
+			toast.error(localize("Failed to run diagnostic"));
 			console.error("Failed to run diagnostic:", error);
 		} finally {
 			unlisten();
@@ -171,7 +183,7 @@ export default function FeedbackTab() {
 		try {
 			await commands.revealDiagnosticReport(report.reportPath);
 		} catch (error) {
-			toast.error("Failed to show diagnostic report");
+			toast.error(localize("Failed to show diagnostic report"));
 			console.error("Failed to reveal diagnostic report:", error);
 		}
 	};
@@ -197,7 +209,7 @@ export default function FeedbackTab() {
 								<textarea
 									value={feedback()}
 									onInput={(e) => setFeedback(e.currentTarget.value)}
-									placeholder={localize("Tell us what you think about Cap...")}
+								placeholder={localize("分享建议或反馈问题…")}
 									required
 									minLength={10}
 									class="p-2 w-full h-32 text-[13px] rounded-md border transition-colors duration-200 resize-none bg-gray-2 placeholder:text-gray-10 border-gray-3 text-primary focus:outline-hidden focus:ring-1 focus:ring-gray-8 hover:border-gray-6"
@@ -223,7 +235,9 @@ export default function FeedbackTab() {
 								disabled={feedback().trim().length < 4}
 								class="mt-2"
 							>
-								{submission.pending ? "Submitting..." : "Submit Feedback"}
+				{submission.pending
+					? localize("正在提交…")
+					: localize("提交反馈")}
 							</Button>
 						</fieldset>
 					</form>
@@ -241,7 +255,7 @@ export default function FeedbackTab() {
 				<Section
 					title={localize("Diagnostic Report")}
 					description={localize(
-						"Runs an audio/video sync test and collects your hardware, displays, cameras, microphones, Cap settings, details of your recent recordings and a copy of Cap's log file, so we can reproduce your setup instead of guessing at it. You can read the whole report before sending it.",
+						"运行音画同步诊断，并收集硬件、显示器、摄像头、麦克风、应用设置、近期录制信息和日志，帮助我们复现问题。发送前可先查看完整报告。",
 					)}
 				>
 					<div class="space-y-2.5">
@@ -296,7 +310,7 @@ export default function FeedbackTab() {
 								variant="dark"
 								disabled={running()}
 							>
-								{running() ? "Running..." : "Run Diagnostic"}
+					{running() ? localize("正在运行…") : localize("开始诊断")}
 							</Button>
 							<Show when={running() && status()}>
 								{(label) => <p class="text-xs text-gray-10">{label()}</p>}

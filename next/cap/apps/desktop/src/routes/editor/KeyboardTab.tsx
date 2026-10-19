@@ -132,7 +132,7 @@ export function KeyboardTab(props: {
 
 			if (!segments) {
 				toast.error(
-					"The timeline changed while keyboard events were generated. Try again.",
+					localize("生成按键事件时，时间线发生了变化，请重试。"),
 				);
 				return;
 			}
@@ -203,22 +203,24 @@ export function KeyboardTab(props: {
 										item={props.item}
 									>
 										<KSelect.ItemLabel class="flex-1">
-											{
-												FONT_OPTIONS.find(
-													(f) => f.value === props.item.rawValue,
-												)?.label
-											}
+										{localize(
+											localize(FONT_OPTIONS.find(
+												(f) => f.value === props.item.rawValue,
+											)?.label ?? "") ?? "",
+										)}
 										</KSelect.ItemLabel>
 									</MenuItem>
 								)}
 							>
 								<KSelect.Trigger class={selectTriggerClass}>
 									<KSelect.Value<string> class="truncate">
-										{(state) =>
-											FONT_OPTIONS.find(
-												(f) => f.value === state.selectedOption(),
-											)?.label
-										}
+						{(state) =>
+							localize(
+								localize(FONT_OPTIONS.find(
+									(f) => f.value === state.selectedOption(),
+								)?.label ?? "") ?? "",
+							)
+						}
 									</KSelect.Value>
 									<KSelect.Icon>
 										<IconCapChevronDown class="shrink-0 size-3.5 text-ed-text-3" />
@@ -299,11 +301,11 @@ export function KeyboardTab(props: {
 									item={props.item}
 								>
 									<KSelect.ItemLabel class="flex-1">
-										{
-											KEYBOARD_POSITION_OPTIONS.find(
+										{localize(
+											localize(KEYBOARD_POSITION_OPTIONS.find(
 												(p) => p.value === props.item.rawValue,
-											)?.label
-										}
+											)?.label ?? "") ?? "",
+										)}
 									</KSelect.ItemLabel>
 								</MenuItem>
 							)}
@@ -312,11 +314,11 @@ export function KeyboardTab(props: {
 								<KSelect.Value<string> class="truncate">
 									{(state) => (
 										<span>
-											{
-												KEYBOARD_POSITION_OPTIONS.find(
-													(p) => p.value === state.selectedOption(),
-												)?.label
-											}
+							{localize(
+								localize(KEYBOARD_POSITION_OPTIONS.find(
+									(p) => p.value === state.selectedOption(),
+								)?.label ?? "") ?? "",
+							)}
 										</span>
 									)}
 								</KSelect.Value>
@@ -354,7 +356,7 @@ export function KeyboardTab(props: {
 									item={selectItemProps.item}
 								>
 									<KSelect.ItemLabel class="flex-1">
-										{selectItemProps.item.rawValue.label}
+						{localize(selectItemProps.item.rawValue.label)}
 									</KSelect.ItemLabel>
 									<KSelect.ItemIndicator class="ml-auto text-ed-accent">
 										<IconCapCircleCheck />
@@ -368,9 +370,11 @@ export function KeyboardTab(props: {
 									value: number;
 								}> class="truncate">
 									{(state) =>
-										state.selectedOption()?.label ??
-										getTextWeightLabel(getSetting("fontWeight"))
-									}
+									localize(
+										localize(state.selectedOption()?.label ??
+										getTextWeightLabel(getSetting("fontWeight"))),
+									)
+								}
 								</KSelect.Value>
 								<KSelect.Icon>
 									<IconCapChevronDown class="shrink-0 size-3.5 transition-transform transform text-ed-text-3 data-expanded:rotate-180" />
@@ -476,8 +480,8 @@ export function KeyboardTab(props: {
 					{isGenerating()
 						? localize("Generating...")
 						: hasKeyboardSegments()
-							? "Regenerate Keyboard Segments"
-							: "Generate Keyboard Segments"}
+							? localize("重新生成按键片段")
+							: localize("生成按键片段")}
 				</Button>
 
 				<Show when={selectedSegment()}>

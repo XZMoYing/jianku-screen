@@ -60,7 +60,7 @@ const INSTANT_OPTIONS = [
 		value: 1920,
 		label: "1080p",
 		description: localize(
-			"Clear text and a practical upload size. Recommended with Cap Pro.",
+		"文字清晰，文件体积适中，适合日常录制。",
 		),
 	},
 	{
@@ -149,7 +149,7 @@ export default function RecordingQualitySettings() {
 			await generalSettingsStore.set({ [key]: value });
 			await store.refetch();
 		} catch {
-			toast.error("Couldn't save your recording settings. Please try again.");
+			toast.error(localize("Couldn't save your recording settings. Please try again."));
 		} finally {
 			setSaving(false);
 		}
@@ -230,7 +230,7 @@ export default function RecordingQualitySettings() {
 												</span>
 												<span class="flex flex-col gap-1">
 													<span class="flex items-center gap-2 text-[13px] font-medium text-gray-12">
-														{option.label}
+									{localize(option.label)}
 														<Show when={option.value === "balanced"}>
 															<span class="rounded px-1.5 py-0.5 text-[10px] font-medium text-blue-11 bg-blue-4">
 																{localize("Recommended")}
@@ -238,7 +238,7 @@ export default function RecordingQualitySettings() {
 														</Show>
 													</span>
 													<span class="text-xs leading-relaxed text-gray-10">
-														{option.description}
+								{localize(option.description)}
 													</span>
 												</span>
 											</button>
@@ -289,9 +289,9 @@ export default function RecordingQualitySettings() {
 														: "border-gray-4 text-gray-10 enabled:hover:bg-gray-3",
 												)}
 											>
-												{option.label}
+								{localize(option.label)}
 												<Show when={!hasCapPro() && option.value > 1280}>
-													<span class="text-[9px] text-gray-10">Pro</span>
+										<span class="text-[9px] text-gray-10">{localize("Pro")}</span>
 												</Show>
 											</button>
 										)}
@@ -307,7 +307,7 @@ export default function RecordingQualitySettings() {
 									<div class="flex flex-col items-start gap-3 mt-4 pt-4 border-t border-gray-4">
 										<p class="text-xs leading-relaxed text-gray-11">
 											{localize(
-												"720p is included. Cap Pro unlocks 1080p, 1440p and 4K for Instant recordings.",
+			"720p is included. Higher resolutions are available for local recordings.",
 											)}
 										</p>
 										<Button

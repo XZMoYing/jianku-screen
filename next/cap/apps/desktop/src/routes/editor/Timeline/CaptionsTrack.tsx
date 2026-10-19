@@ -159,7 +159,7 @@ export function CaptionsTrack(props: {
 							·{" "}
 							{props.isGenerating
 								? localize("Generating...")
-								: "Generate captions"}
+								: localize("生成字幕")}
 						</button>
 					</div>
 				}
@@ -179,7 +179,7 @@ export function CaptionsTrack(props: {
 					const captionLabel = () => (
 						<div class="cap-seg-labels">
 							<span class="cap-seg-label truncate max-w-full">
-								{segment.text || "Caption"}
+								{segment.text || localize("字幕")}
 							</span>
 						</div>
 					);
@@ -191,7 +191,7 @@ export function CaptionsTrack(props: {
 							segColor="var(--track-caption)"
 							class="group"
 							selected={isSelected()}
-							title={segment.text || "Caption"}
+							title={segment.text || localize("字幕")}
 							segment={{
 								start: segment.start,
 								end: Math.min(segment.end, totalDuration()),

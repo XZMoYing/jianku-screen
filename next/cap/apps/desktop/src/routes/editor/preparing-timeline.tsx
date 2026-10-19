@@ -17,8 +17,8 @@ export function PreparingTimeline(props: { model: PreparingEditorModel }) {
 	const tracks = () => {
 		const declared = props.model.seed().tracks;
 		return declared?.length
-			? declared.map((track) => TRACK_NAMES[track])
-			: ["Recording"];
+			? declared.map((track) => localize(TRACK_NAMES[track]))
+			: [localize("Recording")];
 	};
 	const position = () => {
 		const total = timeline().totalDuration;
@@ -28,15 +28,17 @@ export function PreparingTimeline(props: { model: PreparingEditorModel }) {
 	};
 	const status = () => {
 		if (props.model.progress().phase === "unavailable") {
-			return "Your recording will be available when preparation finishes";
+			return localize("准备完成后即可查看录制内容");
 		}
 		if (props.model.progress().phase === "handoff")
-			return "Opening your editor";
-		if (props.model.playback().buffering) return "Preparing the next part";
+			return localize("正在打开编辑器…");
+		if (props.model.playback().buffering) return localize("正在准备下一段…");
 		if (timeline().playableUntil > 0) {
-			return `Playable to ${preparingTime(timeline().playableUntil)}`;
+			return localize("可播放至 {time}", {
+				time: preparingTime(timeline().playableUntil),
+			});
 		}
-		return "Preparing playback";
+		return localize("正在准备播放…");
 	};
 	return (
 		<div

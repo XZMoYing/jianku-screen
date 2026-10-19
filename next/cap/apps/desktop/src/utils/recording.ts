@@ -1,6 +1,6 @@
-import { emit } from "@tauri-apps/api/event";
 import * as dialog from "@tauri-apps/plugin-dialog";
 import { revealItemInDir } from "@tauri-apps/plugin-opener";
+import { t as localize } from "~/utils/i18n";
 import type { createOptionsQuery } from "./queries";
 import {
 	commands,
@@ -8,6 +8,14 @@ import {
 	type RecordingMeta,
 	type RecordingMode,
 } from "./tauri";
+
+export function displayRecordingName(name: string): string {
+	const legacyDate = /^Cap (\d{4}-\d{2}-\d{2}) at (\d{2}\.\d{2}\.\d{2})$/.exec(
+		name,
+	);
+	if (legacyDate) return `${localize("Cap")} ${legacyDate[1]} ${legacyDate[2]}`;
+	return name.replace(/^Cap(?=\s|$)/, localize("Cap"));
+}
 
 export function isRecordingStorageError(error: unknown): boolean {
 	const message = error instanceof Error ? error.message : error;
@@ -69,41 +77,47 @@ export function handleRecordingResult(
 			if (result === "InvalidAuthentication") {
 				const buttons = setOptions
 					? {
-							yes: "Login",
-							no: "Switch to Studio mode",
-							cancel: "Cancel",
+							yes: localize("敬请期待"),
+							no: localize("切换到录制模式"),
+							cancel: localize("取消"),
 						}
 					: {
-							ok: "Login",
-							cancel: "Cancel",
+							ok: localize("敬请期待"),
+							cancel: localize("取消"),
 						};
 
 				const result = await dialog.message(
-					"You must be authenticated to start an instant mode recording. Login or switch to Studio mode.",
+					localize(
+						"实时模式需要账号支持，账号功能敬请期待；你也可以切换到录制模式。",
+					),
 					{
-						title: "Authentication required",
+						title: localize("功能即将推出"),
 						buttons,
 					},
 				);
 
-				if (result === buttons.yes || result === buttons.ok)
-					emit("start-sign-in");
-				else if (result === buttons.no && setOptions) {
+				if (result === buttons.no && setOptions) {
 					setOptions({ mode: "studio" });
 					commands.setRecordingMode("studio");
 				}
-			} else if (result === "UpgradeRequired") commands.showWindow("Upgrade");
-			else
-				await dialog.message(`Error: ${result}`, {
-					title: "Error starting recording",
+			} else if (result === "UpgradeRequired") {
+				await dialog.message(localize("账号与升级功能敬请期待。"), {
+					title: localize("功能即将推出"),
 				});
+			} else
+				await dialog.message(
+					localize("录制启动失败：{reason}", { reason: result }),
+					{
+						title: localize("录制启动失败"),
+					},
+				);
 		})
 		.catch((error: unknown) => {
 			if (isRecordingStartCancelled(error)) return;
 			return dialog.message(
 				error instanceof Error ? error.message : String(error),
 				{
-					title: "Error starting recording",
+					title: localize("录制启动失败"),
 					kind: "error",
 				},
 			);

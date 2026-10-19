@@ -20,7 +20,7 @@ export function AnnotationTools() {
 
 	return (
 		<div class="flex items-center gap-1">
-			<Tooltip content="Layers" kbd={["L"]}>
+			<Tooltip content={localize("Layers")} kbd={["L"]}>
 				<button
 					type="button"
 					onClick={() => setLayersPanelOpen(!layersPanelOpen())}

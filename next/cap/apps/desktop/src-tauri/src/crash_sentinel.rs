@@ -301,7 +301,7 @@ fn report_unexpected_termination(prev: &SessionRecord) {
         prev_graphics_recovery = prev.graphics_recovery,
         prev_blur_active = prev.blur_active,
         prev_blur_recovery = prev.blur_recovery,
-        "Previous Cap session terminated without a clean shutdown"
+        "The previous app session ended unexpectedly"
     );
 
     sentry::with_scope(
@@ -319,10 +319,7 @@ fn report_unexpected_termination(prev: &SessionRecord) {
             scope.set_extra("prev.started_at", prev.started_at.clone().into());
         },
         || {
-            sentry::capture_message(
-                "Cap session terminated unexpectedly (no clean shutdown)",
-                sentry::Level::Error,
-            );
+            sentry::capture_message("The app session ended unexpectedly", sentry::Level::Error);
         },
     );
 }

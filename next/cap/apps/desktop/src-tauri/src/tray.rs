@@ -497,7 +497,7 @@ fn build_tray_menu(app: &AppHandle, cache: &PreviousItemsCache) -> tauri::Result
                 &MenuItem::with_id(
                     app,
                     TrayItem::Quit,
-                    localized(app, "Quit Cap"),
+                    localized(app, "退出简库镜传 Next"),
                     true,
                     None::<&str>,
                 )?,
@@ -630,7 +630,7 @@ fn build_tray_menu(app: &AppHandle, cache: &PreviousItemsCache) -> tauri::Result
     menu.append(&MenuItem::with_id(
         app,
         TrayItem::Quit,
-        localized(app, "Quit Cap"),
+        localized(app, "退出简库镜传 Next"),
         true,
         None::<&str>,
     )?)?;
@@ -774,7 +774,7 @@ fn set_linux_tray_icon(tray: &TrayIcon<tauri::Wry>, icon: LinuxTrayIcon) -> taur
         let indicator = inner.app_indicator() as *mut libappindicator::AppIndicator;
         if let Some(indicator) = indicator.as_mut() {
             indicator.set_icon_theme_path(&icon_dir.to_string_lossy());
-            indicator.set_icon_full(&icon_name, "Cap tray icon");
+            indicator.set_icon_full(&icon_name, "Jianku Screen Next tray icon");
         }
     })?;
 

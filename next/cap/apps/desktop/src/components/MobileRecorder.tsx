@@ -145,7 +145,7 @@ export default function MobileRecorder(props: {
 			await commands.recoverMobileProject(path);
 			await refresh();
 			await refreshProjects();
-			toast.success("工程已恢复，原始视频已保留");
+			toast.success(localize("工程已恢复，原始视频已保留"));
 		} catch (error) {
 			setError(String(error));
 			toast.error(String(error));
@@ -177,7 +177,7 @@ export default function MobileRecorder(props: {
 						onClick={() => void refetch()}
 					>
 						<IconRefresh class="size-3.5" />
-						{setup.loading ? "正在查找…" : "刷新设备"}
+						{setup.loading ? localize("正在查找…") : localize("刷新设备")}
 					</button>
 				</div>
 				<select
@@ -187,7 +187,9 @@ export default function MobileRecorder(props: {
 					onChange={(event) => setSelection(event.currentTarget.value)}
 				>
 					<option value="">
-						{setup.loading ? "正在查找 USB 设备…" : "请选择已连接的设备"}
+						{setup.loading
+							? localize("正在查找 USB 设备…")
+							: localize("请选择已连接的设备")}
 					</option>
 					<For each={setup()?.devices}>
 						{(device) => (
@@ -197,14 +199,14 @@ export default function MobileRecorder(props: {
 							>
 								{device.name} ·{" "}
 								{device.platform === "ios" ? "iOS / iPadOS" : localize("安卓")}
-								{device.authorized ? "" : " · 请允许 USB 调试"}
+				{device.authorized ? "" : ` · ${localize("请允许 USB 调试")}`}
 							</option>
 						)}
 					</For>
 				</select>
 				<Show when={selected()?.mi6Compatibility}>
 					<p class="mobile-hint">
-						已识别 MI 6，使用专用连接兼容；手机应用与网络设置保持运行。
+						{localize("已识别 MI 6，使用专用连接兼容；手机应用与网络设置保持运行。")}
 					</p>
 				</Show>
 				<Show when={selected()?.platform === "android"}>
@@ -303,10 +305,10 @@ export default function MobileRecorder(props: {
 						</label>
 					</div>
 					<p class="mobile-capture-note">
-						按设备比例录制，不放大低分辨率来源。实际帧率由设备与画面变化决定。
+					{localize("按设备比例录制，不放大低分辨率来源。实际帧率由设备与画面变化决定。")}
 					</p>
 					<p class="mobile-capture-note">
-						画面方向在录制期间保持不变，设备仍可正常旋转。需要换画幅时，可停止后重新开始。
+					{localize("画面方向在录制期间保持不变，设备仍可正常旋转。需要换画幅时，可停止后重新开始。")}
 					</p>
 				</Show>
 				<label class="mobile-toggle">
@@ -314,10 +316,10 @@ export default function MobileRecorder(props: {
 						<strong>{localize("设备声音")}</strong>
 						<small>
 							{selected()?.audioSupported
-								? "录制设备播放的声音"
+							? localize("录制设备播放的声音")
 								: selected()?.platform === "ios"
-									? "这台设备暂未提供可录制的声音。"
-									: "安卓声音录制需 Android 11 或更新版本；应用也可限制录音。"}
+									? localize("这台设备暂未提供可录制的声音。")
+									: localize("安卓声音录制需 Android 11 或更新版本；应用也可限制录音。")}
 						</small>
 					</span>
 					<input
@@ -357,16 +359,16 @@ export default function MobileRecorder(props: {
 						}
 						onClick={() => void record()}
 					>
-						{busy() ? "正在连接…" : "开始设备录制"}
+						{busy() ? localize("正在连接…") : localize("开始设备录制")}
 					</button>
 				}
 			>
 				<div class="mobile-record-status" role="status">
 					<span class="mobile-record-dot" />
 					{status()?.phase === "starting"
-						? "正在连接设备…"
+						? localize("正在连接设备…")
 						: status()?.phase === "finalizing"
-							? "正在保存工程…"
+							? localize("正在保存工程…")
 							: `${status()?.deviceName} · ${time()}`}
 				</div>
 				<button
@@ -377,8 +379,8 @@ export default function MobileRecorder(props: {
 				>
 					<IconSquare class="size-4" />
 					{busy() || status()?.phase === "finalizing"
-						? "正在保存…"
-						: "停止并打开编辑器"}
+						? localize("正在保存…")
+						: localize("停止并打开编辑器")}
 				</button>
 			</Show>
 			<Show when={error() || status()?.error || setup.error}>
@@ -420,8 +422,8 @@ export default function MobileRecorder(props: {
 					}}
 				>
 					{status()?.phase === "failed"
-						? "查看保留的原始文件"
-						: "查看工程保存位置"}
+						? localize("查看保留的原始文件")
+						: localize("查看工程保存位置")}
 				</button>
 			</Show>
 			<section class="mobile-history" data-testid="mobile-history">
@@ -445,8 +447,8 @@ export default function MobileRecorder(props: {
 					fallback={
 						<p class="mobile-history-empty">
 							{projects.loading
-								? "正在读取录制…"
-								: "设备录制会保存在这里，重启后也能继续编辑。"}
+							? localize("正在读取录制…")
+							: localize("设备录制会保存在这里，重启后也能继续编辑。")}
 						</p>
 					}
 				>
@@ -459,10 +461,10 @@ export default function MobileRecorder(props: {
 										{project.phase === "complete"
 											? localize("已保存")
 											: project.phase === "recording"
-												? "录制或保存中"
+								? localize("录制或保存中")
 												: project.hasSource
-													? "待恢复 · 原始视频已保留"
-													: "原始视频缺失"}
+									? localize("待恢复 · 原始视频已保留")
+									: localize("原始视频缺失")}
 									</small>
 								</div>
 								<div class="mobile-history-actions">
@@ -486,7 +488,9 @@ export default function MobileRecorder(props: {
 											}
 										}}
 									>
-										{project.phase === "complete" ? "继续编辑" : "恢复并编辑"}
+						{project.phase === "complete"
+							? localize("继续编辑")
+							: localize("恢复并编辑")}
 									</button>
 									<button
 										type="button"
@@ -507,8 +511,10 @@ export default function MobileRecorder(props: {
 						onClick={() => setAllProjects(!allProjects())}
 					>
 						{allProjects()
-							? "收起列表"
-							: `显示全部 ${projects()?.length} 条设备录制`}
+							? localize("收起列表")
+							: localize("显示全部 {count} 条设备录制", {
+									count: projects()?.length ?? 0,
+								})}
 					</button>
 				</Show>
 			</section>
@@ -522,8 +528,7 @@ export default function MobileRecorder(props: {
 					{localize("开启「开发者选项 → USB 调试」，连接后允许这台 Mac。")}
 				</p>
 				<p>
-					录后按画幅初选手机或平板外框，可在编辑器中切换或关闭。支持缩放、运镜、动态模糊和画面设置。
-					当前不支持自动跟随设备触摸，可手动添加镜头。
+					{localize("录制后可先按画幅选择手机或平板外框；可在编辑器中切换或关闭。支持缩放、运镜、动态模糊和画面设置。暂不支持自动跟随设备触摸，可手动添加镜头。")}
 				</p>
 			</div>
 		</div>

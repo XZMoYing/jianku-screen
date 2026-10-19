@@ -63,11 +63,11 @@ export default function CaptureStage(props: {
 					setConnected(true);
 					setError("");
 				};
-				socket.onerror = () => setError("画面连接失败，请重试");
+				socket.onerror = () => setError(localize("画面连接失败，请重试"));
 				socket.onclose = () => {
 					if (!disposed) {
 						setConnected(false);
-						setError("画面连接已断开，点击重试");
+						setError(localize("画面连接已断开，点击重试"));
 					}
 				};
 			}
@@ -114,7 +114,7 @@ export default function CaptureStage(props: {
 				available = true;
 				send();
 			} else if (data.type === "error")
-				setError(data.message ?? "输出画面暂时不可用");
+				setError(data.message ?? localize("输出画面暂时不可用"));
 		};
 		const offscreen = canvas.transferControlToOffscreen();
 		worker.postMessage(

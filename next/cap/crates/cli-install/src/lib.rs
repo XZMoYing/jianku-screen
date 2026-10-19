@@ -1,7 +1,7 @@
-//! Shared logic for installing the `cap` CLI shim onto the user's `PATH`.
+//! Shared logic for installing the `jianku` CLI shim onto the user's `PATH`.
 //!
 //! Used by both the desktop app (via Tauri commands) and the CLI itself
-//! (`cap desktop status|install-cli|uninstall-cli`) so the two surfaces never
+//! (`jianku desktop status|install-cli|uninstall-cli`) so the two surfaces never
 //! diverge. The shim points at the `cap-cli` binary that sits next to the
 //! current executable, which is the bundled CLI for both callers.
 
@@ -16,14 +16,14 @@ use std::{
 #[cfg(unix)]
 pub mod appimage;
 
-const CAP_DIR_NAME: &str = ".cap";
+const JIANKU_DIR_NAME: &str = ".jianku";
 const BIN_DIR_NAME: &str = "bin";
 const CLI_BINARY_STEM: &str = "cap-cli";
 
 #[cfg(windows)]
-const SHIM_NAME: &str = "cap.cmd";
+const SHIM_NAME: &str = "jianku.cmd";
 #[cfg(not(windows))]
-const SHIM_NAME: &str = "cap";
+const SHIM_NAME: &str = "jianku";
 
 #[cfg(windows)]
 const CLI_BINARY_NAME: &str = "cap-cli.exe";
@@ -43,7 +43,7 @@ pub struct CliInstallStatus {
     pub path_entry: String,
     pub shell_command: String,
     /// Whether the install dir is persisted to the user's shell PATH config (profile/registry),
-    /// so `cap` will be available in a new terminal even though it is not on the current PATH.
+    /// so `jianku` will be available in a new terminal even though it is not on the current PATH.
     pub path_configured: bool,
 }
 
@@ -53,7 +53,7 @@ fn home_dir() -> Result<PathBuf, String> {
 
 fn install_dir() -> Result<PathBuf, String> {
     let home = home_dir()?;
-    let cap_bin = home.join(CAP_DIR_NAME).join(BIN_DIR_NAME);
+    let jianku_bin = home.join(JIANKU_DIR_NAME).join(BIN_DIR_NAME);
     let local_bin = home.join(".local/bin");
 
     // Prefer whichever candidate already holds a Cap-managed shim, so `status` and `install` agree
@@ -62,7 +62,7 @@ fn install_dir() -> Result<PathBuf, String> {
     // Also match a shim pointing at a different/older Cap install so `install` repoints it in place
     // rather than leaving it stranded and creating a second shim elsewhere.
     if let Ok(target) = target_path() {
-        for candidate in [&cap_bin, &local_bin] {
+        for candidate in [&jianku_bin, &local_bin] {
             let shim = candidate.join(SHIM_NAME);
             if shim_points_to(&shim, &target).unwrap_or(false) || shim_is_cap_managed(&shim) {
                 return Ok(candidate.clone());
@@ -70,15 +70,15 @@ fn install_dir() -> Result<PathBuf, String> {
         }
     }
 
-    if path_is_present(&cap_bin.join(SHIM_NAME)) || cfg!(windows) {
-        return Ok(cap_bin);
+    if path_is_present(&jianku_bin.join(SHIM_NAME)) || cfg!(windows) {
+        return Ok(jianku_bin);
     }
 
     if path_contains_install_dir(&local_bin) {
         return Ok(local_bin);
     }
 
-    Ok(cap_bin)
+    Ok(jianku_bin)
 }
 
 fn shim_path() -> Result<PathBuf, String> {
@@ -91,7 +91,7 @@ fn target_path() -> Result<PathBuf, String> {
         return Ok(path);
     }
 
-    let exe = env::current_exe().map_err(|e| format!("Could not locate Cap executable: {e}"))?;
+    let exe = env::current_exe().map_err(|e| format!("Could not locate Jianku executable: {e}"))?;
     // When `cap` runs through the installed shim (a symlink), macOS `current_exe()` returns the
     // symlink path; resolve it to the real binary so the sibling `cap-cli` resolves to the bundled
     // one rather than a non-existent path next to the shim (which made status() report installed:false
@@ -99,7 +99,7 @@ fn target_path() -> Result<PathBuf, String> {
     let exe = resolve_path_for_target_lookup(exe);
     let dir = exe
         .parent()
-        .ok_or_else(|| "Could not locate Cap executable directory".to_string())?;
+        .ok_or_else(|| "Could not locate Jianku executable directory".to_string())?;
 
     for candidate in cli_binary_candidates(dir) {
         if candidate.exists() {
@@ -434,7 +434,7 @@ pub fn status() -> Result<CliInstallStatus, String> {
     let installed = target_exists && shim_points_to(&shim_path, &target_path)?;
     let conflict = if shim_exists && !installed && !shim_is_cap_managed(&shim_path) {
         Some(format!(
-            "{} already exists and is not managed by Cap",
+            "{} already exists and is not managed by Jianku Screen Next",
             display_path(&shim_path)
         ))
     } else if !target_exists {
@@ -503,7 +503,7 @@ pub fn install() -> Result<CliInstallStatus, String> {
         // install, or by the web installer); only refuse to clobber a genuinely foreign file.
         if !shim_points_to(&shim_path, &target_path)? && !shim_is_cap_managed(&shim_path) {
             return Err(format!(
-                "{} already exists and is not managed by Cap",
+                "{} already exists and is not managed by Jianku Screen Next",
                 display_path(&shim_path)
             ));
         }
@@ -527,7 +527,7 @@ pub fn install() -> Result<CliInstallStatus, String> {
 }
 
 /// Persist `install_dir` to the user's PATH (shell profile on unix, User registry on Windows) so a
-/// freshly opened terminal can run `cap`. Idempotent; honours `CAP_NO_MODIFY_PATH`. Returns whether
+/// freshly opened terminal can run `jianku`. Idempotent; honours `CAP_NO_MODIFY_PATH`. Returns whether
 /// the directory is now persisted. Best-effort: a failure just falls back to the printed command.
 #[cfg(unix)]
 fn ensure_path_persisted(install_dir: &Path) -> bool {
@@ -650,7 +650,7 @@ fn append_path_export(profile: &Path, install_dir: &str) -> bool {
         .create(true)
         .append(true)
         .open(profile)
-        .and_then(|mut file| writeln!(file, "\n# Added by Cap\n{line}"))
+        .and_then(|mut file| writeln!(file, "\n# Added by Jianku Screen Next\n{line}"))
         .is_ok()
 }
 
@@ -686,7 +686,7 @@ mod tests {
     #[test]
     fn uninstall_handles_moved_appimages_without_removing_other_installations() {
         let directory = tempfile::tempdir().unwrap();
-        let shim = directory.path().join("cap");
+        let shim = directory.path().join(SHIM_NAME);
         let previous = directory.path().join("previous.AppImage");
         let current = directory.path().join("current.AppImage");
         appimage::write_shim(&shim, &previous).unwrap();

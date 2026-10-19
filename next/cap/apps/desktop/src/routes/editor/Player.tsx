@@ -28,7 +28,12 @@ import {
 import { CaptionOverlay } from "./CaptionOverlay";
 import { CaptionsRegenerateBadge } from "./CaptionsRegenerateBadge";
 import { createCaptionTrackSegments } from "./captions";
-import { type EditorPreviewQuality, FPS, useEditorContext } from "./context";
+import {
+	type EditorPreviewQuality,
+	FPS,
+	PREVIEW_QUALITY_SCALE,
+	useEditorContext,
+} from "./context";
 import { FrameButton } from "./FrameButton";
 import { ImageOverlay } from "./image-overlay";
 import { MaskOverlay } from "./MaskOverlay";
@@ -89,16 +94,17 @@ export function PlayerContent(props: { compactness?: number }) {
 		setPreviewPointerDown(false);
 	});
 
-	const previewOptions = [
-		{ label: "Full", value: "full" as EditorPreviewQuality },
-		{ label: "Half", value: "half" as EditorPreviewQuality },
-		{ label: "Quarter", value: "quarter" as EditorPreviewQuality },
-	];
+	const previewOptions = (["full", "half", "quarter"] as const).map(
+		(value) => ({
+			label: `${Math.round(PREVIEW_QUALITY_SCALE[value] * 100)}%`,
+			value,
+		}),
+	);
 
 	const zoomHint = () =>
 		ostype() === "windows"
-			? "Hold Ctrl and scroll, or press Ctrl +/- to zoom"
-			: "Pinch, or press Cmd +/- to zoom";
+			? localize("按住 Ctrl 滚动鼠标滚轮，或按 Ctrl + / - 缩放")
+			: localize("双指捏合，或按 Command + / - 缩放");
 
 	// Load captions on mount
 	onMount(async () => {
@@ -397,7 +403,7 @@ export function PlayerContent(props: { compactness?: number }) {
 					<span class="text-xs text-ed-text-2">{localize("Preview")}</span>
 					<div
 						role="group"
-						aria-label={localize("Preview quality")}
+						aria-label={localize("预览画质")}
 						class="inline-flex gap-0.5 p-0.5 rounded-lg shrink-0 bg-ed-ctl"
 					>
 						<For each={previewOptions}>
@@ -406,8 +412,8 @@ export function PlayerContent(props: { compactness?: number }) {
 								return (
 									<button
 										type="button"
-										title={`${localize(option.label)} preview quality`}
-										aria-label={`${localize(option.label)} preview quality`}
+										title={`${option.label} ${localize("预览画质")}`}
+										aria-label={`${option.label} ${localize("预览画质")}`}
 										aria-pressed={selected()}
 										onClick={() => handlePreviewQualityChange(option.value)}
 										class={cx(
@@ -417,7 +423,7 @@ export function PlayerContent(props: { compactness?: number }) {
 												: "text-ed-text-2 hover:text-ed-text-1",
 										)}
 									>
-										{localize(option.label)}
+										{option.label}
 									</button>
 								);
 							}}
@@ -464,7 +470,7 @@ export function PlayerContent(props: { compactness?: number }) {
 					>
 						<IconCapPrev class="size-3.5" />
 					</button>
-					<Tooltip kbd={["Space"]} content="Play/Pause video">
+					<Tooltip kbd={["Space"]} content={localize("Play/Pause video")}>
 						<button
 							type="button"
 							onClick={handlePlayPauseClick}
@@ -541,9 +547,9 @@ export function PlayerContent(props: { compactness?: number }) {
 								);
 							}}
 							formatTooltip={() =>
-								`${editorState.timeline.transform.zoom.toFixed(
-									0,
-								)} seconds visible`
+								localize("当前显示 {seconds} 秒", {
+									seconds: editorState.timeline.transform.zoom.toFixed(0),
+								})
 							}
 						/>
 						<EditorButton
@@ -607,7 +613,9 @@ function PreviewCanvas(props: {
 			items: [
 				{
 					id: "performance-mode",
-					text: performanceMode() ? "✓ Performance Mode" : "Performance Mode",
+					text: performanceMode()
+						? localize("✓ 性能模式")
+						: localize("性能模式"),
 					action: () => setPerformanceMode(!performanceMode()),
 				},
 			],

@@ -82,7 +82,7 @@ function ShareButton() {
 							>
 								{localize("Reupload")}
 							</EditorButton>
-							<Tooltip content="Open link">
+						<Tooltip content={localize("Open link")}>
 								<div class="flex flex-row gap-1.5 items-center px-2.5 h-7 rounded-[7px] transition-colors duration-100 bg-ed-ctl hover:bg-ed-ctl-hover">
 									<a
 										href={selectedUrl().href}
@@ -103,7 +103,7 @@ function ShareButton() {
 											customDomain.data?.domain_verified
 										}
 									>
-										<Tooltip content="Select link">
+								<Tooltip content={localize("Select link")}>
 											<KSelect
 												value={linkToDisplay()}
 												onChange={(value) =>
@@ -145,7 +145,7 @@ function ShareButton() {
 											</KSelect>
 										</Tooltip>
 									</Show>
-									<Tooltip content="Copy link">
+							<Tooltip content={localize("Copy link")}>
 										<div
 											class="flex justify-center items-center transition-colors duration-200 rounded-md size-5 text-ed-text-2 bg-ed-ctl-hover hover:bg-ed-ctl-active"
 											onClick={copyLink}

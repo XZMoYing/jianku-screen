@@ -104,7 +104,7 @@ function Inner(props: { initialStore: HotkeysStore | null }) {
 				<Section
 					title={localize("Shortcuts")}
 					description={localize(
-						"Configure system-wide keyboard shortcuts to control Cap.",
+						"Configure system-wide keyboard shortcuts to control the app.",
 					)}
 				>
 					<SectionCard class="flex flex-col gap-3 p-4">

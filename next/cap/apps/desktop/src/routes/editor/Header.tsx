@@ -152,7 +152,7 @@ export function Header(props: {
 							clearTimelineSelection();
 
 							if (
-								!(await ask("Are you sure you want to delete this recording?"))
+								!(await ask(localize("确定要删除这段录制吗？")))
 							)
 								return;
 
@@ -221,8 +221,16 @@ export function Header(props: {
 				</EditorButton>
 				<Show when={hasTranscript()}>
 					<EditorButton
-						title={isTranscriptOpen() ? "Back to editor" : "Captions"}
-						aria-label={isTranscriptOpen() ? "Back to editor" : "Captions"}
+						title={
+							isTranscriptOpen()
+								? localize("返回编辑器")
+								: localize("字幕")
+						}
+						aria-label={
+							isTranscriptOpen()
+								? localize("返回编辑器")
+								: localize("字幕")
+						}
 						class={cx(isTranscriptOpen() && "bg-ed-ctl-hover text-ed-text-1")}
 						leftIcon={
 							<Show when={isTranscriptOpen()} fallback={<IconCapCaptions />}>

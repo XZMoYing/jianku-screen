@@ -24,7 +24,10 @@ export function FontPicker(props: {
 	const [installedFonts] = createResource(listSystemFonts);
 
 	const options = createMemo<FontOption[]>(() => [
-		...GENERIC_FONT_OPTIONS,
+		...GENERIC_FONT_OPTIONS.map((option) => ({
+			...option,
+			label: localize(option.label),
+		})),
 		...(installedFonts() ?? []).map((name) => ({ value: name, label: name })),
 	]);
 

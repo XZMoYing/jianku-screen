@@ -20,7 +20,7 @@ export function getTeleprompterWindowOptions(
 
 	return {
 		url: "/teleprompter",
-		title: "Cap Teleprompter",
+		title: "简库镜传 · 提词器",
 		width: 560,
 		height: 320,
 		minWidth: 420,

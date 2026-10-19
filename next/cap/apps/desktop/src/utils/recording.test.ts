@@ -1,6 +1,7 @@
 import * as dialog from "@tauri-apps/plugin-dialog";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+	displayRecordingName,
 	handleRecordingResult,
 	isRecordingStartCancelled,
 	runRecordingStopRequest,
@@ -30,9 +31,26 @@ describe("recording start cancellation", () => {
 		expect(isRecordingStartCancelled(message)).toBe(false);
 		await handleRecordingResult(Promise.reject(new Error(message)), undefined);
 		expect(dialog.message).toHaveBeenCalledWith(message, {
-			title: "Error starting recording",
+			title: "录制启动失败",
 			kind: "error",
 		});
+	});
+});
+
+describe("legacy recording display names", () => {
+	it("shows the local brand and localized date without modifying stored metadata", () => {
+		expect(displayRecordingName("Cap 2026-10-18 at 19.16.30")).toBe(
+			"简库镜传 Next 2026-10-18 19.16.30",
+		);
+	});
+	it("retains meaningful words in custom titles", () => {
+		expect(displayRecordingName("Cap demo at school")).toBe(
+			"简库镜传 Next demo at school",
+		);
+	});
+	it("does not alter custom titles which only share part of the old brand", () => {
+		for (const name of ["Capital Demo", "新演示 at 19.16.30", "我的演示"])
+			expect(displayRecordingName(name)).toBe(name);
 	});
 });
 

@@ -1379,6 +1379,11 @@
 :root .jk-settings-navigation {
 	flex: 1;
 	min-height: 0;
+	overflow-y: auto;
+}
+:root .jk-settings-navigation > .cap-settings-nav {
+	height: auto;
+	overflow: visible;
 }
 :root .jk-settings-navigation .jk-selection-pill {
 	border-radius: 18px;

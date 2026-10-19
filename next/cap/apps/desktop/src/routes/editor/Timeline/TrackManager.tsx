@@ -76,10 +76,12 @@ const trackColor = (type: TimelineTrackType) => `var(--track-${type})`;
 
 function trackHint(option: TrackManagerOption) {
 	const meta = TRACK_META[option.type];
-	if (!option.available) return meta.unavailableHint;
+	if (!option.available) return localize(meta.unavailableHint);
 	if (!option.supportsMultiple && option.active)
-		return `Remove the ${option.label} track.`;
-	return meta.description;
+		return localize('移除“{track}”轨道', {
+			track: localize(option.label),
+		});
+	return localize(meta.description);
 }
 
 function TrackTile(props: {
@@ -146,7 +148,7 @@ function TrackTile(props: {
 						: "text-ed-text-3",
 				)}
 			>
-				{props.option.label}
+				{localize(props.option.label)}
 			</span>
 		</button>
 	);
@@ -163,7 +165,7 @@ export function TrackManager(props: {
 	const hint = () => {
 		const type = hovered();
 		const option = type && props.options.find((o) => o.type === type);
-		return option ? trackHint(option) : DEFAULT_HINT;
+		return option ? trackHint(option) : localize(DEFAULT_HINT);
 	};
 
 	// The tray is anchored to the whole gutter box, not the pill, so it slides

@@ -70,6 +70,7 @@ import {
 	revealRecordingWindow,
 } from "~/utils/queries";
 import {
+	displayRecordingName,
 	isRecordingStartCancelled,
 	recordingMetaNeedsRecovery,
 	recordingOpenErrorMessage,
@@ -1277,7 +1278,9 @@ function TargetMenuPanel(props: TargetMenuPanelProps & SharedTargetMenuProps) {
 		const matchesQuery = (value?: string | null) =>
 			!!value && value.toLowerCase().includes(query);
 
-		return targets.filter((target) => matchesQuery(target.pretty_name));
+		return targets.filter((target) =>
+			matchesQuery(displayRecordingName(target.pretty_name)),
+		);
 	});
 
 	const filteredScreenshotTargets = createMemo<ScreenshotWithPath[]>(() => {
@@ -1414,7 +1417,9 @@ function TargetMenuPanel(props: TargetMenuPanelProps & SharedTargetMenuProps) {
 							}
 							disabled={cameraProps.disabled}
 							emptyMessage={
-								trimmedSearch() ? noResultsMessage : "No cameras found"
+								trimmedSearch()
+									? localize(noResultsMessage)
+									: localize("No cameras found")
 							}
 							permissions={cameraProps.permissions}
 							deviceSettings={cameraProps.deviceSettings}
@@ -1472,7 +1477,9 @@ function TargetMenuPanel(props: TargetMenuPanelProps & SharedTargetMenuProps) {
 							onSettingsRequested={(mic) => handleSettingsTargetChange(mic)}
 							disabled={micProps.disabled}
 							emptyMessage={
-								trimmedSearch() ? noResultsMessage : "No microphones found"
+								trimmedSearch()
+									? localize(noResultsMessage)
+									: localize("No microphones found")
 							}
 							permissions={micProps.permissions}
 							deviceSettings={micProps.deviceSettings}
@@ -1527,12 +1534,12 @@ function TargetMenuPanel(props: TargetMenuPanelProps & SharedTargetMenuProps) {
 											setSearch("");
 										}
 									}}
-									placeholder={placeholder}
+									placeholder={localize(placeholder)}
 									autoCapitalize="off"
 									autocorrect="off"
 									autocomplete="off"
 									spellcheck={false}
-									aria-label={placeholder}
+									aria-label={localize(placeholder)}
 								/>
 							</div>
 							<Show
@@ -1597,7 +1604,9 @@ function TargetMenuPanel(props: TargetMenuPanelProps & SharedTargetMenuProps) {
 							onSelect={props.onSelect}
 							disabled={props.disabled}
 							highlightQuery={trimmedSearch()}
-							emptyMessage={trimmedSearch() ? noResultsMessage : undefined}
+							emptyMessage={
+								trimmedSearch() ? localize(noResultsMessage) : undefined
+							}
 						/>
 					) : props.variant === "window" ? (
 						<TargetMenuGrid
@@ -1608,7 +1617,9 @@ function TargetMenuPanel(props: TargetMenuPanelProps & SharedTargetMenuProps) {
 							onSelect={props.onSelect}
 							disabled={props.disabled}
 							highlightQuery={trimmedSearch()}
-							emptyMessage={trimmedSearch() ? noResultsMessage : undefined}
+							emptyMessage={
+								trimmedSearch() ? localize(noResultsMessage) : undefined
+							}
 						/>
 					) : props.variant === "recording" ? (
 						<TargetMenuGrid
@@ -1619,7 +1630,9 @@ function TargetMenuPanel(props: TargetMenuPanelProps & SharedTargetMenuProps) {
 							onSelect={props.onSelect}
 							disabled={props.disabled}
 							highlightQuery={trimmedSearch()}
-							emptyMessage={trimmedSearch() ? noResultsMessage : undefined}
+							emptyMessage={
+								trimmedSearch() ? localize(noResultsMessage) : undefined
+							}
 							uploadProgress={props.uploadProgress}
 							reuploadingPaths={props.reuploadingPaths}
 							onReupload={props.onReupload}
@@ -1639,7 +1652,9 @@ function TargetMenuPanel(props: TargetMenuPanelProps & SharedTargetMenuProps) {
 							onSelect={props.onSelect}
 							disabled={props.disabled}
 							highlightQuery={trimmedSearch()}
-							emptyMessage={trimmedSearch() ? noResultsMessage : undefined}
+							emptyMessage={
+								trimmedSearch() ? localize(noResultsMessage) : undefined
+							}
 							onViewAll={props.onViewAll}
 						/>
 					)}
@@ -2746,7 +2761,7 @@ function Page() {
 		} else {
 			const link = recording.sharing?.link;
 			if (!link) {
-				toast.error("This recording isn't ready to open yet.");
+				toast.error(localize("This recording isn't ready to open yet."));
 				return;
 			}
 			await shell.open(link);
@@ -2968,24 +2983,22 @@ function Page() {
 							: "Clean Studio recording"
 					}
 				>
-					<strong>
-						{localize("Record without Cap's preview and controls")}
-					</strong>
+					<strong>{localize("录制时隐藏应用预览和控制条")}</strong>
 					<p class="text-sm">
 						{cleanCapture.data?.mode === "instant"
 							? localize(
-									"Any selected camera will be included in the video with its preview appearance. Cap's preview and controls will hide.",
+									"The selected camera will appear in the recording as shown in its preview. The app preview and controls will be hidden.",
 								)
 							: localize(
-									"Any selected camera will keep recording as a separate editable track. Cap's preview and controls will hide.",
+									"The selected camera will remain on a separate editable track. The app preview and controls will be hidden.",
 								)}
 					</p>
 					<p class="text-sm">
 						Press <strong>{cleanCapture.data?.shortcut}</strong>{" "}
 						{localize("to start, then use it to stop.")}{" "}
 						{cleanCapture.data?.mode === "instant"
-							? localize("Open Cap to stop and show controls.")
-							: localize("Open Cap to pause and show controls.")}
+							? localize("Open the app to stop and show controls.")
+							: localize("Open the app to pause and show controls.")}
 					</p>
 					<button
 						type="button"
@@ -3479,7 +3492,7 @@ function Page() {
 								<div class="min-w-0">
 									<span>
 										{localize(
-											"Recording paused. Cap will hide before resuming.",
+											"Recording is paused. The app will hide before resuming.",
 										)}
 									</span>
 								</div>

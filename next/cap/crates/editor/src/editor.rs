@@ -9,7 +9,7 @@ use cap_rendering::{
     DecodedSegmentFrames, FrameLayout, FrameRenderStageTimings, FrameRenderer, Nv12RenderedFrame,
     ProjectUniforms, RenderVideoConstants, RenderedFrame, RendererLayers, TransitionRenderInput,
 };
-use tokio::sync::{mpsc, oneshot};
+use tokio::sync::{mpsc, oneshot, watch};
 
 use crate::telemetry::{PlaybackRenderOutputFormat, PlaybackTelemetry, PlaybackTelemetryEvent};
 
@@ -79,11 +79,13 @@ pub struct Renderer {
     layers_rx: RendererLayersReceiver,
     telemetry: Option<PlaybackTelemetry>,
     output_format: EditorFrameFormat,
+    background_playback: watch::Receiver<Option<u64>>,
 }
 
 pub struct RendererHandle {
     tx: mpsc::Sender<RendererMessage>,
     telemetry: Option<PlaybackTelemetry>,
+    background_playback: watch::Sender<Option<u64>>,
 }
 
 pub(crate) struct BackgroundPlaybackGuard {
@@ -93,6 +95,16 @@ pub(crate) struct BackgroundPlaybackGuard {
 
 impl Drop for BackgroundPlaybackGuard {
     fn drop(&mut self) {
+        self.renderer
+            .background_playback
+            .send_if_modified(|active| {
+                if *active == Some(self.token) {
+                    *active = None;
+                    true
+                } else {
+                    false
+                }
+            });
         let _ = self
             .renderer
             .tx
@@ -206,6 +218,7 @@ impl Renderer {
         telemetry: Option<PlaybackTelemetry>,
     ) -> Result<RendererHandle, String> {
         let (tx, rx) = mpsc::channel(64);
+        let (background_playback, background_playback_rx) = watch::channel(None);
 
         let this = Self {
             rx,
@@ -214,11 +227,16 @@ impl Renderer {
             layers_rx,
             telemetry: telemetry.clone(),
             output_format,
+            background_playback: background_playback_rx,
         };
 
         tokio::spawn(this.run());
 
-        Ok(RendererHandle { tx, telemetry })
+        Ok(RendererHandle {
+            tx,
+            telemetry,
+            background_playback,
+        })
     }
 
     async fn run(self) {
@@ -229,6 +247,7 @@ impl Renderer {
             layers_rx,
             telemetry,
             output_format,
+            background_playback,
         } = self;
 
         let mut frame_renderer = FrameRenderer::new(&render_constants);
@@ -251,6 +270,7 @@ impl Renderer {
                 layers
             }
         };
+        layers.interrupt_paused_background_on_playback(background_playback);
 
         struct PendingFrame {
             input: PendingRenderInput,
@@ -615,6 +635,9 @@ impl Renderer {
                     }
                     let _ = current.finished.send(true);
                 }
+                Err(cap_rendering::RenderingError::PreviewSuperseded) => {
+                    let _ = current.finished.send(false);
+                }
                 Err(e) => {
                     tracing::error!(error = %e, "Failed to render frame in editor");
                     let _ = current.finished.send(false);
@@ -645,6 +668,7 @@ impl RendererHandle {
     pub(crate) fn begin_background_playback(self: &Arc<Self>) -> BackgroundPlaybackGuard {
         static NEXT_TOKEN: AtomicU64 = AtomicU64::new(1);
         let token = NEXT_TOKEN.fetch_add(1, Ordering::Relaxed);
+        let _ = self.background_playback.send(Some(token));
         let _ = self.tx.blocking_send(RendererMessage::BackgroundPlayback {
             token,
             playing: true,

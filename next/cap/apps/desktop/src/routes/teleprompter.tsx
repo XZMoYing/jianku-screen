@@ -425,10 +425,10 @@ export default function Teleprompter() {
 					<span>
 						{pauseStateError() ??
 							(playback().recordingPaused
-								? "Scrolling paused with recording"
+								? localize("录制暂停，提词滚动也已暂停")
 								: isLinux
-									? "This window may appear in recordings on Linux"
-									: localize("This window is hidden from Cap recordings"))}
+									? localize("在 Linux 上，此窗口可能会被录入视频")
+								: localize("此窗口不会录入视频"))}
 					</span>
 				</div>
 				<Show when={isWindows}>
@@ -508,14 +508,14 @@ export default function Teleprompter() {
 					title={
 						playback().recordingPaused
 							? playback().requested
-								? "Recording paused. Cancel automatic scroll resume"
-								: "Play when recording resumes"
+							? localize("录制已暂停；点击可取消自动恢复滚动")
+							: localize("录制恢复后开始滚动")
 							: playback().requested
-								? "Pause"
-								: "Play"
+				? localize("Pause")
+				: localize("Play")
 					}
 					aria-label={
-						playback().requested ? "Pause teleprompter" : "Play teleprompter"
+						playback().requested ? localize("暂停提词器") : localize("播放提词器")
 					}
 					aria-pressed={playback().requested}
 					disabled={!hasScript() || pauseStateError() !== null}

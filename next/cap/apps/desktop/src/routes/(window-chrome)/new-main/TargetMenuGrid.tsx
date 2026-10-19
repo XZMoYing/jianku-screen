@@ -203,7 +203,7 @@ export default function TargetMenuGrid(props: TargetMenuGridProps) {
 					)}
 					action={
 						onViewAll
-							? { label: "View All Recordings", onClick: onViewAll }
+							? { label: localize("查看全部录制"), onClick: onViewAll }
 							: undefined
 					}
 				/>
@@ -220,7 +220,7 @@ export default function TargetMenuGrid(props: TargetMenuGridProps) {
 					)}
 					action={
 						onViewAll
-							? { label: "View All Screenshots", onClick: onViewAll }
+							? { label: localize("查看全部截图"), onClick: onViewAll }
 							: undefined
 					}
 				/>

@@ -72,8 +72,10 @@ fn recovery_error_message(path: &Path, error: RecoveryError) -> String {
 }
 
 fn parse_recording_date(pretty_name: &str) -> Option<NaiveDate> {
-    let date_part = pretty_name.strip_prefix("Cap ")?;
-    let date_str = date_part.split(" at ").next()?;
+    let date_part = pretty_name
+        .strip_prefix("Cap ")
+        .or_else(|| pretty_name.strip_prefix("简库镜传 "))?;
+    let date_str = date_part.split_whitespace().next()?;
     NaiveDate::parse_from_str(date_str, "%Y-%m-%d").ok()
 }
 
@@ -245,4 +247,24 @@ pub async fn discard_incomplete_recording(project_path: String) -> Result<(), St
     info!("Discarded incomplete recording: {}", project_path);
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::parse_recording_date;
+    use chrono::NaiveDate;
+
+    #[test]
+    fn parse_recording_date_supports_legacy_and_jianku_names() {
+        let expected = NaiveDate::from_ymd_opt(2026, 10, 18).unwrap();
+
+        assert_eq!(
+            parse_recording_date("Cap 2026-10-18 at 19.16.30"),
+            Some(expected)
+        );
+        assert_eq!(
+            parse_recording_date("简库镜传 2026-10-18 19.16.30"),
+            Some(expected)
+        );
+    }
 }

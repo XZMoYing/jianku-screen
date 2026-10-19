@@ -1000,7 +1000,7 @@ export function ClipTrack(
 						const parts = [clipName(), formatTime(seg.end - seg.start)];
 						if (seg.timescale !== 1) parts.push(`${seg.timescale}x`);
 						if (clipAudioMuted(seg) || clipVolume(seg) === 0)
-							parts.push("Muted");
+							parts.push(localize("静音"));
 						else if (clipVolume(seg) !== 1)
 							parts.push(`${Math.round(clipVolume(seg) * 100)}% volume`);
 						if (seg.hideCursor) parts.push("Cursor hidden");
@@ -1460,7 +1460,7 @@ export function ClipTrack(
 													"background-image":
 														"linear-gradient(135deg, transparent 42%, rgb(96 165 250 / 0.7) 43%, rgb(96 165 250 / 0.7) 57%, transparent 58%)",
 												}}
-												title={`${transition().type === "cross-fade" ? "Crossfade" : "Fade through black"} · ${transition().duration.toFixed(2)}s`}
+															title={`${transition().type === "cross-fade" ? localize("交叉淡化") : localize("黑场淡化")} · ${transition().duration.toFixed(2)}s`}
 												onMouseDown={(event) => event.stopPropagation()}
 											>
 												<span class="sr-only">

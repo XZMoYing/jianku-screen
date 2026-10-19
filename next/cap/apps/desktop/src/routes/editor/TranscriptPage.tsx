@@ -196,7 +196,7 @@ export function TranscriptPanel() {
 				project.timeline?.textSegments,
 			) ?? outputStart;
 		const end = start + defaultDuration;
-		const text = "New caption";
+		const text = localize("新字幕");
 
 		setProject(
 			produce((p) => {
@@ -242,7 +242,7 @@ export function TranscriptPanel() {
 	const handleExportCaptions = async (format: CaptionExportFormat) => {
 		const cues = exportableCues();
 		if (cues.length === 0) {
-			toast.error("No captions to download");
+			toast.error(localize("No captions to download"));
 			return;
 		}
 
@@ -255,10 +255,10 @@ export function TranscriptPanel() {
 			if (!path) return;
 
 			await writeTextFile(path, formatCaptionCues(cues, format));
-			toast.success(`Captions saved as ${format.toUpperCase()}`);
+			toast.success(localize("Captions saved as {format}", { format: format.toUpperCase() }));
 		} catch (error) {
 			console.error("Failed to save captions:", error);
-			toast.error("Failed to save captions");
+			toast.error(localize("Failed to save captions"));
 		} finally {
 			setExportingFormat(null);
 		}
@@ -404,7 +404,7 @@ export function TranscriptPanel() {
 			)
 		) {
 			toast.error(
-				"Remove the nearby transition before deleting this transcript range.",
+				localize("请先移除附近的转场，再删除这段转录文本。"),
 			);
 			return;
 		}

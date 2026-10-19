@@ -82,7 +82,7 @@ const THEME_TAB_TRIGGER_CLASS =
 function SettingRow(props: { name: string; children: JSX.Element }) {
 	return (
 		<div class="flex gap-3 justify-between items-center">
-			<span class="text-xs font-medium text-ed-text-2">{props.name}</span>
+		<span class="text-xs font-medium text-ed-text-2">{localize(props.name)}</span>
 			{props.children}
 		</div>
 	);
@@ -119,10 +119,10 @@ export function FrameOptions(props: {
 								</span>
 								<span class="flex flex-col flex-1 min-w-0">
 									<span class="text-[13px] font-medium leading-tight text-ed-text-1">
-										{option.label}
+										{localize(option.label)}
 									</span>
 									<span class="text-[0.6875rem] leading-snug text-ed-text-3">
-										{option.description}
+										{localize(option.description)}
 									</span>
 								</span>
 								<Show when={selected()}>
@@ -256,7 +256,7 @@ function ScopedFrameButton() {
 				rightIcon={<IconCapChevronDown />}
 			>
 				<span class="max-[1200px]:hidden">
-					{hasFrame() ? activeStyle().label : "外框"}
+					{hasFrame() ? localize(activeStyle().label) : localize("外框")}
 				</span>
 			</EditorButton>
 			<KPopover.Portal>

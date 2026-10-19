@@ -24,7 +24,7 @@ export default function ColorSchemeOptions() {
 			setError("");
 		} catch (e) {
 			setError(String(e));
-			toast.error("配色设置未保存，请重试");
+			toast.error(localize("配色设置未保存，请重试"));
 		} finally {
 			setBusy(false);
 		}
@@ -35,7 +35,7 @@ export default function ColorSchemeOptions() {
 			await refreshWallpaperColors(true);
 			setError("");
 		} catch {
-			setError("暂时无法读取当前壁纸。你可以重新取色或选择基本配色。");
+			setError(localize("暂时无法读取当前壁纸。你可以重新取色或选择基本配色。"));
 		} finally {
 			setBusy(false);
 		}
@@ -73,7 +73,7 @@ export default function ColorSchemeOptions() {
 									await refresh();
 							}}
 						>
-							{source.name}
+							{localize(source.name)}
 						</button>
 					)}
 				</For>
@@ -98,7 +98,7 @@ export default function ColorSchemeOptions() {
 										class="jk-color-orb"
 										style={{ background: swatches(color.hex) }}
 									/>
-									<span>{color.name}</span>
+									<span>{localize(color.name)}</span>
 								</button>
 							)}
 						</For>
@@ -132,15 +132,17 @@ export default function ColorSchemeOptions() {
 				<div class="jk-color-info">
 					<span>
 						{settings().wallpaperSeeds.length
-							? "取自当前壁纸"
-							: "等待壁纸取色，暂用中性色"}
+							? localize("取自当前壁纸")
+							: localize("等待壁纸取色，暂用中性色")}
 					</span>
 					<button
 						type="button"
 						class="jk-tonal-button"
 						onClick={() => void refresh()}
 					>
-						{busy() ? "正在取色…" : "重新取色"}
+						{busy()
+							? localize("正在取色…")
+							: localize("重新取色")}
 					</button>
 				</div>
 			</Show>
@@ -152,7 +154,7 @@ export default function ColorSchemeOptions() {
 							aria-pressed={settings().variant === variant.id}
 							onClick={() => void save({ variant: variant.id })}
 						>
-							{variant.name}
+							{localize(variant.name)}
 						</button>
 					)}
 				</For>
@@ -167,8 +169,8 @@ export default function ColorSchemeOptions() {
 						}
 					>
 						<option value={0}>{localize("标准")}</option>
-						<option value={0.5}>中</option>
-						<option value={1}>高</option>
+						<option value={0.5}>{localize("中")}</option>
+						<option value={1}>{localize("高")}</option>
 					</select>
 				</label>
 				<Show when={settings().source === "custom"}>

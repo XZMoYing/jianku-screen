@@ -205,7 +205,7 @@ export function AudioLibraryPanel(props: {
 		} catch (error) {
 			if (!acceptsImport(request)) return;
 			console.error("Failed to add audio track", error);
-			toast.error("Failed to add audio track");
+			toast.error(localize("Failed to add audio track"));
 		} finally {
 			if (imports.finish(request)) setBusyId(null);
 		}
@@ -225,7 +225,7 @@ export function AudioLibraryPanel(props: {
 		} catch (error) {
 			if (!acceptsImport(request)) return;
 			console.error("Failed to import audio file", error);
-			toast.error("Failed to import audio file");
+			toast.error(localize("Failed to import audio file"));
 		} finally {
 			if (imports.finish(request)) setUploading(false);
 		}
@@ -238,14 +238,14 @@ export function AudioLibraryPanel(props: {
 					{localize("Done")}
 				</EditorButton>
 				<span class="text-sm text-gray-10">
-					{isReplace() ? "Change audio" : "Add audio"}
+					{isReplace() ? localize("更换音频") : localize("添加音频")}
 				</span>
 			</div>
 
 			<p class="text-xs text-gray-10">
 				{isReplace()
-					? "Pick a different track for this segment"
-					: "Add audio, music or other sounds to your video"}
+					? localize("为此片段更换音轨")
+					: localize("为视频添加音频、音乐或其他声音")}
 			</p>
 
 			<Show when={categories().length > 0}>
@@ -308,9 +308,9 @@ export function AudioLibraryPanel(props: {
 										<button
 											type="button"
 											class="absolute inset-0 w-full h-full"
-											aria-label={
-												isPreviewing() ? "Pause preview" : "Play preview"
-											}
+							aria-label={
+								isPreviewing() ? localize("暂停试听") : localize("播放试听")
+							}
 											onClick={() => togglePreview(track.id)}
 										>
 											<Show when={!isPreviewing()}>
@@ -347,7 +347,7 @@ export function AudioLibraryPanel(props: {
 
 										<button
 											type="button"
-											aria-label={isReplace() ? "Use track" : "Add to timeline"}
+							aria-label={isReplace() ? localize("使用此音轨") : localize("添加到时间线")}
 											class={cx(
 												"flex absolute top-1 right-1 justify-center items-center rounded-full border backdrop-blur-sm transition-all size-5",
 												"opacity-0 group-hover/tile:opacity-100",
@@ -404,7 +404,7 @@ export function AudioLibraryPanel(props: {
 					</Show>
 				</span>
 				<span class="text-[13px] font-medium text-gray-12">
-					{uploading() ? "Importing…" : "Upload your own"}
+					{uploading() ? localize("正在导入…") : localize("导入本地音频")}
 				</span>
 				<span class="text-[11px] text-gray-9">
 					MP3, WAV, M4A, OGG, FLAC, AAC

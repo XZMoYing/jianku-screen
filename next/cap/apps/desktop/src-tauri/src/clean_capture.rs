@@ -578,7 +578,7 @@ impl Inner {
             shortcut: self.lease.as_ref().map(|lease| {
                 lease.stop_description.clone().unwrap_or_else(|| {
                     if lease.wayland {
-                        "the Cap Stop tray icon".to_string()
+                        "the stop control in the system tray".to_string()
                     } else {
                         STOP_SHORTCUT.to_string()
                     }
@@ -1499,7 +1499,7 @@ pub async fn prepare(
     };
     let main = CapWindowId::Main
         .get(app)
-        .ok_or("Open Cap before starting this recording")?;
+        .ok_or("Open the app before starting this recording")?;
 
     let app_state = app.state::<crate::ArcLock<crate::App>>();
     let mut app_state = app_state.write().await;
@@ -1604,7 +1604,7 @@ fn hide_windows(app: &AppHandle) -> Result<(), String> {
             native_id(&window)?;
             set_native_visibility(&window, false)?;
             if window.is_visible().map_err(|e| e.to_string())? {
-                return Err("Cap could not hide its recording windows safely".into());
+                return Err("The app could not hide its recording windows safely".into());
             }
         }
     }
@@ -1627,8 +1627,8 @@ pub async fn hide(app: &AppHandle, generation: u32) -> Result<(), String> {
     .map_err(|e| e.to_string())?;
     tokio::time::timeout(Duration::from_secs(2), rx)
         .await
-        .map_err(|_| "Timed out hiding Cap windows".to_string())?
-        .map_err(|_| "Cap window hide task was cancelled".to_string())??;
+        .map_err(|_| "Timed out hiding app windows".to_string())?
+        .map_err(|_| "App window hide task was cancelled".to_string())??;
     #[cfg(target_os = "linux")]
     if wayland_generation(app) == Some(generation) {
         wayland_fence(app, generation, true).await?;
@@ -2238,7 +2238,7 @@ pub async fn reveal_capture_window(
         window.label().parse::<CapWindowId>(),
         Ok(CapWindowId::Main | CapWindowId::Camera | CapWindowId::RecordingControls)
     ) {
-        return Err("Only Cap recording windows can use this command".into());
+        return Err("Only app recording windows can use this command".into());
     }
     if matches!(
         window.label().parse::<CapWindowId>(),
@@ -2901,7 +2901,7 @@ fn verify_wayland_hidden(app: &AppHandle, generation: u32) -> Result<(), String>
     let display = main.display();
     for window in wayland_application(app)?.windows() {
         if window.display() != display || window.is_visible() || window.is_mapped() {
-            return Err("A Cap window is visible or uses another display connection".into());
+            return Err("An app window is visible or uses another display connection".into());
         }
     }
     Ok(())
@@ -2912,7 +2912,9 @@ fn verify_wayland_restored(app: &AppHandle, generation: u32) -> Result<(), Strin
     use gtk::prelude::*;
     for (saved, wanted) in wayland_restore_plan(app, generation, true)? {
         if saved.window.is_visible() != wanted || saved.window.is_mapped() != wanted {
-            return Err("The compositor restore acknowledgement did not match Cap windows".into());
+            return Err(
+                "The compositor restore acknowledgement did not match the app's windows".into(),
+            );
         }
     }
     Ok(())
@@ -3081,7 +3083,7 @@ fn hide_wayland_windows(app: &AppHandle, generation: u32) -> Result<(), String> 
     for window in wayland_application(app)?.windows() {
         window.hide();
         if window.is_visible() || window.is_mapped() {
-            return Err("GTK could not hide a Cap window".into());
+            return Err("GTK could not hide an app window".into());
         }
     }
     Ok(())
@@ -3094,7 +3096,7 @@ pub(crate) fn admit_wayland_window_creation(app: &AppHandle) -> Result<(), Strin
     if inner.lease.as_ref().is_some_and(|lease| {
         lease.wayland && wayland_blocks_mapping(lease.phase) && lease.phase != Phase::Stopping
     }) {
-        return Err("Pause or stop recording before opening another Cap window".into());
+        return Err("Pause or stop recording before opening another app window".into());
     }
     Ok(())
 }
@@ -3160,10 +3162,10 @@ fn wayland_restore_plan(
             wanted = saved_main.as_ref().is_some_and(|saved| saved.visible);
         }
         if wanted && label_changed {
-            return Err("A retained Cap window changed identity".into());
+            return Err("A retained app window changed identity".into());
         }
         if wanted && !current.contains(&saved.window) {
-            return Err("A retained Cap window disappeared before restoration".into());
+            return Err("A retained app window disappeared before restoration".into());
         }
         result.push((saved, wanted));
     }
@@ -3201,7 +3203,7 @@ fn restore_wayland_windows(
             saved.window.hide();
         }
         if saved.window.is_visible() != wanted || (!wanted && saved.window.is_mapped()) {
-            return Err("GTK did not acknowledge Cap window restoration".into());
+            return Err("GTK did not acknowledge app window restoration".into());
         }
     }
     Ok(())

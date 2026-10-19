@@ -53,8 +53,8 @@ export function ZoomModeHelper(props: { mode: "auto" | "manual" }) {
 					</div>
 					<p class="text-xs text-gray-11">
 						{props.mode === "auto"
-							? "Automatic zoom follows your cursor around the screen."
-							: "Manual zoom stays on a fixed spot you pick below."}
+							? localize("自动跟随光标移动缩放画面。")
+							: localize("手动缩放会固定在你下方选定的位置。")}
 					</p>
 				</div>
 			</KCollapsible.Content>

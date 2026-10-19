@@ -25,7 +25,7 @@ export function SignInButton(
 		>
 			{signIn.isPending
 				? localize("Cancel Sign In")
-				: (props.children ?? localize("Sign In"))}
+				: (props.children ?? localize("敬请期待"))}
 		</Button>
 	);
 }

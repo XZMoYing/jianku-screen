@@ -282,7 +282,7 @@ export default function GoogleDriveConfigPage() {
 				<Section
 					title={localize("Connection")}
 					description={localize(
-						"Google Drive stores new uploads in a private Cap folder in your Drive. Existing Cap-hosted and S3 videos keep using their current storage.",
+						"New uploads are stored in a private folder in Google Drive. Existing videos keep using their current storage.",
 					)}
 				>
 					<SectionCard padded class="custom-scroll">

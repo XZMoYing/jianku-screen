@@ -3578,7 +3578,9 @@ fn persist_final_recording_meta(
 ) -> anyhow::Result<RecordingMeta> {
     use chrono::Local;
 
-    let pretty_name = Local::now().format("Cap %Y-%m-%d at %H.%M.%S").to_string();
+    let pretty_name = Local::now()
+        .format("简库镜传 %Y-%m-%d %H.%M.%S")
+        .to_string();
     let recording_meta = RecordingMeta {
         platform: Some(Platform::default()),
         project_path: recording_dir.to_path_buf(),
@@ -3597,7 +3599,9 @@ fn persist_final_recording_meta(
 fn write_in_progress_meta(recording_dir: &Path) -> anyhow::Result<()> {
     use chrono::Local;
 
-    let pretty_name = Local::now().format("Cap %Y-%m-%d at %H.%M.%S").to_string();
+    let pretty_name = Local::now()
+        .format("简库镜传 %Y-%m-%d %H.%M.%S")
+        .to_string();
 
     let meta = RecordingMeta {
         platform: Some(Platform::default()),

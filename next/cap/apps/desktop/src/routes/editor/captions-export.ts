@@ -213,11 +213,11 @@ if (import.meta.vitest) {
 					{
 						startMs: 0,
 						endMs: 1250,
-						text: "Cap <Rend> & fast --> captions",
+						text: "Jianku <Rend> & fast --> captions",
 					},
 				]),
 			).toBe(
-				"WEBVTT\n\n1\n00:00:00.000 --> 00:00:01.250\nCap &lt;Rend&gt; &amp; fast --&gt; captions\n",
+				"WEBVTT\n\n1\n00:00:00.000 --> 00:00:01.250\nJianku &lt;Rend&gt; &amp; fast --&gt; captions\n",
 			);
 		});
 

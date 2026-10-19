@@ -85,7 +85,7 @@ export default function AppsTab() {
 		{
 			name: "Google Drive",
 			description: localize(
-				"Connect Google Drive for new shareable link uploads. Cap stores new videos in a private Cap folder in your Drive and continues serving them through Cap after normal access checks.",
+				"Connect Google Drive to store new shareable uploads in a private folder. Shared links are managed by the app's sharing service.",
 			),
 			icon: GoogleDriveIcon,
 			url: "/settings/integrations/google-drive-config",
@@ -120,7 +120,7 @@ export default function AppsTab() {
 				<Section
 					title={localize("Integrations")}
 					description={localize(
-						"Configure integrations to extend Cap's functionality and connect with third-party services.",
+						"Connect storage and other third-party services to the app.",
 					)}
 				>
 					<div class="space-y-3">
