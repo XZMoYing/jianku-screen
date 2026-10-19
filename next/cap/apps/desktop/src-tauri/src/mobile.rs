@@ -74,6 +74,40 @@ pub struct MobileStatus {
     pub project_path: Option<PathBuf>,
     pub error: Option<String>,
     pub notice: Option<String>,
+    #[serde(skip)]
+    #[specta(skip)]
+    started_at: Option<Instant>,
+    #[serde(skip)]
+    #[specta(skip)]
+    stopped_at: Option<Instant>,
+}
+
+impl MobileStatus {
+    fn begin_timing(&mut self, now: Instant) {
+        if self.phase == MobilePhase::Starting {
+            self.started_at = Some(now);
+            self.phase = MobilePhase::Recording;
+        }
+    }
+
+    fn finish_timing(&mut self, now: Instant) {
+        self.stopped_at.get_or_insert(now);
+        self.elapsed_seconds = self.observed_duration(now);
+    }
+
+    fn observed_duration(&self, now: Instant) -> f64 {
+        self.started_at.map_or(0.0, |start| {
+            self.stopped_at
+                .unwrap_or(now)
+                .saturating_duration_since(start)
+                .as_secs_f64()
+        })
+    }
+}
+
+fn duration_notice(observed: f64, media: f64) -> Option<String> {
+    (observed.is_finite() && media.is_finite() && observed > 0.0 && (observed - media).abs() > 1.0 + observed * 0.02)
+        .then(|| format!("录制计时约 {observed:.1} 秒，实际媒体为 {media:.1} 秒，时长存在差异。原始文件已保留，请检查静止画面和结尾。"))
 }
 
 #[derive(Deserialize, specta::Type)]
@@ -90,8 +124,6 @@ pub struct MobileRecordingOptions {
 struct Session {
     stop: watch::Sender<bool>,
     done: watch::Receiver<Option<Result<PathBuf, String>>>,
-    started: Instant,
-    timed: bool,
 }
 impl Drop for Session {
     fn drop(&mut self) {
@@ -277,18 +309,8 @@ pub async fn get_mobile_setup() -> Result<MobileSetup, String> {
 pub fn get_mobile_status(app: AppHandle) -> MobileStatus {
     let state = app.state::<MobileState>();
     let mut status = state.status.lock().unwrap().clone();
-    if status.active
-        && let Some(session) = state.session.lock().unwrap().as_mut()
-    {
-        if status.phase == MobilePhase::Recording && !session.timed {
-            session.started = Instant::now();
-            session.timed = true;
-        }
-        status.elapsed_seconds = if session.timed {
-            session.started.elapsed().as_secs_f64()
-        } else {
-            0.0
-        };
+    if status.active {
+        status.elapsed_seconds = status.observed_duration(Instant::now());
     }
     status
 }
@@ -528,9 +550,7 @@ async fn drain(
     while let Ok(Some(line)) = lines.next_line().await {
         let mut status = status.lock().unwrap();
         if line.contains("Recording started to") || line.contains("\"event\":\"started\"") {
-            if status.phase == MobilePhase::Starting {
-                status.phase = MobilePhase::Recording;
-            }
+            status.begin_timing(Instant::now());
         } else if line.starts_with("ERROR:") || line.starts_with("WARN:") {
             status.notice = Some(line.replace(&device_id, "设备"));
         } else if let Ok(value) = serde_json::from_str::<serde_json::Value>(&line)
@@ -653,7 +673,11 @@ async fn capture(
     let result = loop {
         if *stop.borrow() && !requested_stop {
             requested_stop = true;
-            status.lock().unwrap().phase = MobilePhase::Finalizing;
+            {
+                let mut state = status.lock().unwrap();
+                state.finish_timing(Instant::now());
+                state.phase = MobilePhase::Finalizing;
+            }
             if let Err(error) = interrupt(&mut child, &mut stdin, platform).await {
                 break Err(error);
             }
@@ -672,7 +696,7 @@ async fn capture(
             _ = interval.tick() => {
                 if source.metadata().is_ok_and(|meta| meta.len() > 128) {
                     let mut state = status.lock().unwrap();
-                    if state.phase == MobilePhase::Starting { state.phase = MobilePhase::Recording; }
+                    state.begin_timing(Instant::now());
                 } else if startup_expired(&status.lock().unwrap().phase, startup.elapsed()) {
                     let _ = interrupt(&mut child, &mut stdin, platform).await;
                     let _ = tokio::time::timeout(Duration::from_secs(5), child.wait()).await;
@@ -681,6 +705,7 @@ async fn capture(
             }
         }
     };
+    status.lock().unwrap().finish_timing(Instant::now());
     if child.try_wait().ok().flatten().is_none() {
         let _ = child.kill().await;
         let _ = child.wait().await;
@@ -803,12 +828,9 @@ pub async fn start_mobile_recording(
     *state.session.lock().unwrap() = Some(Session {
         stop,
         done: done_rx,
-        started: Instant::now(),
-        timed: false,
     });
     let _ = app.emit("mobile-recording-active", true);
     let app = app.clone();
-    let started = Instant::now();
     tokio::spawn(async move {
         let result = capture(
             command,
@@ -820,6 +842,21 @@ pub async fn start_mobile_recording(
         )
         .await;
         status.lock().unwrap().phase = MobilePhase::Finalizing;
+        let observed_duration = status.lock().unwrap().elapsed_seconds;
+        let media_duration = cap_enc_ffmpeg::remux::get_media_duration(&project.join(source))
+            .map(|duration| duration.as_secs_f64());
+        let timing_notice =
+            media_duration.and_then(|media| duration_notice(observed_duration, media));
+        let timing = serde_json::to_vec_pretty(&serde_json::json!({
+            "observedDurationSeconds": observed_duration,
+            "mediaDurationSeconds": media_duration,
+            "clockBasis": "host monotonic time from recorder-start notification or first observed file data to stop request or process exit",
+            "durationMismatch": timing_notice.is_some(),
+            "rawMediaModified": false,
+        })).map_err(std::io::Error::other).and_then(|bytes| std::fs::write(project.join("mobile-timing.json"), bytes));
+        if let Err(error) = timing {
+            tracing::warn!(%error, "Could not save mobile duration evidence");
+        }
         let result = {
             let project = project.clone();
             let name = name.clone();
@@ -831,11 +868,12 @@ pub async fn start_mobile_recording(
         match &result {
             Ok(notice) => {
                 let open_notice = publish_saved_project(&app, &project, source).await;
-                if notice.is_some() || open_notice.is_some() {
+                if notice.is_some() || open_notice.is_some() || timing_notice.is_some() {
                     status.lock().unwrap().notice = Some(
                         notice
                             .iter()
                             .chain(open_notice.iter())
+                            .chain(timing_notice.iter())
                             .cloned()
                             .collect::<Vec<_>>()
                             .join(" "),
@@ -858,7 +896,6 @@ pub async fn start_mobile_recording(
         }
         {
             let mut status = status.lock().unwrap();
-            status.elapsed_seconds = started.elapsed().as_secs_f64();
             status.active = false;
             status.phase = if result.is_ok() {
                 MobilePhase::Complete
@@ -905,6 +942,31 @@ pub async fn stop_mobile_recording(app: AppHandle) -> Result<Option<PathBuf>, St
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn media_timing_does_not_depend_on_status_polling_or_finalization_time() {
+        let start = Instant::now();
+        let mut status = MobileStatus {
+            phase: MobilePhase::Starting,
+            ..Default::default()
+        };
+        status.begin_timing(start);
+        status.begin_timing(start + Duration::from_secs(2));
+        assert_eq!(
+            status.observed_duration(start + Duration::from_secs(6)),
+            6.0
+        );
+        status.finish_timing(start + Duration::from_secs(6));
+        status.finish_timing(start + Duration::from_secs(20));
+        assert_eq!(
+            status.observed_duration(start + Duration::from_secs(30)),
+            6.0
+        );
+        assert_eq!(status.elapsed_seconds, 6.0);
+        assert!(duration_notice(6.0, 1.1).is_some());
+        assert!(duration_notice(6.0, 5.9).is_none());
+        assert!(duration_notice(0.0, 1.0).is_none());
+    }
 
     #[test]
     fn discovery_includes_unauthorized_devices_without_treating_server_messages_as_devices() {

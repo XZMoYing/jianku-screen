@@ -18,6 +18,7 @@ import CaptionControlsWindows11 from "~/components/titlebar/controls/CaptionCont
 import { trackEvent } from "~/utils/analytics";
 import { t as localize } from "~/utils/i18n";
 import { commands } from "~/utils/tauri";
+import { BookmarksButton } from "./BookmarksButton";
 import { useEditorContext } from "./context";
 import OrganizationDropdown from "./OrganizationDropdown";
 import PresetsDropdown from "./PresetsDropdown";
@@ -151,10 +152,7 @@ export function Header(props: {
 						onClick={async () => {
 							clearTimelineSelection();
 
-							if (
-								!(await ask(localize("确定要删除这段录制吗？")))
-							)
-								return;
+							if (!(await ask(localize("确定要删除这段录制吗？")))) return;
 
 							await commands.editorDeleteProject();
 						}}
@@ -203,6 +201,7 @@ export function Header(props: {
 				/>
 				<OrganizationDropdown />
 				<PresetsDropdown />
+				<BookmarksButton disabled={props.disabled} />
 				<EditorButton
 					title={localize("Clips")}
 					aria-label={localize("Clips")}
@@ -222,14 +221,10 @@ export function Header(props: {
 				<Show when={hasTranscript()}>
 					<EditorButton
 						title={
-							isTranscriptOpen()
-								? localize("返回编辑器")
-								: localize("字幕")
+							isTranscriptOpen() ? localize("返回编辑器") : localize("字幕")
 						}
 						aria-label={
-							isTranscriptOpen()
-								? localize("返回编辑器")
-								: localize("字幕")
+							isTranscriptOpen() ? localize("返回编辑器") : localize("字幕")
 						}
 						class={cx(isTranscriptOpen() && "bg-ed-ctl-hover text-ed-text-1")}
 						leftIcon={

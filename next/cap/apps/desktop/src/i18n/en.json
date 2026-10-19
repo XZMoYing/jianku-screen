@@ -1588,5 +1588,20 @@
 	"下载{model}模型": "Download {model} model",
 	"正在下载{model}模型… {progress}%": "Downloading {model} model… {progress}%",
 	"正在准备模型下载…": "Preparing model download…",
-	"字幕生成失败：{error}": "Failed to generate captions: {error}"
+	"字幕生成失败：{error}": "Failed to generate captions: {error}",
+	"添加录制书签": "Add recording bookmark",
+	"遮盖/恢复演示画面": "Toggle presentation curtain",
+	"录制书签": "Recording bookmarks",
+	"书签": "Bookmarks",
+	"书签名称": "Bookmark name",
+	"删除书签": "Delete bookmark",
+	"所在画面已被剪除": "This moment was removed from the timeline",
+	"书签 {number}": "Bookmark {number}",
+	"录制时点击书签按钮，或使用设置中的快捷键，标记讲解重点。": "Use the bookmark button or a shortcut while recording to mark key moments.",
+	"添加书签": "Add bookmark",
+	"已添加书签": "Bookmark added",
+	"遮盖演示画面": "Cover presentation",
+	"恢复演示画面": "Resume presentation",
+	"演示暂停，稍后继续": "Presentation paused. Back shortly.",
+	"画面仍在准备，请稍后再跳转": "The preview is still preparing. Please try jumping again shortly."
 }

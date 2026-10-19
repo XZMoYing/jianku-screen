@@ -1,0 +1,170 @@
+{
+	"date": "2026-10-19",
+	"package": "0.2.0-alpha.26 debug",
+	"source": "synthetic static window",
+	"userMediaSaved": false,
+	"results": [
+		{
+			"accessibility": "granted",
+			"camera": "empty",
+			"microphone": "empty",
+			"phase": "permissions",
+			"route": "/",
+			"screenRecording": "granted"
+		},
+		{
+			"phase": "shortcut-conflict",
+			"rejected": true,
+			"route": "/"
+		},
+		{
+			"phase": "curtain-visible",
+			"route": "/presentation-output",
+			"visible": false
+		},
+		{
+			"phase": "curtain-visible",
+			"route": "/presentation-output",
+			"visible": true
+		},
+		{
+			"phase": "curtain-visible",
+			"route": "/presentation-output",
+			"visible": false
+		},
+		{
+			"phase": "curtain-visible",
+			"route": "/presentation-output",
+			"visible": false
+		},
+		{
+			"phase": "presentation-curtain",
+			"rapidToggles": 10,
+			"rawFramesSaved": false,
+			"resize": true,
+			"restarted": {
+				"active": true,
+				"curtain": false,
+				"error": null,
+				"frames": 1,
+				"outputDetached": false,
+				"processingMs": 610.788958,
+				"wsPort": 54501
+			},
+			"resumed": {
+				"active": true,
+				"curtain": false,
+				"error": null,
+				"frames": 22,
+				"outputDetached": false,
+				"processingMs": 29.169375000000002,
+				"wsPort": 54494
+			},
+			"route": "/",
+			"staticSource": true,
+			"stopped": {
+				"active": false,
+				"curtain": false,
+				"error": null,
+				"frames": 22,
+				"outputDetached": false,
+				"processingMs": 29.169375000000002,
+				"wsPort": 54494
+			}
+		},
+		{
+			"confirmed": true,
+			"phase": "bookmark-button",
+			"route": "/in-progress-recording"
+		},
+		{
+			"first": 2.088297625,
+			"pauseExcluded": true,
+			"paused1": 2.095378542,
+			"paused2": 2.095378542,
+			"phase": "recording-bookmarks",
+			"route": "/",
+			"syntheticWindow": true
+		},
+		{
+			"phase": "bookmark-projection",
+			"points": [
+				{
+					"positions": [2.0697099999999997],
+					"segment": 0,
+					"time": 2.0800257079999995
+				},
+				{
+					"positions": [2.0697099999999997],
+					"segment": 0,
+					"time": 2.0800257079999995
+				},
+				{
+					"positions": [2.0697099999999997],
+					"segment": 0,
+					"time": 2.0800257079999995
+				},
+				{
+					"positions": [4.181221876],
+					"segment": 1,
+					"time": 2.182536417
+				}
+			],
+			"route": "/editor"
+		},
+		{
+			"delete": true,
+			"duration": 4.4197,
+			"jump": true,
+			"phase": "editor-bookmarks",
+			"positions": [
+				[2.0697099999999997],
+				[2.0697099999999997],
+				[2.0697099999999997],
+				[4.181221876]
+			],
+			"projectPath": "/Users/moyingxz/Library/Application Support/com.jianku.screen.next/recordings/Jianku Runtime Fixture (Window) 2026-10-19 08.02 PM.jks",
+			"rename": true,
+			"route": "/editor",
+			"sourceSegments": [0, 0, 0, 1],
+			"sourceTimes": [
+				2.0800257079999995, 2.0800257079999995, 2.0800257079999995, 2.182536417
+			],
+			"times": ["0:02.04", "0:04.25", "0:02", "0:02"]
+		},
+		{
+			"cleared": true,
+			"phase": "shortcut-settings-ui",
+			"rejectedConflict": true,
+			"reverted": true,
+			"route": "/settings/hotkeys",
+			"saved": true
+		},
+		{
+			"phase": "stable-bookmark-jump",
+			"route": "/editor",
+			"samples": [
+				["0:02.04", "0:04.23", "0:02", "0:02"],
+				["0:02.04", "0:04.23", "0:02", "0:02"],
+				["0:02.04", "0:04.23", "0:02", "0:02"]
+			]
+		},
+		{
+			"count": 3,
+			"deletionRetained": true,
+			"nameRetained": true,
+			"phase": "cold-reopen-bookmarks",
+			"route": "/editor"
+		}
+	],
+	"checks": {
+		"projectTests": 3,
+		"mobileTests": 7,
+		"curtainTests": 2,
+		"hotkeyTests": 1,
+		"bindingExport": 1,
+		"frontendTests": 44,
+		"desktopTypecheck": "passed",
+		"rustCheck": "passed"
+	}
+}

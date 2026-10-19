@@ -4,6 +4,7 @@ import "@radix-ui/colors/amber-dark.css";
 import { createTimer } from "@solid-primitives/timer";
 import { createMutation } from "@tanstack/solid-query";
 import { LogicalPosition } from "@tauri-apps/api/dpi";
+import { listen } from "@tauri-apps/api/event";
 import {
 	CheckMenuItem,
 	Menu,
@@ -50,6 +51,7 @@ import type {
 	RecordingInputKind,
 } from "~/utils/tauri";
 import { commands, events } from "~/utils/tauri";
+import IconBookmark from "~icons/lucide/bookmark";
 
 type State =
 	| { variant: "initializing" }
@@ -620,6 +622,19 @@ function InProgressRecordingInner() {
 			(state().variant === "recording" || state().variant === "paused"),
 	);
 
+	const addBookmark = createMutation(() => ({
+		mutationFn: () => commands.addRecordingBookmark(),
+		onError: (error: unknown) =>
+			dialog.message(String(error), { kind: "error" }),
+	}));
+	const [bookmarkAdded, setBookmarkAdded] = createSignal(false);
+	createTauriEventListener<{ id: string }>(
+		{ listen: (callback) => listen("recording-bookmark-added", callback) },
+		() => {
+			setBookmarkAdded(true);
+			setTimeout(() => setBookmarkAdded(false), 1000);
+		},
+	);
 	const toggleMicMute = createMutation(() => ({
 		mutationFn: async () => {
 			const next = !micMuted();
@@ -636,7 +651,9 @@ function InProgressRecordingInner() {
 	const restartRecording = createMutation(() => ({
 		mutationFn: async () => {
 			const shouldRestart = await dialog.confirm(
-				localize("Are you sure you want to restart the recording? The current recording will be discarded."),
+				localize(
+					"Are you sure you want to restart the recording? The current recording will be discarded.",
+				),
 				{
 					title: localize("Confirm Restart"),
 					okLabel: localize("Restart"),
@@ -1145,6 +1162,24 @@ function InProgressRecordingInner() {
 											</ActionButton>
 										</Show>
 
+										{recordingMode() === "studio" && (
+											<ActionButton
+												title={localize(
+													bookmarkAdded() ? "已添加书签" : "添加书签",
+												)}
+												aria-label={localize("添加书签")}
+												disabled={
+													addBookmark.isPending ||
+													isCountdown() ||
+													stopRequested() ||
+													teardownInFlight()
+												}
+												onClick={() => addBookmark.mutate()}
+												class={bookmarkAdded() ? "text-green-10" : ""}
+											>
+												<IconBookmark />
+											</ActionButton>
+										)}
 										{canPauseRecording() && (
 											<ActionButton
 												disabled={
@@ -1163,13 +1198,13 @@ function InProgressRecordingInner() {
 												)}
 												title={
 													state().variant === "paused"
-										? localize("继续录制")
-										: localize("暂停录制")
+														? localize("继续录制")
+														: localize("暂停录制")
 												}
 												aria-label={
 													state().variant === "paused"
-										? localize("继续录制")
-										: localize("暂停录制")
+														? localize("继续录制")
+														: localize("暂停录制")
 												}
 											>
 												<Show
@@ -1238,7 +1273,9 @@ function recordingIssueMessage(message: string): string {
 		message.includes("Insufficient disk space") &&
 		message.includes("Your recording is still paused")
 	) {
-		return localize("存储空间不足，无法继续录制。请清理空间后重试，或点击“停止”保存录制。" );
+		return localize(
+			"存储空间不足，无法继续录制。请清理空间后重试，或点击“停止”保存录制。",
+		);
 	}
 	return message;
 }

@@ -102,6 +102,7 @@ impl PresentationOptions {
 #[serde(rename_all = "camelCase")]
 pub struct PresentationStatus {
     pub active: bool,
+    pub curtain: bool,
     #[specta(type = f64)]
     pub frames: u64,
     pub processing_ms: f64,
@@ -132,6 +133,7 @@ pub struct PresentationSetup {
 struct Session {
     cancel: CancellationToken,
     options: watch::Sender<PresentationOptions>,
+    output: watch::Sender<Option<Arc<crate::frame_ws::WSFrame>>>,
     shortcut: Shortcut,
     thread: Option<std::thread::JoinHandle<()>>,
 }
@@ -315,6 +317,49 @@ pub fn toggle_presentation_focus(app: AppHandle) -> Result<(), String> {
     Ok(())
 }
 
+fn curtain_frame(width: u32, height: u32) -> Arc<crate::frame_ws::WSFrame> {
+    let mut pixels = vec![0; width as usize * height as usize * 4];
+    for pixel in pixels.chunks_exact_mut(4) {
+        pixel.copy_from_slice(&[242, 241, 237, 255]);
+    }
+    Arc::new(
+        crate::frame_ws::WSFrame {
+            data: Arc::new(pixels).into(),
+            width,
+            height,
+            stride: width * 4,
+            frame_number: 0,
+            target_time_ns: 0,
+            format: crate::frame_ws::WSFrameFormat::Rgba,
+            created_at: std::time::Instant::now(),
+        }
+        .into_packed(),
+    )
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn toggle_presentation_curtain(app: AppHandle) -> Result<PresentationStatus, String> {
+    let state = app.state::<PresentationState>();
+    let sessions = state.session.lock().unwrap();
+    let session = sessions.as_ref().ok_or("请先开始演示")?;
+    let mut status = state.status.lock().unwrap();
+    if !status.active {
+        return Err("请先开始演示".into());
+    }
+    status.curtain = !status.curtain;
+    if status.curtain {
+        let options = session.options.borrow();
+        session.output.send_replace(Some(curtain_frame(
+            options.output_width,
+            options.output_height,
+        )));
+    }
+    app.emit("presentation-curtain-changed", status.curtain)
+        .map_err(|error| error.to_string())?;
+    Ok(status.clone())
+}
+
 pub fn handle_shortcut(app: &AppHandle, shortcut: &Shortcut, pressed: bool) -> bool {
     let matches = app.try_state::<PresentationState>().is_some_and(|state| {
         state
@@ -359,7 +404,12 @@ async fn stop_locked(app: &AppHandle, state: &PresentationState) {
             .await;
         }
     }
-    state.status.lock().unwrap().active = false;
+    {
+        let mut status = state.status.lock().unwrap();
+        status.active = false;
+        status.curtain = false;
+    }
+    let _ = app.emit("presentation-curtain-changed", false);
 }
 
 #[tauri::command]
@@ -540,6 +590,7 @@ pub async fn start_presentation(
         let _ = app.emit("presentation-output-settings", &options);
         let (options_tx, options_rx) = watch::channel(options.clone());
         let (frame_tx, frame_rx) = watch::channel(None);
+        let session_output = frame_tx.clone();
         let (port, ws_cancel) =
             crate::frame_ws::create_watch_frame_ws(frame_rx, Default::default()).await;
         if port == 0 {
@@ -586,6 +637,7 @@ pub async fn start_presentation(
                 ws_cancel.cancel();
                 let mut value = status.lock().unwrap();
                 value.active = false;
+                value.curtain = false;
                 if let Err(error) = result {
                     tracing::error!(%error,"Presentation stopped");
                     value.error = Some(error);
@@ -595,6 +647,7 @@ pub async fn start_presentation(
         *state.session.lock().unwrap() = Some(Session {
             cancel,
             options: options_tx,
+            output: session_output,
             shortcut,
             thread: Some(thread),
         });
@@ -779,6 +832,7 @@ mod macos {
         let mut scroll = unsafe { CGEventSourceCounterForEventType(0, 22) };
         let mut last_monitor_check = Instant::now();
         let mut last_source_check = Instant::now();
+        let mut covered_size = None;
         let result = async {
             loop {
                 tokio::select! { _=cancel.cancelled()=>break, _=tick.tick()=>{} }
@@ -792,10 +846,44 @@ mod macos {
                         return Err("来源显示器已断开，请重新选择来源".into());
                     }
                 }
+                if let Some(target) = &target
+                    && last_monitor_check.elapsed() > Duration::from_secs(1)
+                {
+                    last_monitor_check = Instant::now();
+                    let exists = app
+                        .available_monitors()
+                        .map_err(|e| e.to_string())?
+                        .iter()
+                        .any(|monitor| {
+                            monitor.position() == target.position()
+                                && monitor.size() == target.size()
+                        });
+                    if !exists && !status.lock().unwrap().output_detached {
+                        if let Some(window) = app.get_webview_window("presentation-output") {
+                            let _ = window.set_always_on_top(false);
+                            let _ = window.set_size(tauri::LogicalSize::new(960.0, 540.0));
+                            let _ = window.center();
+                        }
+                        status.lock().unwrap().output_detached = true;
+                    }
+                }
                 if current.toggle_epoch.wrapping_sub(toggle_epoch) % 2 == 1 {
                     motion.toggle();
                 }
                 toggle_epoch = current.toggle_epoch;
+                {
+                    let mut state = status.lock().unwrap();
+                    if state.curtain {
+                        let size = (current.output_width, current.output_height);
+                        if covered_size != Some(size) {
+                            output.send_replace(Some(curtain_frame(size.0, size.1)));
+                            state.frames += 1;
+                            covered_size = Some(size);
+                        }
+                        continue;
+                    }
+                    covered_size = None;
+                }
                 let now_ms = start.elapsed().as_secs_f64() * 1000.0;
                 if now_ms > 10_000.0 && rx.borrow().is_none() {
                     return Err("没有收到捕获帧".into());
@@ -888,6 +976,11 @@ mod macos {
                     .await
                     .map_err(|e| e.to_string())?;
                 if let Some(frame) = frame {
+                    let mut state = status.lock().unwrap();
+                    // A cover request may arrive while GPU readback is in flight.
+                    if state.curtain {
+                        continue;
+                    }
                     let age = frame_times
                         .iter()
                         .find(|(number, _)| *number == frame.frame_number)
@@ -908,7 +1001,6 @@ mod macos {
                         }
                         .into_packed(),
                     )));
-                    let mut state = status.lock().unwrap();
                     state.frames += 1;
                     state.processing_ms = age;
                     if state.frames % 120 == 0 {
@@ -920,27 +1012,6 @@ mod macos {
                     }
                     if let Some(sender) = ready.take() {
                         let _ = sender.send(Ok(()));
-                    }
-                }
-                if let Some(target) = &target
-                    && last_monitor_check.elapsed() > Duration::from_secs(1)
-                {
-                    last_monitor_check = Instant::now();
-                    let exists = app
-                        .available_monitors()
-                        .map_err(|e| e.to_string())?
-                        .iter()
-                        .any(|monitor| {
-                            monitor.position() == target.position()
-                                && monitor.size() == target.size()
-                        });
-                    if !exists && !status.lock().unwrap().output_detached {
-                        if let Some(window) = app.get_webview_window("presentation-output") {
-                            let _ = window.set_always_on_top(false);
-                            let _ = window.set_size(tauri::LogicalSize::new(960.0, 540.0));
-                            let _ = window.center();
-                        }
-                        status.lock().unwrap().output_detached = true;
                     }
                 }
             }
@@ -1030,6 +1101,22 @@ pub fn run_smoke(app: AppHandle) {
 #[cfg(test)]
 mod output_aspect_tests {
     use super::*;
+
+    #[test]
+    fn curtain_frame_is_opaque_packed_and_independent_of_capture() {
+        let frame = curtain_frame(320, 240);
+        assert_eq!((frame.width, frame.height, frame.stride), (320, 240, 1280));
+        let crate::frame_ws::WSFrameData::Packed(bytes) = &frame.data else {
+            panic!("curtain must be ready for transport")
+        };
+        assert_eq!(bytes.len(), 320 * 240 * 4 + 24);
+        assert!(
+            bytes[..320 * 240 * 4]
+                .chunks_exact(4)
+                .all(|pixel| pixel == [242, 241, 237, 255])
+        );
+        assert!(!PresentationStatus::default().curtain);
+    }
 
     #[test]
     fn quality_reference_preserves_ratios_and_even_dimensions_without_stretching() {

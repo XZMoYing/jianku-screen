@@ -23,6 +23,7 @@ export default function PresentationOutput() {
 		return "#eeeaf6";
 	};
 	const [error, setError] = createSignal("");
+	const [curtain, setCurtain] = createSignal(false);
 	onMount(() => {
 		let disposed = false;
 		let socket: WebSocket | undefined;
@@ -32,6 +33,22 @@ export default function PresentationOutput() {
 			"presentation-output-settings",
 			(event) => setOptions(event.payload),
 		);
+		let curtainRevision = 0;
+		const curtainChanges = listen<boolean>(
+			"presentation-curtain-changed",
+			(event) => {
+				curtainRevision++;
+				if (!disposed) setCurtain(event.payload);
+			},
+		);
+		void curtainChanges
+			.then(async () => {
+				const revision = curtainRevision;
+				const status = await commands.getPresentationStatus();
+				if (!disposed && revision === curtainRevision)
+					setCurtain(status.curtain);
+			})
+			.catch((cause: unknown) => setError(String(cause)));
 		const setup = commands.getPresentationSetup().then((value) => {
 			if (!disposed) setOptions(value.options);
 		});
@@ -91,6 +108,7 @@ export default function PresentationOutput() {
 			worker.postMessage({ type: "cleanup" });
 			worker.terminate();
 			void changes.then((remove) => remove());
+			void curtainChanges.then((remove) => remove());
 		});
 	});
 	return (
@@ -101,6 +119,26 @@ export default function PresentationOutput() {
 				ref={canvas}
 				class="w-full h-full object-contain"
 			/>
+			<Show when={curtain()}>
+				<div
+					data-testid="presentation-curtain"
+					class="absolute inset-0 flex flex-col items-center justify-center gap-3"
+					style={{ background: "rgb(242, 241, 237)", color: "#4f5048" }}
+				>
+					<svg
+						viewBox="0 0 32 32"
+						class="size-10"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="1.6"
+						aria-hidden="true"
+					>
+						<rect x="4" y="6" width="24" height="17" rx="5" />
+						<path d="M11 28h10M16 23v5M4 15h24" />
+					</svg>
+					<span>{localize("演示暂停，稍后继续")}</span>
+				</div>
+			</Show>
 			<Show when={error()}>
 				<div class="absolute inset-0 flex items-center justify-center p-6 text-white bg-black/70">
 					{error()}

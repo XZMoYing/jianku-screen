@@ -1663,6 +1663,10 @@ impl<T> OnceSender<T> {
 }
 
 impl OutputPipeline {
+    pub fn latest_video_time(&self) -> Option<Duration> {
+        self.video_timestamp_span.get().map(|(_, last)| last)
+    }
+
     pub fn builder(path: PathBuf) -> OutputPipelineBuilder<NoVideo> {
         let timestamps = Timestamps::now();
         OutputPipelineBuilder::<NoVideo> {

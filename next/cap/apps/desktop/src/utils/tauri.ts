@@ -76,6 +76,15 @@ async stopRecording() : Promise<null> {
 async pauseRecording() : Promise<null> {
     return await TAURI_INVOKE("pause_recording");
 },
+async addRecordingBookmark() : Promise<RecordingBookmark> {
+    return await TAURI_INVOKE("add_recording_bookmark");
+},
+async getRecordingBookmarks(timeline: TimelineConfiguration) : Promise<BookmarkLocation[]> {
+    return await TAURI_INVOKE("get_recording_bookmarks", { timeline });
+},
+async updateRecordingBookmark(id: string, label: string | null) : Promise<null> {
+    return await TAURI_INVOKE("update_recording_bookmark", { id, label });
+},
 async getRecordingPauseState() : Promise<boolean | null> {
     return await TAURI_INVOKE("get_recording_pause_state");
 },
@@ -309,6 +318,9 @@ async updatePresentation(options: PresentationOptions) : Promise<PresentationOpt
 },
 async togglePresentationFocus() : Promise<null> {
     return await TAURI_INVOKE("toggle_presentation_focus");
+},
+async togglePresentationCurtain() : Promise<PresentationStatus> {
+    return await TAURI_INVOKE("toggle_presentation_curtain");
 },
 async pickLocalProject() : Promise<string | null> {
     return await TAURI_INVOKE("pick_local_project");
@@ -837,6 +849,7 @@ frame: FrameConfiguration | null;
 notch: NotchConfiguration | null }
 export type BackgroundMaterial = { id: string; name: string; path: string; animated: boolean }
 export type BackgroundSource = { type: "wallpaper"; path: string | null } | { type: "image"; path: string | null } | { type: "color"; value: [number, number, number]; alpha?: number } | { type: "gradient"; from: [number, number, number]; to: [number, number, number]; angle?: number; noise_intensity?: number | null; noise_scale?: number | null; animated?: boolean | null; animation_speed?: number | null } | { type: "animatedGradient"; config: AnimatedGradientConfig }
+export type BookmarkLocation = { bookmark: RecordingBookmark; positions: number[] }
 export type BorderConfiguration = { enabled: boolean; width: number; color: [number, number, number]; opacity: number }
 export type Camera = { hide: boolean; mirror: boolean; position: CameraPosition;
 /**
@@ -988,7 +1001,7 @@ export type CaptureWindowWithThumbnail = { id: WindowId; owner_name: string; nam
 export type CliInstallStatus = { installDir: string; shimPath: string; targetPath: string; installed: boolean; onPath: boolean; conflict: string | null; pathEntry: string; shellCommand: string;
 /**
  * Whether the install dir is persisted to the user's shell PATH config (profile/registry),
- * so `cap` will be available in a new terminal even though it is not on the current PATH.
+ * so `jianku` will be available in a new terminal even though it is not on the current PATH.
  */
 pathConfigured: boolean }
 export type ClickSpringConfig = { tension: number; mass: number; friction: number }
@@ -1204,7 +1217,7 @@ export type GlideDirection = "none" | "left" | "right" | "up" | "down"
 export type HapticPattern = "alignment" | "levelChange" | "generic"
 export type HapticPerformanceTime = "default" | "now" | "drawCompleted"
 export type Hotkey = { code: string; meta: boolean; ctrl: boolean; alt: boolean; shift: boolean }
-export type HotkeyAction = "startStudioRecording" | "startInstantRecording" | "stopRecording" | "restartRecording" | "togglePauseRecording" | "cycleRecordingMode" | "openRecordingPicker" | "openRecordingPickerDisplay" | "openRecordingPickerWindow" | "openRecordingPickerArea" | "screenshotDisplay" | "screenshotWindow" | "screenshotArea" | "other"
+export type HotkeyAction = "startStudioRecording" | "startInstantRecording" | "stopRecording" | "restartRecording" | "togglePauseRecording" | "addRecordingBookmark" | "togglePresentationCurtain" | "cycleRecordingMode" | "openRecordingPicker" | "openRecordingPickerDisplay" | "openRecordingPickerWindow" | "openRecordingPickerArea" | "screenshotDisplay" | "screenshotWindow" | "screenshotArea" | "other"
 export type HotkeysConfiguration = { show: boolean }
 export type HotkeysStore = { hotkeys: { [key in HotkeyAction]: Hotkey } }
 export type ImageSegment = { start: number; end: number; track: number; enabled: boolean; path: string; name: string; center: XY<number>; size: XY<number>; opacity: number; rotation: number; rounding: number; flipX: boolean; flipY: boolean; lockAspect: boolean }
@@ -1289,7 +1302,7 @@ export type PreparingPlaybackState = { playheadSeconds: number; playing: boolean
 export type PresentationMonitor = { index: number; name: string; width: number; height: number }
 export type PresentationOptions = { sourceId: string; outputMonitor: number | null; outputWidth: number; outputHeight: number; outputResolution?: number; outputAspectRatio?: AspectRatio | null; focusMode: LiveFocusMode; zoomAmount: number; idleSeconds: number; shortcut: string; project: ProjectConfiguration; toggleEpoch?: number }
 export type PresentationSetup = { supported: boolean; displays: CaptureDisplay[]; monitors: PresentationMonitor[]; options: PresentationOptions }
-export type PresentationStatus = { active: boolean; frames: number; processingMs: number; error: string | null; wsPort: number; outputDetached: boolean }
+export type PresentationStatus = { active: boolean; curtain: boolean; frames: number; processingMs: number; error: string | null; wsPort: number; outputDetached: boolean }
 export type Preset = { name: string; config: ProjectConfiguration }
 export type PresetsStore = { presets: Preset[]; default: number | null }
 export type ProjectConfiguration = { aspectRatio: AspectRatio | null; background: BackgroundConfiguration; camera: Camera; audio: AudioConfiguration; cursor: CursorConfiguration; hotkeys: HotkeysConfiguration; timeline: TimelineConfiguration | null; overlayOrder: OverlayTrack[]; captions: CaptionsData | null; keyboard: KeyboardData | null; clips: ClipConfiguration[]; annotations: Annotation[]; screenMotionBlur?: number; screenMovementSpring?: ScreenMovementSpring;
@@ -1317,6 +1330,7 @@ textSizeVersion?: number;
 textAnimVersion?: number }
 export type ProjectRecordingsMeta = { segments: SegmentRecordings[] }
 export type RecordingAction = "Started" | "InvalidAuthentication" | "UpgradeRequired"
+export type RecordingBookmark = { id: string; label: string; recordingSegment: number; time: number; observedTime?: number | null }
 export type RecordingDeleted = { path: string }
 export type RecordingEvent = { variant: "Countdown"; value: number } | { variant: "Started" } | { variant: "Stopped" } | { variant: "Paused" } | { variant: "Resumed" } | { variant: "Failed"; error: string } | { variant: "StartFailed"; error: string } | { variant: "InputLost"; input: RecordingInputKind } | { variant: "InputRestored"; input: RecordingInputKind } | { variant: "Degraded"; reason: string } | { variant: "Recovered" }
 export type RecordingInputKind = "microphone" | "camera"

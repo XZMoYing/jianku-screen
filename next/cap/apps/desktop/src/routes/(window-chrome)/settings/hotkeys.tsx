@@ -2,7 +2,6 @@ import { createEventListener } from "@solid-primitives/event-listener";
 import { type as ostype } from "@tauri-apps/plugin-os";
 import {
 	batch,
-	createEffect,
 	createResource,
 	createSignal,
 	For,
@@ -12,6 +11,7 @@ import {
 	Switch,
 } from "solid-js";
 import { createStore } from "solid-js/store";
+import toast from "solid-toast";
 import { hotkeysStore } from "~/store";
 import { t as localize } from "~/utils/i18n";
 
@@ -29,6 +29,8 @@ const ACTION_TEXT = {
 	restartRecording: "Restart recording",
 	stopRecording: "Stop recording",
 	togglePauseRecording: "Pause/resume recording",
+	addRecordingBookmark: "添加录制书签",
+	togglePresentationCurtain: "遮盖/恢复演示画面",
 	cycleRecordingMode: "Cycle recording mode",
 	openRecordingPicker: "Open recording picker",
 	openRecordingPickerDisplay: "Record display",
@@ -55,17 +57,33 @@ function Inner(props: { initialStore: HotkeysStore | null }) {
 		[K in HotkeyAction]?: Hotkey;
 	}>(props.initialStore?.hotkeys ?? {});
 
-	createEffect(() => {
-		hotkeysStore.set({ hotkeys: { ...hotkeys } as HotkeysStore["hotkeys"] });
-	});
-
 	const [listening, setListening] = createSignal<{
 		action: HotkeyAction;
 		prev?: Hotkey;
 	}>();
 
+	const [saving, setSaving] = createSignal(false);
+	const commitBinding = async (
+		action: HotkeyAction,
+		binding: Hotkey | null,
+	) => {
+		if (saving()) return;
+		const previous = listening()?.prev;
+		setSaving(true);
+		try {
+			await commands.setHotkey(action, binding);
+			setHotkeys(action, binding ?? undefined);
+		} catch (error) {
+			setHotkeys(action, previous);
+			toast.error(localize(String(error)));
+		} finally {
+			setListening();
+			setSaving(false);
+		}
+	};
+
 	createEventListener(window, "keydown", (e) => {
-		if (MODIFIER_KEYS.has(e.key)) return;
+		if (MODIFIER_KEYS.has(e.key) || saving()) return;
 
 		const data = {
 			code: e.code,
@@ -92,6 +110,8 @@ function Inner(props: { initialStore: HotkeysStore | null }) {
 			"stopRecording",
 			"restartRecording",
 			"togglePauseRecording",
+			"addRecordingBookmark",
+			"togglePresentationCurtain",
 			"cycleRecordingMode",
 			"openRecordingPickerDisplay",
 			"openRecordingPickerWindow",
@@ -111,7 +131,7 @@ function Inner(props: { initialStore: HotkeysStore | null }) {
 						<Index each={actions()}>
 							{(item, idx) => {
 								createEventListener(window, "click", () => {
-									if (listening()?.action !== item()) return;
+									if (listening()?.action !== item() || saving()) return;
 
 									batch(() => {
 										setHotkeys(item(), listening()?.prev);
@@ -123,7 +143,7 @@ function Inner(props: { initialStore: HotkeysStore | null }) {
 									<>
 										<div class="flex flex-row justify-between items-center w-full h-8">
 											<p class="text-[13px] text-gray-12">
-												{ACTION_TEXT[item()]}
+												{localize(ACTION_TEXT[item()])}
 											</p>
 											<Switch>
 												<Match when={listening()?.action === item()}>
@@ -147,8 +167,7 @@ function Inner(props: { initialStore: HotkeysStore | null }) {
 																	onClick={(e) => {
 																		e.stopPropagation();
 
-																		setListening();
-																		commands.setHotkey(
+																		void commitBinding(
 																			item(),
 																			hotkeys[item()] ?? null,
 																		);
@@ -161,12 +180,7 @@ function Inner(props: { initialStore: HotkeysStore | null }) {
 																type="button"
 																onClick={(e) => {
 																	e.stopPropagation();
-																	batch(() => {
-																		setListening();
-																		// biome-ignore lint/style/noNonNullAssertion: store
-																		setHotkeys(item(), undefined!);
-																		commands.setHotkey(item(), null);
-																	});
+																	void commitBinding(item(), null);
 																}}
 															>
 																<IconCapCircleX class="text-red-500 transition-colors hover:text-red-700 size-5" />

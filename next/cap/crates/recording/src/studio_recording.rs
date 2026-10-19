@@ -82,6 +82,7 @@ enum ActorState {
         segment_start_instant: Instant,
     },
     Paused {
+        bookmark_time: Option<Duration>,
         next_index: u32,
         cursors: Cursors,
         next_cursor_id: u32,
@@ -703,6 +704,10 @@ impl Message<Pause> for Actor {
                 if let Some(diagnostic) = &mut self.diagnostic {
                     diagnostic.stage("pausing");
                 }
+                let bookmark_time = pipeline
+                    .screen
+                    .latest_video_time()
+                    .map(|_| pipeline.epoch().instant().elapsed());
                 let stopped = self
                     .stop_pipeline(pipeline, segment_start_time)
                     .await
@@ -710,6 +715,7 @@ impl Message<Pause> for Actor {
                 match stopped {
                     Ok((cursors, next_cursor_id)) if self.all_tracks_stopped => {
                         self.state = Some(ActorState::Paused {
+                            bookmark_time,
                             next_index: index + 1,
                             cursors,
                             next_cursor_id,
@@ -1046,6 +1052,7 @@ impl Message<Resume> for Actor {
                 next_index,
                 cursors,
                 next_cursor_id,
+                ..
             }) => {
                 let next_index = *next_index;
                 let next_cursor_id = *next_cursor_id;
@@ -1219,6 +1226,46 @@ impl Message<SetCameraFeed> for Actor {
 }
 
 pub struct IsPaused;
+
+struct AddBookmark;
+
+impl Message<AddBookmark> for Actor {
+    type Reply = anyhow::Result<cap_project::RecordingBookmark>;
+
+    async fn handle(&mut self, _: AddBookmark, _: &mut Context<Self, Self::Reply>) -> Self::Reply {
+        let (index, time) = match self.state.as_ref() {
+            Some(ActorState::Recording {
+                pipeline, index, ..
+            }) => (
+                *index,
+                pipeline
+                    .screen
+                    .latest_video_time()
+                    .map(|_| pipeline.epoch().instant().elapsed()),
+            ),
+            Some(ActorState::Paused {
+                next_index,
+                bookmark_time,
+                ..
+            }) => (next_index.saturating_sub(1), *bookmark_time),
+            None => bail!("当前没有进行中的录制"),
+        };
+        let time = time.ok_or_else(|| anyhow!("录制尚未收到画面，请稍候再添加书签"))?;
+        let mut bookmarks = cap_project::load_recording_bookmarks(&self.recording_dir)
+            .map_err(anyhow::Error::msg)?;
+        let bookmark = cap_project::RecordingBookmark {
+            id: uuid::Uuid::new_v4().to_string(),
+            label: String::new(),
+            recording_segment: index,
+            time: time.as_secs_f64(),
+            observed_time: None,
+        };
+        bookmarks.push(bookmark.clone());
+        cap_project::save_recording_bookmarks(&self.recording_dir, &bookmarks)
+            .map_err(anyhow::Error::msg)?;
+        Ok(bookmark)
+    }
+}
 
 impl Message<IsPaused> for Actor {
     type Reply = bool;
@@ -2020,6 +2067,14 @@ impl ActorHandle {
 
     pub async fn is_paused(&self) -> anyhow::Result<bool> {
         Ok(self.actor_ref.ask(IsPaused).await?)
+    }
+
+    pub async fn add_bookmark(&self) -> anyhow::Result<cap_project::RecordingBookmark> {
+        #[cfg(any(target_os = "macos", windows))]
+        if self.terminal_started() {
+            bail!("录制正在结束，请在编辑器中查看书签");
+        }
+        Ok(self.actor_ref.ask(AddBookmark).await?)
     }
 }
 
@@ -3857,6 +3912,7 @@ mod tests {
                     diagnostic: Some(diagnostic),
                     recording_dir: root.to_path_buf(),
                     state: Some(ActorState::Paused {
+                        bookmark_time: None,
                         next_index: count,
                         cursors: Default::default(),
                         next_cursor_id: 0,
@@ -4035,6 +4091,7 @@ mod tests {
             diagnostic: None,
             recording_dir: path.to_path_buf(),
             state: Some(ActorState::Paused {
+                bookmark_time: None,
                 next_index: 1,
                 cursors: Default::default(),
                 next_cursor_id: 0,
@@ -4203,6 +4260,7 @@ mod tests {
                 diagnostic: None,
                 recording_dir: path.to_path_buf(),
                 state: Some(ActorState::Paused {
+                    bookmark_time: None,
                     next_index: 2,
                     cursors: response.cursors,
                     next_cursor_id: response.next_cursor_id,
@@ -4374,6 +4432,7 @@ mod tests {
                         next_index,
                         next_cursor_id,
                         cursors,
+                        ..
                     }) => (true, *next_index, *next_cursor_id, cursors.len()),
                     _ => (false, 0, 0, 0),
                 };
@@ -4461,6 +4520,7 @@ mod tests {
                     },
                     recording_dir: path.to_path_buf(),
                     state: Some(ActorState::Paused {
+                        bookmark_time: None,
                         next_index: 1,
                         cursors,
                         next_cursor_id: 13,

@@ -4873,6 +4873,48 @@ async fn get_editor_meta(editor: WindowEditorInstance) -> Result<RecordingMeta, 
 
 #[tauri::command]
 #[specta::specta]
+fn get_recording_bookmarks(
+    editor: WindowEditorInstance,
+    timeline: cap_project::TimelineConfiguration,
+) -> Result<Vec<cap_project::BookmarkLocation>, String> {
+    let bookmarks = cap_project::load_recording_bookmarks(&editor.project_path)?;
+    Ok(cap_project::locate_recording_bookmarks(
+        bookmarks,
+        editor.meta(),
+        &timeline,
+        &editor
+            .recordings
+            .segments
+            .iter()
+            .map(|segment| segment.duration())
+            .collect::<Vec<_>>(),
+    ))
+}
+
+#[tauri::command]
+#[specta::specta]
+fn update_recording_bookmark(
+    editor: WindowEditorInstance,
+    id: String,
+    label: Option<String>,
+) -> Result<(), String> {
+    static GATE: std::sync::Mutex<()> = std::sync::Mutex::new(());
+    let _guard = GATE.lock().map_err(|error| error.to_string())?;
+    let mut bookmarks = cap_project::load_recording_bookmarks(&editor.project_path)?;
+    let index = bookmarks
+        .iter()
+        .position(|bookmark| bookmark.id == id)
+        .ok_or("书签已不存在")?;
+    if let Some(label) = label {
+        bookmarks[index].label = label.trim().to_string();
+    } else {
+        bookmarks.remove(index);
+    }
+    cap_project::save_recording_bookmarks(&editor.project_path, &bookmarks)
+}
+
+#[tauri::command]
+#[specta::specta]
 async fn get_recording_meta_by_path(project_path: PathBuf) -> Result<RecordingMeta, String> {
     RecordingMeta::load_for_project(&project_path).map_err(|e| e.to_string())
 }
@@ -6792,6 +6834,9 @@ fn specta_builder() -> tauri_specta::Builder {
             recording::start_recording,
             recording::stop_recording,
             recording::pause_recording,
+            recording::add_recording_bookmark,
+            get_recording_bookmarks,
+            update_recording_bookmark,
             recording::get_recording_pause_state,
             recording::resume_recording,
             recording::toggle_pause_recording,
@@ -6870,6 +6915,7 @@ fn specta_builder() -> tauri_specta::Builder {
             presentation::stop_presentation,
             presentation::update_presentation,
             presentation::toggle_presentation_focus,
+            presentation::toggle_presentation_curtain,
             project_files::pick_local_project,
             project_files::open_local_project,
             project_files::copy_editor_project,

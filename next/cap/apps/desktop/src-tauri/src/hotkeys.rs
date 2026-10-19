@@ -59,6 +59,8 @@ pub enum HotkeyAction {
     StopRecording,
     RestartRecording,
     TogglePauseRecording,
+    AddRecordingBookmark,
+    TogglePresentationCurtain,
     CycleRecordingMode,
     OpenRecordingPicker,
     OpenRecordingPickerDisplay,
@@ -71,7 +73,7 @@ pub enum HotkeyAction {
     Other,
 }
 
-#[derive(Serialize, Deserialize, Type, Default)]
+#[derive(Clone, Serialize, Deserialize, Type, Default)]
 pub struct HotkeysStore {
     hotkeys: HashMap<HotkeyAction, Hotkey>,
 }
@@ -363,6 +365,14 @@ async fn handle_hotkey(app: AppHandle, action: HotkeyAction) -> Result<(), Strin
         HotkeyAction::TogglePauseRecording => {
             recording::toggle_pause_recording(app.clone(), app.state()).await
         }
+        HotkeyAction::AddRecordingBookmark => {
+            recording::add_recording_bookmark(app.clone(), app.state())
+                .await
+                .map(|_| ())
+        }
+        HotkeyAction::TogglePresentationCurtain => {
+            crate::presentation::toggle_presentation_curtain(app).map(|_| ())
+        }
         HotkeyAction::CycleRecordingMode => {
             let current = RecordingSettingsStore::get(&app)
                 .ok()
@@ -462,33 +472,134 @@ async fn handle_hotkey(app: AppHandle, action: HotkeyAction) -> Result<(), Strin
 #[tauri::command(async)]
 #[specta::specta]
 #[instrument(skip(app))]
-pub fn set_hotkey(app: AppHandle, action: HotkeyAction, hotkey: Option<Hotkey>) -> Result<(), ()> {
+pub fn set_hotkey(
+    app: AppHandle,
+    action: HotkeyAction,
+    hotkey: Option<Hotkey>,
+) -> Result<(), String> {
     let global_shortcut = app.global_shortcut();
     let state = app.state::<HotkeysState>();
     let mut store = state.lock().unwrap();
     if crate::clean_capture::phase(&app).is_some() {
-        return Err(());
+        return Err("请先结束纯净录制，再修改快捷键。".into());
     }
-
-    let prev = store.hotkeys.get(&action).cloned();
-
-    if let Some(hotkey) = hotkey {
-        store.hotkeys.insert(action, hotkey);
-    } else {
-        store.hotkeys.remove(&action);
+    let updated = proposed_hotkeys(&store, action, hotkey)?;
+    let previous = store.hotkeys.get(&action).copied();
+    if previous == hotkey {
+        return Ok(());
     }
-
-    if let Some(prev) = prev
-        && !store.hotkeys.values().any(|h| h == &prev)
+    if let Some(binding) = hotkey {
+        let shortcut = Shortcut::from(binding);
+        if global_shortcut.is_registered(shortcut) {
+            return Err("这个快捷键正在被其他功能使用，请换一个。".into());
+        }
+        global_shortcut
+            .register(shortcut)
+            .map_err(|error| format!("无法注册快捷键：{error}"))?;
+    }
+    let unused_previous =
+        previous.filter(|binding| !updated.hotkeys.values().any(|value| value == binding));
+    if let Some(binding) = unused_previous
+        && let Err(error) = global_shortcut.unregister(Shortcut::from(binding))
     {
-        global_shortcut.unregister(Shortcut::from(prev)).ok();
+        if let Some(binding) = hotkey {
+            let _ = global_shortcut.unregister(Shortcut::from(binding));
+        }
+        return Err(format!("无法替换原快捷键：{error}"));
     }
-
-    if let Some(hotkey) = hotkey {
-        global_shortcut.register(Shortcut::from(hotkey)).ok();
+    let saved = (|| -> Result<(), String> {
+        let preferences = app.store("store").map_err(|error| error.to_string())?;
+        preferences.set(
+            "hotkeys",
+            serde_json::to_value(&updated).map_err(|error| error.to_string())?,
+        );
+        if let Err(error) = preferences.save() {
+            preferences.set(
+                "hotkeys",
+                serde_json::to_value(&*store).map_err(|error| error.to_string())?,
+            );
+            let _ = preferences.save();
+            return Err(error.to_string());
+        }
+        Ok(())
+    })();
+    if let Err(error) = saved {
+        if let Some(binding) = hotkey {
+            let _ = global_shortcut.unregister(Shortcut::from(binding));
+        }
+        if let Some(binding) = unused_previous {
+            let _ = global_shortcut.register(Shortcut::from(binding));
+        }
+        return Err(format!("快捷键未能保存，已恢复原设置：{error}"));
     }
-
+    *store = updated;
     Ok(())
+}
+
+fn proposed_hotkeys(
+    store: &HotkeysStore,
+    action: HotkeyAction,
+    hotkey: Option<Hotkey>,
+) -> Result<HotkeysStore, String> {
+    if action == HotkeyAction::Other {
+        return Err("这个快捷键操作不受支持。".into());
+    }
+    if let Some(binding) = hotkey
+        && store
+            .hotkeys
+            .iter()
+            .any(|(other, value)| *other != action && *value == binding)
+    {
+        return Err("这个快捷键已分配给其他操作，请换一个。".into());
+    }
+    let mut updated = store.clone();
+    if let Some(binding) = hotkey {
+        updated.hotkeys.insert(action, binding);
+    } else {
+        updated.hotkeys.remove(&action);
+    }
+    Ok(updated)
+}
+
+#[cfg(test)]
+mod bookmark_shortcut_tests {
+    use super::*;
+
+    #[test]
+    fn conflict_rejection_keeps_original_actions_and_supports_removal() {
+        let mut store = HotkeysStore::default();
+        let binding = Hotkey {
+            code: Code::KeyB,
+            meta: true,
+            ctrl: true,
+            alt: false,
+            shift: true,
+        };
+        store.hotkeys.insert(HotkeyAction::StopRecording, binding);
+        assert!(
+            proposed_hotkeys(&store, HotkeyAction::AddRecordingBookmark, Some(binding)).is_err()
+        );
+        assert!(
+            proposed_hotkeys(
+                &store,
+                HotkeyAction::TogglePresentationCurtain,
+                Some(binding)
+            )
+            .is_err()
+        );
+        assert_eq!(store.hotkeys.len(), 1);
+        assert_eq!(
+            store.hotkeys.get(&HotkeyAction::StopRecording),
+            Some(&binding)
+        );
+        let cleared = proposed_hotkeys(&store, HotkeyAction::StopRecording, None).unwrap();
+        let updated =
+            proposed_hotkeys(&cleared, HotkeyAction::AddRecordingBookmark, Some(binding)).unwrap();
+        assert_eq!(
+            updated.hotkeys.get(&HotkeyAction::AddRecordingBookmark),
+            Some(&binding)
+        );
+    }
 }
 
 #[cfg(target_os = "linux")]

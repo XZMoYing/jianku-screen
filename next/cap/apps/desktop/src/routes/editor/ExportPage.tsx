@@ -668,13 +668,13 @@ export function ExportPage() {
 		isMovCursorOnlyExport() ? "mov" : settings.format === "Gif" ? "gif" : "mp4";
 	const exportedAssetLabel = () =>
 		isMovCursorOnlyExport()
-		? localize("Cursor track")
+			? localize("Cursor track")
 			: settings.format === "Gif"
 				? "GIF"
 				: localize("Recording");
 	const exportMediumLabel = () =>
 		isMovCursorOnlyExport()
-		? localize("cursor track")
+			? localize("cursor track")
 			: settings.format === "Gif"
 				? "GIF"
 				: localize("video");
@@ -730,9 +730,9 @@ export function ExportPage() {
 				return;
 			}
 			commands.globalMessageDialog(
-					error instanceof Error
-						? localize(error.message)
-						: localize("复制录制内容失败"),
+				error instanceof Error
+					? localize(error.message)
+					: localize("复制录制内容失败"),
 			);
 			setExportState(reconcile({ type: "idle" }));
 		},
@@ -842,9 +842,9 @@ export function ExportPage() {
 					? "在线分享功能敬请期待"
 					: disablesLinkExport()
 						? cursorOnly()
-									? "仅光标导出目前只能保存为文件或复制到剪贴板"
-									: "透明背景导出目前只能保存为文件或复制到剪贴板"
-					: undefined,
+							? "仅光标导出目前只能保存为文件或复制到剪贴板"
+							: "透明背景导出目前只能保存为文件或复制到剪贴板"
+						: undefined,
 		}));
 
 	const formatOptions = () =>
@@ -924,7 +924,11 @@ export function ExportPage() {
 				<div class="flex-1 min-w-0 flex flex-col bg-ed-stage pt-4 px-6 pb-5">
 					<div class="flex items-center gap-1.5 h-[22px] text-[12px] font-medium text-ed-text-2">
 						{localize("Preview")}
-						<Tooltip content={localize("This is a rendered frame from your video. Adjust the settings to see the quality of the final export.")}>
+						<Tooltip
+							content={localize(
+								"This is a rendered frame from your video. Adjust the settings to see the quality of the final export.",
+							)}
+						>
 							<IconLucideInfo class="size-[13px] text-ed-text-3 hover:text-ed-text-2 cursor-help transition-colors" />
 						</Tooltip>
 					</div>
@@ -1055,11 +1059,14 @@ export function ExportPage() {
 							<Show when={disablesLinkExport()}>
 								<p class="text-[11px] text-ed-text-3">
 									{cursorOnly()
-										? localize("Cursor-only exports can only be saved to a file or clipboard.")
-										: localize("Transparent exports can only be saved to a file or clipboard.")}
+										? localize(
+												"Cursor-only exports can only be saved to a file or clipboard.",
+											)
+										: localize(
+												"Transparent exports can only be saved to a file or clipboard.",
+											)}
 								</p>
 							</Show>
-
 						</ExportSection>
 
 						<ExportSection
@@ -1264,32 +1271,32 @@ export function ExportPage() {
 
 					<div class="px-4 pt-3 pb-4 border-t border-ed-line">
 						<button
-								type="button"
-								class={cx(
-									EXPORT_CTA_CLASS,
-									"bg-ed-accent text-white hover:bg-ed-accent-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]",
-								)}
-								onClick={() => {
-									if (settings.exportTo === "file") save.mutate();
-									else if (settings.exportTo === "link")
-										toast.info(localize("在线分享功能敬请期待"));
-									else copy.mutate();
-								}}
-							>
-								{settings.exportTo === "file" && (
-									<>
-										<IconCapFile class="size-4" />
-										{localize("Export to File")}
-									</>
-								)}
-								{settings.exportTo === "clipboard" && (
-									<>
-										<IconCapCopy class="size-4" />
-										{localize("Export to Clipboard")}
-									</>
-								)}
-								{settings.exportTo === "link" && localize("在线分享功能敬请期待")}
-							</button>
+							type="button"
+							class={cx(
+								EXPORT_CTA_CLASS,
+								"bg-ed-accent text-white hover:bg-ed-accent-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]",
+							)}
+							onClick={() => {
+								if (settings.exportTo === "file") save.mutate();
+								else if (settings.exportTo === "link")
+									toast(localize("在线分享功能敬请期待"));
+								else copy.mutate();
+							}}
+						>
+							{settings.exportTo === "file" && (
+								<>
+									<IconCapFile class="size-4" />
+									{localize("Export to File")}
+								</>
+							)}
+							{settings.exportTo === "clipboard" && (
+								<>
+									<IconCapCopy class="size-4" />
+									{localize("Export to Clipboard")}
+								</>
+							)}
+							{settings.exportTo === "link" && localize("在线分享功能敬请期待")}
+						</button>
 					</div>
 				</div>
 			</div>
@@ -1374,8 +1381,10 @@ export function ExportPage() {
 													<ActiveExport
 														heading={
 															renderState.type === "rendering"
-												? localize("正在渲染{asset}", { asset: exportMediumLabel() })
-												: localize("正在准备导出")
+																? localize("正在渲染{asset}", {
+																		asset: exportMediumLabel(),
+																	})
+																: localize("正在准备导出")
 														}
 														state={renderState}
 														onCancel={handleCancel}
@@ -1383,12 +1392,14 @@ export function ExportPage() {
 												)}
 											</Match>
 											<Match when={copyState.type === "copying"}>
-											<ActiveExport heading={localize("正在复制到剪贴板")} />
+												<ActiveExport heading={localize("正在复制到剪贴板")} />
 											</Match>
 											<Match when={copyState.type === "done"}>
 												<CompletedExport
 													title={localize("Copied to clipboard")}
-													subtitle={localize("{asset}已准备好，可以粘贴", { asset: exportMediumLabel() })}
+													subtitle={localize("{asset}已准备好，可以粘贴", {
+														asset: exportMediumLabel(),
+													})}
 												/>
 											</Match>
 										</Switch>
@@ -1413,8 +1424,10 @@ export function ExportPage() {
 													<ActiveExport
 														heading={
 															renderState.type === "rendering"
-												? localize("正在渲染{asset}", { asset: exportMediumLabel() })
-												: localize("正在准备导出")
+																? localize("正在渲染{asset}", {
+																		asset: exportMediumLabel(),
+																	})
+																: localize("正在准备导出")
 														}
 														state={renderState}
 														onCancel={handleCancel}
@@ -1422,12 +1435,14 @@ export function ExportPage() {
 												)}
 											</Match>
 											<Match when={saveState.type === "copying"}>
-											<ActiveExport heading={localize("正在保存到文件")} />
+												<ActiveExport heading={localize("正在保存到文件")} />
 											</Match>
 											<Match when={saveState.type === "done"}>
 												<CompletedExport
 													title={localize("Export complete")}
-												subtitle={localize("{asset}已准备就绪", { asset: exportMediumLabel() })}
+													subtitle={localize("{asset}已准备就绪", {
+														asset: exportMediumLabel(),
+													})}
 												/>
 											</Match>
 										</Switch>
@@ -1448,8 +1463,8 @@ export function ExportPage() {
 													<ActiveExport
 														heading={
 															reuploading()
-												? localize("正在更新分享链接")
-												: localize("正在上传")
+																? localize("正在更新分享链接")
+																: localize("正在上传")
 														}
 														percent={uploading.progress}
 													/>
@@ -1467,8 +1482,10 @@ export function ExportPage() {
 													<ActiveExport
 														heading={
 															renderState.type === "rendering"
-													? localize("正在渲染{asset}", { asset: exportMediumLabel() })
-													: localize("正在准备导出")
+																? localize("正在渲染{asset}", {
+																		asset: exportMediumLabel(),
+																	})
+																: localize("正在准备导出")
 														}
 														state={renderState}
 														onCancel={handleCancel}
@@ -1479,12 +1496,12 @@ export function ExportPage() {
 												<CompletedExport
 													title={
 														reuploading()
-													? localize("链接已更新")
-													: localize("上传完成")
+															? localize("链接已更新")
+															: localize("上传完成")
 													}
 													subtitle={
 														reuploading()
-													? localize("最新版本已更新到原分享链接")
+															? localize("最新版本已更新到原分享链接")
 															: localize("上传完成")
 													}
 												/>
@@ -1595,9 +1612,7 @@ export function ExportPage() {
 									<span class="font-semibold text-ed-text-1">
 										{localize("Tip:")}
 									</span>{" "}
-					{localize(
-						"下次可使用实时模式边录边看，无需等待导出。",
-					)}
+									{localize("下次可使用实时模式边录边看，无需等待导出。")}
 								</p>
 							</Show>
 						</div>
@@ -1672,7 +1687,9 @@ function ExportSegmented<T extends string | number>(props: {
 						</button>
 					);
 					return option.disabledReason ? (
-						<Tooltip content={localize(option.disabledReason)}>{button}</Tooltip>
+						<Tooltip content={localize(option.disabledReason)}>
+							{button}
+						</Tooltip>
 					) : (
 						button
 					);
@@ -1700,7 +1717,7 @@ function ExportToggleRow(props: {
 			</div>
 			<Toggle
 				size="sm"
-					aria-label={localize(props.title)}
+				aria-label={localize(props.title)}
 				checked={props.checked}
 				onChange={props.onChange}
 			/>
@@ -1801,7 +1818,9 @@ function ActiveExport(props: {
 				indeterminate={percent() === undefined}
 			/>
 			<div class="flex flex-col gap-1 items-center">
-				<h2 class="text-base font-medium text-ed-text-1">{localize(props.heading)}</h2>
+				<h2 class="text-base font-medium text-ed-text-1">
+					{localize(props.heading)}
+				</h2>
 				<Show when={frames()}>
 					{(rendered) => (
 						<p class="text-[12px] tabular-nums text-ed-text-2">
@@ -1827,7 +1846,9 @@ function CompletedExport(props: { title: string; subtitle: string }) {
 				<IconLucideCheck class="size-8 text-ed-accent" />
 			</div>
 			<div class="flex flex-col gap-1 items-center">
-				<h2 class="text-base font-medium text-ed-text-1">{localize(props.title)}</h2>
+				<h2 class="text-base font-medium text-ed-text-1">
+					{localize(props.title)}
+				</h2>
 				<p class="text-[12px] text-ed-text-2">{localize(props.subtitle)}</p>
 			</div>
 		</div>

@@ -29,6 +29,7 @@ import IconChevronDown from "~icons/lucide/chevron-down";
 import IconImage from "~icons/lucide/image";
 import IconMonitor from "~icons/lucide/monitor";
 import IconMousePointer2 from "~icons/lucide/mouse-pointer-2";
+import IconPanelsTopLeft from "~icons/lucide/panels-top-left";
 import IconPlay from "~icons/lucide/play";
 import IconSlidersHorizontal from "~icons/lucide/sliders-horizontal";
 import IconSquare from "~icons/lucide/square";
@@ -116,11 +117,15 @@ export default function Presentation(props: {
 			}
 		},
 	);
+	const curtainChanges = listen<boolean>("presentation-curtain-changed", () => {
+		void refresh().catch(report);
+	});
 	onCleanup(() => {
 		disposed = true;
 		clearInterval(polling);
 		clearTimeout(timer);
 		void changes.then((remove) => remove());
+		void curtainChanges.then((remove) => remove());
 	});
 	const flush = async () => {
 		clearTimeout(timer);
@@ -299,9 +304,7 @@ export default function Presentation(props: {
 									class={`studio-status ${status()?.active ? "is-live" : ""}`}
 								>
 									<i />
-									{status()?.active
-										? localize("正在演示")
-										: localize("待机")}
+									{status()?.active ? localize("正在演示") : localize("待机")}
 								</span>
 							</div>
 							<div
@@ -371,8 +374,8 @@ export default function Presentation(props: {
 											</div>
 											<small>
 												{value().outputMonitor == null
-												? localize("在会议软件中共享「简库演示输出」窗口。")
-												: localize("输出铺满所选副屏，原屏幕保持原样。")}
+													? localize("在会议软件中共享「简库演示输出」窗口。")
+													: localize("输出铺满所选副屏，原屏幕保持原样。")}
 											</small>
 										</label>
 
@@ -397,8 +400,8 @@ export default function Presentation(props: {
 														{(aspect) => (
 															<option value={aspect}>
 																{aspect === "auto"
-											? localize("适合屏幕 · 默认")
-												: `${ASPECT_RATIOS[aspect].ratio[0]}:${ASPECT_RATIOS[aspect].ratio[1]} · ${localize(ASPECT_RATIOS[aspect].name)}`}
+																	? localize("适合屏幕 · 默认")
+																	: `${ASPECT_RATIOS[aspect].ratio[0]}:${ASPECT_RATIOS[aspect].ratio[1]} · ${localize(ASPECT_RATIOS[aspect].name)}`}
 															</option>
 														)}
 													</For>
@@ -407,8 +410,10 @@ export default function Presentation(props: {
 											</div>
 											<small>
 												{status()?.active
-											? localize("停止演示后可更改比例。")
-												: localize("适合屏幕按来源或副屏比例计算；固定比例保持画布形状。")}
+													? localize("停止演示后可更改比例。")
+													: localize(
+															"适合屏幕按来源或副屏比例计算；固定比例保持画布形状。",
+														)}
 											</small>
 										</label>
 										<label class="studio-field">
@@ -435,7 +440,7 @@ export default function Presentation(props: {
 													<option value={2560}>
 														{localize("1440p · 高清")}
 													</option>
-								<option value={3840}>{localize("2160p · 4K")}</option>
+													<option value={3840}>{localize("2160p · 4K")}</option>
 												</select>
 												<IconChevronDown />
 											</div>
@@ -470,18 +475,22 @@ export default function Presentation(props: {
 															update({ ...value(), focusMode: mode.id })
 														}
 													>
-										<span>{localize(mode.name)}</span>
-										<small>{localize(mode.description)}</small>
+														<span>{localize(mode.name)}</span>
+														<small>{localize(mode.description)}</small>
 													</button>
 												)}
 											</For>
 										</div>
 										<p class="studio-hint">
 											{value().focusMode === "automatic"
-								? localize("点击、滚动或输入时放大，持续操作保持焦点，空闲后返回全景。")
+												? localize(
+														"点击、滚动或输入时放大，持续操作保持焦点，空闲后返回全景。",
+													)
 												: value().focusMode === "manual"
-									? localize("按下快捷键放大，再按一次返回全景。")
-									: localize("保留完整画面，光标平滑与画面外观继续生效。")}
+													? localize("按下快捷键放大，再按一次返回全景。")
+													: localize(
+															"保留完整画面，光标平滑与画面外观继续生效。",
+														)}
 										</p>
 										<Show when={value().focusMode !== "off"}>
 											{range(
@@ -502,7 +511,7 @@ export default function Presentation(props: {
 												(idleSeconds) => update({ ...value(), idleSeconds }),
 												1,
 												0.5,
-								localize(" 秒"),
+												localize(" 秒"),
 											)}
 										</Show>
 										<label class="studio-field">
@@ -516,7 +525,7 @@ export default function Presentation(props: {
 													.replace("Control", "Ctrl")
 													.replace("Shift", "⇧")
 													.replace("Alt", "⌥")
-								.replace("Space", localize("空格"))}
+													.replace("Space", localize("空格"))}
 												readOnly
 												disabled={status()?.active || busy()}
 												title={localize("点击后按下组合键")}
@@ -589,9 +598,9 @@ export default function Presentation(props: {
 												return (
 													<button
 														type="button"
-								aria-label={`${localize("背景：")}${localize(preset.name)}`}
+														aria-label={`${localize("背景：")}${localize(preset.name)}`}
 														aria-pressed={selected()}
-								title={localize(preset.name)}
+														title={localize(preset.name)}
 														class={selected() ? "is-selected" : ""}
 														style={{
 															background: `linear-gradient(${preset.angle}deg, rgb(${preset.from.join(",")}), rgb(${preset.to.join(",")}))`,
@@ -613,8 +622,8 @@ export default function Presentation(props: {
 									>
 										<IconImage />
 										{value().project.background.source.type === "image"
-							? localize("更换背景图片")
-							: localize("选择背景图片")}
+											? localize("更换背景图片")
+											: localize("选择背景图片")}
 									</button>
 									<div class="studio-divider" />
 									{range(
@@ -699,12 +708,29 @@ export default function Presentation(props: {
 								</span>
 								<small>
 									{status()?.active
-									? localize("设置会实时应用，源屏幕不受影响")
-									: localize("开始后生成独立的演示输出窗口")}
+										? localize("设置会实时应用，源屏幕不受影响")
+										: localize("开始后生成独立的演示输出窗口")}
 								</small>
 							</div>
 							<div class="presentation-footer-actions">
 								<Show when={status()?.active}>
+									<button
+										type="button"
+										class="studio-secondary"
+										aria-pressed={status()?.curtain ?? false}
+										disabled={busy()}
+										onClick={() =>
+											void commands
+												.togglePresentationCurtain()
+												.then(acceptStatus)
+												.catch(report)
+										}
+									>
+										<IconPanelsTopLeft />
+										{localize(
+											status()?.curtain ? "恢复演示画面" : "遮盖演示画面",
+										)}
+									</button>
 									<button
 										type="button"
 										class="studio-secondary"

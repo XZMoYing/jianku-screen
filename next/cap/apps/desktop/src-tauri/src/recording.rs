@@ -46,7 +46,7 @@ use std::{
     sync::Arc,
     time::Duration,
 };
-use tauri::{AppHandle, Listener, Manager, path::BaseDirectory};
+use tauri::{AppHandle, Emitter, Listener, Manager, path::BaseDirectory};
 use tauri_plugin_dialog::{
     DialogExt, MessageDialogBuilder, MessageDialogButtons, MessageDialogKind,
 };
@@ -3639,6 +3639,32 @@ pub async fn pause_recording(app: AppHandle, state: MutableState<'_, App>) -> Re
     }
 
     Ok(())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn add_recording_bookmark(
+    app: AppHandle,
+    state: MutableState<'_, App>,
+) -> Result<cap_project::RecordingBookmark, String> {
+    if crate::EditorRecordingTarget::current(&app).is_some() {
+        return Err("请在独立的 Studio 录制中添加书签。".into());
+    }
+    let handle = {
+        let state = state.read().await;
+        let Some(InProgressRecording::Studio { handle, .. }) = state.current_recording() else {
+            return Err("书签仅用于进行中的 Studio 录制。".into());
+        };
+        handle.clone()
+    };
+    let bookmark = handle
+        .add_bookmark()
+        .await
+        .map_err(|error| error.to_string())?;
+    if let Err(error) = app.emit("recording-bookmark-added", &bookmark) {
+        tracing::warn!(%error, "Bookmark saved but recording controls could not be notified");
+    }
+    Ok(bookmark)
 }
 
 #[tauri::command]
