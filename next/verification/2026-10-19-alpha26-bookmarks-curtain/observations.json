@@ -1,8 +1,7 @@
 {
 	"date": "2026-10-19",
 	"package": "0.2.0-alpha.26 debug",
-	"source": "synthetic static window",
-	"userMediaSaved": false,
+	"source": "requested static synthetic window; macOS captures the corresponding display region",
 	"results": [
 		{
 			"accessibility": "granted",
@@ -166,5 +165,12 @@
 		"frontendTests": 44,
 		"desktopTypecheck": "passed",
 		"rustCheck": "passed"
+	},
+	"localRecordingMayContainOccludingWindows": true,
+	"rawDesktopFramesCommitted": false,
+	"sourceFrameInspection": {
+		"segment0": "occluding browser content",
+		"segment1": "synthetic fixture",
+		"releasePreviewMatchesFirstSourceFrame": true
 	}
 }

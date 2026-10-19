@@ -1,0 +1,24 @@
+{
+	"date": "2026-10-19",
+	"version": "0.2.0-alpha.26",
+	"build": "2026.26.0",
+	"identifier": "com.jianku.screen.next",
+	"sourceCommit": "12b5ebdf25d60f479dbf1e6959c7e495322292bf",
+	"application": "/Applications/Jianku Screen Next.app",
+	"archive": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.26/Jianku Screen Next.app",
+	"signing": "ad-hoc",
+	"codesignDeepStrict": "passed",
+	"hashes": {
+		"source": "4a026fcece3fc53041d678c47c43b777f7471599a219aefd83169d7897d74728",
+		"installed": "4a026fcece3fc53041d678c47c43b777f7471599a219aefd83169d7897d74728",
+		"archive": "4a026fcece3fc53041d678c47c43b777f7471599a219aefd83169d7897d74728"
+	},
+	"coldLaunch": {
+		"pid": 77544,
+		"editorWindow": 12122,
+		"project": "owned synthetic fixture",
+		"opened": true,
+		"previewMatchesOriginal": true,
+		"permissionOnboardingBlocked": false
+	}
+}
