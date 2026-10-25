@@ -20,6 +20,7 @@ import { t as localize } from "~/utils/i18n";
 import { commands } from "~/utils/tauri";
 import { BookmarksButton } from "./BookmarksButton";
 import { useEditorContext } from "./context";
+import type { TitleSaveRegistration } from "./editor-title-save-bridge";
 import OrganizationDropdown from "./OrganizationDropdown";
 import PresetsDropdown from "./PresetsDropdown";
 import { ProjectMenu } from "./ProjectMenu";
@@ -45,11 +46,6 @@ export interface ExportEstimates {
 	estimated_time_seconds: number;
 	estimated_size_mb: number;
 }
-
-export type TitleSaveRegistration = {
-	flush: () => Promise<void>;
-	setReadOnly: (readOnly: boolean) => void;
-};
 
 type RegisterTitleSave = (save: TitleSaveRegistration | undefined) => void;
 
@@ -336,7 +332,11 @@ function NameEditor(props: {
 				void refetchMeta();
 			} catch (error) {
 				const message = error instanceof Error ? error.message : String(error);
-				toast.error(`Failed to save recording title: ${message}`);
+				toast.error(
+					localize("Unable to save the project name: {reason}", {
+						reason: message,
+					}),
+				);
 				throw error;
 			}
 		},

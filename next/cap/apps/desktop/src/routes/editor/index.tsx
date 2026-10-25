@@ -1,15 +1,42 @@
+import { emitTo } from "@tauri-apps/api/event";
 import { Effect, getCurrentWindow } from "@tauri-apps/api/window";
 import { type as ostype } from "@tauri-apps/plugin-os";
 import { cx } from "cva";
-import { createEffect, onMount, Suspense } from "solid-js";
+import {
+	createEffect,
+	createSignal,
+	ErrorBoundary,
+	onCleanup,
+	onMount,
+	Suspense,
+} from "solid-js";
 import { generalSettingsStore } from "~/store";
 import { commands } from "~/utils/tauri";
 import { Editor } from "./Editor";
+import { EditorErrorScreen } from "./EditorErrorScreen";
 import { EditorSkeleton } from "./editor-skeleton";
+import { createEditorTitleSaveBridge } from "./editor-title-save-bridge";
 import { PreparingEditorProvider } from "./preparing-editor-context";
 
 export default function () {
 	const generalSettings = generalSettingsStore.createQuery();
+	const currentWindow = getCurrentWindow();
+	const [projectPath, setProjectPath] = createSignal("");
+	// Keep save acknowledgements alive while editor content is suspended or fails.
+	const titleSave = createEditorTitleSaveBridge({
+		listen: (event, handler) =>
+			currentWindow.listen<{ requestId: string }>(event, ({ payload }) =>
+				handler(payload),
+			),
+		acknowledge: (response) =>
+			emitTo(currentWindow.label, "editor-title-save-finished", {
+				...response,
+				windowLabel: currentWindow.label,
+			}),
+		onError: (error) =>
+			console.error("Editor save acknowledgement failed:", error),
+	});
+	onCleanup(titleSave.dispose);
 
 	// The window is normally revealed by Rust as soon as it's built and
 	// positioned (the native background color is themed, so there's no flash).
@@ -52,11 +79,20 @@ export default function () {
 				) && "bg-transparent-window",
 			)}
 		>
-			<PreparingEditorProvider>
-				<Suspense fallback={<EditorSkeleton />}>
-					<Editor />
-				</Suspense>
-			</PreparingEditorProvider>
+			<ErrorBoundary
+				fallback={(error) => (
+					<EditorErrorScreen
+						error={error instanceof Error ? error.message : String(error)}
+						projectPath={projectPath()}
+					/>
+				)}
+			>
+				<PreparingEditorProvider>
+					<Suspense fallback={<EditorSkeleton />}>
+						<Editor titleSave={titleSave} onProjectPath={setProjectPath} />
+					</Suspense>
+				</PreparingEditorProvider>
+			</ErrorBoundary>
 		</div>
 	);
 }

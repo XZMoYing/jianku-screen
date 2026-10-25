@@ -3790,9 +3790,13 @@ pub async fn request_app_exit(app: AppHandle) {
             warn!(%error, "Quit canceled because an editor title could not be saved");
             app.dialog()
                 .message(format!(
-                    "{error}\n\nThe app is still open. Your title is still in the editor."
+                    "{}\n\n{error}",
+                    crate::interface_language::text(
+                        &app,
+                        "The app is still open. Keep the project open and retry after saving your changes."
+                    )
                 ))
-                .title("Title not saved")
+                .title(crate::interface_language::text(&app, "Changes could not be saved"))
                 .kind(tauri_plugin_dialog::MessageDialogKind::Warning)
                 .show(|_| {});
             return;

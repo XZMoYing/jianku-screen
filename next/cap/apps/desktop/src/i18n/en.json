@@ -1619,5 +1619,13 @@
 	"内框颜色": "Inset color",
 	"内框不透明度": "Inset opacity",
 	"Unable to open project": "Unable to open project",
-	"Check that the project still exists and contains its original media.": "Check that the project still exists and contains its original media."
+	"Check that the project still exists and contains its original media.": "Check that the project still exists and contains its original media.",
+	"Check that the project and its original media are still in their original location, then reload the editor.": "Check that the project and its original media are still in their original location, then reload the editor.",
+	"Error details": "Error details",
+	"The action could not be completed. Please try again.": "The action could not be completed. Please try again.",
+	"Return to Home": "Return to Home",
+	"The app is still open. Keep the project open and retry after saving your changes.": "The app is still open. Keep the project open and retry after saving your changes.",
+	"Changes could not be saved": "Changes could not be saved",
+	"Follow the steps below to try recovering the recording.": "Follow the steps below to try recovering the recording.",
+	"Unable to save the project name: {reason}": "Unable to save the project name: {reason}"
 }

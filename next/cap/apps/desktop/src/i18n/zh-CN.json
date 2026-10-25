@@ -1475,5 +1475,13 @@
 	"内框颜色": "内框颜色",
 	"内框不透明度": "内框不透明度",
 	"Unable to open project": "无法打开工程",
-	"Check that the project still exists and contains its original media.": "请检查工程是否仍然存在，并包含录制原文件。"
+	"Check that the project still exists and contains its original media.": "请检查工程是否仍然存在，并包含录制原文件。",
+	"Check that the project and its original media are still in their original location, then reload the editor.": "请确认工程和原始素材仍在原来的位置。文件还原后，点击“重新加载”。",
+	"Error details": "错误详情",
+	"The action could not be completed. Please try again.": "操作未完成，请重试。",
+	"Return to Home": "返回首页",
+	"The app is still open. Keep the project open and retry after saving your changes.": "应用仍保持打开。请保留工程窗口，确认编辑内容已保存后再重试。",
+	"Changes could not be saved": "编辑内容尚未保存",
+	"Follow the steps below to try recovering the recording.": "请按下方提示尝试恢复录制文件。",
+	"Unable to save the project name: {reason}": "无法保存工程名称：{reason}"
 }

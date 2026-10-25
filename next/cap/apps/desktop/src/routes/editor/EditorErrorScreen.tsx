@@ -2,6 +2,7 @@ import { Button } from "@cap/ui-solid";
 import { createMutation } from "@tanstack/solid-query";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { revealItemInDir } from "@tauri-apps/plugin-opener";
 import { type as ostype } from "@tauri-apps/plugin-os";
 import { createEffect, onCleanup, Show } from "solid-js";
@@ -27,7 +28,8 @@ export function EditorErrorScreen(props: {
 }) {
 	const storageShortage = () => isRecordingStorageError(props.error);
 	const needsRecovery = () =>
-		storageShortage() || isRecoveryNeededError(props.error);
+		!!props.projectPath &&
+		(storageShortage() || isRecoveryNeededError(props.error));
 	const isMac = () => ostype() === "macos";
 
 	let disposed = false;
@@ -46,6 +48,7 @@ export function EditorErrorScreen(props: {
 		recoveryRequest === request;
 
 	const recoverMutation = createMutation(() => ({
+		onError: (error) => console.error("Recording recovery failed:", error),
 		onMutate: () => {
 			queryRequest += 1;
 			checkAfterPending = false;
@@ -165,12 +168,23 @@ export function EditorErrorScreen(props: {
 		checkAfterPending = false;
 	});
 
-	const handleOpenFolder = () => {
-		revealItemInDir(props.projectPath);
-	};
+	const windowAction = createMutation(() => ({
+		onError: (error) => console.error("Editor recovery action failed:", error),
+		mutationFn: async (action: "home" | "close" | "folder") => {
+			if (action === "folder") {
+				await revealItemInDir(props.projectPath);
+				return;
+			}
+			if (action === "home") {
+				await commands.showWindow({ Main: { init_target_mode: null } });
+			}
+			await getCurrentWindow().close();
+		},
+	}));
+	const busy = () => recoverMutation.isPending || windowAction.isPending;
 
 	return (
-		<div class="flex flex-col flex-1 min-h-0">
+		<div data-editor-error class="flex flex-col flex-1 min-h-0">
 			<div
 				data-tauri-drag-region
 				class="flex relative flex-row items-center w-full h-14 px-4"
@@ -180,8 +194,8 @@ export function EditorErrorScreen(props: {
 				{ostype() === "windows" && <CaptionControlsWindows11 />}
 			</div>
 
-			<div class="flex-1 flex items-center justify-center p-8">
-				<div class="max-w-md w-full space-y-6">
+			<div class="flex-1 min-h-0 overflow-y-auto p-8">
+				<div class="max-w-md w-full space-y-6 mx-auto my-6">
 					<div class="flex flex-col items-center text-center space-y-3">
 						<div class="size-16 rounded-full bg-red-2 flex items-center justify-center">
 							<IconAlertTriangle class="size-8 text-red-9" />
@@ -193,17 +207,33 @@ export function EditorErrorScreen(props: {
 									? localize("需要恢复录制文件")
 									: localize("无法打开录制文件")}
 						</h2>
-						<p class="text-sm text-gray-11">{props.error}</p>
+						<p class="text-sm text-gray-11">
+							{needsRecovery()
+								? localize(
+										"Follow the steps below to try recovering the recording.",
+									)
+								: localize(
+										"Check that the project and its original media are still in their original location, then reload the editor.",
+									)}
+						</p>
+						<details class="w-full text-sm text-gray-11 text-left">
+							<summary class="cursor-pointer">
+								{localize("Error details")}
+							</summary>
+							<p class="mt-2 break-words whitespace-pre-wrap">{props.error}</p>
+						</details>
 					</div>
 
 					<Show when={!needsRecovery()}>
 						<Button
+							data-editor-error-action="retry"
 							onClick={() => window.location.reload()}
+							disabled={busy()}
 							variant="primary"
 							class="w-full"
 						>
 							<IconRefreshCw class="size-4 mr-2" />
-							{localize("Try again")}
+							{localize("Reload")}
 						</Button>
 					</Show>
 
@@ -217,7 +247,9 @@ export function EditorErrorScreen(props: {
 								</h3>
 								<p class="text-xs text-gray-11">
 									{storageShortage()
-										? localize("请先清理录制磁盘空间，再点击“恢复录制”。录制文件已为你保留。")
+										? localize(
+												"请先清理录制磁盘空间，再点击“恢复录制”。录制文件已为你保留。",
+											)
 										: localize(
 												"简库镜传可以尝试自动恢复录制，并根据已有片段重建工程。",
 											)}
@@ -231,7 +263,7 @@ export function EditorErrorScreen(props: {
 										request: ++recoveryRequest,
 									})
 								}
-								disabled={recoverMutation.isPending}
+								disabled={busy()}
 								variant="primary"
 								class="w-full"
 							>
@@ -262,50 +294,78 @@ export function EditorErrorScreen(props: {
 						</div>
 					</Show>
 
-					<div class="bg-gray-2 border border-gray-4 rounded-xl p-4 space-y-4">
-						<div class="space-y-2">
-							<h3 class="font-medium text-gray-12 text-sm">
-								{localize("Manual Investigation")}
-							</h3>
-							<p class="text-xs text-gray-11">
-								{localize(
-									"You can open the recording folder to inspect the raw files directly.",
-								)}
-							</p>
-
-							<div class="bg-gray-3 rounded-lg p-3 space-y-2">
-								<p class="text-xs font-mono text-gray-11 break-all">
-									{props.projectPath}
+					<Show when={props.projectPath}>
+						<div class="bg-gray-2 border border-gray-4 rounded-xl p-4 space-y-4">
+							<div class="space-y-2">
+								<h3 class="font-medium text-gray-12 text-sm">
+									{localize("Manual Investigation")}
+								</h3>
+								<p class="text-xs text-gray-11">
+									{localize(
+										"You can open the recording folder to inspect the raw files directly.",
+									)}
 								</p>
-								<Show
-									when={isMac()}
-									fallback={
+
+								<div class="bg-gray-3 rounded-lg p-3 space-y-2">
+									<p class="text-xs font-mono text-gray-11 break-all">
+										{props.projectPath}
+									</p>
+									<Show
+										when={isMac()}
+										fallback={
+											<p class="text-xs text-gray-10 italic">
+												{localize(
+													"Tip: Double-click inside the folder to browse the contents.",
+												)}
+											</p>
+										}
+									>
 										<p class="text-xs text-gray-10 italic">
 											{localize(
-												"Tip: Double-click inside the folder to browse the contents.",
+												'Tip: Right-click and select "Show Enclosing Folder" to see the .jks project contents.',
 											)}
 										</p>
-									}
-								>
-									<p class="text-xs text-gray-10 italic">
-										{localize(
-											'Tip: Right-click and select "Show Enclosing Folder" to see the .jks project contents.',
-										)}
-									</p>
-								</Show>
+									</Show>
+								</div>
 							</div>
-						</div>
 
-						<Button onClick={handleOpenFolder} variant="outline" class="w-full">
-							<IconFolder class="size-4 mr-2" />
-							{localize("Open Folder")}
-						</Button>
-					</div>
+							<Button
+								onClick={() => windowAction.mutate("folder")}
+								disabled={busy()}
+								variant="outline"
+								class="w-full"
+							>
+								<IconFolder class="size-4 mr-2" />
+								{localize("Open Folder")}
+							</Button>
+						</div>
+					</Show>
+
+					<Show when={windowAction.error}>
+						<p
+							data-editor-action-error
+							role="alert"
+							class="text-sm text-red-11"
+						>
+							{localize("The action could not be completed. Please try again.")}
+						</p>
+					</Show>
+					<Button
+						data-editor-error-action="home"
+						onClick={() => windowAction.mutate("home")}
+						disabled={busy()}
+						variant="outline"
+						class="w-full"
+					>
+						{localize("Return to Home")}
+					</Button>
 
 					<div class="flex justify-center">
 						<button
 							type="button"
-							onClick={() => window.close()}
+							data-editor-error-action="close"
+							onClick={() => windowAction.mutate("close")}
+							disabled={busy()}
 							class="text-sm text-gray-10 hover:text-gray-11 transition-colors"
 						>
 							{localize("Close Window")}

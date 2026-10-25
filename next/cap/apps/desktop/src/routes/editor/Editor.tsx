@@ -8,7 +8,6 @@ import { makePersisted } from "@solid-primitives/storage";
 import { createMutation, createQuery, skipToken } from "@tanstack/solid-query";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { LogicalPosition } from "@tauri-apps/api/dpi";
-import { emitTo } from "@tauri-apps/api/event";
 import { Menu } from "@tauri-apps/api/menu";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { ask } from "@tauri-apps/plugin-dialog";
@@ -62,7 +61,11 @@ import {
 	editorVerticalLayout,
 } from "./editor-layout";
 import { EditorSkeleton } from "./editor-skeleton";
-import { Header, type TitleSaveRegistration } from "./Header";
+import type {
+	createEditorTitleSaveBridge,
+	TitleSaveRegistration,
+} from "./editor-title-save-bridge";
+import { Header } from "./Header";
 import { ImportProgress } from "./ImportProgress";
 import { PlayerContent } from "./Player";
 import { usePreparingEditor } from "./preparing-editor-context";
@@ -155,83 +158,16 @@ function getPreviewProjectConfig(
 	return config;
 }
 
-export function Editor() {
-	const currentWindow = getCurrentWindow();
-	let flushTitleSave: (() => Promise<void>) | undefined;
-	let setTitleReadOnly: ((readOnly: boolean) => void) | undefined;
-	let activeTitleSave: { generation: number; requestId: string } | undefined;
-	const registerTitleSave = (
-		registration: TitleSaveRegistration | undefined,
-	) => {
-		flushTitleSave = registration?.flush;
-		setTitleReadOnly = registration?.setReadOnly;
-		setTitleReadOnly?.(activeTitleSave !== undefined);
-	};
-
-	onMount(() => {
-		let disposed = false;
-		let titleSaveGeneration = 0;
-
-		const titleSaveCancelled = currentWindow.listen<{ requestId: string }>(
-			"editor-title-save-cancelled",
-			({ payload }) => {
-				if (activeTitleSave?.requestId !== payload.requestId) return;
-				activeTitleSave = undefined;
-				setTitleReadOnly?.(false);
-			},
-		);
-
-		const titleSaveRequest = titleSaveCancelled.then(() =>
-			currentWindow.listen<{ requestId: string }>(
-				"editor-title-save-request",
-				async ({ payload }) => {
-					if (disposed) return;
-
-					const generation = titleSaveGeneration + 1;
-					titleSaveGeneration = generation;
-					const { requestId } = payload;
-					activeTitleSave = { generation, requestId };
-					const readOnly = setTitleReadOnly;
-					readOnly?.(true);
-
-					let error: string | null = null;
-					try {
-						if (flushTitleSave) await flushTitleSave();
-					} catch (cause) {
-						error = cause instanceof Error ? cause.message : String(cause);
-					}
-
-					if (
-						disposed ||
-						activeTitleSave?.generation !== generation ||
-						activeTitleSave?.requestId !== requestId
-					)
-						return;
-
-					try {
-						await emitTo(currentWindow.label, "editor-title-save-finished", {
-							requestId,
-							windowLabel: currentWindow.label,
-							error,
-						});
-					} catch (cause) {
-						console.error("Failed to acknowledge editor title save:", cause);
-						return;
-					}
-				},
-			),
-		);
-
-		onCleanup(() => {
-			disposed = true;
-			activeTitleSave = undefined;
-			setTitleReadOnly?.(false);
-			void titleSaveRequest.then((unlisten) => unlisten()).catch(() => {});
-			void titleSaveCancelled.then((unlisten) => unlisten()).catch(() => {});
-		});
+export function Editor(props: {
+	titleSave: ReturnType<typeof createEditorTitleSaveBridge>;
+	onProjectPath: (path: string) => void;
+}) {
+	const registerTitleSave = props.titleSave.register;
+	const [projectPath] = createResource(async () => {
+		const path = await commands.getEditorProjectPath();
+		props.onProjectPath(path);
+		return path;
 	});
-
-	const [projectPath] = createResource(() => commands.getEditorProjectPath());
 
 	const rawMetaQuery = createQuery(() => ({
 		queryKey: ["editor", "raw-meta", projectPath()],
@@ -241,6 +177,7 @@ export function Editor() {
 		})(),
 		staleTime: Infinity,
 		gcTime: 0,
+		retry: false,
 		refetchOnWindowFocus: false,
 		refetchOnMount: false,
 		refetchOnReconnect: false,
@@ -303,6 +240,14 @@ export function Editor() {
 
 	return (
 		<Switch fallback={<EditorSkeleton />}>
+			<Match when={rawMetaQuery.isError ? projectPath() : null}>
+				{(path) => (
+					<EditorErrorScreen
+						error={getEditorErrorMessage(rawMetaQuery.error)}
+						projectPath={path()}
+					/>
+				)}
+			</Match>
 			<Match
 				when={importStatus() === "importing" ? (projectPath() ?? null) : null}
 			>
@@ -327,7 +272,7 @@ export function Editor() {
 						<EditorInstanceContextProvider>
 							<EditorContent
 								projectPath={path()}
-								getTitleSave={() => flushTitleSave}
+								getTitleSave={props.titleSave.getFlush}
 								registerTitleSave={registerTitleSave}
 							/>
 						</EditorInstanceContextProvider>
@@ -488,7 +433,9 @@ function Inner(props: {
 			window.location.reload();
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error);
-			toast.error(localize("添加片段失败：{reason}", { reason: message }), { id: toastId });
+			toast.error(localize("添加片段失败：{reason}", { reason: message }), {
+				id: toastId,
+			});
 		}
 	};
 
@@ -550,9 +497,7 @@ function Inner(props: {
 					await flushProjectConfig();
 				} catch (error) {
 					console.error("Failed to save the project before closing", error);
-					toast.error(
-						localize("无法保存编辑内容，请保持编辑器打开并重试。"),
-					);
+					toast.error(localize("无法保存编辑内容，请保持编辑器打开并重试。"));
 					return;
 				}
 
@@ -563,7 +508,9 @@ function Inner(props: {
 				}
 
 				const resumeExport = await ask(
-					localize("导出仍在进行中。保持编辑器打开可继续导出；关闭编辑器将取消导出。"),
+					localize(
+						"导出仍在进行中。保持编辑器打开可继续导出；关闭编辑器将取消导出。",
+					),
 					{
 						title: localize("正在导出"),
 						kind: "warning",
@@ -1853,7 +1800,9 @@ function Dialogs() {
 													fallback={
 														<p role="alert" class="text-orange-11">
 															{localize(
-																localize("裁切对象已变化，请关闭并重新打开裁切工具。"),
+																localize(
+																	"裁切对象已变化，请关闭并重新打开裁切工具。",
+																),
 															)}
 														</p>
 													}
