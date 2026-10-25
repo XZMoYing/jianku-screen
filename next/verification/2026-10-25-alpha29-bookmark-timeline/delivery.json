@@ -1,0 +1,53 @@
+{
+	"version": "0.2.0-alpha.29",
+	"build": "2026.29.0",
+	"profile": "release",
+	"architecture": "arm64",
+	"sourceCommit": "863331122a9b04edc8706dc4bd2db9fd53d615f9",
+	"installedPath": "/Applications/Jianku Screen Next.app",
+	"archivePath": "../Jianku Screen Next Builds/0.2.0-alpha.29/Jianku Screen Next.app",
+	"strictSignatureChecks": {
+		"source": true,
+		"installed": true,
+		"archive": true
+	},
+	"signing": "ad-hoc",
+	"mainExecutableSha256": {
+		"source": "05191f28de119ca0967608317bd048af9505d3e4d195bcacc79afb953ee3daeb",
+		"installed": "05191f28de119ca0967608317bd048af9505d3e4d195bcacc79afb953ee3daeb",
+		"archive": "05191f28de119ca0967608317bd048af9505d3e4d195bcacc79afb953ee3daeb"
+	},
+	"launchVerified": true,
+	"physicalAcceptance": "deferred at user request",
+	"duplicateInstallCleanup": [
+		"alpha28 previous installation; identical archived executable verified",
+		"temporary debug previous installation; identical debug build verified"
+	],
+	"runningApplication": {
+		"path": "/Applications/Jianku Screen Next.app",
+		"pid": 6507,
+		"windows": [
+			{
+				"bounds": {
+					"Height": 800,
+					"Width": 1275,
+					"X": 202,
+					"Y": 101
+				},
+				"id": 26698,
+				"name": "简库镜传 · 视频编辑"
+			},
+			{
+				"bounds": {
+					"Height": 800,
+					"Width": 1120,
+					"X": 331,
+					"Y": 110
+				},
+				"id": 26697,
+				"name": "简库镜传 Next"
+			}
+		]
+	},
+	"releaseScreenshot": "release-editor.png"
+}
