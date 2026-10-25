@@ -1,0 +1,24 @@
+{
+	"sourceCommit": "69001b1692dcfe43be7d34a40261972f33233882",
+	"build": "Official scripts/jianku.mjs release: shared rendering rebuilt for both app and sidecars. These are actual newly built optimized sidecar inputs, not reused alpha33 binaries.",
+	"inputs": [
+		{
+			"sourceBinary": "next/cap/target/release/cap",
+			"preparedInput": "next/cap/apps/desktop/src-tauri/binaries/cap-cli-aarch64-apple-darwin",
+			"sha256": "c547663f896ca4f3f56f3d5917fcb1021526fd31e98693c5f4e50d99ff22f328",
+			"exactCopy": true
+		},
+		{
+			"sourceBinary": "next/cap/target/release/cap",
+			"preparedInput": "next/cap/apps/desktop/src-tauri/binaries/cap-exporter-aarch64-apple-darwin",
+			"sha256": "c547663f896ca4f3f56f3d5917fcb1021526fd31e98693c5f4e50d99ff22f328",
+			"exactCopy": true
+		},
+		{
+			"sourceBinary": "next/cap/target/release/cap-muxer",
+			"preparedInput": "next/cap/apps/desktop/src-tauri/binaries/cap-muxer-aarch64-apple-darwin",
+			"sha256": "a94d28f2f243a57180a7d01dfb2e7002215d10f4c6635880f5406da9325c947a",
+			"exactCopy": true
+		}
+	]
+}

@@ -1,0 +1,18 @@
+{
+	"rustFmt": "passed",
+	"renderingCargoCheck": "passed",
+	"tests": {
+		"inset": 7,
+		"display": 21,
+		"motionBlur": 6,
+		"exportZoomEquivalence": 1
+	},
+	"ignoredTests": [
+		"long recording startup benchmark (existing ignored test, not part of this change)"
+	],
+	"realGpu": "Apple M1 / Metal, no software fallback",
+	"release": "Optimized alpha34 installed, archived and opened at the same unchanged sample using ordinary project argument. All three main hashes match and strict signatures passed.",
+	"changes": "Shared motion analysis and accessory blur coordinate mapping; no spring, timeline, sampling kernel, blur strength, quality or preview scheduler changes.",
+	"originalSamplePreflight": "Fresh optimized CLI export of unchanged actual four-clip sample: static central edge range6.7666px ->0.0608px; max consecutive step6.7275px ->0.0137px. Final installed-CLI export matches these metrics.",
+	"installedCliExport": "9s,540frames,1280x720,60fps,maximum/full motion blur; full decode passed; static edge range0.0608px,max step0.0137px; old range6.7666px,maxstep6.7275px."
+}

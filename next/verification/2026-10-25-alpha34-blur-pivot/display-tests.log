@@ -1,0 +1,51 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.49s
+     Running unittests src/lib.rs (target/debug/deps/cap_rendering-ac73c00cb2aa2f5f)
+
+running 21 tests
+test layers::cursor::tests::cursor_height_uses_the_fitted_zoomed_display_once ... ok
+test takeover::tests::split_keeps_display_visible ... ok
+test tests::display_dominant_delta_picks_blur_mode ... ok
+test tests::display_movement_blur_length_is_linear_in_velocity ... ok
+test tests::display_movement_blur_scales_with_user_amount ... ok
+test tests::display_movement_motion_blur_caps_extreme_velocity ... ok
+test tests::display_position_center_is_clamped_to_frame ... ok
+test tests::display_position_center_matches_legacy_centered_layout ... ok
+test tests::display_position_shifts_display_even_without_padding ... ok
+test tests::display_position_translates_and_can_overhang_edges ... ok
+test tests::display_scene_transition_forces_zoom_blur ... ok
+test tests::display_zoom_blur_is_symmetric_in_and_out ... ok
+test tests::fixed_aspect_ratio_clamps_padding_to_keep_display_visible ... ok
+test tests::frame_display_position_shifts_outer_and_content_together ... ok
+test tests::motion_blur_keeps_camera_and_display_pivots_aligned ... ok
+test zoom::test::display_amount_is_zoom_scale ... ok
+test decoder::managed_worker_tests::segment_terminal_tests::managed_segment_terminal_wait_observes_display_idle_failure_after_ready ... ok
+[dash @ 0x121d5a8d0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpuvm99t/original/init.mp4' for writing
+test project_uniforms_tests::cursor_tracks_each_clips_display_aspect_ratio ... ok
+[dash @ 0x121d5a8d0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpuvm99t/original/segment_001.m4s.tmp' for writing
+[dash @ 0x121d5a8d0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpuvm99t/original/dash_manifest.mpd.tmp' for writing
+[dash @ 0x121d5a8d0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpuvm99t/original/media_0.m3u8.tmp' for writing
+[dash @ 0x121d5a8d0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpuvm99t/original/master.m3u8.tmp' for writing
+[dash @ 0x121d5a8d0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpuvm99t/original/segment_002.m4s.tmp' for writing
+[dash @ 0x121d5a8d0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpuvm99t/original/dash_manifest.mpd.tmp' for writing
+[dash @ 0x121d5a8d0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpuvm99t/original/media_0.m3u8.tmp' for writing
+[dash @ 0x121d5a8d0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpuvm99t/original/segment_003.m4s.tmp' for writing
+[dash @ 0x121d5a8d0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpuvm99t/original/dash_manifest.mpd.tmp' for writing
+[dash @ 0x121d5a8d0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpuvm99t/original/media_0.m3u8.tmp' for writing
+[dash @ 0x121d5a8d0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpuvm99t/original/segment_004.m4s.tmp' for writing
+[dash @ 0x121d5a8d0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpuvm99t/original/dash_manifest.mpd.tmp' for writing
+[dash @ 0x121d5a8d0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpuvm99t/original/media_0.m3u8.tmp' for writing
+[dash @ 0x121d5a8d0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpuvm99t/original/segment_005.m4s.tmp' for writing
+[dash @ 0x121d5a8d0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpuvm99t/original/dash_manifest.mpd.tmp' for writing
+[dash @ 0x121d5a8d0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpuvm99t/original/media_0.m3u8.tmp' for writing
+[dash @ 0x121d5a8d0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpuvm99t/original/segment_006.m4s.tmp' for writing
+[dash @ 0x121d5a8d0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpuvm99t/original/dash_manifest.mpd.tmp' for writing
+[dash @ 0x121d5a8d0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpuvm99t/original/media_0.m3u8.tmp' for writing
+[dash @ 0x121d5a8d0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpuvm99t/original/segment_007.m4s.tmp' for writing
+[dash @ 0x121d5a8d0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpuvm99t/original/dash_manifest.mpd.tmp' for writing
+[dash @ 0x121d5a8d0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpuvm99t/original/media_0.m3u8.tmp' for writing
+test decoder::managed_worker_tests::managed_segment_missing_camera_joins_both_workers_and_never_returns_display_only ... ok
+test overlay_layers::native_tests::motion_blur_display_kernel_matches_the_reference_centroid_on_gpu ... ok
+test project_uniforms_tests::cursor_and_ripple_pixels_follow_the_display_through_layout_changes ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 316 filtered out; finished in 3.82s
+

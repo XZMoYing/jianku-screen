@@ -1,0 +1,76 @@
+{
+	"scope": "Native Metal GPU rendering, 1280x720, 640x360 static red marker; full dynamic blur, unchanged fractional browser frame/inset geometry. Does not measure physical screen cadence or other recordings. Before/after are same source/config/GPU with no video compression.",
+	"geometryAndBlurStrengthUnchanged": true,
+	"results": [
+		{
+			"stage": "before",
+			"interval": "zoomIn",
+			"reversalsOverPoint2Pixels": [
+				{
+					"from": 62,
+					"to": 63,
+					"pixels": 1.1284231526888107
+				},
+				{
+					"from": 69,
+					"to": 70,
+					"pixels": 4.354842406232706
+				},
+				{
+					"from": 72,
+					"to": 73,
+					"pixels": 3.7321422707524334
+				},
+				{
+					"from": 79,
+					"to": 80,
+					"pixels": 1.9265840798328213
+				}
+			],
+			"activeBlurPivotMaxDeviationFromExpected": 0.5001
+		},
+		{
+			"stage": "before",
+			"interval": "zoomOut",
+			"reversalsOverPoint2Pixels": [
+				{
+					"from": 241,
+					"to": 242,
+					"pixels": 1.586388527152451
+				},
+				{
+					"from": 250,
+					"to": 251,
+					"pixels": 3.4246630856151796
+				},
+				{
+					"from": 253,
+					"to": 254,
+					"pixels": 1.276748370500627
+				},
+				{
+					"from": 257,
+					"to": 258,
+					"pixels": 1.8185702763561267
+				}
+			],
+			"activeBlurPivotMaxDeviationFromExpected": 0.5001
+		},
+		{
+			"stage": "after",
+			"interval": "zoomIn",
+			"reversalsOverPoint2Pixels": [],
+			"activeBlurPivotMaxDeviationFromExpected": 1.320838927121315e-8
+		},
+		{
+			"stage": "after",
+			"interval": "zoomOut",
+			"reversalsOverPoint2Pixels": [],
+			"activeBlurPivotMaxDeviationFromExpected": 1.320838927121315e-8
+		}
+	],
+	"zeroBlurFramesPreserved": {
+		"comparedFrames": 14,
+		"exactUncompressedPixelsMatch": true
+	}
+}

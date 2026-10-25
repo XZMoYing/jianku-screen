@@ -1,0 +1,15 @@
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.56s
+     Running unittests src/lib.rs (target/debug/deps/cap_rendering-ac73c00cb2aa2f5f)
+
+running 7 tests
+test tests::inset_crop_bounds_keeps_camera_sampling_away_from_source_edges ... ok
+test tests::inset_crop_bounds_preserves_tiny_crops ... ok
+test tests::frame_and_inset_blur_share_content_motion_in_output_pixels ... ok
+test inset_tests::inset_zoom_blur_pivot_is_stable_on_fractional_layouts ... ok
+test inset_tests::inset_layouts_preserve_aspect_and_generate_screenshot_geometry ... ok
+test inset_tests::inset_gpu_pixels_alpha_color_and_live_output_match ... ok
+test inset_tests::inset_zoom_tracks_static_marker_geometry ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 330 filtered out; finished in 4.90s
+

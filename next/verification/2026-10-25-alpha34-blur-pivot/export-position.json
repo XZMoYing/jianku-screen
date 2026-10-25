@@ -1,0 +1,343 @@
+{
+	"before": {
+		"rows": [
+			{
+				"frame": 60,
+				"stationaryBlueYellowEdgeX": 639.5058823529412
+			},
+			{
+				"frame": 61,
+				"stationaryBlueYellowEdgeX": 638.2705882352941
+			},
+			{
+				"frame": 62,
+				"stationaryBlueYellowEdgeX": 636.1607843137255
+			},
+			{
+				"frame": 63,
+				"stationaryBlueYellowEdgeX": 639.4960784313726
+			},
+			{
+				"frame": 64,
+				"stationaryBlueYellowEdgeX": 639.5
+			},
+			{
+				"frame": 65,
+				"stationaryBlueYellowEdgeX": 639.5058823529412
+			},
+			{
+				"frame": 66,
+				"stationaryBlueYellowEdgeX": 639.5098039215686
+			},
+			{
+				"frame": 67,
+				"stationaryBlueYellowEdgeX": 639.5058823529412
+			},
+			{
+				"frame": 68,
+				"stationaryBlueYellowEdgeX": 632.7843137254902
+			},
+			{
+				"frame": 69,
+				"stationaryBlueYellowEdgeX": 632.7882352941176
+			},
+			{
+				"frame": 70,
+				"stationaryBlueYellowEdgeX": 639.5156862745098
+			},
+			{
+				"frame": 71,
+				"stationaryBlueYellowEdgeX": 633.8490196078432
+			},
+			{
+				"frame": 72,
+				"stationaryBlueYellowEdgeX": 633.8607843137255
+			},
+			{
+				"frame": 73,
+				"stationaryBlueYellowEdgeX": 639.5313725490196
+			},
+			{
+				"frame": 74,
+				"stationaryBlueYellowEdgeX": 634.743137254902
+			},
+			{
+				"frame": 75,
+				"stationaryBlueYellowEdgeX": 635.5117647058823
+			},
+			{
+				"frame": 76,
+				"stationaryBlueYellowEdgeX": 636.3039215686274
+			},
+			{
+				"frame": 77,
+				"stationaryBlueYellowEdgeX": 636.5958904109589
+			},
+			{
+				"frame": 78,
+				"stationaryBlueYellowEdgeX": 636.3140900195694
+			},
+			{
+				"frame": 79,
+				"stationaryBlueYellowEdgeX": 636.6705882352941
+			},
+			{
+				"frame": 80,
+				"stationaryBlueYellowEdgeX": 639.5508806262231
+			},
+			{
+				"frame": 81,
+				"stationaryBlueYellowEdgeX": 637.2843137254902
+			},
+			{
+				"frame": 82,
+				"stationaryBlueYellowEdgeX": 637.5431372549019
+			},
+			{
+				"frame": 83,
+				"stationaryBlueYellowEdgeX": 637.7745098039215
+			},
+			{
+				"frame": 84,
+				"stationaryBlueYellowEdgeX": 638.0
+			},
+			{
+				"frame": 85,
+				"stationaryBlueYellowEdgeX": 638.1823529411764
+			},
+			{
+				"frame": 86,
+				"stationaryBlueYellowEdgeX": 638.3666666666667
+			},
+			{
+				"frame": 87,
+				"stationaryBlueYellowEdgeX": 638.5
+			},
+			{
+				"frame": 88,
+				"stationaryBlueYellowEdgeX": 638.7328767123288
+			},
+			{
+				"frame": 89,
+				"stationaryBlueYellowEdgeX": 638.743137254902
+			},
+			{
+				"frame": 90,
+				"stationaryBlueYellowEdgeX": 638.8607843137255
+			},
+			{
+				"frame": 91,
+				"stationaryBlueYellowEdgeX": 638.9666666666667
+			},
+			{
+				"frame": 92,
+				"stationaryBlueYellowEdgeX": 639.0490196078431
+			},
+			{
+				"frame": 93,
+				"stationaryBlueYellowEdgeX": 639.2254901960785
+			},
+			{
+				"frame": 94,
+				"stationaryBlueYellowEdgeX": 639.1725490196078
+			},
+			{
+				"frame": 95,
+				"stationaryBlueYellowEdgeX": 639.3317025440313
+			},
+			{
+				"frame": 96,
+				"stationaryBlueYellowEdgeX": 639.2666666666667
+			},
+			{
+				"frame": 97,
+				"stationaryBlueYellowEdgeX": 639.2803921568627
+			},
+			{
+				"frame": 98,
+				"stationaryBlueYellowEdgeX": 639.5333333333333
+			},
+			{
+				"frame": 99,
+				"stationaryBlueYellowEdgeX": 639.5333333333333
+			},
+			{
+				"frame": 100,
+				"stationaryBlueYellowEdgeX": 639.5333333333333
+			}
+		],
+		"edgeRangePixels": 6.7665669007329825,
+		"maximumFrameStepPixels": 6.727450980392177
+	},
+	"after": {
+		"rows": [
+			{
+				"frame": 60,
+				"stationaryBlueYellowEdgeX": 639.5058823529412
+			},
+			{
+				"frame": 61,
+				"stationaryBlueYellowEdgeX": 639.5058823529412
+			},
+			{
+				"frame": 62,
+				"stationaryBlueYellowEdgeX": 639.4980392156863
+			},
+			{
+				"frame": 63,
+				"stationaryBlueYellowEdgeX": 639.4901960784314
+			},
+			{
+				"frame": 64,
+				"stationaryBlueYellowEdgeX": 639.5019607843137
+			},
+			{
+				"frame": 65,
+				"stationaryBlueYellowEdgeX": 639.5156862745098
+			},
+			{
+				"frame": 66,
+				"stationaryBlueYellowEdgeX": 639.5274509803921
+			},
+			{
+				"frame": 67,
+				"stationaryBlueYellowEdgeX": 639.5235294117647
+			},
+			{
+				"frame": 68,
+				"stationaryBlueYellowEdgeX": 639.5274509803921
+			},
+			{
+				"frame": 69,
+				"stationaryBlueYellowEdgeX": 639.535294117647
+			},
+			{
+				"frame": 70,
+				"stationaryBlueYellowEdgeX": 639.5274509803921
+			},
+			{
+				"frame": 71,
+				"stationaryBlueYellowEdgeX": 639.5372549019608
+			},
+			{
+				"frame": 72,
+				"stationaryBlueYellowEdgeX": 639.527397260274
+			},
+			{
+				"frame": 73,
+				"stationaryBlueYellowEdgeX": 639.527397260274
+			},
+			{
+				"frame": 74,
+				"stationaryBlueYellowEdgeX": 639.5352250489237
+			},
+			{
+				"frame": 75,
+				"stationaryBlueYellowEdgeX": 639.5392156862745
+			},
+			{
+				"frame": 76,
+				"stationaryBlueYellowEdgeX": 639.5392156862745
+			},
+			{
+				"frame": 77,
+				"stationaryBlueYellowEdgeX": 639.5431372549019
+			},
+			{
+				"frame": 78,
+				"stationaryBlueYellowEdgeX": 639.5392156862745
+			},
+			{
+				"frame": 79,
+				"stationaryBlueYellowEdgeX": 639.5392156862745
+			},
+			{
+				"frame": 80,
+				"stationaryBlueYellowEdgeX": 639.5470588235294
+			},
+			{
+				"frame": 81,
+				"stationaryBlueYellowEdgeX": 639.5411764705882
+			},
+			{
+				"frame": 82,
+				"stationaryBlueYellowEdgeX": 639.5411764705882
+			},
+			{
+				"frame": 83,
+				"stationaryBlueYellowEdgeX": 639.5450538687561
+			},
+			{
+				"frame": 84,
+				"stationaryBlueYellowEdgeX": 639.5392156862745
+			},
+			{
+				"frame": 85,
+				"stationaryBlueYellowEdgeX": 639.5430528375734
+			},
+			{
+				"frame": 86,
+				"stationaryBlueYellowEdgeX": 639.5430528375734
+			},
+			{
+				"frame": 87,
+				"stationaryBlueYellowEdgeX": 639.5430528375734
+			},
+			{
+				"frame": 88,
+				"stationaryBlueYellowEdgeX": 639.5430528375734
+			},
+			{
+				"frame": 89,
+				"stationaryBlueYellowEdgeX": 639.5430528375734
+			},
+			{
+				"frame": 90,
+				"stationaryBlueYellowEdgeX": 639.5410958904109
+			},
+			{
+				"frame": 91,
+				"stationaryBlueYellowEdgeX": 639.5410958904109
+			},
+			{
+				"frame": 92,
+				"stationaryBlueYellowEdgeX": 639.5333333333333
+			},
+			{
+				"frame": 93,
+				"stationaryBlueYellowEdgeX": 639.535294117647
+			},
+			{
+				"frame": 94,
+				"stationaryBlueYellowEdgeX": 639.535294117647
+			},
+			{
+				"frame": 95,
+				"stationaryBlueYellowEdgeX": 639.535294117647
+			},
+			{
+				"frame": 96,
+				"stationaryBlueYellowEdgeX": 639.5490196078431
+			},
+			{
+				"frame": 97,
+				"stationaryBlueYellowEdgeX": 639.5509803921568
+			},
+			{
+				"frame": 98,
+				"stationaryBlueYellowEdgeX": 639.5490196078431
+			},
+			{
+				"frame": 99,
+				"stationaryBlueYellowEdgeX": 639.5490196078431
+			},
+			{
+				"frame": 100,
+				"stationaryBlueYellowEdgeX": 639.5490196078431
+			}
+		],
+		"edgeRangePixels": 0.06078431372543491,
+		"maximumFrameStepPixels": 0.013725490196065948
+	},
+	"scope": "Same actual colored four-clip sample, 1280x720/60fps optimized CLI exports; tracks its static yellow-blue central edge with a median across rows to exclude animated source details. This is encoded video with compression noise, not uncompressed GPU output or screen scanout."
+}

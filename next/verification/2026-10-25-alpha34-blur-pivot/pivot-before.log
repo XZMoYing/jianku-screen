@@ -1,0 +1,19 @@
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.11s
+     Running unittests src/lib.rs (target/debug/deps/cap_rendering-ac73c00cb2aa2f5f)
+
+running 1 test
+
+thread 'inset_tests::inset_zoom_blur_pivot_is_stable_on_fractional_layouts' panicked at crates/rendering/src/inset_tests.rs:279:25:
+frame 61, resolution XY { x: 1248, y: 702 }, padding 0: blur pivot jumped to [1.0, 1.0]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test inset_tests::inset_zoom_blur_pivot_is_stable_on_fractional_layouts ... FAILED
+
+failures:
+
+failures:
+    inset_tests::inset_zoom_blur_pivot_is_stable_on_fractional_layouts
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 335 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p cap-rendering --lib`
