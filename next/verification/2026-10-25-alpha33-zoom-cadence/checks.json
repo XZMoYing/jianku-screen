@@ -1,0 +1,18 @@
+{
+	"frontendTests": 42,
+	"suites": [
+		"preparing-frame-transport (23)",
+		"preparing-frame-lease (5)",
+		"preparing-playback-handoff (11)",
+		"frame-worker (3)"
+	],
+	"desktopTypecheck": "passed",
+	"scopedBiome": "passed",
+	"rustSourcesChanged": false,
+	"preparedSidecarsChanged": false,
+	"debugStrictSignature": "passed",
+	"releaseDelivery": "optimized alpha33 installed, archived, opened via ordinary project argument; all three main hashes equal and strict signatures passed",
+	"pausedHoverRegression": "40 successive 4-frame forward seeks arrive faster than media time: each is immediately presented while paused; no pacing queue remains",
+	"finalPackagedDebug": "3 full zoom-in/zoom-out runs: all expected frames in order, all submitted inside rAF; actual paused timeline hover: 41/41 frames and max15ms receive-to-draw",
+	"releaseExport": "540 frames at 1280x720/60fps, full decode passed; all 540 decoded-frame pixel hashes identical to unchanged baseline export"
+}

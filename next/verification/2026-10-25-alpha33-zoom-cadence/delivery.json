@@ -1,0 +1,48 @@
+{
+	"sourceCommit": "071d51a8513c93a07ca55a2a4fc30ba0eac03cba",
+	"installerCommit": "70e1696dc8d622e238de1a6993c2404db34b0754",
+	"signing": "ad-hoc, not Developer ID/notarization",
+	"buildProfile": "release",
+	"bundles": [
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/release/bundle/macos/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.33",
+			"build": "2026.33.0",
+			"mainSha256": "8574f797258b66c83f8a288383e89dcee7da49df23795e01f6a4eadb8d8421db",
+			"strictSignaturePassed": true
+		},
+		{
+			"path": "/Applications/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.33",
+			"build": "2026.33.0",
+			"mainSha256": "8574f797258b66c83f8a288383e89dcee7da49df23795e01f6a4eadb8d8421db",
+			"strictSignaturePassed": true
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.33/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.33",
+			"build": "2026.33.0",
+			"mainSha256": "8574f797258b66c83f8a288383e89dcee7da49df23795e01f6a4eadb8d8421db",
+			"strictSignaturePassed": true
+		}
+	],
+	"openedFixture": "/private/tmp/jianku-alpha32-fixtures/healthy.jks",
+	"runningApplications": [
+		{
+			"path": "/Applications/Jianku Screen Next.app",
+			"pid": 34685
+		}
+	],
+	"editorWindow": {
+		"bounds": {
+			"Height": 800,
+			"Width": 1275,
+			"X": 202,
+			"Y": 105
+		},
+		"id": 28575,
+		"name": "简库镜传 · 视频编辑"
+	},
+	"launch": "Cold installed executable plus ordinary project argument; no local open_editor action and no review hook.",
+	"releaseCliExport": "9s, 540frames, 1280x720 at 60fps; full decode with -xerror passed"
+}

@@ -1,0 +1,8 @@
+{
+	"frames": 540,
+	"baselineFrames": 540,
+	"exactDecodedFrameHashesMatch": true,
+	"differingFrames": 0,
+	"settingsUnchanged": true,
+	"scope": "Same unchanged synthetic sample; compares decoded exported video pixels, not physical preview scanout."
+}
