@@ -8,7 +8,8 @@
 		"outputDimensions": [220, 360],
 		"decodeComplete": true,
 		"rendererVersion": "alpha28 packaged debug",
-		"metadataFps": 60
+		"metadataFps": 60,
+		"tailFrameVisuallyVerified": "static-tail.png at 5.8s contains held source test pattern"
 	},
 	{
 		"case": "sparse",

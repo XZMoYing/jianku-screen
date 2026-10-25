@@ -1,0 +1,59 @@
+{
+	"date": "2026-10-25",
+	"version": "0.2.0-alpha.28",
+	"build": "2026.28.0",
+	"sourceFeatureCommit": "ad94c0d6a7ec200df9882657502be61131f4bb2a",
+	"verificationCommit": "9d0348135473e6f611f5a18fa41e3b471065590e",
+	"profile": "release",
+	"artifacts": [
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/release/bundle/macos/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.28",
+			"build": "2026.28.0",
+			"binarySha256": "e965a9744fba0b5cf3bd50737477a0ab0bfd833b2e580e3602f6465115d6d484",
+			"signature": "strict ad-hoc signature passed"
+		},
+		{
+			"path": "/Applications/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.28",
+			"build": "2026.28.0",
+			"binarySha256": "e965a9744fba0b5cf3bd50737477a0ab0bfd833b2e580e3602f6465115d6d484",
+			"signature": "strict ad-hoc signature passed"
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.28/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.28",
+			"build": "2026.28.0",
+			"binarySha256": "e965a9744fba0b5cf3bd50737477a0ab0bfd833b2e580e3602f6465115d6d484",
+			"signature": "strict ad-hoc signature passed"
+		}
+	],
+	"startup": {
+		"canonicalExecutable": "/Applications/Jianku Screen Next.app/Contents/MacOS/Jianku Screen Next",
+		"pid": 80610,
+		"launchedVia": "LaunchServices open -a",
+		"visibleApplicationWindows": 1
+	},
+	"checks": {
+		"finalScopedRustCheck": true,
+		"rustFmt": true,
+		"scopedBiome": true,
+		"mobileTestExecutions": 18,
+		"wallpaperTestExecutions": 9,
+		"recorderPacketCases": 12,
+		"debugEditorRepeatedPlayPauseAndTailSeek": true,
+		"debugFullExportsAndTailPixels": true,
+		"bundledAndroidClientWithoutDyldOverrides": true,
+		"bundledServerHashVerified": true
+	},
+	"physicalAndroidDevicesAtVerification": 0,
+	"physicalIosVerified": false,
+	"notarized": false,
+	"userMediaCommitted": false,
+	"remaining": "See docs/待验证项目交接.md; physical device, long GOP/complex project, multi-display/meeting and signing acceptance remain pending.",
+	"installerBackupCleanup": {
+		"removed": "/Applications/.jianku-next-update-i7ei8A",
+		"preservedRollbackVersion": "alpha27",
+		"archiveVerifiedBeforeRemoval": true
+	}
+}
