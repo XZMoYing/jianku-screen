@@ -103,7 +103,7 @@ impl VideoBackground {
                             if prefer_native {
                                 let result = objc2::rc::autoreleasepool(|_| {
                                     if native_reader.is_none() {
-                                        native_reader = Some(super::precise_video_background::PreciseVideoBackground::open(&worker_path, handle.clone())?);
+                                        native_reader = Some(super::precise_video_background::PreciseVideoBackground::open_with_cancel(&worker_path, handle.clone(), || reply.is_closed())?);
                                     }
                                     native_reader.as_mut().ok_or("精确壁纸解码器未就绪")?.frame_with_cancel(time, || reply.is_closed())
                                 });
@@ -421,6 +421,58 @@ mod tests {
                     native.prefetch();
                 }
             })
+        })
+        .await
+        .unwrap();
+    }
+
+    #[cfg(target_os = "macos")]
+    #[tokio::test]
+    async fn reopened_precise_wallpaper_preserves_pixels_seeks_and_looping() {
+        let Some(path) = std::env::var_os("JIANKU_TEST_INDEX_CACHE_VIDEO") else {
+            return;
+        };
+        let handle = tokio::runtime::Handle::current();
+        tokio::task::spawn_blocking(move || {
+            objc2::rc::autoreleasepool(|_| {
+                let mut first =
+                    super::super::precise_video_background::PreciseVideoBackground::open(
+                        Path::new(&path),
+                        handle.clone(),
+                    )
+                    .unwrap();
+                let mut reopened =
+                    super::super::precise_video_background::PreciseVideoBackground::open(
+                        Path::new(&path),
+                        handle,
+                    )
+                    .unwrap();
+                let reference = Reader::open(Path::new(&path)).unwrap();
+                let duration = reference.duration;
+                for time in [
+                    0.0,
+                    1.0 / 60.0,
+                    2.0 / 60.0,
+                    1.18,
+                    1.2,
+                    0.017,
+                    duration / 2.0,
+                    0.0,
+                    duration + 0.3,
+                ] {
+                    let expected = native_pixels(&first.frame(time).unwrap(), &mut None).unwrap();
+                    let actual = native_pixels(&reopened.frame(time).unwrap(), &mut None).unwrap();
+                    assert_eq!(first.decoded_time(), reopened.decoded_time());
+                    assert_eq!(expected.data, actual.data);
+                    assert_eq!(
+                        (expected.width, expected.height),
+                        (actual.width, actual.height)
+                    );
+                    first.prefetch();
+                    reopened.prefetch();
+                }
+                println!("reopened precise wallpaper: 9 timestamps and pixel buffers identical");
+            });
         })
         .await
         .unwrap();

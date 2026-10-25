@@ -19,7 +19,19 @@ pub(super) struct PreciseVideoBackground {
 }
 
 impl PreciseVideoBackground {
+    #[cfg(test)]
     pub fn open(path: &Path, handle: Handle) -> Result<Self, String> {
+        Self::open_with_cancel(path, handle, || false)
+    }
+
+    pub fn open_with_cancel(
+        path: &Path,
+        handle: Handle,
+        cancelled: impl Fn() -> bool,
+    ) -> Result<Self, String> {
+        if cancelled() {
+            return Err("壁纸定位已取消".into());
+        }
         let input = ffmpeg::format::input(path).map_err(|error| error.to_string())?;
         let stream = input
             .streams()
@@ -31,7 +43,7 @@ impl PreciseVideoBackground {
             input.duration() as f64 / 1_000_000.0
         };
         Ok(Self {
-            decoder: AVAssetReaderDecoder::new_nv12(path.into(), handle)?,
+            decoder: AVAssetReaderDecoder::new_nv12_with_cancel(path.into(), handle, cancelled)?,
             duration,
             decoded_time: -1.0,
             decoded_frame: None,
