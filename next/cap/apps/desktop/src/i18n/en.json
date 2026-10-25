@@ -1617,5 +1617,7 @@
 	"{value} 像素": "{value} px",
 	"以画面短边 1080 像素为基准，随画面尺寸等比缩放。": "Measured against a 1080 px short edge and scaled with the video.",
 	"内框颜色": "Inset color",
-	"内框不透明度": "Inset opacity"
+	"内框不透明度": "Inset opacity",
+	"Unable to open project": "Unable to open project",
+	"Check that the project still exists and contains its original media.": "Check that the project still exists and contains its original media."
 }

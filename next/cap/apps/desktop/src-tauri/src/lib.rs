@@ -4727,9 +4727,11 @@ async fn start_playback(
     fps: u32,
     resolution_base: XY<u32>,
 ) -> Result<(), String> {
-    editor_instance.start_playback(fps, resolution_base).await;
-
-    Ok(())
+    editor_instance
+        .start_playback_with_handle(fps, resolution_base, None)
+        .await
+        .map(|_| ())
+        .map_err(|error| format!("{error:?}"))
 }
 
 #[tauri::command]
@@ -7180,18 +7182,19 @@ pub async fn run(recording_logging_handle: LoggingHandle, logs_dir: PathBuf) {
     tauri::async_runtime::set(tokio::runtime::Handle::current());
 
     let builder =
-        tauri::Builder::default().plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
-            #[cfg(target_os = "linux")]
+        tauri::Builder::default().plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
+            #[cfg(any(target_os = "linux", target_os = "macos"))]
             {
+                // The macOS singleton listener blocks after this callback; spawn project tasks from the UI thread.
                 let handle = app.clone();
                 if let Err(error) = app.run_on_main_thread(move || {
-                    handle_single_instance(&handle, args);
+                    handle_single_instance(&handle, args, Path::new(&cwd));
                 }) {
                     warn!(%error, "Could not queue Cap activation");
                 }
             }
-            #[cfg(not(target_os = "linux"))]
-            handle_single_instance(app, args);
+            #[cfg(not(any(target_os = "linux", target_os = "macos")))]
+            handle_single_instance(app, args, Path::new(&cwd));
         }));
 
     #[cfg(target_os = "macos")]
@@ -7210,7 +7213,9 @@ pub async fn run(recording_logging_handle: LoggingHandle, logs_dir: PathBuf) {
     let builder = builder
         .manage(startup)
         .on_page_load(|webview, payload| {
-            if webview.label() == "onboarding"
+            if (webview.label() == "onboarding"
+                || webview.label().starts_with("editor-")
+                || webview.label().starts_with("screenshot-editor-"))
                 && matches!(payload.event(), tauri::webview::PageLoadEvent::Finished)
             {
                 webview.app_handle().state::<startup::Startup>().mark_ready();
@@ -7599,9 +7604,31 @@ pub async fn run(recording_logging_handle: LoggingHandle, logs_dir: PathBuf) {
 
             tokio::spawn(check_notification_permissions(app.clone()));
 
+            #[cfg(target_os = "macos")]
+            let opening_startup_project = {
+                let directory = std::env::current_dir().ok();
+                let urls = project_urls_from_arguments(
+                    std::env::args_os().skip(1),
+                    directory.as_deref(),
+                );
+                let requested = !urls.is_empty();
+                match queue_macos_startup_urls(&app, urls) {
+                    Ok(()) => requested,
+                    Err(error) => {
+                        warn!(%error, "Could not queue startup project arguments");
+                        false
+                    }
+                }
+            };
+            #[cfg(not(target_os = "macos"))]
+            let opening_startup_project = false;
+
             tokio::spawn({
                 let app = app.clone();
                 async move {
+                    if opening_startup_project {
+                        return;
+                    }
                     let startup_window = if should_show_onboarding(&app) {
                         ShowCapWindow::Onboarding
                     } else {
@@ -8074,7 +8101,57 @@ fn run_tauri_event_loop<R>(run: impl FnOnce() -> R) -> R {
     run()
 }
 
-fn handle_single_instance(app: &AppHandle, args: Vec<String>) {
+fn project_urls_from_arguments(
+    arguments: impl IntoIterator<Item = std::ffi::OsString>,
+    directory: Option<&Path>,
+) -> Vec<tauri::Url> {
+    let mut urls = Vec::new();
+    for argument in arguments {
+        if argument.as_encoded_bytes().starts_with(b"-") {
+            continue;
+        }
+        let argument_url = argument.to_str().filter(|value| {
+            value.contains("://")
+                || value
+                    .get(..5)
+                    .is_some_and(|prefix| prefix.eq_ignore_ascii_case("file:"))
+        });
+        let path = match argument_url {
+            Some(value) => {
+                let Ok(url) = tauri::Url::parse(value) else {
+                    continue;
+                };
+                if url.scheme() != "file" || url.host_str().is_some_and(|host| host != "localhost")
+                {
+                    continue;
+                }
+                let Ok(path) = url.to_file_path() else {
+                    continue;
+                };
+                path
+            }
+            None => PathBuf::from(argument),
+        };
+        if !cap_project::is_project_path(&path) {
+            continue;
+        }
+        let path = if path.is_absolute() {
+            path
+        } else if let Some(directory) = directory {
+            directory.join(path)
+        } else {
+            continue;
+        };
+        if let Ok(url) = tauri::Url::from_file_path(path)
+            && !urls.contains(&url)
+        {
+            urls.push(url);
+        }
+    }
+    urls
+}
+
+fn handle_single_instance(app: &AppHandle, args: Vec<String>, directory: &Path) {
     trace!(arg_count = args.len(), "Single instance invoked");
 
     #[cfg(target_os = "linux")]
@@ -8104,11 +8181,8 @@ fn handle_single_instance(app: &AppHandle, args: Vec<String>) {
         return;
     }
 
-    let Some(cap_file) = args
-        .iter()
-        .find(|arg| cap_project::is_project_path(std::path::Path::new(arg)))
-        .map(PathBuf::from)
-    else {
+    let urls = project_urls_from_arguments(args.into_iter().map(Into::into), Some(directory));
+    if urls.is_empty() {
         let app = app.clone();
         tauri::async_runtime::spawn(async move {
             if let Err(error) = (ShowCapWindow::Main {
@@ -8121,9 +8195,44 @@ fn handle_single_instance(app: &AppHandle, args: Vec<String>) {
             }
         });
         return;
-    };
+    }
+    for url in urls {
+        if let Ok(path) = url.to_file_path()
+            && let Err(error) = open_project_from_path(&path, app.clone())
+        {
+            report_project_open_failure(app, &path, &error);
+        }
+    }
+}
 
-    let _ = open_project_from_path(&cap_file, app.clone());
+fn report_project_open_failure(app: &AppHandle, path: &Path, error: &str) {
+    warn!(path = %path.display(), %error, "Could not open the requested project");
+    let app = app.clone();
+    let path = path.to_path_buf();
+    tokio::spawn(async move {
+        if let Err(error) = (ShowCapWindow::Main {
+            init_target_mode: None,
+        })
+        .show(&app)
+        .await
+        {
+            warn!(%error, "Could not restore the recording controls after a project open failed");
+        }
+        app.dialog()
+            .message(format!(
+                "{}\n\n{}",
+                crate::interface_language::text(
+                    &app,
+                    "Check that the project still exists and contains its original media."
+                ),
+                path.display()
+            ))
+            .title(crate::interface_language::text(
+                &app,
+                "Unable to open project",
+            ))
+            .show(|_| {});
+    });
 }
 
 pub(crate) fn panic_payload_message(payload: &(dyn std::any::Any + Send)) -> String {
@@ -8411,7 +8520,7 @@ fn dispatch_macos_startup_urls(app: &AppHandle, dispatch: StartupOpenDispatch) {
             && let Ok(path) = url.to_file_path()
             && let Err(error) = open_project_from_path(&path, app.clone())
         {
-            warn!(path = %path.display(), %error, "Could not open the requested project");
+            report_project_open_failure(app, &path, &error);
         }
     }
 }
@@ -9450,10 +9559,78 @@ fn open_project_from_path(path: &Path, app: AppHandle) -> Result<(), String> {
 
 #[cfg(test)]
 mod startup_project_open_tests {
-    use super::{StartupOpenDestination, StartupOpenGate, StartupOpenGuard, StartupOpenQueue};
+    use super::{
+        StartupOpenDestination, StartupOpenGate, StartupOpenGuard, StartupOpenQueue,
+        project_urls_from_arguments,
+    };
+    use std::{ffi::OsString, path::Path};
 
     fn project(name: &str) -> tauri::Url {
         tauri::Url::parse(&format!("file:///recordings/{name}.cap")).unwrap()
+    }
+
+    #[test]
+    fn project_arguments_resolve_sender_directory_and_deduplicate_file_urls() {
+        let temporary = tempfile::tempdir().unwrap();
+        let directory = temporary.path().join("有 空格");
+        let absolute = directory.join("剪辑.jks");
+        let url = tauri::Url::from_file_path(&absolute).unwrap();
+        let arguments = [
+            OsString::from("剪辑.jks"),
+            absolute.into_os_string(),
+            url.as_str().into(),
+            OsString::from("legacy.CAP"),
+            OsString::from("presentation.JKS/"),
+        ];
+        let urls = project_urls_from_arguments(arguments, Some(&directory));
+        assert_eq!(urls.len(), 3);
+        assert_eq!(urls[0], url);
+        assert_eq!(
+            urls[1].to_file_path().unwrap(),
+            directory.join("legacy.CAP")
+        );
+        assert_eq!(
+            urls[2].to_file_path().unwrap(),
+            directory.join("presentation.JKS")
+        );
+    }
+
+    #[test]
+    fn project_arguments_do_not_turn_network_urls_or_other_files_into_projects() {
+        let arguments = [
+            "Jianku Screen Next",
+            "--disable-gpu",
+            "--project=recording.jks",
+            "-psn_0_1234",
+            "legacy.jianku",
+            "video.mp4",
+            "https://example.test/unsafe.jks",
+            "jianku-screen-next://action?value=project.jks",
+            "file://remote-host/recording.jks",
+            "file://%zz/invalid.jks",
+        ];
+        assert!(
+            project_urls_from_arguments(
+                arguments.into_iter().map(OsString::from),
+                Some(Path::new("/recordings")),
+            )
+            .is_empty()
+        );
+    }
+
+    #[test]
+    fn project_arguments_keep_absolute_paths_when_the_working_directory_is_unavailable() {
+        let temporary = tempfile::tempdir().unwrap();
+        let absolute = temporary.path().join("absolute.jks");
+        let urls = project_urls_from_arguments(
+            [
+                OsString::from("relative.jks"),
+                absolute.clone().into_os_string(),
+            ],
+            None,
+        );
+        assert_eq!(urls.len(), 1);
+        assert_eq!(urls[0].to_file_path().unwrap(), absolute);
     }
 
     #[test]

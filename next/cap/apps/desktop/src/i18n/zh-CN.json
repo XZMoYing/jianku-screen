@@ -1473,5 +1473,7 @@
 	"{value} 像素": "{value} 像素",
 	"以画面短边 1080 像素为基准，随画面尺寸等比缩放。": "以画面短边 1080 像素为基准，随画面尺寸等比缩放。",
 	"内框颜色": "内框颜色",
-	"内框不透明度": "内框不透明度"
+	"内框不透明度": "内框不透明度",
+	"Unable to open project": "无法打开工程",
+	"Check that the project still exists and contains its original media.": "请检查工程是否仍然存在，并包含录制原文件。"
 }

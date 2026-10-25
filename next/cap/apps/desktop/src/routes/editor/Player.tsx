@@ -474,6 +474,8 @@ export function PlayerContent(props: { compactness?: number }) {
 						<button
 							type="button"
 							onClick={handlePlayPauseClick}
+							aria-label={localize("Play/Pause video")}
+							aria-pressed={playbackIntent() && !isAtEnd()}
 							class="flex justify-center items-center rounded-full transition-opacity size-8 bg-ed-text-1 text-ed-card hover:opacity-90"
 						>
 							{!playbackIntent() || isAtEnd() ? (

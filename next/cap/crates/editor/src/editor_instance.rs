@@ -903,36 +903,27 @@ impl EditorInstance {
         tokio::spawn(async move {
             loop {
                 let event = *handle.receive_event().await;
-                if this.playback_epoch.load(Ordering::SeqCst) == epoch
-                    && handle.preparing_audio_released()
-                {
-                    drop(
-                        this.preparing_adoption
-                            .lock()
-                            .unwrap_or_else(std::sync::PoisonError::into_inner)
-                            .take(),
-                    );
-                }
-
-                match event {
-                    playback::PlaybackEvent::Start => {}
-                    playback::PlaybackEvent::Frame(frame_number) => {
-                        if this.playback_epoch.load(Ordering::SeqCst) != epoch {
-                            continue;
+                apply_playback_event(
+                    &this.state,
+                    &this.playback_epoch,
+                    epoch,
+                    event,
+                    &this.playback_active,
+                    &*this.on_state_change,
+                    || {
+                        if handle.preparing_audio_released() {
+                            drop(
+                                this.preparing_adoption
+                                    .lock()
+                                    .unwrap_or_else(std::sync::PoisonError::into_inner)
+                                    .take(),
+                            );
                         }
-                        this.modify_and_emit_state(|state| {
-                            state.playhead_position = frame_number;
-                        })
-                        .await;
-                    }
-                    playback::PlaybackEvent::Stop => {
-                        if this.playback_epoch.load(Ordering::SeqCst) == epoch
-                            && let Err(e) = this.playback_active.send(false)
-                        {
-                            tracing::warn!(%e, "failed to send playback_active=false");
-                        }
-                        return;
-                    }
+                    },
+                )
+                .await;
+                if matches!(event, playback::PlaybackEvent::Stop) {
+                    return;
                 }
             }
         });
@@ -1392,6 +1383,35 @@ pub struct EditorState {
     pub preview_task: Option<tokio::task::JoinHandle<()>>,
 }
 
+async fn apply_playback_event(
+    state: &Mutex<EditorState>,
+    active_epoch: &AtomicU64,
+    expected_epoch: u64,
+    event: playback::PlaybackEvent,
+    playback_active: &watch::Sender<bool>,
+    on_state_change: &(dyn Fn(&EditorState) + Send + Sync),
+    on_current: impl FnOnce(),
+) {
+    let mut state = state.lock().await;
+    // A stopped task can still have a Frame queued behind stop/seek or a new start.
+    if active_epoch.load(Ordering::SeqCst) != expected_epoch {
+        return;
+    }
+    on_current();
+    match event {
+        playback::PlaybackEvent::Frame(frame) if state.playback_task.is_some() => {
+            state.playhead_position = frame;
+            on_state_change(&state);
+        }
+        playback::PlaybackEvent::Stop => {
+            if let Err(error) = playback_active.send(false) {
+                warn!(%error, "failed to send playback_active=false");
+            }
+        }
+        _ => {}
+    }
+}
+
 pub struct SegmentMedia {
     pub audio: AudioLoader,
     pub system_audio: AudioLoader,
@@ -1828,6 +1848,120 @@ fn get_calibration_offset(
 mod tests {
     use super::*;
     use cap_project::{AudioGapSummary, CursorClickEvent, CursorConfiguration, CursorMoveEvent};
+
+    fn event_state() -> Arc<Mutex<EditorState>> {
+        Arc::new(Mutex::new(EditorState {
+            playhead_position: 240,
+            playback_task: Some(PlaybackHandle::test_handle()),
+            preview_task: None,
+        }))
+    }
+
+    #[tokio::test]
+    async fn playback_events_ignore_a_frame_queued_before_stop_and_rewind() {
+        let state = event_state();
+        let mut guard = state.lock().await;
+        let epoch = Arc::new(AtomicU64::new(1));
+        let emitted = Arc::new(std::sync::Mutex::new(Vec::new()));
+        let (active, receiver) = watch::channel(true);
+        let (waiting, waited) = tokio::sync::oneshot::channel();
+        let task = tokio::spawn({
+            let state = state.clone();
+            let epoch = epoch.clone();
+            let emitted = emitted.clone();
+            let active = active.clone();
+            async move {
+                waiting.send(()).unwrap();
+                apply_playback_event(
+                    &state,
+                    &epoch,
+                    1,
+                    playback::PlaybackEvent::Frame(241),
+                    &active,
+                    &|state| emitted.lock().unwrap().push(state.playhead_position),
+                    || {},
+                )
+                .await;
+            }
+        });
+        waited.await.unwrap();
+        guard.playback_task.take().unwrap().stop();
+        guard.playhead_position = 0;
+        drop(guard);
+        task.await.unwrap();
+        assert_eq!(state.lock().await.playhead_position, 0);
+        assert!(emitted.lock().unwrap().is_empty());
+        assert!(*receiver.borrow());
+        apply_playback_event(
+            &state,
+            &epoch,
+            1,
+            playback::PlaybackEvent::Stop,
+            &active,
+            &|_| panic!("Stop must not emit a frame"),
+            || {},
+        )
+        .await;
+        assert!(!*receiver.borrow());
+    }
+
+    #[tokio::test]
+    async fn playback_events_recheck_ownership_after_waiting_for_the_state_lock() {
+        for event in [
+            playback::PlaybackEvent::Frame(241),
+            playback::PlaybackEvent::Stop,
+        ] {
+            let state = event_state();
+            let mut guard = state.lock().await;
+            let epoch = Arc::new(AtomicU64::new(1));
+            let (active, receiver) = watch::channel(true);
+            let (waiting, waited) = tokio::sync::oneshot::channel();
+            let task = tokio::spawn({
+                let state = state.clone();
+                let epoch = epoch.clone();
+                let active = active.clone();
+                async move {
+                    waiting.send(()).unwrap();
+                    apply_playback_event(
+                        &state,
+                        &epoch,
+                        1,
+                        event,
+                        &active,
+                        &|_| panic!("An old frame must not emit state"),
+                        || panic!("An old event must not release the new audio adoption"),
+                    )
+                    .await;
+                }
+            });
+            waited.await.unwrap();
+            epoch.store(2, Ordering::SeqCst);
+            guard.playhead_position = 12;
+            guard.playback_task = Some(PlaybackHandle::test_handle());
+            drop(guard);
+            task.await.unwrap();
+            assert_eq!(state.lock().await.playhead_position, 12);
+            assert!(*receiver.borrow());
+        }
+    }
+
+    #[tokio::test]
+    async fn playback_events_accept_current_frames_and_stop() {
+        let state = event_state();
+        let epoch = AtomicU64::new(2);
+        let emitted = std::sync::Mutex::new(Vec::new());
+        let (active, receiver) = watch::channel(true);
+        let on_change = |state: &EditorState| emitted.lock().unwrap().push(state.playhead_position);
+        for event in [
+            playback::PlaybackEvent::Frame(13),
+            playback::PlaybackEvent::Stop,
+        ] {
+            apply_playback_event(&state, &epoch, 2, event, &active, &on_change, || {}).await;
+        }
+        assert_eq!(*emitted.lock().unwrap(), [13]);
+        assert_eq!(state.lock().await.playhead_position, 13);
+        assert!(!*receiver.borrow());
+    }
 
     #[tokio::test]
     async fn completed_pcm_loader_reuses_arc_without_opening_a_missing_file() {

@@ -2006,6 +2006,21 @@ impl Drop for AdoptedPlaybackGuard {
 }
 
 impl PlaybackHandle {
+    #[cfg(test)]
+    pub(crate) fn test_handle() -> Self {
+        let (stop_tx, _) = watch::channel(false);
+        let (_, event_rx) = watch::channel(PlaybackEvent::Start);
+        let (seek_tx, _) = watch::channel((0, 0));
+        Self {
+            preparing_audio_released: Arc::new(AtomicBool::new(false)),
+            stop_tx,
+            event_rx,
+            seek_tx: Arc::new(seek_tx),
+            seek_generation: Arc::new(AtomicU64::new(0)),
+            adopted: None,
+        }
+    }
+
     pub(crate) fn preparing_audio_released(&self) -> bool {
         self.preparing_audio_released.load(Ordering::Acquire)
     }
