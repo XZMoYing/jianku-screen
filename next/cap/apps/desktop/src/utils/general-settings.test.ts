@@ -11,6 +11,22 @@ import {
 } from "~/utils/general-settings";
 
 describe("general-settings", () => {
+	it("keeps overlapping windows visible until isolation is explicitly enabled", () => {
+		expect(deriveGeneralSettings(null).isolateWindowCapture).toBe(false);
+		expect(
+			deriveGeneralSettings({
+				enableNativeCameraPreview: false,
+				isolateWindowCapture: true,
+			}).isolateWindowCapture,
+		).toBe(true);
+		expect(
+			deriveGeneralSettings({
+				enableNativeCameraPreview: false,
+				isolateWindowCapture: false,
+			}).isolateWindowCapture,
+		).toBe(false);
+	});
+
 	it("normalizes transcription hints from text input", () => {
 		expect(
 			parseTranscriptionHints(" Cap \n\nTypeScript\nCap\nGitHub\n"),

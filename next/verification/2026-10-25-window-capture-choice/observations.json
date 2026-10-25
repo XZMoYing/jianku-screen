@@ -1,0 +1,185 @@
+{
+	"date": "2026-10-25",
+	"version": "0.2.0-alpha.27",
+	"defaultIsolation": false,
+	"uiToggleSaved": true,
+	"settingsRestoredAfterReview": true,
+	"recordingModesActuallyTested": ["studio"],
+	"frameSelection": "Last encoded frame with presentation timestamp <= bookmark source time; cursor sample also selected at or before that time. Static source gaps retain the preceding frame.",
+	"whiteTargetTolerancePixels": 5,
+	"gridSamplingStridePixels": 4,
+	"samples": [
+		{
+			"isolated": false,
+			"stage": "initial",
+			"sourceSegment": 0,
+			"sourceTime": 0.71887225,
+			"width": 1440,
+			"height": 956,
+			"frameIndex": 3,
+			"frameTime": 0.05,
+			"redRatio": 0.0,
+			"greenRatio": 0.9355,
+			"whiteCenter": [0.4986111111111111, 0.5292887029288703],
+			"cursor": {
+				"x": 0.5,
+				"y": 0.5292887029288703
+			},
+			"cursorErrorPixels": 2.0
+		},
+		{
+			"isolated": false,
+			"stage": "cover",
+			"sourceSegment": 0,
+			"sourceTime": 3.3295695,
+			"width": 1440,
+			"height": 956,
+			"frameIndex": 8,
+			"frameTime": 3.046211,
+			"redRatio": 1.0,
+			"greenRatio": 0.0,
+			"whiteCenter": null,
+			"cursor": {
+				"x": 0.5,
+				"y": 0.5292887029288703
+			},
+			"cursorErrorPixels": null
+		},
+		{
+			"isolated": false,
+			"stage": "uncover",
+			"sourceSegment": 0,
+			"sourceTime": 6.4401535,
+			"width": 1440,
+			"height": 956,
+			"frameIndex": 13,
+			"frameTime": 6.061656,
+			"redRatio": 0.0,
+			"greenRatio": 0.9355,
+			"whiteCenter": [0.4986111111111111, 0.5292887029288703],
+			"cursor": {
+				"x": 0.5,
+				"y": 0.5292887029288703
+			},
+			"cursorErrorPixels": 2.0
+		},
+		{
+			"isolated": true,
+			"stage": "initial",
+			"sourceSegment": 0,
+			"sourceTime": 0.706277833,
+			"width": 1440,
+			"height": 956,
+			"frameIndex": 0,
+			"frameTime": 0.0,
+			"redRatio": 0.0,
+			"greenRatio": 0.9355,
+			"whiteCenter": [0.4986111111111111, 0.5292887029288703],
+			"cursor": {
+				"x": 0.5,
+				"y": 0.5292887029288703
+			},
+			"cursorErrorPixels": 2.0
+		},
+		{
+			"isolated": true,
+			"stage": "cover",
+			"sourceSegment": 0,
+			"sourceTime": 3.31811775,
+			"width": 1440,
+			"height": 956,
+			"frameIndex": 0,
+			"frameTime": 0.0,
+			"redRatio": 0.0,
+			"greenRatio": 0.9355,
+			"whiteCenter": [0.4986111111111111, 0.5292887029288703],
+			"cursor": {
+				"x": 0.5,
+				"y": 0.5292887029288703
+			},
+			"cursorErrorPixels": 2.0
+		},
+		{
+			"isolated": true,
+			"stage": "uncover",
+			"sourceSegment": 0,
+			"sourceTime": 6.432023458,
+			"width": 1440,
+			"height": 956,
+			"frameIndex": 0,
+			"frameTime": 0.0,
+			"redRatio": 0.0,
+			"greenRatio": 0.9355,
+			"whiteCenter": [0.4986111111111111, 0.5292887029288703],
+			"cursor": {
+				"x": 0.5,
+				"y": 0.5292887029288703
+			},
+			"cursorErrorPixels": 2.0
+		},
+		{
+			"isolated": true,
+			"stage": "move",
+			"sourceSegment": 0,
+			"sourceTime": 8.546391333,
+			"width": 1440,
+			"height": 956,
+			"frameIndex": 2,
+			"frameTime": 8.150122,
+			"redRatio": 0.0,
+			"greenRatio": 0.9355,
+			"whiteCenter": [0.4986111111111111, 0.5292887029288703],
+			"cursor": {
+				"x": 0.5,
+				"y": 0.5292887029288703
+			},
+			"cursorErrorPixels": 2.0
+		},
+		{
+			"isolated": true,
+			"stage": "resize",
+			"sourceSegment": 0,
+			"sourceTime": 11.159642125,
+			"width": 1440,
+			"height": 956,
+			"frameIndex": 3,
+			"frameTime": 10.711278,
+			"redRatio": 0.0,
+			"greenRatio": 0.3621,
+			"whiteCenter": [0.1902777777777778, 0.5230125523012552],
+			"cursor": {
+				"x": 0.19028662145137787,
+				"y": 0.5222929860757485
+			},
+			"cursorErrorPixels": 0.69
+		},
+		{
+			"isolated": true,
+			"stage": "resumed",
+			"sourceSegment": 1,
+			"sourceTime": 0.616614,
+			"width": 720,
+			"height": 1256,
+			"frameIndex": 2,
+			"frameTime": 0.033333,
+			"redRatio": 0.0,
+			"greenRatio": 0.9464,
+			"whiteCenter": [0.49722222222222223, 0.5207006369426752],
+			"cursor": {
+				"x": 0.5,
+				"y": 0.5222929936305732
+			},
+			"cursorErrorPixels": 2.0
+		}
+	],
+	"rawRecordingsCommitted": false,
+	"fullDesktopScreenshotsCommitted": false,
+	"unverified": [
+		"Physical cross-display movement and display disconnection",
+		"Minimized/closed windows and system-triggered stream rebuild",
+		"Separate dialogs, popup menus, child windows",
+		"Pre-13.1 cursor mapping",
+		"Instant recording runtime and audio/camera combinations",
+		"Long recordings and performance benchmarks"
+	]
+}

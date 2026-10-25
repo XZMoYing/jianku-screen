@@ -2839,6 +2839,11 @@ async fn start_recording_prepared(
                             #[cfg(target_os = "macos")]
                             {
                                 builder = builder.with_excluded_windows(excluded_windows.clone());
+                                builder = builder.with_window_isolation(
+                                    general_settings
+                                        .as_ref()
+                                        .is_some_and(|settings| settings.isolate_window_capture),
+                                );
                             }
 
                             if let Some(camera_feed) = camera_feed.clone() {
@@ -2886,6 +2891,11 @@ async fn start_recording_prepared(
                             #[cfg(target_os = "macos")]
                             {
                                 builder = builder.with_excluded_windows(excluded_windows.clone());
+                                builder = builder.with_window_isolation(
+                                    general_settings
+                                        .as_ref()
+                                        .is_some_and(|settings| settings.isolate_window_capture),
+                                );
                             }
 
                             if let Some(camera_feed) = camera_feed.clone() {

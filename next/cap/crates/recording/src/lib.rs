@@ -89,6 +89,8 @@ pub struct RecordingBaseInputs {
     pub shareable_content: Option<SendableShareableContent>,
     #[cfg(target_os = "macos")]
     pub excluded_windows: Vec<scap_targets::WindowId>,
+    #[cfg(target_os = "macos")]
+    pub isolate_window: bool,
     /// Present when the pipeline is primed ahead of the start cue; capture is
     /// held back until it is armed.
     pub start_gate: Option<RecordingStartGate>,

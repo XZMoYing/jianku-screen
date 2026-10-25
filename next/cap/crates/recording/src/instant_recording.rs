@@ -861,6 +861,8 @@ pub struct ActorBuilder {
     max_fps: u32,
     #[cfg(target_os = "macos")]
     excluded_windows: Vec<scap_targets::WindowId>,
+    #[cfg(target_os = "macos")]
+    isolate_window: bool,
     #[cfg(target_os = "linux")]
     lifetime: InstantLifetimeOwner,
     start_gate: Option<RecordingStartGate>,
@@ -888,6 +890,8 @@ impl ActorBuilder {
             lifetime: InstantLifetimeOwner::new(),
             #[cfg(target_os = "macos")]
             excluded_windows: Vec::new(),
+            #[cfg(target_os = "macos")]
+            isolate_window: false,
             start_gate: None,
         }
     }
@@ -960,6 +964,12 @@ impl ActorBuilder {
     }
 
     #[cfg(target_os = "macos")]
+    pub fn with_window_isolation(mut self, isolate_window: bool) -> Self {
+        self.isolate_window = isolate_window;
+        self
+    }
+
+    #[cfg(target_os = "macos")]
     pub fn with_excluded_windows(mut self, excluded_windows: Vec<scap_targets::WindowId>) -> Self {
         self.excluded_windows = excluded_windows;
         self
@@ -981,6 +991,8 @@ impl ActorBuilder {
                 shareable_content,
                 #[cfg(target_os = "macos")]
                 excluded_windows: self.excluded_windows,
+                #[cfg(target_os = "macos")]
+                isolate_window: self.isolate_window,
             },
             self.max_output_size,
             self.max_fps,
@@ -1338,6 +1350,11 @@ async fn build_instant_recording_actor(
                 ),
                 #[cfg(windows)]
                 d3d_device,
+                #[cfg(target_os = "macos")]
+                inputs
+                    .capture_target
+                    .window()
+                    .filter(|_| inputs.isolate_window),
                 #[cfg(target_os = "macos")]
                 inputs
                     .shareable_content

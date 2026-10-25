@@ -50,6 +50,7 @@ export function createDefaultGeneralSettings(): GeneralSettingsStore {
 		macbookNotchOverlay: false,
 		captureKeyboardEvents: true,
 		custom_cursor_capture2: true,
+		isolateWindowCapture: false,
 		excludedWindows: [],
 		instantModeMaxResolution: 1920,
 		crashRecoveryRecording: true,

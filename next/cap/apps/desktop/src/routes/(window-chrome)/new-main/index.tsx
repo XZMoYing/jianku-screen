@@ -38,6 +38,7 @@ import { MotionGroup, MotionPresence } from "~/components/InterfaceMotion";
 import MobileRecorder from "~/components/MobileRecorder";
 import Mode from "~/components/Mode";
 import { RecoveryToast } from "~/components/RecoveryToast";
+import WindowCaptureOptions from "~/components/WindowCaptureOptions";
 import { Input } from "~/routes/editor/ui";
 import Presentation from "~/routes/presentation";
 import { generalSettingsStore, recordingSettingsStore } from "~/store";
@@ -3260,6 +3261,17 @@ function Page() {
 									</div>
 								</Show>
 								<div class="workspace-recording-body">
+									<Show
+										when={
+											rawOptions.mode !== "screenshot" &&
+											(activeMenu() === "window" ||
+												rawOptions.captureTarget.variant === "window")
+										}
+									>
+										<WindowCaptureOptions
+											disabled={isRecording() || styleBusy()}
+										/>
+									</Show>
 									<Show when={signIn.isPending}>
 										<div class="flex absolute inset-0 justify-center items-center bg-gray-1 animate-in fade-in">
 											<div class="flex flex-col gap-4 justify-center items-center">

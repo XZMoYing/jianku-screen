@@ -48,6 +48,8 @@ pub struct IncrementalCaptureOutputs {
 pub struct CursorCaptureTarget {
     pub crop_bounds: CursorCropBounds,
     pub display: scap_targets::Display,
+    #[cfg(target_os = "macos")]
+    pub window_geometry: Option<crate::screen_capture::WindowGeometryState>,
     #[cfg(target_os = "linux")]
     pub window: Option<scap_targets::WindowId>,
 }
@@ -357,7 +359,7 @@ pub fn spawn_cursor_recorder(
                 .inspect_err(|error| tracing::error!(%error, "X11 window cursor setup failed"))
                 .ok()
         });
-        #[cfg(target_os = "linux")]
+        #[cfg(any(target_os = "linux", target_os = "macos"))]
         let mut last_window_position = None;
         let device_state = DeviceState::new();
         let mut last_mouse_state = device_state.get_mouse();
@@ -411,10 +413,23 @@ pub fn spawn_cursor_recorder(
             }
             #[cfg(target_os = "linux")]
             let window_position = window_cursor.as_ref().and_then(X11WindowCursor::position);
+            #[cfg(target_os = "macos")]
+            let window_position = target.window_geometry.as_ref().and_then(|state| {
+                let geometry = (*state.lock().ok()?)?;
+                let bounds = display.raw_handle().logical_bounds()?;
+                let normalized = position.relative_to_display(display)?.normalize()?;
+                Some(geometry.project(
+                    normalized.x() * bounds.size().width() + bounds.position().x(),
+                    normalized.y() * bounds.size().height() + bounds.position().y(),
+                ))
+            });
             #[cfg(target_os = "linux")]
             let position_changed = position_changed
                 || (target.window.is_some() && window_position != last_window_position);
-            #[cfg(target_os = "linux")]
+            #[cfg(target_os = "macos")]
+            let position_changed = position_changed
+                || (target.window_geometry.is_some() && window_position != last_window_position);
+            #[cfg(any(target_os = "linux", target_os = "macos"))]
             {
                 last_window_position = window_position;
             }
@@ -471,6 +486,12 @@ pub fn spawn_cursor_recorder(
                 #[cfg(target_os = "linux")]
                 let cropped_norm_pos = if target.window.is_some() {
                     window_position
+                } else {
+                    cropped_norm_pos
+                };
+                #[cfg(target_os = "macos")]
+                let cropped_norm_pos = if target.window_geometry.is_some() {
+                    window_position.or(cropped_norm_pos)
                 } else {
                     cropped_norm_pos
                 };

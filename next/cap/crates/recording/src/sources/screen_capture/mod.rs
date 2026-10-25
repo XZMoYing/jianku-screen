@@ -298,6 +298,8 @@ pub struct ScreenCaptureConfig<TCaptureFormat: ScreenCaptureFormat> {
     shareable_content: cidre::arc::R<cidre::sc::ShareableContent>,
     #[cfg(target_os = "macos")]
     pub excluded_windows: Vec<WindowId>,
+    #[cfg(target_os = "macos")]
+    window_geometry: WindowGeometryState,
 }
 
 fn constrain_capture_size(size: PhysicalSize, max_size: Option<(u32, u32)>) -> PhysicalSize {
@@ -366,6 +368,8 @@ impl<TCaptureFormat: ScreenCaptureFormat> Clone for ScreenCaptureConfig<TCapture
             shareable_content: self.shareable_content.clone(),
             #[cfg(target_os = "macos")]
             excluded_windows: self.excluded_windows.clone(),
+            #[cfg(target_os = "macos")]
+            window_geometry: self.window_geometry.clone(),
         }
     }
 }
@@ -374,6 +378,8 @@ impl<TCaptureFormat: ScreenCaptureFormat> Clone for ScreenCaptureConfig<TCapture
 pub struct Config {
     display: DisplayId,
     crop_bounds: Option<CropBounds>,
+    #[cfg(target_os = "macos")]
+    window: Option<WindowId>,
     fps: u32,
     show_cursor: bool,
     #[cfg(target_os = "linux")]
@@ -471,6 +477,7 @@ impl<TCaptureFormat: ScreenCaptureFormat> ScreenCaptureConfig<TCaptureFormat> {
         system_audio: bool,
         #[cfg(target_os = "linux")] linux_source: LinuxCaptureSource,
         #[cfg(windows)] d3d_device: ::windows::Win32::Graphics::Direct3D11::ID3D11Device,
+        #[cfg(target_os = "macos")] window: Option<WindowId>,
         #[cfg(target_os = "macos")] shareable_content: SendableShareableContent,
         #[cfg(target_os = "macos")] excluded_windows: Vec<WindowId>,
     ) -> Result<Self, ScreenCaptureInitError> {
@@ -527,6 +534,8 @@ impl<TCaptureFormat: ScreenCaptureFormat> ScreenCaptureConfig<TCaptureFormat> {
             config: Config {
                 display: display.id(),
                 crop_bounds,
+                #[cfg(target_os = "macos")]
+                window,
                 fps,
                 show_cursor,
                 #[cfg(target_os = "linux")]
@@ -547,6 +556,8 @@ impl<TCaptureFormat: ScreenCaptureFormat> ScreenCaptureConfig<TCaptureFormat> {
             shareable_content: shareable_content.retained(),
             #[cfg(target_os = "macos")]
             excluded_windows,
+            #[cfg(target_os = "macos")]
+            window_geometry: Default::default(),
         })
     }
 

@@ -2103,6 +2103,8 @@ pub struct ActorBuilder {
     quality: crate::StudioQuality,
     #[cfg(target_os = "macos")]
     excluded_windows: Vec<scap_targets::WindowId>,
+    #[cfg(target_os = "macos")]
+    isolate_window: bool,
     start_gate: Option<RecordingStartGate>,
 }
 
@@ -2127,6 +2129,8 @@ impl ActorBuilder {
             quality: crate::StudioQuality::Balanced,
             #[cfg(target_os = "macos")]
             excluded_windows: Vec::new(),
+            #[cfg(target_os = "macos")]
+            isolate_window: false,
             start_gate: None,
         }
     }
@@ -2185,6 +2189,12 @@ impl ActorBuilder {
     }
 
     #[cfg(target_os = "macos")]
+    pub fn with_window_isolation(mut self, isolate_window: bool) -> Self {
+        self.isolate_window = isolate_window;
+        self
+    }
+
+    #[cfg(target_os = "macos")]
     pub fn with_excluded_windows(mut self, excluded_windows: Vec<scap_targets::WindowId>) -> Self {
         self.excluded_windows = excluded_windows;
         self
@@ -2221,6 +2231,8 @@ impl ActorBuilder {
                 shareable_content,
                 #[cfg(target_os = "macos")]
                 excluded_windows: self.excluded_windows,
+                #[cfg(target_os = "macos")]
+                isolate_window: self.isolate_window,
             },
             self.custom_cursor,
             self.keyboard_capture,
@@ -3222,6 +3234,8 @@ async fn create_segment_pipeline(
     #[cfg(target_os = "linux")]
     let mut start_time = start_time;
 
+    #[cfg(target_os = "macos")]
+    let mut window_geometry = None;
     let (screen, system_audio, cursor_display) = if camera_only {
         #[cfg(target_os = "linux")]
         {
@@ -3330,6 +3344,10 @@ async fn create_segment_pipeline(
             #[cfg(windows)]
             d3d_device,
             #[cfg(target_os = "macos")]
+            capture_target
+                .window()
+                .filter(|_| base_inputs.isolate_window),
+            #[cfg(target_os = "macos")]
             base_inputs
                 .shareable_content
                 .clone()
@@ -3341,6 +3359,10 @@ async fn create_segment_pipeline(
         .context("screen capture init")?;
 
         let screen_info = screen_config.info();
+        #[cfg(target_os = "macos")]
+        {
+            window_geometry = screen_config.window_geometry();
+        }
         let output_size = calculate_gpu_compatible_size(
             screen_info.width,
             screen_info.height,
@@ -3559,6 +3581,8 @@ async fn create_segment_pipeline(
                     crate::cursor::CursorCaptureTarget {
                         crop_bounds: cursor_crop_bounds,
                         display: cursor_display,
+                        #[cfg(target_os = "macos")]
+                        window_geometry,
                         #[cfg(target_os = "linux")]
                         window: base_inputs.capture_target.window(),
                     },
@@ -3870,6 +3894,8 @@ mod tests {
                         shareable_content: None,
                         #[cfg(target_os = "macos")]
                         excluded_windows: Vec::new(),
+                        #[cfg(target_os = "macos")]
+                        isolate_window: false,
                     },
                     false,
                     false,
@@ -3981,6 +4007,8 @@ mod tests {
                 shareable_content: None,
                 #[cfg(target_os = "macos")]
                 excluded_windows: Vec::new(),
+                #[cfg(target_os = "macos")]
+                isolate_window: false,
             },
             false,
             false,
@@ -4077,6 +4105,8 @@ mod tests {
                 start_gate: None,
                 shareable_content: None,
                 excluded_windows: Vec::new(),
+                #[cfg(target_os = "macos")]
+                isolate_window: false,
             },
             false,
             false,
@@ -4186,6 +4216,7 @@ mod tests {
                     next_index,
                     next_cursor_id,
                     cursors,
+                    ..
                 }) = &self.state
                 else {
                     panic!("failed resume must retain paused state");
@@ -4217,6 +4248,8 @@ mod tests {
                     shareable_content: None,
                     #[cfg(target_os = "macos")]
                     excluded_windows: Vec::new(),
+                    #[cfg(target_os = "macos")]
+                    isolate_window: false,
                 },
                 false,
                 false,
@@ -4463,6 +4496,8 @@ mod tests {
                     shareable_content: None,
                     #[cfg(target_os = "macos")]
                     excluded_windows: Vec::new(),
+                    #[cfg(target_os = "macos")]
+                    isolate_window: false,
                 },
                 false,
                 false,

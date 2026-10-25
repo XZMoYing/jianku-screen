@@ -28,6 +28,134 @@ use tracing::{debug, error, info, warn};
 const MAX_CAPTURE_RESTARTS: u32 = 3;
 const RESTART_DELAY: Duration = Duration::from_secs(2);
 
+pub type WindowGeometryState = Arc<Mutex<Option<WindowCaptureGeometry>>>;
+
+#[derive(Clone, Copy, Debug)]
+pub struct WindowCaptureGeometry {
+    screen: LogicalBounds,
+    viewport: LogicalBounds,
+}
+
+impl WindowCaptureGeometry {
+    pub fn project(&self, x: f64, y: f64) -> (f64, f64) {
+        (
+            self.viewport.position().x()
+                + (x - self.screen.position().x()) / self.screen.size().width()
+                    * self.viewport.size().width(),
+            self.viewport.position().y()
+                + (y - self.screen.position().y()) / self.screen.size().height()
+                    * self.viewport.size().height(),
+        )
+    }
+}
+
+fn frame_rect(value: &cf::Plist) -> Option<LogicalBounds> {
+    let dict = value.try_as_dictionary()?;
+    let number = |key: &cf::String| dict.get(key)?.try_as_number()?.to_f64();
+    let (x, y, width, height) = (
+        number(ns::str!(c"X").as_cf())?,
+        number(ns::str!(c"Y").as_cf())?,
+        number(ns::str!(c"Width").as_cf())?,
+        number(ns::str!(c"Height").as_cf())?,
+    );
+    (x.is_finite()
+        && y.is_finite()
+        && width > 0.0
+        && height > 0.0
+        && width.is_finite()
+        && height.is_finite())
+    .then_some(LogicalBounds::new(
+        LogicalPosition::new(x, y),
+        LogicalSize::new(width, height),
+    ))
+}
+
+fn update_window_geometry(sample: &cm::SampleBuf, state: &WindowGeometryState) {
+    if !api::macos_available("13.1") {
+        return;
+    }
+    let geometry = (|| {
+        let info = sample.attaches(false)?.iter().next()?;
+        let screen = frame_rect(info.get(unsafe { sc::FrameInfo::screen_rect() }?.as_cf())?)?;
+        let content = frame_rect(info.get(sc::FrameInfo::content_rect().as_cf())?)?;
+        let scale = info
+            .get(sc::FrameInfo::scale_factor().as_cf())?
+            .try_as_number()?
+            .to_f64()?;
+        let image = sample.image_buf()?;
+        if !scale.is_finite() || scale <= 0.0 || image.width() == 0 || image.height() == 0 {
+            return None;
+        }
+        Some(WindowCaptureGeometry {
+            screen,
+            viewport: LogicalBounds::new(
+                LogicalPosition::new(
+                    content.position().x() * scale / image.width() as f64,
+                    content.position().y() * scale / image.height() as f64,
+                ),
+                LogicalSize::new(
+                    content.size().width() * scale / image.width() as f64,
+                    content.size().height() * scale / image.height() as f64,
+                ),
+            ),
+        })
+    })();
+    if let Some(geometry) = geometry
+        && let Ok(mut current) = state.lock()
+    {
+        if current.is_none() {
+            info!(?geometry, "Received isolated window capture geometry");
+        }
+        *current = Some(geometry);
+    }
+}
+
+impl Config {
+    fn content_filter(
+        &self,
+        content: arc::R<sc::ShareableContent>,
+        excluded_windows: &[WindowId],
+        capture_phase: &'static str,
+    ) -> anyhow::Result<arc::R<sc::ContentFilter>> {
+        if let Some(id) = &self.window {
+            let native_id = id.to_string().parse::<u32>()?;
+            let windows = content.windows();
+            let window = windows
+                .iter()
+                .find(|window| window.id() == native_id)
+                .ok_or_else(|| anyhow!("Capture target window unavailable: {id}"))?;
+            return Ok(sc::ContentFilter::with_desktop_independent_window(window));
+        }
+
+        let display = Display::from_id(&self.display)
+            .ok_or_else(|| SourceError::NoDisplay(self.display.clone()))?;
+        let excluded = excluded_shareable_windows(excluded_windows, &content, capture_phase);
+        display
+            .raw_handle()
+            .as_content_filter_excluding_windows(content, excluded)
+            .ok_or_else(|| SourceError::AsContentFilter.into())
+    }
+
+    fn apply_capture_region(&self, settings: &mut sc::StreamCfg) {
+        if self.window.is_some() {
+            // A window filter already has window-local coordinates. Reusing the
+            // display crop clips the window again and can expose the wrong region.
+            if api::macos_available("14.0") {
+                unsafe { settings.set_ignore_shadows_single_window(true) };
+                unsafe { settings.set_ignore_global_clip_single_window(true) };
+            }
+            settings.set_scales_to_fit(true);
+        } else if let Some(bounds) = self.crop_bounds {
+            settings.set_src_rect(cg::Rect::new(
+                bounds.position().x(),
+                bounds.position().y(),
+                bounds.size().width(),
+                bounds.size().height(),
+            ));
+        }
+    }
+}
+
 fn excluded_shareable_windows(
     excluded_windows: &[WindowId],
     content: &sc::ShareableContent,
@@ -65,6 +193,61 @@ fn excluded_shareable_windows(
         "Mapped ScreenCaptureKit excluded windows"
     );
     collected
+}
+
+#[cfg(test)]
+mod window_capture_tests {
+    use super::*;
+
+    fn config(isolated: bool) -> Config {
+        Config {
+            display: "1".parse().unwrap(),
+            crop_bounds: Some(LogicalBounds::new(
+                LogicalPosition::new(320.0, 180.0),
+                LogicalSize::new(720.0, 450.0),
+            )),
+            window: isolated.then(|| "42".parse().unwrap()),
+            fps: 60,
+            show_cursor: false,
+        }
+    }
+
+    #[test]
+    fn overlapping_content_mode_preserves_the_display_region() {
+        let mut settings = sc::StreamCfg::new();
+        config(false).apply_capture_region(&mut settings);
+        assert_eq!(
+            settings.src_rect(),
+            cg::Rect::new(320.0, 180.0, 720.0, 450.0)
+        );
+    }
+
+    #[test]
+    fn isolated_window_does_not_reapply_the_display_crop() {
+        let mut settings = sc::StreamCfg::new();
+        let full_source = settings.src_rect();
+        config(true).apply_capture_region(&mut settings);
+        assert_eq!(settings.src_rect(), full_source);
+        assert!(settings.scales_to_fit());
+    }
+
+    #[test]
+    fn cursor_follows_captured_window_coordinates_and_letterboxing() {
+        let geometry = WindowCaptureGeometry {
+            screen: LogicalBounds::new(
+                LogicalPosition::new(-1000.0, 80.0),
+                LogicalSize::new(400.0, 600.0),
+            ),
+            viewport: LogicalBounds::new(
+                LogicalPosition::new(0.25, 0.0),
+                LogicalSize::new(0.5, 1.0),
+            ),
+        };
+        assert_eq!(geometry.project(-1000.0, 80.0), (0.25, 0.0));
+        assert_eq!(geometry.project(-800.0, 380.0), (0.5, 0.5));
+        assert_eq!(geometry.project(-600.0, 680.0), (0.75, 1.0));
+        assert!(geometry.project(-1200.0, 80.0).0 < 0.25);
+    }
 }
 
 struct FrameScaler {
@@ -199,6 +382,13 @@ impl output_pipeline::VideoFrame for VideoFrame {
 }
 
 impl ScreenCaptureConfig<CMSampleBufferCapture> {
+    pub fn window_geometry(&self) -> Option<WindowGeometryState> {
+        self.config
+            .window
+            .as_ref()
+            .map(|_| self.window_geometry.clone())
+    }
+
     pub async fn to_sources(
         &self,
     ) -> anyhow::Result<(VideoSourceConfig, Option<SystemAudioSourceConfig>)> {
@@ -216,19 +406,11 @@ impl ScreenCaptureConfig<CMSampleBufferCapture> {
         let system_audio_drop_counter: Arc<AtomicU64> = Arc::new(AtomicU64::new(0));
         let system_audio_frame_counter: Arc<AtomicU64> = Arc::new(AtomicU64::new(0));
 
-        let display = Display::from_id(&self.config.display)
-            .ok_or_else(|| SourceError::NoDisplay(self.config.display.clone()))?;
-
-        let excluded_sc_windows =
-            excluded_shareable_windows(&self.excluded_windows, &self.shareable_content, "initial");
-
-        let content_filter = display
-            .raw_handle()
-            .as_content_filter_excluding_windows(
-                self.shareable_content.clone(),
-                excluded_sc_windows,
-            )
-            .ok_or(SourceError::AsContentFilter)?;
+        let content_filter = self.config.content_filter(
+            self.shareable_content.clone(),
+            &self.excluded_windows,
+            "initial",
+        )?;
 
         debug!("SCK content filter: {:?}", content_filter);
 
@@ -257,15 +439,7 @@ impl ScreenCaptureConfig<CMSampleBufferCapture> {
         settings.set_pixel_format(cv::PixelFormat::_420V);
         settings.set_color_space_name(cg::color_space::names::srgb());
 
-        if let Some(crop_bounds) = self.config.crop_bounds {
-            debug!("crop bounds: {:?}", crop_bounds);
-            settings.set_src_rect(cg::Rect::new(
-                crop_bounds.position().x(),
-                crop_bounds.position().y(),
-                crop_bounds.size().width(),
-                crop_bounds.size().height(),
-            ));
-        }
+        self.config.apply_capture_region(&mut settings);
         cap_fail::fail_err!(
             "macos::ScreenCaptureActor::new",
             ns::Error::with_domain(ns::ErrorDomain::os_status(), 69420, None)
@@ -285,6 +459,7 @@ impl ScreenCaptureConfig<CMSampleBufferCapture> {
         let rebuild_params = Arc::new(CapturerRebuildParams {
             display_id: self.config.display.clone(),
             config: self.config.clone(),
+            window_geometry: self.window_geometry(),
             system_audio: self.system_audio,
             excluded_windows: self.excluded_windows.clone(),
             video_info: self.video_info,
@@ -308,6 +483,7 @@ impl ScreenCaptureConfig<CMSampleBufferCapture> {
                 let sys_audio_drop_counter = system_audio_drop_counter.clone();
                 let sys_audio_frame_counter = system_audio_frame_counter.clone();
                 let stall_health_tx = stall_health_tx.clone();
+                let window_geometry = self.window_geometry();
                 move |frame| {
                     let sample_buffer = frame.sample_buf();
 
@@ -319,6 +495,9 @@ impl ScreenCaptureConfig<CMSampleBufferCapture> {
 
                     match &frame {
                         scap_screencapturekit::Frame::Screen(frame) => {
+                            if let Some(state) = &window_geometry {
+                                update_window_geometry(sample_buffer, state);
+                            }
                             let Some(image_buf) = frame.image_buf() else {
                                 return;
                             };
@@ -737,7 +916,9 @@ impl output_pipeline::VideoSource for VideoSource {
                                 break Ok(());
                             }
 
-                            if Display::from_id(&rebuild_params.display_id).is_none() {
+                            if rebuild_params.config.window.is_none()
+                                && Display::from_id(&rebuild_params.display_id).is_none()
+                            {
                                 error!(
                                     display_id = ?rebuild_params.display_id,
                                     "Capture target display is gone; aborting restart"
@@ -921,6 +1102,7 @@ fn system_stop_message() -> &'static str {
 struct CapturerRebuildParams {
     display_id: DisplayId,
     config: Config,
+    window_geometry: Option<WindowGeometryState>,
     system_audio: bool,
     excluded_windows: Vec<WindowId>,
     video_info: VideoInfo,
@@ -945,16 +1127,10 @@ async fn rebuild_capturer(params: &CapturerRebuildParams) -> anyhow::Result<Capt
         .await
         .map_err(|e| anyhow!("Failed to get shareable content during restart: {e}"))?;
 
-    let display = Display::from_id(&params.display_id)
-        .ok_or_else(|| anyhow!("Display not found during restart: {:?}", params.display_id))?;
-
-    let excluded_sc_windows =
-        excluded_shareable_windows(&params.excluded_windows, &shareable_content, "restart");
-
-    let content_filter = display
-        .raw_handle()
-        .as_content_filter_excluding_windows(shareable_content, excluded_sc_windows)
-        .ok_or_else(|| anyhow!("Failed to create content filter during restart"))?;
+    let content_filter =
+        params
+            .config
+            .content_filter(shareable_content, &params.excluded_windows, "restart")?;
 
     let size = PhysicalSize::new(
         params.video_info.width as f64,
@@ -977,14 +1153,7 @@ async fn rebuild_capturer(params: &CapturerRebuildParams) -> anyhow::Result<Capt
     settings.set_pixel_format(cv::PixelFormat::_420V);
     settings.set_color_space_name(cg::color_space::names::srgb());
 
-    if let Some(crop_bounds) = params.config.crop_bounds {
-        settings.set_src_rect(cg::Rect::new(
-            crop_bounds.position().x(),
-            crop_bounds.position().y(),
-            crop_bounds.size().width(),
-            crop_bounds.size().height(),
-        ));
-    }
+    params.config.apply_capture_region(&mut settings);
 
     let expected_width = params.video_info.width as usize;
     let expected_height = params.video_info.height as usize;
@@ -995,6 +1164,7 @@ async fn rebuild_capturer(params: &CapturerRebuildParams) -> anyhow::Result<Capt
 
     let builder = scap_screencapturekit::Capturer::builder(content_filter, settings)
         .with_output_sample_buf_cb({
+            let window_geometry = params.window_geometry.clone();
             let video_frame_count = params.video_frame_counter.clone();
             let drop_counter = params.drop_counter.clone();
             let frame_scaler = params.frame_scaler.clone();
@@ -1014,6 +1184,9 @@ async fn rebuild_capturer(params: &CapturerRebuildParams) -> anyhow::Result<Capt
 
                 match &frame {
                     scap_screencapturekit::Frame::Screen(frame) => {
+                        if let Some(state) = &window_geometry {
+                            update_window_geometry(sample_buffer, state);
+                        }
                         let Some(image_buf) = frame.image_buf() else {
                             return;
                         };

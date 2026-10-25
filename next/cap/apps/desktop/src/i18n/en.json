@@ -1603,5 +1603,7 @@
 	"遮盖演示画面": "Cover presentation",
 	"恢复演示画面": "Resume presentation",
 	"演示暂停，稍后继续": "Presentation paused. Back shortly.",
-	"画面仍在准备，请稍后再跳转": "The preview is still preparing. Please try jumping again shortly."
+	"画面仍在准备，请稍后再跳转": "The preview is still preparing. Please try jumping again shortly.",
+	"过滤其他窗口": "Filter other windows",
+	"关闭时保留遮挡内容；开启后只录所选窗口。": "Off: include overlapping content. On: capture only the selected window."
 }

@@ -112,10 +112,6 @@ const LOCKED_AREA_COMMIT_DELAY_MS = 180;
 const LIQUID_GLASS_SURFACE_CLASS =
 	"rounded-2xl border border-gray-12/10 bg-gray-1/82 shadow-xl shadow-black/20 backdrop-blur-xl dark:border-white/10 dark:bg-gray-2/82";
 
-const capitalize = (str: string) => {
-	return str.charAt(0).toUpperCase() + str.slice(1);
-};
-
 const findCamera = (cameras: CameraInfo[], id?: DeviceOrModelID | null) => {
 	if (!id) return undefined;
 	return cameras.find((camera) =>
@@ -746,7 +742,7 @@ function Inner() {
 										>
 											{localize("Adjust recording area")}
 										</Button>
-												<ShowInstantModeNote
+										<ShowInstantModeNote
 											isInstantMode={options.mode === "instant"}
 										/>
 									</div>
@@ -1340,7 +1336,7 @@ function Inner() {
 										<div class="min-w-28 px-2 text-base font-normal leading-none tracking-[-0.01em] tabular-nums">
 											{isValid()
 												? `${Math.round(crop().width)} × ${Math.round(crop().height)}`
-											: localize("拖动框选区域")}
+												: localize("拖动框选区域")}
 										</div>
 
 										<div class="h-6 w-px bg-gray-5" />
@@ -1426,12 +1422,14 @@ function Inner() {
 												aria-pressed={isSelectionLocked()}
 												title={
 													isSelectionLocked()
-									? localize("取消固定此录制区域")
-								: localize("后续录制继续使用此区域")
+														? localize("取消固定此录制区域")
+														: localize("后续录制继续使用此区域")
 												}
 											>
 												<IconLucideLock class="size-3.5" />
-								{isSelectionLocked() ? localize("已固定") : localize("固定区域")}
+												{isSelectionLocked()
+													? localize("已固定")
+													: localize("固定区域")}
 											</button>
 										</Show>
 									</div>
@@ -1491,7 +1489,7 @@ function Inner() {
 										</div>
 									</Show>
 									<Show when={isValid()}>
-												<ShowInstantModeNote
+										<ShowInstantModeNote
 											isInstantMode={options.mode === "instant"}
 										/>
 									</Show>
@@ -2048,7 +2046,9 @@ function RecordingControls(props: {
 			await commands.suspendTargetSelectOverlays();
 		} catch (error) {
 			setDismissingPicker(false);
-			toast.error(localize("Could not dismiss the target picker. Please try again."));
+			toast.error(
+				localize("Could not dismiss the target picker. Please try again."),
+			);
 			console.error("Failed to suspend target select overlays", error);
 			return;
 		}
@@ -2099,9 +2099,7 @@ function RecordingControls(props: {
 					msg.includes("no longer available") ||
 					msg.includes("DeviceNotFound")
 				) {
-					toast.error(
-						localize("所选麦克风不可用，请在设置中选择其他麦克风。"),
-					);
+					toast.error(localize("所选麦克风不可用，请在设置中选择其他麦克风。"));
 				} else if (!isRecordingStartCancelled(e)) {
 					toast.error(localize("录制启动失败：{reason}", { reason: msg }));
 				}
@@ -2130,9 +2128,7 @@ function RecordingControls(props: {
 				if (controlsDisposed || revision !== microphoneConfirmationRevision)
 					return;
 				setConfirmingWithoutMicrophone(false);
-				toast.error(
-					localize("无法保存此设置，请重试，或取消勾选后继续。"),
-				);
+				toast.error(localize("无法保存此设置，请重试，或取消勾选后继续。"));
 				return;
 			}
 		}
@@ -2214,10 +2210,28 @@ function RecordingControls(props: {
 		return await Menu.new({
 			items: [
 				await MenuItem.new({
-			text: localize("录制倒计时"),
+					text: localize("录制倒计时"),
 					enabled: false,
 				}),
 				...(await countdownItems()),
+				...(ostype() === "macos" &&
+				props.target.variant === "window" &&
+				rawOptions.mode !== "screenshot"
+					? [
+							await PredefinedMenuItem.new({ item: "Separator" }),
+							await CheckMenuItem.new({
+								text: localize("过滤其他窗口"),
+								checked: generalSetings.data?.isolateWindowCapture ?? false,
+								action: () =>
+									void generalSettingsStore
+										.set({
+											isolateWindowCapture:
+												!generalSetings.data?.isolateWindowCapture,
+										})
+										.catch((error: unknown) => toast.error(String(error))),
+							}),
+						]
+					: []),
 			],
 		});
 	};
@@ -2298,11 +2312,11 @@ function RecordingControls(props: {
 											})()}
 										</span>
 										<span class="text-[11px] flex items-center text-nowrap gap-1 transition-opacity duration-200 text-white/90 font-light -mt-0.5">
-												{rawOptions.mode === "instant"
-													? localize("实时模式")
-													: rawOptions.mode === "screenshot"
-														? localize("截图模式")
-														: localize("录制模式")}
+											{rawOptions.mode === "instant"
+												? localize("实时模式")
+												: rawOptions.mode === "screenshot"
+													? localize("截图模式")
+													: localize("录制模式")}
 										</span>
 									</div>
 								</div>

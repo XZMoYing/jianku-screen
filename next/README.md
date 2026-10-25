@@ -1,8 +1,8 @@
 # 简库镜传新版
 
-新版在独立分支 `rewrite/cap-foundation` 开发，源代码位于 `next/cap/`。旧版源码、研究和工程格式保留在仓库原有目录；主工作目录继续停留在旧版。
+新版在 `rewrite/cap-foundation` 分支开发，源代码位于 `next/cap/`，当前工作目录为 `Jianku Screen Next`。旧版目录仍保留共用的 Git 仓库及历史源码；旧版应用与构建已经清理。
 
-当前阶段：底座试用及动画校准。已完成源码接入、原生桌面检查、调试应用打包与签名，以及打包内导出程序的本地素材验证。当前源码版本为 0.2.0-alpha.8，已接入连续的光标倾斜与点击形变弹簧、偏侧缩回的模糊中心与 21 次平移采样校准；普通光标移动移除通用预读，位置缓存保留完整收尾，预览与导出共用计算，保留点击前瞻及原有参数和画面配置。此前修正经典 Mac 箭头尖端、小数采集和旋转热点，补充运行时系统外形识别；此前增加本地工程打开、显式保存、可携带副本、定位和最近打开，副本携带已知外部素材并使用工程内相对路径；实时演示已接入首版；完整动画对照、物理多屏/会议共享验收和旧工程迁移尚未完成；一次实际显示器录制的权限、停止、保存和自动打开编辑器已通过；截图、音频及完整编辑交互仍需实机验收。
+当前阶段为 `0.2.0-alpha.27`：窗口录制新增“过滤其他窗口”选项，默认保留遮挡内容，可切换为独立窗口采集。此前书签、演示幕布及其他实现的状态与剩余范围见 [当前阶段计划](../docs/当前阶段计划.md)、[待验证项目交接](../docs/待验证项目交接.md) 和 [本轮实录验证](verification/2026-10-25-window-capture-choice/README.md)。以下早期接入记录用于追溯，不代表当前完整验收状态。
 
 ## 版本与来源
 
@@ -37,7 +37,7 @@ macOS 打包完成后会重签并严格验证整个应用，避免调试包残�
 
 2026-10-12 已确认 Xcode 16.2 初始化完成，原生构建障碍已解除。系统光标兼容证据见 [系统光标验证](verification/2026-10-12-system-cursor/verification.json)；位置时间与收尾证据见 [光标时间验证](verification/2026-10-12-cursor-timing/verification.json)；模糊阶段证据见 [动态模糊验证](verification/2026-10-12-motion-blur/verification.json)；光标阶段证据见 [姿态验证](verification/2026-10-12-cursor-pose/verification.json)；底座证据见 [原生底座验证](verification/2026-10-12-native-foundation/verification.json)；[前期接入记录](verification/2026-10-11-foundation/verification.json)保留当时的失败与等待状态，用于追溯。
 
-本机试用应用：`../Jianku Screen Next Builds/0.2.0-alpha.8/Jianku Screen Next.app`（相对项目工作目录）；当前实时演示的启动、显示及重启记录见 [实时演示验证](verification/2026-10-13-live-presentation/verification.json)；前一阶段工程管理记录见 [工程管理验证](verification/2026-10-12-project-files/verification.json)。试用工程在 `~/Movies/Jianku Screen Next/试用 0.2.0-alpha.6/移动后/可携带工程.cap`，含自建背景、贴图、音频与缩放；为验证便携性，测试源工程和外部测试素材已移除，副本和三份对照视频保留。软件内可用主界面“打开工程”或编辑器“工程”菜单选择本地 `.cap` 文件夹/文件包；保存副本时选择新名称，不覆盖已有工程。系统光标仍保持用户当前约 1.4 倍设置，真实录制偏移仍待试录确认。旧应用和用户原工程保留；调试包性能不代表发布版表现。
+2026-10-13 历史试用记录（该旧包已清理，当前应用统一安装在 `/Applications/Jianku Screen Next.app`）：`0.2.0-alpha.8`（相对项目工作目录）；当前实时演示的启动、显示及重启记录见 [实时演示验证](verification/2026-10-13-live-presentation/verification.json)；前一阶段工程管理记录见 [工程管理验证](verification/2026-10-12-project-files/verification.json)。试用工程在 `~/Movies/Jianku Screen Next/试用 0.2.0-alpha.6/移动后/可携带工程.cap`，含自建背景、贴图、音频与缩放；为验证便携性，测试源工程和外部测试素材已移除，副本和三份对照视频保留。软件内可用主界面“打开工程”或编辑器“工程”菜单选择本地 `.cap` 文件夹/文件包；保存副本时选择新名称，不覆盖已有工程。系统光标仍保持用户当前约 1.4 倍设置，真实录制偏移仍待试录确认。旧应用和用户原工程保留；调试包性能不代表发布版表现。
 
 2026-10-13 接入实时演示首版。主界面“实时演示”打开控制页，开始后出现“简库演示输出”共享窗口；焦点可选自动、手动或关闭，快捷键默认 ⌘/Ctrl+Shift+空格，外观可实时调整。选择副屏时不覆盖主屏或来源屏；物理多屏和会议共享仍需实机验收。实时来源目前限 macOS 显示器，Windows 适配及完整参考效果对照保留待办。验证见 [实时演示证据](verification/2026-10-13-live-presentation/verification.json)。
 

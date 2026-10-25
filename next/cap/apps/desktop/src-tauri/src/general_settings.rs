@@ -199,6 +199,8 @@ pub struct GeneralSettingsStore {
         rename = "custom_cursor_capture2"
     )]
     pub custom_cursor_capture: bool,
+    #[serde(default)]
+    pub isolate_window_capture: bool,
     #[serde(default = "default_server_url")]
     pub server_url: String,
     #[serde(default)]
@@ -345,6 +347,7 @@ impl Default for GeneralSettingsStore {
             post_studio_recording_behaviour: PostStudioRecordingBehaviour::OpenEditor,
             main_window_recording_start_behaviour: MainWindowRecordingStartBehaviour::Close,
             custom_cursor_capture: cap_recording::DEFAULT_CUSTOM_CURSOR_CAPTURE,
+            isolate_window_capture: false,
             server_url: default_server_url(),
             recording_countdown: Some(3),
             enable_native_camera_preview: default_enable_native_camera_preview(),
@@ -783,6 +786,17 @@ pub fn get_default_excluded_windows() -> Vec<WindowExclusion> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn window_isolation_is_opt_in_and_survives_settings_roundtrip() {
+        let old: GeneralSettingsStore = serde_json::from_value(json!({})).unwrap();
+        assert!(!old.isolate_window_capture);
+        let selected: GeneralSettingsStore =
+            serde_json::from_value(json!({ "isolateWindowCapture": true })).unwrap();
+        let saved = serde_json::to_value(&selected).unwrap();
+        let reopened: GeneralSettingsStore = serde_json::from_value(saved).unwrap();
+        assert!(reopened.isolate_window_capture);
+    }
 
     fn settings_with_preserved_values() -> Value {
         json!({
