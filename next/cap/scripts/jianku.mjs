@@ -77,6 +77,7 @@ function prepareEnvironment() {
 }
 
 function buildSidecars() {
+	run("node", ["scripts/build-android-capture.mjs"]);
 	run("cargo", [
 		"build",
 		"--locked",
@@ -252,6 +253,7 @@ function main() {
 	} else if (command === "setup") {
 		run("bun", ["install", "--frozen-lockfile"]);
 		run("node", ["scripts/setup.js"]);
+		run("node", ["scripts/build-android-capture.mjs"]);
 	} else if (command === "frontend") {
 		run("bun", ["run", "build"], desktop);
 	} else {

@@ -1,0 +1,13 @@
+{
+	"version": "4.1",
+	"source": {
+		"url": "https://codeload.github.com/Genymobile/scrcpy/tar.gz/refs/tags/v4.1",
+		"sha256": "537b2ade623cb94b6edddfa5c61bf0b0af21484aa8365ea2531b686ea573249a"
+	},
+	"server": {
+		"url": "https://github.com/Genymobile/scrcpy/releases/download/v4.1/scrcpy-server-v4.1",
+		"sha256": "deacb991ed2509715160ffdc7907e47b4160eb30d1566217e9047fd5b8850cae"
+	},
+	"license": "Apache-2.0",
+	"changes": "Capture first video packet arrival and explicit normal stop with a monotonic clock; retain packet timestamps and extend only the final video sample. EOS and failures do not extend the sample."
+}

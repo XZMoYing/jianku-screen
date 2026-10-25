@@ -80,6 +80,21 @@ pub struct MobileStatus {
     #[serde(skip)]
     #[specta(skip)]
     stopped_at: Option<Instant>,
+    #[serde(skip)]
+    #[specta(skip)]
+    android_timing: Option<AndroidTiming>,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct AndroidTiming {
+    first_video_pts_us: i64,
+    first_video_received_us: i64,
+    stop_requested_us: i64,
+    origin_pts_us: i64,
+    last_video_pts_us: i64,
+    last_video_duration_us: i64,
+    normal_stop: bool,
 }
 
 impl MobileStatus {
@@ -96,6 +111,13 @@ impl MobileStatus {
     }
 
     fn observed_duration(&self, now: Instant) -> f64 {
+        if let Some(timing) = &self.android_timing
+            && timing.normal_stop
+            && timing.stop_requested_us >= timing.first_video_received_us
+        {
+            return (timing.stop_requested_us - timing.first_video_received_us) as f64
+                / 1_000_000.0;
+        }
         self.started_at.map_or(0.0, |start| {
             self.stopped_at
                 .unwrap_or(now)
@@ -181,6 +203,14 @@ fn ios_helper() -> Option<PathBuf> {
     path.is_file().then_some(path)
 }
 
+fn android_helper() -> Option<(PathBuf, PathBuf)> {
+    let executable = std::env::current_exe().ok()?;
+    let directory = executable.parent()?;
+    let client = directory.join("jianku-android-capture");
+    let server = directory.parent()?.join("Resources/mobile/scrcpy-server");
+    (client.is_file() && server.is_file()).then_some((client, server))
+}
+
 async fn output(command: &mut Command) -> Result<std::process::Output, String> {
     command.kill_on_drop(true);
     tokio::time::timeout(Duration::from_secs(8), command.output())
@@ -235,11 +265,11 @@ pub async fn get_mobile_setup() -> Result<MobileSetup, String> {
         return Err("移动设备录制目前仅支持 macOS".into());
     }
     let adb = tool("adb");
-    let scrcpy = tool("scrcpy");
+    let android_helper = android_helper();
     let helper = ios_helper();
     let mut setup = MobileSetup {
         devices: Vec::new(),
-        android_ready: adb.is_some() && scrcpy.is_some(),
+        android_ready: adb.is_some() && android_helper.is_some(),
         ios_ready: helper.is_some(),
         warnings: Vec::new(),
     };
@@ -275,10 +305,13 @@ pub async fn get_mobile_setup() -> Result<MobileSetup, String> {
                 .push("安卓设备查询失败，请检查 USB 连接。".into()),
         }
     }
-    if !setup.android_ready {
+    if adb.is_none() {
+        setup.warnings.push("安卓录制需要本机安装 adb。".into());
+    }
+    if android_helper.is_none() {
         setup
             .warnings
-            .push("安卓录制需要本机安装 adb 和 scrcpy。".into());
+            .push("安卓捕获组件缺失，请重新安装应用。".into());
     }
     if let Some(helper) = helper {
         match output(Command::new(helper).arg("list")).await {
@@ -371,18 +404,16 @@ fn finalize_project(project: &Path, source: &str, name: &str) -> Result<(), Stri
         .streams()
         .best(ffmpeg::media::Type::Video)
         .ok_or("未找到设备视频")?;
-    let rate = video.avg_frame_rate();
+    let requested_fps = std::fs::read(project.join("mobile-source.json"))
+        .ok()
+        .and_then(|bytes| serde_json::from_slice::<serde_json::Value>(&bytes).ok())
+        .and_then(|value| value.get("capture")?.get("maxFps")?.as_u64())
+        .and_then(|value| u32::try_from(value).ok());
+    let fps = project_frame_rate(requested_fps, video.rate(), video.avg_frame_rate());
     let decoder = ffmpeg::codec::context::Context::from_parameters(video.parameters())
         .and_then(|context| context.decoder().video())
         .map_err(|error| error.to_string())?;
     let size = (decoder.width(), decoder.height());
-    let fps = if rate.denominator() > 0 {
-        (f64::from(rate.numerator()) / f64::from(rate.denominator()))
-            .round()
-            .clamp(1.0, 240.0) as u32
-    } else {
-        60
-    };
     let has_audio = input.streams().best(ffmpeg::media::Type::Audio).is_some();
     drop(input);
     let mut meta = if project.join("recording-meta.json").exists() {
@@ -443,6 +474,25 @@ fn finalize_project(project: &Path, source: &str, name: &str) -> Result<(), Stri
     }
     inner.status = Some(StudioRecordingStatus::Complete);
     meta.save_for_project().map_err(|error| error.to_string())
+}
+
+fn project_frame_rate(
+    requested: Option<u32>,
+    nominal: ffmpeg::Rational,
+    average: ffmpeg::Rational,
+) -> u32 {
+    if let Some(requested) = requested.filter(|value| [30, 60].contains(value)) {
+        return requested;
+    }
+    [nominal, average]
+        .into_iter()
+        .filter_map(|rate| {
+            (rate.denominator() > 0)
+                .then(|| f64::from(rate.numerator()) / f64::from(rate.denominator()))
+        })
+        .filter(|rate| (1.0..=240.0).contains(rate))
+        .reduce(f64::max)
+        .map_or(60, |rate| rate.ceil() as u32)
 }
 
 fn finalize_capture(
@@ -507,9 +557,11 @@ fn recording_command(
     match device.platform {
         MobilePlatform::Android => {
             let adb = tool("adb").ok_or("本机未安装 adb")?;
-            let mut command = Command::new(tool("scrcpy").ok_or("本机未安装 scrcpy")?);
+            let (client, server) = android_helper().ok_or("安卓捕获组件缺失，请重新安装应用")?;
+            let mut command = Command::new(client);
             command
                 .env("ADB", adb)
+                .env("SCRCPY_SERVER_PATH", server)
                 .args(["--serial", &device.id, "--video-codec=h264"])
                 .args(options.capture.scrcpy_args()?)
                 .arg(format!("--record={}", source.display()));
@@ -549,8 +601,13 @@ async fn drain(
     let mut lines = BufReader::new(reader).lines();
     while let Ok(Some(line)) = lines.next_line().await {
         let mut status = status.lock().unwrap();
-        if line.contains("Recording started to") || line.contains("\"event\":\"started\"") {
+        if line == "JIANKU_RECORDING_FIRST_VIDEO" || line.contains("\"event\":\"started\"") {
             status.begin_timing(Instant::now());
+        } else if let Some(json) = line.strip_prefix("JIANKU_RECORDING_TIMING ") {
+            if let Ok(timing) = serde_json::from_str::<AndroidTiming>(json) {
+                status.android_timing = Some(timing);
+                status.elapsed_seconds = status.observed_duration(Instant::now());
+            }
         } else if line.starts_with("ERROR:") || line.starts_with("WARN:") {
             status.notice = Some(line.replace(&device_id, "设备"));
         } else if let Ok(value) = serde_json::from_str::<serde_json::Value>(&line)
@@ -694,7 +751,7 @@ async fn capture(
             result = child.wait() => { break result.map_err(|error| error.to_string()).and_then(capture_exit_status); }
             changed = stop.changed() => { if changed.is_err() { stop.mark_changed(); requested_stop = true; let _ = interrupt(&mut child, &mut stdin, platform).await; } }
             _ = interval.tick() => {
-                if source.metadata().is_ok_and(|meta| meta.len() > 128) {
+                if platform == MobilePlatform::Ios && source.metadata().is_ok_and(|meta| meta.len() > 128) {
                     let mut state = status.lock().unwrap();
                     state.begin_timing(Instant::now());
                 } else if startup_expired(&status.lock().unwrap().phase, startup.elapsed()) {
@@ -842,7 +899,10 @@ pub async fn start_mobile_recording(
         )
         .await;
         status.lock().unwrap().phase = MobilePhase::Finalizing;
-        let observed_duration = status.lock().unwrap().elapsed_seconds;
+        let (observed_duration, android_timing) = {
+            let state = status.lock().unwrap();
+            (state.elapsed_seconds, state.android_timing.clone())
+        };
         let media_duration = cap_enc_ffmpeg::remux::get_media_duration(&project.join(source))
             .map(|duration| duration.as_secs_f64());
         let timing_notice =
@@ -850,7 +910,10 @@ pub async fn start_mobile_recording(
         let timing = serde_json::to_vec_pretty(&serde_json::json!({
             "observedDurationSeconds": observed_duration,
             "mediaDurationSeconds": media_duration,
-            "clockBasis": "host monotonic time from recorder-start notification or first observed file data to stop request or process exit",
+            "clockBasis": if device.platform == MobilePlatform::Android { "first received video packet to explicit normal stop using capture client monotonic clock; host event timing on abnormal exit" } else { "host monotonic time from recorder-start notification or first observed file data to stop request or process exit" },
+            "androidCaptureTiming": android_timing,
+            "androidCaptureVersion": (device.platform == MobilePlatform::Android).then_some("scrcpy-4.1-jianku-tail-1"),
+            "tailClockLimitation": (device.platform == MobilePlatform::Android).then_some("first-packet arrival excludes startup but includes transport latency; original packet PTS/DTS and audio are unchanged"),
             "durationMismatch": timing_notice.is_some(),
             "rawMediaModified": false,
         })).map_err(std::io::Error::other).and_then(|bytes| std::fs::write(project.join("mobile-timing.json"), bytes));
@@ -944,6 +1007,24 @@ mod tests {
     use super::*;
 
     #[test]
+    fn static_holds_do_not_reduce_the_source_frame_index_resolution() {
+        assert_eq!(
+            project_frame_rate(Some(60), (10, 1).into(), (11, 6).into()),
+            60
+        );
+        assert_eq!(
+            project_frame_rate(Some(30), (10, 1).into(), (11, 6).into()),
+            30
+        );
+        assert_eq!(project_frame_rate(None, (10, 1).into(), (11, 6).into()), 10);
+        assert_eq!(
+            project_frame_rate(None, (0, 0).into(), (30000, 1001).into()),
+            30
+        );
+        assert_eq!(project_frame_rate(None, (0, 0).into(), (0, 0).into()), 60);
+    }
+
+    #[test]
     fn media_timing_does_not_depend_on_status_polling_or_finalization_time() {
         let start = Instant::now();
         let mut status = MobileStatus {
@@ -966,6 +1047,34 @@ mod tests {
         assert!(duration_notice(6.0, 1.1).is_some());
         assert!(duration_notice(6.0, 5.9).is_none());
         assert!(duration_notice(0.0, 1.0).is_none());
+    }
+
+    #[tokio::test]
+    async fn android_timing_waits_for_the_first_video_packet() {
+        let status = Arc::new(Mutex::new(MobileStatus {
+            phase: MobilePhase::Starting,
+            ..Default::default()
+        }));
+        drain(
+            &b"INFO: Recording started to mp4 file: fixture\n"[..],
+            status.clone(),
+            "fixture".into(),
+        )
+        .await;
+        assert!(status.lock().unwrap().started_at.is_none());
+        drain(
+            &b"JIANKU_RECORDING_FIRST_VIDEO\n"[..],
+            status.clone(),
+            "fixture".into(),
+        )
+        .await;
+        assert!(status.lock().unwrap().started_at.is_some());
+        drain(
+            &b"JIANKU_RECORDING_TIMING {\"firstVideoPtsUs\":10000000,\"firstVideoReceivedUs\":5000000,\"stopRequestedUs\":11000000,\"originPtsUs\":10000000,\"lastVideoPtsUs\":1000000,\"lastVideoDurationUs\":5000000,\"normalStop\":true}\n"[..],
+            status.clone(),
+            "fixture".into(),
+        ).await;
+        assert_eq!(status.lock().unwrap().elapsed_seconds, 6.0);
     }
 
     #[test]
@@ -1112,7 +1221,7 @@ mod tests {
         let root = tempfile::tempdir().unwrap();
         let c = root.path().join("stdout.c");
         let binary = root.path().join("stdout-fixture");
-        std::fs::write(&c, b"#include <stdio.h>\n#include <unistd.h>\nint main(void) { printf(\"INFO: Recording started to mp4 file: fixture\\n\"); sleep(10); return 0; }\n").unwrap();
+        std::fs::write(&c, b"#include <stdio.h>\n#include <unistd.h>\nint main(void) { printf(\"JIANKU_RECORDING_FIRST_VIDEO\\n\"); sleep(10); return 0; }\n").unwrap();
         assert!(
             std::process::Command::new("/usr/bin/clang")
                 .arg(&c)

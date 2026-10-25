@@ -3,7 +3,7 @@
 	"productName": "Jianku Screen Next",
 	"mainBinaryName": "Jianku Screen Next",
 	"identifier": "com.jianku.screen.next",
-	"version": "0.2.0-alpha.27",
+	"version": "0.2.0-alpha.28",
 	"build": {
 		"beforeBuildCommand": "bun run build"
 	},
@@ -37,18 +37,26 @@
 			"../../../LICENSE": "licenses/Cap-LICENSE.txt",
 			"../../../JIANKU-NOTICE.md": "licenses/JIANKU-NOTICE.md",
 			"../../../licenses/material-color-utilities-LICENSE.txt": "licenses/material-color-utilities-LICENSE.txt",
-			"../../../licenses/dogsc-LICENSE.txt": "licenses/dogsc-LICENSE.txt"
+			"../../../licenses/dogsc-LICENSE.txt": "licenses/dogsc-LICENSE.txt",
+			"../../../target/native-deps/jianku-scrcpy/scrcpy-server-v4.1": "mobile/scrcpy-server",
+			"../../../licenses/scrcpy-LICENSE.txt": "licenses/scrcpy-LICENSE.txt",
+			"../../../licenses/SDL-LICENSE.txt": "licenses/SDL-LICENSE.txt"
 		},
 		"macOS": {
 			"bundleName": "简库镜传 Next",
-			"bundleVersion": "2026.27.0",
-			"entitlements": "Entitlements.plist"
+			"bundleVersion": "2026.28.0",
+			"entitlements": "Entitlements.plist",
+			"frameworks": [
+				"../../../target/native-deps/Spacedrive.framework",
+				"../../../target/native-deps/jianku-scrcpy/libSDL3.0.dylib"
+			]
 		},
 		"externalBin": [
 			"binaries/cap-muxer",
 			"binaries/cap-exporter",
 			"binaries/cap-cli",
-			"binaries/jianku-device-capture"
+			"binaries/jianku-device-capture",
+			"binaries/jianku-android-capture"
 		]
 	}
 }

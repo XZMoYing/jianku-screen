@@ -79,3 +79,5 @@ analysis/plans/
 tmp/
 
 /apps/desktop/src-tauri/binaries/jianku-device-capture-*
+
+/apps/desktop/src-tauri/binaries/jianku-android-capture-*

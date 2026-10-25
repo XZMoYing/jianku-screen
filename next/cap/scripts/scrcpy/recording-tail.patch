@@ -1,0 +1,55 @@
+--- a/app/src/recorder.c
++++ b/app/src/recorder.c
+@@ -1,0 +2,3 @@
++
++#include <stdio.h>
++#include "util/tick.h"
+@@ -434,2 +437,10 @@
+-        // assign an arbitrary duration to the last packet
+-        last->duration = 100000;
++        // Hold a static final frame only until an explicit stop. EOS must not extend it.
++        last->duration = jianku_tail_duration(&recorder->timing, pts_origin,
++                                               last->pts, 100000);
++        fprintf(stderr, "JIANKU_RECORDING_TIMING {\"firstVideoPtsUs\":%" PRId64
++                ",\"firstVideoReceivedUs\":%" PRId64 ",\"stopRequestedUs\":%" PRId64
++                ",\"originPtsUs\":%" PRId64 ",\"lastVideoPtsUs\":%" PRId64
++                ",\"lastVideoDurationUs\":%" PRId64 ",\"normalStop\":%s}\n",
++                recorder->timing.first_pts, recorder->timing.first_received,
++                recorder->timing.stopped_at, pts_origin, last->pts, last->duration,
++                recorder->timing.normal_stop ? "true" : "false");
+@@ -627,0 +639,5 @@
++    }
++
++    if (packet->pts != AV_NOPTS_VALUE
++            && jianku_tail_first_frame(&recorder->timing, packet->pts, sc_tick_now())) {
++        fprintf(stderr, "JIANKU_RECORDING_FIRST_VIDEO\n");
+@@ -788,0 +805 @@
++    recorder->timing = (struct jianku_tail) {0};
+@@ -856,0 +874,11 @@
++sc_recorder_stop_normal(struct sc_recorder *recorder) {
++    sc_mutex_lock(&recorder->mutex);
++    if (!recorder->stopped) {
++        jianku_tail_stop(&recorder->timing, sc_tick_now());
++        recorder->stopped = true;
++        sc_cond_signal(&recorder->cond);
++    }
++    sc_mutex_unlock(&recorder->mutex);
++}
++
++void
+--- a/app/src/recorder.h
++++ b/app/src/recorder.h
+@@ -13,0 +14 @@
++#include "jianku_tail.h"
+@@ -48,0 +50 @@
++    struct jianku_tail timing;
+@@ -83,0 +86,3 @@
++sc_recorder_stop_normal(struct sc_recorder *recorder);
++
++void
+--- a/app/src/scrcpy.c
++++ b/app/src/scrcpy.c
+@@ -906,0 +907,3 @@
++    if (recorder_initialized && ret == SCRCPY_EXIT_SUCCESS) {
++        sc_recorder_stop_normal(&s->recorder);
++    }

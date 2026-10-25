@@ -110,9 +110,23 @@ mod tests {
         );
     }
 
+    #[cfg(target_os = "macos")]
     #[test]
-    fn installed_scrcpy_accepts_capture_options_without_connecting_to_a_device() {
-        let scrcpy = super::super::tool("scrcpy").expect("option verification requires scrcpy");
+    fn bundled_capture_accepts_options_without_connecting_to_a_device() {
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../..");
+        let scrcpy = root.join(format!(
+            "apps/desktop/src-tauri/binaries/jianku-android-capture-{}-apple-darwin",
+            std::env::consts::ARCH
+        ));
+        assert!(
+            scrcpy.is_file(),
+            "run scripts/build-android-capture.mjs first"
+        );
+        let libraries = std::env::join_paths([
+            root.join("target/native-deps/jianku-scrcpy"),
+            root.join("target/native-deps/lib"),
+        ])
+        .unwrap();
         for orientation in [
             MobileCaptureOrientation::Initial,
             MobileCaptureOrientation::Natural,
@@ -127,6 +141,7 @@ mod tests {
                 orientation,
             };
             let result = std::process::Command::new(&scrcpy)
+                .env("DYLD_LIBRARY_PATH", &libraries)
                 .args(settings.scrcpy_args().unwrap())
                 .arg("--version")
                 .output()
@@ -136,6 +151,7 @@ mod tests {
                 "{}",
                 String::from_utf8_lossy(&result.stderr)
             );
+            assert!(String::from_utf8_lossy(&result.stdout).starts_with("scrcpy 4.1 "));
         }
     }
 }
