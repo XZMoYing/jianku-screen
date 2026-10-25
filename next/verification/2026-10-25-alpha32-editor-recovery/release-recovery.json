@@ -1,0 +1,46 @@
+{
+	"scope": "Installed optimized app, no review hooks or injected transport; healthy synthetic project and ordinary missing-media project",
+	"initialPid": 21099,
+	"errorWindow": {
+		"bounds": {
+			"Height": 800,
+			"Width": 1275,
+			"X": 202,
+			"Y": 105
+		},
+		"id": 28411,
+		"name": "简库镜传 · 视频编辑"
+	},
+	"windowsBeforeQuit": {
+		"applications": [
+			{
+				"path": "/Applications/Jianku Screen Next.app",
+				"pid": 21099
+			}
+		],
+		"windows": [
+			{
+				"bounds": {
+					"Height": 800,
+					"Width": 1275,
+					"X": 202,
+					"Y": 105
+				},
+				"id": 28411,
+				"name": "简库镜传 · 视频编辑"
+			},
+			{
+				"bounds": {
+					"Height": 800,
+					"Width": 1275,
+					"X": 202,
+					"Y": 105
+				},
+				"id": 28406,
+				"name": "简库镜传 · 视频编辑"
+			}
+		]
+	},
+	"normalQuitPassed": true,
+	"quitSeconds": 0.1448436250211671
+}

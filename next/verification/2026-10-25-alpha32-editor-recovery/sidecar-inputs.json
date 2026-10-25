@@ -1,0 +1,12 @@
+{
+	"scope": "Prepared alpha31 sidecar inputs reused: this stage changes desktop lifecycle/UI only, no shared crate or sidecar sources. Tauri signs and packages these inputs; strict nested signature verification passed.",
+	"inputsUnchangedDuringBuild": true,
+	"sha256": {
+		"cap-cli-aarch64-apple-darwin": "ebea997a142a2b21ae9dea812c8f2dd5376d02f64efe4461ecb1672fe9e25489",
+		"cap-muxer-aarch64-apple-darwin": "a94d28f2f243a57180a7d01dfb2e7002215d10f4c6635880f5406da9325c947a",
+		"jianku-android-capture-aarch64-apple-darwin": "bac5c35f6a684f9d3c7f37a9be6922b0770f33312c313cc226d0d3247413b539",
+		".gitignore": "a10516aa8ffc02070bf7e6ecd60d68d3b78e17a9c7a5e6ac13bb2ad6222e6667",
+		"jianku-device-capture-aarch64-apple-darwin": "b7ef5be1d4bc8dd2530467937bb04e723cb388dc095bceb6170777f1e31351fe",
+		"cap-exporter-aarch64-apple-darwin": "ebea997a142a2b21ae9dea812c8f2dd5376d02f64efe4461ecb1672fe9e25489"
+	}
+}

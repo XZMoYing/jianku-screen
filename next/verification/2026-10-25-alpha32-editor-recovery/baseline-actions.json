@@ -1,0 +1,28 @@
+[
+	{
+		"case": "close-button",
+		"events": [
+			{
+				"phase": "close-clicked",
+				"route": "/editor"
+			},
+			{
+				"errorVisible": true,
+				"phase": "still-visible",
+				"route": "/editor"
+			}
+		],
+		"editorStillOpen": true
+	},
+	{
+		"case": "loading-quit",
+		"faultInjection": "Only UI fetch for create_editor_instance is held indefinitely; actual metadata and native project are valid",
+		"events": [
+			{
+				"phase": "creation-held",
+				"route": "/editor"
+			}
+		],
+		"stillRunningAfterQuit": true
+	}
+]

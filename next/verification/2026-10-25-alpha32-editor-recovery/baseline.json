@@ -1,0 +1,23 @@
+{
+	"version": "0.2.0-alpha.31",
+	"pid": 6741,
+	"events": [
+		{
+			"heading": "无法打开录制文件",
+			"listeners": [],
+			"phase": "error-visible",
+			"route": "/editor"
+		},
+		{
+			"acknowledgements": [],
+			"headings": [
+				"无法打开录制文件"
+			],
+			"listeners": [],
+			"phase": "observed",
+			"route": "/editor"
+		}
+	],
+	"stillRunningAfterQuit": false,
+	"instrumentationNote": "The attempted invoke wrapper was ignored because Tauri defines invoke as non-writable. Empty listener/ack arrays are not evidence of missing listeners; actual Quit succeeded for this ordinary missing-media error."
+}

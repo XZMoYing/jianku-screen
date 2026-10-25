@@ -1,0 +1,34 @@
+{
+	"scope": "Only four temporary install backups created during alpha32. Release archives and source/media/build caches retained.",
+	"removed": [
+		{
+			"directory": "/Applications/.jianku-next-update-5GhD0v",
+			"version": "0.2.0-alpha.31",
+			"sha256": "9286076523b24f9660c8ae43bbaad822ef1d46e824186ce912ba7bf99159ab45",
+			"bytes": 315632907
+		},
+		{
+			"directory": "/Applications/.jianku-next-update-Jb4mCV",
+			"version": "0.2.0-alpha.31",
+			"sha256": "ceeeae66c8bc87c372b09d480029f4fb993a5a3ae86427e297186e578b7cf8ca",
+			"bytes": 511764203
+		},
+		{
+			"directory": "/Applications/.jianku-next-update-gVnb0S",
+			"version": "0.2.0-alpha.32",
+			"sha256": "55e653633549007a12d1efc484b90d5ee39c1bbe3506fa3bc4079cad6ff1267e",
+			"bytes": 511780075
+		},
+		{
+			"directory": "/Applications/.jianku-next-update-jfKnCx",
+			"version": "0.2.0-alpha.32",
+			"sha256": "af226cf2e289bed5b3d25a66267856ed345ad79098c55da85c50d2ef81c998fc",
+			"bytes": 511780139
+		}
+	],
+	"logicalBytes": 1850957324,
+	"retainedRollbackArchives": [
+		"0.2.0-alpha.31",
+		"0.2.0-alpha.32"
+	]
+}

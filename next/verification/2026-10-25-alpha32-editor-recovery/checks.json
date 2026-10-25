@@ -1,0 +1,28 @@
+{
+	"sourceCommit": "6d14bbe9f835dce07e38e1609a4e16e1e9ceaea8",
+	"frontendTests": {
+		"passed": 34,
+		"files": {
+			"editor-title-save-bridge": 8,
+			"recording-title-save": 8,
+			"project-config-save": 15,
+			"preparing-editor-context": 3
+		}
+	},
+	"nativeCheck": "cap-desktop passed",
+	"rustFormat": "passed",
+	"biomeProductFiles": "9 passed",
+	"desktopTypescript": "passed after final changes",
+	"debugInteractionCasesPassed": 8,
+	"playbackSmoke": {
+		"passedCycles": 3,
+		"scope": "Renderer counter + received frame metadata, not exact pixel-frame matching or sustained display FPS",
+		"previousObserverFailurePreserved": true
+	},
+	"physicalDeviceAcceptance": "Deferred by user; no Android/iPad/monitor/conference tests performed",
+	"releaseDelivery": "passed",
+	"releaseRecovery": "healthy + missing-media editors quit normally without review hooks",
+	"releaseExport": "9s/540 frames/1280x720/60fps/full decode -xerror passed",
+	"signatureAndHashes": "source, installed and archive strict signatures passed and main hashes match",
+	"sidecarInputsUnchangedDuringBuild": true
+}

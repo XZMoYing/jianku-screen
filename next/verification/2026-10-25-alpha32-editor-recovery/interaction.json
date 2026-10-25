@@ -1,0 +1,240 @@
+[
+	{
+		"case": "quit-during-held-initial-load",
+		"events": [
+			{
+				"mode": "loading-quit",
+				"phase": "creation-held",
+				"route": "/editor"
+			}
+		],
+		"quitSeconds": 0.3528560420963913
+	},
+	{
+		"case": "native-close-button",
+		"events": [
+			{
+				"actions": [
+					"retry",
+					"home",
+					"close"
+				],
+				"heading": "无法打开录制文件",
+				"mode": "close",
+				"phase": "error-ready",
+				"project": "/private/tmp/jianku-alpha32-fixtures/close.jks",
+				"route": "/editor"
+			},
+			{
+				"action": "close",
+				"mode": "close",
+				"phase": "action-clicked",
+				"route": "/editor"
+			}
+		],
+		"windows": {
+			"applications": [],
+			"windows": []
+		}
+	},
+	{
+		"case": "return-home-preserves-healthy-editor-and-saves-its-draft",
+		"events": [
+			{
+				"mode": "home",
+				"phase": "editor-ready",
+				"project": "/private/tmp/jianku-alpha32-fixtures/mixed.jks",
+				"route": "/editor"
+			},
+			{
+				"actions": [
+					"retry",
+					"home",
+					"close"
+				],
+				"heading": "无法打开录制文件",
+				"mode": "home",
+				"phase": "error-ready",
+				"project": "/private/tmp/jianku-alpha32-fixtures/home-error.jks",
+				"route": "/editor"
+			},
+			{
+				"action": "home",
+				"mode": "home",
+				"phase": "action-clicked",
+				"route": "/editor"
+			},
+			{
+				"mode": "home",
+				"phase": "home-ready",
+				"route": "/"
+			}
+		],
+		"windows": {
+			"applications": [
+				{
+					"path": "/Applications/Jianku Screen Next.app",
+					"pid": 15937
+				}
+			],
+			"windows": [
+				{
+					"bounds": {
+						"Height": 800,
+						"Width": 1120,
+						"X": 331,
+						"Y": 110
+					},
+					"id": 28229,
+					"name": "简库镜传 Next"
+				},
+				{
+					"bounds": {
+						"Height": 800,
+						"Width": 1275,
+						"X": 202,
+						"Y": 103
+					},
+					"id": 28223,
+					"name": "简库镜传 · 视频编辑"
+				}
+			]
+		},
+		"healthySavedName": "异常工程共存验收",
+		"quitSeconds": 0.29888175008818507
+	},
+	{
+		"case": "restore-missing-source-and-click-reload",
+		"events": [
+			{
+				"actions": [
+					"retry",
+					"home",
+					"close"
+				],
+				"heading": "无法打开录制文件",
+				"mode": "reload",
+				"phase": "error-ready",
+				"project": "/private/tmp/jianku-alpha32-fixtures/reload.jks",
+				"route": "/editor"
+			},
+			{
+				"mode": "reload",
+				"phase": "restore-required",
+				"route": "/editor"
+			},
+			{
+				"mode": "reload",
+				"phase": "editor-ready",
+				"project": "/private/tmp/jianku-alpha32-fixtures/reload.jks",
+				"route": "/editor"
+			}
+		],
+		"recordingMetaUnchanged": true,
+		"sourceMatchesOriginal": true
+	},
+	{
+		"case": "metadata-unavailable-after-window-open-and-restored",
+		"events": [
+			{
+				"mode": "metadata",
+				"phase": "metadata-held",
+				"route": "/editor"
+			},
+			{
+				"actions": [
+					"retry",
+					"home",
+					"close"
+				],
+				"heading": "无法打开录制文件",
+				"mode": "metadata",
+				"phase": "error-ready",
+				"project": "/private/tmp/jianku-alpha32-fixtures/metadata.jks",
+				"route": "/editor"
+			},
+			{
+				"mode": "metadata",
+				"phase": "restore-required",
+				"route": "/editor"
+			},
+			{
+				"mode": "metadata",
+				"phase": "editor-ready",
+				"project": "/private/tmp/jianku-alpha32-fixtures/metadata.jks",
+				"route": "/editor"
+			}
+		],
+		"recordingMetaRestoredByteForByte": true
+	},
+	{
+		"case": "early-route-error-remains-closable",
+		"events": [
+			{
+				"actions": [
+					"retry",
+					"home",
+					"close"
+				],
+				"heading": "无法打开录制文件",
+				"mode": "route-error",
+				"phase": "error-ready",
+				"project": null,
+				"route": "/editor"
+			}
+		],
+		"quitSeconds": 0.3223748749587685
+	},
+	{
+		"case": "ordinary-missing-media-quit-control",
+		"events": [
+			{
+				"actions": [
+					"retry",
+					"home",
+					"close"
+				],
+				"heading": "无法打开录制文件",
+				"mode": "error-quit",
+				"phase": "error-ready",
+				"project": "/private/tmp/jianku-alpha32-fixtures/error-quit.jks",
+				"route": "/editor"
+			}
+		],
+		"quitSeconds": 0.1509095838991925
+	},
+	{
+		"case": "real-save-failure-prevents-quit-and-retry-saves",
+		"events": [
+			{
+				"mode": "save-failure",
+				"phase": "editor-ready",
+				"project": "/private/tmp/jianku-alpha32-fixtures/save-failure.jks",
+				"route": "/editor"
+			},
+			{
+				"mode": "save-failure",
+				"phase": "save-rejected",
+				"route": "/editor"
+			},
+			{
+				"mode": "save-failure",
+				"phase": "save-rejected",
+				"route": "/editor"
+			},
+			{
+				"mode": "save-failure",
+				"phase": "save-unblocked",
+				"route": "/editor"
+			},
+			{
+				"mode": "save-failure",
+				"phase": "save-unblocked",
+				"route": "/editor"
+			}
+		],
+		"failurePreservedOriginal": true,
+		"savedAfterRetry": "异常工程共存验收",
+		"quitSeconds": 0.32673650002107024
+	}
+]

@@ -1,0 +1,698 @@
+[
+	{
+		"phase": "ready",
+		"project": "/private/tmp/jianku-alpha32-fixtures/healthy.jks",
+		"route": "/editor",
+		"transport": "canvas2d"
+	},
+	{
+		"after": [
+			"0:00.47",
+			" / ",
+			"0:09.00"
+		],
+		"before": [
+			"0:02.36",
+			" / ",
+			"0:09.00"
+		],
+		"cycle": 0,
+		"firstFrameMs": 240.0000000000009,
+		"frames": [
+			{
+				"at": 5616.000000000001,
+				"number": 1,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 5632,
+				"number": 2,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 5649,
+				"number": 3,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 5665,
+				"number": 4,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 5682,
+				"number": 5,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 5698,
+				"number": 6,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 5714,
+				"number": 7,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 5731,
+				"number": 8,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 5749.000000000001,
+				"number": 9,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 5782,
+				"number": 11,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 5798,
+				"number": 12,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 5816,
+				"number": 13,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 5831,
+				"number": 14,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 5848,
+				"number": 15,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 5865,
+				"number": 16,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 5882.000000000001,
+				"number": 17,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 5898,
+				"number": 18,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 5915,
+				"number": 19,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 5931,
+				"number": 20,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 5949,
+				"number": 20,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 5981,
+				"number": 23,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 5998,
+				"number": 24,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 6015.000000000001,
+				"number": 25,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 6031,
+				"number": 26,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 6047,
+				"number": 27,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 6065,
+				"number": 28,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 6082,
+				"number": 29,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 6102,
+				"number": 30,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 6115,
+				"number": 31,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 6132.000000000001,
+				"number": 32,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 6148,
+				"number": 33,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 6165,
+				"number": 34,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 6181,
+				"number": 35,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 6198,
+				"number": 36,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 6214,
+				"number": 37,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 6232,
+				"number": 38,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 6248,
+				"number": 39,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 6264,
+				"number": 40,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 6281,
+				"number": 41,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 6298,
+				"number": 42,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 6315,
+				"number": 43,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 6334.000000000001,
+				"number": 44,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 6348,
+				"number": 43,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 6365,
+				"number": 46,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 6381,
+				"number": 47,
+				"transport": "canvas2d"
+			}
+		],
+		"method": "timeline-ruler",
+		"passed": true,
+		"phase": "cycle",
+		"route": "/editor"
+	},
+	{
+		"after": [
+			"0:00.47",
+			" / ",
+			"0:09.00"
+		],
+		"before": [
+			"0:01.21",
+			" / ",
+			"0:09.00"
+		],
+		"cycle": 1,
+		"firstFrameMs": 40,
+		"frames": [
+			{
+				"at": 7281.000000000001,
+				"number": 0,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7314,
+				"number": 2,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7331,
+				"number": 3,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7348,
+				"number": 4,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7365,
+				"number": 5,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7380,
+				"number": 6,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7398.000000000001,
+				"number": 7,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7415,
+				"number": 8,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7431,
+				"number": 8,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7464,
+				"number": 9,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7481,
+				"number": 12,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7498,
+				"number": 11,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7517,
+				"number": 14,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7533,
+				"number": 13,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7549,
+				"number": 15,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7565,
+				"number": 16,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7583,
+				"number": 18,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7598,
+				"number": 17,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7615,
+				"number": 19,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7632.000000000001,
+				"number": 20,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7652,
+				"number": 20,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7688,
+				"number": 21,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7698,
+				"number": 23,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7714,
+				"number": 26,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7731,
+				"number": 24,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7749.000000000001,
+				"number": 28,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7766,
+				"number": 29,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7781.000000000001,
+				"number": 30,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7815,
+				"number": 32,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7831,
+				"number": 33,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7848,
+				"number": 34,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7865,
+				"number": 35,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7881,
+				"number": 36,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7897,
+				"number": 34,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7916,
+				"number": 38,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7932,
+				"number": 39,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7947,
+				"number": 37,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7965,
+				"number": 38,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7981,
+				"number": 42,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 7998,
+				"number": 42,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 8031.000000000001,
+				"number": 45,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 8048,
+				"number": 46,
+				"transport": "canvas2d"
+			}
+		],
+		"method": "timeline-ruler",
+		"passed": true,
+		"phase": "cycle",
+		"route": "/editor"
+	},
+	{
+		"after": [
+			"0:00.50",
+			" / ",
+			"0:09.00"
+		],
+		"before": [
+			"0:01.22",
+			" / ",
+			"0:09.00"
+		],
+		"cycle": 2,
+		"firstFrameMs": 81,
+		"frames": [
+			{
+				"at": 8881,
+				"number": 1,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 8898,
+				"number": 1,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 8931.000000000002,
+				"number": 2,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 8948,
+				"number": 4,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 8965,
+				"number": 6,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 8982,
+				"number": 7,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 8998,
+				"number": 6,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9015,
+				"number": 9,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9030,
+				"number": 8,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9048,
+				"number": 10,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9065,
+				"number": 11,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9081,
+				"number": 12,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9098,
+				"number": 12,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9133,
+				"number": 13,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9148,
+				"number": 16,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9165.000000000002,
+				"number": 15,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9181.000000000002,
+				"number": 18,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9198,
+				"number": 17,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9215,
+				"number": 20,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9232,
+				"number": 21,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9247,
+				"number": 22,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9265,
+				"number": 23,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9281,
+				"number": 25,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9298,
+				"number": 26,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9315,
+				"number": 27,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9331,
+				"number": 25,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9348,
+				"number": 28,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9367,
+				"number": 29,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9395,
+				"number": 30,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9405,
+				"number": 29,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9440,
+				"number": 30,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9487,
+				"number": 31,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9546,
+				"number": 32,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9620.000000000002,
+				"number": 41,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9634,
+				"number": 43,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9649,
+				"number": 44,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9682,
+				"number": 48,
+				"transport": "canvas2d"
+			},
+			{
+				"at": 9699,
+				"number": 50,
+				"transport": "canvas2d"
+			}
+		],
+		"method": "timeline-ruler",
+		"passed": true,
+		"phase": "cycle",
+		"route": "/editor"
+	},
+	{
+		"cycles": 3,
+		"phase": "complete",
+		"route": "/editor"
+	}
+]

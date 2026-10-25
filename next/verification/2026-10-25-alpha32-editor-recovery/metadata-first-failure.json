@@ -1,0 +1,7 @@
+{
+	"scope": "First alpha32 debug candidate before disabling raw metadata automatic retry",
+	"phase": "Window opened while metadata was valid, then metadata was replaced by invalid JSON before its UI fetch",
+	"observed": "No error panel within 25 seconds; loading skeleton remained",
+	"inference": "Default query retries can pause while the app lacks focus; route metadata needs immediate error presentation and explicit reload",
+	"nextChange": "retry:false for the initial local metadata query"
+}

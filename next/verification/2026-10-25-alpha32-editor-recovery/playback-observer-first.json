@@ -1,0 +1,22 @@
+{
+	"scope": "Legacy alpha31 observer only intercepted main-thread Canvas2D.putImageData",
+	"events": [
+		{
+			"phase": "ready",
+			"project": "/private/tmp/jianku-alpha32-fixtures/healthy.jks",
+			"route": "/editor"
+		},
+		{
+			"labels": [
+				"0:04.14",
+				" / ",
+				"0:09.00"
+			],
+			"lastFrames": [],
+			"message": "Error: Timed out: resumed frames progressed",
+			"phase": "error",
+			"route": "/editor"
+		}
+	],
+	"classification": "Observation failed: no Canvas2D draws recorded while native log continued rendering and sending. Verify active renderer and rerun using renderer-independent render counters; not counted as a playback pass."
+}
