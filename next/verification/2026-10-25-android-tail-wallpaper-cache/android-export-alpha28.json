@@ -1,0 +1,24 @@
+[
+	{
+		"case": "static",
+		"samplesSeconds": [1.2, 5.8],
+		"meanPixelDifference": 0.0,
+		"frames": 360,
+		"durationSeconds": 6.0,
+		"outputDimensions": [220, 360],
+		"decodeComplete": true,
+		"rendererVersion": "alpha28 packaged debug",
+		"metadataFps": 60
+	},
+	{
+		"case": "sparse",
+		"samplesSeconds": [4.2, 5.8],
+		"meanPixelDifference": 0.0,
+		"frames": 360,
+		"durationSeconds": 6.0,
+		"outputDimensions": [220, 360],
+		"decodeComplete": true,
+		"rendererVersion": "alpha28 packaged debug",
+		"metadataFps": 60
+	}
+]

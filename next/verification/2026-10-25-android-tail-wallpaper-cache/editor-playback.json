@@ -1,0 +1,160 @@
+{
+	"profile": "packaged debug alpha27",
+	"project": "synthetic 12s screen video + 60s 120fps long-GOP wallpaper",
+	"framesAreTransportMessages": true,
+	"before": [
+		{
+			"frames": 4,
+			"phase": "ready",
+			"route": "/editor",
+			"time": ["0:00.00", " / ", "0:12.00"]
+		},
+		{
+			"cycle": 0,
+			"durationMs": 1302,
+			"newFrames": 76,
+			"phase": "cycle",
+			"route": "/editor",
+			"time": ["0:01.15", " / ", "0:12.00"]
+		},
+		{
+			"cycle": 1,
+			"durationMs": 1302,
+			"newFrames": 71,
+			"phase": "cycle",
+			"route": "/editor",
+			"time": ["0:02.27", " / ", "0:12.00"]
+		},
+		{
+			"cycle": 2,
+			"durationMs": 1301.000000000001,
+			"newFrames": 69,
+			"phase": "cycle",
+			"route": "/editor",
+			"time": ["0:03.35", " / ", "0:12.00"]
+		},
+		{
+			"cycle": 3,
+			"durationMs": 1302,
+			"newFrames": 60,
+			"phase": "cycle",
+			"route": "/editor",
+			"time": ["0:04.40", " / ", "0:12.00"]
+		},
+		{
+			"newFrames": 2,
+			"phase": "seek",
+			"route": "/editor",
+			"time": ["0:06.00", " / ", "0:12.00"]
+		},
+		{
+			"phase": "complete",
+			"route": "/editor"
+		}
+	],
+	"afterProfile": "packaged debug alpha28",
+	"after": {
+		"wallpaper": [
+			{
+				"frames": 5,
+				"phase": "ready",
+				"route": "/editor",
+				"time": ["0:00.00", " / ", "0:12.00"]
+			},
+			{
+				"cycle": 0,
+				"durationMs": 1302,
+				"newFrames": 76,
+				"phase": "cycle",
+				"route": "/editor",
+				"time": ["0:01.15", " / ", "0:12.00"]
+			},
+			{
+				"cycle": 1,
+				"durationMs": 1301,
+				"newFrames": 72,
+				"phase": "cycle",
+				"route": "/editor",
+				"time": ["0:02.27", " / ", "0:12.00"]
+			},
+			{
+				"cycle": 2,
+				"durationMs": 1305,
+				"newFrames": 69,
+				"phase": "cycle",
+				"route": "/editor",
+				"time": ["0:03.36", " / ", "0:12.00"]
+			},
+			{
+				"cycle": 3,
+				"durationMs": 1304,
+				"newFrames": 66,
+				"phase": "cycle",
+				"route": "/editor",
+				"time": ["0:04.42", " / ", "0:12.00"]
+			},
+			{
+				"newFrames": 2,
+				"phase": "seek",
+				"route": "/editor",
+				"time": ["0:06.00", " / ", "0:12.00"]
+			},
+			{
+				"phase": "complete",
+				"route": "/editor"
+			}
+		],
+		"static-tail": [
+			{
+				"frames": 5,
+				"phase": "ready",
+				"route": "/editor",
+				"time": ["0:00.00", " / ", "0:06.00"]
+			},
+			{
+				"cycle": 0,
+				"durationMs": 1303,
+				"newFrames": 77,
+				"phase": "cycle",
+				"route": "/editor",
+				"time": ["0:01.17", " / ", "0:06.00"]
+			},
+			{
+				"cycle": 1,
+				"durationMs": 1304,
+				"newFrames": 77,
+				"phase": "cycle",
+				"route": "/editor",
+				"time": ["0:02.34", " / ", "0:06.00"]
+			},
+			{
+				"cycle": 2,
+				"durationMs": 1301,
+				"newFrames": 77,
+				"phase": "cycle",
+				"route": "/editor",
+				"time": ["0:03.50", " / ", "0:06.00"]
+			},
+			{
+				"cycle": 3,
+				"durationMs": 1304,
+				"newFrames": 76,
+				"phase": "cycle",
+				"route": "/editor",
+				"time": ["0:05.04", " / ", "0:06.00"]
+			},
+			{
+				"newFrames": 1,
+				"phase": "seek",
+				"route": "/editor",
+				"time": ["0:05.30", " / ", "0:06.00"]
+			},
+			{
+				"phase": "complete",
+				"route": "/editor"
+			}
+		]
+	},
+	"beforeWallpaperIndexBuilds": 2,
+	"afterWallpaperIndexBuilds": 1
+}

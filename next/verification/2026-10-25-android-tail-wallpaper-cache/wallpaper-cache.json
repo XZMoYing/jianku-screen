@@ -1,0 +1,209 @@
+{
+	"date": "2026-10-25",
+	"scope": "Native precise wallpaper NV12 keyframe-index reuse; no UI or export end-to-end speed claims",
+	"test_executions_passed": 9,
+	"cargo_check": ["cap-video-decode", "cap-rendering"],
+	"cargo_fmt_check": true,
+	"git_diff_check": true,
+	"cache_limits": {
+		"entries": 8,
+		"index_bytes": 8388608,
+		"stores_pixels_or_hardware_buffers": false
+	},
+	"benchmark_ms": {
+		"cached_index_ms": 0.0085,
+		"first_open_ms": 290.291292,
+		"keyframe_count": 12,
+		"repeated_open_ms": 7.08425,
+		"uncached_index_ms": 22.467000000000002
+	},
+	"benchmark_limit": "First-open vs repeated-open includes AVFoundation cold-start effects; uncached_index_ms vs cached_index_ms isolates index lookup overhead. Measurements are a single local run, not a repeated median.",
+	"fixtures": [
+		{
+			"kind": "cfr",
+			"path": "/private/tmp/jianku-alpha28-fixtures/wallpaper.mp4",
+			"sha256": "9876deb21766615cd5da8918da45253399059d4028a24e74a25a605a9f3f15db",
+			"metadata": {
+				"codec_name": "h264",
+				"width": 960,
+				"height": 540,
+				"avg_frame_rate": "120/1",
+				"duration": "60.000000",
+				"nb_frames": "7200"
+			},
+			"reopened_index_sample_count": 9,
+			"reopened_index_pixels_bit_identical": true,
+			"reopened_index_pts_identical": true,
+			"ffmpeg_reference_samples": [
+				{
+					"request_time": 0.0,
+					"native_pts": 0.0,
+					"reference_pts": 0.0,
+					"mean_pixel_difference": 0.0
+				},
+				{
+					"request_time": 0.016666666666666666,
+					"native_pts": 0.016666666666666666,
+					"reference_pts": 0.016666666666666666,
+					"mean_pixel_difference": 0.41390094521604937
+				},
+				{
+					"request_time": 0.03333333333333333,
+					"native_pts": 0.03333333333333333,
+					"reference_pts": 0.03333333333333333,
+					"mean_pixel_difference": 0.42074604552469136
+				},
+				{
+					"request_time": 0.05,
+					"native_pts": 0.05,
+					"reference_pts": 0.05,
+					"mean_pixel_difference": 0.42911747685185186
+				},
+				{
+					"request_time": 0.3,
+					"native_pts": 0.3,
+					"reference_pts": 0.3,
+					"mean_pixel_difference": 0.4775376157407407
+				},
+				{
+					"request_time": 1.18,
+					"native_pts": 1.1833333333333333,
+					"reference_pts": 1.1833333333333333,
+					"mean_pixel_difference": 0.4546387924382716
+				},
+				{
+					"request_time": 1.2,
+					"native_pts": 1.2,
+					"reference_pts": 1.2,
+					"mean_pixel_difference": 0.46380497685185185
+				},
+				{
+					"request_time": 1.2166666666666666,
+					"native_pts": 1.2166666666666666,
+					"reference_pts": 1.2166666666666666,
+					"mean_pixel_difference": 0.4640928819444444
+				},
+				{
+					"request_time": 0.017,
+					"native_pts": 0.025,
+					"reference_pts": 0.025,
+					"mean_pixel_difference": 0.4176432291666667
+				},
+				{
+					"request_time": 0.3,
+					"native_pts": 0.3,
+					"reference_pts": 0.3,
+					"mean_pixel_difference": 0.4775376157407407
+				},
+				{
+					"request_time": 0.0,
+					"native_pts": 0.0,
+					"reference_pts": 0.0,
+					"mean_pixel_difference": 0.0
+				},
+				{
+					"request_time": 0.0,
+					"native_pts": 0.0,
+					"reference_pts": 0.0,
+					"mean_pixel_difference": 0.0
+				}
+			]
+		},
+		{
+			"kind": "vfr",
+			"path": "/private/tmp/jianku-alpha28-fixtures/wallpaper-vfr.mp4",
+			"sha256": "c7cd8c28a86ae544fed5ae6dd73c875ac3160159a32b4a430185e14af3590563",
+			"metadata": {
+				"codec_name": "h264",
+				"width": 320,
+				"height": 180,
+				"avg_frame_rate": "4200/121",
+				"duration": "12.000000",
+				"nb_frames": "420"
+			},
+			"reopened_index_sample_count": 9,
+			"reopened_index_pixels_bit_identical": true,
+			"reopened_index_pts_identical": true,
+			"ffmpeg_reference_samples": [
+				{
+					"request_time": 0.0,
+					"native_pts": 0.0,
+					"reference_pts": 0.0,
+					"mean_pixel_difference": 0.0
+				},
+				{
+					"request_time": 0.016666666666666666,
+					"native_pts": 0.06666666666666667,
+					"reference_pts": 0.06666666666666667,
+					"mean_pixel_difference": 0.0
+				},
+				{
+					"request_time": 0.03333333333333333,
+					"native_pts": 0.06666666666666667,
+					"reference_pts": 0.06666666666666667,
+					"mean_pixel_difference": 0.0
+				},
+				{
+					"request_time": 0.05,
+					"native_pts": 0.06666666666666667,
+					"reference_pts": 0.06666666666666667,
+					"mean_pixel_difference": 0.0
+				},
+				{
+					"request_time": 0.3,
+					"native_pts": 0.3333333333333333,
+					"reference_pts": 0.3333333333333333,
+					"mean_pixel_difference": 0.0
+				},
+				{
+					"request_time": 1.18,
+					"native_pts": 1.2,
+					"reference_pts": 1.2,
+					"mean_pixel_difference": 0.9605902777777777
+				},
+				{
+					"request_time": 1.2,
+					"native_pts": 1.2,
+					"reference_pts": 1.2,
+					"mean_pixel_difference": 0.9605902777777777
+				},
+				{
+					"request_time": 1.2166666666666666,
+					"native_pts": 1.2666666666666666,
+					"reference_pts": 1.2666666666666666,
+					"mean_pixel_difference": 0.9334982638888889
+				},
+				{
+					"request_time": 0.017,
+					"native_pts": 0.06666666666666667,
+					"reference_pts": 0.06666666666666667,
+					"mean_pixel_difference": 0.0
+				},
+				{
+					"request_time": 0.3,
+					"native_pts": 0.3333333333333333,
+					"reference_pts": 0.3333333333333333,
+					"mean_pixel_difference": 0.0
+				},
+				{
+					"request_time": 0.0,
+					"native_pts": 0.0,
+					"reference_pts": 0.0,
+					"mean_pixel_difference": 0.0
+				},
+				{
+					"request_time": 0.0,
+					"native_pts": 0.0,
+					"reference_pts": 0.0,
+					"mean_pixel_difference": 0.0
+				}
+			]
+		}
+	],
+	"known_limits": [
+		"First file scan still required in a new process; separate export process does not share memory cache.",
+		"Long GOP sample decoding remains necessary and is not shortened.",
+		"Cancellation checks run between demux packets and around native reader setup, not inside blocking filesystem or AVFoundation calls.",
+		"Concurrent initial misses may scan twice, but scans do not hold the shared cache lock."
+	]
+}

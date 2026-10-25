@@ -1,0 +1,32 @@
+[
+	{
+		"case": "static",
+		"samplesSeconds": [1.2, 5.8],
+		"meanPixelDifference": 0.0,
+		"frames": 360,
+		"durationSeconds": 6.0,
+		"outputDimensions": [220, 360],
+		"rendererVersion": "alpha27 release baseline",
+		"metadataFps": 10
+	},
+	{
+		"case": "sparse",
+		"samplesSeconds": [4.2, 5.8],
+		"meanPixelDifference": 0.0,
+		"frames": 360,
+		"durationSeconds": 6.0,
+		"outputDimensions": [220, 360],
+		"rendererVersion": "alpha27 release baseline",
+		"metadataFps": 10
+	},
+	{
+		"case": "sparse-middle",
+		"samplesSeconds": [1.2, 2.8],
+		"meanPixelDifference": 0.0,
+		"frames": 360,
+		"durationSeconds": 6.0,
+		"outputDimensions": [220, 360],
+		"rendererVersion": "alpha27 release baseline",
+		"metadataFps": 10
+	}
+]

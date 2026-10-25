@@ -1,0 +1,198 @@
+{
+	"passed": 12,
+	"checks": "All encoded payload hashes and packet timestamps preserved; delayed first frame, video/audio origin, sparse middle, normal stop, errors and EOS tested; all outputs fully decoded.",
+	"cases": [
+		{
+			"source": "static",
+			"mode": "normal",
+			"videoOffsetUs": 0,
+			"packetCount": 11,
+			"videoEndSeconds": 6.0,
+			"timing": {
+				"firstVideoPtsUs": 10000000,
+				"firstVideoReceivedUs": 5000000,
+				"stopRequestedUs": 11000000,
+				"originPtsUs": 10000000,
+				"lastVideoPtsUs": 1000000,
+				"lastVideoDurationUs": 5000000,
+				"normalStop": true
+			}
+		},
+		{
+			"source": "static",
+			"mode": "error",
+			"videoOffsetUs": 0,
+			"packetCount": 11,
+			"videoEndSeconds": 1.1,
+			"timing": {
+				"firstVideoPtsUs": 10000000,
+				"firstVideoReceivedUs": 5000000,
+				"stopRequestedUs": 0,
+				"originPtsUs": 10000000,
+				"lastVideoPtsUs": 1000000,
+				"lastVideoDurationUs": 100000,
+				"normalStop": false
+			}
+		},
+		{
+			"source": "static",
+			"mode": "eos-before-stop",
+			"videoOffsetUs": 0,
+			"packetCount": 11,
+			"videoEndSeconds": 1.1,
+			"timing": {
+				"firstVideoPtsUs": 10000000,
+				"firstVideoReceivedUs": 5000000,
+				"stopRequestedUs": 0,
+				"originPtsUs": 10000000,
+				"lastVideoPtsUs": 1000000,
+				"lastVideoDurationUs": 100000,
+				"normalStop": false
+			}
+		},
+		{
+			"source": "sparse",
+			"mode": "normal",
+			"videoOffsetUs": 0,
+			"packetCount": 22,
+			"videoEndSeconds": 6.0,
+			"timing": {
+				"firstVideoPtsUs": 10000000,
+				"firstVideoReceivedUs": 5000000,
+				"stopRequestedUs": 11000000,
+				"originPtsUs": 10000000,
+				"lastVideoPtsUs": 4000000,
+				"lastVideoDurationUs": 2000000,
+				"normalStop": true
+			}
+		},
+		{
+			"source": "sparse",
+			"mode": "error",
+			"videoOffsetUs": 0,
+			"packetCount": 22,
+			"videoEndSeconds": 4.1,
+			"timing": {
+				"firstVideoPtsUs": 10000000,
+				"firstVideoReceivedUs": 5000000,
+				"stopRequestedUs": 0,
+				"originPtsUs": 10000000,
+				"lastVideoPtsUs": 4000000,
+				"lastVideoDurationUs": 100000,
+				"normalStop": false
+			}
+		},
+		{
+			"source": "sparse",
+			"mode": "eos-before-stop",
+			"videoOffsetUs": 0,
+			"packetCount": 22,
+			"videoEndSeconds": 4.1,
+			"timing": {
+				"firstVideoPtsUs": 10000000,
+				"firstVideoReceivedUs": 5000000,
+				"stopRequestedUs": 0,
+				"originPtsUs": 10000000,
+				"lastVideoPtsUs": 4000000,
+				"lastVideoDurationUs": 100000,
+				"normalStop": false
+			}
+		},
+		{
+			"source": "audio",
+			"mode": "normal",
+			"videoOffsetUs": 0,
+			"packetCount": 294,
+			"videoEndSeconds": 6.021,
+			"timing": {
+				"firstVideoPtsUs": 10000000,
+				"firstVideoReceivedUs": 5000000,
+				"stopRequestedUs": 11000000,
+				"originPtsUs": 9978667,
+				"lastVideoPtsUs": 1021333,
+				"lastVideoDurationUs": 5000000,
+				"normalStop": true
+			}
+		},
+		{
+			"source": "audio",
+			"mode": "normal",
+			"videoOffsetUs": 250000,
+			"packetCount": 294,
+			"videoEndSeconds": 6.271,
+			"timing": {
+				"firstVideoPtsUs": 10250000,
+				"firstVideoReceivedUs": 5250000,
+				"stopRequestedUs": 11250000,
+				"originPtsUs": 9978667,
+				"lastVideoPtsUs": 1271333,
+				"lastVideoDurationUs": 5000000,
+				"normalStop": true
+			}
+		},
+		{
+			"source": "audio",
+			"mode": "error",
+			"videoOffsetUs": 0,
+			"packetCount": 294,
+			"videoEndSeconds": 1.121,
+			"timing": {
+				"firstVideoPtsUs": 10000000,
+				"firstVideoReceivedUs": 5000000,
+				"stopRequestedUs": 0,
+				"originPtsUs": 9978667,
+				"lastVideoPtsUs": 1021333,
+				"lastVideoDurationUs": 100000,
+				"normalStop": false
+			}
+		},
+		{
+			"source": "audio",
+			"mode": "error",
+			"videoOffsetUs": 250000,
+			"packetCount": 294,
+			"videoEndSeconds": 1.371,
+			"timing": {
+				"firstVideoPtsUs": 10250000,
+				"firstVideoReceivedUs": 5250000,
+				"stopRequestedUs": 0,
+				"originPtsUs": 9978667,
+				"lastVideoPtsUs": 1271333,
+				"lastVideoDurationUs": 100000,
+				"normalStop": false
+			}
+		},
+		{
+			"source": "audio",
+			"mode": "eos-before-stop",
+			"videoOffsetUs": 0,
+			"packetCount": 294,
+			"videoEndSeconds": 1.121,
+			"timing": {
+				"firstVideoPtsUs": 10000000,
+				"firstVideoReceivedUs": 5000000,
+				"stopRequestedUs": 0,
+				"originPtsUs": 9978667,
+				"lastVideoPtsUs": 1021333,
+				"lastVideoDurationUs": 100000,
+				"normalStop": false
+			}
+		},
+		{
+			"source": "audio",
+			"mode": "eos-before-stop",
+			"videoOffsetUs": 250000,
+			"packetCount": 294,
+			"videoEndSeconds": 1.371,
+			"timing": {
+				"firstVideoPtsUs": 10250000,
+				"firstVideoReceivedUs": 5250000,
+				"stopRequestedUs": 0,
+				"originPtsUs": 9978667,
+				"lastVideoPtsUs": 1271333,
+				"lastVideoDurationUs": 100000,
+				"normalStop": false
+			}
+		}
+	]
+}
