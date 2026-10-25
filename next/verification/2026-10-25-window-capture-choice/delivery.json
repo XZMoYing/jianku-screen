@@ -1,0 +1,41 @@
+{
+	"date": "2026-10-25",
+	"sourceCommit": "b0b859e527c6e8441486d950824162e8ba87ec9b",
+	"profile": "release",
+	"artifacts": [
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/release/bundle/macos/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.27",
+			"build": "2026.27.0",
+			"binarySha256": "60ce07a32f18cbeb41b7d0d97b1bb77e9b4f4726db6024d0a6c7a03a220f4a2e",
+			"signature": "codesign --verify --deep --strict passed"
+		},
+		{
+			"path": "/Applications/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.27",
+			"build": "2026.27.0",
+			"binarySha256": "60ce07a32f18cbeb41b7d0d97b1bb77e9b4f4726db6024d0a6c7a03a220f4a2e",
+			"signature": "codesign --verify --deep --strict passed"
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.27/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.27",
+			"build": "2026.27.0",
+			"binarySha256": "60ce07a32f18cbeb41b7d0d97b1bb77e9b4f4726db6024d0a6c7a03a220f4a2e",
+			"signature": "codesign --verify --deep --strict passed"
+		}
+	],
+	"validation": [
+		"packaged debug: real settings toggle and two Studio recordings; nine held-frame comparisons; eight cursor markers within 2 pixels",
+		"release: build, strict ad-hoc signature, canonical install and matching source/archive/installed executable hashes"
+	],
+	"notarized": false,
+	"userMediaCommitted": false,
+	"startup": {
+		"process": [
+			"57373 /Applications/Jianku Screen Next.app/Contents/MacOS/Jianku Screen Next"
+		],
+		"canonicalExecutable": "/Applications/Jianku Screen Next.app/Contents/MacOS/Jianku Screen Next",
+		"verified": "process running after LaunchServices open; recording scenarios validated in packaged debug build"
+	}
+}
