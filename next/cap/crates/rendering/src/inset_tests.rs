@@ -217,3 +217,215 @@ async fn inset_gpu_pixels_alpha_color_and_live_output_match() {
         }
     }
 }
+
+fn zoom_probe_project() -> ProjectConfiguration {
+    let project: ProjectConfiguration = serde_json::from_value(serde_json::json!({
+        "background": {
+            "source": {"type": "color", "value": [235, 230, 213], "alpha": 255},
+            "padding": 14.0, "rounding": 7.5, "roundingType": "squircle",
+            "inset": 100, "insetStyle": {"color": [20, 60, 90], "opacity": 100.0},
+            "shadow": 60.0, "advancedShadow": {"size": 25.0, "opacity": 30.0, "blur": 30.0},
+            "frame": {"style": "browser", "theme": "light", "url": "jianku.local", "title": "合成示例"}
+        },
+        "camera": {"hide": true}, "cursor": {"hide": true},
+        "screenMovementSpring": {"stiffness": 200.0, "damping": 40.0, "mass": 2.25},
+        "timeline": {
+            "segments": [{"recordingSegment": 0, "timescale": 1.0, "start": 0.0, "end": 6.0}],
+            "zoomSegments": [{"start": 1.0, "end": 4.0, "amount": 1.5, "mode": "auto"}]
+        }
+    })).unwrap();
+    project
+}
+
+#[test]
+fn inset_zoom_blur_pivot_is_stable_on_fractional_layouts() {
+    let events = CursorEvents::default();
+    let mut project = zoom_probe_project();
+    let options = RenderOptions {
+        screen_size: XY::new(640, 360),
+        camera_size: None,
+        preserve_screen_alpha: false,
+    };
+    let mut timeline =
+        ZoomTransformTimeline::from_project(&project, &events, 6.0, options.screen_size);
+    timeline.precompute();
+    for resolution in [
+        XY::new(1248, 702),
+        XY::new(1280, 720),
+        XY::new(2560, 1600),
+        XY::new(3840, 2160),
+    ] {
+        for padding in [0.0, 14.0, 60.0] {
+            project.background.padding = padding;
+            let layout = ProjectUniforms::display_layout(&options, &project, resolution);
+            for number in (61..115).chain(241..305) {
+                let time = number as f32 / 60.0;
+                let previous_time = time - 1.0 / 60.0;
+                let bounds = |zoom| {
+                    let (start, end) = ProjectUniforms::display_bounds(
+                        &zoom,
+                        Coord::new(layout.content_offset),
+                        Coord::new(layout.content_size),
+                    );
+                    MotionBounds::new(start, end)
+                };
+                let current = bounds(timeline.sample(time));
+                let previous = bounds(timeline.sample(previous_time));
+                let blur = ProjectUniforms::compute_display_motion_blur(
+                    current, previous, true, 1.0, 0.0, 1.0,
+                );
+                if blur.descriptor.mode == MotionBlurMode::Zoom {
+                    for actual in blur.descriptor.zoom_center_uv {
+                        assert!(
+                            (actual - 0.4999).abs() < 0.00002,
+                            "frame {number}, resolution {resolution:?}, padding {padding}: blur pivot jumped to {:?}",
+                            blur.descriptor.zoom_center_uv
+                        );
+                    }
+                }
+            }
+        }
+    }
+}
+
+#[tokio::test]
+async fn inset_zoom_tracks_static_marker_geometry() {
+    let constants = constants().await;
+    let events = CursorEvents::default();
+    let mut project = zoom_probe_project();
+    let mut pixels = [255, 255, 255, 255].repeat(640 * 360);
+    for y in 0..360 {
+        for x in 254..258 {
+            let offset = (y * 640 + x) * 4;
+            pixels[offset..offset + 4].copy_from_slice(&[255, 0, 0, 255]);
+        }
+    }
+    let frames = DecodedSegmentFrames {
+        screen_size: XY::new(640, 360),
+        screen_frame: Some(DecodedFrame::new(pixels, 640, 360)),
+        camera_frame: None,
+        segment_time: 0.0,
+        recording_time: 0.0,
+        segment_has_camera: false,
+    };
+    let output = std::env::var_os("JIANKU_ZOOM_PROBE_OUTPUT").map(std::path::PathBuf::from);
+    if let Some(output) = &output {
+        std::fs::create_dir_all(output).unwrap();
+    }
+    let mut rows = Vec::new();
+    for blur in [0.0, 1.0] {
+        project.screen_motion_blur = blur;
+        let mut timeline =
+            ZoomTransformTimeline::from_project(&project, &events, 6.0, frames.screen_size);
+        timeline.precompute();
+        let mut renderer = FrameRenderer::new(&constants);
+        let mut layers = RendererLayers::new(&constants.device, &constants.queue);
+        let mut previous_marker: Option<(u32, f64)> = None;
+        for number in (57..115).chain(238..305) {
+            let uniforms = ProjectUniforms::new(
+                &constants,
+                &project,
+                number,
+                60,
+                XY::new(1280, 720),
+                &events,
+                &frames,
+                6.0,
+                &timeline,
+            );
+            if uniforms.display.motion_blur_params[0] == MotionBlurMode::Zoom.as_f32() {
+                let pivot = uniforms.display.motion_blur_zoom_center;
+                for actual in pivot {
+                    assert!(
+                        (actual - 0.4999).abs() < 0.00002,
+                        "unstable blur center at {number}: {pivot:?}"
+                    );
+                }
+                let display = uniforms.display;
+                let accessories = [
+                    uniforms.inset.unwrap().composite,
+                    uniforms.frame_chrome.as_ref().unwrap().composite,
+                ];
+                for accessory in accessories {
+                    for (axis, focus) in pivot.into_iter().enumerate() {
+                        let expected =
+                            display.target_bounds[axis] + focus * display.target_size[axis];
+                        let actual = accessory.target_bounds[axis]
+                            + accessory.motion_blur_zoom_center[axis] * accessory.target_size[axis];
+                        assert!(
+                            (actual - expected).abs() < 0.0002,
+                            "accessory blur pivot is detached at {number}"
+                        );
+                    }
+                }
+            }
+            let frame = renderer
+                .render_immediate(frames.clone(), uniforms.clone(), &events, true, &mut layers)
+                .await
+                .unwrap();
+            let mut weighted = 0.0;
+            let mut weight = 0.0;
+            for y in 290..430 {
+                for x in 440..600 {
+                    let offset = y * frame.padded_bytes_per_row as usize + x * 4;
+                    let signal =
+                        f64::from(frame.data[offset].saturating_sub(frame.data[offset + 1]));
+                    weight += signal;
+                    weighted += signal * (x as f64 + 0.5);
+                }
+            }
+            assert!(weight > 0.0);
+            let center = weighted / weight;
+            if let Some((previous_number, previous_center)) = previous_marker {
+                let direction = if number > 60 && number < 115 {
+                    Some(-1.0)
+                } else if number > 240 {
+                    Some(1.0)
+                } else {
+                    None
+                };
+                if number == previous_number + 1
+                    && let Some(direction) = direction
+                {
+                    assert!(
+                        (center - previous_center) * direction > -0.2,
+                        "marker reversed: {previous_number}:{previous_center} -> {number}:{center}, blur={blur}"
+                    );
+                }
+            }
+            previous_marker = Some((number, center));
+            rows.push(serde_json::json!({
+                "frame": number, "blur": blur, "markerCenter": center,
+                "displayBounds": uniforms.display.target_bounds,
+                "insetBounds": uniforms.inset.unwrap().composite.target_bounds,
+                "chromeBounds": uniforms.frame_chrome.as_ref().unwrap().composite.target_bounds,
+                "blurCenter": uniforms.display.motion_blur_zoom_center,
+                "blurParams": uniforms.display.motion_blur_params
+            }));
+            if let Some(output) = output.as_ref().filter(|_| {
+                [57, 60, 61, 62, 68, 69, 70, 80, 240, 241, 248, 250, 270, 300].contains(&number)
+            }) {
+                let image: Vec<u8> = frame
+                    .data
+                    .chunks_exact(frame.padded_bytes_per_row as usize)
+                    .flat_map(|row| row[..1280 * 4].iter().copied())
+                    .collect();
+                image::save_buffer(
+                    output.join(format!("blur-{blur}-frame-{number:03}.png")),
+                    &image,
+                    1280,
+                    720,
+                    image::ColorType::Rgba8,
+                )
+                .unwrap();
+            }
+        }
+    }
+    if let Some(output) = output {
+        std::fs::write(
+            output.join("motion.json"),
+            serde_json::to_vec_pretty(&rows).unwrap(),
+        )
+        .unwrap();
+    }
+}

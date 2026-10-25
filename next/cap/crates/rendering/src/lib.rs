@@ -2574,22 +2574,6 @@ impl MotionBounds {
             ((point.y - self.start.coord.y) / size.y.max(f64::EPSILON)) as f32,
         )
     }
-
-    fn top_left(&self) -> XY<f64> {
-        self.start.coord
-    }
-
-    fn top_right(&self) -> XY<f64> {
-        XY::new(self.end.coord.x, self.start.coord.y)
-    }
-
-    fn bottom_left(&self) -> XY<f64> {
-        XY::new(self.start.coord.x, self.end.coord.y)
-    }
-
-    fn bottom_right(&self) -> XY<f64> {
-        self.end.coord
-    }
 }
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -2678,44 +2662,40 @@ fn analyze_motion(current: &MotionBounds, previous: &MotionBounds) -> MotionAnal
 }
 
 fn zoom_vanishing_point(current: &MotionBounds, previous: &MotionBounds) -> Option<XY<f64>> {
-    line_intersection(
-        previous.top_left(),
-        current.top_left(),
-        previous.bottom_right(),
-        current.bottom_right(),
-    )
-    .or_else(|| {
-        line_intersection(
-            previous.top_right(),
-            current.top_right(),
-            previous.bottom_left(),
-            current.bottom_left(),
-        )
-    })
-}
-
-fn line_intersection(a1: XY<f64>, a2: XY<f64>, b1: XY<f64>, b2: XY<f64>) -> Option<XY<f64>> {
-    let a = a2 - a1;
-    let b = b2 - b1;
-    let a_length = a.x.hypot(a.y);
-    let b_length = b.x.hypot(b.y);
-    let coordinate_scale = [a1.x, a1.y, a2.x, a2.y, b1.x, b1.y, b2.x, b2.y]
-        .into_iter()
-        .map(f64::abs)
-        .fold(1.0, f64::max);
-    let precision = 16.0 * f64::EPSILON;
-    // A pivot corner can acquire roundoff-sized motion; use the other diagonal.
-    if a_length <= precision * coordinate_scale || b_length <= precision * coordinate_scale {
+    let current_size = current.size();
+    let previous_size = previous.size();
+    let current_center = current.center();
+    let previous_center = previous.center();
+    // Opposite-corner trajectories become collinear near diagonal focuses.
+    // Solve the scale's fixed point per axis instead of intersecting those lines.
+    let axis_pivot = |current_size: f64, previous_size: f64, current: f64, previous: f64| {
+        let delta = current_size - previous_size;
+        let tolerance = current_size.abs().max(previous_size.abs()).max(1.0) * 64.0 * f64::EPSILON;
+        if delta.abs() <= tolerance || previous_size <= tolerance {
+            return None;
+        }
+        let point = previous - (current - previous) * previous_size / delta;
+        point.is_finite().then_some(point)
+    };
+    let x = axis_pivot(
+        current_size.x,
+        previous_size.x,
+        current_center.x,
+        previous_center.x,
+    );
+    let y = axis_pivot(
+        current_size.y,
+        previous_size.y,
+        current_center.y,
+        previous_center.y,
+    );
+    if x.is_none() && y.is_none() {
         return None;
     }
-    let denominator = a.x * b.y - a.y * b.x;
-    if denominator.abs() <= precision * a_length * b_length {
-        return None;
-    }
-    let relative = b1 - a1;
-    let t = (relative.x * b.y - relative.y * b.x) / denominator;
-    let point = a1 + a * t;
-    (point.x.is_finite() && point.y.is_finite()).then_some(point)
+    Some(XY::new(
+        x.unwrap_or(previous_center.x),
+        y.unwrap_or(previous_center.y),
+    ))
 }
 
 fn clamp_vector(vec: XY<f32>, max_len: f32) -> XY<f32> {
@@ -2949,6 +2929,24 @@ impl Default for MotionBlurDescriptor {
 }
 
 impl MotionBlurDescriptor {
+    fn in_target_bounds(self, source: [f32; 4], target: [f32; 4]) -> Self {
+        let source_size = [source[2] - source[0], source[3] - source[1]];
+        let target_size = [
+            (target[2] - target[0]).max(1.0),
+            (target[3] - target[1]).max(1.0),
+        ];
+        Self {
+            movement_vector_uv: std::array::from_fn(|axis| {
+                self.movement_vector_uv[axis] * source_size[axis] / target_size[axis]
+            }),
+            zoom_center_uv: std::array::from_fn(|axis| {
+                (source[axis] + self.zoom_center_uv[axis] * source_size[axis] - target[axis])
+                    / target_size[axis]
+            }),
+            ..self
+        }
+    }
+
     fn none() -> Self {
         Self::default()
     }
@@ -4172,6 +4170,7 @@ impl ProjectUniforms {
                     chrome_bounds[3] - chrome_bounds[1],
                 ];
                 let decorated = frame_chrome::style_uses_card_decoration(frame.style);
+                let chrome_motion = descriptor.in_target_bounds(final_target_bounds, chrome_bounds);
 
                 frame_chrome::FrameChromeUniforms {
                     composite: CompositeVideoFrameUniforms {
@@ -4197,8 +4196,8 @@ impl ProjectUniforms {
                         },
                         rounding_type: rounding_type_value(project.background.rounding_type),
                         mirror_x: 0.0,
-                        motion_blur_vector: descriptor.movement_vector_uv,
-                        motion_blur_zoom_center: descriptor.zoom_center_uv,
+                        motion_blur_vector: chrome_motion.movement_vector_uv,
+                        motion_blur_zoom_center: chrome_motion.zoom_center_uv,
                         motion_blur_params: [
                             descriptor.mode.as_f32(),
                             descriptor.strength,
@@ -4270,6 +4269,7 @@ impl ProjectUniforms {
                 let style = project.background.inset_style.clone().unwrap_or_default();
                 let gap_px = ((gap.x + gap.y) * 0.5) as f32 * split_fade * (1.0 - takeover_t);
                 let decorated = !frame_active;
+                let inset_motion = descriptor.in_target_bounds(final_target_bounds, bounds);
                 layers::InsetUniforms {
                     color: style.color.map(|channel| channel.min(255) as u8),
                     composite: CompositeVideoFrameUniforms {
@@ -4288,22 +4288,8 @@ impl ProjectUniforms {
                             }
                             _ => [1.0; 4],
                         },
-                        motion_blur_vector: [
-                            descriptor.movement_vector_uv[0] * final_target_size[0]
-                                / size[0].max(1.0),
-                            descriptor.movement_vector_uv[1] * final_target_size[1]
-                                / size[1].max(1.0),
-                        ],
-                        motion_blur_zoom_center: [
-                            (final_target_bounds[0]
-                                + descriptor.zoom_center_uv[0] * final_target_size[0]
-                                - bounds[0])
-                                / size[0].max(1.0),
-                            (final_target_bounds[1]
-                                + descriptor.zoom_center_uv[1] * final_target_size[1]
-                                - bounds[1])
-                                / size[1].max(1.0),
-                        ],
+                        motion_blur_vector: inset_motion.movement_vector_uv,
+                        motion_blur_zoom_center: inset_motion.zoom_center_uv,
                         motion_blur_params: [
                             descriptor.mode.as_f32(),
                             descriptor.strength,
@@ -5532,12 +5518,18 @@ mod tests {
                     XY::new(0.0, 0.0),
                     XY::new(1.0, 1.0),
                     XY::new(0.5, 0.5),
+                    XY::new(0.4999, 0.4999),
+                    XY::new(0.5001, 0.5001),
+                    XY::new(0.25, 0.25),
+                    XY::new(0.75, 0.25),
                 ] {
                     let bounds = |scale| {
                         let start = offset + focus * size * (1.0 - scale);
                         motion_bounds(start, start + size * scale)
                     };
-                    for (previous, current) in [(2.0, 1.9), (1.9, 2.0), (1.9, 1.0)] {
+                    for (previous, current) in
+                        [(2.0, 1.9), (1.9, 2.0), (1.9, 1.0), (1.49, 1.490001)]
+                    {
                         let analysis = analyze_motion(&bounds(current), &bounds(previous));
                         assert!(
                             (f64::from(analysis.zoom_center_uv.x) - focus.x).abs() < 1e-6
@@ -5562,6 +5554,36 @@ mod tests {
             assert_eq!(descriptor.mode, MotionBlurMode::Zoom);
             assert!((descriptor.zoom_center_uv[0] - 0.8).abs() < 1e-6);
             assert!((descriptor.zoom_center_uv[1] - 0.3).abs() < 1e-6);
+        }
+    }
+
+    #[test]
+    fn frame_and_inset_blur_share_content_motion_in_output_pixels() {
+        let source = [80.5, 90.5, 980.5, 690.5];
+        for target in [
+            [21.25, 50.75, 1040.75, 790.25],
+            [-31.5, -43.25, 1100.5, 720.75],
+            source,
+        ] {
+            for descriptor in [
+                MotionBlurDescriptor::movement(XY::new(0.02, -0.03), 1.0),
+                MotionBlurDescriptor::zoom(XY::new(0.8, 0.3), 0.025, 1.0),
+            ] {
+                let accessory = descriptor.in_target_bounds(source, target);
+                assert_eq!(accessory.mode, descriptor.mode);
+                assert_eq!(accessory.zoom_amount, descriptor.zoom_amount);
+                assert_eq!(accessory.strength, descriptor.strength);
+                for axis in 0..2 {
+                    let source_size = source[axis + 2] - source[axis];
+                    let target_size = target[axis + 2] - target[axis];
+                    let source_motion = descriptor.movement_vector_uv[axis] * source_size;
+                    let target_motion = accessory.movement_vector_uv[axis] * target_size;
+                    assert!((source_motion - target_motion).abs() < 0.00001);
+                    let source_pivot = source[axis] + descriptor.zoom_center_uv[axis] * source_size;
+                    let target_pivot = target[axis] + accessory.zoom_center_uv[axis] * target_size;
+                    assert!((source_pivot - target_pivot).abs() < 0.0001);
+                }
+            }
         }
     }
 
