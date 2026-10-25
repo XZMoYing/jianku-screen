@@ -82,7 +82,7 @@ function main() {
 	}
 	const running = spawnSync(
 		"pgrep",
-		["-f", "/Contents/MacOS/Jianku Screen Next$"],
+		["-f", "/Contents/MacOS/Jianku Screen Next( |$)"],
 		{ encoding: "utf8" },
 	);
 	if (running.error) throw running.error;
