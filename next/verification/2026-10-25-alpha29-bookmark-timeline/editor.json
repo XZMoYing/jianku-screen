@@ -1,0 +1,59 @@
+[
+	{
+		"initial": [
+			{
+				"label": "0:00.8 · 重复使用",
+				"width": 20,
+				"x": 212.078125
+			},
+			{
+				"label": "2 个相邻书签",
+				"width": 28.3125,
+				"x": 367.21875
+			},
+			{
+				"label": "0:04.0 · 操作",
+				"width": 20,
+				"x": 615.4375
+			},
+			{
+				"label": "0:07.5 · 重复使用",
+				"width": 20,
+				"x": 1049.828125
+			}
+		],
+		"phase": "markers",
+		"route": "/editor"
+	},
+	{
+		"phase": "single-jump",
+		"route": "/editor",
+		"time": ["0:00.45", " / ", "0:09.00"]
+	},
+	{
+		"phase": "cluster-jump",
+		"route": "/editor",
+		"time": ["0:02.00", " / ", "0:09.00"]
+	},
+	{
+		"markers": [
+			"0:00.8 · 重复使用",
+			"2 个相邻书签",
+			"0:04.0 · 后续名称保留",
+			"0:07.5 · 重复使用"
+		],
+		"names": ["起点已重命名", "紧邻", "后续名称保留", "重复使用", "已剪除"],
+		"phase": "delete-undo",
+		"route": "/editor"
+	},
+	{
+		"phase": "playback",
+		"route": "/editor",
+		"time": ["0:03.29", " / ", "0:09.00"],
+		"transportFrames": 90
+	},
+	{
+		"phase": "complete",
+		"route": "/editor"
+	}
+]

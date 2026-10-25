@@ -1,0 +1,32 @@
+{
+	"date": "2026-10-25",
+	"version": "0.2.0-alpha.29",
+	"frontendTests": 32,
+	"nativeBookmarkTests": 5,
+	"nativeBindingExportTests": 1,
+	"typescript": "passed",
+	"cargoCheck": ["cap-project", "cap-desktop"],
+	"cargoFmt": "passed",
+	"scopedBiome": "passed",
+	"uiProfile": "packaged debug",
+	"physicalAcceptance": "deferred at user request",
+	"cases": [
+		"source reorder and 2x speed",
+		"reused source positions",
+		"cut marker retained in list",
+		"dense marker selection",
+		"rename then delete then edit another then restore",
+		"two sequential deletions and undo",
+		"delete all and restore all",
+		"cold reopen keeps names/order but clears undo stack",
+		"invalid data does not block editor",
+		"reload restores valid bookmark data"
+	],
+	"videoQualityChanges": false,
+	"limitations": [
+		"Undo is a dedicated bookmark panel action, not project Cmd+Z.",
+		"Only the current session retains the last 20 deleted bookmark snapshots.",
+		"No mobile, instant or append-recording bookmark capture yet.",
+		"The final count-badge collision sizing addition is covered by unit tests; initial debug UI evidence preceded that sizing adjustment."
+	]
+}

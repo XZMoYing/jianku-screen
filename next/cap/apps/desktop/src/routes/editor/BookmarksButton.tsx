@@ -1,69 +1,26 @@
-import { createResource, createSignal, For, Show } from "solid-js";
-import toast from "solid-toast";
+import { createSignal, For, Show } from "solid-js";
 import { t as localize } from "~/utils/i18n";
-import { commands, type RecordingBookmark } from "~/utils/tauri";
 import IconBookmark from "~icons/lucide/bookmark";
 import IconTrash from "~icons/lucide/trash-2";
-import {
-	FPS,
-	serializeProjectConfiguration,
-	useEditorContext,
-} from "./context";
+import IconUndo from "~icons/lucide/undo-2";
+import { useEditorContext } from "./context";
+import { bookmarkTimestamp } from "./recording-bookmarks";
 import { Dialog, DialogContent, EditorButton } from "./ui";
 
-function timestamp(seconds: number) {
-	const ticks = Math.round(seconds * 10);
-	return `${Math.floor(ticks / 600)}:${((ticks % 600) / 10).toFixed(1).padStart(4, "0")}`;
-}
-
 export function BookmarksButton(props: { disabled?: boolean }) {
+	const { recordingBookmarks, dialog, exportState } = useEditorContext();
 	const {
-		project,
-		setEditorState,
-		requestHandoffPlayback,
-		dialog,
-		exportState,
-	} = useEditorContext();
+		items: bookmarks,
+		busy,
+		save,
+		undoCount,
+		undoDelete,
+		error,
+		loading,
+	} = recordingBookmarks;
 	const [open, setOpen] = createSignal(false);
-	const [busy, setBusy] = createSignal(false);
-	const [bookmarks, { refetch }] = createResource(
-		() => open() && serializeProjectConfiguration(project).timeline,
-		(timeline) => commands.getRecordingBookmarks(timeline),
-	);
-	const report = (error: unknown) => toast.error(String(error));
-	const save = async (bookmark: RecordingBookmark, label: string | null) => {
-		if (busy()) return;
-		setBusy(true);
-		try {
-			await commands.updateRecordingBookmark(bookmark.id, label);
-			await refetch();
-		} catch (error) {
-			report(error);
-		} finally {
-			setBusy(false);
-		}
-	};
 	const jump = async (time: number) => {
-		if (busy()) return;
-		setBusy(true);
-		try {
-			const pending = requestHandoffPlayback(false, time);
-			if (pending) {
-				if (!(await pending))
-					throw new Error(localize("画面仍在准备，请稍后再跳转"));
-			} else {
-				await commands.stopPlayback();
-				await commands.seekTo(Math.floor(time * FPS));
-				setEditorState("playing", false);
-				setEditorState("previewTime", null);
-				setEditorState("playbackTime", time);
-			}
-			setOpen(false);
-		} catch (error) {
-			report(error);
-		} finally {
-			setBusy(false);
-		}
+		if (await recordingBookmarks.jump(time)) setOpen(false);
 	};
 	return (
 		<>
@@ -101,14 +58,29 @@ export function BookmarksButton(props: { disabled?: boolean }) {
 								if (event.key !== "Escape") event.stopPropagation();
 							}}
 						>
-							<Show when={bookmarks.error}>
-								<p role="alert">{String(bookmarks.error)}</p>
+							<Show when={undoCount() > 0}>
+								<button
+									type="button"
+									class="flex items-center justify-center gap-2 rounded-full bg-ed-accent/15 px-3 py-2 text-ed-text-1"
+									disabled={busy()}
+									onClick={() => void undoDelete()}
+								>
+									<IconUndo class="size-4" />
+									{localize("撤销上次删除")}
+								</button>
 							</Show>
-							<Show
-								when={
-									!bookmarks.loading && !bookmarks.error && !bookmarks()?.length
-								}
-							>
+							<Show when={error()}>
+								<p role="alert">{localize(String(error()))}</p>
+								<button
+									type="button"
+									class="rounded-full bg-ed-ctl px-3 py-2"
+									disabled={busy()}
+									onClick={() => void recordingBookmarks.refresh()}
+								>
+									{localize("重新读取")}
+								</button>
+							</Show>
+							<Show when={!loading() && !error() && !bookmarks()?.length}>
 								<p class="text-ed-text-2">
 									{localize(
 										"录制时点击书签按钮，或使用设置中的快捷键，标记讲解重点。",
@@ -162,7 +134,7 @@ export function BookmarksButton(props: { disabled?: boolean }) {
 														disabled={busy()}
 														onClick={() => void jump(time)}
 													>
-														{timestamp(time)}
+														{bookmarkTimestamp(time)}
 													</button>
 												)}
 											</For>

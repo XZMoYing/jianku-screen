@@ -1605,5 +1605,13 @@
 	"演示暂停，稍后继续": "Presentation paused. Back shortly.",
 	"画面仍在准备，请稍后再跳转": "The preview is still preparing. Please try jumping again shortly.",
 	"过滤其他窗口": "Filter other windows",
-	"关闭时保留遮挡内容；开启后只录所选窗口。": "Off: include overlapping content. On: capture only the selected window."
+	"关闭时保留遮挡内容；开启后只录所选窗口。": "Off: include overlapping content. On: capture only the selected window.",
+	"撤销上次删除": "Undo last bookmark deletion",
+	"{number} 个相邻书签": "{number} nearby bookmarks",
+	"片段 {number}": "Clip {number}",
+	"书签已存在，未覆盖现有内容。": "This bookmark already exists. Its current content was kept.",
+	"书签已不存在": "This bookmark no longer exists.",
+	"书签数据无效，原文件已保留。": "Invalid bookmark data. The original file was kept.",
+	"书签文件不可写，原文件已保留。": "The bookmark file is not writable. The original file was kept.",
+	"重新读取": "Reload"
 }

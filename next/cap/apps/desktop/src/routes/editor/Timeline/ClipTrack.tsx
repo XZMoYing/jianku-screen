@@ -977,7 +977,9 @@ export function ClipTrack(
 
 					const defaultClipName = () =>
 						hasMultipleRecordingSegments()
-							? `Clip ${segment().recordingSegment}`
+							? localize("片段 {number}", {
+									number: (segment().recordingSegment ?? 0) + 1,
+								})
 							: localize("Clip");
 					const clipName = () => segment().name?.trim() || defaultClipName();
 
@@ -1460,7 +1462,7 @@ export function ClipTrack(
 													"background-image":
 														"linear-gradient(135deg, transparent 42%, rgb(96 165 250 / 0.7) 43%, rgb(96 165 250 / 0.7) 57%, transparent 58%)",
 												}}
-															title={`${transition().type === "cross-fade" ? localize("交叉淡化") : localize("黑场淡化")} · ${transition().duration.toFixed(2)}s`}
+												title={`${transition().type === "cross-fade" ? localize("交叉淡化") : localize("黑场淡化")} · ${transition().duration.toFixed(2)}s`}
 												onMouseDown={(event) => event.stopPropagation()}
 											>
 												<span class="sr-only">

@@ -65,6 +65,7 @@ import {
 } from "../timelineTracks";
 import { formatTime } from "../utils";
 import { type AudioSegmentDragState, AudioTrack } from "./AudioTrack";
+import { BookmarkTrack } from "./BookmarkTrack";
 import { type CaptionSegmentDragState, CaptionsTrack } from "./CaptionsTrack";
 import { ClipTrack } from "./ClipTrack";
 import { TimelineContextProvider, useTimelineContext } from "./context";
@@ -1479,6 +1480,7 @@ export function Timeline(props: {
 						}}
 					>
 						<div class="flex flex-col gap-1.5 min-h-full">
+							<BookmarkTrack gutter={TRACK_GUTTER} />
 							<TrackRow
 								icon={trackIcons.clip}
 								label={localize("Video")}

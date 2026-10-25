@@ -1,0 +1,21 @@
+[
+	{
+		"names": ["起点已重命名", "紧邻", "后续名称保留", "重复使用", "已剪除"],
+		"phase": "cold-reopen",
+		"route": "/editor"
+	},
+	{
+		"message": "书签数据无效，原文件已保留。",
+		"phase": "corrupt-visible",
+		"route": "/editor"
+	},
+	{
+		"names": ["起点已重命名", "紧邻", "后续名称保留", "重复使用", "已剪除"],
+		"phase": "recovered",
+		"route": "/editor"
+	},
+	{
+		"phase": "complete",
+		"route": "/editor"
+	}
+]

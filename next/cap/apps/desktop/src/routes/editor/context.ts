@@ -101,6 +101,7 @@ import type { MaskSegment } from "./masks";
 import { usePreparingEditor } from "./preparing-editor-context";
 import { createPreparingPlaybackHandoff } from "./preparing-playback-handoff";
 import { createProjectConfigSave } from "./project-config-save";
+import { createRecordingBookmarks } from "./recording-bookmarks";
 import type { SnapGuide } from "./snapping";
 import {
 	defaultStyleSegment,
@@ -2475,8 +2476,28 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				return preparingCommand;
 			};
 
+			const recordingBookmarks = createRecordingBookmarks(
+				() => serializeProjectConfiguration(project).timeline,
+				async (time) => {
+					const pending = requestHandoffPlayback(false, time);
+					if (pending) {
+						if (!(await pending))
+							throw new Error(localize("画面仍在准备，请稍后再跳转"));
+					} else {
+						await commands.stopPlayback();
+						await commands.seekTo(Math.floor(time * FPS));
+						batch(() => {
+							setEditorState("playing", false);
+							setEditorState("previewTime", null);
+							setEditorState("playbackTime", time);
+						});
+					}
+				},
+			);
+
 			return {
 				...editorInstanceContext,
+				recordingBookmarks,
 				playbackIntent,
 				handoffPlaybackPending: () => handoffIntent().active,
 				requestHandoffPlayback,

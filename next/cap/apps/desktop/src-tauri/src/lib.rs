@@ -4897,20 +4897,17 @@ fn update_recording_bookmark(
     editor: WindowEditorInstance,
     id: String,
     label: Option<String>,
+) -> Result<Option<cap_project::DeletedRecordingBookmark>, String> {
+    cap_project::update_recording_bookmark(&editor.project_path, &id, label.as_deref())
+}
+
+#[tauri::command]
+#[specta::specta]
+fn restore_recording_bookmark(
+    editor: WindowEditorInstance,
+    deleted: cap_project::DeletedRecordingBookmark,
 ) -> Result<(), String> {
-    static GATE: std::sync::Mutex<()> = std::sync::Mutex::new(());
-    let _guard = GATE.lock().map_err(|error| error.to_string())?;
-    let mut bookmarks = cap_project::load_recording_bookmarks(&editor.project_path)?;
-    let index = bookmarks
-        .iter()
-        .position(|bookmark| bookmark.id == id)
-        .ok_or("书签已不存在")?;
-    if let Some(label) = label {
-        bookmarks[index].label = label.trim().to_string();
-    } else {
-        bookmarks.remove(index);
-    }
-    cap_project::save_recording_bookmarks(&editor.project_path, &bookmarks)
+    cap_project::restore_recording_bookmark(&editor.project_path, deleted)
 }
 
 #[tauri::command]
@@ -6837,6 +6834,7 @@ fn specta_builder() -> tauri_specta::Builder {
             recording::add_recording_bookmark,
             get_recording_bookmarks,
             update_recording_bookmark,
+            restore_recording_bookmark,
             recording::get_recording_pause_state,
             recording::resume_recording,
             recording::toggle_pause_recording,

@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::{io::Write, path::Path};
 
 const FILE_NAME: &str = "recording-bookmarks.json";
+static MUTATIONS: std::sync::Mutex<()> = std::sync::Mutex::new(());
 
 #[derive(Clone, Debug, Serialize, Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
@@ -20,6 +21,53 @@ pub struct RecordingBookmark {
 pub struct BookmarkLocation {
     pub bookmark: RecordingBookmark,
     pub positions: Vec<f64>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct DeletedRecordingBookmark {
+    pub bookmark: RecordingBookmark,
+    pub index: u32,
+}
+
+pub fn update_recording_bookmark(
+    project: &Path,
+    id: &str,
+    label: Option<&str>,
+) -> Result<Option<DeletedRecordingBookmark>, String> {
+    let _guard = MUTATIONS.lock().map_err(|error| error.to_string())?;
+    let mut bookmarks = load_recording_bookmarks(project)?;
+    let index = bookmarks
+        .iter()
+        .position(|bookmark| bookmark.id == id)
+        .ok_or("书签已不存在")?;
+    let deleted = if let Some(label) = label {
+        bookmarks[index].label = label.trim().to_string();
+        None
+    } else {
+        Some(DeletedRecordingBookmark {
+            bookmark: bookmarks.remove(index),
+            index: u32::try_from(index).map_err(|error| error.to_string())?,
+        })
+    };
+    save_recording_bookmarks(project, &bookmarks)?;
+    Ok(deleted)
+}
+
+pub fn restore_recording_bookmark(
+    project: &Path,
+    deleted: DeletedRecordingBookmark,
+) -> Result<(), String> {
+    let _guard = MUTATIONS.lock().map_err(|error| error.to_string())?;
+    let mut bookmarks = load_recording_bookmarks(project)?;
+    if bookmarks.iter().any(|item| item.id == deleted.bookmark.id) {
+        return Err("书签已存在，未覆盖现有内容。".into());
+    }
+    bookmarks.insert(
+        (deleted.index as usize).min(bookmarks.len()),
+        deleted.bookmark,
+    );
+    save_recording_bookmarks(project, &bookmarks)
 }
 
 pub fn load_recording_bookmarks(project: &Path) -> Result<Vec<RecordingBookmark>, String> {
@@ -265,5 +313,64 @@ mod tests {
         assert_eq!(bookmarks[0].time, time);
         align_recording_bookmarks_to_sources(&mut bookmarks, &[(0.016, 5.0)]);
         assert_eq!(bookmarks[0].time, 4.5);
+    }
+
+    #[test]
+    fn undo_restores_original_source_time_order_and_preserves_other_edits() {
+        let project = tempfile::tempdir().unwrap();
+        let first = bookmark();
+        let mut second = bookmark();
+        second.id = "mark-2".into();
+        second.time = 9.5;
+        second.observed_time = Some(10.0);
+        save_recording_bookmarks(project.path(), &[first, second]).unwrap();
+        let deleted = update_recording_bookmark(project.path(), "mark-2", None)
+            .unwrap()
+            .unwrap();
+        update_recording_bookmark(project.path(), "mark-1", Some("新名称")).unwrap();
+        restore_recording_bookmark(project.path(), deleted.clone()).unwrap();
+        let saved = load_recording_bookmarks(project.path()).unwrap();
+        assert_eq!(saved[0].label, "新名称");
+        assert_eq!(saved[1].id, "mark-2");
+        assert_eq!(saved[1].time, 9.5);
+        assert_eq!(saved[1].observed_time, Some(10.0));
+        let bytes = std::fs::read(project.path().join(FILE_NAME)).unwrap();
+        assert!(restore_recording_bookmark(project.path(), deleted).is_err());
+        assert_eq!(
+            std::fs::read(project.path().join(FILE_NAME)).unwrap(),
+            bytes
+        );
+    }
+
+    #[test]
+    fn failed_mutations_keep_the_file_and_do_not_return_an_undo_record() {
+        let project = tempfile::tempdir().unwrap();
+        save_recording_bookmarks(project.path(), &[bookmark()]).unwrap();
+        let bytes = std::fs::read(project.path().join(FILE_NAME)).unwrap();
+        assert!(update_recording_bookmark(project.path(), "missing", None).is_err());
+        assert!(
+            update_recording_bookmark(project.path(), "mark-1", Some(&"字".repeat(121))).is_err()
+        );
+        assert_eq!(
+            std::fs::read(project.path().join(FILE_NAME)).unwrap(),
+            bytes
+        );
+        let mut invalid = bookmark();
+        invalid.id = "invalid".into();
+        invalid.time = -1.0;
+        assert!(
+            restore_recording_bookmark(
+                project.path(),
+                DeletedRecordingBookmark {
+                    bookmark: invalid,
+                    index: u32::MAX,
+                }
+            )
+            .is_err()
+        );
+        assert_eq!(
+            std::fs::read(project.path().join(FILE_NAME)).unwrap(),
+            bytes
+        );
     }
 }

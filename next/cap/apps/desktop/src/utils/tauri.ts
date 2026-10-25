@@ -82,8 +82,11 @@ async addRecordingBookmark() : Promise<RecordingBookmark> {
 async getRecordingBookmarks(timeline: TimelineConfiguration) : Promise<BookmarkLocation[]> {
     return await TAURI_INVOKE("get_recording_bookmarks", { timeline });
 },
-async updateRecordingBookmark(id: string, label: string | null) : Promise<null> {
+async updateRecordingBookmark(id: string, label: string | null) : Promise<DeletedRecordingBookmark | null> {
     return await TAURI_INVOKE("update_recording_bookmark", { id, label });
+},
+async restoreRecordingBookmark(deleted: DeletedRecordingBookmark) : Promise<null> {
+    return await TAURI_INVOKE("restore_recording_bookmark", { deleted });
 },
 async getRecordingPauseState() : Promise<boolean | null> {
     return await TAURI_INVOKE("get_recording_pause_state");
@@ -1090,6 +1093,7 @@ export type CursorMeta = { imagePath: string; hotspot: XY<number>; shape?: strin
 export type CursorRippleConfig = { enabled: boolean; color: [number, number, number]; strength: number; size: number; duration: number }
 export type CursorType = "auto" | "pointer" | "circle" | "macos" | "tahoe" | "windows"
 export type Cursors = { [key in string]: string } | { [key in string]: CursorMeta }
+export type DeletedRecordingBookmark = { bookmark: RecordingBookmark; index: number }
 export type DesktopWallpaper = { path: string; previewPath: string; animated: boolean }
 export type DeviceOrModelID = { DeviceID: string } | { ModelID: ModelIDType }
 export type DevicesUpdated = { cameras: CameraInfo[]; microphones: string[]; permissions: OSPermissionsCheck }
