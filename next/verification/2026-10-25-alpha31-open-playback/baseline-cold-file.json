@@ -1,0 +1,30 @@
+{
+	"applications": [
+		{
+			"path": "\/Applications\/Jianku Screen Next.app",
+			"pid": 57905
+		}
+	],
+	"windows": [
+		{
+			"bounds": {
+				"Height": 800,
+				"Width": 1275,
+				"X": 202,
+				"Y": 103
+			},
+			"id": 27727,
+			"name": "简库镜传 · 视频编辑"
+		},
+		{
+			"bounds": {
+				"Height": 800,
+				"Width": 1120,
+				"X": 331,
+				"Y": 110
+			},
+			"id": 27729,
+			"name": "简库镜传 Next"
+		}
+	]
+}

@@ -1,0 +1,8 @@
+{
+	"scope": "first alpha31 debug build, before macOS UI-thread dispatch fix",
+	"firstRequest": "2026-10-25T10:15:19.574574Z",
+	"timedOutAfterSeconds": 32,
+	"additionalSameRequest": "2026-10-25T10:18:00.606161Z",
+	"windowReady": "2026-10-25T10:18:00.669728Z",
+	"inference": "The plugin uses a blocking listener on a Tokio worker; directly spawning from its callback can leave a task in that blocked worker local queue until a subsequent launch. Sending the same payload again released the first open."
+}

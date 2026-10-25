@@ -1,0 +1,29 @@
+{
+	"scope": "Only three temporary install backups created in this alpha31 stage; release rollback archives retained. No source, project media or build cache removed.",
+	"removed": [
+		{
+			"directory": "/Applications/.jianku-next-update-mCRISO",
+			"version": "0.2.0-alpha.30",
+			"sha256": "bf59373318dc8a3e08d37026d834fe9cbc8047ca00bb01f6743e769a2d8bd841",
+			"bytes": 315584939
+		},
+		{
+			"directory": "/Applications/.jianku-next-update-nl2MMc",
+			"version": "0.2.0-alpha.31",
+			"sha256": "53ae2d4983fb6ff13e05aec71a1a0badcc15caa9d3bdb3d4911aec2435e08839",
+			"bytes": 511762523
+		},
+		{
+			"directory": "/Applications/.jianku-next-update-7fOFyZ",
+			"version": "0.2.0-alpha.31",
+			"sha256": "ceeeae66c8bc87c372b09d480029f4fb993a5a3ae86427e297186e578b7cf8ca",
+			"bytes": 511764203
+		}
+	],
+	"logicalBytes": 1339111665,
+	"retainedArchives": [
+		"0.2.0-alpha.29",
+		"0.2.0-alpha.30",
+		"0.2.0-alpha.31"
+	]
+}

@@ -1,0 +1,44 @@
+{
+	"source_commit": "f0e09222db7431ee3ac3021383f2870789ab3514",
+	"rust_check": {
+		"packages": [
+			"cap-editor",
+			"cap-desktop"
+		],
+		"result": "passed"
+	},
+	"native_tests": {
+		"startup_and_arguments": 12,
+		"playback_event_ownership": 3,
+		"result": "passed"
+	},
+	"frontend_tests": {
+		"files": [
+			"playback-intent-routing",
+			"preparing-playback-handoff",
+			"preparing-frame-transport"
+		],
+		"tests": 35,
+		"result": "passed"
+	},
+	"desktop_typescript": "passed",
+	"rust_format": "passed",
+	"changed_product_biome": "passed",
+	"debug_startup_cases": 8,
+	"debug_playback_cycles": {
+		"playback-first.json": 12,
+		"playback-final.json": 12
+	},
+	"scope": "Synthetic projects only. Frame progress and state ownership checks are not a sustained playback FPS benchmark.",
+	"installer_guard": {
+		"existing_tests": 3,
+		"actual_argument_bearing_process": "passed",
+		"biome": "passed",
+		"source_commit": "70e1696"
+	},
+	"optimized_release_build": "passed",
+	"optimized_release_cold_project_open": "passed",
+	"optimized_release_first_warm_relative_open": "passed",
+	"optimized_release_cli_export": "9s/540frames/1280x720/60fps/full decode -xerror passed",
+	"strict_signature_and_three_bundle_main_hashes": "passed"
+}

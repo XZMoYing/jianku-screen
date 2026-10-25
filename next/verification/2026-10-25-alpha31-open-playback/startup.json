@@ -1,0 +1,171 @@
+[
+	{
+		"case": "absolute",
+		"events": [
+			{
+				"phase": "loaded",
+				"route": "/editor",
+				"title": ""
+			},
+			{
+				"canvas": [
+					1248,
+					702
+				],
+				"phase": "editor-ready",
+				"project": "/private/tmp/jianku-alpha31-fixtures/editor.jks",
+				"route": "/editor"
+			}
+		]
+	},
+	{
+		"case": "relative",
+		"events": [
+			{
+				"phase": "loaded",
+				"route": "/editor",
+				"title": ""
+			},
+			{
+				"canvas": [
+					1248,
+					702
+				],
+				"phase": "editor-ready",
+				"project": "/private/tmp/jianku-alpha31-fixtures/中文 空格/彩色 片段.JKS",
+				"route": "/editor"
+			}
+		]
+	},
+	{
+		"case": "file-url",
+		"events": [
+			{
+				"phase": "loaded",
+				"route": "/editor",
+				"title": ""
+			},
+			{
+				"canvas": [
+					1248,
+					702
+				],
+				"phase": "editor-ready",
+				"project": "/private/tmp/jianku-alpha31-fixtures/中文 空格/彩色 片段.JKS",
+				"route": "/editor"
+			}
+		]
+	},
+	{
+		"case": "multiple",
+		"events": [
+			{
+				"phase": "loaded",
+				"route": "/screenshot-editor",
+				"title": ""
+			},
+			{
+				"phase": "loaded",
+				"route": "/editor",
+				"title": ""
+			},
+			{
+				"canvas": [
+					1248,
+					702
+				],
+				"phase": "editor-ready",
+				"project": "/private/tmp/jianku-alpha31-fixtures/editor.jks",
+				"route": "/editor"
+			},
+			{
+				"phase": "screenshot-ready",
+				"route": "/screenshot-editor"
+			}
+		]
+	},
+	{
+		"case": "plain",
+		"events": [
+			{
+				"phase": "loaded",
+				"route": "/",
+				"title": ""
+			},
+			{
+				"phase": "main-ready",
+				"route": "/"
+			}
+		]
+	},
+	{
+		"case": "warm-relative",
+		"events": [
+			{
+				"phase": "loaded",
+				"route": "/",
+				"title": ""
+			},
+			{
+				"phase": "main-ready",
+				"route": "/"
+			},
+			{
+				"phase": "loaded",
+				"route": "/editor",
+				"title": ""
+			},
+			{
+				"canvas": [
+					1248,
+					702
+				],
+				"phase": "editor-ready",
+				"project": "/private/tmp/jianku-alpha31-fixtures/中文 空格/彩色 片段.JKS",
+				"route": "/editor"
+			}
+		]
+	},
+	{
+		"case": "launchservices",
+		"events": [
+			{
+				"phase": "loaded",
+				"route": "/editor",
+				"title": ""
+			},
+			{
+				"phase": "loaded",
+				"route": "/",
+				"title": ""
+			},
+			{
+				"phase": "main-ready",
+				"route": "/"
+			},
+			{
+				"canvas": [
+					300,
+					150
+				],
+				"phase": "editor-ready",
+				"project": "/private/tmp/jianku-alpha31-fixtures/editor.jks/",
+				"route": "/editor"
+			}
+		]
+	},
+	{
+		"case": "invalid-main-recovery",
+		"events": [
+			{
+				"phase": "loaded",
+				"route": "/",
+				"title": ""
+			},
+			{
+				"phase": "main-ready",
+				"route": "/"
+			}
+		]
+	}
+]

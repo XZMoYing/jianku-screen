@@ -1,0 +1,6 @@
+{
+	"scope": "test fixture construction failure, not a product change",
+	"initial": "cloned original.png screenshot fixture had fps30 metadata, so it was correctly routed as a video project and decoding failed",
+	"corrected": "fixture fps set to0, matching native screenshot creation; actual screenshot dispatch subsequently passed",
+	"additionalFinding": "An editor error screen without a title saver caused normal Quit title acknowledgement to time out. Closing that owned invalid fixture window allowed normal quit. Broader malformed-project/error-screen exit recovery remains pending."
+}

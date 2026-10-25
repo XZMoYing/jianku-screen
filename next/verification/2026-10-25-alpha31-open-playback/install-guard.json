@@ -1,0 +1,8 @@
+{
+	"case": "Actual application launched with a project argument",
+	"pid": 87961,
+	"oldGuardMatches": false,
+	"fixedGuardMatches": true,
+	"noInstallationPerformedDuringGuardTest": true,
+	"existingInstallerTestsPassed": 3
+}
