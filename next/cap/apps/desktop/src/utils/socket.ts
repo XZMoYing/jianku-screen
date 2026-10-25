@@ -351,6 +351,7 @@ export function createImageDataWS(
 		buffer: ArrayBuffer;
 		receivedAt: number;
 		kind: DisplayKind;
+		targetTimeNs: bigint;
 	};
 	let orderedDisplayFrames: QueuedDisplayFrame[] = [];
 	let orderedDisplayRaf: number | null = null;
@@ -360,21 +361,46 @@ export function createImageDataWS(
 				width: number;
 				height: number;
 				kind: DisplayKind;
+				receivedAt: number;
 		  })
 		| null = null;
+
+	let orderedDisplayClock: { targetTimeNs: bigint; wallTimeMs: number } | null =
+		null;
+	let firstOrderedFrame = true;
 
 	function clearOrderedDisplayFrames() {
 		orderedDisplayFrames = [];
 		previousQueuedFrame = null;
+		orderedDisplayClock = null;
+		firstOrderedFrame = true;
 		presentationGeneration++;
 		if (orderedDisplayRaf !== null) cancelAnimationFrame(orderedDisplayRaf);
 		orderedDisplayRaf = null;
 	}
 
-	function renderOrderedDisplayFrame() {
+	function renderOrderedDisplayFrame(timestamp: number) {
 		orderedDisplayRaf = null;
+		const next = orderedDisplayFrames[0];
+		if (!next || isCleanedUp) return;
+		if (!firstOrderedFrame && orderedDisplayClock) {
+			const deadline =
+				orderedDisplayClock.wallTimeMs +
+				Number(next.targetTimeNs - orderedDisplayClock.targetTimeNs) / 1e6;
+			if (timestamp + 0.5 < deadline) {
+				orderedDisplayRaf = requestAnimationFrame(renderOrderedDisplayFrame);
+				return;
+			}
+		}
 		const frame = orderedDisplayFrames.shift();
-		if (!frame || isCleanedUp) return;
+		if (!frame) return;
+		if (firstOrderedFrame && orderedDisplayClock) {
+			orderedDisplayClock = {
+				targetTimeNs: frame.targetTimeNs,
+				wallTimeMs: timestamp,
+			};
+		}
+		firstOrderedFrame = false;
 		switch (frame.kind) {
 			case "rgba":
 				pendingRgbaFrame = frame;
@@ -415,16 +441,33 @@ export function createImageDataWS(
 			})();
 		if (
 			previousQueuedFrame &&
-			(metadata.frameNumber !== previousQueuedFrame.frameNumber + 1 ||
+			(metadata.frameNumber <= previousQueuedFrame.frameNumber ||
+				metadata.frameNumber > previousQueuedFrame.frameNumber + 8 ||
+				receivedAt - previousQueuedFrame.receivedAt > 250 ||
 				metadata.targetTimeNs <= previousQueuedFrame.targetTimeNs ||
 				metadata.width !== previousQueuedFrame.width ||
 				metadata.height !== previousQueuedFrame.height ||
 				kind !== previousQueuedFrame.kind)
 		)
 			clearOrderedDisplayFrames();
-		previousQueuedFrame = { ...metadata, kind };
-		orderedDisplayFrames.push({ buffer, receivedAt, kind });
-		if (orderedDisplayFrames.length > 3) orderedDisplayFrames.shift();
+		if (!orderedDisplayClock && previousQueuedFrame) {
+			const intervalMs =
+				Number(metadata.targetTimeNs - previousQueuedFrame.targetTimeNs) /
+				1e6 /
+				(metadata.frameNumber - previousQueuedFrame.frameNumber);
+			orderedDisplayClock = {
+				targetTimeNs: metadata.targetTimeNs,
+				wallTimeMs: receivedAt + Math.min(intervalMs * 2, 50),
+			};
+		}
+		previousQueuedFrame = { ...metadata, kind, receivedAt };
+		orderedDisplayFrames.push({
+			buffer,
+			receivedAt,
+			kind,
+			targetTimeNs: metadata.targetTimeNs,
+		});
+		if (orderedDisplayFrames.length > 4) orderedDisplayFrames.shift();
 		if (orderedDisplayRaf === null) {
 			orderedDisplayRaf = requestAnimationFrame(renderOrderedDisplayFrame);
 		}
@@ -848,12 +891,8 @@ export function createImageDataWS(
 			return;
 		}
 
-		if (!needsStrideCorrection) {
-			const frameData = new Uint8ClampedArray(
-				buffer,
-				0,
-				expectedRowBytes * height,
-			);
+		if (!needsStrideCorrection || options.preserveFrameOrder) {
+			const frameData = new Uint8ClampedArray(buffer, 0, availableLength);
 			const renderStart = performance.now();
 
 			if (directCanvas.width !== width || directCanvas.height !== height) {
@@ -870,7 +909,19 @@ export function createImageDataWS(
 				cachedDirectWidth = width;
 				cachedDirectHeight = height;
 			}
-			cachedDirectImageData.data.set(frameData);
+			if (needsStrideCorrection) {
+				for (let row = 0; row < height; row++) {
+					cachedDirectImageData.data.set(
+						frameData.subarray(
+							row * strideBytes,
+							row * strideBytes + expectedRowBytes,
+						),
+						row * expectedRowBytes,
+					);
+				}
+			} else {
+				cachedDirectImageData.data.set(frameData);
+			}
 			directCtx.putImageData(cachedDirectImageData, 0, 0);
 
 			storeRenderedFrame(

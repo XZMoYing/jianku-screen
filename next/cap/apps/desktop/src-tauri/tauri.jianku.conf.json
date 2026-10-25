@@ -3,7 +3,7 @@
 	"productName": "Jianku Screen Next",
 	"mainBinaryName": "Jianku Screen Next",
 	"identifier": "com.jianku.screen.next",
-	"version": "0.2.0-alpha.32",
+	"version": "0.2.0-alpha.33",
 	"build": {
 		"beforeBuildCommand": "bun run build"
 	},
@@ -44,7 +44,7 @@
 		},
 		"macOS": {
 			"bundleName": "简库镜传 Next",
-			"bundleVersion": "2026.32.0",
+			"bundleVersion": "2026.33.0",
 			"entitlements": "Entitlements.plist",
 			"frameworks": [
 				"../../../target/native-deps/Spacedrive.framework",

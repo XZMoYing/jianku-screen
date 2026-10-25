@@ -110,6 +110,7 @@ class Canvas {
 const rgba = [29, 61, 127, 255];
 let scheduled: Map<number, FrameRequestCallback>;
 let nextFrame: number;
+let now: number;
 
 function packedFrame(pixels = rgba, frameNumber = 0, targetTimeNs = 0n) {
 	const buffer = new ArrayBuffer(rgba.length + 24);
@@ -123,10 +124,11 @@ function packedFrame(pixels = rgba, frameNumber = 0, targetTimeNs = 0n) {
 	return buffer;
 }
 
-function renderScheduledFrame() {
+function renderScheduledFrame(timestamp = now + 1000 / 60) {
+	now = timestamp;
 	const callbacks = Array.from(scheduled.values());
 	scheduled.clear();
-	for (const callback of callbacks) callback(performance.now());
+	for (const callback of callbacks) callback(timestamp);
 }
 
 async function mount() {
@@ -172,6 +174,8 @@ beforeEach(() => {
 	sockets.Socket.instances = [];
 	scheduled = new Map();
 	nextFrame = 0;
+	now = 0;
+	vi.spyOn(performance, "now").mockImplementation(() => now);
 	vi.stubGlobal("WebSocket", sockets.Socket);
 	vi.stubGlobal("ImageData", Pixels);
 	vi.stubGlobal("navigator", {});
@@ -214,6 +218,94 @@ describe("ordered editor presentation with the actual socket utility", () => {
 		renderScheduledFrame();
 		expect(view.displayed).toEqual([1, 2]);
 		expect(view.canvas.pixels).toEqual([200, 151, 80, 255]);
+	});
+
+	it("draws padded rows on the refresh without allocating an asynchronous stride worker", () => {
+		const view = create();
+		const pixels = [...rgba, 255, 0, 200, 255];
+		const bytes = new ArrayBuffer(16 + 24);
+		new Uint8Array(bytes).set([
+			...rgba,
+			99,
+			99,
+			99,
+			99,
+			...pixels.slice(4),
+			88,
+			88,
+			88,
+			88,
+		]);
+		const metadata = new DataView(bytes, 16);
+		metadata.setUint32(0, 8, true);
+		metadata.setUint32(4, 2, true);
+		metadata.setUint32(8, 1, true);
+		metadata.setUint32(12, 12, true);
+		metadata.setBigUint64(16, 200_000_000n, true);
+		view.socket.frame(bytes);
+		expect(view.displayed).toEqual([]);
+		renderScheduledFrame();
+		expect(view.displayed).toEqual([12]);
+		expect(view.canvas.pixels).toEqual(pixels);
+		expect(strideReplies.pending).toEqual([]);
+	});
+
+	it("buffers arrival jitter and presents one frame per refresh without changing pixels", () => {
+		const view = create();
+		view.send(0);
+		renderScheduledFrame(0);
+		now = 17;
+		view.send(1);
+		renderScheduledFrame(1000 / 60);
+		now = 34;
+		view.send(2);
+		renderScheduledFrame(1000 / 30);
+		expect(view.displayed).toEqual([0]);
+		renderScheduledFrame(50);
+		now = 68;
+		view.send(3);
+		view.send(4);
+		for (const timestamp of [200 / 3, 250 / 3, 100])
+			renderScheduledFrame(timestamp);
+		expect(view.displayed).toEqual([0, 1, 2, 3, 4]);
+	});
+
+	it("keeps queued frames across a small producer gap instead of clearing the buffer", () => {
+		const view = create();
+		view.send(10);
+		view.send(11);
+		view.send(13);
+		for (const timestamp of [0, 1000 / 60, 1000 / 30, 50])
+			renderScheduledFrame(timestamp);
+		expect(view.displayed).toEqual([10, 11, 13]);
+	});
+
+	it("honors 30 fps timestamps on a 60 Hz display even when frames arrive together", () => {
+		const view = create();
+		for (let frame = 0; frame < 3; frame++) {
+			view.socket.frame(packedFrame(rgba, frame, BigInt(frame) * 33_333_333n));
+		}
+		renderScheduledFrame(0);
+		renderScheduledFrame(1000 / 60);
+		expect(view.displayed).toEqual([0]);
+		renderScheduledFrame(1000 / 30);
+		expect(view.displayed).toEqual([0, 1]);
+		renderScheduledFrame(50);
+		expect(view.displayed).toEqual([0, 1]);
+		renderScheduledFrame(200 / 3);
+		expect(view.displayed).toEqual([0, 1, 2]);
+	});
+
+	it("does not delay a paused seek after a long gap in arrivals", () => {
+		const view = create();
+		view.send(1);
+		renderScheduledFrame();
+		now = 17;
+		view.send(2);
+		now = 500;
+		view.send(3);
+		renderScheduledFrame(501);
+		expect(view.displayed).toEqual([1, 3]);
 	});
 
 	it("preserves latest-frame behavior for other consumers", () => {
@@ -265,11 +357,11 @@ describe("ordered editor presentation with the actual socket utility", () => {
 		expect(view.canvas.pixels).toEqual([...rgba, ...rgba]);
 	});
 
-	it("bounds backlog to three frames", () => {
+	it("bounds backlog to four frames", () => {
 		const view = create();
 		for (let index = 1; index <= 8; index++) view.send(index);
 		for (let index = 0; index < 4; index++) renderScheduledFrame();
-		expect(view.displayed).toEqual([6, 7, 8]);
+		expect(view.displayed).toEqual([5, 6, 7, 8]);
 	});
 
 	it.each([0, 100])(
@@ -301,8 +393,8 @@ describe("ordered editor presentation with the actual socket utility", () => {
 		expect(view.displayed).toEqual([10]);
 	});
 
-	it("rejects a late stride-worker reply from before a seek", () => {
-		const view = create();
+	it("rejects a late stride-worker reply from before a seek for other consumers", () => {
+		const view = create(false);
 		const padded = (number: number, color: number[]) => {
 			const frame = new ArrayBuffer(8 + 24);
 			new Uint8Array(frame).set(color);
@@ -330,6 +422,7 @@ describe("ordered editor presentation with the actual socket utility", () => {
 afterEach(() => {
 	for (const socket of sockets.Socket.instances) socket.close();
 	vi.unstubAllGlobals();
+	vi.restoreAllMocks();
 });
 
 describe("preparing transport with the actual socket utility", () => {
