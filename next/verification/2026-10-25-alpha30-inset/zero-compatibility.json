@@ -1,0 +1,23 @@
+{
+	"baseline": "installed alpha.29 release",
+	"results": [
+		{
+			"frame": "plain",
+			"jpegBytes": 155378,
+			"sha256": "db86788f4111fe0e5ba9ec07146812ef88d309ec4a6a12bcc5ffb0ff095fbcf6",
+			"equalToAlpha29": true
+		},
+		{
+			"frame": "browser",
+			"jpegBytes": 162087,
+			"sha256": "f3c475d50120fb90b6533a864ffe70a191d73aee25651c1682c236cf0ac1e863",
+			"equalToAlpha29": true
+		},
+		{
+			"frame": "phone",
+			"jpegBytes": 164650,
+			"sha256": "479867b5089645f8428a23edba60d133a45a2067e714fe457adf84ac0427f522",
+			"equalToAlpha29": true
+		}
+	]
+}

@@ -1,0 +1,46 @@
+{
+	"scope": "only temporary previous.app staging copies created by this alpha30 work; alpha29 and alpha30 release archives retained",
+	"removed": [
+		{
+			"path": "/Applications/.jianku-next-update-76wmVR/previous.app",
+			"version": "0.2.0-alpha.30",
+			"fileBytes": 748357771
+		},
+		{
+			"path": "/Applications/.jianku-next-update-DNix6v/previous.app",
+			"version": "0.2.0-alpha.30",
+			"fileBytes": 511578059
+		},
+		{
+			"path": "/Applications/.jianku-next-update-SAkmGk/previous.app",
+			"version": "0.2.0-alpha.30",
+			"fileBytes": 511578107
+		},
+		{
+			"path": "/Applications/.jianku-next-update-c4Grrz/previous.app",
+			"version": "0.2.0-alpha.30",
+			"fileBytes": 748357819
+		},
+		{
+			"path": "/Applications/.jianku-next-update-fus3B3/previous.app",
+			"version": "0.2.0-alpha.30",
+			"fileBytes": 748357819
+		},
+		{
+			"path": "/Applications/.jianku-next-update-jkeqUt/previous.app",
+			"version": "0.2.0-alpha.30",
+			"fileBytes": 748356651
+		},
+		{
+			"path": "/Applications/.jianku-next-update-pPN1sm/previous.app",
+			"version": "0.2.0-alpha.29",
+			"fileBytes": 315491739
+		},
+		{
+			"path": "/Applications/.jianku-next-update-qhXtDb/previous.app",
+			"version": "0.2.0-alpha.30",
+			"fileBytes": 748357771
+		}
+	],
+	"totalFileBytes": 5080435736
+}

@@ -1,0 +1,167 @@
+[
+	{
+		"inset": 100,
+		"phase": "home",
+		"route": "/",
+		"style": {
+			"color": [20, 60, 90],
+			"opacity": 100
+		}
+	},
+	{
+		"color": "#143c5a",
+		"opacity": 100,
+		"phase": "editor-controls",
+		"route": "/editor",
+		"width": 100
+	},
+	{
+		"completed": true,
+		"phase": "editor-playback",
+		"route": "/editor"
+	},
+	{
+		"before": 0,
+		"changed": 100,
+		"phase": "screenshot-history",
+		"route": "/screenshot-editor",
+		"undone": 0
+	},
+	{
+		"completed": true,
+		"phase": "focused-slider-undo",
+		"route": "/screenshot-editor"
+	},
+	{
+		"after": [
+			{
+				"fillColor": "transparent",
+				"height": 75.93750000000001,
+				"id": "rect-test",
+				"maskLevel": null,
+				"maskType": null,
+				"opacity": 1,
+				"points": null,
+				"rotation": 0,
+				"strokeColor": "#ff0000",
+				"strokeWidth": 4,
+				"text": null,
+				"type": "rectangle",
+				"width": 135.00000000000003,
+				"x": 381.25,
+				"y": 268.92093023255813
+			}
+		],
+		"before": [
+			{
+				"fillColor": "transparent",
+				"height": 75.93750000000001,
+				"id": "rect-test",
+				"maskLevel": null,
+				"maskType": null,
+				"opacity": 1,
+				"points": null,
+				"rotation": 0,
+				"strokeColor": "#ff0000",
+				"strokeWidth": 4,
+				"text": null,
+				"type": "rectangle",
+				"width": 135.00000000000003,
+				"x": 381.25,
+				"y": 268.92093023255813
+			}
+		],
+		"phase": "padding-history",
+		"route": "/screenshot-editor"
+	},
+	{
+		"completed": true,
+		"phase": "resized-canvas-undo",
+		"route": "/screenshot-editor"
+	},
+	{
+		"before": [
+			{
+				"fillColor": "transparent",
+				"height": 90,
+				"id": "rect-test",
+				"maskLevel": null,
+				"maskType": null,
+				"opacity": 1,
+				"points": null,
+				"rotation": 0,
+				"strokeColor": "#ff0000",
+				"strokeWidth": 4,
+				"text": null,
+				"type": "rectangle",
+				"width": 160,
+				"x": 320,
+				"y": 240
+			}
+		],
+		"inset": [
+			{
+				"fillColor": "transparent",
+				"height": 75.93750000000001,
+				"id": "rect-test",
+				"maskLevel": null,
+				"maskType": null,
+				"opacity": 1,
+				"points": null,
+				"rotation": 0,
+				"strokeColor": "#ff0000",
+				"strokeWidth": 4,
+				"text": null,
+				"type": "rectangle",
+				"width": 135.00000000000003,
+				"x": 381.25,
+				"y": 268.92093023255813
+			}
+		],
+		"phase": "screenshot-undo-export",
+		"pngBytes": 194852,
+		"redone": [
+			{
+				"fillColor": "transparent",
+				"height": 75.93750000000001,
+				"id": "rect-test",
+				"maskLevel": null,
+				"maskType": null,
+				"opacity": 1,
+				"points": null,
+				"rotation": 0,
+				"strokeColor": "#ff0000",
+				"strokeWidth": 4,
+				"text": null,
+				"type": "rectangle",
+				"width": 135.00000000000003,
+				"x": 381.25,
+				"y": 268.92093023255813
+			}
+		],
+		"route": "/screenshot-editor",
+		"undone": [
+			{
+				"fillColor": "transparent",
+				"height": 90,
+				"id": "rect-test",
+				"maskLevel": null,
+				"maskType": null,
+				"opacity": 1,
+				"points": null,
+				"rotation": 0,
+				"strokeColor": "#ff0000",
+				"strokeWidth": 4,
+				"text": null,
+				"type": "rectangle",
+				"width": 160,
+				"x": 320,
+				"y": 240
+			}
+		]
+	},
+	{
+		"phase": "complete",
+		"route": "/screenshot-editor"
+	}
+]

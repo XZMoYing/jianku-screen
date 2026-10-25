@@ -1,0 +1,56 @@
+{
+	"frontend": {
+		"passed": 39,
+		"files": [
+			"screenshot-editor/layout.test.ts",
+			"editor/style.test.ts",
+			"components/crop-alignment.test.ts",
+			"editor/preparing-frame-transport.test.ts",
+			"utils/frame-worker.test.ts"
+		],
+		"nativeGeometryCases": 189
+	},
+	"native": {
+		"passed": 4,
+		"groups": [
+			"inset layout and GPU color/alpha/live equality (2)",
+			"legacy background serialization (1)",
+			"cursor/ripple pixel alignment with inset (1)"
+		],
+		"bindingExportPassed": true
+	},
+	"typecheck": "passed",
+	"rustChecks": ["cap-project", "cap-rendering", "cap-desktop"],
+	"format": "Scoped Biome and cargo fmt passed; Markdown checked with git diff --check and current link resolution",
+	"zeroInsetCompatibility": "release: 3 previous-release JPEG exports match byte for byte",
+	"debugBuild": "packaged and strict signed",
+	"packagedUi": {
+		"homeSharedInset": true,
+		"editorSharedInsetAndPlayback": true,
+		"screenshotAnnotationUndoRedo": true,
+		"focusedSliderKeyboardUndo": true,
+		"resizedCanvasUndo": true,
+		"coldReopenViaOriginalPng": true,
+		"exportPngBytes": 194852,
+		"exportPngScope": "native compositor PNG; frontend annotations verified separately in UI screenshot",
+		"playbackRewindResume": {
+			"timelineRulerCycles": 2,
+			"startButtonCycles": 1,
+			"passed": true
+		}
+	},
+	"previewPacing": {
+		"boundedQueueFrames": 3,
+		"scope": "editor direct canvas only; home/live retain latest-frame policy",
+		"qualityAndAnimationCurves": "unchanged",
+		"seekPausePlay": "flush queued and stale stride conversion frames",
+		"trace": "preview-pacing.json",
+		"zoomWindowMissingReceivedFramesAfterFix": 0
+	},
+	"additionalColorPlayback": {
+		"continuousPlayback": "passed",
+		"restartRetests": "start-button+ruler x2, start-button x1, ruler-only x1 passed",
+		"initialRestartAssertion": "failed without per-cycle frame details; cause unclassified, intermittent complex-project resume remains open"
+	},
+	"releaseBuild": "packaged, strict signed, installed and archived; main SHA256 matched"
+}

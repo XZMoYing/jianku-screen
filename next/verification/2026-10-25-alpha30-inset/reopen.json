@@ -1,0 +1,31 @@
+[
+	{
+		"annotations": [
+			{
+				"fillColor": "transparent",
+				"height": 75.93750000000001,
+				"id": "rect-test",
+				"maskLevel": null,
+				"maskType": null,
+				"opacity": 1,
+				"points": null,
+				"rotation": 0,
+				"strokeColor": "#ff0000",
+				"strokeWidth": 4,
+				"text": null,
+				"type": "rectangle",
+				"width": 135.00000000000003,
+				"x": 381.25,
+				"y": 268.92093023255813
+			}
+		],
+		"inset": 100,
+		"phase": "persisted-child-path",
+		"pngBytes": 194852,
+		"route": "/screenshot-editor",
+		"style": {
+			"color": [20, 60, 90],
+			"opacity": 100
+		}
+	}
+]

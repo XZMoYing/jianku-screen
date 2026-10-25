@@ -1,0 +1,52 @@
+{
+	"scope": "packaged debug Canvas2D draw-call traces, 6s static synthetic grid, zoom 1–4s at 60fps; 5s sample; not optimized build or physical display benchmark",
+	"traces": [
+		{
+			"trace": "playback-before.json",
+			"received": 295,
+			"drawn": 283,
+			"unshownReceivedInteriorFrames": [
+				34, 61, 83, 94, 108, 199, 212, 241, 276, 291
+			],
+			"unshownReceivedZoomFrames": [61, 83, 94, 108, 199, 212]
+		},
+		{
+			"trace": "playback-after.json",
+			"received": 297,
+			"drawn": 294,
+			"unshownReceivedInteriorFrames": [9],
+			"unshownReceivedZoomFrames": []
+		},
+		{
+			"trace": "playback-final.json",
+			"received": 294,
+			"drawn": 292,
+			"unshownReceivedInteriorFrames": [293],
+			"unshownReceivedZoomFrames": []
+		}
+	],
+	"restarts": [
+		{
+			"method": "timeline-ruler",
+			"framesDrawn": 83,
+			"firstFrameMs": 19,
+			"firstFrame": 0,
+			"lastFrame": 82
+		},
+		{
+			"method": "timeline-ruler",
+			"framesDrawn": 82,
+			"firstFrameMs": 31,
+			"firstFrame": 0,
+			"lastFrame": 81
+		},
+		{
+			"method": "start-button",
+			"framesDrawn": 82,
+			"firstFrameMs": 25.00000000000182,
+			"firstFrame": 0,
+			"lastFrame": 81
+		}
+	],
+	"boundary": "In-flight frames can remain when sample stops; frame293 in final trace was near sample end and discarded on a producer sequence discontinuity; no claim that every frame or all producer frames were displayed"
+}
