@@ -188,7 +188,10 @@ beforeEach(() => {
 });
 
 describe("ordered editor presentation with the actual socket utility", () => {
-	const create = (preserveFrameOrder = true) => {
+	const create = (
+		preserveFrameOrder = true,
+		isPlaybackActive?: () => boolean,
+	) => {
 		const canvas = new Canvas();
 		const displayed: number[] = [];
 		const [, , , controls] = createImageDataWS(
@@ -198,7 +201,7 @@ describe("ordered editor presentation with the actual socket utility", () => {
 					displayed.push(frame.renderedFrame.frameNumber);
 			},
 			undefined,
-			{ preserveFrameOrder },
+			{ preserveFrameOrder, isPlaybackActive },
 		);
 		controls.initDirectCanvas(canvas.asElement());
 		const socket = sockets.Socket.instances.at(-1);
@@ -306,6 +309,19 @@ describe("ordered editor presentation with the actual socket utility", () => {
 		view.send(3);
 		renderScheduledFrame(501);
 		expect(view.displayed).toEqual([1, 3]);
+	});
+
+	it("immediately presents rapid forward hover seeks instead of pacing them as playback", () => {
+		const view = create(true, () => false);
+		view.send(0);
+		renderScheduledFrame(0);
+		for (let frame = 1; frame <= 40; frame++) {
+			now = frame * 4;
+			view.send(frame * 4);
+			renderScheduledFrame(now);
+			expect(view.displayed.at(-1)).toBe(frame * 4);
+		}
+		expect(scheduled.size).toBe(0);
 	});
 
 	it("preserves latest-frame behavior for other consumers", () => {

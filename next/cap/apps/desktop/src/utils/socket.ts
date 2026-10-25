@@ -220,6 +220,7 @@ export type CanvasControls = {
 
 export type ImageDataWSOptions = {
 	preserveFrameOrder?: boolean;
+	isPlaybackActive?: () => boolean;
 	preserveAlpha?: boolean;
 	powerPreference?: GPUPowerPreference;
 	retainLastFrameOnDispose?: HTMLCanvasElement;
@@ -439,7 +440,9 @@ export function createImageDataWS(
 					height: view.getUint32(4, true),
 				};
 			})();
-		if (
+		if (options.isPlaybackActive?.() === false) {
+			clearOrderedDisplayFrames();
+		} else if (
 			previousQueuedFrame &&
 			(metadata.frameNumber <= previousQueuedFrame.frameNumber ||
 				metadata.frameNumber > previousQueuedFrame.frameNumber + 8 ||

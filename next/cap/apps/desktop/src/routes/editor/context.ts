@@ -2400,6 +2400,11 @@ export const [EditorContextProvider, useBaseEditorContext] =
 			});
 			const playbackIntent = () =>
 				handoffIntent().active ? handoffIntent().playing : editorState.playing;
+			createEffect(() => {
+				const active = playbackIntent();
+				editorInstanceContext.setPlaybackActive(active);
+				if (!active) editorInstanceContext.canvasControls()?.resetFrameState();
+			});
 			let preparingCommand: Promise<boolean> = Promise.resolve(true);
 			let preparingCommandRevision = 0;
 			let cancelPreparingCommand: (() => void) | undefined;
@@ -2419,6 +2424,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 			});
 			const requestHandoffPlayback = (playing: boolean, seconds?: number) => {
 				editorInstanceContext.canvasControls()?.resetFrameState();
+				editorInstanceContext.setPlaybackActive(playing);
 				const progressive =
 					props.editorInstance.preparingPlayback && !preparing?.ordinaryReady();
 				if (!progressive && !playbackHandoff?.active()) return undefined;
@@ -2607,6 +2613,7 @@ export type TransformedMeta = ReturnType<typeof transformMeta>;
 const createEditorInstanceContext = () => {
 	const preparing = usePreparingEditor();
 	const [latestFrame, setLatestFrame] = createLazySignal<FrameData>();
+	const [playbackActive, setPlaybackActive] = createSignal(false);
 
 	// Rendered display/camera placement of the latest preview frame, emitted
 	// by the renderer so on-canvas overlays hit-test exactly what was drawn.
@@ -2699,7 +2706,7 @@ const createEditorInstanceContext = () => {
 					if (alive && activeInstanceId === instanceId) setLatestFrame(frame);
 				},
 				requestFrame,
-				{ preserveFrameOrder: true },
+				{ preserveFrameOrder: true, isPlaybackActive: playbackActive },
 			);
 			closeSocket = () => ws.close();
 
@@ -2740,6 +2747,7 @@ const createEditorInstanceContext = () => {
 		editorInstance,
 		refetchEditorInstance,
 		latestFrame,
+		setPlaybackActive,
 		latestFrameLayout,
 		presets: createPresets(),
 		metaQuery,
