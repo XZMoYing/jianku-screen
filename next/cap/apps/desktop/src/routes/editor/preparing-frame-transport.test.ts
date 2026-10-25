@@ -44,13 +44,39 @@ vi.mock("~/utils/frame-worker?worker", () => ({
 		}
 	},
 }));
+
+const strideReplies = vi.hoisted(() => ({ pending: [] as (() => void)[] }));
 vi.mock("~/utils/stride-correction-worker?worker", () => ({
 	default: class {
-		constructor() {
-			throw new Error(
-				"The tightly packed native test frame needs no stride worker",
+		onmessage: ((event: { data: Record<string, unknown> }) => void) | null =
+			null;
+		postMessage(request: {
+			buffer: ArrayBuffer;
+			strideBytes: number;
+			width: number;
+			height: number;
+			frameNumber: number;
+			targetTimeNs: bigint;
+			generation: number;
+		}) {
+			const pixels = new Uint8Array(request.width * request.height * 4);
+			const source = new Uint8Array(request.buffer);
+			for (let row = 0; row < request.height; row++) {
+				pixels.set(
+					source.subarray(
+						row * request.strideBytes,
+						row * request.strideBytes + request.width * 4,
+					),
+					row * request.width * 4,
+				);
+			}
+			strideReplies.pending.push(() =>
+				this.onmessage?.({
+					data: { ...request, type: "corrected", buffer: pixels.buffer },
+				}),
 			);
 		}
+		terminate() {}
 	},
 }));
 
@@ -142,6 +168,7 @@ async function mount() {
 }
 
 beforeEach(() => {
+	strideReplies.pending = [];
 	sockets.Socket.instances = [];
 	scheduled = new Map();
 	nextFrame = 0;
@@ -154,6 +181,150 @@ beforeEach(() => {
 		return id;
 	});
 	vi.stubGlobal("cancelAnimationFrame", (id: number) => scheduled.delete(id));
+});
+
+describe("ordered editor presentation with the actual socket utility", () => {
+	const create = (preserveFrameOrder = true) => {
+		const canvas = new Canvas();
+		const displayed: number[] = [];
+		const [, , , controls] = createImageDataWS(
+			"ws://ordered-editor",
+			(frame) => {
+				if (frame.renderedFrame)
+					displayed.push(frame.renderedFrame.frameNumber);
+			},
+			undefined,
+			{ preserveFrameOrder },
+		);
+		controls.initDirectCanvas(canvas.asElement());
+		const socket = sockets.Socket.instances.at(-1);
+		if (!socket) throw new Error("Expected editor socket");
+		const send = (number: number, color = rgba) =>
+			socket.frame(packedFrame(color, number, BigInt(number) * 16_666_667n));
+		return { canvas, displayed, controls, socket, send };
+	};
+
+	it("presents two sequential arrivals on consecutive refreshes without replacing pixels", () => {
+		const view = create();
+		view.send(1);
+		view.send(2, [200, 151, 80, 255]);
+		renderScheduledFrame();
+		expect(view.displayed).toEqual([1]);
+		expect(view.canvas.pixels).toEqual(rgba);
+		renderScheduledFrame();
+		expect(view.displayed).toEqual([1, 2]);
+		expect(view.canvas.pixels).toEqual([200, 151, 80, 255]);
+	});
+
+	it("preserves latest-frame behavior for other consumers", () => {
+		const view = create(false);
+		view.send(1);
+		view.send(2);
+		renderScheduledFrame();
+		expect(view.displayed).toEqual([2]);
+	});
+
+	it("keeps NV12 frames in order without changing converted pixels", () => {
+		const view = create();
+		for (const number of [1, 2]) {
+			const frame = new ArrayBuffer(6 + 28);
+			new Uint8Array(frame).set([16, 16, 16, 16, 128, 128]);
+			const metadata = new DataView(frame, 6);
+			metadata.setUint32(0, 2, true);
+			metadata.setUint32(4, 2, true);
+			metadata.setUint32(8, 2, true);
+			metadata.setUint32(12, number, true);
+			metadata.setBigUint64(16, BigInt(number) * 16_666_667n, true);
+			metadata.setUint32(24, 0x4e563132, true);
+			view.socket.frame(frame);
+		}
+		renderScheduledFrame();
+		expect(view.displayed).toEqual([1]);
+		renderScheduledFrame();
+		expect(view.displayed).toEqual([1, 2]);
+		expect(view.canvas.pixels).toEqual(
+			Array.from({ length: 4 }, () => [0, 0, 0, 255]).flat(),
+		);
+	});
+
+	it("drops frames from the previous output size before presenting a resized canvas", () => {
+		const view = create();
+		view.send(1);
+		const frame = new ArrayBuffer(8 + 24);
+		new Uint8Array(frame).set([...rgba, ...rgba]);
+		const metadata = new DataView(frame, 8);
+		metadata.setUint32(0, 8, true);
+		metadata.setUint32(4, 1, true);
+		metadata.setUint32(8, 2, true);
+		metadata.setUint32(12, 2, true);
+		metadata.setBigUint64(16, 33_333_334n, true);
+		view.socket.frame(frame);
+		renderScheduledFrame();
+		expect(view.displayed).toEqual([2]);
+		expect(view.canvas.width).toBe(2);
+		expect(view.canvas.pixels).toEqual([...rgba, ...rgba]);
+	});
+
+	it("bounds backlog to three frames", () => {
+		const view = create();
+		for (let index = 1; index <= 8; index++) view.send(index);
+		for (let index = 0; index < 4; index++) renderScheduledFrame();
+		expect(view.displayed).toEqual([6, 7, 8]);
+	});
+
+	it.each([0, 100])(
+		"discards the old queue on a seek to frame %s",
+		(target) => {
+			const view = create();
+			view.send(10);
+			view.send(11);
+			view.send(target);
+			renderScheduledFrame();
+			renderScheduledFrame();
+			expect(view.displayed).toEqual([target]);
+		},
+	);
+
+	it("replaces queued paused-frame edits and cancels old frames on reset or disposal", () => {
+		const view = create();
+		view.send(10);
+		view.send(10, [200, 151, 80, 255]);
+		renderScheduledFrame();
+		expect(view.canvas.pixels).toEqual([200, 151, 80, 255]);
+		view.send(11);
+		view.controls.resetFrameState();
+		renderScheduledFrame();
+		expect(view.displayed).toEqual([10]);
+		view.send(0);
+		view.controls.dispose();
+		renderScheduledFrame();
+		expect(view.displayed).toEqual([10]);
+	});
+
+	it("rejects a late stride-worker reply from before a seek", () => {
+		const view = create();
+		const padded = (number: number, color: number[]) => {
+			const frame = new ArrayBuffer(8 + 24);
+			new Uint8Array(frame).set(color);
+			const metadata = new DataView(frame, 8);
+			metadata.setUint32(0, 8, true);
+			metadata.setUint32(4, 1, true);
+			metadata.setUint32(8, 1, true);
+			metadata.setUint32(12, number, true);
+			metadata.setBigUint64(16, BigInt(number) * 16_666_667n, true);
+			return frame;
+		};
+		view.socket.frame(padded(10, rgba));
+		renderScheduledFrame();
+		view.controls.resetFrameState();
+		view.socket.frame(padded(0, [200, 151, 80, 255]));
+		renderScheduledFrame();
+		strideReplies.pending[0]();
+		expect(view.displayed).toEqual([]);
+		strideReplies.pending[1]();
+		expect(view.displayed).toEqual([0]);
+		expect(view.canvas.pixels).toEqual([200, 151, 80, 255]);
+	});
 });
 
 afterEach(() => {

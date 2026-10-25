@@ -2,6 +2,7 @@ import type { RenderedFrameIdentity } from "./frame-identity";
 
 interface StrideCorrectionRequest extends RenderedFrameIdentity {
 	type: "correct-stride";
+	generation: number;
 	buffer: ArrayBuffer;
 	strideBytes: number;
 	width: number;
@@ -10,6 +11,7 @@ interface StrideCorrectionRequest extends RenderedFrameIdentity {
 
 interface StrideCorrectionResponse extends RenderedFrameIdentity {
 	type: "corrected";
+	generation: number;
 	buffer: ArrayBuffer;
 	width: number;
 	height: number;
@@ -26,8 +28,15 @@ let correctionBufferSize = 0;
 self.onmessage = (e: MessageEvent<StrideCorrectionRequest>) => {
 	if (e.data.type !== "correct-stride") return;
 
-	const { buffer, strideBytes, width, height, frameNumber, targetTimeNs } =
-		e.data;
+	const {
+		buffer,
+		strideBytes,
+		width,
+		height,
+		frameNumber,
+		targetTimeNs,
+		generation,
+	} = e.data;
 	const expectedRowBytes = width * 4;
 	const expectedLength = expectedRowBytes * height;
 
@@ -49,6 +58,7 @@ self.onmessage = (e: MessageEvent<StrideCorrectionRequest>) => {
 	const result = correctionBuffer.slice(0, expectedLength);
 	const response: StrideCorrectionResponse = {
 		type: "corrected",
+		generation,
 		frameNumber,
 		targetTimeNs,
 		buffer: result.buffer,

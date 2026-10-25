@@ -2418,6 +2418,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				}
 			});
 			const requestHandoffPlayback = (playing: boolean, seconds?: number) => {
+				editorInstanceContext.canvasControls()?.resetFrameState();
 				const progressive =
 					props.editorInstance.preparingPlayback && !preparing?.ordinaryReady();
 				if (!progressive && !playbackHandoff?.active()) return undefined;
@@ -2698,6 +2699,7 @@ const createEditorInstanceContext = () => {
 					if (alive && activeInstanceId === instanceId) setLatestFrame(frame);
 				},
 				requestFrame,
+				{ preserveFrameOrder: true },
 			);
 			closeSocket = () => ws.close();
 

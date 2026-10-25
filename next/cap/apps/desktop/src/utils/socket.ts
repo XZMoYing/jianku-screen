@@ -219,6 +219,7 @@ export type CanvasControls = {
 };
 
 export type ImageDataWSOptions = {
+	preserveFrameOrder?: boolean;
 	preserveAlpha?: boolean;
 	powerPreference?: GPUPowerPreference;
 	retainLastFrameOnDispose?: HTMLCanvasElement;
@@ -345,6 +346,89 @@ export function createImageDataWS(
 		receivedAt: number;
 	} | null = null;
 	let pendingCanvas2DRgbaRafId: number | null = null;
+	type DisplayKind = "rgba" | "nv12" | "rgba2d" | "nv122d";
+	type QueuedDisplayFrame = {
+		buffer: ArrayBuffer;
+		receivedAt: number;
+		kind: DisplayKind;
+	};
+	let orderedDisplayFrames: QueuedDisplayFrame[] = [];
+	let orderedDisplayRaf: number | null = null;
+	let presentationGeneration = 0;
+	let previousQueuedFrame:
+		| (RenderedFrameIdentity & {
+				width: number;
+				height: number;
+				kind: DisplayKind;
+		  })
+		| null = null;
+
+	function clearOrderedDisplayFrames() {
+		orderedDisplayFrames = [];
+		previousQueuedFrame = null;
+		presentationGeneration++;
+		if (orderedDisplayRaf !== null) cancelAnimationFrame(orderedDisplayRaf);
+		orderedDisplayRaf = null;
+	}
+
+	function renderOrderedDisplayFrame() {
+		orderedDisplayRaf = null;
+		const frame = orderedDisplayFrames.shift();
+		if (!frame || isCleanedUp) return;
+		switch (frame.kind) {
+			case "rgba":
+				pendingRgbaFrame = frame;
+				renderPendingRgbaFrame();
+				break;
+			case "nv12":
+				pendingNv12Frame = frame;
+				renderPendingNv12Frame();
+				break;
+			case "rgba2d":
+				renderRgbaFrameCanvas2D(frame.buffer, frame.receivedAt);
+				break;
+			case "nv122d":
+				pendingNv12Frame = frame;
+				renderPendingFrameCanvas2D();
+				break;
+		}
+		if (orderedDisplayFrames.length > 0) {
+			orderedDisplayRaf = requestAnimationFrame(renderOrderedDisplayFrame);
+		}
+	}
+
+	function queueOrderedDisplayFrame(
+		kind: DisplayKind,
+		buffer: ArrayBuffer,
+		receivedAt: number,
+	) {
+		if (buffer.byteLength < 24) return;
+		const metadata =
+			readNv12Metadata(buffer) ??
+			(() => {
+				const view = new DataView(buffer, buffer.byteLength - 24);
+				return {
+					...readFrameIdentity(view),
+					width: view.getUint32(8, true),
+					height: view.getUint32(4, true),
+				};
+			})();
+		if (
+			previousQueuedFrame &&
+			(metadata.frameNumber !== previousQueuedFrame.frameNumber + 1 ||
+				metadata.targetTimeNs <= previousQueuedFrame.targetTimeNs ||
+				metadata.width !== previousQueuedFrame.width ||
+				metadata.height !== previousQueuedFrame.height ||
+				kind !== previousQueuedFrame.kind)
+		)
+			clearOrderedDisplayFrames();
+		previousQueuedFrame = { ...metadata, kind };
+		orderedDisplayFrames.push({ buffer, receivedAt, kind });
+		if (orderedDisplayFrames.length > 3) orderedDisplayFrames.shift();
+		if (orderedDisplayRaf === null) {
+			orderedDisplayRaf = requestAnimationFrame(renderOrderedDisplayFrame);
+		}
+	}
 
 	let lastRenderedFrameData: {
 		data: Uint8ClampedArray;
@@ -390,6 +474,7 @@ export function createImageDataWS(
 			} catch {}
 		}
 		isCleanedUp = true;
+		clearOrderedDisplayFrames();
 
 		ws.onmessage = null;
 
@@ -518,6 +603,10 @@ export function createImageDataWS(
 	}
 
 	function schedulePendingNv12Frame(buffer: ArrayBuffer, receivedAt: number) {
+		if (options.preserveFrameOrder) {
+			queueOrderedDisplayFrame("nv12", buffer, receivedAt);
+			return;
+		}
 		pendingNv12Frame = { buffer, receivedAt };
 		if (pendingNv12RafId !== null) return;
 
@@ -573,6 +662,10 @@ export function createImageDataWS(
 	}
 
 	function schedulePendingRgbaFrame(buffer: ArrayBuffer, receivedAt: number) {
+		if (options.preserveFrameOrder) {
+			queueOrderedDisplayFrame("rgba", buffer, receivedAt);
+			return;
+		}
 		pendingRgbaFrame = { buffer, receivedAt };
 		if (pendingRgbaRafId !== null) return;
 
@@ -666,6 +759,10 @@ export function createImageDataWS(
 		buffer: ArrayBuffer,
 		receivedAt: number,
 	) {
+		if (options.preserveFrameOrder) {
+			queueOrderedDisplayFrame("nv122d", buffer, receivedAt);
+			return;
+		}
 		pendingNv12Frame = { buffer, receivedAt };
 		if (pendingCanvas2DNv12RafId !== null) return;
 
@@ -679,7 +776,13 @@ export function createImageDataWS(
 		if (strideWorker) return strideWorker;
 		strideWorker = new StrideCorrectionWorker();
 		strideWorker.onmessage = (e: MessageEvent<StrideCorrectionResponse>) => {
-			if (e.data.type !== "corrected" || !directCanvas || !directCtx) return;
+			if (
+				e.data.type !== "corrected" ||
+				!directCanvas ||
+				!directCtx ||
+				e.data.generation !== presentationGeneration
+			)
+				return;
 
 			const { buffer, width, height } = e.data;
 			const renderStart = performance.now();
@@ -790,6 +893,7 @@ export function createImageDataWS(
 		ensureStrideWorker().postMessage(
 			{
 				type: "correct-stride",
+				generation: presentationGeneration,
 				...readFrameIdentity(meta),
 				buffer,
 				strideBytes,
@@ -817,6 +921,10 @@ export function createImageDataWS(
 		buffer: ArrayBuffer,
 		receivedAt: number,
 	) {
+		if (options.preserveFrameOrder) {
+			queueOrderedDisplayFrame("rgba2d", buffer, receivedAt);
+			return;
+		}
 		pendingCanvas2DRgbaFrame = { buffer, receivedAt };
 		if (pendingCanvas2DRgbaRafId !== null) return;
 
@@ -844,6 +952,7 @@ export function createImageDataWS(
 			if (isCleanedUp) return;
 
 			const isNewCanvas = directCanvas !== canvas;
+			if (isNewCanvas) clearOrderedDisplayFrames();
 
 			if (isNewCanvas && directCanvas) {
 				if (mainThreadWebGPU) {
@@ -926,6 +1035,7 @@ export function createImageDataWS(
 		},
 		resetFrameState: () => {
 			if (isCleanedUp) return;
+			clearOrderedDisplayFrames();
 			worker?.postMessage({ type: "reset-frame-state" });
 		},
 		captureFrame: async () => {
