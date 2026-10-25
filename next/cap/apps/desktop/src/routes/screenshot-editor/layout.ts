@@ -1,5 +1,5 @@
 import { ASPECT_RATIOS } from "~/routes/editor/projectConfig";
-import type { AspectRatio, XY } from "~/utils/tauri";
+import type { AspectRatio, BackgroundConfiguration, XY } from "~/utils/tauri";
 
 export const SCREEN_MAX_PADDING = 0.4;
 
@@ -27,7 +27,8 @@ function getBaseSize(
 		};
 	}
 
-	const cropAspect = cropWidth / cropHeight;
+	// Native crop aspect uses f32 before choosing the fitted dimension.
+	const cropAspect = Math.fround(cropWidth / cropHeight);
 	const targetAspect = getAspectRatioValue(aspectRatio);
 	const padding = Math.max(cropWidth, cropHeight) * paddingFactor * 2;
 
@@ -48,7 +49,7 @@ function getBaseSize(
 	};
 }
 
-export function calculateImageTransform(
+function baseImageTransform(
 	frameSize: { width: number; height: number },
 	imageSize: { width: number; height: number },
 	padding: number,
@@ -138,12 +139,87 @@ export function calculateImageTransform(
 	};
 }
 
+type ImageDecoration = Pick<
+	BackgroundConfiguration,
+	"inset" | "frame" | "displayPosition"
+>;
+
+export function calculateImageTransform(
+	frameSize: { width: number; height: number },
+	imageSize: { width: number; height: number },
+	padding: number,
+	crop: { position: XY<number>; size: XY<number> } | null,
+	aspectRatio: AspectRatio | null,
+	decoration?: ImageDecoration,
+) {
+	const base = baseImageTransform(
+		frameSize,
+		imageSize,
+		padding,
+		crop,
+		aspectRatio,
+	);
+	if (!decoration || frameSize.width <= 0 || frameSize.height <= 0) return base;
+	const style = decoration.frame?.style ?? "none";
+	const inset = Math.min(100, Math.max(0, decoration.inset || 0));
+	let offset = { ...base.offset };
+	let size = { ...base.size };
+	if (inset > 0 || style !== "none") {
+		const aspect =
+			(crop?.size.x ?? imageSize.width) /
+			Math.max(1, crop?.size.y ?? imageSize.height);
+		const gap = (inset / 1080) * Math.min(aspect, 1);
+		const plateWidth = aspect + gap * 2;
+		const plateHeight = 1 + gap * 2;
+		const plateAspect = plateWidth / plateHeight;
+		let [top, right, bottom, left] = [0, 0, 0, 0];
+		if (style === "macOS") top = 0.055;
+		else if (style === "windows") top = 0.05;
+		else if (style === "browser") top = 0.075;
+		else if (style === "macbook")
+			[top, right, bottom, left] = [0.028, 0.128, 0.108, 0.128];
+		else if (style === "phone" || style === "tablet") {
+			const bezel =
+				(style === "phone" ? 0.024 : 0.04) *
+				Math.min(Math.max(plateAspect, Number.EPSILON), 1);
+			[top, right, bottom, left] = [bezel, bezel, bezel, bezel];
+		}
+		const outerWidth = plateWidth + (left + right) * plateHeight;
+		const outerHeight = plateHeight * (1 + top + bottom);
+		const height = Math.max(
+			1,
+			Math.min(base.size.width / outerWidth, base.size.height / outerHeight),
+		);
+		offset = {
+			x:
+				base.offset.x +
+				(base.size.width - outerWidth * height) / 2 +
+				(left * plateHeight + gap) * height,
+			y:
+				base.offset.y +
+				(base.size.height - outerHeight * height) / 2 +
+				(top * plateHeight + gap) * height,
+		};
+		size = { width: aspect * height, height };
+	}
+	if (decoration.displayPosition) {
+		offset.x +=
+			(Math.min(1, Math.max(0, decoration.displayPosition.x)) - 0.5) *
+			frameSize.width;
+		offset.y +=
+			(Math.min(1, Math.max(0, decoration.displayPosition.y)) - 0.5) *
+			frameSize.height;
+	}
+	return { offset, size };
+}
+
 export function getImageRect(
 	frameSize: { width: number; height: number },
 	imageSize: { width: number; height: number } | null,
 	padding: number,
 	crop: { position: XY<number>; size: XY<number> } | null,
 	aspectRatio: AspectRatio | null,
+	decoration?: ImageDecoration,
 ) {
 	if (!imageSize) {
 		return {
@@ -160,6 +236,7 @@ export function getImageRect(
 		padding,
 		crop,
 		aspectRatio,
+		decoration,
 	);
 
 	return {
@@ -168,4 +245,22 @@ export function getImageRect(
 		width: transform.size.width,
 		height: transform.size.height,
 	};
+}
+
+export function remapImageAnnotations<
+	T extends { x: number; y: number; width: number; height: number },
+>(
+	annotations: T[],
+	previous: ReturnType<typeof calculateImageTransform>,
+	next: ReturnType<typeof calculateImageTransform>,
+) {
+	const scaleX = next.size.width / Math.max(previous.size.width, 1);
+	const scaleY = next.size.height / Math.max(previous.size.height, 1);
+	return annotations.map((annotation) => ({
+		...annotation,
+		x: next.offset.x + (annotation.x - previous.offset.x) * scaleX,
+		y: next.offset.y + (annotation.y - previous.offset.y) * scaleY,
+		width: annotation.width * scaleX,
+		height: annotation.height * scaleY,
+	}));
 }

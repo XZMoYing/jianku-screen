@@ -12,6 +12,7 @@ import {
 	Show,
 } from "solid-js";
 import toast from "solid-toast";
+import { InsetSettings } from "~/components/InsetSettings";
 import {
 	ASPECT_RATIO_OPTIONS,
 	ASPECT_RATIOS,
@@ -638,12 +639,22 @@ export default function Presentation(props: {
 										100,
 										(value) => adjustBackground("rounding", value),
 									)}
-									{range(
-										"内边距",
-										value().project.background.inset,
-										40,
-										(value) => adjustBackground("inset", value),
-									)}
+									<InsetSettings
+										background={value().project.background}
+										onChange={(patch) => {
+											const current = value();
+											update({
+												...current,
+												project: {
+													...current.project,
+													background: {
+														...current.project.background,
+														...patch,
+													},
+												},
+											});
+										}}
+									/>
 									{range(
 										"阴影",
 										value().project.background.shadow,

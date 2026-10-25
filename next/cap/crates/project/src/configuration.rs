@@ -312,7 +312,7 @@ impl Default for FrameConfiguration {
         Self {
             style: FrameStyle::None,
             theme: FrameTheme::default(),
-            url: "Cap.so".to_string(),
+            url: "jianku.local".to_string(),
             title: String::new(),
         }
     }
@@ -384,6 +384,7 @@ pub struct BackgroundConfiguration {
     pub rounding: f64,
     pub rounding_type: CornerStyle,
     pub inset: u32,
+    pub inset_style: Option<InsetStyle>,
     pub crop: Option<Crop>,
     /// Normalized (0-1) center of the display rect in output-frame space.
     /// `None` keeps the display centered. When a frame is active this is the
@@ -399,6 +400,22 @@ pub struct BackgroundConfiguration {
     /// from `frame`: the decorative MacBook style is a mockup, this restores
     /// something the capture really did hide, and the two are independent.
     pub notch: Option<NotchConfiguration>,
+}
+
+#[derive(Type, Serialize, Deserialize, Clone, Debug)]
+#[serde(rename_all = "camelCase", default)]
+pub struct InsetStyle {
+    pub color: Color,
+    pub opacity: f32,
+}
+
+impl Default for InsetStyle {
+    fn default() -> Self {
+        Self {
+            color: [0; 3],
+            opacity: 50.0,
+        }
+    }
 }
 
 impl Default for BorderConfiguration {
@@ -421,6 +438,7 @@ impl Default for BackgroundConfiguration {
             rounding: 0.0,
             rounding_type: CornerStyle::default(),
             inset: 0,
+            inset_style: None,
             crop: None,
             display_position: None,
             shadow: 73.6,
@@ -3055,6 +3073,32 @@ mod notch_tests {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn inset_preserves_legacy_values_and_round_trips_optional_style() {
+        let legacy: BackgroundConfiguration =
+            serde_json::from_str(r#"{"inset":32,"padding":17}"#).unwrap();
+        assert_eq!(legacy.inset, 32);
+        assert_eq!(legacy.padding, 17.0);
+        assert!(legacy.inset_style.is_none());
+        let fallback: InsetStyle = serde_json::from_str("{}").unwrap();
+        assert_eq!(fallback.color, [0; 3]);
+        assert_eq!(fallback.opacity, 50.0);
+        let mut styled = legacy;
+        styled.inset_style = Some(InsetStyle {
+            color: [12, 34, 56],
+            opacity: 72.0,
+        });
+        let restored: BackgroundConfiguration =
+            serde_json::from_slice(&serde_json::to_vec(&styled).unwrap()).unwrap();
+        assert_eq!(restored.inset, 32);
+        assert_eq!(restored.padding, 17.0);
+        let style = restored.inset_style.unwrap();
+        assert_eq!(style.color, [12, 34, 56]);
+        assert_eq!(style.opacity, 72.0);
+        let fresh: BackgroundConfiguration = serde_json::from_str("{}").unwrap();
+        assert_eq!(fresh.inset, 0);
+    }
 
     #[test]
     fn studio_sound_defaults_old_projects_to_balanced_and_round_trips_tiers() {

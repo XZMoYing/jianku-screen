@@ -1,5 +1,6 @@
 import { Popover } from "@kobalte/core/popover";
 import { batch } from "solid-js";
+import { InsetSettings } from "~/components/InsetSettings";
 import { t as localize } from "~/utils/i18n";
 import IconCapPadding from "~icons/cap/padding";
 import { useScreenshotEditorContext } from "../context";
@@ -20,8 +21,13 @@ function hasNoVisibleBackground(source: {
 }
 
 export function PaddingPopover() {
-	const { project, setProject, activePopover, setActivePopover } =
-		useScreenshotEditorContext();
+	const {
+		project,
+		setProject,
+		activePopover,
+		setActivePopover,
+		projectHistory,
+	} = useScreenshotEditorContext();
 
 	const handlePaddingChange = (v: number[]) => {
 		const value = v[0];
@@ -64,7 +70,7 @@ export function PaddingPopover() {
 				kbd={["P"]}
 			/>
 			<Popover.Portal>
-				<Popover.Content class="z-50 w-[200px] overflow-hidden rounded-xl border border-gray-3 bg-gray-1 shadow-xl animate-in fade-in zoom-in-95 p-4">
+				<Popover.Content class="z-50 w-[320px] overflow-hidden rounded-xl border border-gray-3 bg-gray-1 shadow-xl animate-in fade-in zoom-in-95 p-4">
 					<div class="flex flex-col gap-2">
 						<span class="text-xs font-medium text-gray-11">
 							{localize("Padding")}
@@ -76,6 +82,11 @@ export function PaddingPopover() {
 							maxValue={100}
 							step={1}
 							formatTooltip="px"
+						/>
+						<InsetSettings
+							history={projectHistory}
+							background={project.background}
+							onChange={(patch) => setProject("background", patch)}
 						/>
 					</div>
 				</Popover.Content>

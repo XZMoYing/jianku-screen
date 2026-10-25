@@ -20,7 +20,12 @@ use std::io::Cursor;
 use std::str::FromStr;
 use std::sync::atomic::{AtomicU8, Ordering};
 use std::time::Instant;
-use std::{collections::HashMap, ops::Deref, path::PathBuf, sync::Arc};
+use std::{
+    collections::HashMap,
+    ops::Deref,
+    path::{Path, PathBuf},
+    sync::Arc,
+};
 use tauri::{
     AppHandle, Manager, Runtime, Window,
     ipc::{CommandArg, InvokeError},
@@ -29,6 +34,15 @@ use tokio::sync::{RwLock, watch};
 use tokio_util::sync::CancellationToken;
 
 const MAX_DIMENSION: u32 = 16_384;
+
+fn screenshot_project_dir(path: &Path) -> Option<&Path> {
+    if cap_project::is_project_path(path) {
+        Some(path)
+    } else {
+        path.parent()
+            .filter(|parent| cap_project::is_project_path(parent))
+    }
+}
 
 type PendingResult = Result<Arc<ScreenshotEditorInstanceDelivery>, String>;
 type PendingReceiver = watch::Receiver<Option<PendingResult>>;
@@ -266,17 +280,7 @@ impl ScreenshotEditorInstances {
             "screenshot_editor timing: source image ready"
         );
 
-        let cap_dir = if cap_project::is_project_path(&path) {
-            Some(path.clone())
-        } else if let Some(parent) = path.parent() {
-            if cap_project::is_project_path(parent) {
-                Some(parent.to_path_buf())
-            } else {
-                None
-            }
-        } else {
-            None
-        };
+        let cap_dir = screenshot_project_dir(&path).map(Path::to_path_buf);
 
         let (recording_meta, loaded_config) = if let Some(cap_dir) = &cap_dir {
             let meta = RecordingMeta::load_for_project(cap_dir).ok();
@@ -1093,20 +1097,10 @@ pub async fn update_screenshot_config(
         return Ok(());
     }
 
-    let Some(parent) = instance.path.parent() else {
-        return Ok(());
-    };
-
-    if cap_project::is_project_path(parent) {
-        let path = parent.to_path_buf();
-        if let Err(e) = config.write(&path) {
-            eprintln!("Failed to save screenshot config: {e}");
-        } else {
-            println!("Saved screenshot config to {path:?}");
-        }
-    } else {
-        println!("Not saving config: parent {parent:?} is not a .cap directory");
+    if let Some(path) = screenshot_project_dir(&instance.path) {
+        config.write(path).map_err(|error| error.to_string())?;
     }
+
     Ok(())
 }
 

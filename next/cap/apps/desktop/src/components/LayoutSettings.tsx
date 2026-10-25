@@ -11,6 +11,7 @@ import type {
 	BackgroundConfiguration,
 	CornerStyle,
 } from "~/utils/tauri";
+import { InsetSettings } from "./InsetSettings";
 import { Toggle } from "./Toggle";
 
 export function LayoutSettings(props: {
@@ -23,22 +24,16 @@ export function LayoutSettings(props: {
 }) {
 	const range = (
 		name: string,
-		key: "blur" | "padding" | "rounding" | "inset" | "shadow",
+		key: "blur" | "padding" | "rounding" | "shadow",
 		max = 100,
 		step = 0.1,
 	) => (
 		<Field
 			inline
 			name={name}
-			disabled={key === "inset"}
-			value={
-				key === "inset"
-					? localize("敬请期待")
-					: `${Number(props.background[key].toFixed(1))}%`
-			}
+			value={`${Number(props.background[key].toFixed(1))}%`}
 		>
 			<Slider
-				disabled={key === "inset"}
 				value={[props.background[key]]}
 				minValue={0}
 				maxValue={max}
@@ -100,7 +95,7 @@ export function LayoutSettings(props: {
 					<option value="squircle">{localize("连续曲率")}</option>
 				</select>
 			</label>
-			{range("内边距", "inset", 100, 1)}
+			<InsetSettings background={props.background} onChange={props.onChange} />
 			<Show when={props.background.displayPosition}>
 				<Field inline name="画面位置">
 					<button

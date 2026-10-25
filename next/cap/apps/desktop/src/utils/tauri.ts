@@ -832,7 +832,7 @@ export type AutomationTestReport = { ruleId: string; ruleName: string; actionChe
 export type AutomationsStore = { version?: number; rules?: AutomationRule[] }
 export type BackgroundBlurConfig = { mode: BackgroundBlurMode }
 export type BackgroundBlurMode = "off" | "light" | "heavy" | "remove"
-export type BackgroundConfiguration = { source: BackgroundSource; blur: number; padding: number; rounding: number; roundingType: CornerStyle; inset: number; crop: Crop | null;
+export type BackgroundConfiguration = { source: BackgroundSource; blur: number; padding: number; rounding: number; roundingType: CornerStyle; inset: number; insetStyle: InsetStyle | null; crop: Crop | null;
 /**
  * Normalized (0-1) center of the display rect in output-frame space.
  * `None` keeps the display centered. When a frame is active this is the
@@ -1232,6 +1232,7 @@ export type ImportedAudioTrack = {
  */
 path: string; name: string; duration: number }
 export type IncompleteRecordingInfo = { projectPath: string; prettyName: string; segmentCount: number; estimatedDurationSecs: number }
+export type InsetStyle = { color: [number, number, number]; opacity: number }
 export type InstantRecordingMeta = { recording: boolean } | { error: string } | { fps: number; sample_rate: number | null }
 export type JsonValue<T> = [T]
 export type KeyPressDisplay = { key: string; timeOffset: number }

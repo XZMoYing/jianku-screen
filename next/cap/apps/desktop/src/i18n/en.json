@@ -1613,5 +1613,9 @@
 	"书签已不存在": "This bookmark no longer exists.",
 	"书签数据无效，原文件已保留。": "Invalid bookmark data. The original file was kept.",
 	"书签文件不可写，原文件已保留。": "The bookmark file is not writable. The original file was kept.",
-	"重新读取": "Reload"
+	"重新读取": "Reload",
+	"{value} 像素": "{value} px",
+	"以画面短边 1080 像素为基准，随画面尺寸等比缩放。": "Measured against a 1080 px short edge and scaled with the video.",
+	"内框颜色": "Inset color",
+	"内框不透明度": "Inset opacity"
 }

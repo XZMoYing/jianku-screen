@@ -22,6 +22,7 @@ const background: BackgroundConfiguration = {
 	rounding: 0,
 	roundingType: "rounded",
 	inset: 0,
+	insetStyle: null,
 	crop: null,
 	displayPosition: null,
 	shadow: 0,

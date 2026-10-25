@@ -10,6 +10,7 @@ mod cursor;
 mod display;
 mod frame;
 mod image;
+mod inset;
 mod keyboard;
 #[cfg(target_os = "macos")]
 mod live_video_background;
@@ -93,6 +94,7 @@ pub use cursor::*;
 pub use display::*;
 pub use frame::*;
 pub use image::*;
+pub use inset::*;
 pub use keyboard::*;
 pub use mask::*;
 pub use notch::*;

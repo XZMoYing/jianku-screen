@@ -4,6 +4,7 @@ import { debounce, throttle } from "@solid-primitives/scheduled";
 import { makePersisted } from "@solid-primitives/storage";
 import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 import {
+	batch,
 	createEffect,
 	createResource,
 	createSignal,
@@ -24,7 +25,7 @@ import {
 	type ProjectConfiguration,
 	type XY,
 } from "~/utils/tauri";
-import { calculateImageTransform } from "./layout";
+import { calculateImageTransform, remapImageAnnotations } from "./layout";
 
 const NV12_FORMAT_MAGIC = 0x4e563132;
 
@@ -164,6 +165,7 @@ const DEFAULT_PROJECT: ScreenshotProject = {
 		rounding: 10,
 		roundingType: "squircle",
 		inset: 0,
+		insetStyle: null,
 		crop: null,
 		shadow: 0,
 		advancedShadow: null,
@@ -464,6 +466,7 @@ function createScreenshotEditorContext() {
 		),
 	);
 
+	let geometryRestoreAfterRevision: number | null = 0;
 	let prevState: {
 		frameSize: { width: number; height: number };
 		imageSize: { width: number; height: number };
@@ -481,9 +484,20 @@ function createScreenshotEditorContext() {
 				padding: project.background.padding,
 				crop: project.background.crop,
 				aspectRatio: project.aspectRatio,
+				decoration: {
+					inset: project.background.inset,
+					frame: project.background.frame,
+					displayPosition: project.background.displayPosition,
+				},
 			}),
-			({ frame, imageSize, padding, crop, aspectRatio }) => {
+			({ frame, imageSize, padding, crop, aspectRatio, decoration }) => {
 				if (!frame || !imageSize) return;
+				if (
+					geometryRestoreAfterRevision !== null &&
+					(frame.revision <= geometryRestoreAfterRevision ||
+						frame.revision !== configRevision())
+				)
+					return;
 
 				const frameSize = { width: frame.width, height: frame.height };
 
@@ -492,53 +506,42 @@ function createScreenshotEditorContext() {
 					Math.abs(frameSize.width - prevState.frameSize.width) > 1 ||
 					Math.abs(frameSize.height - prevState.frameSize.height) > 1;
 
-				if (!frameSizeChanged) {
-					return;
-				}
-
 				const currentTransform = calculateImageTransform(
 					frameSize,
 					imageSize,
 					padding,
 					crop,
 					aspectRatio,
+					decoration,
 				);
 
+				const transformChanged =
+					!prevState ||
+					frameSizeChanged ||
+					Math.abs(currentTransform.offset.x - prevState.transform.offset.x) >
+						0.01 ||
+					Math.abs(currentTransform.offset.y - prevState.transform.offset.y) >
+						0.01 ||
+					Math.abs(
+						currentTransform.size.width - prevState.transform.size.width,
+					) > 0.01 ||
+					Math.abs(
+						currentTransform.size.height - prevState.transform.size.height,
+					) > 0.01;
+				if (!transformChanged) return;
 				const rawAnnotations = unwrap(annotations);
-				const shouldTransform =
-					prevState && rawAnnotations.length > 0 && frameSizeChanged;
+				const shouldTransform = prevState && rawAnnotations.length > 0;
 
 				if (shouldTransform && prevState) {
-					const scaleX =
-						currentTransform.size.width / prevState.transform.size.width;
-					const scaleY =
-						currentTransform.size.height / prevState.transform.size.height;
-
-					const oldOffset = prevState.transform.offset;
-					const newOffset = currentTransform.offset;
-
-					const updatedAnnotations = rawAnnotations.map((ann) => {
-						const relX = ann.x - oldOffset.x;
-						const relY = ann.y - oldOffset.y;
-
-						const newX = newOffset.x + relX * scaleX;
-						const newY = newOffset.y + relY * scaleY;
-
-						const newWidth = ann.width * scaleX;
-						const newHeight = ann.height * scaleY;
-
-						return {
-							...ann,
-							x: newX,
-							y: newY,
-							width: newWidth,
-							height: newHeight,
-						};
-					});
-
+					const updatedAnnotations = remapImageAnnotations(
+						rawAnnotations,
+						prevState.transform,
+						currentTransform,
+					);
 					setAnnotations(reconcile(updatedAnnotations));
 				}
 
+				geometryRestoreAfterRevision = null;
 				prevState = {
 					frameSize,
 					imageSize,
@@ -563,16 +566,7 @@ function createScreenshotEditorContext() {
 	};
 
 	let pausedHistorySnapshot: HistorySnapshot | null = null;
-	let hasPausedHistoryChanges = false;
 	const [historyPauseCount, setHistoryPauseCount] = createSignal(0);
-
-	createEffect(
-		on([() => trackStore(project), () => trackStore(annotations)], () => {
-			if (historyPauseCount() > 0) {
-				hasPausedHistoryChanges = true;
-			}
-		}),
-	);
 
 	const pushHistory = (snapshot: HistorySnapshot | null = null) => {
 		const state = snapshot ?? {
@@ -589,7 +583,6 @@ function createScreenshotEditorContext() {
 				project: structuredClone(unwrap(project)),
 				annotations: structuredClone(unwrap(annotations)),
 			};
-			hasPausedHistoryChanges = false;
 		}
 
 		setHistoryPauseCount((count) => count + 1);
@@ -604,12 +597,17 @@ function createScreenshotEditorContext() {
 				const next = Math.max(0, count - 1);
 
 				if (next === 0) {
-					if (pausedHistorySnapshot && hasPausedHistoryChanges) {
+					if (
+						pausedHistorySnapshot &&
+						(JSON.stringify(pausedHistorySnapshot.project) !==
+							JSON.stringify(unwrap(project)) ||
+							JSON.stringify(pausedHistorySnapshot.annotations) !==
+								JSON.stringify(unwrap(annotations)))
+					) {
 						pushHistory(pausedHistorySnapshot);
 					}
 
 					pausedHistorySnapshot = null;
-					hasPausedHistoryChanges = false;
 				}
 
 				return next;
@@ -628,8 +626,12 @@ function createScreenshotEditorContext() {
 		setHistory("past", (p) => p.slice(0, -1));
 		setHistory("future", (f) => [current, ...f]);
 
-		setProject(reconcile(previous.project));
-		setAnnotations(reconcile(previous.annotations));
+		batch(() => {
+			prevState = null;
+			geometryRestoreAfterRevision = configRevision();
+			setProject(reconcile(previous.project));
+			setAnnotations(reconcile(previous.annotations));
+		});
 	};
 
 	const redo = () => {
@@ -643,8 +645,12 @@ function createScreenshotEditorContext() {
 		setHistory("future", (f) => f.slice(1));
 		setHistory("past", (p) => [...p, current]);
 
-		setProject(reconcile(next.project));
-		setAnnotations(reconcile(next.annotations));
+		batch(() => {
+			prevState = null;
+			geometryRestoreAfterRevision = configRevision();
+			setProject(reconcile(next.project));
+			setAnnotations(reconcile(next.annotations));
+		});
 	};
 
 	const canUndo = () => history.past.length > 0;

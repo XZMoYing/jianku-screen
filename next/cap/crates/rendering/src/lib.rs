@@ -43,6 +43,8 @@ pub mod decoder;
 pub mod frame_chrome;
 mod frame_pipeline;
 mod frame_windows;
+#[cfg(test)]
+mod inset_tests;
 #[cfg(target_os = "macos")]
 pub mod iosurface_texture;
 mod layers;
@@ -2447,6 +2449,7 @@ pub struct ProjectUniforms {
     /// Decorative frame chrome around the display; `None` when no frame style
     /// is active.
     pub frame_chrome: Option<frame_chrome::FrameChromeUniforms>,
+    pub inset: Option<layers::InsetUniforms>,
     /// The recording device's physical notch, redrawn over the capture;
     /// `None` when the overlay is off or the recording has no notch.
     pub notch: Option<layers::NotchUniforms>,
@@ -3148,6 +3151,40 @@ impl ProjectUniforms {
         let box_size = (output_size - base) - base;
 
         let style = FrameConfiguration::active_style(project.background.frame.as_ref());
+        if project.background.inset > 0 {
+            let crop = Self::get_crop(options, project);
+            let aspect = f64::from(crop.size.x) / f64::from(crop.size.y.max(1));
+            let gap = f64::from(project.background.inset.min(100)) / 1080.0 * aspect.min(1.0);
+            let plate_width = aspect + gap * 2.0;
+            let plate_height = 1.0 + gap * 2.0;
+            let chrome = frame_chrome::chrome_insets_for_aspect(style, plate_width / plate_height);
+            let outer_width = plate_width + (chrome.left + chrome.right) * plate_height;
+            let outer_height = plate_height * (1.0 + chrome.top + chrome.bottom);
+            let height = (box_size.x / outer_width)
+                .min(box_size.y / outer_height)
+                .max(1.0);
+            let outer_size = XY::new(outer_width * height, outer_height * height);
+            let delta = project
+                .background
+                .display_position
+                .map_or(XY::new(0.0, 0.0), |position| {
+                    XY::new(
+                        (position.x.clamp(0.0, 1.0) - 0.5) * output_size.x,
+                        (position.y.clamp(0.0, 1.0) - 0.5) * output_size.y,
+                    )
+                });
+            let outer_offset = base + (box_size - outer_size) / 2.0 + delta;
+            return DisplayLayout {
+                outer_offset,
+                outer_size,
+                content_offset: outer_offset
+                    + XY::new(
+                        chrome.left * plate_height + gap,
+                        chrome.top * plate_height + gap,
+                    ) * height,
+                content_size: XY::new(aspect * height, height),
+            };
+        }
         let (outer_offset, outer_size, content_offset, content_size) = if style == FrameStyle::None
         {
             (base, box_size, base, box_size)
@@ -3924,6 +3961,7 @@ impl ProjectUniforms {
             display,
             display_motion_parent,
             frame_chrome,
+            inset,
             display_outer_bounds,
             notch,
             takeover_morph,
@@ -4060,11 +4098,15 @@ impl ProjectUniforms {
             let display_rounding_px =
                 lerp_f32(display_rounding_px, floating_rounding_px, takeover_card_t);
             let frame_active = frame_config.is_some();
+            let inset_active = project.background.inset > 0;
+            let inset_gap = layout.content_size.x.min(layout.content_size.y)
+                * f64::from(project.background.inset.min(100))
+                / 1080.0;
             // With a frame active the card decoration (shadow/border) moves to
             // the chrome pass; the video keeps only the floating-card shadow
             // that appears as a Floating scene morphs in (the chrome itself
             // fades out with any split, so nothing double-draws).
-            let display_decoration_fade = if frame_active {
+            let display_decoration_fade = if frame_active || inset_active {
                 floating_t
             } else {
                 chrome_fade
@@ -4074,7 +4116,9 @@ impl ProjectUniforms {
             // card rounding). As a split/floating scene morphs in the chrome
             // fades out, so the multipliers relax back to uniform rounding.
             let display_corner_radii = match frame_config.as_ref().map(|f| f.style) {
-                Some(FrameStyle::MacOS | FrameStyle::Windows | FrameStyle::Browser) => {
+                Some(FrameStyle::MacOS | FrameStyle::Windows | FrameStyle::Browser)
+                    if !inset_active =>
+                {
                     // The chrome bar also fades out under a takeover, so the
                     // top corners regain their rounding the same way they do
                     // in a split.
@@ -4140,6 +4184,9 @@ impl ProjectUniforms {
                         target_size: chrome_size,
                         rounding_px: if decorated {
                             display_rounding_px
+                                + inset_gap as f32
+                                    * ((zoom_scale.x + zoom_scale.y) * 0.5) as f32
+                                    * split_fade
                                 + frame_chrome::mobile_bezel_px(
                                     frame.style,
                                     f64::from(chrome_size[0]),
@@ -4201,13 +4248,111 @@ impl ProjectUniforms {
                     url: frame.url,
                     title: frame.title,
                     raster_size: layout.outer_size,
-                    content_height: layout.content_size.y,
+                    content_height: layout.content_size.y + inset_gap * 2.0,
+                }
+            });
+
+            let inset = inset_active.then(|| {
+                let span = zoom.bounds.bottom_right - zoom.bounds.top_left;
+                let gap = XY::new(inset_gap * span.x, inset_gap * span.y);
+                let base_bounds = [
+                    start.x as f32 - gap.x as f32,
+                    start.y as f32 - gap.y as f32,
+                    end.x as f32 + gap.x as f32,
+                    end.y as f32 + gap.y as f32,
+                ];
+                let bounds = split_layout.as_ref().map_or(base_bounds, |split| {
+                    lerp_bounds(base_bounds, split.screen.target, split_t)
+                });
+                let bounds = takeover_target
+                    .map_or(bounds, |target| lerp_bounds(bounds, target, takeover_t));
+                let size = [bounds[2] - bounds[0], bounds[3] - bounds[1]];
+                let style = project.background.inset_style.clone().unwrap_or_default();
+                let gap_px = ((gap.x + gap.y) * 0.5) as f32 * split_fade * (1.0 - takeover_t);
+                let decorated = !frame_active;
+                layers::InsetUniforms {
+                    color: style.color.map(|channel| channel.min(255) as u8),
+                    composite: CompositeVideoFrameUniforms {
+                        output_size: [output_size.x as f32, output_size.y as f32],
+                        frame_size: [1.0; 2],
+                        crop_bounds: [0.0, 0.0, 1.0, 1.0],
+                        target_bounds: bounds,
+                        target_size: size,
+                        rounding_px: display_rounding_px + gap_px,
+                        rounding_type: rounding_type_value(project.background.rounding_type),
+                        corner_radii: match FrameConfiguration::active_style(
+                            project.background.frame.as_ref(),
+                        ) {
+                            FrameStyle::MacOS | FrameStyle::Windows | FrameStyle::Browser => {
+                                [split_t.max(takeover_t), split_t.max(takeover_t), 1.0, 1.0]
+                            }
+                            _ => [1.0; 4],
+                        },
+                        motion_blur_vector: [
+                            descriptor.movement_vector_uv[0] * final_target_size[0]
+                                / size[0].max(1.0),
+                            descriptor.movement_vector_uv[1] * final_target_size[1]
+                                / size[1].max(1.0),
+                        ],
+                        motion_blur_zoom_center: [
+                            (final_target_bounds[0]
+                                + descriptor.zoom_center_uv[0] * final_target_size[0]
+                                - bounds[0])
+                                / size[0].max(1.0),
+                            (final_target_bounds[1]
+                                + descriptor.zoom_center_uv[1] * final_target_size[1]
+                                - bounds[1])
+                                / size[1].max(1.0),
+                        ],
+                        motion_blur_params: [
+                            descriptor.mode.as_f32(),
+                            descriptor.strength,
+                            descriptor.zoom_amount,
+                            0.0,
+                        ],
+                        shadow: if decorated {
+                            project.background.shadow
+                                * split_fade
+                                * camera3d_shadow_fade
+                                * takeover_accessory_fade
+                        } else {
+                            0.0
+                        },
+                        shadow_size: project
+                            .background
+                            .advanced_shadow
+                            .as_ref()
+                            .map_or(50.0, |s| s.size),
+                        shadow_opacity: project
+                            .background
+                            .advanced_shadow
+                            .as_ref()
+                            .map_or(18.0, |s| s.opacity)
+                            * split_fade
+                            * camera3d_shadow_fade
+                            * takeover_accessory_fade,
+                        shadow_blur: project
+                            .background
+                            .advanced_shadow
+                            .as_ref()
+                            .map_or(50.0, |s| s.blur),
+                        border_enabled: if decorated && border_on { 1.0 } else { 0.0 },
+                        border_width: project.background.border.as_ref().map_or(5.0, |b| b.width),
+                        border_color,
+                        opacity: style.opacity.clamp(0.0, 100.0) / 100.0
+                            * scene.screen_opacity as f32
+                            * split_fade
+                            * takeover_accessory_fade,
+                        preserve_source_alpha: 1.0,
+                        ..Default::default()
+                    },
                 }
             });
 
             let display_outer_bounds = frame_chrome
                 .as_ref()
                 .map(|f| f.composite.target_bounds)
+                .or_else(|| inset.as_ref().map(|i| i.composite.target_bounds))
                 .unwrap_or(final_target_bounds);
 
             let notch = project
@@ -4311,7 +4456,11 @@ impl ProjectUniforms {
                         .as_ref()
                         .map_or(50.0, |s| s.blur),
                     opacity: scene.screen_opacity as f32 * takeover_display_fade,
-                    border_enabled: if border_on && !frame_active { 1.0 } else { 0.0 },
+                    border_enabled: if border_on && !frame_active && !inset_active {
+                        1.0
+                    } else {
+                        0.0
+                    },
                     border_width: project.background.border.as_ref().map_or(5.0, |b| b.width),
                     preserve_source_alpha: if options.preserve_screen_alpha {
                         1.0
@@ -4327,6 +4476,7 @@ impl ProjectUniforms {
                 },
                 display_parent_motion_px,
                 frame_chrome,
+                inset,
                 display_outer_bounds,
                 notch,
                 takeover
@@ -4347,7 +4497,7 @@ impl ProjectUniforms {
                 XY::new(frame.width(), frame.height())
             });
         let display = display.for_source_frame(source_size);
-        let display_outer_bounds = if frame_chrome.is_none() {
+        let display_outer_bounds = if frame_chrome.is_none() && inset.is_none() {
             display.target_bounds
         } else {
             display_outer_bounds
@@ -4735,6 +4885,7 @@ impl ProjectUniforms {
             camera,
             camera_only,
             frame_chrome,
+            inset,
             notch,
             display_outer_bounds,
             project: styled_project.into_owned(),
@@ -6953,6 +7104,7 @@ pub struct RendererLayers {
     background_blur: BlurLayer,
     background_color_grade: ColorGradeLayer,
     frame: FrameLayer,
+    inset: layers::InsetLayer,
     display: DisplayLayer,
     notch: NotchLayer,
     click_ripple: ClickRippleLayer,
@@ -7034,6 +7186,7 @@ impl RendererLayers {
             background_color_grade: readiness::measure("layers.background_color_grade", || {
                 ColorGradeLayer::new(device)
             }),
+            inset: layers::InsetLayer::new(device, shared_composite_pipeline.clone()),
             frame: readiness::measure("layers.frame", || {
                 FrameLayer::new(device, shared_composite_pipeline.clone())
             }),
@@ -7265,6 +7418,7 @@ impl RendererLayers {
             .prepare(&constants.queue, uniforms);
 
         if render_display {
+            self.inset.prepare(constants, uniforms.inset);
             self.frame.prepare(constants, uniforms);
             self.notch
                 .prepare(&constants.device, &constants.queue, uniforms.notch);
@@ -7423,6 +7577,7 @@ impl RendererLayers {
 
         let start = Instant::now();
         if render_display {
+            self.inset.prepare(constants, uniforms.inset);
             self.frame.prepare(constants, uniforms);
             self.notch
                 .prepare(&constants.device, &constants.queue, uniforms.notch);
@@ -7656,6 +7811,11 @@ impl RendererLayers {
                     session.current_texture_view()
                 }
             };
+        }
+
+        if should_render_screen && uniforms.inset.is_some() {
+            let mut pass = render_pass!(content_view!(), wgpu::LoadOp::Load);
+            self.inset.render(&mut pass);
         }
 
         if should_render_screen && self.frame.has_content() {
@@ -8514,7 +8674,12 @@ mod project_uniforms_tests {
             style: FrameStyle::Browser,
             ..Default::default()
         });
-        cases.push(("decorative-frame", framed, short, 120));
+        cases.push(("decorative-frame", framed.clone(), short, 120));
+        let mut inset = project.clone();
+        inset.background.inset = 72;
+        cases.push(("inset", inset, short, 120));
+        framed.background.inset = 72;
+        cases.push(("framed-inset", framed, short, 120));
 
         let mut zoomed = project.clone();
         zoomed.timeline.as_mut().unwrap().zoom_segments = vec![
@@ -8525,7 +8690,9 @@ mod project_uniforms_tests {
             }))
             .unwrap(),
         ];
-        cases.push(("zoom", zoomed, short, 120));
+        cases.push(("zoom", zoomed.clone(), short, 120));
+        zoomed.background.inset = 72;
+        cases.push(("zoomed-inset", zoomed, short, 120));
 
         for (name, mode, frame_number) in [
             ("split-morph", SceneMode::SplitScreen, 105),

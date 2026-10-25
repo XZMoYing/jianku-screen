@@ -74,6 +74,7 @@ export function Preview(props: { zoom: number; setZoom: (z: number) => void }) {
 			project.background.padding,
 			project.background.crop,
 			project.aspectRatio,
+			project.background,
 		);
 	});
 

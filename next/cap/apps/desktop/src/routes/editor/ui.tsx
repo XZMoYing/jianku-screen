@@ -164,7 +164,11 @@ export function Slider(
 
 	// Pause history when slider is being dragged
 	let resumeHistory: (() => void) | null = null;
-	onCleanup(() => resumeHistory?.());
+	const finishHistory = () => {
+		resumeHistory?.();
+		resumeHistory = null;
+	};
+	onCleanup(finishHistory);
 
 	const [thumbRef, setThumbRef] = createSignal<HTMLDivElement>();
 
@@ -198,8 +202,7 @@ export function Slider(
 				props.onChange?.(v);
 			}}
 			onChangeEnd={(e) => {
-				resumeHistory?.();
-				resumeHistory = null;
+				finishHistory();
 				props.onChangeEnd?.(e);
 			}}
 		>
@@ -238,6 +241,15 @@ export function Slider(
 				>
 					<KSlider.Thumb
 						ref={setThumbRef}
+						onBlur={finishHistory}
+						onKeyDown={(event) => {
+							if (
+								(event.metaKey || event.ctrlKey) &&
+								event.key.toLowerCase() === "z"
+							) {
+								finishHistory();
+							}
+						}}
 						onPointerDown={() => {
 							setDragging(true);
 						}}
