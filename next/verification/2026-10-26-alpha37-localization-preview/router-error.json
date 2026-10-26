@@ -1,0 +1,15 @@
+{
+	"captures": 6,
+	"first": {
+		"file": "apps/desktop/src/routes/(window-chrome)/new-main/mobile-recovery-smoke.ts",
+		"loader": {
+			"jsx": "transform",
+			"format": "esm",
+			"loader": "tsx"
+		},
+		"error": "Error: Transform failed with 1 error:\n<stdin>:20:6: ERROR: Expected \")\" but found \":\"",
+		"caller": "vinxi/lib/fs-router.js:43 analyzeModule -> SolidStartServerFileRouter.toRoute"
+	},
+	"rootCause": "TS generic async arrow parsed as JSX by route discovery, .ts extension still scanned with loader tsx. Replaced with ordinary generic async function; no runtime semantic change.",
+	"cleanBuildHasTransformFailed": false
+}

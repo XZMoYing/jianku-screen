@@ -1,0 +1,4 @@
+    Checking cap-video-decode v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/video-decode)
+    Checking cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+    Checking cap-editor v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/editor)
+    Finished `release` profile [optimized + debuginfo] target(s) in 4.81s

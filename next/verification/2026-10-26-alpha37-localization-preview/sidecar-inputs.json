@@ -1,0 +1,12 @@
+{
+	"freshReleaseBuild": false,
+	"reusedFrom": "next-v0.2.0-alpha.36",
+	"reason": "Only frontend/configuration and cfg(test) editor code changed; no shared production Rust media/CLI code changed.",
+	"preparedSha256": {
+		"cap-cli": "040983836d61ce843eede37057dac50263886fbf62d08787f3798df7261249d8",
+		"cap-exporter": "040983836d61ce843eede37057dac50263886fbf62d08787f3798df7261249d8",
+		"cap-muxer": "a94d28f2f243a57180a7d01dfb2e7002215d10f4c6635880f5406da9325c947a",
+		"jianku-device-capture": "b7ef5be1d4bc8dd2530467937bb04e723cb388dc095bceb6170777f1e31351fe",
+		"jianku-android-capture": "bac5c35f6a684f9d3c7f37a9be6922b0770f33312c313cc226d0d3247413b539"
+	}
+}

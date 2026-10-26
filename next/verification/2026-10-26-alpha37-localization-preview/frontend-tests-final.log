@@ -1,0 +1,12 @@
+
+ RUN  v3.2.6 /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/apps/desktop
+
+ ✓ src/routes/editor/timeline-tracks.test.ts (10 tests) 3ms
+ ✓ src/routes/editor/three-d.test.ts (89 tests) 32ms
+ ✓ src/utils/i18n.test.ts (3 tests) 2ms
+
+ Test Files  3 passed (3)
+      Tests  102 passed (102)
+   Start at  22:16:46
+   Duration  667ms (transform 266ms, setup 0ms, collect 452ms, tests 37ms, environment 0ms, prepare 178ms)
+

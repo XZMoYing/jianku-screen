@@ -1,0 +1,60 @@
+{
+	"frame": 0,
+	"scope": "Temporary cfg(test) plane snapshot using application bundled decoders before GPU render, hardware FFmpeg ordinary vs software fragmented preparing; normalized U/V planes, no tolerance changes. Capture materializes frames to CPU for diagnosis only.",
+	"planes": [
+		{
+			"track": "screen",
+			"plane": 0,
+			"bytes": 19200,
+			"differentBytes": 0,
+			"maxDifference": 0,
+			"hardwareSha256": "18364368319069c2bccfa85deeaae9cc1b5dd678a958b365fbbdd0c817090afd",
+			"softwareSha256": "18364368319069c2bccfa85deeaae9cc1b5dd678a958b365fbbdd0c817090afd"
+		},
+		{
+			"track": "screen",
+			"plane": 1,
+			"bytes": 4800,
+			"differentBytes": 9,
+			"maxDifference": 1,
+			"hardwareSha256": "0107fd36e9a6b9ec1b997ce268c9c7a55d9fffdeaf6a319f6aaf07a149187ff0",
+			"softwareSha256": "d06125a522dd5959e81b4f40eeb9d205830724f20687cb20c9118b2377a8acfa"
+		},
+		{
+			"track": "screen",
+			"plane": 2,
+			"bytes": 4800,
+			"differentBytes": 9,
+			"maxDifference": 1,
+			"hardwareSha256": "0107fd36e9a6b9ec1b997ce268c9c7a55d9fffdeaf6a319f6aaf07a149187ff0",
+			"softwareSha256": "d06125a522dd5959e81b4f40eeb9d205830724f20687cb20c9118b2377a8acfa"
+		},
+		{
+			"track": "camera",
+			"plane": 0,
+			"bytes": 6400,
+			"differentBytes": 0,
+			"maxDifference": 0,
+			"hardwareSha256": "7558074a1069e6253aeef9accb979b2aad5855df041c5f440ba03e540c9eda94",
+			"softwareSha256": "7558074a1069e6253aeef9accb979b2aad5855df041c5f440ba03e540c9eda94"
+		},
+		{
+			"track": "camera",
+			"plane": 1,
+			"bytes": 1600,
+			"differentBytes": 50,
+			"maxDifference": 4,
+			"hardwareSha256": "ea6dd55294438f31ba776bbc626de584169f0e728f0c0d0ca214d98ffb9202c3",
+			"softwareSha256": "b4b792ac11fcc1a7905f2c7fd84ae554208af87bcd71784d8fe3d6d9bad54e9e"
+		},
+		{
+			"track": "camera",
+			"plane": 2,
+			"bytes": 1600,
+			"differentBytes": 50,
+			"maxDifference": 4,
+			"hardwareSha256": "ea6dd55294438f31ba776bbc626de584169f0e728f0c0d0ca214d98ffb9202c3",
+			"softwareSha256": "b4b792ac11fcc1a7905f2c7fd84ae554208af87bcd71784d8fe3d6d9bad54e9e"
+		}
+	]
+}

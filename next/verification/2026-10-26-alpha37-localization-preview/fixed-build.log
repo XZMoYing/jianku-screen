@@ -1,0 +1,3 @@
+   Compiling cap-editor v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/editor)
+    Finished `release` profile [optimized + debuginfo] target(s) in 1m 29s
+  Executable unittests src/lib.rs (target/release/deps/cap_editor-6a51d48ad0c977f0)

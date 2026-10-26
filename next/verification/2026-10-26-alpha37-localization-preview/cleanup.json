@@ -1,0 +1,68 @@
+{
+	"removed": [
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.35/Jianku Screen Next.app",
+			"allocatedBeforeBytes": 316321792,
+			"kind": "verified obsolete app or installer staging"
+		},
+		{
+			"path": "/Applications/.jianku-next-update-f4t4Za",
+			"allocatedBeforeBytes": 316366848,
+			"kind": "verified obsolete app or installer staging"
+		},
+		{
+			"path": "/private/tmp/jianku-alpha37-preparing/old-export.mp4",
+			"allocatedBeforeBytes": 14946304,
+			"kind": "own synthetic test copy or reproducible test runner"
+		},
+		{
+			"path": "/private/tmp/jianku-alpha37-preparing/new-export.mp4",
+			"allocatedBeforeBytes": 15732736,
+			"kind": "own synthetic test copy or reproducible test runner"
+		},
+		{
+			"path": "/private/tmp/jianku-alpha37-preparing/fixed-test-runner",
+			"allocatedBeforeBytes": 24391680,
+			"kind": "own synthetic test copy or reproducible test runner"
+		},
+		{
+			"path": "/private/tmp/jianku-alpha37-preparing/本地化与多轨示例.jks",
+			"allocatedBeforeBytes": 8892416,
+			"kind": "own synthetic test copy or reproducible test runner"
+		},
+		{
+			"path": "/private/tmp/jianku-alpha37-preparing/native_preparing_matches_default_avasset_editor_decoder-baseline.log",
+			"bytes": 2948711,
+			"kind": "huge assertion arrays summarized in repository evidence"
+		},
+		{
+			"path": "/private/tmp/jianku-alpha37-preparing/native_preparing_bgra_surface_matches_default_avasset_editor_frame-baseline.log",
+			"bytes": 2948755,
+			"kind": "huge assertion arrays summarized in repository evidence"
+		},
+		{
+			"path": "/private/tmp/jianku-alpha37-preparing/native-preview-tests.log",
+			"bytes": 5945029,
+			"kind": "huge assertion arrays summarized in repository evidence"
+		},
+		{
+			"path": "/private/tmp/jianku-alpha37-preparing/raw-capture.log",
+			"bytes": 2943718,
+			"kind": "huge assertion arrays summarized in repository evidence"
+		},
+		{
+			"path": "target/release/deps/cap_editor-6a51d48ad0c977f0",
+			"bytes": 24388328,
+			"kind": "completed synthetic test executable"
+		}
+	],
+	"removedObjectCount": 1010,
+	"objectLogicalBytes": 1366683768,
+	"objectAllocatedBytes": 1474682880,
+	"freeBeforeBytes": 70435999744,
+	"freeAfterBytes": 72665358336,
+	"availableDeltaBytes": 2229358592,
+	"preservedAppVersions": ["0.2.0-alpha.36", "0.2.0-alpha.37"],
+	"preserved": "Source/Git/user projects/native runtime libraries/release dependency archives. Synthetic old demo directories retained if present; no unknown files removed.",
+	"oldAlpha35RemoteTagVerified": "edfbb9b073d60549b88ad3840faa5e1c161ad1de"
+}

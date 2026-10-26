@@ -1,0 +1,980 @@
+{
+	"scope": "Static TSX candidate inventory only; not full localization coverage, no user strings or internal identifiers modified. Dynamic conditional/translation calls, native menus and CLI require separate review.",
+	"filesScanned": 166,
+	"candidateCount": 162,
+	"parseErrors": [],
+	"candidates": [
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/new-main/TargetCard.tsx",
+			"line": 353,
+			"kind": "template attribute",
+			"text": "{…} preview for {…}"
+		},
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/new-main/TargetCard.tsx",
+			"line": 368,
+			"kind": "template attribute",
+			"text": "{…} icon"
+		},
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/new-main/TargetCard.tsx",
+			"line": 379,
+			"kind": "direct JSX text",
+			"text": "clips"
+		},
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/new-main/index.tsx",
+			"line": 2997,
+			"kind": "direct JSX text",
+			"text": "Press"
+		},
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/settings/Setting.tsx",
+			"line": 32,
+			"kind": "direct JSX text",
+			"text": "Pro"
+		},
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/settings/automations.tsx",
+			"line": 817,
+			"kind": "direct JSX text",
+			"text": "Runs for every"
+		},
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/settings/automations.tsx",
+			"line": 1133,
+			"kind": "literal attribute",
+			"text": "/Users/you/Screenshots"
+		},
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/settings/automations.tsx",
+			"line": 1158,
+			"kind": "literal attribute",
+			"text": "{date}-{window}"
+		},
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/settings/automations.tsx",
+			"line": 1220,
+			"kind": "literal attribute",
+			"text": "/usr/local/bin/my-script"
+		},
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/settings/automations.tsx",
+			"line": 1258,
+			"kind": "literal attribute",
+			"text": "URL"
+		},
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/settings/automations.tsx",
+			"line": 1261,
+			"kind": "literal attribute",
+			"text": "https://hooks.slack.com/..."
+		},
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/settings/automations.tsx",
+			"line": 1289,
+			"kind": "literal attribute",
+			"text": "{\"text\":\"{share_link}\"}"
+		},
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/settings/cli.tsx",
+			"line": 127,
+			"kind": "direct JSX text",
+			"text": "jianku"
+		},
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/settings/cli.tsx",
+			"line": 186,
+			"kind": "direct JSX text",
+			"text": "jianku"
+		},
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/settings/cli.tsx",
+			"line": 191,
+			"kind": "direct JSX text",
+			"text": "jianku"
+		},
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/settings/integrations/google-drive-config.tsx",
+			"line": 281,
+			"kind": "literal attribute",
+			"text": "Google Drive"
+		},
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/settings/integrations/s3-config.tsx",
+			"line": 205,
+			"kind": "direct JSX text",
+			"text": "AWS S3"
+		},
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/settings/integrations/s3-config.tsx",
+			"line": 206,
+			"kind": "direct JSX text",
+			"text": "Cloudflare R2"
+		},
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/settings/integrations/s3-config.tsx",
+			"line": 207,
+			"kind": "direct JSX text",
+			"text": "Supabase"
+		},
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/settings/integrations/s3-config.tsx",
+			"line": 208,
+			"kind": "direct JSX text",
+			"text": "MinIO"
+		},
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/settings/recordings.tsx",
+			"line": 387,
+			"kind": "direct JSX text",
+			"text": "clips"
+		},
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/settings.tsx",
+			"line": 535,
+			"kind": "template attribute",
+			"text": "Copy version {…} to clipboard"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/AnimatedGradientEditor.tsx",
+			"line": 507,
+			"kind": "template attribute",
+			"text": "Delete {…}"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/AnimatedGradientEditor.tsx",
+			"line": 526,
+			"kind": "literal attribute",
+			"text": "Colours"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/AnimatedGradientEditor.tsx",
+			"line": 573,
+			"kind": "template attribute",
+			"text": "Colour {…}"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/AnimatedGradientEditor.tsx",
+			"line": 651,
+			"kind": "template attribute",
+			"text": "Remove colour {…}"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/AnimatedGradientEditor.tsx",
+			"line": 683,
+			"kind": "literal attribute",
+			"text": "Motion"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/AudioLibrary.tsx",
+			"line": 409,
+			"kind": "direct JSX text",
+			"text": "MP3, WAV, M4A, OGG, FLAC, AAC"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/CaptionsTab.tsx",
+			"line": 1085,
+			"kind": "literal attribute",
+			"text": "Font settings"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/CaptionsTab.tsx",
+			"line": 1087,
+			"kind": "literal attribute",
+			"text": "Font Family"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/CaptionsTab.tsx",
+			"line": 1164,
+			"kind": "literal attribute",
+			"text": "Active Word Highlight"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/CaptionsTab.tsx",
+			"line": 1180,
+			"kind": "literal attribute",
+			"text": "Highlight Style"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/CaptionsTab.tsx",
+			"line": 1239,
+			"kind": "literal attribute",
+			"text": "Text Color"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/CaptionsTab.tsx",
+			"line": 1251,
+			"kind": "literal attribute",
+			"text": "Background settings"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/CaptionsTab.tsx",
+			"line": 1253,
+			"kind": "literal attribute",
+			"text": "Background Color"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/CaptionsTab.tsx",
+			"line": 1263,
+			"kind": "literal attribute",
+			"text": "Background Opacity"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/CaptionsTab.tsx",
+			"line": 1336,
+			"kind": "literal attribute",
+			"text": "Font Weight"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/CaptionsTab.tsx",
+			"line": 1397,
+			"kind": "literal attribute",
+			"text": "Animation"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/CaptionsTab.tsx",
+			"line": 1399,
+			"kind": "literal attribute",
+			"text": "Animation Style"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/CaptionsTab.tsx",
+			"line": 1450,
+			"kind": "literal attribute",
+			"text": "Highlight Color"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/CaptionsTab.tsx",
+			"line": 1461,
+			"kind": "literal attribute",
+			"text": "Fade Duration"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/CaptionsTab.tsx",
+			"line": 1481,
+			"kind": "literal attribute",
+			"text": "Export options"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/CaptionsTab.tsx",
+			"line": 1482,
+			"kind": "literal attribute",
+			"text": "Export with Subtitles"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/CaptionsTab.tsx",
+			"line": 1501,
+			"kind": "literal attribute",
+			"text": "Selected caption override"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/CaptionsTab.tsx",
+			"line": 1505,
+			"kind": "literal attribute",
+			"text": "Start Time"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/CaptionsTab.tsx",
+			"line": 1518,
+			"kind": "literal attribute",
+			"text": "End Time"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/CaptionsTab.tsx",
+			"line": 1531,
+			"kind": "literal attribute",
+			"text": "Caption Text"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/CaptionsTab.tsx",
+			"line": 1548,
+			"kind": "literal attribute",
+			"text": "Fade Duration Override"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ColorCorrectionSection.tsx",
+			"line": 124,
+			"kind": "literal attribute",
+			"text": "Color correction"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ColorCorrectionSection.tsx",
+			"line": 148,
+			"kind": "literal attribute",
+			"text": "Grain"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ColorCorrectionSection.tsx",
+			"line": 159,
+			"kind": "literal attribute",
+			"text": "Apply to cursor"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 619,
+			"kind": "literal attribute",
+			"text": "Hotkeys"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 621,
+			"kind": "literal attribute",
+			"text": "Show hotkeys"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 757,
+			"kind": "direct JSX text",
+			"text": "caption"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 760,
+			"kind": "direct JSX text",
+			"text": "selected"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 830,
+			"kind": "direct JSX text",
+			"text": "keyboard"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 833,
+			"kind": "direct JSX text",
+			"text": "selected"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 897,
+			"kind": "direct JSX text",
+			"text": "text"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 900,
+			"kind": "direct JSX text",
+			"text": "selected"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 969,
+			"kind": "direct JSX text",
+			"text": "audio"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 972,
+			"kind": "direct JSX text",
+			"text": "selected"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 1036,
+			"kind": "direct JSX text",
+			"text": "mask"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 1039,
+			"kind": "direct JSX text",
+			"text": "selected"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 1310,
+			"kind": "direct JSX text",
+			"text": "scene"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 1313,
+			"kind": "direct JSX text",
+			"text": "selected"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 1389,
+			"kind": "literal attribute",
+			"text": "MacBook notch"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 1546,
+			"kind": "template attribute",
+			"text": "Audio {…}"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 1631,
+			"kind": "literal attribute",
+			"text": "Fade In"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 1649,
+			"kind": "literal attribute",
+			"text": "Fade Out"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 1689,
+			"kind": "template attribute",
+			"text": "Keyboard {…}"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 1700,
+			"kind": "literal attribute",
+			"text": "Timing"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 1749,
+			"kind": "literal attribute",
+			"text": "Fade Duration"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 1798,
+			"kind": "template attribute",
+			"text": "Caption {…}"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 1815,
+			"kind": "literal attribute",
+			"text": "Timing"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 1931,
+			"kind": "template attribute",
+			"text": "Mask {…}"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 1981,
+			"kind": "literal attribute",
+			"text": "Effect"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 2024,
+			"kind": "literal attribute",
+			"text": "Outside Darkness"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 2043,
+			"kind": "literal attribute",
+			"text": "Fade Duration"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 2228,
+			"kind": "template attribute",
+			"text": "Zoom {…}"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 2248,
+			"kind": "literal attribute",
+			"text": "Zoom Mode"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 2739,
+			"kind": "literal attribute",
+			"text": "Sync"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 2751,
+			"kind": "template attribute",
+			"text": "Clip {…}"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 2762,
+			"kind": "literal attribute",
+			"text": "System Audio Offset"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 2774,
+			"kind": "literal attribute",
+			"text": "Microphone Offset"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 2786,
+			"kind": "literal attribute",
+			"text": "Camera Offset"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 2971,
+			"kind": "literal attribute",
+			"text": "Camera Layout"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 3039,
+			"kind": "literal attribute",
+			"text": "Transition"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 3067,
+			"kind": "literal attribute",
+			"text": "Out"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 3101,
+			"kind": "literal attribute",
+			"text": "Screen Zoom"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 3113,
+			"kind": "literal attribute",
+			"text": "Screen Position"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 3122,
+			"kind": "literal attribute",
+			"text": "Camera Zoom"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"line": 3134,
+			"kind": "literal attribute",
+			"text": "Camera Position"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/Editor.tsx",
+			"line": 1793,
+			"kind": "direct JSX text",
+			"text": "to skip snapping"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ExportPage.tsx",
+			"line": 1044,
+			"kind": "literal attribute",
+			"text": "Destination"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/FrameButton.tsx",
+			"line": 166,
+			"kind": "literal attribute",
+			"text": "URL"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/FrameButton.tsx",
+			"line": 170,
+			"kind": "literal attribute",
+			"text": "example.com"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/GradientEditor.tsx",
+			"line": 210,
+			"kind": "literal attribute",
+			"text": "Grain Scale"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/Header.tsx",
+			"line": 130,
+			"kind": "direct JSX text",
+			"text": ".jks"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/KeyboardTab.tsx",
+			"line": 173,
+			"kind": "literal attribute",
+			"text": "Show keyboard"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/KeyboardTab.tsx",
+			"line": 190,
+			"kind": "literal attribute",
+			"text": "Font settings"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/KeyboardTab.tsx",
+			"line": 192,
+			"kind": "literal attribute",
+			"text": "Font Family"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/KeyboardTab.tsx",
+			"line": 253,
+			"kind": "literal attribute",
+			"text": "Text Color"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/KeyboardTab.tsx",
+			"line": 265,
+			"kind": "literal attribute",
+			"text": "Background settings"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/KeyboardTab.tsx",
+			"line": 267,
+			"kind": "literal attribute",
+			"text": "Background Color"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/KeyboardTab.tsx",
+			"line": 275,
+			"kind": "literal attribute",
+			"text": "Background Opacity"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/KeyboardTab.tsx",
+			"line": 340,
+			"kind": "literal attribute",
+			"text": "Font Weight"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/KeyboardTab.tsx",
+			"line": 400,
+			"kind": "literal attribute",
+			"text": "Animation"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/KeyboardTab.tsx",
+			"line": 403,
+			"kind": "literal attribute",
+			"text": "Fade Duration"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/KeyboardTab.tsx",
+			"line": 417,
+			"kind": "literal attribute",
+			"text": "Linger Duration"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/KeyboardTab.tsx",
+			"line": 431,
+			"kind": "literal attribute",
+			"text": "Grouping Threshold"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/KeyboardTab.tsx",
+			"line": 448,
+			"kind": "literal attribute",
+			"text": "Behavior"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/KeyboardTab.tsx",
+			"line": 450,
+			"kind": "literal attribute",
+			"text": "Show Modifier Keys"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/KeyboardTab.tsx",
+			"line": 457,
+			"kind": "literal attribute",
+			"text": "Show Special Keys"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/KeyboardTab.tsx",
+			"line": 491,
+			"kind": "literal attribute",
+			"text": "Selected segment override"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/KeyboardTab.tsx",
+			"line": 493,
+			"kind": "literal attribute",
+			"text": "Start Time"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/KeyboardTab.tsx",
+			"line": 510,
+			"kind": "literal attribute",
+			"text": "End Time"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/KeyboardTab.tsx",
+			"line": 527,
+			"kind": "literal attribute",
+			"text": "Display Text"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/KeyboardTab.tsx",
+			"line": 542,
+			"kind": "literal attribute",
+			"text": "Fade Duration Override"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ProjectMenu.tsx",
+			"line": 126,
+			"kind": "direct JSX text",
+			"text": "⌘/Ctrl O"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/ProjectMenu.tsx",
+			"line": 133,
+			"kind": "direct JSX text",
+			"text": "⌘/Ctrl S"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/Timeline/ClipTrack.tsx",
+			"line": 623,
+			"kind": "literal attribute",
+			"text": "Speed"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/Timeline/ClipTrack.tsx",
+			"line": 687,
+			"kind": "literal attribute",
+			"text": "Cursor"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/Timeline/ClipTrack.tsx",
+			"line": 1417,
+			"kind": "template attribute",
+			"text": "Add transition before clip {…}"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/Timeline/SceneTrack.tsx",
+			"line": 421,
+			"kind": "template attribute",
+			"text": "Scene · {…}"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/Timeline/ThreeDTrack.tsx",
+			"line": 246,
+			"kind": "direct JSX text",
+			"text": "+ Add shot"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/Timeline/ThreeDTrack.tsx",
+			"line": 275,
+			"kind": "direct JSX text",
+			"text": "+ Add shot"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/editor-skeleton.tsx",
+			"line": 40,
+			"kind": "direct JSX text",
+			"text": ".jks"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/image-segment-config.tsx",
+			"line": 97,
+			"kind": "literal attribute",
+			"text": "Arrange on canvas"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/image-segment-config.tsx",
+			"line": 139,
+			"kind": "literal attribute",
+			"text": "Rotation"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/image-segment-config.tsx",
+			"line": 159,
+			"kind": "literal attribute",
+			"text": "Rounded corners"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/image-segment-config.tsx",
+			"line": 179,
+			"kind": "literal attribute",
+			"text": "Lock aspect ratio"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/image-segment-config.tsx",
+			"line": 193,
+			"kind": "literal attribute",
+			"text": "Flip horizontally"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/image-segment-config.tsx",
+			"line": 207,
+			"kind": "literal attribute",
+			"text": "Flip vertically"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/preparing-timeline.tsx",
+			"line": 112,
+			"kind": "template attribute",
+			"text": "Seek {…}"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/style-segment-config.tsx",
+			"line": 51,
+			"kind": "template attribute",
+			"text": "Editing style · {…}–{…}s"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/style-segment-config.tsx",
+			"line": 92,
+			"kind": "literal attribute",
+			"text": "Override camera-only padding"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/text-segment-config.tsx",
+			"line": 522,
+			"kind": "template attribute",
+			"text": "Text {…}"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/text-segment-config.tsx",
+			"line": 624,
+			"kind": "literal attribute",
+			"text": "Font"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/text-segment-config.tsx",
+			"line": 694,
+			"kind": "literal attribute",
+			"text": "Line height"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/text-segment-config.tsx",
+			"line": 713,
+			"kind": "literal attribute",
+			"text": "Letter spacing"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/text-segment-config.tsx",
+			"line": 736,
+			"kind": "literal attribute",
+			"text": "Look"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/text-segment-config.tsx",
+			"line": 805,
+			"kind": "literal attribute",
+			"text": "Outline"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/text-segment-config.tsx",
+			"line": 855,
+			"kind": "literal attribute",
+			"text": "Glow"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/text-segment-config.tsx",
+			"line": 891,
+			"kind": "literal attribute",
+			"text": "Animation"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/text-segment-config.tsx",
+			"line": 959,
+			"kind": "literal attribute",
+			"text": "Screen transition"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/three-d-panel.tsx",
+			"line": 773,
+			"kind": "literal attribute",
+			"text": "Look"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/three-d-panel.tsx",
+			"line": 892,
+			"kind": "literal attribute",
+			"text": "Depth blur"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/three-d-panel.tsx",
+			"line": 905,
+			"kind": "literal attribute",
+			"text": "Amount"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/three-d-panel.tsx",
+			"line": 914,
+			"kind": "literal attribute",
+			"text": "Focus"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/three-d-panel.tsx",
+			"line": 952,
+			"kind": "literal attribute",
+			"text": "Bokeh"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/three-d-panel.tsx",
+			"line": 960,
+			"kind": "literal attribute",
+			"text": "Timing & advanced"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/three-d-panel.tsx",
+			"line": 965,
+			"kind": "literal attribute",
+			"text": "Motion style"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/three-d-panel.tsx",
+			"line": 1019,
+			"kind": "literal attribute",
+			"text": "Ease in"
+		},
+		{
+			"file": "apps/desktop/src/routes/editor/three-d-panel.tsx",
+			"line": 1036,
+			"kind": "literal attribute",
+			"text": "Ease out"
+		},
+		{
+			"file": "apps/desktop/src/routes/target-select-overlay.tsx",
+			"line": 655,
+			"kind": "template attribute",
+			"text": "{…} icon"
+		},
+		{
+			"file": "apps/desktop/src/routes/teleprompter.tsx",
+			"line": 533,
+			"kind": "template attribute",
+			"text": "Scroll speed: {…} wpm"
+		},
+		{
+			"file": "apps/desktop/src/routes/teleprompter.tsx",
+			"line": 553,
+			"kind": "direct JSX text",
+			"text": "wpm"
+		},
+		{
+			"file": "apps/desktop/src/routes/teleprompter.tsx",
+			"line": 559,
+			"kind": "template attribute",
+			"text": "Window opacity: {…}%"
+		},
+		{
+			"file": "apps/desktop/src/components/Cropper.tsx",
+			"line": 1268,
+			"kind": "template attribute",
+			"text": "Resize {…}"
+		},
+		{
+			"file": "apps/desktop/src/components/Cropper.tsx",
+			"line": 1362,
+			"kind": "template attribute",
+			"text": "Resize {…}"
+		},
+		{
+			"file": "apps/desktop/src/components/MobileRecorder.tsx",
+			"line": 523,
+			"kind": "direct JSX text",
+			"text": "iPhone / iPad"
+		},
+		{
+			"file": "apps/desktop/src/components/RecoveryToast.tsx",
+			"line": 89,
+			"kind": "direct JSX text",
+			"text": "segment"
+		}
+	]
+}

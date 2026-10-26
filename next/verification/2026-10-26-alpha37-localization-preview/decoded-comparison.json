@@ -1,0 +1,14 @@
+{
+	"frames": 540,
+	"identicalDecodedFrames": 540,
+	"decodedAudio": [
+		{
+			"sha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885",
+			"bytes": 1728000
+		},
+		{
+			"sha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885",
+			"bytes": 1728000
+		}
+	]
+}

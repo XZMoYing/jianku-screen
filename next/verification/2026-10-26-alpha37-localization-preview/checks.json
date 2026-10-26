@@ -1,0 +1,30 @@
+{
+	"sourceCommit": "4e0f9052ba1655a37bdebcb3def7d655ea856910",
+	"frontendTests": 102,
+	"playbackRelatedTests": 43,
+	"preparingPlaybackTests": 17,
+	"countsOverlap": true,
+	"expandedNativePreview": {
+		"passed": 15,
+		"failed": 2,
+		"failedBaselineFingerprintsMatch": true,
+		"scope": "FFmpeg preparing vs AVAssetReader finalized and BGRA surface remain unresolved; original strict assertions retained"
+	},
+	"rustCheck": "cap-editor release passed",
+	"rustFmt": true,
+	"typecheck": true,
+	"biomeTouchedSource": true,
+	"staticBuildWithoutPriorTransformError": true,
+	"releaseBuiltInstalledArchived": true,
+	"strictAdhocSignature": true,
+	"actualChineseScreenshotLabels": ["音频 1", "音频 2", "固定镜头", "4.0 秒"],
+	"decodedEquivalentToAlpha36": {
+		"frames": 540,
+		"audioPcmBytes": 1728000
+	},
+	"markdownLocalLinksChecked": 187,
+	"prototypeNotApplied": true,
+	"physicalDeviceOrConferenceAcceptance": false,
+	"formalPublicationAuditComplete": false,
+	"sourceTestFileSha256": "582c83229a86738c6d10e98663fdce882d2d87f1a6a38e3668623385c1f1a1fa"
+}

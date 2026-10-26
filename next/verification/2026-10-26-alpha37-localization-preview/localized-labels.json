@@ -1,0 +1,29 @@
+{
+	"templates": {
+		"音频 {number}": {
+			"zh-CN": "音频 {number}",
+			"en": "Audio {number}"
+		},
+		"样式 {number}": {
+			"zh-CN": "样式 {number}",
+			"en": "Style {number}"
+		},
+		"{type} {number}": {
+			"zh-CN": "{type} {number}",
+			"en": "{type} {number}"
+		},
+		"选择轨道：{track}": {
+			"zh-CN": "选择轨道：{track}",
+			"en": "Select track: {track}"
+		},
+		"{seconds} 秒": {
+			"zh-CN": "{seconds} 秒",
+			"en": "{seconds}s"
+		},
+		"3D 镜头 · {name} · {duration}": {
+			"zh-CN": "3D 镜头 · {name} · {duration}",
+			"en": "3D shot · {name} · {duration}"
+		}
+	},
+	"scope": "Static dictionaries and explicit dynamic call sites; actual installed Chinese screenshot pending. No claim of full localization coverage."
+}

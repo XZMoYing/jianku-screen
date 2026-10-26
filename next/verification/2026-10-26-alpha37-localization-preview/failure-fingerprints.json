@@ -1,0 +1,47 @@
+{
+	"baselineCommit": "8f3a7e53fa5188b5d8fed7a8014444eab517b676",
+	"runs": [
+		{
+			"run": "native-preview-tests",
+			"bytes": 307200,
+			"differentBytes": 1155,
+			"maxDifference": 7,
+			"actualSha256": "e6085ac1b81f562c71fb8969f3cc1c1e858bd7aafc8b3a60c341020cd265ef8b",
+			"expectedSha256": "31426fc5cfef0438897c3d9ae88b52c64fed9e7feeb7168d3e3bd00039b20ce2"
+		},
+		{
+			"run": "native-preview-tests",
+			"bytes": 307200,
+			"differentBytes": 1155,
+			"maxDifference": 7,
+			"actualSha256": "e6085ac1b81f562c71fb8969f3cc1c1e858bd7aafc8b3a60c341020cd265ef8b",
+			"expectedSha256": "31426fc5cfef0438897c3d9ae88b52c64fed9e7feeb7168d3e3bd00039b20ce2"
+		},
+		{
+			"run": "native_preparing_matches_default_avasset_editor_decoder-baseline",
+			"bytes": 307200,
+			"differentBytes": 1155,
+			"maxDifference": 7,
+			"actualSha256": "e6085ac1b81f562c71fb8969f3cc1c1e858bd7aafc8b3a60c341020cd265ef8b",
+			"expectedSha256": "31426fc5cfef0438897c3d9ae88b52c64fed9e7feeb7168d3e3bd00039b20ce2"
+		},
+		{
+			"run": "native_preparing_bgra_surface_matches_default_avasset_editor_frame-baseline",
+			"bytes": 307200,
+			"differentBytes": 1155,
+			"maxDifference": 7,
+			"actualSha256": "e6085ac1b81f562c71fb8969f3cc1c1e858bd7aafc8b3a60c341020cd265ef8b",
+			"expectedSha256": "31426fc5cfef0438897c3d9ae88b52c64fed9e7feeb7168d3e3bd00039b20ce2"
+		},
+		{
+			"run": "raw-capture",
+			"bytes": 307200,
+			"differentBytes": 1185,
+			"maxDifference": 8,
+			"actualSha256": "9d7fc06ec6cf13c1b3aa93ac0199965a947bd291a23fb3f449639ac1f954df16",
+			"expectedSha256": "87f6cff00defab6ce07b4de356250857bb43f47815615169ec77d79f732ca65b"
+		}
+	],
+	"baselineMethod": "try/finally restored full original native_tests.rs; ran same AVAsset tests and restored current tests; current production files unchanged.",
+	"scope": "Original mixed software/hardware comparison diagnosed; separate AVAsset parity failures reproduce exact baseline fingerprints and remain unresolved."
+}
