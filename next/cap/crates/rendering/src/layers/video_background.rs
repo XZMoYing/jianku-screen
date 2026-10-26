@@ -37,6 +37,8 @@ pub(crate) struct VideoBackground {
     native: Option<super::live_video_background::LiveVideoBackground>,
     #[cfg(target_os = "macos")]
     native_frame: Option<crate::DecodedFrame>,
+    #[cfg(target_os = "macos")]
+    native_compatible: bool,
 }
 
 pub(crate) fn is_video(path: &str) -> bool {
@@ -92,7 +94,7 @@ impl VideoBackground {
                 #[cfg(target_os = "macos")]
                 let mut native_reader = None;
                 #[cfg(target_os = "macos")]
-                let mut prefer_native = compatible && !realtime;
+                let mut prefer_native = compatible;
                 for request in receiver {
                     match request {
                         Request::Accurate(time, reply) => {
@@ -152,13 +154,43 @@ impl VideoBackground {
                 .then(|| super::live_video_background::LiveVideoBackground::new(path.clone())),
             #[cfg(target_os = "macos")]
             native_frame: None,
+            #[cfg(target_os = "macos")]
+            native_compatible: compatible,
             path,
             sender,
         })
     }
+
+    pub fn set_realtime(&mut self, realtime: bool) {
+        #[cfg(target_os = "macos")]
+        if realtime {
+            if self.native_compatible && self.native.is_none() {
+                self.native = Some(super::live_video_background::LiveVideoBackground::new(
+                    self.path.clone(),
+                ));
+            }
+        } else {
+            self.pause();
+        }
+        #[cfg(not(target_os = "macos"))]
+        let _ = realtime;
+    }
+
+    #[cfg(target_os = "macos")]
+    fn pause(&mut self) {
+        if let Some(native) = &self.native {
+            native.pause();
+        }
+        self.native_frame = None;
+    }
+
     pub async fn source(&mut self, time: f64, playing: bool) -> Result<VideoFrame, String> {
         #[cfg(target_os = "macos")]
-        if let Some(native) = &self.native {
+        if !playing {
+            self.pause();
+        }
+        #[cfg(target_os = "macos")]
+        if playing && let Some(native) = &self.native {
             let started = std::time::Instant::now();
             loop {
                 match native.frame(time, playing).await {
@@ -365,6 +397,32 @@ fn native_pixels(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[cfg(target_os = "macos")]
+    #[tokio::test]
+    async fn paused_realtime_wallpaper_keeps_native_precision_across_mode_changes() {
+        let Some(path) = std::env::var_os("JIANKU_TEST_WALLPAPER_VIDEO") else {
+            return;
+        };
+        let mut video = VideoBackground::new(path.to_string_lossy().into_owned(), true).unwrap();
+        let mut reference = Reader::open(Path::new(&path)).unwrap();
+        for (time, realtime) in [(0.7, true), (0.0, false), (0.3, true), (0.3, false)] {
+            video.set_realtime(realtime);
+            let VideoFrame::Native(frame) = video.source(time, false).await.unwrap() else {
+                panic!("Paused wallpaper should retain the precise native path");
+            };
+            let actual = native_pixels(&frame, &mut None).unwrap();
+            let expected = reference.frame(time).unwrap();
+            let mean = actual
+                .data
+                .iter()
+                .zip(expected.data.iter())
+                .map(|(a, b)| f64::from(a.abs_diff(*b)))
+                .sum::<f64>()
+                / actual.data.len() as f64;
+            assert!(mean < 3.0, "Paused wallpaper pixel difference={mean}");
+        }
+    }
 
     #[cfg(target_os = "macos")]
     #[tokio::test]

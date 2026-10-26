@@ -289,6 +289,104 @@ fn inset_zoom_blur_pivot_is_stable_on_fractional_layouts() {
 }
 
 #[tokio::test]
+async fn inset_zoom_crop_and_3d_frames_are_identical_after_seeking() {
+    let constants = constants().await;
+    let events = CursorEvents::default();
+    let mut pixels = vec![0; 640 * 360 * 4];
+    for (number, pixel) in pixels.chunks_exact_mut(4).enumerate() {
+        pixel.copy_from_slice(&[
+            (number % 640 / 3) as u8,
+            (number / 640 / 2) as u8,
+            if number % 640 < 320 { 220 } else { 40 },
+            255,
+        ]);
+    }
+    let frames = DecodedSegmentFrames {
+        screen_size: XY::new(640, 360),
+        screen_frame: Some(DecodedFrame::new(pixels, 640, 360)),
+        camera_frame: None,
+        segment_time: 0.0,
+        recording_time: 0.0,
+        segment_has_camera: false,
+    };
+    for (style, focus, resolution, camera3d) in [
+        (
+            FrameStyle::Browser,
+            XY::new(0.2, 0.8),
+            XY::new(960, 540),
+            false,
+        ),
+        (
+            FrameStyle::MacOS,
+            XY::new(0.8, 0.2),
+            XY::new(960, 600),
+            false,
+        ),
+        (
+            FrameStyle::Tablet,
+            XY::new(0.35, 0.65),
+            XY::new(600, 600),
+            true,
+        ),
+        (
+            FrameStyle::Browser,
+            XY::new(0.7, 0.3),
+            XY::new(960, 540),
+            true,
+        ),
+    ] {
+        let mut project = zoom_probe_project();
+        project.background.crop = Some(Crop {
+            position: XY::new(40, 30),
+            size: XY::new(540, 290),
+        });
+        project.background.display_position = Some(XY::new(0.56, 0.46));
+        project.background.frame.as_mut().unwrap().style = style;
+        let timeline = project.timeline.as_mut().unwrap();
+        timeline.zoom_segments[0].mode = cap_project::ZoomMode::Manual {
+            x: focus.x,
+            y: focus.y,
+        };
+        if camera3d {
+            timeline.camera3d_segments = serde_json::from_value(serde_json::json!([{
+                "start": 0.5, "end": 5.5,
+                "properties": {"tiltX": 12.0, "tiltY": -8.0, "roll": 3.0},
+                "transitionIn": 0.7, "transitionOut": 0.7
+            }]))
+            .unwrap();
+        }
+        let mut eager =
+            ZoomTransformTimeline::from_project(&project, &events, 6.0, frames.screen_size);
+        eager.precompute();
+        let mut renderer = FrameRenderer::new(&constants);
+        let mut warm = RendererLayers::new(&constants.device, &constants.queue);
+        for number in [61, 69, 80, 120, 241, 260, 0, 80] {
+            let mut seeked =
+                ZoomTransformTimeline::from_project(&project, &events, 6.0, frames.screen_size);
+            seeked.ensure_precomputed_until((number + 1) as f32 / 60.0);
+            let uniforms = |timeline: &ZoomTransformTimeline| {
+                ProjectUniforms::new(
+                    &constants, &project, number, 60, resolution, &events, &frames, 6.0, timeline,
+                )
+            };
+            let expected = renderer
+                .render_immediate(frames.clone(), uniforms(&eager), &events, true, &mut warm)
+                .await
+                .unwrap();
+            let mut cold = RendererLayers::new(&constants.device, &constants.queue);
+            let actual = renderer
+                .render_immediate(frames.clone(), uniforms(&seeked), &events, true, &mut cold)
+                .await
+                .unwrap();
+            assert_eq!(
+                expected.data, actual.data,
+                "seek changed rendered pixels: style={style:?}, frame={number}, 3d={camera3d}"
+            );
+        }
+    }
+}
+
+#[tokio::test]
 async fn inset_zoom_tracks_static_marker_geometry() {
     let constants = constants().await;
     let events = CursorEvents::default();

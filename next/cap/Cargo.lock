@@ -1990,6 +1990,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "bezier_easing",
+ "block2 0.6.1",
  "build-time",
  "bytemuck",
  "cap-camera-effects",

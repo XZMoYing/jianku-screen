@@ -39,6 +39,7 @@ dirs = "5.0"
 workspace-hack = { version = "0.1", path = "../workspace-hack" }
 
 [target.'cfg(target_os = "macos")'.dependencies]
+block2 = "0.6"
 cidre.workspace = true
 metal = "0.31"
 objc2 = "0.6"

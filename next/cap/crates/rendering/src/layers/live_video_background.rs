@@ -1,12 +1,20 @@
 use std::{
     cell::RefCell,
     collections::HashMap,
-    sync::atomic::{AtomicU64, Ordering},
+    sync::{
+        Arc,
+        atomic::{AtomicU8, AtomicU64, Ordering},
+    },
 };
 
+use block2::RcBlock;
 use cidre::cv;
 use dispatch2::DispatchQueue;
-use objc2::{AnyThread, MainThreadMarker, rc::Retained, runtime::AnyObject};
+use objc2::{
+    AnyThread, MainThreadMarker,
+    rc::Retained,
+    runtime::{AnyObject, Bool},
+};
 use objc2_av_foundation::{
     AVPlayer, AVPlayerAudiovisualBackgroundPlaybackPolicy, AVPlayerItem, AVPlayerItemVideoOutput,
 };
@@ -56,6 +64,18 @@ impl LiveVideoBackground {
             .map_err(|error| error.to_string())?
             .map_err(|error| error.to_string())?
     }
+
+    pub fn pause(&self) {
+        let id = self.id;
+        DispatchQueue::main().exec_async(move || {
+            PLAYERS.with(|players| {
+                if let Some(player) = players.borrow_mut().get_mut(&id) {
+                    unsafe { player.player.pause() };
+                    player.playing = false;
+                }
+            });
+        });
+    }
 }
 
 impl Drop for LiveVideoBackground {
@@ -75,6 +95,7 @@ struct Player {
     output: Retained<AVPlayerItemVideoOutput>,
     last_request: Option<f64>,
     playing: bool,
+    seek_result: Option<Arc<AtomicU8>>,
 }
 
 impl Player {
@@ -115,6 +136,7 @@ impl Player {
                 output,
                 last_request: None,
                 playing: false,
+                seek_result: None,
             })
         }
     }
@@ -137,9 +159,18 @@ impl Player {
             if seek {
                 let target = CMTime::with_seconds(time, 600_000);
                 let zero = CMTime::new(0, 600_000);
+                let result = Arc::new(AtomicU8::new(0));
+                let completed = result.clone();
+                let completion = RcBlock::new(move |finished: Bool| {
+                    completed.store(if finished.as_bool() { 1 } else { 2 }, Ordering::Release);
+                });
+                self.seek_result = Some(result);
                 self.item
                     .seekToTime_toleranceBefore_toleranceAfter_completionHandler(
-                        target, zero, zero, None,
+                        target,
+                        zero,
+                        zero,
+                        Some(&completion),
                     );
             }
             if playing != self.playing {
@@ -151,6 +182,13 @@ impl Player {
                 self.playing = playing;
             }
             self.last_request = Some(time);
+            if let Some(result) = &self.seek_result {
+                match result.load(Ordering::Acquire) {
+                    0 => return Ok(None),
+                    1 => self.seek_result = None,
+                    _ => return Err("动态壁纸定位未完成".into()),
+                }
+            }
             let current = self.player.currentTime();
             if !self.output.hasNewPixelBufferForItemTime(current) {
                 return Ok(None);

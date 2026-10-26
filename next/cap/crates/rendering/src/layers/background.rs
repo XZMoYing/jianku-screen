@@ -401,14 +401,10 @@ pub struct BackgroundLayer {
 
 impl BackgroundLayer {
     pub(crate) fn set_realtime(&mut self, state: Option<bool>) {
-        if self.realtime.is_some() != state.is_some() {
-            self.video = None;
-            self.video_texture = None;
-            self.inner = None;
-            #[cfg(target_os = "macos")]
-            {
-                self.native_identity = None;
-            }
+        if self.realtime.is_some() != state.is_some()
+            && let Some(video) = &mut self.video
+        {
+            video.set_realtime(state.is_some());
         }
         self.realtime = state;
     }
