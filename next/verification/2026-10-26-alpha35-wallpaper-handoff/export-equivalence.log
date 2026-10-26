@@ -1,0 +1,10 @@
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.99s
+     Running tests/export_zoom_equivalence.rs (target/debug/deps/export_zoom_equivalence-1be75a6f31f6a1df)
+
+running 2 tests
+test benchmark_long_recording_zoom_startup ... ignored
+test incremental_export_zoom_matches_eager_across_clips_transitions_and_seeks ... ok
+
+test result: ok. 1 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.07s
+

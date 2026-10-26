@@ -1,0 +1,13 @@
+{
+	"freshReleaseBuild": true,
+	"compiled": {
+		"cap": "adfb78fb083093a98f8c0fdd5db7f4cf24768c58a0d935c1ee96b7bd08332cc8",
+		"cap-muxer": "a94d28f2f243a57180a7d01dfb2e7002215d10f4c6635880f5406da9325c947a"
+	},
+	"prepared": {
+		"cap-cli": "adfb78fb083093a98f8c0fdd5db7f4cf24768c58a0d935c1ee96b7bd08332cc8",
+		"cap-exporter": "adfb78fb083093a98f8c0fdd5db7f4cf24768c58a0d935c1ee96b7bd08332cc8",
+		"cap-muxer": "a94d28f2f243a57180a7d01dfb2e7002215d10f4c6635880f5406da9325c947a"
+	},
+	"scope": "Official release build rebuilt shared Rust code and CLI; prepared sidecar hashes equal freshly compiled inputs. Installed CLI is independently verified by complete export."
+}

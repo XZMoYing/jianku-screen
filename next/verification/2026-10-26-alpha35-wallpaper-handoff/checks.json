@@ -1,0 +1,34 @@
+{
+	"rustFmt": "passed",
+	"renderingCargoCheck": "passed",
+	"nativeWallpaperCheckpoints": {
+		"short": 18,
+		"longSingleKeyframe": 18,
+		"identicalFullPixels": 36,
+		"failedBaseline": 9
+	},
+	"zoomCropFrame3dSeekPixelComparisons": 32,
+	"scopedRustTests": {
+		"insetFilterPassed": 10,
+		"displayFilterPassed": 24,
+		"preciseSamplerPassed": 1,
+		"wallpaperFilterEffective": 2,
+		"wallpaperFilterReturnedWithoutFixtures": 3,
+		"exportZoomEquivalencePassed": 1,
+		"exportStartupBenchmarkIgnored": 1
+	},
+	"countingNote": "Filters overlap; do not sum their reported tests as unique coverage. Three wallpaper tests returned early without the separate 4K fixture and are excluded from effective coverage.",
+	"visualChanges": "None: curves,motion blur strength/kernel,resolution,quality and existing preview scheduler unchanged. Paused wallpaper now samples requested time instead of stale playback pixels.",
+	"pending": "First late seek of60s single-keyframe fixture2510ms; long projects,multitrack/audio/camera,physical display pacing,device/meeting tests deferred.",
+	"release": "Optimized alpha35 installed/archived/ordinary project launch and strict signature checks passed; all three main hashes match. Official build rebuilt CLI/sidecars.",
+	"installedCliExport": {
+		"durationSeconds": 9,
+		"frames": 540,
+		"resolution": "1280x720",
+		"fps": 60,
+		"quality": "maximum",
+		"fullMotionBlur": true,
+		"allDecodedPixelsMatchAlpha34": true,
+		"fullDecodePassed": true
+	}
+}

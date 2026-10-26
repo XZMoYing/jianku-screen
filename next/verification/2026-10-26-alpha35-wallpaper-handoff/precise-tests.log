@@ -1,0 +1,20 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.50s
+     Running unittests src/lib.rs (target/debug/deps/cap_rendering-9f91b75f85564f48)
+
+running 1 test
+time=0 native_pts=0 reference_pts=0 mean pixel difference=0
+time=0.016666666666666666 native_pts=0.016666666666666666 reference_pts=0.016666666666666666 mean pixel difference=0
+time=0.03333333333333333 native_pts=0.03333333333333333 reference_pts=0.03333333333333333 mean pixel difference=0
+time=0.05 native_pts=0.05 reference_pts=0.05 mean pixel difference=0
+time=0.3 native_pts=0.3 reference_pts=0.3 mean pixel difference=0.4647342785493827
+time=1.18 native_pts=1.1833333333333333 reference_pts=1.1833333333333333 mean pixel difference=0.4420235339506173
+time=1.2 native_pts=1.2 reference_pts=1.2 mean pixel difference=0.4498316936728395
+time=1.2166666666666666 native_pts=1.2166666666666666 reference_pts=1.2166666666666666 mean pixel difference=0.43844810956790126
+time=0.017 native_pts=0.03333333333333333 reference_pts=0.03333333333333333 mean pixel difference=0
+time=0.3 native_pts=0.3 reference_pts=0.3 mean pixel difference=0.4647342785493827
+time=0 native_pts=0 reference_pts=0 mean pixel difference=0
+time=0 native_pts=0 reference_pts=0 mean pixel difference=0
+test layers::video_background::tests::native_precise_sampling_matches_seek_loop_and_prefetch_reference ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 338 filtered out; finished in 1.42s
+

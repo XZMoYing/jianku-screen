@@ -1,0 +1,40 @@
+[
+	{
+		"name": "wallpaper.mp4",
+		"sha256": "bf93bccc84a9fdbaabb5d265cda5060bfeb866c81ed5a2ae1987909f67cdf73b",
+		"bytes": 2368586,
+		"programs": [],
+		"stream_groups": [],
+		"streams": [
+			{
+				"codec_name": "h264",
+				"width": 960,
+				"height": 540,
+				"r_frame_rate": "60/1",
+				"nb_frames": "360"
+			}
+		],
+		"format": {
+			"duration": "6.000000"
+		}
+	},
+	{
+		"name": "long-gop.mp4",
+		"sha256": "4eef99b4afd8cae55bd2542aeadc09a1a6d015138126ae0c38012f48e9e264bf",
+		"bytes": 23511299,
+		"programs": [],
+		"stream_groups": [],
+		"streams": [
+			{
+				"codec_name": "h264",
+				"width": 960,
+				"height": 540,
+				"r_frame_rate": "60/1",
+				"nb_frames": "3600"
+			}
+		],
+		"format": {
+			"duration": "60.000000"
+		}
+	}
+]

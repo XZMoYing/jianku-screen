@@ -1,0 +1,26 @@
+{
+	"programs": [],
+	"stream_groups": [],
+	"streams": [
+		{
+			"codec_name": "h264",
+			"width": 1280,
+			"height": 720,
+			"r_frame_rate": "60/1",
+			"nb_read_frames": "540"
+		},
+		{
+			"codec_name": "aac",
+			"r_frame_rate": "0/0",
+			"nb_read_frames": "422"
+		}
+	],
+	"format": {
+		"duration": "9.000000"
+	},
+	"fullDecodePassed": true,
+	"cliSha256": "50d9d121d762a8f1cb01466a970a5862cd04f879031a1b1addcb613317d62c37",
+	"videoSha256": "2311cfb2d29d26141bb955db0c952e3d6bd36a29292ddc9a9ac23e1868e6d9df",
+	"elapsedSeconds": 3.9569232919966453,
+	"scope": "Installed optimized CLI,9s/540frames,1280x720/60fps,maximum,video wallpaper loop/zoom/inset/browser/3D; all decoded pixels identical to alpha34 export. No before/after export-speed benchmark."
+}

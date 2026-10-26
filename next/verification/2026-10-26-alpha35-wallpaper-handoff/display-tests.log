@@ -1,0 +1,167 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.42s
+     Running unittests src/lib.rs (target/debug/deps/cap_rendering-9f91b75f85564f48)
+
+running 24 tests
+test layers::cursor::tests::cursor_height_uses_the_fitted_zoomed_display_once ... ok
+test notch_bounds_tests::is_horizontally_centred_on_the_display ... ok
+test notch_bounds_tests::padding_shrinks_the_notch_with_the_display ... ok
+test notch_bounds_tests::keeps_its_proportions_relative_to_the_display ... ok
+test takeover::tests::split_keeps_display_visible ... ok
+test tests::display_movement_blur_length_is_linear_in_velocity ... ok
+test tests::display_dominant_delta_picks_blur_mode ... ok
+test tests::display_movement_blur_scales_with_user_amount ... ok
+test tests::display_movement_motion_blur_caps_extreme_velocity ... ok
+test tests::display_position_center_is_clamped_to_frame ... ok
+test tests::display_position_center_matches_legacy_centered_layout ... ok
+test tests::display_position_shifts_display_even_without_padding ... ok
+test decoder::managed_worker_tests::segment_terminal_tests::managed_segment_terminal_wait_observes_display_idle_failure_after_ready ... ok
+test tests::display_position_translates_and_can_overhang_edges ... ok
+test tests::display_scene_transition_forces_zoom_blur ... ok
+test tests::fixed_aspect_ratio_clamps_padding_to_keep_display_visible ... ok
+test tests::display_zoom_blur_is_symmetric_in_and_out ... ok
+test tests::frame_display_position_shifts_outer_and_content_together ... ok
+test tests::motion_blur_keeps_camera_and_display_pivots_aligned ... ok
+test zoom::test::display_amount_is_zoom_scale ... ok
+[dash @ 0x120f3f560] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkS6gSx/original/init.mp4' for writing
+{"adapter":"Apple M1","backend":"Metal","deviceType":"IntegratedGpu","software":false,"test":"overlay_native_boundary"}
+test project_uniforms_tests::cursor_tracks_each_clips_display_aspect_ratio ... ok
+[dash @ 0x120f3f560] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkS6gSx/original/segment_001.m4s.tmp' for writing
+[dash @ 0x120f3f560] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkS6gSx/original/dash_manifest.mpd.tmp' for writing
+[dash @ 0x120f3f560] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkS6gSx/original/media_0.m3u8.tmp' for writing
+[dash @ 0x120f3f560] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkS6gSx/original/master.m3u8.tmp' for writing
+[dash @ 0x120f3f560] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkS6gSx/original/segment_002.m4s.tmp' for writing
+[dash @ 0x120f3f560] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkS6gSx/original/dash_manifest.mpd.tmp' for writing
+[dash @ 0x120f3f560] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkS6gSx/original/media_0.m3u8.tmp' for writing
+[dash @ 0x120f3f560] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkS6gSx/original/segment_003.m4s.tmp' for writing
+[dash @ 0x120f3f560] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkS6gSx/original/dash_manifest.mpd.tmp' for writing
+[dash @ 0x120f3f560] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkS6gSx/original/media_0.m3u8.tmp' for writing
+[dash @ 0x120f3f560] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkS6gSx/original/segment_004.m4s.tmp' for writing
+[dash @ 0x120f3f560] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkS6gSx/original/dash_manifest.mpd.tmp' for writing
+[dash @ 0x120f3f560] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkS6gSx/original/media_0.m3u8.tmp' for writing
+[dash @ 0x120f3f560] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkS6gSx/original/segment_005.m4s.tmp' for writing
+[dash @ 0x120f3f560] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkS6gSx/original/dash_manifest.mpd.tmp' for writing
+[dash @ 0x120f3f560] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkS6gSx/original/media_0.m3u8.tmp' for writing
+[dash @ 0x120f3f560] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkS6gSx/original/segment_006.m4s.tmp' for writing
+[dash @ 0x120f3f560] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkS6gSx/original/dash_manifest.mpd.tmp' for writing
+[dash @ 0x120f3f560] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkS6gSx/original/media_0.m3u8.tmp' for writing
+[dash @ 0x120f3f560] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkS6gSx/original/segment_007.m4s.tmp' for writing
+[dash @ 0x120f3f560] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkS6gSx/original/dash_manifest.mpd.tmp' for writing
+[dash @ 0x120f3f560] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkS6gSx/original/media_0.m3u8.tmp' for writing
+selected pixels: count=36, bounds=XY { x: 437, y: 132 }..=XY { x: 442, y: 137 }
+test decoder::managed_worker_tests::managed_segment_missing_camera_joins_both_workers_and_never_returns_display_only ... ok
+test overlay_layers::native_tests::motion_blur_display_kernel_matches_the_reference_centroid_on_gpu ... ok
+selected pixels: count=107, bounds=XY { x: 429, y: 124 }..=XY { x: 450, y: 145 }
+selected pixels: count=392, bounds=XY { x: 429, y: 124 }..=XY { x: 450, y: 145 }
+original, ripple=false: marker XY { x: 440.0, y: 135.0 }, overlay XY { x: 440.2196261682243, y: 135.2196261682243 }, cursor-only XY { x: 440.21173469387753, y: 135.21173469387756 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=2076, bounds=XY { x: 415, y: 110 }..=XY { x: 465, y: 160 }
+selected pixels: count=2076, bounds=XY { x: 415, y: 110 }..=XY { x: 465, y: 160 }
+original, ripple=true: marker XY { x: 440.0, y: 135.0 }, overlay XY { x: 440.27842003853567, y: 135.27842003853564 }, cursor-only XY { x: 440.27842003853567, y: 135.27842003853564 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=36, bounds=XY { x: 445, y: 148 }..=XY { x: 450, y: 153 }
+selected pixels: count=91, bounds=XY { x: 439, y: 142 }..=XY { x: 457, y: 160 }
+selected pixels: count=294, bounds=XY { x: 439, y: 142 }..=XY { x: 457, y: 160 }
+shorter, ripple=false: marker XY { x: 448.0, y: 151.0 }, overlay XY { x: 448.1373626373626, y: 151.13736263736263 }, cursor-only XY { x: 448.29931972789115, y: 151.29931972789115 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=1545, bounds=XY { x: 426, y: 129 }..=XY { x: 469, y: 172 }
+selected pixels: count=1545, bounds=XY { x: 426, y: 129 }..=XY { x: 469, y: 172 }
+shorter, ripple=true: marker XY { x: 448.0, y: 151.0 }, overlay XY { x: 448.18478964401294, y: 151.18478964401294 }, cursor-only XY { x: 448.18478964401294, y: 151.18478964401294 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=9, bounds=XY { x: 416, y: 143 }..=XY { x: 418, y: 145 }
+selected pixels: count=79, bounds=XY { x: 407, y: 133 }..=XY { x: 428, y: 154 }
+selected pixels: count=392, bounds=XY { x: 407, y: 133 }..=XY { x: 428, y: 154 }
+portrait, ripple=false: marker XY { x: 417.5, y: 144.5 }, overlay XY { x: 418.19620253164555, y: 143.80379746835442 }, cursor-only XY { x: 417.9234693877551, y: 144.0765306122449 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=2084, bounds=XY { x: 392, y: 118 }..=XY { x: 443, y: 169 }
+selected pixels: count=2084, bounds=XY { x: 392, y: 118 }..=XY { x: 443, y: 169 }
+portrait, ripple=true: marker XY { x: 417.5, y: 144.5 }, overlay XY { x: 417.8426103646833, y: 144.1573896353167 }, cursor-only XY { x: 417.8426103646833, y: 144.1573896353167 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=121, bounds=XY { x: 435, y: 143 }..=XY { x: 445, y: 153 }
+selected pixels: count=197, bounds=XY { x: 429, y: 137 }..=XY { x: 451, y: 159 }
+selected pixels: count=401, bounds=XY { x: 429, y: 137 }..=XY { x: 451, y: 159 }
+same-aspect-low-resolution, ripple=false: marker XY { x: 440.5, y: 148.5 }, overlay XY { x: 440.5, y: 148.5 }, cursor-only XY { x: 440.5, y: 148.5 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=2085, bounds=XY { x: 415, y: 123 }..=XY { x: 465, y: 173 }
+selected pixels: count=2085, bounds=XY { x: 415, y: 123 }..=XY { x: 465, y: 173 }
+same-aspect-low-resolution, ripple=true: marker XY { x: 440.5, y: 148.5 }, overlay XY { x: 440.5, y: 148.5 }, cursor-only XY { x: 440.5, y: 148.5 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=42, bounds=XY { x: 489, y: 111 }..=XY { x: 494, y: 117 }
+selected pixels: count=105, bounds=XY { x: 482, y: 104 }..=XY { x: 501, y: 124 }
+selected pixels: count=342, bounds=XY { x: 482, y: 104 }..=XY { x: 501, y: 124 }
+crop-padding-position, ripple=false: marker XY { x: 492.0, y: 114.5 }, overlay XY { x: 492.0809523809524, y: 114.42380952380952 }, cursor-only XY { x: 492.0, y: 114.46491228070175 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=1799, bounds=XY { x: 468, y: 91 }..=XY { x: 515, y: 137 }
+selected pixels: count=1799, bounds=XY { x: 468, y: 91 }..=XY { x: 515, y: 137 }
+crop-padding-position, ripple=true: marker XY { x: 492.0, y: 114.5 }, overlay XY { x: 491.98749305169537, y: 114.40105614230127 }, cursor-only XY { x: 491.98749305169537, y: 114.40105614230127 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=30, bounds=XY { x: 450, y: 169 }..=XY { x: 454, y: 174 }
+selected pixels: count=82, bounds=XY { x: 443, y: 163 }..=XY { x: 460, y: 180 }
+selected pixels: count=257, bounds=XY { x: 443, y: 163 }..=XY { x: 460, y: 180 }
+decorative-frame, ripple=false: marker XY { x: 452.5, y: 172.0 }, overlay XY { x: 452.280487804878, y: 172.14634146341464 }, cursor-only XY { x: 452.23929961089493, y: 172.13035019455253 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=1338, bounds=XY { x: 432, y: 151 }..=XY { x: 472, y: 192 }
+selected pixels: count=1338, bounds=XY { x: 432, y: 151 }..=XY { x: 472, y: 192 }
+decorative-frame, ripple=true: marker XY { x: 452.5, y: 172.0 }, overlay XY { x: 452.3908819133034, y: 172.10239162929747 }, cursor-only XY { x: 452.3908819133034, y: 172.10239162929747 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=25, bounds=XY { x: 433, y: 161 }..=XY { x: 437, y: 165 }
+selected pixels: count=69, bounds=XY { x: 427, y: 155 }..=XY { x: 443, y: 171 }
+selected pixels: count=229, bounds=XY { x: 427, y: 155 }..=XY { x: 443, y: 171 }
+inset, ripple=false: marker XY { x: 435.5, y: 163.5 }, overlay XY { x: 435.5, y: 163.18115942028984 }, cursor-only XY { x: 435.5, y: 163.40393013100436 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=1201, bounds=XY { x: 416, y: 144 }..=XY { x: 454, y: 182 }
+selected pixels: count=1201, bounds=XY { x: 416, y: 144 }..=XY { x: 454, y: 182 }
+inset, ripple=true: marker XY { x: 435.5, y: 163.5 }, overlay XY { x: 435.5, y: 163.5 }, cursor-only XY { x: 435.5, y: 163.5 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=25, bounds=XY { x: 437, y: 184 }..=XY { x: 441, y: 188 }
+selected pixels: count=63, bounds=XY { x: 432, y: 179 }..=XY { x: 447, y: 194 }
+selected pixels: count=199, bounds=XY { x: 432, y: 179 }..=XY { x: 447, y: 194 }
+framed-inset, ripple=false: marker XY { x: 439.5, y: 186.5 }, overlay XY { x: 439.7063492063492, y: 186.29365079365078 }, cursor-only XY { x: 439.6708542713568, y: 186.7713567839196 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=1046, bounds=XY { x: 421, y: 169 }..=XY { x: 457, y: 204 }
+selected pixels: count=1046, bounds=XY { x: 421, y: 169 }..=XY { x: 457, y: 204 }
+framed-inset, ripple=true: marker XY { x: 439.5, y: 186.5 }, overlay XY { x: 439.65391969407267, y: 186.79541108986615 }, cursor-only XY { x: 439.65391969407267, y: 186.79541108986615 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=36, bounds=XY { x: 453, y: 144 }..=XY { x: 458, y: 149 }
+selected pixels: count=91, bounds=XY { x: 447, y: 138 }..=XY { x: 465, y: 156 }
+selected pixels: count=294, bounds=XY { x: 447, y: 138 }..=XY { x: 465, y: 156 }
+zoom, ripple=false: marker XY { x: 456.0, y: 147.0 }, overlay XY { x: 456.1373626373626, y: 147.13736263736263 }, cursor-only XY { x: 456.29931972789115, y: 147.29931972789115 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=1545, bounds=XY { x: 434, y: 125 }..=XY { x: 477, y: 168 }
+selected pixels: count=1545, bounds=XY { x: 434, y: 125 }..=XY { x: 477, y: 168 }
+zoom, ripple=true: marker XY { x: 456.0, y: 147.0 }, overlay XY { x: 456.18478964401294, y: 147.18478964401294 }, cursor-only XY { x: 456.18478964401294, y: 147.18478964401294 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=25, bounds=XY { x: 433, y: 157 }..=XY { x: 437, y: 161 }
+selected pixels: count=65, bounds=XY { x: 427, y: 151 }..=XY { x: 443, y: 167 }
+selected pixels: count=229, bounds=XY { x: 427, y: 151 }..=XY { x: 443, y: 167 }
+zoomed-inset, ripple=false: marker XY { x: 435.5, y: 159.5 }, overlay XY { x: 435.46923076923076, y: 159.3 }, cursor-only XY { x: 435.5, y: 159.8231441048035 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=1209, bounds=XY { x: 416, y: 140 }..=XY { x: 454, y: 179 }
+selected pixels: count=1209, bounds=XY { x: 416, y: 140 }..=XY { x: 454, y: 179 }
+zoomed-inset, ripple=true: marker XY { x: 435.5, y: 159.5 }, overlay XY { x: 435.51240694789084, y: 159.89950372208438 }, cursor-only XY { x: 435.51240694789084, y: 159.89950372208438 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=36, bounds=XY { x: 345, y: 152 }..=XY { x: 350, y: 157 }
+selected pixels: count=91, bounds=XY { x: 339, y: 146 }..=XY { x: 357, y: 164 }
+selected pixels: count=294, bounds=XY { x: 339, y: 146 }..=XY { x: 357, y: 164 }
+split-morph, ripple=false: marker XY { x: 348.0, y: 155.0 }, overlay XY { x: 348.1373626373626, y: 155.13736263736263 }, cursor-only XY { x: 348.29931972789115, y: 155.29931972789115 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=1545, bounds=XY { x: 326, y: 133 }..=XY { x: 369, y: 176 }
+selected pixels: count=1545, bounds=XY { x: 326, y: 133 }..=XY { x: 369, y: 176 }
+split-morph, ripple=true: marker XY { x: 348.0, y: 155.0 }, overlay XY { x: 348.18478964401294, y: 155.18478964401294 }, cursor-only XY { x: 348.18478964401294, y: 155.18478964401294 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=36, bounds=XY { x: 253, y: 156 }..=XY { x: 258, y: 161 }
+selected pixels: count=91, bounds=XY { x: 247, y: 150 }..=XY { x: 265, y: 168 }
+selected pixels: count=294, bounds=XY { x: 247, y: 150 }..=XY { x: 265, y: 168 }
+split, ripple=false: marker XY { x: 256.0, y: 159.0 }, overlay XY { x: 256.1373626373626, y: 159.13736263736263 }, cursor-only XY { x: 256.29931972789115, y: 159.29931972789115 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=1545, bounds=XY { x: 234, y: 137 }..=XY { x: 277, y: 180 }
+selected pixels: count=1545, bounds=XY { x: 234, y: 137 }..=XY { x: 277, y: 180 }
+split, ripple=true: marker XY { x: 256.0, y: 159.0 }, overlay XY { x: 256.18478964401294, y: 159.18478964401294 }, cursor-only XY { x: 256.18478964401294, y: 159.18478964401294 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=30, bounds=XY { x: 313, y: 152 }..=XY { x: 317, y: 157 }
+selected pixels: count=74, bounds=XY { x: 306, y: 146 }..=XY { x: 323, y: 163 }
+selected pixels: count=241, bounds=XY { x: 306, y: 146 }..=XY { x: 323, y: 163 }
+floating, ripple=false: marker XY { x: 315.5, y: 155.0 }, overlay XY { x: 315.0405405405405, y: 154.94594594594594 }, cursor-only XY { x: 315.15145228215766, y: 155.0311203319502 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=1257, bounds=XY { x: 295, y: 135 }..=XY { x: 334, y: 174 }
+selected pixels: count=1257, bounds=XY { x: 295, y: 135 }..=XY { x: 334, y: 174 }
+floating, ripple=true: marker XY { x: 315.5, y: 155.0 }, overlay XY { x: 315.14598249801116, y: 155.04176610978521 }, cursor-only XY { x: 315.14598249801116, y: 155.04176610978521 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=25, bounds=XY { x: 444, y: 152 }..=XY { x: 448, y: 156 }
+selected pixels: count=39, bounds=XY { x: 437, y: 145 }..=XY { x: 454, y: 162 }
+selected pixels: count=262, bounds=XY { x: 437, y: 145 }..=XY { x: 454, y: 162 }
+fullscreen, ripple=false: marker XY { x: 446.5, y: 154.5 }, overlay XY { x: 445.5, y: 153.78205128205127 }, cursor-only XY { x: 446.206106870229, y: 154.15648854961833 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=1390, bounds=XY { x: 425, y: 133 }..=XY { x: 466, y: 174 }
+selected pixels: count=1390, bounds=XY { x: 425, y: 133 }..=XY { x: 466, y: 174 }
+fullscreen, ripple=true: marker XY { x: 446.5, y: 154.5 }, overlay XY { x: 446.2870503597122, y: 154.21079136690648 }, cursor-only XY { x: 446.2870503597122, y: 154.21079136690648 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=16, bounds=XY { x: 539, y: 173 }..=XY { x: 542, y: 176 }
+selected pixels: count=40, bounds=XY { x: 534, y: 168 }..=XY { x: 547, y: 181 }
+selected pixels: count=151, bounds=XY { x: 534, y: 168 }..=XY { x: 547, y: 181 }
+splitLeft, ripple=false: marker XY { x: 541.0, y: 175.0 }, overlay XY { x: 540.65, y: 174.85 }, cursor-only XY { x: 540.6258278145696, y: 174.67880794701986 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=806, bounds=XY { x: 525, y: 159 }..=XY { x: 556, y: 190 }
+selected pixels: count=806, bounds=XY { x: 525, y: 159 }..=XY { x: 556, y: 190 }
+splitLeft, ripple=true: marker XY { x: 541.0, y: 175.0 }, overlay XY { x: 540.6327543424318, y: 174.65508684863525 }, cursor-only XY { x: 540.6327543424318, y: 174.65508684863525 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=20, bounds=XY { x: 327, y: 175 }..=XY { x: 330, y: 179 }
+selected pixels: count=45, bounds=XY { x: 322, y: 171 }..=XY { x: 335, y: 184 }
+selected pixels: count=155, bounds=XY { x: 322, y: 171 }..=XY { x: 335, y: 184 }
+splitRight, ripple=false: marker XY { x: 329.0, y: 177.5 }, overlay XY { x: 328.8333333333333, y: 178.12222222222223 }, cursor-only XY { x: 329.02258064516127, y: 177.6290322580645 }, outside-support changes=0, max_rgb_error=0
+selected pixels: count=805, bounds=XY { x: 313, y: 162 }..=XY { x: 344, y: 193 }
+selected pixels: count=805, bounds=XY { x: 313, y: 162 }..=XY { x: 344, y: 193 }
+splitRight, ripple=true: marker XY { x: 329.0, y: 177.5 }, overlay XY { x: 329.07639751552796, y: 177.55838509316771 }, cursor-only XY { x: 329.07639751552796, y: 177.55838509316771 }, outside-support changes=0, max_rgb_error=0
+test project_uniforms_tests::cursor_and_ripple_pixels_follow_the_display_through_layout_changes ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 315 filtered out; finished in 3.81s
+

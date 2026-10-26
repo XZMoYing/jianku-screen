@@ -1,0 +1,114 @@
+[
+	{
+		"phase": "initial-precise",
+		"frame": 42,
+		"elapsed_ms": 188.967583,
+		"mean_difference": 0.0,
+		"different_bytes": 0
+	},
+	{
+		"phase": "paused-forward-0",
+		"frame": 114,
+		"elapsed_ms": 33.689667,
+		"mean_difference": 2.357975623451053,
+		"different_bytes": 51474
+	},
+	{
+		"phase": "paused-rewind-0",
+		"frame": 0,
+		"elapsed_ms": 33.109708000000005,
+		"mean_difference": 1.9834557969330855,
+		"different_bytes": 47459
+	},
+	{
+		"phase": "paused-loop-0",
+		"frame": 390,
+		"elapsed_ms": 33.554167,
+		"mean_difference": 1.5847365822490707,
+		"different_bytes": 40000
+	},
+	{
+		"phase": "precise-handoff-0",
+		"frame": 90,
+		"elapsed_ms": 83.559541,
+		"mean_difference": 0.0,
+		"different_bytes": 0
+	},
+	{
+		"phase": "precise-repeat-0",
+		"frame": 90,
+		"elapsed_ms": 34.485834,
+		"mean_difference": 0.0,
+		"different_bytes": 0
+	},
+	{
+		"phase": "paused-forward-1",
+		"frame": 114,
+		"elapsed_ms": 33.358332999999995,
+		"mean_difference": 2.4543060718711276,
+		"different_bytes": 53325
+	},
+	{
+		"phase": "paused-rewind-1",
+		"frame": 0,
+		"elapsed_ms": 33.268166,
+		"mean_difference": 2.080828880111524,
+		"different_bytes": 49269
+	},
+	{
+		"phase": "paused-loop-1",
+		"frame": 390,
+		"elapsed_ms": 33.239791,
+		"mean_difference": 1.5847365822490707,
+		"different_bytes": 40000
+	},
+	{
+		"phase": "precise-handoff-1",
+		"frame": 90,
+		"elapsed_ms": 98.36066699999999,
+		"mean_difference": 0.0,
+		"different_bytes": 0
+	},
+	{
+		"phase": "precise-repeat-1",
+		"frame": 90,
+		"elapsed_ms": 34.96212499999999,
+		"mean_difference": 0.0,
+		"different_bytes": 0
+	},
+	{
+		"phase": "paused-forward-2",
+		"frame": 114,
+		"elapsed_ms": 33.117,
+		"mean_difference": 2.357975623451053,
+		"different_bytes": 51474
+	},
+	{
+		"phase": "paused-rewind-2",
+		"frame": 0,
+		"elapsed_ms": 33.328416,
+		"mean_difference": 1.9834557969330855,
+		"different_bytes": 47459
+	},
+	{
+		"phase": "paused-loop-2",
+		"frame": 390,
+		"elapsed_ms": 33.709125,
+		"mean_difference": 1.5847365822490707,
+		"different_bytes": 40000
+	},
+	{
+		"phase": "precise-handoff-2",
+		"frame": 90,
+		"elapsed_ms": 83.197292,
+		"mean_difference": 0.0,
+		"different_bytes": 0
+	},
+	{
+		"phase": "precise-repeat-2",
+		"frame": 90,
+		"elapsed_ms": 33.3915,
+		"mean_difference": 0.0,
+		"different_bytes": 0
+	}
+]

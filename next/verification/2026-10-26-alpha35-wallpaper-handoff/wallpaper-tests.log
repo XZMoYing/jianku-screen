@@ -1,0 +1,14 @@
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 11.61s
+     Running unittests src/lib.rs (target/debug/deps/cap_rendering-9f91b75f85564f48)
+
+running 5 tests
+test layers::video_background::tests::samples_high_rate_wallpaper_and_repeats_exact_pixels ... ok
+test layers::video_background::tests::discarded_wallpaper_seek_can_rewind_without_publishing_the_old_frame ... ok
+test layers::video_background::tests::first_wallpaper_request_after_pause_preserves_exact_pixels_and_rewind ... ok
+test layers::video_background::tests::paused_realtime_wallpaper_keeps_native_precision_across_mode_changes ... ok
+reopened precise wallpaper: 9 timestamps and pixel buffers identical
+test layers::video_background::tests::reopened_precise_wallpaper_preserves_pixels_seeks_and_looping ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 333 filtered out; finished in 3.19s
+

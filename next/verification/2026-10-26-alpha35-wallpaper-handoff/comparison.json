@@ -1,0 +1,18 @@
+{
+	"before": {
+		"checkpoints": 16,
+		"mismatched": 9,
+		"precise_handoff_ms": [83.559541, 98.36066699999999, 83.197292]
+	},
+	"after": {
+		"checkpoints": 18,
+		"mismatched": 0,
+		"precise_handoff_ms": [52.523417, 52.636458999999995, 53.643833]
+	},
+	"long_gop": {
+		"checkpoints": 18,
+		"mismatched": 0,
+		"late_seek_ms": 2510.297375
+	},
+	"scope": "Native Metal renderer, 960x540 output, unchanged visual effects; elapsed times include rendering in debug and are not physical display FPS. Long fixture contains one keyframe for 60s."
+}
