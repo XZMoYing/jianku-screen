@@ -49,6 +49,7 @@ const PRERENDER_READY_TIMEOUT: Duration = Duration::from_secs(2);
 pub struct PlaySpec {
     pub segments: Vec<AudioSegment>,
     pub music: MusicTracks,
+    pub(crate) music_source: Option<crate::segments::PlaybackMusicSource>,
     pub project: ProjectConfiguration,
     pub duration_secs: f64,
     pub start_playhead_secs: f64,
@@ -195,6 +196,17 @@ pub(crate) struct PreparingAudioPlayTicket {
 }
 
 impl PreparingAudioPlayTicket {
+    pub(crate) fn start_result(&self) -> Option<bool> {
+        if self.request.is_cancelled() {
+            return Some(false);
+        }
+        match *self.request.status.borrow() {
+            PreparingAudioStatus::Pending | PreparingAudioStatus::AwaitingCallback => None,
+            PreparingAudioStatus::Started => Some(!self.request.is_cancelled()),
+            _ => Some(false),
+        }
+    }
+
     pub(crate) fn generation(&self) -> u64 {
         self.generation
     }
@@ -571,11 +583,46 @@ struct StreamState {
     handle: TypedStreamHandle,
 }
 
+fn next_control_message(
+    receiver: &std_mpsc::Receiver<ControlMsg>,
+    pending: &mut Option<ControlMsg>,
+) -> Option<ControlMsg> {
+    let mut message = pending.take().or_else(|| receiver.recv().ok())?;
+    if let ControlMsg::Refresh {
+        generation,
+        revision,
+        ..
+    } = &message
+    {
+        let generation = *generation;
+        let mut revision = *revision;
+        while let Ok(next) = receiver.try_recv() {
+            if let ControlMsg::Refresh {
+                generation: next_generation,
+                revision: next_revision,
+                ..
+            } = &next
+                && *next_generation == generation
+            {
+                if *next_revision >= revision {
+                    revision = *next_revision;
+                    message = next;
+                }
+            } else {
+                *pending = Some(next);
+                break;
+            }
+        }
+    }
+    Some(message)
+}
+
 fn control_thread(control_rx: std_mpsc::Receiver<ControlMsg>) {
     // cpal streams aren't Send; this thread owns the stream for its lifetime.
     let mut state: Option<StreamState> = None;
 
-    while let Ok(msg) = control_rx.recv() {
+    let mut pending = None;
+    while let Some(msg) = next_control_message(&control_rx, &mut pending) {
         match msg {
             ControlMsg::Refresh {
                 spec,
@@ -840,11 +887,14 @@ fn install_source<T: FromSampleBytes + cpal::FromSample<f32>>(
     let PlaySpec {
         segments,
         music,
+        music_source,
         project,
         duration_secs,
         start_playhead_secs,
         playhead_rx,
     } = *spec;
+
+    let music = music_source.map_or(music, |source| source.load(&project));
 
     if !(duration_secs.is_finite() && duration_secs > 0.0) {
         return Err(format!(
@@ -1055,7 +1105,8 @@ fn control_thread_headless(control_rx: std_mpsc::Receiver<ControlMsg>, mut tap: 
         }
     };
 
-    while let Ok(msg) = control_rx.recv() {
+    let mut pending = None;
+    while let Some(msg) = next_control_message(&control_rx, &mut pending) {
         match msg {
             ControlMsg::Refresh {
                 spec,
@@ -1348,6 +1399,79 @@ mod native_tests;
 mod tests {
     use super::*;
 
+    #[test]
+    fn queued_mix_updates_keep_newest_revision_and_preserve_control_barriers() {
+        let (sender, receiver) = std_mpsc::channel();
+        let spec = || PlaySpec {
+            segments: Vec::new(),
+            music: MusicTracks::new(),
+            music_source: None,
+            project: ProjectConfiguration::default(),
+            duration_secs: 2.0,
+            start_playhead_secs: 0.0,
+            playhead_rx: watch::channel(0.0).1,
+        };
+        for (generation, revision) in [(1, 1), (1, 3), (1, 2), (1, 4), (2, 5)] {
+            sender
+                .send(ControlMsg::Refresh {
+                    spec: Box::new(spec()),
+                    generation,
+                    revision,
+                    retire_tx: sender.clone(),
+                })
+                .unwrap();
+        }
+        sender
+            .send(ControlMsg::StopPlayback { generation: 1 })
+            .unwrap();
+        sender
+            .send(ControlMsg::Play {
+                spec: Box::new(spec()),
+                generation: 3,
+                result_tx: std_mpsc::channel().0,
+            })
+            .unwrap();
+        for revision in [6, 7] {
+            sender
+                .send(ControlMsg::Refresh {
+                    spec: Box::new(spec()),
+                    generation: 3,
+                    revision,
+                    retire_tx: sender.clone(),
+                })
+                .unwrap();
+        }
+        sender.send(ControlMsg::Shutdown).unwrap();
+        drop(sender);
+        let mut pending = None;
+        for (generation, revision) in [(1, 4), (2, 5)] {
+            assert!(matches!(next_control_message(&receiver, &mut pending),
+                Some(ControlMsg::Refresh { generation: actual, revision: actual_revision, .. })
+                if actual == generation && actual_revision == revision));
+        }
+        assert!(matches!(
+            next_control_message(&receiver, &mut pending),
+            Some(ControlMsg::StopPlayback { generation: 1 })
+        ));
+        assert!(matches!(
+            next_control_message(&receiver, &mut pending),
+            Some(ControlMsg::Play { generation: 3, .. })
+        ));
+        assert!(matches!(
+            next_control_message(&receiver, &mut pending),
+            Some(ControlMsg::Refresh {
+                generation: 3,
+                revision: 7,
+                ..
+            })
+        ));
+        assert!(matches!(
+            next_control_message(&receiver, &mut pending),
+            Some(ControlMsg::Shutdown)
+        ));
+        assert!(next_control_message(&receiver, &mut pending).is_none());
+    }
+
     pub(super) fn source(sample_rate: u32) -> (ActiveSource<f32>, watch::Sender<f64>) {
         source_with_info(
             AudioInfo::new_raw(AudioData::SAMPLE_FORMAT, sample_rate, 2),
@@ -1367,6 +1491,7 @@ mod tests {
             Box::new(PlaySpec {
                 segments: Vec::new(),
                 music: MusicTracks::new(),
+                music_source: None,
                 project: ProjectConfiguration::default(),
                 duration_secs: 2.0,
                 start_playhead_secs: 0.0,

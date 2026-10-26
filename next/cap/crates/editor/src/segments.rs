@@ -1,4 +1,8 @@
-use std::{collections::HashMap, path::Path, sync::Arc};
+use std::{
+    collections::HashMap,
+    path::{Path, PathBuf},
+    sync::{Arc, Mutex},
+};
 
 use cap_audio::AudioData;
 use cap_project::ProjectConfiguration;
@@ -15,6 +19,31 @@ fn resolve_music_path(project_path: &Path, path: &str) -> std::path::PathBuf {
         candidate.to_path_buf()
     } else {
         project_path.join(candidate)
+    }
+}
+
+#[derive(Clone)]
+pub(crate) struct PlaybackMusicSource {
+    project_path: PathBuf,
+    cache: Arc<Mutex<MusicTracks>>,
+}
+
+impl PlaybackMusicSource {
+    pub(crate) fn new(project_path: PathBuf, cache: MusicTracks) -> Self {
+        Self {
+            project_path,
+            cache: Arc::new(Mutex::new(cache)),
+        }
+    }
+
+    pub(crate) fn load(&self, project: &ProjectConfiguration) -> MusicTracks {
+        let mut cache = self
+            .cache
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        let result = load_music_tracks(project, &self.project_path, &mut cache);
+        cache.retain(|path, _| result.contains_key(path));
+        result
     }
 }
 

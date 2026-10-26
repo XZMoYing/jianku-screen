@@ -49,7 +49,52 @@ const FRAME_CACHE_SIZE: usize = 4;
 const MAX_FRAME_CACHE_BYTES: usize = 64 * 1024 * 1024;
 const RAMP_UP_FRAME_COUNT: u32 = 15;
 
-fn clip_audio_changed(previous: &ProjectConfiguration, next: &ProjectConfiguration) -> bool {
+fn playback_mapping_changed(previous: &ProjectConfiguration, next: &ProjectConfiguration) -> bool {
+    let clip = |segment: &cap_project::TimelineSegment| {
+        (
+            segment.recording_clip,
+            segment.start,
+            segment.end,
+            segment.timescale,
+        )
+    };
+    let offsets = |clip: &cap_project::ClipConfiguration| (clip.index, clip.offsets.camera);
+    let transition = |transition: &cap_project::ClipTransition| {
+        (
+            transition.segment_index,
+            transition.kind,
+            transition.duration,
+        )
+    };
+    if previous.requires_camera() != next.requires_camera()
+        || !previous
+            .clips
+            .iter()
+            .map(offsets)
+            .eq(next.clips.iter().map(offsets))
+    {
+        return true;
+    }
+    match (&previous.timeline, &next.timeline) {
+        (Some(previous), Some(next)) => {
+            !previous
+                .segments
+                .iter()
+                .map(clip)
+                .eq(next.segments.iter().map(clip))
+                || !previous
+                    .transitions
+                    .iter()
+                    .map(transition)
+                    .eq(next.transitions.iter().map(transition))
+                || previous.hold_windows() != next.hold_windows()
+        }
+        (None, None) => false,
+        _ => true,
+    }
+}
+
+fn playback_audio_changed(previous: &ProjectConfiguration, next: &ProjectConfiguration) -> bool {
     let settings = |segment: &cap_project::TimelineSegment| {
         (
             segment.recording_clip,
@@ -60,12 +105,58 @@ fn clip_audio_changed(previous: &ProjectConfiguration, next: &ProjectConfigurati
             segment.volume(),
         )
     };
-    match (&previous.timeline, &next.timeline) {
-        (Some(previous), Some(next)) => !previous
-            .segments
+    let offsets = |clip: &cap_project::ClipConfiguration| {
+        (clip.index, clip.offsets.mic, clip.offsets.system_audio)
+    };
+    if previous.audio != next.audio
+        || !previous
+            .clips
             .iter()
-            .map(settings)
-            .eq(next.segments.iter().map(settings)),
+            .map(offsets)
+            .eq(next.clips.iter().map(offsets))
+    {
+        return true;
+    }
+    fn music(
+        segment: &cap_project::AudioTrackSegment,
+    ) -> (&str, f64, f64, bool, f64, f32, f64, f64) {
+        (
+            segment.path.as_str(),
+            segment.start,
+            segment.end,
+            segment.enabled,
+            segment.trim_start,
+            segment.volume_db,
+            segment.fade_in,
+            segment.fade_out,
+        )
+    }
+    let transition = |transition: &cap_project::ClipTransition| {
+        (
+            transition.segment_index,
+            transition.kind,
+            transition.duration,
+        )
+    };
+    match (&previous.timeline, &next.timeline) {
+        (Some(previous), Some(next)) => {
+            !previous
+                .segments
+                .iter()
+                .map(settings)
+                .eq(next.segments.iter().map(settings))
+                || !previous
+                    .audio_segments
+                    .iter()
+                    .map(music)
+                    .eq(next.audio_segments.iter().map(music))
+                || !previous
+                    .transitions
+                    .iter()
+                    .map(transition)
+                    .eq(next.transitions.iter().map(transition))
+                || previous.hold_windows() != next.hold_windows()
+        }
         (None, None) => false,
         _ => true,
     }
@@ -332,6 +423,11 @@ impl FrameCache {
             cache_bytes: 0,
             max_bytes,
         }
+    }
+
+    fn clear(&mut self) {
+        self.cache.clear();
+        self.cache_bytes = 0;
     }
 
     fn get(&mut self, frame_number: u32) -> Option<CachedFrame> {
@@ -612,6 +708,7 @@ impl Playback {
             seek_generation: Arc::new(AtomicU64::new(0)),
             adopted: adopted.clone(),
         };
+        let seek_generation_counter = handle.seek_generation.clone();
 
         let (prefetch_tx, prefetch_rx) =
             std_mpsc::sync_channel::<PrefetchedFrame>(PREFETCH_CHANNEL_SIZE);
@@ -636,7 +733,7 @@ impl Playback {
         let mut prefetch_stop_rx = stop_rx.clone();
         let mut prefetch_project = self.project.clone();
         let prefetch_segment_medias = self.segment_medias.clone();
-        let (prefetch_duration, has_timeline) = self
+        let (mut prefetch_duration, has_timeline) = self
             .project
             .borrow()
             .timeline
@@ -670,6 +767,11 @@ impl Playback {
 
                 if prefetch_project.has_changed().unwrap_or(false) {
                     cached_project = prefetch_project.borrow_and_update().clone();
+                    prefetch_duration = cached_project
+                        .timeline
+                        .as_ref()
+                        .and_then(|timeline| valid_playback_duration(timeline.duration()))
+                        .unwrap_or(0.0);
                 }
 
                 if request_changed || frame_request_rx.has_changed().unwrap_or(false) {
@@ -895,7 +997,7 @@ impl Playback {
                 .timeline
                 .as_ref()
                 .and_then(|timeline| valid_playback_duration(timeline.duration()));
-            let Some(duration) = duration else {
+            let Some(mut duration) = duration else {
                 diagnostic.stage("invalid_timeline");
                 diagnostic.finish(false);
                 warn!("Playback: No valid timeline duration found");
@@ -1069,7 +1171,7 @@ impl Playback {
                 };
 
             let build_zoom_timelines =
-                |project: &ProjectConfiguration| -> Vec<ZoomTransformTimeline> {
+                |project: &ProjectConfiguration, duration: f64| -> Vec<ZoomTransformTimeline> {
                     self.segment_medias
                         .iter()
                         .enumerate()
@@ -1085,7 +1187,7 @@ impl Playback {
                         .collect()
                 };
             let build_outgoing_zoom_timelines =
-                |project: &ProjectConfiguration| -> Vec<ZoomTransformTimeline> {
+                |project: &ProjectConfiguration, duration: f64| -> Vec<ZoomTransformTimeline> {
                     if project
                         .timeline
                         .as_ref()
@@ -1109,8 +1211,9 @@ impl Playback {
                 };
 
             let mut cursor_timelines = build_cursor_timelines(&cached_project);
-            let mut zoom_timelines = build_zoom_timelines(&cached_project);
-            let mut outgoing_zoom_timelines = build_outgoing_zoom_timelines(&cached_project);
+            let mut zoom_timelines = build_zoom_timelines(&cached_project, duration);
+            let mut outgoing_zoom_timelines =
+                build_outgoing_zoom_timelines(&cached_project, duration);
 
             if !*stop_rx.borrow()
                 && let Some(prefetched_idx) = prefetch_buffer
@@ -1275,6 +1378,10 @@ impl Playback {
             diagnostic.stage("initializing_audio_output");
             let audio_spawn_start = Instant::now();
             let _ = audio_playhead_tx.send(playback_start_frame as f64 / fps_f64);
+            let music_source = crate::segments::PlaybackMusicSource::new(
+                self.render_constants.recording_meta.project_path.clone(),
+                self.music.clone(),
+            );
             let mut audio_generation = if adopted.is_some() {
                 None
             } else if !has_playback_audio(&audio_segments, !self.music.is_empty()) {
@@ -1284,6 +1391,7 @@ impl Playback {
                 self.audio_output.play(PlaySpec {
                     segments: audio_segments.clone(),
                     music: self.music.clone(),
+                    music_source: Some(music_source.clone()),
                     project: self.project.borrow().clone(),
                     duration_secs: duration,
                     start_playhead_secs: playback_start_frame as f64 / fps_f64,
@@ -1313,17 +1421,24 @@ impl Playback {
             let mut start = Instant::now();
             let mut clock_anchor_frame = playback_start_frame;
 
-            let mut transitioned_audio = None;
+            let mut transitioned_audio: Option<crate::audio_output::PreparingAudioPlayTicket> =
+                None;
             let mut last_adopted_frame = None;
             'playback: loop {
                 if *stop_rx.borrow() {
                     break;
                 }
+                if transitioned_audio
+                    .as_ref()
+                    .is_some_and(|ticket| ticket.start_result() == Some(false))
+                {
+                    drop(transitioned_audio.take());
+                    audio_generation = None;
+                    has_audio = false;
+                }
                 if adopted.as_ref().is_some_and(|adoption| adoption.is_owner()) && {
                     let project = self.project.borrow();
-                    project.audio.improve
-                        || project.audio != cached_project.audio
-                        || clip_audio_changed(&cached_project, &project)
+                    project.audio.improve || playback_audio_changed(&cached_project, &project)
                 } {
                     let adoption = adopted.as_ref().unwrap();
                     frame_number = adoption.frame_number(fps).unwrap_or(frame_number);
@@ -1342,10 +1457,11 @@ impl Playback {
                     drop(adopted.take());
                     preparing_audio_released.store(true, Ordering::Release);
                     let project = self.project.borrow().clone();
-                    cached_project.audio = project.audio.clone();
+
                     let ticket = self.audio_output.prepare_playback(PlaySpec {
                         segments: audio_segments.clone(),
                         music: self.music.clone(),
+                        music_source: Some(music_source.clone()),
                         project,
                         duration_secs: duration,
                         start_playhead_secs: frame_number as f64 / fps_f64,
@@ -1411,28 +1527,56 @@ impl Playback {
 
                 if self.project.has_changed().unwrap_or(false) {
                     let next_project = self.project.borrow_and_update().clone();
-                    let audio_changed = cached_project.audio != next_project.audio
-                        || clip_audio_changed(&cached_project, &next_project);
+                    let audio_changed = playback_audio_changed(&cached_project, &next_project);
+                    let mapping_changed = playback_mapping_changed(&cached_project, &next_project);
                     cached_project = next_project;
-                    if adopted.is_none()
-                        && audio_changed
-                        && let Some(generation) = audio_generation
-                    {
-                        self.audio_output.refresh_playback(
-                            PlaySpec {
-                                segments: audio_segments.clone(),
-                                music: self.music.clone(),
-                                project: cached_project.clone(),
-                                duration_secs: duration,
-                                start_playhead_secs: frame_number as f64 / fps_f64,
-                                playhead_rx: audio_playhead_rx.clone(),
-                            },
-                            generation,
-                        );
+                    let Some(next_duration) = cached_project
+                        .timeline
+                        .as_ref()
+                        .and_then(|timeline| valid_playback_duration(timeline.duration()))
+                    else {
+                        break 'playback;
+                    };
+                    duration = next_duration;
+                    if mapping_changed {
+                        seek_generation =
+                            seek_generation_counter.fetch_add(1, Ordering::Relaxed) + 1;
+                        prefetch_buffer.clear();
+                        frame_cache.clear();
+                        let _ = frame_request_tx.send((seek_generation, frame_number));
+                    }
+                    if adopted.is_none() && audio_changed {
+                        let spec = PlaySpec {
+                            segments: audio_segments.clone(),
+                            music: self.music.clone(),
+                            music_source: Some(music_source.clone()),
+                            project: cached_project.clone(),
+                            duration_secs: duration,
+                            start_playhead_secs: frame_number as f64 / fps_f64,
+                            playhead_rx: audio_playhead_rx.clone(),
+                        };
+                        if let Some(generation) = audio_generation {
+                            self.audio_output.refresh_playback(spec, generation);
+                        } else if has_playback_audio(
+                            &audio_segments,
+                            cached_project.timeline.as_ref().is_some_and(|timeline| {
+                                timeline.audio_segments.iter().any(|segment| {
+                                    segment.enabled
+                                        && segment.volume_db > crate::audio::MUSIC_SILENCE_DB
+                                        && segment.end > segment.start
+                                })
+                            }),
+                        ) {
+                            let ticket = self.audio_output.prepare_playback(spec);
+                            audio_generation = Some(ticket.generation());
+                            transitioned_audio = Some(ticket);
+                            has_audio = true;
+                        }
                     }
                     cursor_timelines = build_cursor_timelines(&cached_project);
-                    zoom_timelines = build_zoom_timelines(&cached_project);
-                    outgoing_zoom_timelines = build_outgoing_zoom_timelines(&cached_project);
+                    zoom_timelines = build_zoom_timelines(&cached_project, duration);
+                    outgoing_zoom_timelines =
+                        build_outgoing_zoom_timelines(&cached_project, duration);
                 }
 
                 let frame_offset = frame_number.saturating_sub(clock_anchor_frame) as f64;
@@ -2064,15 +2208,69 @@ mod tests {
         let mut next = project.clone();
         next.timeline.as_mut().unwrap().segments[0].name = Some("Renamed".into());
         next.timeline.as_mut().unwrap().segments[0].volume = Some(1.0);
-        assert!(!clip_audio_changed(&project, &next));
+        assert!(!playback_audio_changed(&project, &next));
         next.timeline.as_mut().unwrap().segments[0].volume = Some(0.5);
-        assert!(clip_audio_changed(&project, &next));
+        assert!(playback_audio_changed(&project, &next));
         next.timeline.as_mut().unwrap().segments[0].volume = None;
         next.timeline.as_mut().unwrap().segments[0].speed_audio_mode =
             Some(cap_project::ClipSpeedAudioMode::Mute);
-        assert!(clip_audio_changed(&project, &next));
+        assert!(playback_audio_changed(&project, &next));
         next.timeline.as_mut().unwrap().segments.clear();
-        assert!(clip_audio_changed(&project, &next));
+        assert!(playback_audio_changed(&project, &next));
+    }
+
+    #[test]
+    fn timeline_mix_changes_refresh_audio_without_refreshing_visual_edits() {
+        let project: ProjectConfiguration = serde_json::from_value(serde_json::json!({
+            "clips": [{"index": 0}, {"index": 1}],
+            "timeline": {
+                "segments": [
+                    {"recordingSegment": 0, "start": 0.0, "end": 5.0, "timescale": 1.0},
+                    {"recordingSegment": 1, "start": 0.0, "end": 5.0, "timescale": 1.0}
+                ],
+                "zoomSegments": [],
+                "audioSegments": [{"start": 0.0, "end": 9.0, "track": 0, "path": "music.wav"}],
+                "transitions": [{"segmentIndex": 0, "type": "cross-fade", "duration": 0.5}]
+            }
+        }))
+        .unwrap();
+        for field in [
+            "volumeDb",
+            "fadeIn",
+            "fadeOut",
+            "trimStart",
+            "start",
+            "end",
+            "enabled",
+            "path",
+        ] {
+            let mut value = serde_json::to_value(&project).unwrap();
+            value["timeline"]["audioSegments"][0][field] = match field {
+                "enabled" => serde_json::json!(false),
+                "path" => serde_json::json!("replacement.wav"),
+                _ => serde_json::json!(1.25),
+            };
+            let next = serde_json::from_value(value).unwrap();
+            assert!(
+                playback_audio_changed(&project, &next),
+                "Missed music setting {field}"
+            );
+        }
+        let mut next = project.clone();
+        next.clips[0].offsets.mic = 0.25;
+        assert!(playback_audio_changed(&project, &next));
+        next = project.clone();
+        next.clips[1].offsets.system_audio = -0.125;
+        assert!(playback_audio_changed(&project, &next));
+        next = project.clone();
+        next.timeline.as_mut().unwrap().transitions[0].duration = 0.75;
+        assert!(playback_audio_changed(&project, &next));
+        next = project.clone();
+        next.background.padding = 25.0;
+        next.clips[0].offsets.camera = 0.25;
+        next.timeline.as_mut().unwrap().audio_segments[0].name = Some("配乐".into());
+        next.timeline.as_mut().unwrap().audio_segments[0].track = 3;
+        assert!(!playback_audio_changed(&project, &next));
     }
 
     #[test]
