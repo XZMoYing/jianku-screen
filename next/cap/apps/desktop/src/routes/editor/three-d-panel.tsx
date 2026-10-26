@@ -71,7 +71,12 @@ import {
 } from "./ui";
 
 export const camera3DShotSummary = (segment: Camera3DSegment) =>
-	`3D shot · ${camera3DShotLabel(segment)} · ${(segment.end - segment.start).toFixed(1)}s`;
+	localize("3D 镜头 · {name} · {duration}", {
+		name: localize(camera3DShotLabel(segment)),
+		duration: localize("{seconds} 秒", {
+			seconds: (segment.end - segment.start).toFixed(1),
+		}),
+	});
 
 const LOOK_TILE_HEIGHT = 62;
 const POSE_CARD_HEIGHT = 104;
@@ -851,7 +856,9 @@ export function Camera3DShotPanel(props: {
 						onClick={makeStill}
 						disabled={isStill()}
 						tooltipText={
-							isStill() ? localize("当前已是静帧") : localize("保持开始镜头姿态")
+							isStill()
+								? localize("当前已是静帧")
+								: localize("保持开始镜头姿态")
 						}
 						leftIcon={<IconLucidePause />}
 					>

@@ -1483,5 +1483,18 @@
 	"The app is still open. Keep the project open and retry after saving your changes.": "应用仍保持打开。请保留工程窗口，确认编辑内容已保存后再重试。",
 	"Changes could not be saved": "编辑内容尚未保存",
 	"Follow the steps below to try recovering the recording.": "请按下方提示尝试恢复录制文件。",
-	"Unable to save the project name: {reason}": "无法保存工程名称：{reason}"
+	"Unable to save the project name: {reason}": "无法保存工程名称：{reason}",
+	"样式 {number}": "样式 {number}",
+	"Style {number}": "样式 {number}",
+	"音频 {number}": "音频 {number}",
+	"Audio {number}": "音频 {number}",
+	"{type} {number}": "{type} {number}",
+	"拖动轨道标题可调整顺序，上方的画面图层会显示在前面。也可按 Alt + ↑ 或 ↓ 调整。": "拖动轨道标题可调整顺序，上方的画面图层会显示在前面。也可按 Alt + ↑ 或 ↓ 调整。",
+	"Drag this header to reorder. Higher visual layers appear in front. Alt + Up or Down also moves the track.": "拖动轨道标题可调整顺序，上方的画面图层会显示在前面。也可按 Alt + ↑ 或 ↓ 调整。",
+	"选择轨道：{track}": "选择轨道：{track}",
+	"Select track: {track}": "选择轨道：{track}",
+	"{seconds} 秒": "{seconds} 秒",
+	"{seconds}s": "{seconds} 秒",
+	"3D 镜头 · {name} · {duration}": "3D 镜头 · {name} · {duration}",
+	"3D shot · {name} · {duration}": "3D 镜头 · {name} · {duration}"
 }

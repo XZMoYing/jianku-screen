@@ -1527,7 +1527,7 @@ export function Timeline(props: {
 								{(laneIndex) => (
 									<TrackRow
 										icon={trackIcons.style}
-										label={`Style ${laneIndex + 1}`}
+										label={localize("样式 {number}", { number: laneIndex + 1 })}
 										type="style"
 										laneIndex={laneIndex}
 										onDelete={() => handleDeleteTrackLane("style", laneIndex)}
@@ -1549,7 +1549,16 @@ export function Timeline(props: {
 								{(row) => (
 									<TrackRow
 										icon={trackIcons[row.kind]}
-										label={`${row.kind[0].toUpperCase()}${row.kind.slice(1)} ${row.track + 1}`}
+										label={localize("{type} {number}", {
+											type: localize(
+												row.kind === "image"
+													? "Image"
+													: row.kind === "text"
+														? "Text"
+														: "Mask",
+											),
+											number: row.track + 1,
+										})}
 										type={row.kind}
 										laneIndex={row.track}
 										onDelete={() => handleDeleteTrackLane(row.kind, row.track)}
@@ -1593,7 +1602,7 @@ export function Timeline(props: {
 								{(laneIndex) => (
 									<TrackRow
 										icon={trackIcons.audio}
-										label={`Audio ${laneIndex + 1}`}
+										label={localize("音频 {number}", { number: laneIndex + 1 })}
 										type="audio"
 										laneIndex={laneIndex}
 										onDelete={() => handleDeleteTrackLane("audio", laneIndex)}
@@ -2038,12 +2047,16 @@ function TrackRow(props: {
 					data-track-reorder={canReorder() ? "" : undefined}
 					title={
 						canReorder()
-							? "Drag this header to reorder. Higher visual layers appear in front. Alt + Up or Down also moves the track."
+							? localize(
+									"拖动轨道标题可调整顺序，上方的画面图层会显示在前面。也可按 Alt + ↑ 或 ↓ 调整。",
+								)
 							: undefined
 					}
 					onMouseDown={startReorder}
 					onKeyDown={reorderWithKeyboard}
-					aria-label={`Select ${props.label ?? props.type} track`}
+					aria-label={localize("选择轨道：{track}", {
+						track: props.label ?? props.type,
+					})}
 					onClick={(event) => {
 						event.stopPropagation();
 						if (suppressClick) {

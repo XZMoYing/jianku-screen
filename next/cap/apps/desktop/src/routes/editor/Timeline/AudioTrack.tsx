@@ -189,7 +189,9 @@ function FadeControl(props: {
 				<div
 					role="slider"
 					aria-label={
-						props.edge === "in" ? localize("淡入控制点") : localize("淡出控制点")
+						props.edge === "in"
+							? localize("淡入控制点")
+							: localize("淡出控制点")
 					}
 					aria-valuenow={Math.round(props.fadeSeconds * 1000)}
 					tabindex={-1}
@@ -448,7 +450,7 @@ export function AudioTrack(props: {
 							class="group"
 							selected={isSelected()}
 							muted={!segment.enabled}
-							title={segment.name || "Audio"}
+							title={segment.name || localize("Audio")}
 							segment={segment}
 							onMouseDown={(e) => {
 								e.stopPropagation();
@@ -525,7 +527,7 @@ export function AudioTrack(props: {
 									full={() => (
 										<div class="cap-seg-labels z-10 max-w-full">
 											<span class="cap-seg-label max-w-full truncate">
-							{segment.name || localize("音频")}
+												{segment.name || localize("音频")}
 											</span>
 											<span class="cap-seg-sublabel">
 												{`${Math.round(segment.end - segment.start)}s`}
@@ -535,7 +537,7 @@ export function AudioTrack(props: {
 									compact={() => (
 										<div class="cap-seg-labels z-10 max-w-full">
 											<span class="cap-seg-label max-w-full truncate">
-							{segment.name || localize("音频")}
+												{segment.name || localize("音频")}
 											</span>
 										</div>
 									)}

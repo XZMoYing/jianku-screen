@@ -166,7 +166,7 @@ function PreparingSidebar() {
 							disabled
 							class="px-1 text-[10px] text-ed-text-3 opacity-50"
 						>
-											{localize(name)}
+							{localize(name)}
 						</button>
 					)}
 				</For>
@@ -184,7 +184,7 @@ function PreparingSidebar() {
 				<For each={["Padding", "Rounding", "Shadow"]}>
 					{(name) => (
 						<div class="flex items-center justify-between h-[34px] text-[12px] text-ed-text-3">
-							<span>{name}</span>
+							<span>{localize(name)}</span>
 							<span class="h-1 w-24 rounded-full bg-ed-ctl-hover" />
 						</div>
 					)}

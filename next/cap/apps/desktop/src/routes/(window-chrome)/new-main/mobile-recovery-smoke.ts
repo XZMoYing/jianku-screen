@@ -16,9 +16,9 @@ export async function runMobileRecoverySmoke() {
 		metrics.stage = value;
 		await emit("jianku-mobile-recovery-smoke-result", metrics);
 	};
-	const waitFor = async <T>(
+	async function waitFor<T>(
 		find: () => Promise<T | false | undefined> | T | false | undefined,
-	): Promise<T> => {
+	): Promise<T> {
 		const deadline = performance.now() + 25_000;
 		while (performance.now() < deadline) {
 			const value = await find();
@@ -26,7 +26,7 @@ export async function runMobileRecoverySmoke() {
 			await new Promise((resolve) => setTimeout(resolve, 100));
 		}
 		throw new Error("设备录制恢复界面验证等待超时");
-	};
+	}
 	const button = (text: string, root: ParentNode = document) =>
 		Array.from(root.querySelectorAll<HTMLButtonElement>("button")).find(
 			(node) => node.textContent?.trim() === text,

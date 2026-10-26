@@ -283,9 +283,11 @@ export function ThreeDTrack(props: {
 				{(segment, i) => {
 					const { setTrackState } = useTrackContext();
 
-					const shotLabel = () => camera3DShotLabel(segment());
+					const shotLabel = () => localize(camera3DShotLabel(segment()));
 					const shotDuration = () =>
-						`${(segment().end - segment().start).toFixed(1)}s`;
+						localize("{seconds} 秒", {
+							seconds: (segment().end - segment().start).toFixed(1),
+						});
 
 					// Double-clicking a handle expands the segment as far as it can go
 					// in that direction (up to the neighbouring segment / timeline edge).
@@ -458,7 +460,10 @@ export function ThreeDTrack(props: {
 							segColor="var(--track-3d)"
 							class="group"
 							selected={isSelected()}
-							title={`3D shot · ${shotLabel()} · ${shotDuration()}`}
+							title={localize("3D 镜头 · {name} · {duration}", {
+								name: shotLabel(),
+								duration: shotDuration(),
+							})}
 							segment={segment()}
 							onMouseDown={(e) => {
 								e.stopPropagation();
@@ -660,7 +665,9 @@ export function ThreeDTrack(props: {
 										<button
 											type="button"
 											aria-label={
-												end ? localize("编辑结束镜头") : localize("编辑开始镜头")
+												end
+													? localize("编辑结束镜头")
+													: localize("编辑开始镜头")
 											}
 											title={end ? localize("结束镜头") : localize("开始镜头")}
 											class="cap-pose-dot"

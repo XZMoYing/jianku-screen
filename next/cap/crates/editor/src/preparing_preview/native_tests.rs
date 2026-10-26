@@ -299,10 +299,42 @@ async fn ordinary_composed_frames(
     frame_numbers: &[u32],
     force_ffmpeg: bool,
 ) -> Vec<(RenderedFrame, FrameLayout)> {
+    composed_reference_frames(fixture, frame_numbers, force_ffmpeg, false).await
+}
+
+async fn composed_reference_frames(
+    fixture: &Fixture,
+    frame_numbers: &[u32],
+    force_ffmpeg: bool,
+    software: bool,
+) -> Vec<(RenderedFrame, FrameLayout)> {
     let metadata = &fixture.reference_metadata;
     let studio = metadata.studio_meta().unwrap();
     let mut decoders = Vec::new();
+    let mut software_decoders = Vec::new();
     for index in 0..fixture.project.clips.len() {
+        if software {
+            let source = RelocatableSource::new(metadata.project_path.clone()).unwrap();
+            let input = ManagedSegmentVideoInput::new(
+                index,
+                studio,
+                ManagedVideoTrackInput::new(source.clone(), vec!["display.mp4".into()]).unwrap(),
+                Some(ManagedVideoTrackInput::new(source, vec!["camera.mp4".into()]).unwrap()),
+            )
+            .unwrap();
+            let mut decoder = ManagedRecordingSegmentDecoders::spawn(input, false);
+            let status = decoder.wait_ready().await.unwrap();
+            assert_eq!(
+                status.display.decoder_type,
+                cap_rendering::decoder::DecoderType::FFmpegSoftware
+            );
+            assert_eq!(
+                status.camera.unwrap().decoder_type,
+                cap_rendering::decoder::DecoderType::FFmpegSoftware
+            );
+            software_decoders.push(decoder);
+            continue;
+        }
         decoders.push(
             RecordingSegmentDecoders::new(
                 metadata,
@@ -361,15 +393,18 @@ async fn ordinary_composed_frames(
     for &frame_number in frame_numbers {
         let time = f64::from(frame_number) / 30.0;
         let (segment_time, segment) = fixture.project.get_segment_time(time).unwrap();
-        let frames = decoders[segment.recording_clip as usize]
-            .get_frames_initial(
-                segment_time as f32,
-                true,
-                true,
-                fixture.project.clips[segment.recording_clip as usize].offsets,
-            )
-            .await
-            .unwrap();
+        let offsets = fixture.project.clips[segment.recording_clip as usize].offsets;
+        let frames = if software {
+            software_decoders[segment.recording_clip as usize]
+                .get_frames_initial(segment_time as f32, true, true, offsets)
+                .await
+                .unwrap()
+        } else {
+            decoders[segment.recording_clip as usize]
+                .get_frames_initial(segment_time as f32, true, true, offsets)
+                .await
+                .unwrap()
+        };
         let timeline = cache.get(segment.recording_clip, &fixture.cursor, &fixture.project);
         let mut zoom = ZoomTransformTimeline::from_project_for_clip(
             &fixture.project,
@@ -430,6 +465,9 @@ async fn ordinary_composed_frames(
             .any(|amount| (amount - 1.0).abs() > 0.01)
     );
     drop(decoders);
+    for decoder in software_decoders {
+        decoder.stop_and_wait().await;
+    }
     result
 }
 
@@ -439,6 +477,15 @@ async fn composed_parity(fixture: Fixture, frames: &[u32]) {
 
 #[tokio::test]
 async fn native_preparing_playback_seeks_match_ordinary_and_handoff_joins_sources() {
+    preparing_playback_composed_parity(!cfg!(target_os = "windows")).await;
+}
+
+#[tokio::test]
+async fn native_software_preparing_playback_matches_finalized_software_and_joins_sources() {
+    preparing_playback_composed_parity(false).await;
+}
+
+async fn preparing_playback_composed_parity(use_hardware_decoding: bool) {
     let mut fixture = fixture(false);
     for metadata in [&mut fixture.metadata, &mut fixture.reference_metadata] {
         let cap_project::RecordingMetaInner::Studio(studio) = &mut metadata.inner else {
@@ -449,7 +496,8 @@ async fn native_preparing_playback_seeks_match_ordinary_and_handoff_joins_source
         };
         inner.segments[0].mic = None;
     }
-    let expected = ordinary_composed_frames(&fixture, &[0, 45], true).await;
+    let expected =
+        composed_reference_frames(&fixture, &[0, 45], true, !use_hardware_decoding).await;
     let (frames, mut received) = tokio::sync::mpsc::unbounded_channel();
     let session = crate::PreparingPlaybackSession::spawn(
         fixture.input(),
@@ -459,7 +507,10 @@ async fn native_preparing_playback_seeks_match_ordinary_and_handoff_joins_source
             timing_repair: Default::default(),
         }],
         crate::PreparingPlaybackOptions {
-            preview: PreparingPreviewOptions::default(),
+            preview: PreparingPreviewOptions {
+                use_hardware_decoding,
+                frame_format: EditorFrameFormat::Rgba,
+            },
             fps: 30,
             resolution: XY::new(320, 240),
         },
