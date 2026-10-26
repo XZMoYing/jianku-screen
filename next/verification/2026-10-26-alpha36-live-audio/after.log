@@ -1,0 +1,9 @@
+   Compiling cap-editor v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/editor)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.93s
+     Running unittests src/lib.rs (target/debug/deps/cap_editor-e1f9bfad99903fbf)
+
+running 1 test
+test playback::tests::timeline_mix_changes_refresh_audio_without_refreshing_visual_edits ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 190 filtered out; finished in 0.00s
+

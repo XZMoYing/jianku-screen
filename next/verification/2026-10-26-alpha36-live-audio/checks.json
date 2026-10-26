@@ -1,0 +1,42 @@
+{
+	"rustFmt": "passed",
+	"cargoCheckEditor": "passed",
+	"clippyEditorNoDeps": "passed",
+	"fullDependencyClippy": "Blocked by preexisting same-type casts in rendering/src/live.rs; rules unchanged.",
+	"effectiveChecks": {
+		"productionMixCheckpoints": 20,
+		"playbackCoreTests": 28,
+		"audioOutputTests": 20,
+		"audioFilterTests": 56,
+		"audioFilterIgnored": 2,
+		"eventOwnershipTests": 3
+	},
+	"countingNote": "Rust filters overlap; counts are not summed as unique tests.",
+	"knownFailure": "Preparing-preview versus ordinary frame comparison fails on alpha35 and current source with identical output/reference hashes. Strict assertion remains; listed separately.",
+	"release": "Installed alpha36, strict signatures and three equal main hashes; ordinary project launch and actual window screenshot verified. Ad-hoc signing; formal Developer ID/notarization deferred.",
+	"quality": "No reduction to effects,blur,curves,preview resolution or export settings.",
+	"installedExport": {
+		"frames": 540,
+		"quality": "maximum",
+		"resolution": "1280x720",
+		"fps": 60,
+		"allVideoAndAudioDecodedPixelsOrSamplesMatchAlpha35": true
+	},
+	"sameFixturePlaybackSync": {
+		"sameGeneratedFixture": true,
+		"before": {
+			"version": "alpha35",
+			"verdict": "pass",
+			"deltaFromRawMs": -10.641069111111179,
+			"presentedFrames": 649
+		},
+		"after": {
+			"version": "alpha36",
+			"verdict": "pass",
+			"deltaFromRawMs": -8.445778111109803,
+			"presentedFrames": 649
+		},
+		"scope": "Installed optimized native editor path and production headless audio sink. Same raw source with VFR gaps and source jitter; thresholds unchanged. Not physical sound-device or WebView scanout validation."
+	},
+	"existingFrontendBuildDiagnostic": "Same12 transform diagnostic occurrences as alpha35; build/bundle completed and actual UI/preview opened. Separate build-chain cleanup remains."
+}

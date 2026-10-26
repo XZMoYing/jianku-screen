@@ -1,0 +1,7 @@
+{
+	"removed": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/debug",
+	"duAllocatedBytes": 17733582848,
+	"availableBytesBefore": 54028410880,
+	"availableBytesAfter": 70617296896,
+	"scope": "Reproducible debug app, binaries, dependencies and test builds only; no debug executable running. Scoped checks completed and evidence archived. Current alpha35 release/install and source rollback retained. Active release build uses separate target/release, which is preserved with native-deps."
+}

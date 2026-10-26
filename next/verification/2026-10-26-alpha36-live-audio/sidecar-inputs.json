@@ -1,0 +1,14 @@
+{
+	"freshReleaseBuild": true,
+	"compiled": {
+		"cap": "040983836d61ce843eede37057dac50263886fbf62d08787f3798df7261249d8",
+		"cap-muxer": "a94d28f2f243a57180a7d01dfb2e7002215d10f4c6635880f5406da9325c947a"
+	},
+	"prepared": {
+		"cap-cli": "040983836d61ce843eede37057dac50263886fbf62d08787f3798df7261249d8",
+		"cap-exporter": "040983836d61ce843eede37057dac50263886fbf62d08787f3798df7261249d8",
+		"cap-muxer": "a94d28f2f243a57180a7d01dfb2e7002215d10f4c6635880f5406da9325c947a"
+	},
+	"sourceCommit": "fbcf455088c2aee99752abe29b6db0518993a0ee",
+	"scope": "Official release command rebuilt CLI and sidecars. Desktop bundling interrupted during the ongoing conversation and resumed separately with identical sidecar inputs, then explicit nested/app signing."
+}

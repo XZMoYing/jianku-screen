@@ -1,0 +1,209 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.81s
+     Running unittests src/lib.rs (target/debug/deps/cap_editor-e1f9bfad99903fbf)
+
+running 42 tests
+test editor_instance::tests::playback_events_ignore_a_frame_queued_before_stop_and_rewind ... ok
+test editor_instance::tests::playback_events_accept_current_frames_and_stop ... ok
+test editor_instance::tests::playback_events_recheck_ownership_after_waiting_for_the_state_lock ... ok
+test playback::tests::backward_seek_discards_queued_frames_from_the_previous_generation ... ok
+test playback::tests::boosted_limit_widens_and_never_shrinks_below_base ... ok
+test playback::tests::buffering_retries_preserve_in_flight_decodes ... ok
+test playback::tests::clip_audio_changes_refresh_playback_without_refreshing_for_names ... ok
+test playback::tests::frame_cache_accounts_for_count_based_eviction ... ok
+test playback::tests::frame_cache_evicts_oldest_frames_to_stay_within_byte_budget ... ok
+test playback::tests::frame_cache_holds_multiple_frames_within_byte_budget ... ok
+test playback::tests::frame_cache_keeps_one_oversized_frame ... ok
+test playback::tests::late_handoff_stop_only_cancels_its_original_playback ... ok
+test playback::tests::prefetch_limit_tracks_decoded_frame_memory ... ok
+test playback::tests::prefetch_retries_recover_when_idle_and_new_seeks_always_reset ... ok
+test playback::tests::repeated_seeks_to_the_same_frame_require_the_latest_generation ... ok
+test playback::tests::stale_prefetch_frames_do_not_hide_timeout_or_disconnection ... ok
+test playback::tests::timeline_music_enables_audio_playback_without_recorded_audio ... ok
+test playback::tests::timeline_mix_changes_refresh_audio_without_refreshing_visual_edits ... ok
+test preparing_playback::tests::audible_starvation_and_resume_never_advance_the_presented_frame_or_wall_clock ... ok
+test preparing_handoff::tests::discarded_candidate_does_not_cancel_preparing_playback ... ok
+test preparing_playback::tests::buffering_freezes_clock_and_resumes_from_boundary_without_catching_up ... ok
+test preparing_playback::tests::expected_audio_metadata_only_allows_gap_summary_clearing ... ok
+test preparing_playback::tests::handoff_preserves_playing_intent_and_seeking_never_advances_beyond_prefix ... ok
+test preparing_playback::tests::invalid_audio_status_cannot_mutate_the_clock_and_valid_status_clamps_to_prefix ... ok
+test preparing_playback::tests::partial_audio_admits_a_long_clip_only_after_its_video_is_ready ... ok
+test preparing_playback::tests::partial_audio_prefix_preserves_contiguous_video_and_silent_clip_gates ... ok
+test preparing_playback::tests::pause_and_handoff_discard_audible_ahead_position_but_retain_the_presented_frame ... ok
+test audio_output::tests::enhancement_refresh_only_replaces_its_active_playback_generation ... ok
+test preparing_playback::tests::pause_and_update_sequence_preserve_the_confirmed_position ... ok
+test preparing_playback::tests::preview_and_wall_time_cannot_admit_playback ... ok
+test preparing_playback::tests::reaching_the_complete_recording_end_pauses_without_buffering ... ok
+test preparing_playback::tests::readiness_never_skips_an_unready_clip_or_required_audio ... ok
+test preparing_playback::tests::saturated_frame_delivery_retains_the_newest_seek_response ... ok
+test audio::tests::prerendered_playback_and_export_apply_negative_timing_offset_consistently ... ok
+test audio_output::native_tests::preparing_cancel_wakes_while_control_is_blocked_and_preserves_ordinary_playback ... ok
+test audio::tests::one_x_split_clip_mute_is_local_in_playback_and_export ... ok
+test audio_output::native_tests::preparing_stale_ticket_does_not_stop_a_newer_ordinary_playback ... ok
+[dash @ 0x142806be0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/display/init.mp4' for writing
+[dash @ 0x141f1a980] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/display/init.mp4' for writing
+[dash @ 0x142b04d90] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/display/init.mp4' for writing
+[dash @ 0x142807210] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/display/init.mp4' for writing
+test audio::tests::clip_volume_is_local_across_boundaries_playback_and_export ... ok
+[dash @ 0x142807210] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/display/segment_001.m4s.tmp' for writing
+[dash @ 0x142b04d90] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/display/segment_001.m4s.tmp' for writing
+[dash @ 0x141f1a980] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/display/segment_001.m4s.tmp' for writing
+[dash @ 0x142806be0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/display/segment_001.m4s.tmp' for writing
+[dash @ 0x142b04d90] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142b04d90] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x142b04d90] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/display/master.m3u8.tmp' for writing
+[dash @ 0x142807210] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142807210] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x142b04d90] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/display/segment_002.m4s.tmp' for writing
+[dash @ 0x142807210] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/display/master.m3u8.tmp' for writing
+[dash @ 0x142807210] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/display/segment_002.m4s.tmp' for writing
+[dash @ 0x141f1a980] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x141f1a980] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x141f1a980] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/display/master.m3u8.tmp' for writing
+[dash @ 0x141f1a980] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/display/segment_002.m4s.tmp' for writing
+[dash @ 0x142806be0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142806be0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x142806be0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/display/master.m3u8.tmp' for writing
+[dash @ 0x142806be0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/display/segment_002.m4s.tmp' for writing
+[dash @ 0x142807210] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142807210] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x142807210] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/display/segment_003.m4s.tmp' for writing
+[dash @ 0x142b04d90] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142b04d90] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x142b04d90] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/display/segment_003.m4s.tmp' for writing
+[dash @ 0x141f1a980] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x141f1a980] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x141f1a980] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/display/segment_003.m4s.tmp' for writing
+[dash @ 0x142806be0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142806be0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x142806be0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/display/segment_003.m4s.tmp' for writing
+[dash @ 0x142807210] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142807210] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x142807210] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/display/segment_004.m4s.tmp' for writing
+[dash @ 0x142b04d90] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142b04d90] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x142b04d90] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/display/segment_004.m4s.tmp' for writing
+[dash @ 0x141f1a980] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x141f1a980] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x141f1a980] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/display/segment_004.m4s.tmp' for writing
+[dash @ 0x142806be0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142806be0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x142806be0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/display/segment_004.m4s.tmp' for writing
+[dash @ 0x142807210] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142807210] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x142807210] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/display/segment_005.m4s.tmp' for writing
+[dash @ 0x142b04d90] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142b04d90] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x142b04d90] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/display/segment_005.m4s.tmp' for writing
+[dash @ 0x141f1a980] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x141f1a980] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x141f1a980] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/display/segment_005.m4s.tmp' for writing
+[dash @ 0x142806be0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142806be0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x142806be0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/display/segment_005.m4s.tmp' for writing
+[dash @ 0x142807210] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142807210] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x141f1a980] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142806be0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142b04d90] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x141f1a980] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x142806be0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x142b04d90] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x141f14a00] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/camera/init.mp4' for writing
+[dash @ 0x141f14a00] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/camera/segment_001.m4s.tmp' for writing
+[dash @ 0x142b05cb0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/camera/init.mp4' for writing
+[dash @ 0x141f14a00] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x112e60590] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/camera/init.mp4' for writing
+[dash @ 0x142a070a0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/camera/init.mp4' for writing
+[dash @ 0x141f14a00] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x142b05cb0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/camera/segment_001.m4s.tmp' for writing
+[dash @ 0x141f14a00] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/camera/master.m3u8.tmp' for writing
+[dash @ 0x141f14a00] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/camera/segment_002.m4s.tmp' for writing
+[dash @ 0x112e60590] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/camera/segment_001.m4s.tmp' for writing
+[dash @ 0x142a070a0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/camera/segment_001.m4s.tmp' for writing
+[dash @ 0x142b05cb0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142b05cb0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x142b05cb0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/camera/master.m3u8.tmp' for writing
+[dash @ 0x142b05cb0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/camera/segment_002.m4s.tmp' for writing
+[dash @ 0x141f14a00] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x141f14a00] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x141f14a00] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/camera/segment_003.m4s.tmp' for writing
+[dash @ 0x112e60590] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x112e60590] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x112e60590] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/camera/master.m3u8.tmp' for writing
+[dash @ 0x112e60590] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/camera/segment_002.m4s.tmp' for writing
+[dash @ 0x142a070a0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142a070a0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x142a070a0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/camera/master.m3u8.tmp' for writing
+[dash @ 0x142a070a0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/camera/segment_002.m4s.tmp' for writing
+[dash @ 0x142b05cb0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142b05cb0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x142b05cb0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/camera/segment_003.m4s.tmp' for writing
+[dash @ 0x141f14a00] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x141f14a00] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x141f14a00] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/camera/segment_004.m4s.tmp' for writing
+[dash @ 0x112e60590] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x112e60590] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x112e60590] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/camera/segment_003.m4s.tmp' for writing
+[dash @ 0x142a070a0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142a070a0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x142a070a0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/camera/segment_003.m4s.tmp' for writing
+[dash @ 0x142b05cb0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142b05cb0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x142b05cb0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/camera/segment_004.m4s.tmp' for writing
+[dash @ 0x141f14a00] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x141f14a00] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x141f14a00] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/camera/segment_005.m4s.tmp' for writing
+[dash @ 0x112e60590] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x112e60590] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x112e60590] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/camera/segment_004.m4s.tmp' for writing
+[dash @ 0x142a070a0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142a070a0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x142a070a0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/camera/segment_004.m4s.tmp' for writing
+[dash @ 0x142b05cb0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142b05cb0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x142b05cb0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/camera/segment_005.m4s.tmp' for writing
+[dash @ 0x141f14a00] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x141f14a00] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x141f14a00] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/camera/segment_006.m4s.tmp' for writing
+[dash @ 0x112e60590] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x112e60590] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x112e60590] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/camera/segment_005.m4s.tmp' for writing
+[dash @ 0x142a070a0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142a070a0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x142b05cb0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142b05cb0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x142b05cb0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/camera/segment_006.m4s.tmp' for writing
+[dash @ 0x142a070a0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/camera/segment_005.m4s.tmp' for writing
+[dash @ 0x141f14a00] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x141f14a00] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpkDiQYf/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x112e60590] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x112e60590] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x112e60590] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/camera/segment_006.m4s.tmp' for writing
+[dash @ 0x142a070a0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142b05cb0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142a070a0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x142b05cb0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYmGtNG/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x142a070a0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/camera/segment_006.m4s.tmp' for writing
+[dash @ 0x112e60590] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x112e60590] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpXXknLO/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x142a070a0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x142a070a0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpBJicEX/original/camera/media_0.m3u8.tmp' for writing
+test preparing_preview::native_tests::native_preparing_audio_decode_failure_never_admits_playback ... ok
+test preparing_preview::native_tests::native_preparing_image_does_not_enable_playback_with_unavailable_declared_audio ... ok
+
+thread 'preparing_preview::native_tests::native_preparing_playback_seeks_match_ordinary_and_handoff_joins_sources' panicked at crates/editor/src/preparing_preview/native_tests.rs:504:9:
+assertion `left == right` failed
+[Omitted 1468962-character pixel array; raw log retained in /private/tmp/jianku-alpha36]
+[Omitted 1468965-character pixel array; raw log retained in /private/tmp/jianku-alpha36]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test preparing_preview::native_tests::native_preparing_playback_audio_matches_completed_pcm_and_releases_its_source ... ok
+test preparing_preview::native_tests::native_preparing_playback_seeks_match_ordinary_and_handoff_joins_sources ... FAILED
+
+failures:
+
+failures:
+    preparing_preview::native_tests::native_preparing_playback_seeks_match_ordinary_and_handoff_joins_sources
+
+test result: FAILED. 41 passed; 1 failed; 0 ignored; 0 measured; 150 filtered out; finished in 2.05s
+
+error: test failed, to rerun pass `-p cap-editor --lib`

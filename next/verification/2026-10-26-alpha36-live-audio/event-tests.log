@@ -1,0 +1,10 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.44s
+     Running unittests src/lib.rs (target/debug/deps/cap_editor-e1f9bfad99903fbf)
+
+running 3 tests
+test editor_instance::tests::playback_events_accept_current_frames_and_stop ... ok
+test editor_instance::tests::playback_events_ignore_a_frame_queued_before_stop_and_rewind ... ok
+test editor_instance::tests::playback_events_recheck_ownership_after_waiting_for_the_state_lock ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 189 filtered out; finished in 0.00s
+

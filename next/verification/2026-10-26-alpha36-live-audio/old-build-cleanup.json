@@ -1,0 +1,89 @@
+{
+	"removedBuilds": [
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.26/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.26",
+			"mainSha256": "4a026fcece3fc53041d678c47c43b777f7471599a219aefd83169d7897d74728",
+			"logicalBytes": 311811828,
+			"duAllocatedBytes": 312487936,
+			"rollbackTag": "next-v0.2.0-alpha.26",
+			"remoteTagVerified": true
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.27/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.27",
+			"mainSha256": "60ce07a32f18cbeb41b7d0d97b1bb77e9b4f4726db6024d0a6c7a03a220f4a2e",
+			"logicalBytes": 311901460,
+			"duAllocatedBytes": 312578048,
+			"rollbackTag": "next-v0.2.0-alpha.27",
+			"remoteTagVerified": true
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.28/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.28",
+			"mainSha256": "e965a9744fba0b5cf3bd50737477a0ab0bfd833b2e580e3602f6465115d6d484",
+			"logicalBytes": 315482507,
+			"duAllocatedBytes": 316162048,
+			"rollbackTag": "next-v0.2.0-alpha.28",
+			"remoteTagVerified": true
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.29/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.29",
+			"mainSha256": "05191f28de119ca0967608317bd048af9505d3e4d195bcacc79afb953ee3daeb",
+			"logicalBytes": 315491739,
+			"duAllocatedBytes": 316170240,
+			"rollbackTag": "next-v0.2.0-alpha.29",
+			"remoteTagVerified": true
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.30/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.30",
+			"mainSha256": "bf59373318dc8a3e08d37026d834fe9cbc8047ca00bb01f6743e769a2d8bd841",
+			"logicalBytes": 315584939,
+			"duAllocatedBytes": 316264448,
+			"rollbackTag": "next-v0.2.0-alpha.30",
+			"remoteTagVerified": true
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.31/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.31",
+			"mainSha256": "9286076523b24f9660c8ae43bbaad822ef1d46e824186ce912ba7bf99159ab45",
+			"logicalBytes": 315632907,
+			"duAllocatedBytes": 316313600,
+			"rollbackTag": "next-v0.2.0-alpha.31",
+			"remoteTagVerified": true
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.32/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.32",
+			"mainSha256": "0e10eed94e40fe9d7b3977184bda90fa4d6f67235c5e9f7ff334ebb926d0cdce",
+			"logicalBytes": 315632859,
+			"duAllocatedBytes": 316313600,
+			"rollbackTag": "next-v0.2.0-alpha.32",
+			"remoteTagVerified": true
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.33/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.33",
+			"mainSha256": "8574f797258b66c83f8a288383e89dcee7da49df23795e01f6a4eadb8d8421db",
+			"logicalBytes": 315632859,
+			"duAllocatedBytes": 316313600,
+			"rollbackTag": "next-v0.2.0-alpha.33",
+			"remoteTagVerified": true
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.34/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.34",
+			"mainSha256": "ce3bc91a0c1039e121b7248cad3a5ca857c4ed8f3074ee3ccbd83fa045edeb84",
+			"logicalBytes": 315649419,
+			"duAllocatedBytes": 316329984,
+			"rollbackTag": "next-v0.2.0-alpha.34",
+			"remoteTagVerified": true
+		}
+	],
+	"retainedRollback": "0.2.0-alpha.35",
+	"availableBytesBefore": 45483761664,
+	"availableBytesAfter": 48324349952,
+	"caution": "Concurrent release build and APFS snapshots/clones mean free-space delta is not solely attributable to these deletions. User projects and all non-app entries preserved."
+}

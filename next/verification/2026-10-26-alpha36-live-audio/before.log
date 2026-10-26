@@ -1,0 +1,72 @@
+   Compiling serde_json v1.0.145
+   Compiling tokio v1.47.1
+   Compiling ring v0.17.14
+   Compiling tokio-util v0.7.16
+   Compiling h2 v0.4.12
+   Compiling rustls-webpki v0.103.6
+   Compiling rustls v0.23.31
+   Compiling hyper v1.7.0
+   Compiling hyper-util v0.1.17
+   Compiling tower v0.5.2
+   Compiling tokio-native-tls v0.3.1
+   Compiling tokio-rustls v0.26.3
+   Compiling tower-http v0.6.6
+   Compiling hyper-rustls v0.27.7
+   Compiling cookie_store v0.21.1
+   Compiling hyper-tls v0.6.0
+   Compiling jsonptr v0.6.3
+   Compiling reqwest v0.12.24 (https://github.com/CapSoftware/reqwest?rev=9b5ecbd5210a9510fde766015cabb724c1e70d2e#9b5ecbd5)
+   Compiling json-patch v3.0.1
+   Compiling schemars v0.8.22
+   Compiling swift-rs v1.0.7
+   Compiling cargo_metadata v0.19.2
+   Compiling specta v2.0.0-rc.20
+   Compiling tauri-utils v2.7.0
+   Compiling sentry-types v0.42.0
+   Compiling wgpu-hal v25.0.2 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/vendor/wgpu-hal)
+   Compiling workspace-hack v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/workspace-hack)
+   Compiling sentry-core v0.42.0
+   Compiling cap-media-info v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/media-info)
+   Compiling wgpu-core-deps-apple v25.0.0
+   Compiling wgpu-core v25.0.2
+   Compiling cap-enc-ffmpeg v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/enc-ffmpeg)
+   Compiling wgpu v25.0.2
+   Compiling sentry-backtrace v0.42.0
+   Compiling cap-rnnoise v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rnnoise)
+   Compiling cap-cursor-info v0.0.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/cursor-info)
+   Compiling ffmpeg-hw-device v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/ffmpeg-hw-device)
+   Compiling sentry-contexts v0.42.0
+   Compiling cap-project v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/project)
+   Compiling glyphon v0.9.0
+   Compiling cap-camera-effects v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/camera-effects)
+   Compiling cap-video-decode v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/video-decode)
+   Compiling sentry-debug-images v0.42.0
+   Compiling tokio-tungstenite v0.24.0
+   Compiling sentry-panic v0.42.0
+   Compiling sentry-anyhow v0.42.0
+   Compiling cap-flags v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/flags)
+   Compiling axum v0.7.9
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+   Compiling cap-utils v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/utils)
+   Compiling sentry v0.42.0
+   Compiling cap-audio v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/audio)
+   Compiling cap-media v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/media)
+   Compiling cap-editor v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/editor)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 03s
+     Running unittests src/lib.rs (target/debug/deps/cap_editor-e1f9bfad99903fbf)
+
+running 1 test
+
+thread 'playback::tests::timeline_mix_changes_refresh_audio_without_refreshing_visual_edits' panicked at crates/editor/src/playback.rs:2100:13:
+Missed music setting volumeDb
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test playback::tests::timeline_mix_changes_refresh_audio_without_refreshing_visual_edits ... FAILED
+
+failures:
+
+failures:
+    playback::tests::timeline_mix_changes_refresh_audio_without_refreshing_visual_edits
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 190 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p cap-editor --lib`

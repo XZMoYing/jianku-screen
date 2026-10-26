@@ -1,0 +1,45 @@
+{
+	"sourceCommit": "fbcf455088c2aee99752abe29b6db0518993a0ee",
+	"bundles": [
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/release/bundle/macos/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.36",
+			"build": "2026.36.0",
+			"mainSha256": "af4668d2a26b738135787dc3f690ff01767649bf7f5382ab46645114b1a26d59",
+			"strictSignature": true,
+			"signatureType": "ad-hoc; not Developer ID/notarized"
+		},
+		{
+			"path": "/Applications/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.36",
+			"build": "2026.36.0",
+			"mainSha256": "af4668d2a26b738135787dc3f690ff01767649bf7f5382ab46645114b1a26d59",
+			"strictSignature": true,
+			"signatureType": "ad-hoc; not Developer ID/notarized"
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.36/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.36",
+			"build": "2026.36.0",
+			"mainSha256": "af4668d2a26b738135787dc3f690ff01767649bf7f5382ab46645114b1a26d59",
+			"strictSignature": true,
+			"signatureType": "ad-hoc; not Developer ID/notarized"
+		}
+	],
+	"ordinaryLaunch": {
+		"pid": 57959,
+		"project": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.36/多轨剪辑示例.jks",
+		"window": {
+			"bounds": {
+				"Height": 800,
+				"Width": 1275,
+				"X": 202,
+				"Y": 101
+			},
+			"id": 731,
+			"name": "简库镜传 · 视频编辑",
+			"pid": 57959
+		}
+	},
+	"legacyArchiveVerifiedSha256": "c213123a4f7c79718c61b6b375dcd63f7b24680cbc19f812633c73598051d536"
+}

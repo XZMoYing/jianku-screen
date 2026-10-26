@@ -1,0 +1,28 @@
+   Compiling cap-editor v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/editor)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.34s
+     Running unittests src/lib.rs (target/debug/deps/cap_editor-e1f9bfad99903fbf)
+
+running 20 tests
+test audio_output::native_tests::healthy_stream_stale_stop_preserves_ordinary_replacement_after_preparing_join ... ok
+test audio_output::native_tests::preparing_callback_silences_active_cancelled_source_without_a_remove_command ... ok
+test audio_output::native_tests::preparing_expired_install_does_not_replace_an_active_ordinary_source ... ok
+test audio_output::native_tests::preparing_dropped_acknowledgement_wakes_and_cancels_without_waiting_for_timeout ... ok
+test audio_output::native_tests::failed_stream_stop_retires_active_and_queued_preparing_owners_without_callbacks ... ok
+test audio_output::native_tests::preparing_cancelled_wait_can_be_retried_while_ticket_is_owned ... ok
+test audio_output::native_tests::preparing_failed_install_revokes_the_request ... ok
+test audio_output::native_tests::preparing_cancel_wakes_while_control_is_blocked_and_preserves_ordinary_playback ... ok
+test audio_output::tests::coalesced_video_updates_preserve_synchronized_audio_position ... ok
+test audio_output::native_tests::preparing_ticket_drop_rejects_already_queued_install ... ok
+test audio_output::tests::enhancement_refresh_only_replaces_its_active_playback_generation ... ok
+test audio_output::tests::queued_mix_updates_keep_newest_revision_and_preserve_control_barriers ... ok
+test audio_output::native_tests::progressive_output_without_a_prefix_never_acknowledges_and_cancels_cleanly ... ok
+test audio_output::tests::video_drift_reseats_audio_for_forward_and_backward_seeks ... ok
+test audio_output::tests::enhancement_refresh_realigns_off_callback_and_rejects_superseded_work ... ok
+test audio_output::native_tests::preparing_stale_ticket_does_not_stop_a_newer_ordinary_playback ... ok
+test audio_output::native_tests::preparing_timeout_cancels_late_callback_install ... ok
+test audio_output::native_tests::clip_volume_refresh_changes_live_pcm_and_preserves_mute ... ok
+test audio_output::native_tests::studio_sound_refresh_changes_live_pcm_and_cannot_restart_stopped_audio ... ok
+test audio_output::native_tests::progressive_output_acknowledges_real_pcm_and_grows_the_same_gated_source ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 172 filtered out; finished in 1.59s
+

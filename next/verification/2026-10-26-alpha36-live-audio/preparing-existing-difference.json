@@ -1,0 +1,36 @@
+{
+	"baselineCommit": "edfbb9b073d60549b88ad3840faa5e1c161ad1de",
+	"runs": [
+		{
+			"run": "playback-tests",
+			"bytes": 307200,
+			"differentBytes": 1185,
+			"maxDifference": 8,
+			"meanDifference": 0.005631510416666667,
+			"bboxYX": [20, 98, 228, 310],
+			"actualSha256": "9d7fc06ec6cf13c1b3aa93ac0199965a947bd291a23fb3f449639ac1f954df16",
+			"referenceSha256": "87f6cff00defab6ce07b4de356250857bb43f47815615169ec77d79f732ca65b"
+		},
+		{
+			"run": "preparing-isolated",
+			"bytes": 307200,
+			"differentBytes": 1185,
+			"maxDifference": 8,
+			"meanDifference": 0.005631510416666667,
+			"bboxYX": [20, 98, 228, 310],
+			"actualSha256": "9d7fc06ec6cf13c1b3aa93ac0199965a947bd291a23fb3f449639ac1f954df16",
+			"referenceSha256": "87f6cff00defab6ce07b4de356250857bb43f47815615169ec77d79f732ca65b"
+		},
+		{
+			"run": "preparing-baseline",
+			"bytes": 307200,
+			"differentBytes": 1185,
+			"maxDifference": 8,
+			"meanDifference": 0.005631510416666667,
+			"bboxYX": [20, 98, 228, 310],
+			"actualSha256": "9d7fc06ec6cf13c1b3aa93ac0199965a947bd291a23fb3f449639ac1f954df16",
+			"referenceSha256": "87f6cff00defab6ce07b4de356250857bb43f47815615169ec77d79f732ca65b"
+		}
+	],
+	"scope": "Original strict assertion preserved. Baseline produced by restoring all four modified production/test source files from HEAD in a try/finally and then restoring current edits. Difference remains unresolved; not counted as passing."
+}

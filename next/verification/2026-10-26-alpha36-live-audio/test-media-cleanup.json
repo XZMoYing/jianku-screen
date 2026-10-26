@@ -1,0 +1,53 @@
+{
+	"removed": [
+		{
+			"path": "/private/tmp/jianku-alpha35",
+			"duAllocatedBytes": 64839680,
+			"kind": "self-created test media/helpers or duplicate export"
+		},
+		{
+			"path": "/private/tmp/jianku-alpha36/多轨播放回归.jks",
+			"duAllocatedBytes": 34680832,
+			"kind": "self-created test media/helpers or duplicate export"
+		},
+		{
+			"path": "/private/tmp/jianku-alpha36/多轨剪辑示例.jks",
+			"duAllocatedBytes": 8282112,
+			"kind": "self-created test media/helpers or duplicate export"
+		},
+		{
+			"path": "/private/tmp/jianku-alpha36/old-export.mp4",
+			"duAllocatedBytes": 15470592,
+			"kind": "self-created test media/helpers or duplicate export"
+		},
+		{
+			"path": "/private/tmp/jianku-alpha36/new-export.mp4",
+			"duAllocatedBytes": 15208448,
+			"kind": "self-created test media/helpers or duplicate export"
+		},
+		{
+			"path": "/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/cap-selftest-playback-afc1ef7b-e433-40a6-bb6d-ec45911273b7.cap",
+			"duAllocatedBytes": 880640,
+			"kind": "self-generated channel-source flash/beep recording; sync reports archived"
+		},
+		{
+			"path": "/private/tmp/jianku-alpha36/playback-tests.log",
+			"bytes": 2963225,
+			"kind": "oversized pixel-array test log; metrics, hashes and compact diagnostic archived"
+		},
+		{
+			"path": "/private/tmp/jianku-alpha36/preparing-isolated.log",
+			"bytes": 2943929,
+			"kind": "oversized pixel-array test log; metrics, hashes and compact diagnostic archived"
+		},
+		{
+			"path": "/private/tmp/jianku-alpha36/preparing-baseline.log",
+			"bytes": 2944050,
+			"kind": "oversized pixel-array test log; metrics, hashes and compact diagnostic archived"
+		}
+	],
+	"availableBytesBefore": 70197485568,
+	"availableBytesAfter": 70345748480,
+	"preservedDemo": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.36/多轨剪辑示例.jks",
+	"scope": "Only self-created verification data and duplicates; all final reports/screenshots preserved in repository. No user recordings or projects deleted."
+}

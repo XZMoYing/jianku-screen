@@ -1,0 +1,58 @@
+   Compiling cap-editor v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/editor)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.88s
+     Running unittests src/lib.rs (target/debug/deps/cap_editor-e1f9bfad99903fbf)
+
+running 1 test
+[dash @ 0x145760450] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/display/init.mp4' for writing
+[dash @ 0x145760450] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/display/segment_001.m4s.tmp' for writing
+[dash @ 0x145760450] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x145760450] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x145760450] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/display/master.m3u8.tmp' for writing
+[dash @ 0x145760450] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/display/segment_002.m4s.tmp' for writing
+[dash @ 0x145760450] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x145760450] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x145760450] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/display/segment_003.m4s.tmp' for writing
+[dash @ 0x145760450] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x145760450] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x145760450] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/display/segment_004.m4s.tmp' for writing
+[dash @ 0x145760450] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x145760450] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x145760450] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/display/segment_005.m4s.tmp' for writing
+[dash @ 0x145760450] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x145760450] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x10b3c64f0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/camera/init.mp4' for writing
+[dash @ 0x10b3c64f0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/camera/segment_001.m4s.tmp' for writing
+[dash @ 0x10b3c64f0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x10b3c64f0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x10b3c64f0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/camera/master.m3u8.tmp' for writing
+[dash @ 0x10b3c64f0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/camera/segment_002.m4s.tmp' for writing
+[dash @ 0x10b3c64f0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x10b3c64f0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x10b3c64f0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/camera/segment_003.m4s.tmp' for writing
+[dash @ 0x10b3c64f0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x10b3c64f0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x10b3c64f0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/camera/segment_004.m4s.tmp' for writing
+[dash @ 0x10b3c64f0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x10b3c64f0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x10b3c64f0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/camera/segment_005.m4s.tmp' for writing
+[dash @ 0x10b3c64f0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x10b3c64f0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x10b3c64f0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/camera/segment_006.m4s.tmp' for writing
+[dash @ 0x10b3c64f0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x10b3c64f0] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpLkMLIl/original/camera/media_0.m3u8.tmp' for writing
+
+thread 'preparing_preview::native_tests::native_preparing_playback_seeks_match_ordinary_and_handoff_joins_sources' panicked at crates/editor/src/preparing_preview/native_tests.rs:504:9:
+assertion `left == right` failed
+[Omitted 1468962-character pixel array; raw log retained in /private/tmp/jianku-alpha36]
+[Omitted 1468965-character pixel array; raw log retained in /private/tmp/jianku-alpha36]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test preparing_preview::native_tests::native_preparing_playback_seeks_match_ordinary_and_handoff_joins_sources ... FAILED
+
+failures:
+
+failures:
+    preparing_preview::native_tests::native_preparing_playback_seeks_match_ordinary_and_handoff_joins_sources
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 189 filtered out; finished in 1.25s
+
+error: test failed, to rerun pass `-p cap-editor --lib`

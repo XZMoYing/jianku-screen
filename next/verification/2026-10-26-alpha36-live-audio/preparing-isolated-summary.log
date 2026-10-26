@@ -1,0 +1,57 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.58s
+     Running unittests src/lib.rs (target/debug/deps/cap_editor-e1f9bfad99903fbf)
+
+running 1 test
+[dash @ 0x152833770] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/display/init.mp4' for writing
+[dash @ 0x152833770] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/display/segment_001.m4s.tmp' for writing
+[dash @ 0x152833770] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x152833770] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x152833770] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/display/master.m3u8.tmp' for writing
+[dash @ 0x152833770] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/display/segment_002.m4s.tmp' for writing
+[dash @ 0x152833770] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x152833770] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x152833770] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/display/segment_003.m4s.tmp' for writing
+[dash @ 0x152833770] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x152833770] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x152833770] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/display/segment_004.m4s.tmp' for writing
+[dash @ 0x152833770] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x152833770] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x152833770] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/display/segment_005.m4s.tmp' for writing
+[dash @ 0x152833770] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x152833770] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x132fdcc40] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/camera/init.mp4' for writing
+[dash @ 0x132fdcc40] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/camera/segment_001.m4s.tmp' for writing
+[dash @ 0x132fdcc40] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x132fdcc40] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x132fdcc40] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/camera/master.m3u8.tmp' for writing
+[dash @ 0x132fdcc40] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/camera/segment_002.m4s.tmp' for writing
+[dash @ 0x132fdcc40] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x132fdcc40] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x132fdcc40] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/camera/segment_003.m4s.tmp' for writing
+[dash @ 0x132fdcc40] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x132fdcc40] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x132fdcc40] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/camera/segment_004.m4s.tmp' for writing
+[dash @ 0x132fdcc40] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x132fdcc40] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x132fdcc40] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/camera/segment_005.m4s.tmp' for writing
+[dash @ 0x132fdcc40] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x132fdcc40] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x132fdcc40] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/camera/segment_006.m4s.tmp' for writing
+[dash @ 0x132fdcc40] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x132fdcc40] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpP8zxWn/original/camera/media_0.m3u8.tmp' for writing
+
+thread 'preparing_preview::native_tests::native_preparing_playback_seeks_match_ordinary_and_handoff_joins_sources' panicked at crates/editor/src/preparing_preview/native_tests.rs:504:9:
+assertion `left == right` failed
+[Omitted 1468962-character pixel array; raw log retained in /private/tmp/jianku-alpha36]
+[Omitted 1468965-character pixel array; raw log retained in /private/tmp/jianku-alpha36]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test preparing_preview::native_tests::native_preparing_playback_seeks_match_ordinary_and_handoff_joins_sources ... FAILED
+
+failures:
+
+failures:
+    preparing_preview::native_tests::native_preparing_playback_seeks_match_ordinary_and_handoff_joins_sources
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 191 filtered out; finished in 1.26s
+
+error: test failed, to rerun pass `-p cap-editor --lib`

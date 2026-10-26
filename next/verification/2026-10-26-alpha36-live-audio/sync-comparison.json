@@ -1,0 +1,16 @@
+{
+	"sameGeneratedFixture": true,
+	"before": {
+		"version": "alpha35",
+		"verdict": "pass",
+		"deltaFromRawMs": -10.641069111111179,
+		"presentedFrames": 649
+	},
+	"after": {
+		"version": "alpha36",
+		"verdict": "pass",
+		"deltaFromRawMs": -8.445778111109803,
+		"presentedFrames": 649
+	},
+	"scope": "Installed optimized native editor path and production headless audio sink. Same raw source with VFR gaps and source jitter; thresholds unchanged. Not physical sound-device or WebView scanout validation."
+}

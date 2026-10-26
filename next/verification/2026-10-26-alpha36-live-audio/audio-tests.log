@@ -1,0 +1,72 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.44s
+     Running unittests src/lib.rs (target/debug/deps/cap_editor-e1f9bfad99903fbf)
+
+running 58 tests
+test audio::tests::clip_volume_does_not_scale_timeline_music ... ok
+test audio::tests::bounded_timeline_music_unions_segments_and_skips_inaudible_tracks ... ok
+test audio::tests::export_audio_honors_timeline_trim_offset ... ok
+test audio::tests::export_audio_reanchors_across_segment_boundary ... ok
+test audio::tests::crossfade_audio_uses_equal_power_weights ... ok
+test audio::tests::long_prerender_uses_bounded_streaming_buffer ... ok
+test audio::tests::bounded_timeline_music_preserves_trimmed_source_and_cache_coverage ... ok
+test audio::tests::export_audio_virtual_negative_timing_offset_inserts_leading_silence ... ok
+test audio::tests::fade_through_black_audio_reaches_silence_at_midpoint ... ok
+test audio::tests::mixes_timeline_music_over_silent_recording ... ok
+test audio::tests::one_x_clip_mute_cuts_and_resumes_inside_a_single_request ... ok
+test audio::tests::playhead_to_samples_rounds_to_nearest ... ok
+test audio::tests::prerendered_audio_reports_audible_playhead_after_output_latency ... ok
+test audio::tests::one_x_clip_mute_keeps_timeline_music_audible ... ok
+test audio::tests::speed_audio_filter_rejects_mute_and_omits_near_unit_stage ... ok
+test audio::tests::one_x_audio_bypasses_speed_processing ... ok
+test audio::tests::speed_audio_mode_does_not_retime_timeline_music ... ok
+test audio::tests::one_x_clip_mute_preserves_the_other_side_of_a_transition ... ok
+test audio::tests::prerendered_playback_and_export_apply_negative_timing_offset_consistently ... ok
+test audio::tests::clip_volume_scales_retimed_audio_without_changing_pitch_processing ... ok
+test audio::tests::one_x_split_clip_mute_is_local_in_playback_and_export ... ok
+test audio::tests::export_audio_tracks_presentation_time_across_fps ... ok
+test audio::tests::speed_segment_end_resumes_audio_inside_a_single_request ... ok
+test audio::tests::timeline_music_applies_fade_in ... ok
+test audio::tests::speed_segment_start_cuts_audio_inside_a_single_request ... ok
+test audio::tests::clip_volume_is_local_across_boundaries_playback_and_export ... ok
+test audio::tests::timeline_music_respects_start_offset ... ok
+test completed_audio::tests::completed_cache_accepts_equivalent_project_paths_and_preserves_pcm ... ok
+test completed_audio::tests::completed_cache_preserves_arc_and_sparse_missing_tracks ... ok
+test completed_audio::tests::completed_cache_rejects_different_or_unresolvable_project_paths ... ok
+test completed_audio::tests::completed_cache_rejects_every_changed_track_identity ... ok
+test completed_audio::tests::silent_completed_cache_accepts_canonical_editor_paths ... ok
+test completed_audio::tests::completed_pcm_cannot_be_relabelled_as_transcoded_or_absent_track ... ok
+test audio::tests::transition_audio_advances_past_fractional_sample_boundaries ... ok
+test audio::tests::studio_sound_changes_only_the_microphone_and_preserves_system_audio ... ok
+test export_audio::tests::eligibility_rejects_unbounded_or_nonsequential_shapes ... ok
+test export_audio::tests::failed_source_aborts_and_joins_waiting_peer_without_user_cancellation ... ok
+test audio::tests::transition_audio_retimes_each_segment_before_mixing ... ok
+
+thread 'export_audio::tests::inline_source_panic_preserves_original_source_index' panicked at crates/editor/src/export_audio.rs:865:13:
+inline source panic
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test export_audio::tests::inline_source_panic_preserves_original_source_index ... ok
+test export_audio::tests::open_rejects_segment_mismatch_before_missing_source_io ... ok
+test export_audio::tests::invalid_finish_drops_all_prepared_readers ... ok
+test export_audio::tests::single_source_job_stays_on_current_thread ... ok
+test export_audio::tests::detachment_does_not_split_more_than_four_readers ... ok
+test export_audio::tests::preparation_preserves_readers_positions_and_timing_repair_bits ... ok
+test export_audio::tests::source_jobs_preserve_first_real_error_and_join_later_sources ... ok
+test export_audio::tests::source_jobs_are_bounded_joined_and_ordered ... ok
+
+thread '<unnamed>' panicked at crates/editor/src/export_audio.rs:793:17:
+source worker test
+test export_audio::tests::source_worker_panic_becomes_error_after_other_sources_join ... ok
+test export_audio::tests::studio_sound_real_voice_matches_preview_and_export_at_every_tier ... ignored, requires CAP_STUDIO_SOUND_TEST_AUDIO pointing to a local microphone recording
+test export_audio::tests::studio_sound_streams_a_real_recording_with_bounded_memory ... ignored, requires CAP_STUDIO_SOUND_BENCH_RECORDING pointing to a local Studio recording
+test export_audio::tests::sink_failure_stops_before_later_source_reads ... ok
+test export_audio::tests::source_windows_reject_backward_reads_and_keep_failures_sticky ... ok
+test audio::tests::speed_audio_modes_preserve_or_shift_pitch ... ok
+test audio::tests::studio_sound_prepared_alignment_reuses_samples_without_rendering ... ok
+test export_audio::tests::unused_source_detachment_preserves_slots_identity_and_project ... ok
+test audio::tests::studio_sound_streaming_worker_preserves_ring_wraps_and_seek_generations ... ok
+test export_audio::tests::studio_sound_transition_with_single_sample_requests_keeps_lookahead ... ok
+test export_audio::tests::clip_volume_matches_preview_in_streaming_exports_and_transitions ... ok
+test export_audio::tests::bounded_sink_matches_full_renderer_at_original_request_boundaries ... ok
+
+test result: ok. 56 passed; 0 failed; 2 ignored; 0 measured; 134 filtered out; finished in 29.50s
+

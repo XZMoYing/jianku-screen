@@ -1,0 +1,17 @@
+[
+	{
+		"name": "display.mp4",
+		"bytes": 104646,
+		"sha256": "3e131efaa92476f4bf90a940cdfd033bf2f08883d280a583228519f950c4ea54"
+	},
+	{
+		"name": "music-a.wav",
+		"bytes": 17280044,
+		"sha256": "7307cef87785ec814020782b67d1638ba50cea2a91617640742329a433ee0897"
+	},
+	{
+		"name": "music-b.wav",
+		"bytes": 17280044,
+		"sha256": "0fb07dd3638ed8759718ac8719a286d4c0caac408c71bf89fd3dc96cf6b6a162"
+	}
+]

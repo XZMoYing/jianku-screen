@@ -1,0 +1,129 @@
+{
+	"passed": true,
+	"checkpoints": [
+		{
+			"actual": 0.0,
+			"elapsed_ms": 48.317291999999995,
+			"expected": 0.0,
+			"name": "initial-silence"
+		},
+		{
+			"actual": 0.172607421875,
+			"elapsed_ms": 144.775958,
+			"expected": 0.172607421875,
+			"name": "add-music-while-playing"
+		},
+		{
+			"actual": 0.00034134915676986566,
+			"elapsed_ms": 64.091416,
+			"expected": 9.589301215277778e-5,
+			"name": "live-fade-in"
+		},
+		{
+			"actual": 0.172607421875,
+			"elapsed_ms": 63.907500000000006,
+			"expected": 0.172607421875,
+			"name": "reset-fade-in"
+		},
+		{
+			"actual": 0.014123152796400973,
+			"elapsed_ms": 79.423209,
+			"expected": 0.014383951822916666,
+			"name": "live-fade-out"
+		},
+		{
+			"actual": 0.172607421875,
+			"elapsed_ms": 64.115833,
+			"expected": 0.172607421875,
+			"name": "reset-fade-out"
+		},
+		{
+			"actual": 0.04335702210664749,
+			"elapsed_ms": 64.038,
+			"expected": 0.04335702409856624,
+			"name": "live-volume"
+		},
+		{
+			"actual": 0.0863037109375,
+			"elapsed_ms": 80.03125,
+			"expected": 0.0863037109375,
+			"name": "replace-music-while-playing"
+		},
+		{
+			"actual": 0.12945556640625,
+			"elapsed_ms": 95.67150000000001,
+			"expected": 0.12945556640625,
+			"name": "live-trim-outside-cached-range"
+		},
+		{
+			"actual": 0.0,
+			"elapsed_ms": 98.69024999999999,
+			"expected": 0.0,
+			"name": "disable-track"
+		},
+		{
+			"actual": 0.12945556640625,
+			"elapsed_ms": 80.84187499999999,
+			"expected": 0.12945556640625,
+			"name": "reenable-track"
+		},
+		{
+			"actual": 0.30206298828125,
+			"elapsed_ms": 95.322292,
+			"expected": 0.30206298828125,
+			"name": "overlapping-tracks"
+		},
+		{
+			"actual": 0.172607421875,
+			"elapsed_ms": 97.985708,
+			"expected": 0.172607421875,
+			"name": "remove-track-and-extend-timeline"
+		},
+		{
+			"actual": 0.172607421875,
+			"elapsed_ms": 48.137375000000006,
+			"expected": 0.172607421875,
+			"name": "extended-tail-audio"
+		},
+		{
+			"actual": 0.0,
+			"elapsed_ms": 51.469542,
+			"expected": 0.0,
+			"name": "pause-0"
+		},
+		{
+			"actual": 0.172607421875,
+			"elapsed_ms": 48.102875000000004,
+			"expected": 0.172607421875,
+			"name": "rewind-and-replay-0"
+		},
+		{
+			"actual": 0.0,
+			"elapsed_ms": 49.622625,
+			"expected": 0.0,
+			"name": "pause-1"
+		},
+		{
+			"actual": 0.172607421875,
+			"elapsed_ms": 49.110459,
+			"expected": 0.172607421875,
+			"name": "rewind-and-replay-1"
+		},
+		{
+			"actual": 0.0,
+			"elapsed_ms": 50.630083,
+			"expected": 0.0,
+			"name": "pause-2"
+		},
+		{
+			"actual": 0.172607421875,
+			"elapsed_ms": 48.17783300000001,
+			"expected": 0.172607421875,
+			"name": "rewind-and-replay-2"
+		}
+	],
+	"nativeVideoFrames": 43,
+	"headlessAudioBlocks": 189,
+	"scope": "Native editor/GPU with production headless audio callback; not physical audio-device or WebView display validation.",
+	"note": "Checks include observing requested source luminance after an in-play timeline extension and seek beyond its original end; not continuous120s playback or physical output-device validation."
+}

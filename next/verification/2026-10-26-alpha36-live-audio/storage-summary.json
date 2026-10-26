@@ -1,0 +1,13 @@
+{
+	"availableBytesBefore": 45483761664,
+	"availableBytesAfter": 70345748480,
+	"availableGiBBefore": 42.36005401611328,
+	"availableGiBAfter": 65.51458358764648,
+	"oldApplicationsRemoved": 9,
+	"retainedApplicationVersions": ["0.2.0-alpha.35", "0.2.0-alpha.36"],
+	"debugBuildRemoved": true,
+	"releaseBuildCachePreserved": true,
+	"nativeDependenciesPreserved": true,
+	"userProjectsAndGitPreserved": true,
+	"scope": "Free-space readings cover concurrent build/install/cleanup; delta is not uniquely attributable to deleted byte totals. Debug caches regenerate on next debug build."
+}
