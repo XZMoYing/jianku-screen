@@ -1,0 +1,13 @@
+
+running 7 tests
+test avassetreader::nv12_index_cache_tests::sample_index_preserves_vfr_boundaries_tolerance_and_last_frame ... ok
+test avassetreader::nv12_index_cache_tests::sample_timestamp_capacity_is_included_in_cache_budget ... ok
+test avassetreader::nv12_index_cache_tests::unchanged_file_reuses_index_without_holding_lock_during_scan ... ok
+test avassetreader::nv12_index_cache_tests::cancelled_or_changed_scans_do_not_publish_an_index ... ok
+test avassetreader::nv12_index_cache_tests::rewritten_and_replaced_files_invalidate_cached_index ... ok
+test avassetreader::nv12_index_cache_tests::cache_evicts_least_recent_entries_and_bounds_retained_bytes ... ok
+NV12 index cache benchmark: {"cached_index_ms":0.008333,"first_open_ms":172.90908299999998,"keyframe_count":1,"repeated_open_ms":9.570583000000001,"uncached_index_ms":9.433874999999999}
+test avassetreader::nv12_index_cache_tests::synthetic_video_reopens_reuse_the_same_precise_index ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.20s
+

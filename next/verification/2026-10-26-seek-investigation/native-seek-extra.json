@@ -1,0 +1,222 @@
+[
+	{
+		"baselineMs": 18.526,
+		"baselineSamples": 1,
+		"indexedMs": 16.484084,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/long-gop-540p.mp4",
+		"pts": 0.0,
+		"sha256": "4940e9ec0183f2225798e20044c199ce110f45c60c324cd0ff4a1087681d0d77",
+		"target": 0.0
+	},
+	{
+		"baselineMs": 15.625709000000002,
+		"baselineSamples": 1,
+		"indexedMs": 15.469375000000001,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/long-gop-540p.mp4",
+		"pts": 0.0,
+		"sha256": "4940e9ec0183f2225798e20044c199ce110f45c60c324cd0ff4a1087681d0d77",
+		"target": 0.00001
+	},
+	{
+		"baselineMs": 18.332125,
+		"baselineSamples": 2,
+		"indexedMs": 15.944792,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/long-gop-540p.mp4",
+		"pts": 0.016666666666666666,
+		"sha256": "a3faca8a0c7d7d1ab275cd29e56b5d3dcd02ab5b0a73a00af4c42fed4b6892ab",
+		"target": 0.016666666666666666
+	},
+	{
+		"baselineMs": 23.704666999999997,
+		"baselineSamples": 19,
+		"indexedMs": 20.950291,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/long-gop-540p.mp4",
+		"pts": 0.3,
+		"sha256": "05a46037e9a99d8d673c51346151826fded1ea518864d018e07b3742c1d8ba24",
+		"target": 0.29995
+	},
+	{
+		"baselineMs": 22.828999999999997,
+		"baselineSamples": 19,
+		"indexedMs": 22.611791999999998,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/long-gop-540p.mp4",
+		"pts": 0.3,
+		"sha256": "05a46037e9a99d8d673c51346151826fded1ea518864d018e07b3742c1d8ba24",
+		"target": 0.3
+	},
+	{
+		"baselineMs": 20.798707999999998,
+		"baselineSamples": 19,
+		"indexedMs": 24.847583,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/long-gop-540p.mp4",
+		"pts": 0.3,
+		"sha256": "05a46037e9a99d8d673c51346151826fded1ea518864d018e07b3742c1d8ba24",
+		"target": 0.30005
+	},
+	{
+		"baselineMs": 35.838292,
+		"baselineSamples": 63,
+		"indexedMs": 36.120082999999994,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/long-gop-540p.mp4",
+		"pts": 1.0333333333333334,
+		"sha256": "cf6d1586fef6e373713fecde889835a2990b8e6975022cc2db96dc6331ef0041",
+		"target": 1.017
+	},
+	{
+		"baselineMs": 1235.7797500000001,
+		"baselineSamples": 3571,
+		"indexedMs": 1245.517125,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/long-gop-540p.mp4",
+		"pts": 59.5,
+		"sha256": "833d2c6a773015d1888bcf9cf0c4a0514ba3f73f000a52d4e70bdd095b36e40e",
+		"target": 59.5
+	},
+	{
+		"baselineMs": 1250.323167,
+		"baselineSamples": 3600,
+		"indexedMs": 1260.60525,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/long-gop-540p.mp4",
+		"pts": 59.983333333333334,
+		"sha256": "b1dbaccbedd6e4af14ae56af497efd053632c656ae9aea9fb3a42b4467b1cf9f",
+		"target": 59.99999
+	},
+	{
+		"baselineMs": 23.123833,
+		"baselineSamples": 19,
+		"indexedMs": 19.819833,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/long-gop-540p.mp4",
+		"pts": 0.3,
+		"sha256": "05a46037e9a99d8d673c51346151826fded1ea518864d018e07b3742c1d8ba24",
+		"target": 0.3
+	},
+	{
+		"baselineMs": 13.771291,
+		"baselineSamples": 1,
+		"indexedMs": 14.578792,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/long-gop-540p.mp4",
+		"pts": 0.0,
+		"sha256": "4940e9ec0183f2225798e20044c199ce110f45c60c324cd0ff4a1087681d0d77",
+		"target": 0.0
+	},
+	{
+		"baselineMs": 9.682542,
+		"baselineSamples": 1,
+		"indexedMs": 13.417250000000001,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/short.mp4",
+		"pts": 0.0,
+		"sha256": "c98732e27430ddb5345d21435372c7ab406a009e4a3db93dfa0bb1413190ed78",
+		"target": 0.0
+	},
+	{
+		"baselineMs": 9.785042,
+		"baselineSamples": 1,
+		"indexedMs": 13.07275,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/short.mp4",
+		"pts": 0.0,
+		"sha256": "c98732e27430ddb5345d21435372c7ab406a009e4a3db93dfa0bb1413190ed78",
+		"target": 0.00001
+	},
+	{
+		"baselineMs": 10.615417,
+		"baselineSamples": 2,
+		"indexedMs": 9.802334,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/short.mp4",
+		"pts": 0.016666666666666666,
+		"sha256": "8d452bb3f4d2b942b38dcd80ff6ea4765d8b075378951d096f9c00384c25e5c3",
+		"target": 0.016666666666666666
+	},
+	{
+		"baselineMs": 14.612958,
+		"baselineSamples": 19,
+		"indexedMs": 15.103167000000001,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/short.mp4",
+		"pts": 0.3,
+		"sha256": "c6b95947c1e61f69d7bb578d093a0763466df6772870107f116d49e1228d9824",
+		"target": 0.29995
+	},
+	{
+		"baselineMs": 15.341292,
+		"baselineSamples": 19,
+		"indexedMs": 14.398459,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/short.mp4",
+		"pts": 0.3,
+		"sha256": "c6b95947c1e61f69d7bb578d093a0763466df6772870107f116d49e1228d9824",
+		"target": 0.3
+	},
+	{
+		"baselineMs": 14.614041,
+		"baselineSamples": 19,
+		"indexedMs": 15.175208000000001,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/short.mp4",
+		"pts": 0.3,
+		"sha256": "c6b95947c1e61f69d7bb578d093a0763466df6772870107f116d49e1228d9824",
+		"target": 0.30005
+	},
+	{
+		"baselineMs": 23.774459,
+		"baselineSamples": 63,
+		"indexedMs": 20.326125,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/short.mp4",
+		"pts": 1.0333333333333334,
+		"sha256": "fd1c36c47986eab4e93756f6e8078bf7801104cafe3c5c0cd9e20e911c0d5b14",
+		"target": 1.017
+	},
+	{
+		"baselineMs": 21.565708,
+		"baselineSamples": 43,
+		"indexedMs": 18.626,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/short.mp4",
+		"pts": 0.7,
+		"sha256": "09cbf04cb733e1ecf1fed17e47784aee190186d6d040682d2ac60f389c684356",
+		"target": 0.7
+	},
+	{
+		"baselineMs": 28.257667,
+		"baselineSamples": 72,
+		"indexedMs": 23.760375,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/short.mp4",
+		"pts": 1.1833333333333333,
+		"sha256": "475995e379a629bcc1788620d77c3e82da032d0e0de31a73b1a6a6fd56c1c6f1",
+		"target": 1.19999
+	},
+	{
+		"baselineMs": 15.632708,
+		"baselineSamples": 19,
+		"indexedMs": 15.370875000000002,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/short.mp4",
+		"pts": 0.3,
+		"sha256": "c6b95947c1e61f69d7bb578d093a0763466df6772870107f116d49e1228d9824",
+		"target": 0.3
+	},
+	{
+		"baselineMs": 12.703334,
+		"baselineSamples": 1,
+		"indexedMs": 12.724708,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/short.mp4",
+		"pts": 0.0,
+		"sha256": "c98732e27430ddb5345d21435372c7ab406a009e4a3db93dfa0bb1413190ed78",
+		"target": 0.0
+	}
+]

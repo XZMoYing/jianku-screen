@@ -1,0 +1,97 @@
+{
+	"scope": "Only reproducible thin-LTO intermediate objects, this investigation test/probe binaries and own synthetic temporary media; no running build, no app/source/Git/user projects/native runtime dependencies removed.",
+	"objectFiles": 4409,
+	"objectBytes": 4661482016,
+	"objectAllocatedBytes": 4893560832,
+	"objectLocations": [
+		"next/cap/target/release/deps/*.rcgu.o",
+		"next/cap/target/release/examples/*.rcgu.o"
+	],
+	"otherRemoved": [
+		{
+			"path": "/private/tmp/jianku-alpha37/long-gop.mp4",
+			"bytes": 13266453
+		},
+		{
+			"path": "/private/tmp/jianku-alpha37/long-gop-540p.mp4",
+			"bytes": 23426075
+		},
+		{
+			"path": "/private/tmp/jianku-alpha37/offset.mp4",
+			"bytes": 880679
+		},
+		{
+			"path": "/private/tmp/jianku-alpha37/short.mp4",
+			"bytes": 277378
+		},
+		{
+			"path": "/private/tmp/jianku-alpha37/ntsc.mp4",
+			"bytes": 849147
+		},
+		{
+			"path": "/private/tmp/jianku-alpha37/vfr.mp4",
+			"bytes": 880667
+		},
+		{
+			"path": "/private/tmp/jianku-alpha37/frames/camera.mp4",
+			"bytes": 577103
+		},
+		{
+			"path": "/private/tmp/jianku-alpha37/frames/display.mp4",
+			"bytes": 1729859
+		},
+		{
+			"path": "/private/tmp/jianku-alpha37/camera-sw.yuv",
+			"bytes": 9600
+		},
+		{
+			"path": "/private/tmp/jianku-alpha37/display-sw.yuv",
+			"bytes": 28800
+		},
+		{
+			"path": "/private/tmp/jianku-alpha37/camera-hw.yuv",
+			"bytes": 9600
+		},
+		{
+			"path": "/private/tmp/jianku-alpha37/display-hw.yuv",
+			"bytes": 28800
+		},
+		{
+			"path": "/private/tmp/jianku-alpha37/baseline-native.log",
+			"bytes": 2943718
+		},
+		{
+			"path": "target/release/deps/cap_editor-6a51d48ad0c977f0",
+			"bytes": 24388328
+		},
+		{
+			"path": "target/release/deps/cap_rendering-45735894cf19c8c4",
+			"bytes": 19383136
+		},
+		{
+			"path": "target/release/deps/cap_video_decode-bc5dec8a8067ed9f",
+			"bytes": 1880384
+		},
+		{
+			"path": "target/release/examples/native_seek_check-073b5dfcacfbac63",
+			"bytes": 1001024
+		},
+		{
+			"path": "target/release/examples/native-seek-check.d",
+			"bytes": 4461
+		},
+		{
+			"path": "target/release/examples/native_seek_check-073b5dfcacfbac63.d",
+			"bytes": 423
+		},
+		{
+			"path": "target/release/examples/native-seek-check",
+			"bytes": 1001024
+		}
+	],
+	"freeBeforeBytes": 68154613760,
+	"freeAfterBytes": 73154592768,
+	"availableDeltaBytes": 4999979008,
+	"preservedApps": ["0.2.0-alpha.35", "0.2.0-alpha.36"],
+	"productionTreeMatchesHead": true
+}

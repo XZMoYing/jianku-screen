@@ -1,0 +1,290 @@
+[
+	{
+		"baseline": {
+			"hash": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+			"ms": 121.54358332918491,
+			"pts": 0,
+			"samples": 1
+		},
+		"direct": {
+			"hash": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+			"ms": 8.9084166684187949,
+			"pts": 0,
+			"samples": 1
+		},
+		"path": "\/private\/tmp\/jianku-alpha37\/long-gop.mp4",
+		"target": 0
+	},
+	{
+		"baseline": {
+			"hash": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+			"ms": 9.399000002304092,
+			"pts": 0,
+			"samples": 1
+		},
+		"direct": {
+			"hash": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+			"ms": 9.6173333367914893,
+			"pts": 0,
+			"samples": 1
+		},
+		"path": "\/private\/tmp\/jianku-alpha37\/long-gop.mp4",
+		"target": 1.0000000000000001e-5
+	},
+	{
+		"baseline": {
+			"hash": "10d67a355f9968d72cd2aebdcdd99ba659c5ff856422cd0905636628b888e2f4",
+			"ms": 10.02945833170088,
+			"pts": 0.016666666666666666,
+			"samples": 2
+		},
+		"direct": {
+			"hash": "10d67a355f9968d72cd2aebdcdd99ba659c5ff856422cd0905636628b888e2f4",
+			"ms": 10.007750002841931,
+			"pts": 0.016666666666666666,
+			"samples": 1
+		},
+		"path": "\/private\/tmp\/jianku-alpha37\/long-gop.mp4",
+		"target": 0.016666666666666666
+	},
+	{
+		"baseline": {
+			"hash": "e8a6ae89a8ebbdecd31e533a39bd2cb9252d8da97e6e749757f7c43bdeed1ec8",
+			"ms": 13.896041666157544,
+			"pts": 0.29999999999999999,
+			"samples": 19
+		},
+		"direct": {
+			"hash": "e8a6ae89a8ebbdecd31e533a39bd2cb9252d8da97e6e749757f7c43bdeed1ec8",
+			"ms": 13.459458328725304,
+			"pts": 0.29999999999999999,
+			"samples": 1
+		},
+		"path": "\/private\/tmp\/jianku-alpha37\/long-gop.mp4",
+		"target": 0.29994999999999999
+	},
+	{
+		"baseline": {
+			"hash": "e8a6ae89a8ebbdecd31e533a39bd2cb9252d8da97e6e749757f7c43bdeed1ec8",
+			"ms": 15.744666670798324,
+			"pts": 0.29999999999999999,
+			"samples": 19
+		},
+		"direct": {
+			"hash": "e8a6ae89a8ebbdecd31e533a39bd2cb9252d8da97e6e749757f7c43bdeed1ec8",
+			"ms": 13.657250005053356,
+			"pts": 0.29999999999999999,
+			"samples": 1
+		},
+		"path": "\/private\/tmp\/jianku-alpha37\/long-gop.mp4",
+		"target": 0.29999999999999999
+	},
+	{
+		"baseline": {
+			"hash": "e8a6ae89a8ebbdecd31e533a39bd2cb9252d8da97e6e749757f7c43bdeed1ec8",
+			"ms": 14.382041663338896,
+			"pts": 0.29999999999999999,
+			"samples": 19
+		},
+		"direct": {
+			"hash": "e8a6ae89a8ebbdecd31e533a39bd2cb9252d8da97e6e749757f7c43bdeed1ec8",
+			"ms": 14.702458334795665,
+			"pts": 0.29999999999999999,
+			"samples": 1
+		},
+		"path": "\/private\/tmp\/jianku-alpha37\/long-gop.mp4",
+		"target": 0.30004999999999998
+	},
+	{
+		"baseline": {
+			"hash": "1be9ddf4877820f95c03d25831516dc0d4f57efa23babfa1d54aca639a203729",
+			"ms": 27.154166666150559,
+			"pts": 1.0333333333333334,
+			"samples": 63
+		},
+		"direct": {
+			"hash": "1be9ddf4877820f95c03d25831516dc0d4f57efa23babfa1d54aca639a203729",
+			"ms": 20.29716666584136,
+			"pts": 1.0333333333333334,
+			"samples": 1
+		},
+		"path": "\/private\/tmp\/jianku-alpha37\/long-gop.mp4",
+		"target": 1.0169999999999999
+	},
+	{
+		"baseline": {
+			"hash": "211edeef0e63047a8f4c4d1e596e42aa0a557e08ffcd2b552210fffd708c7086",
+			"ms": 705.60758333886042,
+			"pts": 59.5,
+			"samples": 3571
+		},
+		"direct": {
+			"hash": "211edeef0e63047a8f4c4d1e596e42aa0a557e08ffcd2b552210fffd708c7086",
+			"ms": 412.0167916698847,
+			"pts": 59.5,
+			"samples": 1
+		},
+		"path": "\/private\/tmp\/jianku-alpha37\/long-gop.mp4",
+		"target": 59.5
+	},
+	{
+		"baseline": {
+			"hash": "58d33b3dc5684aaa80f165f659eee012d38f23a02286b8243c1630f8f987619b",
+			"ms": 708.65858333127107,
+			"pts": 59.983333333333334,
+			"samples": 3600
+		},
+		"direct": {
+			"hash": "58d33b3dc5684aaa80f165f659eee012d38f23a02286b8243c1630f8f987619b",
+			"ms": 436.61637500190409,
+			"pts": 59.983333333333334,
+			"samples": 1
+		},
+		"path": "\/private\/tmp\/jianku-alpha37\/long-gop.mp4",
+		"target": 59.999989999999997
+	},
+	{
+		"baseline": {
+			"hash": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+			"ms": 12.545541663712356,
+			"pts": 0,
+			"samples": 1
+		},
+		"direct": {
+			"hash": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+			"ms": 9.2108749959152192,
+			"pts": 0,
+			"samples": 1
+		},
+		"path": "\/private\/tmp\/jianku-alpha37\/vfr.mp4",
+		"target": 0
+	},
+	{
+		"baseline": {
+			"hash": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+			"ms": 9.6258333287551068,
+			"pts": 0,
+			"samples": 1
+		},
+		"direct": {
+			"hash": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+			"ms": 9.2740416657761671,
+			"pts": 0,
+			"samples": 1
+		},
+		"path": "\/private\/tmp\/jianku-alpha37\/vfr.mp4",
+		"target": 1.0000000000000001e-5
+	},
+	{
+		"baseline": {
+			"hash": "53465d9ddf7d1e79beb7d7223eeb1159eacf3b20b3b7b9203a2514c62d866f71",
+			"ms": 9.8285416606813669,
+			"pts": 0.083333333333333329,
+			"samples": 2
+		},
+		"direct": {
+			"hash": "53465d9ddf7d1e79beb7d7223eeb1159eacf3b20b3b7b9203a2514c62d866f71",
+			"ms": 9.8975833316217177,
+			"pts": 0.083333333333333329,
+			"samples": 1
+		},
+		"path": "\/private\/tmp\/jianku-alpha37\/vfr.mp4",
+		"target": 0.016666666666666666
+	},
+	{
+		"baseline": {
+			"hash": "bb4b6b7dffc8559d367a0fa7e8a67063b40a7389770dc4dac91465203a5270a6",
+			"ms": 10.239250004815403,
+			"pts": 0.33333333333333331,
+			"samples": 5
+		},
+		"direct": {
+			"hash": "bb4b6b7dffc8559d367a0fa7e8a67063b40a7389770dc4dac91465203a5270a6",
+			"ms": 12.435916665708646,
+			"pts": 0.33333333333333331,
+			"samples": 1
+		},
+		"path": "\/private\/tmp\/jianku-alpha37\/vfr.mp4",
+		"target": 0.29994999999999999
+	},
+	{
+		"baseline": {
+			"hash": "bb4b6b7dffc8559d367a0fa7e8a67063b40a7389770dc4dac91465203a5270a6",
+			"ms": 12.199374999909196,
+			"pts": 0.33333333333333331,
+			"samples": 5
+		},
+		"direct": {
+			"hash": "bb4b6b7dffc8559d367a0fa7e8a67063b40a7389770dc4dac91465203a5270a6",
+			"ms": 10.720250000304077,
+			"pts": 0.33333333333333331,
+			"samples": 1
+		},
+		"path": "\/private\/tmp\/jianku-alpha37\/vfr.mp4",
+		"target": 0.29999999999999999
+	},
+	{
+		"baseline": {
+			"hash": "bb4b6b7dffc8559d367a0fa7e8a67063b40a7389770dc4dac91465203a5270a6",
+			"ms": 11.107625003205612,
+			"pts": 0.33333333333333331,
+			"samples": 5
+		},
+		"direct": {
+			"hash": "bb4b6b7dffc8559d367a0fa7e8a67063b40a7389770dc4dac91465203a5270a6",
+			"ms": 10.327333337045275,
+			"pts": 0.33333333333333331,
+			"samples": 1
+		},
+		"path": "\/private\/tmp\/jianku-alpha37\/vfr.mp4",
+		"target": 0.30004999999999998
+	},
+	{
+		"baseline": {
+			"hash": "245e5dab1c5608d4bf1227fc66d1d5be51fc48c454fa45935810ebc0c771a13d",
+			"ms": 13.149958329449873,
+			"pts": 1.0833333333333333,
+			"samples": 14
+		},
+		"direct": {
+			"hash": "245e5dab1c5608d4bf1227fc66d1d5be51fc48c454fa45935810ebc0c771a13d",
+			"ms": 13.188375000027008,
+			"pts": 1.0833333333333333,
+			"samples": 1
+		},
+		"path": "\/private\/tmp\/jianku-alpha37\/vfr.mp4",
+		"target": 1.0169999999999999
+	},
+	{
+		"baseline": {
+			"hash": "f24e412cb232e80a30b1d984459bf1fad50744283418b3ff906d1d7840c4eda5",
+			"ms": 145.89679166965652,
+			"pts": 5.5,
+			"samples": 175
+		},
+		"direct": {
+			"hash": "f24e412cb232e80a30b1d984459bf1fad50744283418b3ff906d1d7840c4eda5",
+			"ms": 37.905500001215842,
+			"pts": 5.5,
+			"samples": 1
+		},
+		"path": "\/private\/tmp\/jianku-alpha37\/vfr.mp4",
+		"target": 5.5
+	},
+	{
+		"baseline": {
+			"hash": "7a2e3dfe20358588abba3358daff2f0eab971f2f32ecbab2a1085042c55229fc",
+			"ms": 51.490583333361428,
+			"pts": 5.9833333333333334,
+			"samples": 204
+		},
+		"direct": {
+			"hash": "7a2e3dfe20358588abba3358daff2f0eab971f2f32ecbab2a1085042c55229fc",
+			"ms": 39.470374998927582,
+			"pts": 5.9833333333333334,
+			"samples": 1
+		},
+		"path": "\/private\/tmp\/jianku-alpha37\/vfr.mp4",
+		"target": 5.9999900000000004
+	}
+]

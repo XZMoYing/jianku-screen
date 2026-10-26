@@ -1,0 +1,442 @@
+[
+	{
+		"baselineMs": 8.4795,
+		"baselineSamples": 1,
+		"indexedMs": 8.074083,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/long-gop.mp4",
+		"pts": 0.0,
+		"sha256": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+		"target": 0.0
+	},
+	{
+		"baselineMs": 8.6835,
+		"baselineSamples": 1,
+		"indexedMs": 10.777709,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/long-gop.mp4",
+		"pts": 0.0,
+		"sha256": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+		"target": 0.00001
+	},
+	{
+		"baselineMs": 8.966083,
+		"baselineSamples": 2,
+		"indexedMs": 9.22525,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/long-gop.mp4",
+		"pts": 0.016666666666666666,
+		"sha256": "10d67a355f9968d72cd2aebdcdd99ba659c5ff856422cd0905636628b888e2f4",
+		"target": 0.016666666666666666
+	},
+	{
+		"baselineMs": 12.700790999999999,
+		"baselineSamples": 19,
+		"indexedMs": 12.573167,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/long-gop.mp4",
+		"pts": 0.3,
+		"sha256": "e8a6ae89a8ebbdecd31e533a39bd2cb9252d8da97e6e749757f7c43bdeed1ec8",
+		"target": 0.29995
+	},
+	{
+		"baselineMs": 14.390500000000001,
+		"baselineSamples": 19,
+		"indexedMs": 15.756167000000001,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/long-gop.mp4",
+		"pts": 0.3,
+		"sha256": "e8a6ae89a8ebbdecd31e533a39bd2cb9252d8da97e6e749757f7c43bdeed1ec8",
+		"target": 0.3
+	},
+	{
+		"baselineMs": 13.146291,
+		"baselineSamples": 19,
+		"indexedMs": 17.264709,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/long-gop.mp4",
+		"pts": 0.3,
+		"sha256": "e8a6ae89a8ebbdecd31e533a39bd2cb9252d8da97e6e749757f7c43bdeed1ec8",
+		"target": 0.30005
+	},
+	{
+		"baselineMs": 22.289792,
+		"baselineSamples": 63,
+		"indexedMs": 20.070332999999998,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/long-gop.mp4",
+		"pts": 1.0333333333333334,
+		"sha256": "1be9ddf4877820f95c03d25831516dc0d4f57efa23babfa1d54aca639a203729",
+		"target": 1.017
+	},
+	{
+		"baselineMs": 691.119667,
+		"baselineSamples": 3571,
+		"indexedMs": 407.356875,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/long-gop.mp4",
+		"pts": 59.5,
+		"sha256": "211edeef0e63047a8f4c4d1e596e42aa0a557e08ffcd2b552210fffd708c7086",
+		"target": 59.5
+	},
+	{
+		"baselineMs": 660.689917,
+		"baselineSamples": 3600,
+		"indexedMs": 435.37958399999997,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/long-gop.mp4",
+		"pts": 59.983333333333334,
+		"sha256": "58d33b3dc5684aaa80f165f659eee012d38f23a02286b8243c1630f8f987619b",
+		"target": 59.99999
+	},
+	{
+		"baselineMs": 14.816709000000001,
+		"baselineSamples": 19,
+		"indexedMs": 15.092958999999999,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/long-gop.mp4",
+		"pts": 0.3,
+		"sha256": "e8a6ae89a8ebbdecd31e533a39bd2cb9252d8da97e6e749757f7c43bdeed1ec8",
+		"target": 0.3
+	},
+	{
+		"baselineMs": 9.252292,
+		"baselineSamples": 1,
+		"indexedMs": 9.731625000000001,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/long-gop.mp4",
+		"pts": 0.0,
+		"sha256": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+		"target": 0.0
+	},
+	{
+		"baselineMs": 9.157708000000001,
+		"baselineSamples": 1,
+		"indexedMs": 10.219917,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/vfr.mp4",
+		"pts": 0.0,
+		"sha256": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+		"target": 0.0
+	},
+	{
+		"baselineMs": 11.174625,
+		"baselineSamples": 1,
+		"indexedMs": 9.828583,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/vfr.mp4",
+		"pts": 0.0,
+		"sha256": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+		"target": 0.00001
+	},
+	{
+		"baselineMs": 9.696083,
+		"baselineSamples": 2,
+		"indexedMs": 9.6545,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/vfr.mp4",
+		"pts": 0.08333333333333333,
+		"sha256": "53465d9ddf7d1e79beb7d7223eeb1159eacf3b20b3b7b9203a2514c62d866f71",
+		"target": 0.016666666666666666
+	},
+	{
+		"baselineMs": 9.874542,
+		"baselineSamples": 5,
+		"indexedMs": 9.761583,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/vfr.mp4",
+		"pts": 0.3333333333333333,
+		"sha256": "bb4b6b7dffc8559d367a0fa7e8a67063b40a7389770dc4dac91465203a5270a6",
+		"target": 0.29995
+	},
+	{
+		"baselineMs": 11.085292,
+		"baselineSamples": 5,
+		"indexedMs": 11.816875,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/vfr.mp4",
+		"pts": 0.3333333333333333,
+		"sha256": "bb4b6b7dffc8559d367a0fa7e8a67063b40a7389770dc4dac91465203a5270a6",
+		"target": 0.3
+	},
+	{
+		"baselineMs": 10.458458,
+		"baselineSamples": 5,
+		"indexedMs": 10.579666,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/vfr.mp4",
+		"pts": 0.3333333333333333,
+		"sha256": "bb4b6b7dffc8559d367a0fa7e8a67063b40a7389770dc4dac91465203a5270a6",
+		"target": 0.30005
+	},
+	{
+		"baselineMs": 14.639167,
+		"baselineSamples": 14,
+		"indexedMs": 16.539334,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/vfr.mp4",
+		"pts": 1.0833333333333333,
+		"sha256": "245e5dab1c5608d4bf1227fc66d1d5be51fc48c454fa45935810ebc0c771a13d",
+		"target": 1.017
+	},
+	{
+		"baselineMs": 45.156791,
+		"baselineSamples": 175,
+		"indexedMs": 32.958,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/vfr.mp4",
+		"pts": 5.5,
+		"sha256": "f24e412cb232e80a30b1d984459bf1fad50744283418b3ff906d1d7840c4eda5",
+		"target": 5.5
+	},
+	{
+		"baselineMs": 52.565292,
+		"baselineSamples": 204,
+		"indexedMs": 36.455209,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/vfr.mp4",
+		"pts": 5.983333333333333,
+		"sha256": "7a2e3dfe20358588abba3358daff2f0eab971f2f32ecbab2a1085042c55229fc",
+		"target": 5.99999
+	},
+	{
+		"baselineMs": 9.344916999999999,
+		"baselineSamples": 5,
+		"indexedMs": 9.431333,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/vfr.mp4",
+		"pts": 0.3333333333333333,
+		"sha256": "bb4b6b7dffc8559d367a0fa7e8a67063b40a7389770dc4dac91465203a5270a6",
+		"target": 0.3
+	},
+	{
+		"baselineMs": 8.796375000000001,
+		"baselineSamples": 1,
+		"indexedMs": 9.099083,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/vfr.mp4",
+		"pts": 0.0,
+		"sha256": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+		"target": 0.0
+	},
+	{
+		"baselineMs": 8.511833999999999,
+		"baselineSamples": 1,
+		"indexedMs": 8.935875,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/ntsc.mp4",
+		"pts": 0.0,
+		"sha256": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+		"target": 0.0
+	},
+	{
+		"baselineMs": 10.180833999999999,
+		"baselineSamples": 1,
+		"indexedMs": 9.493583999999998,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/ntsc.mp4",
+		"pts": 0.0,
+		"sha256": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+		"target": 0.00001
+	},
+	{
+		"baselineMs": 9.957041,
+		"baselineSamples": 2,
+		"indexedMs": 10.342583000000001,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/ntsc.mp4",
+		"pts": 0.03336666666666667,
+		"sha256": "11b97cb5e9a7f3c16944d127709151e1fee3100fd626971814d83abc20b11585",
+		"target": 0.016666666666666666
+	},
+	{
+		"baselineMs": 11.898499999999999,
+		"baselineSamples": 10,
+		"indexedMs": 12.680166999999999,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/ntsc.mp4",
+		"pts": 0.3003,
+		"sha256": "92654681b9f405a58f8d84e65eff2358e5517040f6b142a384ebb706e7cb4df9",
+		"target": 0.29995
+	},
+	{
+		"baselineMs": 11.721167,
+		"baselineSamples": 10,
+		"indexedMs": 11.416125,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/ntsc.mp4",
+		"pts": 0.3003,
+		"sha256": "92654681b9f405a58f8d84e65eff2358e5517040f6b142a384ebb706e7cb4df9",
+		"target": 0.3
+	},
+	{
+		"baselineMs": 11.871041,
+		"baselineSamples": 10,
+		"indexedMs": 11.637708,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/ntsc.mp4",
+		"pts": 0.3003,
+		"sha256": "92654681b9f405a58f8d84e65eff2358e5517040f6b142a384ebb706e7cb4df9",
+		"target": 0.30005
+	},
+	{
+		"baselineMs": 16.804166,
+		"baselineSamples": 32,
+		"indexedMs": 22.562333,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/ntsc.mp4",
+		"pts": 1.0343666666666667,
+		"sha256": "c3c88e04c36cd34ae1e982bbb2d9643de5afbf3e7ad136de4504d1933f6d030b",
+		"target": 1.017
+	},
+	{
+		"baselineMs": 46.376625,
+		"baselineSamples": 167,
+		"indexedMs": 32.812917,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/ntsc.mp4",
+		"pts": 5.538866666666666,
+		"sha256": "2d162ef8c230da306eaebd90c408d80b60f5d3e7bcf169b2e8edec0a117b19b2",
+		"target": 5.506
+	},
+	{
+		"baselineMs": 49.519583,
+		"baselineSamples": 180,
+		"indexedMs": 32.116040999999996,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/ntsc.mp4",
+		"pts": 5.9726333333333335,
+		"sha256": "03dc992d1c5caa75c5f3446c55cd88db89f0c74f37f97b124a6e47551b31a885",
+		"target": 6.005990000000001
+	},
+	{
+		"baselineMs": 10.6295,
+		"baselineSamples": 10,
+		"indexedMs": 10.62775,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/ntsc.mp4",
+		"pts": 0.3003,
+		"sha256": "92654681b9f405a58f8d84e65eff2358e5517040f6b142a384ebb706e7cb4df9",
+		"target": 0.3
+	},
+	{
+		"baselineMs": 9.676,
+		"baselineSamples": 1,
+		"indexedMs": 9.22425,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/ntsc.mp4",
+		"pts": 0.0,
+		"sha256": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+		"target": 0.0
+	},
+	{
+		"baselineMs": 12.105041,
+		"baselineSamples": 1,
+		"indexedMs": 9.234416000000001,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/offset.mp4",
+		"pts": 2.0,
+		"sha256": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+		"target": 0.0
+	},
+	{
+		"baselineMs": 9.581083000000001,
+		"baselineSamples": 1,
+		"indexedMs": 11.260041,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/offset.mp4",
+		"pts": 2.0,
+		"sha256": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+		"target": 0.00001
+	},
+	{
+		"baselineMs": 8.93225,
+		"baselineSamples": 1,
+		"indexedMs": 9.174541,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/offset.mp4",
+		"pts": 2.0,
+		"sha256": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+		"target": 0.016666666666666666
+	},
+	{
+		"baselineMs": 9.268791,
+		"baselineSamples": 1,
+		"indexedMs": 9.9455,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/offset.mp4",
+		"pts": 2.0,
+		"sha256": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+		"target": 0.29995
+	},
+	{
+		"baselineMs": 11.662833,
+		"baselineSamples": 1,
+		"indexedMs": 9.875541,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/offset.mp4",
+		"pts": 2.0,
+		"sha256": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+		"target": 0.3
+	},
+	{
+		"baselineMs": 11.377375,
+		"baselineSamples": 1,
+		"indexedMs": 8.947875,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/offset.mp4",
+		"pts": 2.0,
+		"sha256": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+		"target": 0.30005
+	},
+	{
+		"baselineMs": 8.992750000000001,
+		"baselineSamples": 1,
+		"indexedMs": 11.148167,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/offset.mp4",
+		"pts": 2.0,
+		"sha256": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+		"target": 1.017
+	},
+	{
+		"baselineMs": 25.205375,
+		"baselineSamples": 74,
+		"indexedMs": 23.815917,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/offset.mp4",
+		"pts": 5.633333333333334,
+		"sha256": "4464136b2e19c28f83875bb702a35102172b3a6b70ef22d94226796bbc376081",
+		"target": 5.633333333333334
+	},
+	{
+		"baselineMs": 30.07725,
+		"baselineSamples": 93,
+		"indexedMs": 23.917416,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/offset.mp4",
+		"pts": 6.133333333333334,
+		"sha256": "9907f956cf2256ae4096213cb23b59e44204ebf0c3edef401c830851a37e141c",
+		"target": 6.133323333333334
+	},
+	{
+		"baselineMs": 9.342082999999999,
+		"baselineSamples": 1,
+		"indexedMs": 9.79025,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/offset.mp4",
+		"pts": 2.0,
+		"sha256": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+		"target": 0.3
+	},
+	{
+		"baselineMs": 11.413417,
+		"baselineSamples": 1,
+		"indexedMs": 9.206583,
+		"indexedSamples": 1,
+		"path": "/private/tmp/jianku-alpha37/offset.mp4",
+		"pts": 2.0,
+		"sha256": "4de0c47006d84fa1f9fd6c1d28b2c663603ca278901e666d51dc2daeef17dfe6",
+		"target": 0.0
+	}
+]

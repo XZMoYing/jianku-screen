@@ -1,0 +1,242 @@
+   Compiling libc v0.2.175
+   Compiling cfg-if v1.0.3
+   Compiling libm v0.2.15
+   Compiling once_cell v1.21.3
+   Compiling num-traits v0.2.19
+   Compiling getrandom v0.3.3
+   Compiling bytemuck v1.23.2
+   Compiling serde_json v1.0.145
+   Compiling objc2-exception-helper v0.1.1
+   Compiling objc2 v0.6.2
+   Compiling core-foundation v0.9.4
+   Compiling simd-adler32 v0.3.7
+   Compiling arrayvec v0.7.6
+   Compiling tracing-core v0.1.34
+   Compiling mio v1.0.4
+   Compiling getrandom v0.2.16
+   Compiling signal-hook-registry v1.4.6
+   Compiling socket2 v0.6.0
+   Compiling adler2 v2.0.1
+   Compiling miniz_oxide v0.8.9
+   Compiling tokio v1.47.1
+   Compiling uuid v1.18.1
+   Compiling tracing v0.1.41
+   Compiling parking_lot_core v0.9.11
+   Compiling parking_lot v0.12.4
+   Compiling objc2-core-foundation v0.3.1
+   Compiling block2 v0.6.1
+   Compiling num-integer v0.1.46
+   Compiling zlib-rs v0.5.2
+   Compiling libz-rs-sys v0.5.2
+   Compiling ring v0.17.14
+   Compiling tokio-util v0.7.16
+   Compiling crc32fast v1.5.0
+   Compiling h2 v0.4.12
+   Compiling flate2 v1.1.2
+   Compiling system-configuration-sys v0.6.0
+   Compiling errno v0.3.14
+   Compiling either v1.15.0
+   Compiling hyper v1.7.0
+   Compiling rustix v1.1.2
+   Compiling system-configuration v0.6.1
+   Compiling crossbeam-utils v0.8.21
+   Compiling security-framework-sys v2.17.0
+   Compiling hyper-util v0.1.17
+   Compiling tempfile v3.23.0
+   Compiling rustls v0.23.31
+   Compiling security-framework v2.11.1
+   Compiling rustls-webpki v0.103.6
+   Compiling num-bigint v0.4.6
+   Compiling rand_core v0.6.4
+   Compiling rand_chacha v0.3.1
+   Compiling native-tls v0.2.14
+   Compiling num-rational v0.4.2
+   Compiling cfb v0.7.3
+   Compiling string_cache v0.8.9
+   Compiling tower v0.5.2
+   Compiling weezl v0.1.10
+   Compiling utf8parse v0.2.2
+   Compiling schemars v0.8.22
+   Compiling anstyle-parse v0.2.7
+   Compiling markup5ever v0.14.1
+   Compiling infer v0.19.0
+   Compiling tokio-rustls v0.26.3
+   Compiling tokio-native-tls v0.3.1
+   Compiling rand v0.8.5
+   Compiling num-complex v0.4.6
+   Compiling rgb v0.8.52
+   Compiling is_terminal_polyfill v1.70.1
+   Compiling color_quant v1.1.0
+   Compiling anstyle v1.0.11
+   Compiling anstyle-query v1.1.4
+   Compiling colorchoice v1.0.4
+   Compiling anstream v0.6.20
+   Compiling tower-http v0.6.6
+   Compiling tauri-utils v2.7.0
+   Compiling gif v0.13.3
+   Compiling hyper-rustls v0.27.7
+   Compiling cookie_store v0.21.1
+   Compiling hyper-tls v0.6.0
+   Compiling html5ever v0.29.1
+   Compiling dispatch2 v0.3.0
+   Compiling objc2-core-graphics v0.3.1
+   Compiling jsonptr v0.6.3
+   Compiling encoding_rs v0.8.35
+   Compiling strsim v0.11.1
+   Compiling clap_lex v0.7.5
+   Compiling swift-rs v1.0.7
+   Compiling clap_builder v4.5.47
+   Compiling workspace-hack v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/workspace-hack)
+   Compiling cargo_metadata v0.19.2
+   Compiling reqwest v0.12.24 (https://github.com/CapSoftware/reqwest?rev=9b5ecbd5210a9510fde766015cabb724c1e70d2e#9b5ecbd5)
+   Compiling chrono v0.4.42
+   Compiling json-patch v3.0.1
+   Compiling kuchikiki v0.8.8-speedreader
+   Compiling ndarray v0.17.2
+   Compiling tracing-log v0.2.0
+   Compiling libloading v0.9.0
+   Compiling thread_local v1.1.9
+   Compiling dunce v1.0.5
+   Compiling tracing-subscriber v0.3.20
+   Compiling ort v2.0.0-rc.12
+   Compiling clap v4.5.47
+   Compiling specta v2.0.0-rc.20
+   Compiling open v5.4.0
+   Compiling crossbeam-epoch v0.9.18
+   Compiling crossbeam-deque v0.8.6
+   Compiling rayon-core v1.13.0
+   Compiling half v2.6.0
+   Compiling coreaudio-sys v0.2.17
+   Compiling ffmpeg-sys-next v7.1.3
+   Compiling objc2-foundation v0.3.1
+   Compiling rand_core v0.9.3
+   Compiling rand_chacha v0.9.0
+   Compiling rayon v1.11.0
+   Compiling malloc_buf v0.0.6
+   Compiling ffmpeg-next v7.1.0 (https://github.com/CapSoftware/rust-ffmpeg?rev=49db1fede112#49db1fed)
+   Compiling objc v0.2.7
+   Compiling rand v0.9.2
+   Compiling debugid v0.8.0
+   Compiling core-graphics-types v0.1.3
+   Compiling cpufeatures v0.2.17
+   Compiling metal v0.31.0
+   Compiling naga v25.0.1
+   Compiling sentry-types v0.42.0
+   Compiling coreaudio-rs v0.11.3
+   Compiling wgpu-types v25.0.0
+   Compiling mach2 v0.4.3
+   Compiling memmap2 v0.9.8
+   Compiling wgpu-hal v25.0.2 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/vendor/wgpu-hal)
+   Compiling cpal v0.15.3 (https://github.com/CapSoftware/cpal?rev=6013cb5f8bd3#6013cb5f)
+   Compiling sentry-core v0.42.0
+   Compiling fdeflate v0.3.7
+   Compiling font-types v0.9.0
+   Compiling core_maths v0.1.1
+   Compiling quick-error v2.0.1
+   Compiling ttf-parser v0.25.1
+   Compiling read-fonts v0.29.3
+   Compiling v_frame v0.3.9
+   Compiling cap-media-info v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/media-info)
+   Compiling wgpu-core-deps-apple v25.0.0
+   Compiling objc2-core-image v0.3.1
+   Compiling objc2-quartz-core v0.3.1
+   Compiling concurrent-queue v2.5.0
+   Compiling backtrace v0.3.75
+   Compiling skrifa v0.31.3
+   Compiling event-listener v5.4.1
+   Compiling dirs-sys v0.4.1
+   Compiling tiny-skia-path v0.11.4
+   Compiling wgpu-core v25.0.2
+   Compiling av1-grain v0.2.4
+   Compiling sysinfo v0.32.1
+   Compiling maybe-rayon v0.1.1
+   Compiling objc2-cloud-kit v0.3.1
+   Compiling objc2-core-data v0.3.1
+   Compiling itertools v0.12.1
+   Compiling kurbo v0.11.3
+   Compiling imgref v1.11.0
+   Compiling rav1e v0.7.1
+   Compiling rustybuzz v0.14.1
+   Compiling wgpu v25.0.2
+   Compiling rustybuzz v0.20.1
+   Compiling loop9 v0.1.5
+   Compiling fontdb v0.16.2
+   Compiling swash v0.2.5
+   Compiling cidre v0.11.0 (https://github.com/CapSoftware/cidre?rev=bf84b67079a8#bf84b670)
+   Compiling image-webp v0.2.4
+   Compiling svgtypes v0.15.3
+   Compiling objc2-app-kit v0.3.1
+   Compiling cap-enc-ffmpeg v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/enc-ffmpeg)
+   Compiling event-listener-strategy v0.5.4
+   Compiling sentry-backtrace v0.42.0
+   Compiling fontdb v0.23.0
+   Compiling png v0.17.16
+   Compiling sha2 v0.10.9
+   Compiling sha1 v0.10.6
+   Compiling objc2-core-video v0.3.1
+   Compiling objc2-core-audio v0.3.1
+   Compiling avif-serialize v0.8.6
+   Compiling objc2-core-audio-types v0.3.1
+   Compiling zune-inflate v0.2.54
+   Compiling pxfm v0.1.23
+   Compiling euclid v0.22.11
+   Compiling tungstenite v0.24.0
+   Compiling usvg v0.45.1
+   Compiling cap-cursor-info v0.0.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/cursor-info)
+   Compiling cosmic-text v0.14.2
+   Compiling exr v1.73.0
+   Compiling etagere v0.2.15
+   Compiling cap-rnnoise v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rnnoise)
+   Compiling moxcms v0.7.5
+   Compiling objc2-core-media v0.3.1
+   Compiling ravif v0.11.20
+   Compiling tiny-skia v0.11.4
+   Compiling async-lock v3.4.1
+   Compiling findshlibs v0.10.2
+   Compiling tiff v0.10.3
+   Compiling png v0.18.0
+   Compiling ffmpeg-hw-device v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/ffmpeg-hw-device)
+   Compiling objc2-avf-audio v0.3.1
+   Compiling ndarray v0.16.1
+   Compiling nanorand v0.7.0
+   Compiling qoi v0.4.1
+   Compiling uname v0.1.1
+   Compiling hostname v0.4.1
+   Compiling num_cpus v1.17.0
+   Compiling reactive_graph v0.1.8
+   Compiling cap-camera-effects v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/camera-effects)
+   Compiling axum-core v0.4.5
+   Compiling cap-project v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/project)
+   Compiling cap-video-decode v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/video-decode)
+   Compiling sentry-contexts v0.42.0
+   Compiling image v0.25.8
+   Compiling glyphon v0.9.0
+   Compiling flume v0.11.1
+   Compiling objc2-av-foundation v0.3.1
+   Compiling sentry-debug-images v0.42.0
+   Compiling resvg v0.45.1
+   Compiling nix v0.29.0
+   Compiling tokio-tungstenite v0.24.0
+   Compiling sentry-anyhow v0.42.0
+   Compiling sentry-panic v0.42.0
+   Compiling dirs v5.0.1
+   Compiling directories v5.0.1
+   Compiling cap-flags v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/flags)
+   Compiling futures-intrusive v0.5.0
+   Compiling axum v0.7.9
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+   Compiling cap-utils v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/utils)
+   Compiling sentry v0.42.0
+   Compiling cap-audio v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/audio)
+   Compiling cap-media v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/media)
+   Compiling ringbuf v0.4.8
+   Compiling cap-editor v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/editor)
+    Finished `release` profile [optimized + debuginfo] target(s) in 5m 34s
+     Running unittests src/lib.rs (target/release/deps/cap_editor-6a51d48ad0c977f0)
+dyld[69499]: Library not loaded: @executable_path/../Frameworks/Spacedrive.framework/Libraries/libavcodec.61.19.100.dylib
+  Referenced from: <71A14AD0-3BD5-3AAF-BAB4-1C99ABE7D674> /Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/release/deps/cap_editor-6a51d48ad0c977f0
+[Pixel array omitted; raw frames and compact difference are retained.]
+error: test failed, to rerun pass `-p cap-editor --lib`
+
+Caused by:
+  process didn't exit successfully: `/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/release/deps/cap_editor-6a51d48ad0c977f0 native_preparing_playback_seeks_match_ordinary_and_handoff_joins_sources --nocapture` (signal: 6, SIGABRT: process abort signal)

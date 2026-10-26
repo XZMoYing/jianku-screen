@@ -1,0 +1,15 @@
+{
+	"productionSourceUnchanged": true,
+	"installedVersionUnchanged": "0.2.0-alpha.36",
+	"markdownLocalLinksChecked": 150,
+	"pythonSyntax": true,
+	"archivedRustFmt": true,
+	"jsonBiome": true,
+	"prototypeOnly": true,
+	"nativePixelCheckpoints": 66,
+	"indexChecks": 7,
+	"wallpaperReportedTests": 11,
+	"wallpaperEffectiveTests": 7,
+	"preparingStrictAssertion": "still fails; expected and actual fingerprints match alpha35/36 evidence",
+	"releaseOrPhysicalValidation": false
+}

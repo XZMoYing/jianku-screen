@@ -1,0 +1,20 @@
+[
+	{
+		"track": "display",
+		"differentBytes": 0,
+		"maxDifference": 0,
+		"hashes": [
+			"9386851f7ac7489065edd90ae202986a247c1f41229587b8ef147be987ebe6de",
+			"9386851f7ac7489065edd90ae202986a247c1f41229587b8ef147be987ebe6de"
+		]
+	},
+	{
+		"track": "camera",
+		"differentBytes": 0,
+		"maxDifference": 0,
+		"hashes": [
+			"8c946465212efc87073a226541f28c1d957188657550527994034716fe9157f9",
+			"8c946465212efc87073a226541f28c1d957188657550527994034716fe9157f9"
+		]
+	}
+]

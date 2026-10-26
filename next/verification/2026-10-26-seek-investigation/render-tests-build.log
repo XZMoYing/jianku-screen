@@ -1,0 +1,38 @@
+   Compiling hashbrown v0.15.5
+   Compiling uuid v1.18.1
+   Compiling cfb v0.7.3
+   Compiling indexmap v2.11.4
+   Compiling h2 v0.4.12
+   Compiling schemars v0.8.22
+   Compiling kuchikiki v0.8.8-speedreader
+   Compiling hyper v1.7.0
+   Compiling hyper-util v0.1.17
+   Compiling infer v0.19.0
+   Compiling hyper-tls v0.6.0
+   Compiling hyper-rustls v0.27.7
+   Compiling tauri-utils v2.7.0
+   Compiling reqwest v0.12.24 (https://github.com/CapSoftware/reqwest?rev=9b5ecbd5210a9510fde766015cabb724c1e70d2e#9b5ecbd5)
+   Compiling specta v2.0.0-rc.20
+   Compiling workspace-hack v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/workspace-hack)
+   Compiling naga v25.0.1
+   Compiling wgpu-hal v25.0.2 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/vendor/wgpu-hal)
+   Compiling wgpu-core-deps-apple v25.0.0
+   Compiling wgpu-core v25.0.2
+   Compiling cap-media-info v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/media-info)
+   Compiling cap-enc-ffmpeg v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/enc-ffmpeg)
+   Compiling wgpu v25.0.2
+   Compiling cap-cursor-info v0.0.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/cursor-info)
+   Compiling ffmpeg-hw-device v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/ffmpeg-hw-device)
+   Compiling diff v0.1.13
+   Compiling yansi v1.0.1
+   Compiling lru v0.12.5
+   Compiling glyphon v0.9.0
+   Compiling pretty_assertions v1.4.1
+   Compiling cap-video-decode v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/video-decode)
+   Compiling cap-project v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/project)
+   Compiling cap-camera-effects v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/camera-effects)
+   Compiling cap-flags v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/flags)
+   Compiling pollster v0.4.0
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+    Finished `release` profile [optimized + debuginfo] target(s) in 2m 06s
+  Executable unittests src/lib.rs (target/release/deps/cap_rendering-45735894cf19c8c4)

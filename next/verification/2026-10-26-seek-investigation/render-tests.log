@@ -1,0 +1,29 @@
+
+running 11 tests
+test layers::video_background::tests::cancelled_indexed_wallpaper_sample_cannot_replace_the_rewound_frame ... ok
+test layers::video_background::tests::decodes_loop_and_backwards_seek ... ok
+test layers::video_background::tests::discarded_wallpaper_seek_can_rewind_without_publishing_the_old_frame ... ok
+test layers::video_background::tests::first_wallpaper_request_after_pause_preserves_exact_pixels_and_rewind ... ok
+test layers::video_background::tests::high_rate_precise_source_returns_native_surface ... ok
+test layers::video_background::tests::loops_at_media_duration_and_rejects_invalid_clocks ... ok
+test layers::video_background::tests::native_pixel_planes_preserve_the_precise_color_conversion ... ok
+test layers::video_background::tests::native_precise_sampling_matches_seek_loop_and_prefetch_reference ... time=0 native_pts=0 reference_pts=0 mean pixel difference=0
+time=0.016666666666666666 native_pts=0.016666666666666666 reference_pts=0.016666666666666666 mean pixel difference=0
+time=0.03333333333333333 native_pts=0.03333333333333333 reference_pts=0.03333333333333333 mean pixel difference=0.6863908179012346
+time=0.05 native_pts=0.05 reference_pts=0.05 mean pixel difference=0.7023322964891975
+time=0.3 native_pts=0.3 reference_pts=0.3 mean pixel difference=0.8392740885416666
+time=1.18 native_pts=1.1833333333333333 reference_pts=1.1833333333333333 mean pixel difference=0.8249391155478395
+time=1.2 native_pts=0 reference_pts=0 mean pixel difference=0
+time=1.2166666666666666 native_pts=0.016666666666666666 reference_pts=0.016666666666666666 mean pixel difference=0
+time=0.017 native_pts=0.03333333333333333 reference_pts=0.03333333333333333 mean pixel difference=0.6863908179012346
+time=0.3 native_pts=0.3 reference_pts=0.3 mean pixel difference=0.8392740885416666
+time=0 native_pts=0 reference_pts=0 mean pixel difference=0
+time=0 native_pts=0 reference_pts=0 mean pixel difference=0
+ok
+test layers::video_background::tests::paused_realtime_wallpaper_keeps_native_precision_across_mode_changes ... ok
+test layers::video_background::tests::reopened_precise_wallpaper_preserves_pixels_seeks_and_looping ... reopened precise wallpaper: 9 timestamps and pixel buffers identical
+ok
+test layers::video_background::tests::samples_high_rate_wallpaper_and_repeats_exact_pixels ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 329 filtered out; finished in 0.59s
+
