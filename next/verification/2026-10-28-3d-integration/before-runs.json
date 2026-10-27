@@ -1,0 +1,74 @@
+[
+  {
+    "name": "whole",
+    "fps": 30,
+    "exitCode": 0,
+    "seconds": 3.4007744169794023
+  },
+  {
+    "name": "aligned",
+    "fps": 30,
+    "exitCode": 0,
+    "seconds": 2.3606691249879077
+  },
+  {
+    "name": "offgrid",
+    "fps": 30,
+    "exitCode": 0,
+    "seconds": 2.3863106250064448
+  },
+  {
+    "name": "hardcut",
+    "fps": 30,
+    "exitCode": 0,
+    "seconds": 2.279617291991599
+  },
+  {
+    "name": "whole",
+    "fps": 60,
+    "exitCode": 0,
+    "seconds": 4.284177541994723
+  },
+  {
+    "name": "aligned",
+    "fps": 60,
+    "exitCode": 0,
+    "seconds": 4.307941208011471
+  },
+  {
+    "name": "offgrid",
+    "fps": 60,
+    "exitCode": 0,
+    "seconds": 4.436070041003404
+  },
+  {
+    "name": "hardcut",
+    "fps": 60,
+    "exitCode": 0,
+    "seconds": 4.490395250002621
+  },
+  {
+    "name": "whole",
+    "fps": 120,
+    "exitCode": 0,
+    "seconds": 8.532631583017064
+  },
+  {
+    "name": "aligned",
+    "fps": 120,
+    "exitCode": 0,
+    "seconds": 8.519911209004931
+  },
+  {
+    "name": "offgrid",
+    "fps": 120,
+    "exitCode": 0,
+    "seconds": 8.623008208000101
+  },
+  {
+    "name": "hardcut",
+    "fps": 120,
+    "exitCode": 0,
+    "seconds": 8.672744583018357
+  }
+]
