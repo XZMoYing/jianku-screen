@@ -1,7 +1,11 @@
-use cap_editor::{AudioOutput, EditorFrameOutput, EditorInstance, PlaybackHandle};
+use cap_editor::{
+    AudioOutput, EditorFrameFormat, EditorFrameOutput, EditorInstance, EditorStartupInputs,
+    PlaybackHandle, PlaybackTelemetry, PlaybackTelemetryEvent,
+};
 use cap_project::{ProjectConfiguration, RecordingMeta, XY};
 use serde::Serialize;
 use std::{
+    io::Write,
     path::PathBuf,
     sync::{Arc, Mutex},
     time::{Duration, Instant},
@@ -10,6 +14,7 @@ use std::{
 #[derive(Clone, Serialize)]
 struct AudioPoint {
     seconds: f64,
+    callback_seconds: f64,
     mean: f64,
     phase: Option<usize>,
 }
@@ -35,6 +40,8 @@ struct Window {
 
 struct Probe {
     fps: u32,
+    replay_rounds: u32,
+    telemetry_rx: tokio::sync::mpsc::UnboundedReceiver<(Instant, PlaybackTelemetryEvent)>,
     editor: Arc<EditorInstance>,
     project: ProjectConfiguration,
     epoch: Instant,
@@ -54,7 +61,7 @@ fn phase(value: f64, levels: &[f64; 4], tolerance: f64) -> Option<usize> {
 }
 
 impl Probe {
-    async fn new(path: PathBuf, fps: u32) -> Result<Self, String> {
+    async fn new(path: PathBuf, fps: u32, replay_rounds: u32, trace: bool) -> Result<Self, String> {
         let marker: serde_json::Value = serde_json::from_slice(
             &std::fs::read(path.join(".jianku-long-project-fixture.json")).map_err(|error| {
                 format!("Only generated long-project fixtures are supported: {error}")
@@ -81,18 +88,21 @@ impl Probe {
         let output = Arc::new(AudioOutput::new_headless(Box::new({
             let audio = audio.clone();
             move |samples, deadline| {
+                let callback_seconds = epoch.elapsed().as_secs_f64();
                 let mean = samples.iter().map(|sample| f64::from(*sample)).sum::<f64>()
                     / samples.len() as f64;
                 let levels = [5000.0, 9000.0, 13000.0, 17000.0]
                     .map(|sample| sample / 32768.0 * std::f64::consts::FRAC_1_SQRT_2);
                 audio.lock().unwrap().push(AudioPoint {
                     seconds: deadline.saturating_duration_since(epoch).as_secs_f64(),
+                    callback_seconds,
                     mean,
                     phase: phase(mean, &levels, 0.004),
                 });
             }
         })));
-        let editor = EditorInstance::new_with_audio_output(
+        let (telemetry, telemetry_rx) = PlaybackTelemetry::timed_channel();
+        let editor = EditorInstance::new_with_startup_inputs(
             path,
             |_| {},
             Box::new({
@@ -126,11 +136,18 @@ impl Probe {
                 }
             }),
             None,
+            EditorFrameFormat::Rgba,
             output,
+            EditorStartupInputs {
+                playback_telemetry: trace.then_some(telemetry),
+                ..Default::default()
+            },
         )
         .await?;
         Ok(Self {
             fps,
+            replay_rounds,
+            telemetry_rx,
             editor,
             project,
             epoch,
@@ -272,7 +289,7 @@ impl Probe {
         }
         self.pause(&handle).await?;
         self.rewind_preview().await?;
-        for round in 0..3 {
+        for round in 0..self.replay_rounds {
             let replay = self
                 .editor
                 .start_playback_with_handle(self.fps, XY::new(1280, 720), Some(7))
@@ -326,12 +343,11 @@ fn edges(points: impl Iterator<Item = (f64, Option<usize>)>) -> Vec<(f64, usize)
     result
 }
 
-#[tokio::main]
-async fn main() -> Result<(), String> {
+async fn run() -> Result<(), String> {
     let args: Vec<_> = std::env::args().collect();
     let path = args
         .get(1)
-        .ok_or("Usage: long-project-check GENERATED_PROJECT NEW_OUTPUT_JSON [30|60]")?;
+        .ok_or("Usage: long-project-check GENERATED_PROJECT NEW_OUTPUT_JSON [30|60] [REPLAY_ROUNDS] [trace]")?;
     let output = args.get(2).ok_or("Missing report path")?;
     if PathBuf::from(output).exists() {
         return Err("Choose a new output report path".into());
@@ -344,20 +360,142 @@ async fn main() -> Result<(), String> {
     if ![30, 60].contains(&fps) {
         return Err("Expected 30 or 60 fps".into());
     }
+    let replay_rounds = args
+        .get(4)
+        .map(|value| value.parse::<u32>())
+        .transpose()
+        .map_err(|error| error.to_string())?
+        .unwrap_or(3);
+    if !(1..=20).contains(&replay_rounds) {
+        return Err("Expected 1 to 20 replay rounds".into());
+    }
+    let trace = match args.get(5).map(String::as_str) {
+        None => false,
+        Some("trace") => true,
+        Some(_) => return Err("Expected trace option".into()),
+    };
     let startup = Instant::now();
-    let mut probe = Probe::new(PathBuf::from(path), fps).await?;
+    let mut probe = Probe::new(PathBuf::from(path), fps, replay_rounds, trace).await?;
     let startup_ms = startup.elapsed().as_secs_f64() * 1000.0;
     let result = probe.run().await;
     probe.editor.dispose().await;
+    let mut timings = Vec::new();
+    while let Ok((emitted, event)) = probe.telemetry_rx.try_recv() {
+        timings.push(timing_point(
+            emitted.saturating_duration_since(probe.epoch).as_secs_f64(),
+            event,
+        ));
+    }
     let report = serde_json::json!({
-        "fps": fps, "passed": result.is_ok(), "error": result.as_ref().err(), "startupMs": startup_ms,
+        "fps": fps, "replayRounds": replay_rounds, "traceEnabled": trace, "timings": timings, "passed": result.is_ok(), "error": result.as_ref().err(), "startupMs": startup_ms,
         "naturalEndVerified": probe.natural_end_verified, "windows": probe.windows, "video": *probe.video.lock().unwrap(), "audio": *probe.audio.lock().unwrap(),
         "scope": "Sampled windows of long timelines in native EditorInstance/GPU and production headless audio callback; not full-duration playback, physical audio or WebView display acceptance."
     });
-    std::fs::write(
-        output,
-        serde_json::to_vec_pretty(&report).map_err(|error| error.to_string())?,
-    )
-    .map_err(|error| error.to_string())?;
+    let bytes = serde_json::to_vec_pretty(&report).map_err(|error| error.to_string())?;
+    let mut file = std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(output)
+        .map_err(|error| error.to_string())?;
+    file.write_all(&bytes).map_err(|error| error.to_string())?;
     result
+}
+
+fn timing_point(seconds: f64, event: PlaybackTelemetryEvent) -> serde_json::Value {
+    let mut point = match event {
+        PlaybackTelemetryEvent::FrameSubmitted {
+            frame_number,
+            source,
+            schedule_overshoot,
+            frame_acquire_duration,
+            uniforms_duration,
+            submit_duration,
+            prefetch_buffer_len,
+            total_frames_skipped,
+        } => serde_json::json!({
+            "stage":"submitted", "frame":frame_number,"source":format!("{source:?}"),
+            "overshootMs":schedule_overshoot.as_secs_f64()*1000.0,"acquireMs":frame_acquire_duration.as_secs_f64()*1000.0,
+            "uniformsMs":uniforms_duration.as_secs_f64()*1000.0,"submitMs":submit_duration.as_secs_f64()*1000.0,
+            "prefetchFrames":prefetch_buffer_len,"skipped":total_frames_skipped
+        }),
+        PlaybackTelemetryEvent::RendererFrame {
+            frame_number,
+            input_frame_number,
+            queue_wait,
+            drain_duration,
+            flush_duration,
+            render_duration,
+            render_stage_timings: t,
+            callback_duration,
+            drained_count,
+            ..
+        } => serde_json::json!({
+            "stage":"rendered","frame":frame_number,"inputFrame":input_frame_number,"queueMs":queue_wait.as_secs_f64()*1000.0,
+            "drainMs":drain_duration.as_secs_f64()*1000.0,"flushMs":flush_duration.as_secs_f64()*1000.0,"renderMs":render_duration.as_secs_f64()*1000.0,
+            "prepareMs":t.prepare_duration.as_secs_f64()*1000.0,"backgroundMs":t.background_prepare_duration.as_secs_f64()*1000.0,
+            "backgroundBlurMs":t.background_blur_prepare_duration.as_secs_f64()*1000.0,"displayMs":t.display_prepare_duration.as_secs_f64()*1000.0,
+            "cameraMs":t.camera_prepare_duration.as_secs_f64()*1000.0,"layersMs":t.layer_render_duration.as_secs_f64()*1000.0,
+            "finishMs":t.finish_duration.as_secs_f64()*1000.0,"finishWaitMs":t.finish_wait_previous_duration.as_secs_f64()*1000.0,
+            "submitReadbackMs":t.finish_submit_readback_duration.as_secs_f64()*1000.0,"immediateFlushMs":t.immediate_flush_duration.as_secs_f64()*1000.0,
+            "callbackMs":callback_duration.as_secs_f64()*1000.0,"drainedCount":drained_count
+        }),
+        PlaybackTelemetryEvent::FrameSkipped {
+            frame_number,
+            skipped,
+            reason,
+            prefetch_buffer_len,
+        } => {
+            serde_json::json!({"stage":"skipped","frame":frame_number,"count":skipped,"reason":format!("{reason:?}"),"prefetchFrames":prefetch_buffer_len})
+        }
+        other => serde_json::json!({"stage":"control","event":format!("{other:?}")}),
+    };
+    point["seconds"] = serde_json::json!(seconds);
+    point
+}
+
+fn main() -> Result<(), String> {
+    #[cfg(target_os = "macos")]
+    {
+        use std::ffi::c_void;
+        #[link(name = "CoreFoundation", kind = "framework")]
+        unsafe extern "C" {
+            static kCFRunLoopDefaultMode: *const c_void;
+            fn CFRunLoopRunInMode(
+                mode: *const c_void,
+                seconds: f64,
+                return_after_source: u8,
+            ) -> i32;
+        }
+        #[link(name = "objc")]
+        unsafe extern "C" {
+            fn objc_autoreleasePoolPush() -> *mut c_void;
+            fn objc_autoreleasePoolPop(pool: *mut c_void);
+        }
+        // AVPlayer work is dispatched to the main queue; blocking it on Tokio
+        // silently measures wallpaper timeouts and fallback instead of the app path.
+        let worker = std::thread::spawn(|| {
+            tokio::runtime::Builder::new_multi_thread()
+                .enable_all()
+                .build()
+                .map_err(|error| error.to_string())?
+                .block_on(run())
+        });
+        while !worker.is_finished() {
+            unsafe {
+                let pool = objc_autoreleasePoolPush();
+                CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.01, 0);
+                objc_autoreleasePoolPop(pool);
+            }
+            std::thread::sleep(Duration::from_millis(1));
+        }
+        worker
+            .join()
+            .map_err(|_| "Verification worker panicked".to_string())?
+    }
+    #[cfg(not(target_os = "macos"))]
+    tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()
+        .map_err(|error| error.to_string())?
+        .block_on(run())
 }

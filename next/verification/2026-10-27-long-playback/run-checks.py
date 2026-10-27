@@ -13,6 +13,9 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--cap-root", type=Path, default=evidence.parents[1] / "cap")
     parser.add_argument("--fps", type=int, choices=[30, 60], default=60)
+    parser.add_argument("--minutes", type=int, choices=[10, 30, 60], nargs="+", default=[10, 30, 60])
+    parser.add_argument("--replay-rounds", type=int, choices=range(1, 21), default=3)
+    parser.add_argument("--trace", action="store_true")
     args = parser.parse_args()
     cap = args.cap_root.resolve()
     binary = cap / "target/release/examples/long-project-check"
@@ -26,14 +29,15 @@ def main():
         str(cap / "target/native-deps/lib") + ":" + str(cap / "target/native-deps/onnxruntime/lib")
     )
     results = []
-    for minutes in [10, 30, 60]:
+    for minutes in args.minutes:
         project = args.directory / f"{minutes}分钟多轨回归.jks"
         report = args.output / f"{minutes}min.json"
         samples = []
         started = time.monotonic()
         with (args.output / f"{minutes}min.log").open("w") as log:
             process = subprocess.Popen(
-                [str(binary), str(project), str(report), str(args.fps)],
+                [str(binary), str(project), str(report), str(args.fps), str(args.replay_rounds)]
+                + (["trace"] if args.trace else []),
                 cwd=cap, env=environment, stdout=log, stderr=subprocess.STDOUT,
             )
             try:
@@ -63,6 +67,8 @@ def main():
             "peakRssBytes": max((sample["rssBytes"] for sample in samples), default=0),
             "memorySamples": samples, "windows": native.get("windows", []),
             "naturalEndVerified": native.get("naturalEndVerified", False),
+            "replayRounds": native.get("replayRounds", 3),
+            "traceEnabled": native.get("traceEnabled", False),
         }
         results.append(result)
         (args.output / "summary.json").write_text(json.dumps(results, ensure_ascii=False, indent=2) + "\n")

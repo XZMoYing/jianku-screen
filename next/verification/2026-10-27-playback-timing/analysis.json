@@ -1,0 +1,3855 @@
+[
+	{
+		"artifact": "legacy-no-mainloop.json.gz",
+		"uncompressedSha256": "4ec52bc2db6ead8bbc1836e3744458b3686c428dd9030891b96b7d1933fb7e91",
+		"passed": true,
+		"error": null,
+		"startupMs": 384.83525000000003,
+		"fps": 60,
+		"replayRounds": 12,
+		"windowCount": 15,
+		"sourcePhaseChecks": 1465,
+		"naturalEndVerified": true,
+		"timingEvents": 4244,
+		"windows": [
+			{
+				"audio_video_offsets_ms": [13.359176999999889, 8.434937000000087],
+				"frames": 122,
+				"name": "initial",
+				"source_checks": 91,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					-0.12842000000024, 7.3002989999997325, 4.444309000000146
+				],
+				"frames": 163,
+				"name": "middle-boundary",
+				"source_checks": 112,
+				"target_frame": 53964
+			},
+			{
+				"audio_video_offsets_ms": [-3.593969999998947],
+				"frames": 162,
+				"name": "tail",
+				"source_checks": 133,
+				"target_frame": 107654
+			},
+			{
+				"audio_video_offsets_ms": [10.66526099999976, 8.479146000000881],
+				"frames": 125,
+				"name": "rewind-replay-0",
+				"source_checks": 94,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [10.432828999999089, 5.585672000000486],
+				"frames": 125,
+				"name": "rewind-replay-1",
+				"source_checks": 94,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [7.388647000002635, 7.065656999998282],
+				"frames": 125,
+				"name": "rewind-replay-2",
+				"source_checks": 94,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [9.361047999998817, 4.983974999998253],
+				"frames": 125,
+				"name": "rewind-replay-3",
+				"source_checks": 94,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [5.840199999997964, 7.191419000001531],
+				"frames": 126,
+				"name": "rewind-replay-4",
+				"source_checks": 95,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [9.399976000000976, 7.769403000001063],
+				"frames": 125,
+				"name": "rewind-replay-5",
+				"source_checks": 94,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [10.191627000001091, 8.267678999999362],
+				"frames": 125,
+				"name": "rewind-replay-6",
+				"source_checks": 94,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [10.027862000001164, 6.324914000003901],
+				"frames": 125,
+				"name": "rewind-replay-7",
+				"source_checks": 94,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [10.055096999998625, 5.634106999998778],
+				"frames": 125,
+				"name": "rewind-replay-8",
+				"source_checks": 94,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [11.305247999999324, 9.829299999999819],
+				"frames": 125,
+				"name": "rewind-replay-9",
+				"source_checks": 94,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [11.838023999999336, 8.177450999994562],
+				"frames": 125,
+				"name": "rewind-replay-10",
+				"source_checks": 94,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [8.169009999996035, 6.248894999998811],
+				"frames": 125,
+				"name": "rewind-replay-11",
+				"source_checks": 94,
+				"target_frame": 7
+			}
+		],
+		"plannedAudioToNativeVideoOffsetMs": {
+			"count": 30,
+			"median": 8.173230499995299,
+			"p95": 11.838023999999336,
+			"p99": 13.359176999999889,
+			"max": 13.359176999999889
+		},
+		"audioCallbackLatenessMs": {
+			"count": 4688,
+			"median": 1.918964499997955,
+			"p95": 2.5357710000015743,
+			"p99": 2.646838000000429,
+			"max": 40.27042100000244
+		},
+		"metrics": {
+			"renderMs": {
+				"count": 2089,
+				"median": 7.301541,
+				"p95": 13.003166,
+				"p99": 20.435083,
+				"max": 1055.2115840000001,
+				"largest": [
+					{
+						"seconds": 1.438281667,
+						"frame": 7,
+						"milliseconds": 1055.2115840000001
+					},
+					{
+						"seconds": 48.680970375,
+						"frame": 107922,
+						"milliseconds": 1031.074291
+					},
+					{
+						"seconds": 42.321431459,
+						"frame": 7,
+						"milliseconds": 1011.35325
+					}
+				]
+			},
+			"queueMs": {
+				"count": 2089,
+				"median": 0.02075,
+				"p95": 0.050457999999999996,
+				"p99": 0.369833,
+				"max": 6.317708,
+				"largest": [
+					{
+						"seconds": 6.711839875,
+						"frame": 107660,
+						"milliseconds": 6.317708
+					},
+					{
+						"seconds": 3.574056959,
+						"frame": 53968,
+						"milliseconds": 5.2585
+					},
+					{
+						"seconds": 31.11863475,
+						"frame": 91,
+						"milliseconds": 5.135166
+					}
+				]
+			},
+			"backgroundMs": {
+				"count": 2089,
+				"median": 0.161333,
+				"p95": 0.27316599999999996,
+				"p99": 13.872584,
+				"max": 1022.8573329999999,
+				"largest": [
+					{
+						"seconds": 48.680970375,
+						"frame": 107922,
+						"milliseconds": 1022.8573329999999
+					},
+					{
+						"seconds": 1.438281667,
+						"frame": 7,
+						"milliseconds": 1019.6539579999999
+					},
+					{
+						"seconds": 45.456246625,
+						"frame": 7,
+						"milliseconds": 1002.304791
+					}
+				]
+			},
+			"displayMs": {
+				"count": 2089,
+				"median": 0.10483400000000001,
+				"p95": 0.21937500000000001,
+				"p99": 0.27754100000000004,
+				"max": 23.828083,
+				"largest": [
+					{
+						"seconds": 1.438281667,
+						"frame": 7,
+						"milliseconds": 23.828083
+					},
+					{
+						"seconds": 17.440386542,
+						"frame": 28,
+						"milliseconds": 0.927583
+					},
+					{
+						"seconds": 26.926574834,
+						"frame": 30,
+						"milliseconds": 0.6532089999999999
+					}
+				]
+			},
+			"cameraMs": {
+				"count": 2089,
+				"median": 0.006334,
+				"p95": 0.064334,
+				"p99": 0.092292,
+				"max": 0.327708,
+				"largest": [
+					{
+						"seconds": 1.438281667,
+						"frame": 7,
+						"milliseconds": 0.327708
+					},
+					{
+						"seconds": 6.668490084,
+						"frame": 107656,
+						"milliseconds": 0.293541
+					},
+					{
+						"seconds": 6.840241625,
+						"frame": 107668,
+						"milliseconds": 0.266
+					}
+				]
+			},
+			"finishWaitMs": {
+				"count": 2089,
+				"median": 4.2e-5,
+				"p95": 0.000167,
+				"p99": 0.00025,
+				"max": 0.001375,
+				"largest": [
+					{
+						"seconds": 20.455567834,
+						"frame": 20,
+						"milliseconds": 0.001375
+					},
+					{
+						"seconds": 25.513803542,
+						"frame": 0,
+						"milliseconds": 0.0005
+					},
+					{
+						"seconds": 30.440429625,
+						"frame": 51,
+						"milliseconds": 0.0005
+					}
+				]
+			},
+			"submitReadbackMs": {
+				"count": 2089,
+				"median": 0.044458,
+				"p95": 0.09708399999999999,
+				"p99": 0.175917,
+				"max": 0.29879100000000003,
+				"largest": [
+					{
+						"seconds": 1.438281667,
+						"frame": 7,
+						"milliseconds": 0.29879100000000003
+					},
+					{
+						"seconds": 45.639011417,
+						"frame": 17,
+						"milliseconds": 0.297541
+					},
+					{
+						"seconds": 6.705987375,
+						"frame": 107659,
+						"milliseconds": 0.25275
+					}
+				]
+			},
+			"immediateFlushMs": {
+				"count": 2089,
+				"median": 6.77125,
+				"p95": 12.406291999999999,
+				"p99": 14.837833999999999,
+				"max": 19.473208,
+				"largest": [
+					{
+						"seconds": 31.1059365,
+						"frame": 90,
+						"milliseconds": 19.473208
+					},
+					{
+						"seconds": 21.146858125,
+						"frame": 61,
+						"milliseconds": 19.259958
+					},
+					{
+						"seconds": 17.999368792,
+						"frame": 61,
+						"milliseconds": 19.11225
+					}
+				]
+			},
+			"callbackMs": {
+				"count": 2089,
+				"median": 0.050665999999999996,
+				"p95": 0.065375,
+				"p99": 0.09208300000000001,
+				"max": 1.59575,
+				"largest": [
+					{
+						"seconds": 17.10685,
+						"frame": 8,
+						"milliseconds": 1.59575
+					},
+					{
+						"seconds": 23.71240725,
+						"frame": 27,
+						"milliseconds": 1.225625
+					},
+					{
+						"seconds": 20.791587459,
+						"frame": 40,
+						"milliseconds": 0.93575
+					}
+				]
+			},
+			"overshootMs": {
+				"count": 2079,
+				"median": 3.138993,
+				"p95": 3.930429,
+				"p99": 4.129863,
+				"max": 13.881166,
+				"largest": [
+					{
+						"seconds": 6.644424292,
+						"frame": 107656,
+						"milliseconds": 13.881166
+					},
+					{
+						"seconds": 3.548646542,
+						"frame": 53967,
+						"milliseconds": 5.3318330000000005
+					},
+					{
+						"seconds": 36.032669875,
+						"frame": 8,
+						"milliseconds": 4.197792
+					}
+				]
+			},
+			"acquireMs": {
+				"count": 2079,
+				"median": 0.001083,
+				"p95": 0.002125,
+				"p99": 0.00725,
+				"max": 0.023041,
+				"largest": [
+					{
+						"seconds": 2.246772209,
+						"frame": 55,
+						"milliseconds": 0.023041
+					},
+					{
+						"seconds": 12.272981834,
+						"frame": 98,
+						"milliseconds": 0.020333
+					},
+					{
+						"seconds": 7.5156725,
+						"frame": 107709,
+						"milliseconds": 0.0195
+					}
+				]
+			},
+			"uniformsMs": {
+				"count": 2079,
+				"median": 0.026292,
+				"p95": 0.045958000000000006,
+				"p99": 0.059916,
+				"max": 0.107208,
+				"largest": [
+					{
+						"seconds": 11.205812917,
+						"frame": 34,
+						"milliseconds": 0.107208
+					},
+					{
+						"seconds": 30.634956417,
+						"frame": 63,
+						"milliseconds": 0.098417
+					},
+					{
+						"seconds": 33.329704334,
+						"frame": 36,
+						"milliseconds": 0.083291
+					}
+				]
+			},
+			"submitMs": {
+				"count": 2079,
+				"median": 0.0045000000000000005,
+				"p95": 0.008667,
+				"p99": 0.029834,
+				"max": 1055.2541660000002,
+				"largest": [
+					{
+						"seconds": 1.438481875,
+						"frame": 7,
+						"milliseconds": 1055.2541660000002
+					},
+					{
+						"seconds": 48.680980708999996,
+						"frame": 107922,
+						"milliseconds": 1031.190333
+					},
+					{
+						"seconds": 42.321447125,
+						"frame": 7,
+						"milliseconds": 1011.444542
+					}
+				]
+			}
+		},
+		"controlEvents": [
+			{
+				"event": "AudioSegmentsResolved { elapsed: 1.541µs }",
+				"seconds": 0.382644292,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 48.875µs }",
+				"seconds": 0.382695042,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 1.055783917s, buffered_frames: 7, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 1.438496125,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 4.41ms, has_audio: true }",
+				"seconds": 1.4429072920000001,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 1.060293125s }",
+				"seconds": 1.4429078340000001,
+				"stage": "control"
+			},
+			{
+				"event": "RendererDropped { frame_number: 53967, replacement_frame_number: 53968 }",
+				"seconds": 3.568118709,
+				"stage": "control"
+			},
+			{
+				"event": "RendererDropped { frame_number: 107655, replacement_frame_number: 107656 }",
+				"seconds": 6.644445542,
+				"stage": "control"
+			},
+			{
+				"event": "RendererDropped { frame_number: 107657, replacement_frame_number: 107658 }",
+				"seconds": 6.668500667,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.125µs }",
+				"seconds": 9.745549459,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 542ns }",
+				"seconds": 9.745562125,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 1.007604625s, buffered_frames: 4, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 10.75328875,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 1.632625ms, has_audio: true }",
+				"seconds": 10.754922667,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 1.009394875s }",
+				"seconds": 10.75492275,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 1.916µs }",
+				"seconds": 12.906098625,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 667ns }",
+				"seconds": 12.906120417,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 1.0085025s, buffered_frames: 4, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 13.91466375,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 8.160792ms, has_audio: true }",
+				"seconds": 13.922825792,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 1.016742625s }",
+				"seconds": 13.922826542,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2µs }",
+				"seconds": 16.05910325,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 458ns }",
+				"seconds": 16.059119,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 1.00859s, buffered_frames: 4, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 17.067777084,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 10.520708ms, has_audio: true }",
+				"seconds": 17.078299292,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 1.019209792s }",
+				"seconds": 17.078299709,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 1.916µs }",
+				"seconds": 19.2116215,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 875ns }",
+				"seconds": 19.211640084,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 1.011880125s, buffered_frames: 4, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 20.223605584,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 1.342584ms, has_audio: true }",
+				"seconds": 20.22494925,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 1.013345083s }",
+				"seconds": 20.224949542,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.042µs }",
+				"seconds": 22.362321,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 667ns }",
+				"seconds": 22.362330209,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 1.007562959s, buffered_frames: 6, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 23.369940209,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 1.131583ms, has_audio: true }",
+				"seconds": 23.371073417,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 1.008765208s }",
+				"seconds": 23.371073542,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 1.417µs }",
+				"seconds": 25.51930725,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 500ns }",
+				"seconds": 25.519346375,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 1.009225208s, buffered_frames: 6, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 26.528594959,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 2.315959ms, has_audio: true }",
+				"seconds": 26.53091225,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 1.011620083s }",
+				"seconds": 26.530912375,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.084µs }",
+				"seconds": 28.680610625,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 667ns }",
+				"seconds": 28.680654709,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 1.008298584s, buffered_frames: 7, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 29.688974625,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 9.948584ms, has_audio: true }",
+				"seconds": 29.698924625,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 1.0183295s }",
+				"seconds": 29.698925167,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.125µs }",
+				"seconds": 31.831897792,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 625ns }",
+				"seconds": 31.831926875,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 1.008983792s, buffered_frames: 6, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 32.84094725,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 4.262834ms, has_audio: true }",
+				"seconds": 32.84521125,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 1.013328791s }",
+				"seconds": 32.845211667,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 1.75µs }",
+				"seconds": 34.9972415,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 417ns }",
+				"seconds": 34.997268209,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 1.010781208s, buffered_frames: 6, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 36.008078417,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 3.676542ms, has_audio: true }",
+				"seconds": 36.011756417,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 1.014539458s }",
+				"seconds": 36.011756875,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2µs }",
+				"seconds": 38.14565475,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 584ns }",
+				"seconds": 38.145659625,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 1.008024083s, buffered_frames: 7, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 39.153741542,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 5.800125ms, has_audio: true }",
+				"seconds": 39.159543,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 1.013905292s }",
+				"seconds": 39.159543709,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 1.542µs }",
+				"seconds": 41.309869375,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 542ns }",
+				"seconds": 41.309884834,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 1.011531125s, buffered_frames: 7, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 42.3214655,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 4.591708ms, has_audio: true }",
+				"seconds": 42.326058917,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 1.016205125s }",
+				"seconds": 42.32605975,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 1.917µs }",
+				"seconds": 44.447073459,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 15.75µs }",
+				"seconds": 44.447122709,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 1.009152791s, buffered_frames: 7, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 45.456289,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 5.994208ms, has_audio: true }",
+				"seconds": 45.462285584,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 1.015227166s }",
+				"seconds": 45.462285792,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 1.208µs }",
+				"seconds": 47.583540959,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.834µs }",
+				"seconds": 47.5835615,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 1.097290333s, buffered_frames: 4, target_frames: 30, start_frame_number: 107922 }",
+				"seconds": 48.680987625,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 3.0125ms, has_audio: true }",
+				"seconds": 48.684001792,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 1.100488083s }",
+				"seconds": 48.684002167,
+				"stage": "control"
+			}
+		],
+		"scope": "Sampled windows of long timelines in native EditorInstance/GPU and production headless audio callback; not full-duration playback, physical audio or WebView display acceptance."
+	},
+	{
+		"artifact": "30min-mainloop.json.gz",
+		"uncompressedSha256": "be492a26f5f7abb3f616eba20ee222d63ebfce59f6d2569460b3acb43bdd6e3f",
+		"passed": true,
+		"error": null,
+		"startupMs": 427.6605,
+		"fps": 60,
+		"replayRounds": 12,
+		"windowCount": 15,
+		"sourcePhaseChecks": 1767,
+		"naturalEndVerified": true,
+		"timingEvents": 5778,
+		"windows": [
+			{
+				"audio_video_offsets_ms": [
+					13.784120999999816, 10.536339000000172, 9.253849999999897
+				],
+				"frames": 162,
+				"name": "initial",
+				"source_checks": 121,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					14.856537000000003, 10.530131000000331, 5.840683000000624
+				],
+				"frames": 162,
+				"name": "middle-boundary",
+				"source_checks": 112,
+				"target_frame": 53964
+			},
+			{
+				"audio_video_offsets_ms": [7.77081999999929],
+				"frames": 162,
+				"name": "tail",
+				"source_checks": 133,
+				"target_frame": 107654
+			},
+			{
+				"audio_video_offsets_ms": [
+					8.443081999999436, 9.879342999999707, 3.096061000000816
+				],
+				"frames": 162,
+				"name": "rewind-replay-0",
+				"source_checks": 117,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					10.915441999998166, 8.90795299999958, 5.257796000000425
+				],
+				"frames": 162,
+				"name": "rewind-replay-1",
+				"source_checks": 117,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					6.621968999997563, 7.4586050000000625, 2.952698000001419
+				],
+				"frames": 160,
+				"name": "rewind-replay-2",
+				"source_checks": 116,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					10.105747000000775, 9.513173999998514, 8.265350999998589
+				],
+				"frames": 162,
+				"name": "rewind-replay-3",
+				"source_checks": 117,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					7.751522999999594, 8.258699999998953, 5.221251999998344
+				],
+				"frames": 162,
+				"name": "rewind-replay-4",
+				"source_checks": 117,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					10.008091999999635, 9.006060000000815, 4.942611999997126
+				],
+				"frames": 162,
+				"name": "rewind-replay-5",
+				"source_checks": 117,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					11.11007700000144, 6.664129000000685, 1.8543889999982355
+				],
+				"frames": 163,
+				"name": "rewind-replay-6",
+				"source_checks": 118,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					13.08143700000386, 7.502738999995984, 9.702832999998634
+				],
+				"frames": 162,
+				"name": "rewind-replay-7",
+				"source_checks": 117,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					11.036423000000184, 10.740390999998795, 8.66831799999801
+				],
+				"frames": 162,
+				"name": "rewind-replay-8",
+				"source_checks": 117,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					9.240532999996276, 9.920335000003888, 2.9417619999989597
+				],
+				"frames": 161,
+				"name": "rewind-replay-9",
+				"source_checks": 116,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					8.369975999997337, 14.424611000002585, 6.015955000002293
+				],
+				"frames": 161,
+				"name": "rewind-replay-10",
+				"source_checks": 116,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					7.692460999997763, 5.929012999999372, 3.516147999995667
+				],
+				"frames": 161,
+				"name": "rewind-replay-11",
+				"source_checks": 116,
+				"target_frame": 7
+			}
+		],
+		"plannedAudioToNativeVideoOffsetMs": {
+			"count": 43,
+			"median": 8.443081999999436,
+			"p95": 13.784120999999816,
+			"p99": 14.856537000000003,
+			"max": 14.856537000000003
+		},
+		"audioCallbackLatenessMs": {
+			"count": 4582,
+			"median": 1.8003374999988608,
+			"p95": 2.432353999999748,
+			"p99": 2.6144590000001244,
+			"max": 13.899893000001384
+		},
+		"metrics": {
+			"renderMs": {
+				"count": 2853,
+				"median": 7.266,
+				"p95": 12.961041,
+				"p99": 16.354332999999997,
+				"max": 149.687667,
+				"largest": [
+					{
+						"seconds": 0.574898291,
+						"frame": 7,
+						"milliseconds": 149.687667
+					},
+					{
+						"seconds": 22.331882083,
+						"frame": 192,
+						"milliseconds": 33.04775
+					},
+					{
+						"seconds": 18.091044833,
+						"frame": 125,
+						"milliseconds": 29.531083
+					}
+				]
+			},
+			"queueMs": {
+				"count": 2853,
+				"median": 0.021292,
+				"p95": 0.05450000000000001,
+				"p99": 0.5305000000000001,
+				"max": 10.996041,
+				"largest": [
+					{
+						"seconds": 22.347973625,
+						"frame": 0,
+						"milliseconds": 10.996041
+					},
+					{
+						"seconds": 30.053935583,
+						"frame": 90,
+						"milliseconds": 7.342541
+					},
+					{
+						"seconds": 42.143943416,
+						"frame": 62,
+						"milliseconds": 5.4026250000000005
+					}
+				]
+			},
+			"backgroundMs": {
+				"count": 2853,
+				"median": 0.22054200000000002,
+				"p95": 0.9339580000000001,
+				"p99": 1.520583,
+				"max": 112.85445800000001,
+				"largest": [
+					{
+						"seconds": 0.574898291,
+						"frame": 7,
+						"milliseconds": 112.85445800000001
+					},
+					{
+						"seconds": 22.331882083,
+						"frame": 192,
+						"milliseconds": 25.300832999999997
+					},
+					{
+						"seconds": 9.777504875,
+						"frame": 0,
+						"milliseconds": 20.180333
+					}
+				]
+			},
+			"displayMs": {
+				"count": 2853,
+				"median": 0.099041,
+				"p95": 0.206125,
+				"p99": 0.29975,
+				"max": 25.422625,
+				"largest": [
+					{
+						"seconds": 0.574898291,
+						"frame": 7,
+						"milliseconds": 25.422625
+					},
+					{
+						"seconds": 18.061382625,
+						"frame": 124,
+						"milliseconds": 1.390292
+					},
+					{
+						"seconds": 15.914749083,
+						"frame": 184,
+						"milliseconds": 0.672334
+					}
+				]
+			},
+			"cameraMs": {
+				"count": 2853,
+				"median": 0.011792,
+				"p95": 0.06612499999999999,
+				"p99": 0.123833,
+				"max": 0.39379200000000003,
+				"largest": [
+					{
+						"seconds": 0.61011875,
+						"frame": 8,
+						"milliseconds": 0.39379200000000003
+					},
+					{
+						"seconds": 26.569948625,
+						"frame": 70,
+						"milliseconds": 0.355833
+					},
+					{
+						"seconds": 0.574898291,
+						"frame": 7,
+						"milliseconds": 0.321834
+					}
+				]
+			},
+			"finishWaitMs": {
+				"count": 2853,
+				"median": 4.1e-5,
+				"p95": 0.000166,
+				"p99": 0.00025,
+				"max": 0.000583,
+				"largest": [
+					{
+						"seconds": 33.143832166,
+						"frame": 88,
+						"milliseconds": 0.000583
+					},
+					{
+						"seconds": 15.128530625,
+						"frame": 137,
+						"milliseconds": 0.0005
+					},
+					{
+						"seconds": 0.742152333,
+						"frame": 16,
+						"milliseconds": 0.000458
+					}
+				]
+			},
+			"submitReadbackMs": {
+				"count": 2853,
+				"median": 0.045584,
+				"p95": 0.10354100000000001,
+				"p99": 0.194833,
+				"max": 0.5718340000000001,
+				"largest": [
+					{
+						"seconds": 15.937945958,
+						"frame": 185,
+						"milliseconds": 0.5718340000000001
+					},
+					{
+						"seconds": 15.914749083,
+						"frame": 184,
+						"milliseconds": 0.430125
+					},
+					{
+						"seconds": 35.138692958,
+						"frame": 20,
+						"milliseconds": 0.40141699999999997
+					}
+				]
+			},
+			"immediateFlushMs": {
+				"count": 2853,
+				"median": 6.650875,
+				"p95": 12.106167,
+				"p99": 15.100708,
+				"max": 20.685041000000002,
+				"largest": [
+					{
+						"seconds": 35.838373625,
+						"frame": 61,
+						"milliseconds": 20.685041000000002
+					},
+					{
+						"seconds": 30.027695833,
+						"frame": 88,
+						"milliseconds": 19.870292000000003
+					},
+					{
+						"seconds": 18.138596375,
+						"frame": 128,
+						"milliseconds": 19.705792
+					}
+				]
+			},
+			"callbackMs": {
+				"count": 2853,
+				"median": 0.050417000000000003,
+				"p95": 0.06754099999999999,
+				"p99": 0.107125,
+				"max": 1.957583,
+				"largest": [
+					{
+						"seconds": 22.7084135,
+						"frame": 26,
+						"milliseconds": 1.957583
+					},
+					{
+						"seconds": 15.900366625,
+						"frame": 183,
+						"milliseconds": 0.592584
+					},
+					{
+						"seconds": 30.027695833,
+						"frame": 88,
+						"milliseconds": 0.581708
+					}
+				]
+			},
+			"overshootMs": {
+				"count": 2845,
+				"median": 2.706203,
+				"p95": 3.9453379999999996,
+				"p99": 4.1401449999999995,
+				"max": 17.114444,
+				"largest": [
+					{
+						"seconds": 41.958793125,
+						"frame": 51,
+						"milliseconds": 17.114444
+					},
+					{
+						"seconds": 18.08377125,
+						"frame": 126,
+						"milliseconds": 12.520711
+					},
+					{
+						"seconds": 18.116214708,
+						"frame": 128,
+						"milliseconds": 11.62846
+					}
+				]
+			},
+			"acquireMs": {
+				"count": 2845,
+				"median": 0.001041,
+				"p95": 0.002041,
+				"p99": 0.00825,
+				"max": 0.135167,
+				"largest": [
+					{
+						"seconds": 7.272081791,
+						"frame": 107692,
+						"milliseconds": 0.135167
+					},
+					{
+						"seconds": 18.038557375,
+						"frame": 124,
+						"milliseconds": 0.06945799999999999
+					},
+					{
+						"seconds": 16.271534791,
+						"frame": 18,
+						"milliseconds": 0.034709000000000004
+					}
+				]
+			},
+			"uniformsMs": {
+				"count": 2845,
+				"median": 0.026875,
+				"p95": 0.049709,
+				"p99": 0.08475,
+				"max": 10.662291000000002,
+				"largest": [
+					{
+						"seconds": 18.133148625,
+						"frame": 129,
+						"milliseconds": 10.662291000000002
+					},
+					{
+						"seconds": 15.789958500000001,
+						"frame": 177,
+						"milliseconds": 0.667417
+					},
+					{
+						"seconds": 18.455711708,
+						"frame": 149,
+						"milliseconds": 0.254833
+					}
+				]
+			},
+			"submitMs": {
+				"count": 2845,
+				"median": 0.004875,
+				"p95": 0.009541000000000001,
+				"p99": 0.027542,
+				"max": 149.74362499999998,
+				"largest": [
+					{
+						"seconds": 0.57490625,
+						"frame": 7,
+						"milliseconds": 149.74362499999998
+					},
+					{
+						"seconds": 47.550338625,
+						"frame": 107922,
+						"milliseconds": 20.6585
+					},
+					{
+						"seconds": 28.643940833,
+						"frame": 7,
+						"milliseconds": 15.867249999999999
+					}
+				]
+			}
+		},
+		"controlEvents": [
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 55.125µs }",
+				"seconds": 0.424821708,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 11.792µs }",
+				"seconds": 0.424902333,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 149.952208ms, buffered_frames: 5, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 0.574913125,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 3.719375ms, has_audio: true }",
+				"seconds": 0.578633666,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 153.900958ms }",
+				"seconds": 0.578634375,
+				"stage": "control"
+			},
+			{
+				"event": "RendererDropped { frame_number: 53967, replacement_frame_number: 53968 }",
+				"seconds": 3.607640541,
+				"stage": "control"
+			},
+			{
+				"event": "RendererDropped { frame_number: 107656, replacement_frame_number: 107657 }",
+				"seconds": 6.693840583,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 1.834µs }",
+				"seconds": 9.7832705,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 917ns }",
+				"seconds": 9.783290166,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 11.446583ms, buffered_frames: 7, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 9.79477425,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 10.182542ms, has_audio: true }",
+				"seconds": 9.804957666,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 21.699125ms }",
+				"seconds": 9.804958083,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 1.542µs }",
+				"seconds": 12.926738291,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 458ns }",
+				"seconds": 12.926763208,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 13.625709ms, buffered_frames: 7, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 12.9404755,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 11.506834ms, has_audio: true }",
+				"seconds": 12.951983208,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 25.259791ms }",
+				"seconds": 12.951983833,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 1.417µs }",
+				"seconds": 16.073581916,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 667ns }",
+				"seconds": 16.073593375,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 13.58275ms, buffered_frames: 6, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 16.087240041,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 628.75µs, has_audio: true }",
+				"seconds": 16.087869791,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 14.304584ms }",
+				"seconds": 16.087870041,
+				"stage": "control"
+			},
+			{
+				"event": "RendererDropped { frame_number: 126, replacement_frame_number: 127 }",
+				"seconds": 18.091054958,
+				"stage": "control"
+			},
+			{
+				"event": "RendererDropped { frame_number: 129, replacement_frame_number: 130 }",
+				"seconds": 18.1386075,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 1.666µs }",
+				"seconds": 19.197370708,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 625ns }",
+				"seconds": 19.197410333,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 13.0615ms, buffered_frames: 7, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 19.210555916,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 2.7275ms, has_audio: true }",
+				"seconds": 19.213284458,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 15.927042ms }",
+				"seconds": 19.213284875,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 1.792µs }",
+				"seconds": 22.356117666,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 583ns }",
+				"seconds": 22.356135,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 12.733291ms, buffered_frames: 7, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 22.368992958,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 11.044458ms, has_audio: true }",
+				"seconds": 22.380038416,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 23.937833ms }",
+				"seconds": 22.380039125,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.625µs }",
+				"seconds": 25.490188083,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 1µs }",
+				"seconds": 25.490215375,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 13.153375ms, buffered_frames: 5, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 25.503485333,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 2.511083ms, has_audio: true }",
+				"seconds": 25.5059975,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 15.837625ms }",
+				"seconds": 25.505998125,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 1.625µs }",
+				"seconds": 28.627934291,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 541ns }",
+				"seconds": 28.627970583,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 15.961916ms, buffered_frames: 7, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 28.643952208,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 9.161417ms, has_audio: true }",
+				"seconds": 28.65311475,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 25.194417ms }",
+				"seconds": 28.653115541,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.125µs }",
+				"seconds": 31.761531,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 666ns }",
+				"seconds": 31.761550416,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 14.921875ms, buffered_frames: 7, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 31.776529875,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 2.340709ms, has_audio: true }",
+				"seconds": 31.778871916,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 17.355875ms }",
+				"seconds": 31.778872166,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 1.958µs }",
+				"seconds": 34.89922475,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 500ns }",
+				"seconds": 34.899277916,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 12.6815ms, buffered_frames: 7, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 34.911994333,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 2.431125ms, has_audio: true }",
+				"seconds": 34.914426458,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 15.234458ms }",
+				"seconds": 34.914427041,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 1.583µs }",
+				"seconds": 38.036007125,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 583ns }",
+				"seconds": 38.036031125,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 13.631042ms, buffered_frames: 4, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 38.049721791,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 11.639292ms, has_audio: true }",
+				"seconds": 38.061362541,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 25.36875ms }",
+				"seconds": 38.061363333,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 1.541µs }",
+				"seconds": 41.183641958,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 542ns }",
+				"seconds": 41.183655541,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 13.839917ms, buffered_frames: 7, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 41.197546833,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 10.569125ms, has_audio: true }",
+				"seconds": 41.208117,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 24.487583ms }",
+				"seconds": 41.208117583,
+				"stage": "control"
+			},
+			{
+				"event": "RendererDropped { frame_number: 51, replacement_frame_number: 52 }",
+				"seconds": 41.958836375,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 583ns }",
+				"seconds": 44.328664833,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2µs }",
+				"seconds": 44.328665375,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 14.191375ms, buffered_frames: 7, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 44.342914333,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 10.601541ms, has_audio: true }",
+				"seconds": 44.353516958,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 24.871542ms }",
+				"seconds": 44.353517291,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 1.333µs }",
+				"seconds": 47.459892583,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 583ns }",
+				"seconds": 47.459899958,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 90.377833ms, buffered_frames: 4, target_frames: 30, start_frame_number: 107922 }",
+				"seconds": 47.55034875,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 3.753083ms, has_audio: true }",
+				"seconds": 47.55410325,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 94.223916ms }",
+				"seconds": 47.554103541,
+				"stage": "control"
+			}
+		],
+		"scope": "Sampled windows of long timelines in native EditorInstance/GPU and production headless audio callback; not full-duration playback, physical audio or WebView display acceptance."
+	},
+	{
+		"artifact": "60min-observer-attached.json.gz",
+		"uncompressedSha256": "fc726c2fdb9bec3036365f565341b10a42d0ce8da3d8b4765c46758f8fb045c3",
+		"passed": true,
+		"error": null,
+		"startupMs": 427.565333,
+		"fps": 60,
+		"replayRounds": 12,
+		"windowCount": 15,
+		"sourcePhaseChecks": 1719,
+		"naturalEndVerified": true,
+		"timingEvents": 5637,
+		"windows": [
+			{
+				"audio_video_offsets_ms": [
+					11.470955999999921, 8.4004249999996, 5.67818500000028
+				],
+				"frames": 162,
+				"name": "initial",
+				"source_checks": 118,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					6.668246000000266, 18.27009000000057, 10.810557999999304
+				],
+				"frames": 162,
+				"name": "middle-boundary",
+				"source_checks": 111,
+				"target_frame": 107964
+			},
+			{
+				"audio_video_offsets_ms": [18.211279000000857],
+				"frames": 162,
+				"name": "tail",
+				"source_checks": 133,
+				"target_frame": 215654
+			},
+			{
+				"audio_video_offsets_ms": [
+					13.58716600000065, 10.752884000000407, 7.33289499999934
+				],
+				"frames": 162,
+				"name": "rewind-replay-0",
+				"source_checks": 117,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					14.259317000000493, 15.31295200000038, 3.9347960000011284
+				],
+				"frames": 160,
+				"name": "rewind-replay-1",
+				"source_checks": 115,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					11.787258999998329, 16.83093600000163, 12.384487999998584
+				],
+				"frames": 163,
+				"name": "rewind-replay-2",
+				"source_checks": 118,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					10.368284999998423, 10.77208699999943, 7.034138999998163
+				],
+				"frames": 163,
+				"name": "rewind-replay-3",
+				"source_checks": 118,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					10.768519999999171, 11.184947000000278, 9.082248999998654
+				],
+				"frames": 162,
+				"name": "rewind-replay-4",
+				"source_checks": 117,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					11.464921999998268, 12.57501599999955, 13.055275999999338
+				],
+				"frames": 163,
+				"name": "rewind-replay-5",
+				"source_checks": 118,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [15.020532000001197, 5.944333999998719],
+				"frames": 91,
+				"name": "rewind-replay-6",
+				"source_checks": 68,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					13.176805999997043, 13.283233000002781, 9.529619000005596
+				],
+				"frames": 162,
+				"name": "rewind-replay-7",
+				"source_checks": 117,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					16.831999000004316, 14.920383999999842, 16.442435999998395
+				],
+				"frames": 162,
+				"name": "rewind-replay-8",
+				"source_checks": 117,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					17.75869200000102, 17.76053600000438, 13.433337999998685
+				],
+				"frames": 162,
+				"name": "rewind-replay-9",
+				"source_checks": 117,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					15.791177000004097, 13.230645000000152, 5.60482200000223
+				],
+				"frames": 162,
+				"name": "rewind-replay-10",
+				"source_checks": 117,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					15.621660999997289, 13.09687999999909, 13.771890000001008
+				],
+				"frames": 163,
+				"name": "rewind-replay-11",
+				"source_checks": 118,
+				"target_frame": 7
+			}
+		],
+		"plannedAudioToNativeVideoOffsetMs": {
+			"count": 42,
+			"median": 12.815145999999444,
+			"p95": 17.76053600000438,
+			"p99": 18.27009000000057,
+			"max": 18.27009000000057
+		},
+		"audioCallbackLatenessMs": {
+			"count": 4619,
+			"median": 2.834802999998942,
+			"p95": 5.071993999997915,
+			"p99": 750.6080680000018,
+			"max": 1241.122707999999
+		},
+		"metrics": {
+			"renderMs": {
+				"count": 2782,
+				"median": 8.66575,
+				"p95": 15.303417,
+				"p99": 19.937832999999998,
+				"max": 1260.491625,
+				"largest": [
+					{
+						"seconds": 31.914441584,
+						"frame": 121,
+						"milliseconds": 1260.491625
+					},
+					{
+						"seconds": 0.526203292,
+						"frame": 7,
+						"milliseconds": 101.32775
+					},
+					{
+						"seconds": 16.076318292,
+						"frame": 188,
+						"milliseconds": 67.156958
+					}
+				]
+			},
+			"queueMs": {
+				"count": 2782,
+				"median": 0.043792,
+				"p95": 2.3675829999999998,
+				"p99": 7.034000000000001,
+				"max": 18.2335,
+				"largest": [
+					{
+						"seconds": 31.961206209,
+						"frame": 0,
+						"milliseconds": 18.2335
+					},
+					{
+						"seconds": 42.890580125,
+						"frame": 91,
+						"milliseconds": 12.446333000000001
+					},
+					{
+						"seconds": 18.163485834,
+						"frame": 126,
+						"milliseconds": 12.120791
+					}
+				]
+			},
+			"backgroundMs": {
+				"count": 2782,
+				"median": 0.3183545,
+				"p95": 1.541625,
+				"p99": 3.8907920000000003,
+				"max": 66.370666,
+				"largest": [
+					{
+						"seconds": 0.526203292,
+						"frame": 7,
+						"milliseconds": 66.370666
+					},
+					{
+						"seconds": 31.944189792,
+						"frame": 196,
+						"milliseconds": 22.132166
+					},
+					{
+						"seconds": 9.77536925,
+						"frame": 0,
+						"milliseconds": 15.705041999999999
+					}
+				]
+			},
+			"displayMs": {
+				"count": 2782,
+				"median": 0.197521,
+				"p95": 0.59575,
+				"p99": 0.874625,
+				"max": 23.641333,
+				"largest": [
+					{
+						"seconds": 0.526203292,
+						"frame": 7,
+						"milliseconds": 23.641333
+					},
+					{
+						"seconds": 34.76014775,
+						"frame": 172,
+						"milliseconds": 5.09675
+					},
+					{
+						"seconds": 32.733799375,
+						"frame": 51,
+						"milliseconds": 4.029584
+					}
+				]
+			},
+			"cameraMs": {
+				"count": 2782,
+				"median": 0.0265835,
+				"p95": 0.199708,
+				"p99": 0.302667,
+				"max": 0.737167,
+				"largest": [
+					{
+						"seconds": 25.297989584,
+						"frame": 176,
+						"milliseconds": 0.737167
+					},
+					{
+						"seconds": 12.678617459,
+						"frame": 178,
+						"milliseconds": 0.683
+					},
+					{
+						"seconds": 19.417472792,
+						"frame": 12,
+						"milliseconds": 0.631333
+					}
+				]
+			},
+			"finishWaitMs": {
+				"count": 2782,
+				"median": 4.2e-5,
+				"p95": 0.00020800000000000001,
+				"p99": 0.00033299999999999996,
+				"max": 0.114542,
+				"largest": [
+					{
+						"seconds": 38.132244625,
+						"frame": 185,
+						"milliseconds": 0.114542
+					},
+					{
+						"seconds": 42.790032334,
+						"frame": 85,
+						"milliseconds": 0.004
+					},
+					{
+						"seconds": 42.634380084,
+						"frame": 76,
+						"milliseconds": 0.003916
+					}
+				]
+			},
+			"submitReadbackMs": {
+				"count": 2782,
+				"median": 0.11156250000000001,
+				"p95": 0.284209,
+				"p99": 0.482042,
+				"max": 1.30875,
+				"largest": [
+					{
+						"seconds": 33.243651417,
+						"frame": 81,
+						"milliseconds": 1.30875
+					},
+					{
+						"seconds": 33.407945667,
+						"frame": 91,
+						"milliseconds": 1.2996660000000002
+					},
+					{
+						"seconds": 29.077137042,
+						"frame": 26,
+						"milliseconds": 1.268708
+					}
+				]
+			},
+			"immediateFlushMs": {
+				"count": 2782,
+				"median": 7.042417,
+				"p95": 13.009125,
+				"p99": 17.103832999999998,
+				"max": 1258.232209,
+				"largest": [
+					{
+						"seconds": 31.914441584,
+						"frame": 121,
+						"milliseconds": 1258.232209
+					},
+					{
+						"seconds": 16.076318292,
+						"frame": 188,
+						"milliseconds": 65.52383400000001
+					},
+					{
+						"seconds": 26.535607959,
+						"frame": 61,
+						"milliseconds": 22.762500000000003
+					}
+				]
+			},
+			"callbackMs": {
+				"count": 2782,
+				"median": 0.079,
+				"p95": 0.154167,
+				"p99": 0.27962499999999996,
+				"max": 3.540167,
+				"largest": [
+					{
+						"seconds": 11.137819667,
+						"frame": 85,
+						"milliseconds": 3.540167
+					},
+					{
+						"seconds": 12.413698709,
+						"frame": 162,
+						"milliseconds": 2.7451250000000003
+					},
+					{
+						"seconds": 15.185813459,
+						"frame": 138,
+						"milliseconds": 1.881708
+					}
+				]
+			},
+			"overshootMs": {
+				"count": 2773,
+				"median": 4.02074,
+				"p95": 7.507942,
+				"p99": 8.211677,
+				"max": 15.046772,
+				"largest": [
+					{
+						"seconds": 16.067801334,
+						"frame": 191,
+						"milliseconds": 15.046772
+					},
+					{
+						"seconds": 2.30882475,
+						"frame": 113,
+						"milliseconds": 14.523589999999999
+					},
+					{
+						"seconds": 18.135234959,
+						"frame": 125,
+						"milliseconds": 13.866544
+					}
+				]
+			},
+			"acquireMs": {
+				"count": 2773,
+				"median": 0.002167,
+				"p95": 0.005167,
+				"p99": 0.022125,
+				"max": 0.284416,
+				"largest": [
+					{
+						"seconds": 25.273311667,
+						"frame": 175,
+						"milliseconds": 0.284416
+					},
+					{
+						"seconds": 45.913520667,
+						"frame": 84,
+						"milliseconds": 0.142417
+					},
+					{
+						"seconds": 19.875707875,
+						"frame": 40,
+						"milliseconds": 0.108292
+					}
+				]
+			},
+			"uniformsMs": {
+				"count": 2773,
+				"median": 0.073791,
+				"p95": 0.208375,
+				"p99": 0.290333,
+				"max": 13.669875,
+				"largest": [
+					{
+						"seconds": 16.037402709,
+						"frame": 189,
+						"milliseconds": 13.669875
+					},
+					{
+						"seconds": 37.610615792,
+						"frame": 154,
+						"milliseconds": 0.8517079999999999
+					},
+					{
+						"seconds": 6.779285292,
+						"frame": 215662,
+						"milliseconds": 0.798
+					}
+				]
+			},
+			"submitMs": {
+				"count": 2773,
+				"median": 0.009791,
+				"p95": 0.023042,
+				"p99": 0.14725,
+				"max": 101.4,
+				"largest": [
+					{
+						"seconds": 0.526210667,
+						"frame": 7,
+						"milliseconds": 101.4
+					},
+					{
+						"seconds": 47.939757417,
+						"frame": 215922,
+						"milliseconds": 25.101666
+					},
+					{
+						"seconds": 9.810323459,
+						"frame": 7,
+						"milliseconds": 22.794083
+					}
+				]
+			}
+		},
+		"controlEvents": [
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 30.875µs }",
+				"seconds": 0.424335834,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 1.417µs }",
+				"seconds": 0.424482584,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 101.6725ms, buffered_frames: 5, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 0.526217667,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 993.125µs, has_audio: true }",
+				"seconds": 0.527211959,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 102.93625ms }",
+				"seconds": 0.527212125,
+				"stage": "control"
+			},
+			{
+				"event": "RendererDropped { frame_number: 107971, replacement_frame_number: 107972 }",
+				"seconds": 3.674844834,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 1.917µs }",
+				"seconds": 9.787293959,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 792ns }",
+				"seconds": 9.787317209,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 22.907666ms, buffered_frames: 4, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 9.810347459,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 4.473959ms, has_audio: true }",
+				"seconds": 9.814824417,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 27.5495ms }",
+				"seconds": 9.814825417,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.041µs }",
+				"seconds": 12.959017542,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 750ns }",
+				"seconds": 12.959049042,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 17.331792ms, buffered_frames: 5, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 12.97647725,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 9.505625ms, has_audio: true }",
+				"seconds": 12.985986125,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 26.985333ms }",
+				"seconds": 12.98598725,
+				"stage": "control"
+			},
+			{
+				"event": "RendererDropped { frame_number: 189, replacement_frame_number: 190 }",
+				"seconds": 16.076337584,
+				"stage": "control"
+			},
+			{
+				"event": "RendererDropped { frame_number: 190, replacement_frame_number: 191 }",
+				"seconds": 16.0764095,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.542µs }",
+				"seconds": 16.138708125,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 458ns }",
+				"seconds": 16.138722625,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 13.791709ms, buffered_frames: 4, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 16.152685,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 1.87975ms, has_audio: true }",
+				"seconds": 16.154567667,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 15.889791ms }",
+				"seconds": 16.154568667,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.875µs }",
+				"seconds": 19.296721917,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 791ns }",
+				"seconds": 19.297198209,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 14.910542ms, buffered_frames: 4, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 19.312494917,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 8.451208ms, has_audio: true }",
+				"seconds": 19.320948959,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 24.26ms }",
+				"seconds": 19.320949959,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.167µs }",
+				"seconds": 22.448524959,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 625ns }",
+				"seconds": 22.448549125,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 12.849083ms, buffered_frames: 7, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 22.461496959,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 7.471417ms, has_audio: true }",
+				"seconds": 22.468969667,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 20.461916ms }",
+				"seconds": 22.468970625,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.958µs }",
+				"seconds": 25.582776417,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 1.083µs }",
+				"seconds": 25.582791459,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 13.584167ms, buffered_frames: 7, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 25.596565625,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 8.407333ms, has_audio: true }",
+				"seconds": 25.604974417,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 22.263625ms }",
+				"seconds": 25.604975292,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.125µs }",
+				"seconds": 28.725612417,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 917ns }",
+				"seconds": 28.725622,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 19.329375ms, buffered_frames: 4, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 28.745034417,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 2.566334ms, has_audio: true }",
+				"seconds": 28.747602042,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 22.004875ms }",
+				"seconds": 28.74760275,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2µs }",
+				"seconds": 31.966956292,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 459ns }",
+				"seconds": 31.966962125,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 12.379709ms, buffered_frames: 5, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 31.979383625,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 3.752125ms, has_audio: true }",
+				"seconds": 31.983136875,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 16.192625ms }",
+				"seconds": 31.983137,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.292µs }",
+				"seconds": 35.128094209,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 875ns }",
+				"seconds": 35.128110792,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 19.820583ms, buffered_frames: 6, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 35.147997542,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 4.593583ms, has_audio: true }",
+				"seconds": 35.152592542,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 24.521875ms }",
+				"seconds": 35.152592834000004,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.417µs }",
+				"seconds": 38.288226875,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 750ns }",
+				"seconds": 38.288249667,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 18.380709ms, buffered_frames: 6, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 38.30672375,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 2.757125ms, has_audio: true }",
+				"seconds": 38.309483167,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 21.273625ms }",
+				"seconds": 38.309483334,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.917µs }",
+				"seconds": 41.43910325,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 750ns }",
+				"seconds": 41.4391225,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 18.119666ms, buffered_frames: 5, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 41.457329209,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 7.207333ms, has_audio: true }",
+				"seconds": 41.464538542,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 25.485041ms }",
+				"seconds": 41.464538959,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.459µs }",
+				"seconds": 44.6043985,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 750ns }",
+				"seconds": 44.60441925,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 13.382292ms, buffered_frames: 4, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 44.617887125,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 4.82375ms, has_audio: true }",
+				"seconds": 44.622712417,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 18.332167ms }",
+				"seconds": 44.622712625,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 1.792µs }",
+				"seconds": 47.7437845,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 625ns }",
+				"seconds": 47.7438035,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 195.898958ms, buffered_frames: 4, target_frames: 30, start_frame_number: 215922 }",
+				"seconds": 47.939764292,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 12.78125ms, has_audio: true }",
+				"seconds": 47.952547292,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 208.788541ms }",
+				"seconds": 47.952548417,
+				"stage": "control"
+			},
+			{
+				"event": "RendererDropped { frame_number: 215933, replacement_frame_number: 215934 }",
+				"seconds": 48.154442917,
+				"stage": "control"
+			}
+		],
+		"scope": "Sampled windows of long timelines in native EditorInstance/GPU and production headless audio callback; not full-duration playback, physical audio or WebView display acceptance."
+	},
+	{
+		"artifact": "60min-mainloop.json.gz",
+		"uncompressedSha256": "ca9b9e50dfaed52a2c8031fe8e1f32e4cbdf38e9ecdb09cae751208a87b91cbb",
+		"passed": true,
+		"error": null,
+		"startupMs": 169.38916700000001,
+		"fps": 60,
+		"replayRounds": 12,
+		"windowCount": 15,
+		"sourcePhaseChecks": 1761,
+		"naturalEndVerified": true,
+		"timingEvents": 5760,
+		"windows": [
+			{
+				"audio_video_offsets_ms": [
+					19.743671999999933, 11.94101500000011, 10.604108999999973
+				],
+				"frames": 162,
+				"name": "initial",
+				"source_checks": 119,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					3.8302109999999168, 12.977304999999717, 10.254023999999973
+				],
+				"frames": 162,
+				"name": "middle-boundary",
+				"source_checks": 111,
+				"target_frame": 107964
+			},
+			{
+				"audio_video_offsets_ms": [5.967786999999447],
+				"frames": 162,
+				"name": "tail",
+				"source_checks": 133,
+				"target_frame": 215654
+			},
+			{
+				"audio_video_offsets_ms": [
+					19.892714999999228, 21.959350000001265, 20.035401999999536
+				],
+				"frames": 162,
+				"name": "rewind-replay-0",
+				"source_checks": 117,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					23.649407000000622, 8.542333999999485, 14.728635999999184
+				],
+				"frames": 161,
+				"name": "rewind-replay-1",
+				"source_checks": 116,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					18.839227000000847, 14.238945000002445, 9.696038999997825
+				],
+				"frames": 162,
+				"name": "rewind-replay-2",
+				"source_checks": 117,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					10.468420000002254, 13.03847199999808, 11.582441000001609
+				],
+				"frames": 162,
+				"name": "rewind-replay-3",
+				"source_checks": 117,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					13.787279999998958, 12.746081999999603, 13.075008999997806
+				],
+				"frames": 162,
+				"name": "rewind-replay-4",
+				"source_checks": 117,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					14.628349000002316, 15.61377599999858, 6.675410999999798
+				],
+				"frames": 162,
+				"name": "rewind-replay-5",
+				"source_checks": 117,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					18.4132080000019, 16.276719000000384, 11.021354000000372
+				],
+				"frames": 162,
+				"name": "rewind-replay-6",
+				"source_checks": 117,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					12.690276999997252, 8.470578999997258, 4.016047000000356
+				],
+				"frames": 158,
+				"name": "rewind-replay-7",
+				"source_checks": 113,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					17.02584499999915, 10.819855000001155, 10.803407000004484
+				],
+				"frames": 161,
+				"name": "rewind-replay-8",
+				"source_checks": 116,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					10.776495999998303, 10.27625700000101, 6.9614339999972685
+				],
+				"frames": 162,
+				"name": "rewind-replay-9",
+				"source_checks": 117,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					18.740480999994702, 15.33240799999902, 17.80716900000101
+				],
+				"frames": 162,
+				"name": "rewind-replay-10",
+				"source_checks": 117,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					7.271840999997892, 7.111309999999094, 4.801904000004242
+				],
+				"frames": 162,
+				"name": "rewind-replay-11",
+				"source_checks": 117,
+				"target_frame": 7
+			}
+		],
+		"plannedAudioToNativeVideoOffsetMs": {
+			"count": 43,
+			"median": 12.690276999997252,
+			"p95": 20.035401999999536,
+			"p99": 23.649407000000622,
+			"max": 23.649407000000622
+		},
+		"audioCallbackLatenessMs": {
+			"count": 4579,
+			"median": 2.835539000000331,
+			"p95": 4.825504999999453,
+			"p99": 5.3019919999997,
+			"max": 28.08905599999889
+		},
+		"metrics": {
+			"renderMs": {
+				"count": 2840,
+				"median": 8.826021,
+				"p95": 15.205125,
+				"p99": 19.443875,
+				"max": 102.905125,
+				"largest": [
+					{
+						"seconds": 0.274858792,
+						"frame": 7,
+						"milliseconds": 102.905125
+					},
+					{
+						"seconds": 32.920334458,
+						"frame": 82,
+						"milliseconds": 62.913417
+					},
+					{
+						"seconds": 9.54259025,
+						"frame": 0,
+						"milliseconds": 35.803583
+					}
+				]
+			},
+			"queueMs": {
+				"count": 2840,
+				"median": 0.04425,
+				"p95": 2.146833,
+				"p99": 7.4429170000000004,
+				"max": 25.007125000000002,
+				"largest": [
+					{
+						"seconds": 32.962636458,
+						"frame": 87,
+						"milliseconds": 25.007125000000002
+					},
+					{
+						"seconds": 32.947198875,
+						"frame": 85,
+						"milliseconds": 21.590083
+					},
+					{
+						"seconds": 36.221239083,
+						"frame": 94,
+						"milliseconds": 16.443541999999997
+					}
+				]
+			},
+			"backgroundMs": {
+				"count": 2840,
+				"median": 0.34633349999999996,
+				"p95": 1.595708,
+				"p99": 2.975583,
+				"max": 69.513,
+				"largest": [
+					{
+						"seconds": 0.274858792,
+						"frame": 7,
+						"milliseconds": 69.513
+					},
+					{
+						"seconds": 9.54259025,
+						"frame": 0,
+						"milliseconds": 24.162917
+					},
+					{
+						"seconds": 22.151103125,
+						"frame": 7,
+						"milliseconds": 15.152875
+					}
+				]
+			},
+			"displayMs": {
+				"count": 2840,
+				"median": 0.209729,
+				"p95": 0.548208,
+				"p99": 0.7877500000000001,
+				"max": 19.757832999999998,
+				"largest": [
+					{
+						"seconds": 0.274858792,
+						"frame": 7,
+						"milliseconds": 19.757832999999998
+					},
+					{
+						"seconds": 36.310951292,
+						"frame": 100,
+						"milliseconds": 3.1379580000000002
+					},
+					{
+						"seconds": 22.308606625,
+						"frame": 15,
+						"milliseconds": 2.4892920000000003
+					}
+				]
+			},
+			"cameraMs": {
+				"count": 2840,
+				"median": 0.027187500000000003,
+				"p95": 0.186167,
+				"p99": 0.276875,
+				"max": 1.114334,
+				"largest": [
+					{
+						"seconds": 0.644716333,
+						"frame": 28,
+						"milliseconds": 1.114334
+					},
+					{
+						"seconds": 3.897326792,
+						"frame": 108000,
+						"milliseconds": 0.6751250000000001
+					},
+					{
+						"seconds": 2.37777225,
+						"frame": 132,
+						"milliseconds": 0.6221669999999999
+					}
+				]
+			},
+			"finishWaitMs": {
+				"count": 2840,
+				"median": 8.3e-5,
+				"p95": 0.000209,
+				"p99": 0.000292,
+				"max": 0.00425,
+				"largest": [
+					{
+						"seconds": 7.475367042,
+						"frame": 215719,
+						"milliseconds": 0.00425
+					},
+					{
+						"seconds": 8.058483792,
+						"frame": 215754,
+						"milliseconds": 0.004
+					},
+					{
+						"seconds": 18.130824375,
+						"frame": 143,
+						"milliseconds": 0.00045900000000000004
+					}
+				]
+			},
+			"submitReadbackMs": {
+				"count": 2840,
+				"median": 0.112083,
+				"p95": 0.278208,
+				"p99": 0.478791,
+				"max": 1.2812080000000001,
+				"largest": [
+					{
+						"seconds": 31.690201708,
+						"frame": 12,
+						"milliseconds": 1.2812080000000001
+					},
+					{
+						"seconds": 45.698203375,
+						"frame": 97,
+						"milliseconds": 1.2613329999999998
+					},
+					{
+						"seconds": 34.829436042,
+						"frame": 12,
+						"milliseconds": 1.123625
+					}
+				]
+			},
+			"immediateFlushMs": {
+				"count": 2840,
+				"median": 7.179812500000001,
+				"p95": 13.222458,
+				"p99": 16.830125000000002,
+				"max": 58.73225,
+				"largest": [
+					{
+						"seconds": 32.920334458,
+						"frame": 82,
+						"milliseconds": 58.73225
+					},
+					{
+						"seconds": 32.947198875,
+						"frame": 85,
+						"milliseconds": 23.412665999999998
+					},
+					{
+						"seconds": 1.20700025,
+						"frame": 61,
+						"milliseconds": 22.024458
+					}
+				]
+			},
+			"callbackMs": {
+				"count": 2840,
+				"median": 0.081208,
+				"p95": 0.148333,
+				"p99": 0.270417,
+				"max": 20.527166,
+				"largest": [
+					{
+						"seconds": 32.920334458,
+						"frame": 82,
+						"milliseconds": 20.527166
+					},
+					{
+						"seconds": 24.348668375,
+						"frame": 137,
+						"milliseconds": 7.460541
+					},
+					{
+						"seconds": 18.735420958,
+						"frame": 179,
+						"milliseconds": 2.4768749999999997
+					}
+				]
+			},
+			"overshootMs": {
+				"count": 2834,
+				"median": 3.8241895,
+				"p95": 7.565656,
+				"p99": 8.196503000000002,
+				"max": 19.34289,
+				"largest": [
+					{
+						"seconds": 32.922313833,
+						"frame": 86,
+						"milliseconds": 19.34289
+					},
+					{
+						"seconds": 37.132067375,
+						"frame": 150,
+						"milliseconds": 12.606327
+					},
+					{
+						"seconds": 32.89883025,
+						"frame": 85,
+						"milliseconds": 12.514641
+					}
+				]
+			},
+			"acquireMs": {
+				"count": 2834,
+				"median": 0.002125,
+				"p95": 0.004042,
+				"p99": 0.015625,
+				"max": 0.193125,
+				"largest": [
+					{
+						"seconds": 12.212202167,
+						"frame": 165,
+						"milliseconds": 0.193125
+					},
+					{
+						"seconds": 36.405415375,
+						"frame": 107,
+						"milliseconds": 0.178708
+					},
+					{
+						"seconds": 32.836707417,
+						"frame": 82,
+						"milliseconds": 0.162083
+					}
+				]
+			},
+			"uniformsMs": {
+				"count": 2834,
+				"median": 0.08777100000000002,
+				"p95": 0.153291,
+				"p99": 0.35795899999999997,
+				"max": 1.3042500000000001,
+				"largest": [
+					{
+						"seconds": 27.110961875,
+						"frame": 116,
+						"milliseconds": 1.3042500000000001
+					},
+					{
+						"seconds": 40.281448167,
+						"frame": 150,
+						"milliseconds": 1.14825
+					},
+					{
+						"seconds": 24.464769708,
+						"frame": 145,
+						"milliseconds": 0.871
+					}
+				]
+			},
+			"submitMs": {
+				"count": 2834,
+				"median": 0.0100625,
+				"p95": 0.023,
+				"p99": 0.093333,
+				"max": 102.964958,
+				"largest": [
+					{
+						"seconds": 0.274867458,
+						"frame": 7,
+						"milliseconds": 102.964958
+					},
+					{
+						"seconds": 22.151124417,
+						"frame": 7,
+						"milliseconds": 22.209833
+					},
+					{
+						"seconds": 41.032032167,
+						"frame": 7,
+						"milliseconds": 21.528208
+					}
+				]
+			}
+		},
+		"controlEvents": [
+			{
+				"event": "AudioSegmentsResolved { elapsed: 3.042µs }",
+				"seconds": 0.167648667,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 74.208µs }",
+				"seconds": 0.167748,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 107.119583ms, buffered_frames: 4, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 0.274873125,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 4.616ms, has_audio: true }",
+				"seconds": 0.279490167,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 111.85875ms }",
+				"seconds": 0.279490292,
+				"stage": "control"
+			},
+			{
+				"event": "RendererDropped { frame_number: 107967, replacement_frame_number: 107972 }",
+				"seconds": 3.42748625,
+				"stage": "control"
+			},
+			{
+				"event": "RendererDropped { frame_number: 215657, replacement_frame_number: 215662 }",
+				"seconds": 6.519357042,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 3.292µs }",
+				"seconds": 9.542916208,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 833ns }",
+				"seconds": 9.542922333,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 21.313458ms, buffered_frames: 4, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 9.564341083,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 8.947875ms, has_audio: true }",
+				"seconds": 9.573291083,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 30.398708ms }",
+				"seconds": 9.573291583,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.125µs }",
+				"seconds": 12.708790875,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 542ns }",
+				"seconds": 12.70881225,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 19.700375ms, buffered_frames: 7, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 12.7285955,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 11.156584ms, has_audio: true }",
+				"seconds": 12.739754625,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 30.980625ms }",
+				"seconds": 12.739755167,
+				"stage": "control"
+			},
+			{
+				"event": "RendererDropped { frame_number: 161, replacement_frame_number: 162 }",
+				"seconds": 15.331764083,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.125µs }",
+				"seconds": 15.83287375,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 834ns }",
+				"seconds": 15.832895042,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 13.931042ms, buffered_frames: 8, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 15.847066708,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 6.665083ms, has_audio: true }",
+				"seconds": 15.853733917,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 20.879708ms }",
+				"seconds": 15.853734625,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 1.584µs }",
+				"seconds": 18.973756042,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 417ns }",
+				"seconds": 18.973768167,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 17.244625ms, buffered_frames: 4, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 18.991097625,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 7.747667ms, has_audio: true }",
+				"seconds": 18.998846667,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 25.103792ms }",
+				"seconds": 18.998847292,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 3µs }",
+				"seconds": 22.126768292,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 500ns }",
+				"seconds": 22.126858292,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 23.535333ms, buffered_frames: 7, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 22.151143125,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 6.415ms, has_audio: true }",
+				"seconds": 22.157560458,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 30.822ms }",
+				"seconds": 22.1575615,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.458µs }",
+				"seconds": 25.268308292,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 1.042µs }",
+				"seconds": 25.268331666999998,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 13.455458ms, buffered_frames: 7, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 25.28186575,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 2.556292ms, has_audio: true }",
+				"seconds": 25.284424125,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 16.141959ms }",
+				"seconds": 25.284425208,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 3.375µs }",
+				"seconds": 28.41866025,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 583ns }",
+				"seconds": 28.418677958,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 15.007167ms, buffered_frames: 7, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 28.433804625,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 7.440834ms, has_audio: true }",
+				"seconds": 28.441246875,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 22.615ms }",
+				"seconds": 28.441247625,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 1.75µs }",
+				"seconds": 31.567479542,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 1.25µs }",
+				"seconds": 31.567523708,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 14.842458ms, buffered_frames: 6, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 31.58244425,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 3.7375ms, has_audio: true }",
+				"seconds": 31.586184167,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 18.745333ms }",
+				"seconds": 31.586185125,
+				"stage": "control"
+			},
+			{
+				"event": "RendererDropped { frame_number: 83, replacement_frame_number: 85 }",
+				"seconds": 32.92035125,
+				"stage": "control"
+			},
+			{
+				"event": "RendererDropped { frame_number: 86, replacement_frame_number: 87 }",
+				"seconds": 32.947217125,
+				"stage": "control"
+			},
+			{
+				"event": "RendererDropped { frame_number: 88, replacement_frame_number: 89 }",
+				"seconds": 32.962654833,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.333µs }",
+				"seconds": 34.711249,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 1µs }",
+				"seconds": 34.711283417,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 13.283709ms, buffered_frames: 6, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 34.724669667,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 11.326125ms, has_audio: true }",
+				"seconds": 34.735997375,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 24.830791ms }",
+				"seconds": 34.735998083,
+				"stage": "control"
+			},
+			{
+				"event": "RendererDropped { frame_number: 95, replacement_frame_number: 96 }",
+				"seconds": 36.221252875,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.042µs }",
+				"seconds": 37.864573667,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 1.041µs }",
+				"seconds": 37.86459475,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 14.863875ms, buffered_frames: 7, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 37.879562292,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 10.221833ms, has_audio: true }",
+				"seconds": 37.889786708,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 25.238708ms }",
+				"seconds": 37.8897875,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.75µs }",
+				"seconds": 41.010005417,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 24.791µs }",
+				"seconds": 41.010037417,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 21.854458ms, buffered_frames: 5, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 41.032050042,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 4.818291ms, has_audio: true }",
+				"seconds": 41.036871125,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 26.890042ms }",
+				"seconds": 41.036872083,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 1.792µs }",
+				"seconds": 44.160700583,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 834ns }",
+				"seconds": 44.160725,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 15.755916ms, buffered_frames: 7, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 44.176596375,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 4.884041ms, has_audio: true }",
+				"seconds": 44.181481875,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 20.795125ms }",
+				"seconds": 44.181482583,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 1.792µs }",
+				"seconds": 47.309463542,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 792ns }",
+				"seconds": 47.309480417,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 204.183958ms, buffered_frames: 4, target_frames: 30, start_frame_number: 215922 }",
+				"seconds": 47.513758375,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 10.150334ms, has_audio: true }",
+				"seconds": 47.52391075,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 214.463334ms }",
+				"seconds": 47.523911458,
+				"stage": "control"
+			}
+		],
+		"scope": "Sampled windows of long timelines in native EditorInstance/GPU and production headless audio callback; not full-duration playback, physical audio or WebView display acceptance."
+	},
+	{
+		"artifact": "10min-runner-smoke.json.gz",
+		"uncompressedSha256": "b40dfd468cc198cb01ed333aff5037cb0865a04d1d6eb0d1217fba3ab582be11",
+		"passed": true,
+		"error": null,
+		"startupMs": 253.66125,
+		"fps": 60,
+		"replayRounds": 1,
+		"windowCount": 4,
+		"sourcePhaseChecks": 479,
+		"naturalEndVerified": true,
+		"timingEvents": 1640,
+		"windows": [
+			{
+				"audio_video_offsets_ms": [
+					15.575668999999959, 12.821428999999718, 9.713730999999726
+				],
+				"frames": 162,
+				"name": "initial",
+				"source_checks": 121,
+				"target_frame": 7
+			},
+			{
+				"audio_video_offsets_ms": [
+					3.348833999999634, 11.103386999999465, 4.667646999999775
+				],
+				"frames": 158,
+				"name": "middle-boundary",
+				"source_checks": 107,
+				"target_frame": 17964
+			},
+			{
+				"audio_video_offsets_ms": [5.837784000000568],
+				"frames": 162,
+				"name": "tail",
+				"source_checks": 133,
+				"target_frame": 35654
+			},
+			{
+				"audio_video_offsets_ms": [
+					24.215088000001828, 21.962890000001067, 7.079358000000369
+				],
+				"frames": 163,
+				"name": "rewind-replay-0",
+				"source_checks": 118,
+				"target_frame": 7
+			}
+		],
+		"plannedAudioToNativeVideoOffsetMs": {
+			"count": 10,
+			"median": 10.408558999999595,
+			"p95": 24.215088000001828,
+			"p99": 24.215088000001828,
+			"max": 24.215088000001828
+		},
+		"audioCallbackLatenessMs": {
+			"count": 1327,
+			"median": 2.8744820000010662,
+			"p95": 4.853860000000099,
+			"p99": 5.334142000000597,
+			"max": 30.84030799999926
+		},
+		"metrics": {
+			"renderMs": {
+				"count": 808,
+				"median": 8.2087705,
+				"p95": 14.080333,
+				"p99": 18.771,
+				"max": 137.241334,
+				"largest": [
+					{
+						"seconds": 0.395569042,
+						"frame": 7,
+						"milliseconds": 137.241334
+					},
+					{
+						"seconds": 6.265470792,
+						"frame": 18133,
+						"milliseconds": 61.427292
+					},
+					{
+						"seconds": 6.203889,
+						"frame": 18131,
+						"milliseconds": 46.025209
+					}
+				]
+			},
+			"queueMs": {
+				"count": 808,
+				"median": 0.039958499999999994,
+				"p95": 0.683667,
+				"p99": 5.965084,
+				"max": 11.268083,
+				"largest": [
+					{
+						"seconds": 10.719709333,
+						"frame": 69,
+						"milliseconds": 11.268083
+					},
+					{
+						"seconds": 5.409095958,
+						"frame": 18085,
+						"milliseconds": 10.707082999999999
+					},
+					{
+						"seconds": 10.705416917,
+						"frame": 68,
+						"milliseconds": 10.283000000000001
+					}
+				]
+			},
+			"backgroundMs": {
+				"count": 808,
+				"median": 0.35431250000000003,
+				"p95": 1.75325,
+				"p99": 3.640208,
+				"max": 89.946125,
+				"largest": [
+					{
+						"seconds": 0.395569042,
+						"frame": 7,
+						"milliseconds": 89.946125
+					},
+					{
+						"seconds": 9.617240833,
+						"frame": 0,
+						"milliseconds": 24.470417
+					},
+					{
+						"seconds": 6.265470792,
+						"frame": 18133,
+						"milliseconds": 23.423125
+					}
+				]
+			},
+			"displayMs": {
+				"count": 808,
+				"median": 0.18866650000000001,
+				"p95": 0.43720899999999996,
+				"p99": 0.7210409999999999,
+				"max": 30.099,
+				"largest": [
+					{
+						"seconds": 0.395569042,
+						"frame": 7,
+						"milliseconds": 30.099
+					},
+					{
+						"seconds": 8.393488042,
+						"frame": 35768,
+						"milliseconds": 1.130042
+					},
+					{
+						"seconds": 10.460015792,
+						"frame": 54,
+						"milliseconds": 0.844625
+					}
+				]
+			},
+			"cameraMs": {
+				"count": 808,
+				"median": 0.0125,
+				"p95": 0.141292,
+				"p99": 0.226708,
+				"max": 4.4450829999999995,
+				"largest": [
+					{
+						"seconds": 10.563051542,
+						"frame": 60,
+						"milliseconds": 4.4450829999999995
+					},
+					{
+						"seconds": 7.455749458,
+						"frame": 35712,
+						"milliseconds": 0.573708
+					},
+					{
+						"seconds": 6.48727175,
+						"frame": 18150,
+						"milliseconds": 0.477958
+					}
+				]
+			},
+			"finishWaitMs": {
+				"count": 808,
+				"median": 4.2e-5,
+				"p95": 0.00025,
+				"p99": 0.000334,
+				"max": 0.000542,
+				"largest": [
+					{
+						"seconds": 11.840746875,
+						"frame": 137,
+						"milliseconds": 0.000542
+					},
+					{
+						"seconds": 1.497787167,
+						"frame": 72,
+						"milliseconds": 0.000458
+					},
+					{
+						"seconds": 10.012448458,
+						"frame": 27,
+						"milliseconds": 0.000458
+					}
+				]
+			},
+			"submitReadbackMs": {
+				"count": 808,
+				"median": 0.06616649999999999,
+				"p95": 0.223208,
+				"p99": 0.381166,
+				"max": 0.816334,
+				"largest": [
+					{
+						"seconds": 9.89122025,
+						"frame": 20,
+						"milliseconds": 0.816334
+					},
+					{
+						"seconds": 0.694735583,
+						"frame": 24,
+						"milliseconds": 0.692584
+					},
+					{
+						"seconds": 10.096170917,
+						"frame": 32,
+						"milliseconds": 0.591167
+					}
+				]
+			},
+			"immediateFlushMs": {
+				"count": 808,
+				"median": 7.086854499999999,
+				"p95": 12.333874999999999,
+				"p99": 15.563583000000001,
+				"max": 44.958541999999994,
+				"largest": [
+					{
+						"seconds": 6.203889,
+						"frame": 18131,
+						"milliseconds": 44.958541999999994
+					},
+					{
+						"seconds": 6.265470792,
+						"frame": 18133,
+						"milliseconds": 37.623708
+					},
+					{
+						"seconds": 5.363153375,
+						"frame": 18082,
+						"milliseconds": 23.130959
+					}
+				]
+			},
+			"callbackMs": {
+				"count": 808,
+				"median": 0.068771,
+				"p95": 0.125166,
+				"p99": 0.547917,
+				"max": 5.0385,
+				"largest": [
+					{
+						"seconds": 9.809394625,
+						"frame": 15,
+						"milliseconds": 5.0385
+					},
+					{
+						"seconds": 8.041720833,
+						"frame": 35747,
+						"milliseconds": 1.606417
+					},
+					{
+						"seconds": 9.719801499999999,
+						"frame": 10,
+						"milliseconds": 1.18475
+					}
+				]
+			},
+			"overshootMs": {
+				"count": 809,
+				"median": 4.294295,
+				"p95": 7.567453,
+				"p99": 8.233766,
+				"max": 11.15136,
+				"largest": [
+					{
+						"seconds": 6.231145792,
+						"frame": 18135,
+						"milliseconds": 11.15136
+					},
+					{
+						"seconds": 10.653558792,
+						"frame": 66,
+						"milliseconds": 11.140564000000001
+					},
+					{
+						"seconds": 6.197631542,
+						"frame": 18133,
+						"milliseconds": 10.949610999999999
+					}
+				]
+			},
+			"acquireMs": {
+				"count": 809,
+				"median": 0.002125,
+				"p95": 0.003333,
+				"p99": 0.015666,
+				"max": 0.12245800000000001,
+				"largest": [
+					{
+						"seconds": 6.583445875,
+						"frame": 35660,
+						"milliseconds": 0.12245800000000001
+					},
+					{
+						"seconds": 5.673973708,
+						"frame": 18102,
+						"milliseconds": 0.079709
+					},
+					{
+						"seconds": 13.542922625,
+						"frame": 35964,
+						"milliseconds": 0.028917
+					}
+				]
+			},
+			"uniformsMs": {
+				"count": 809,
+				"median": 0.033958999999999996,
+				"p95": 0.055917,
+				"p99": 0.238209,
+				"max": 18.269167,
+				"largest": [
+					{
+						"seconds": 6.261811458,
+						"frame": 18136,
+						"milliseconds": 18.269167
+					},
+					{
+						"seconds": 1.5329993750000002,
+						"frame": 75,
+						"milliseconds": 0.787583
+					},
+					{
+						"seconds": 9.999449792,
+						"frame": 27,
+						"milliseconds": 0.5735
+					}
+				]
+			},
+			"submitMs": {
+				"count": 809,
+				"median": 0.009166,
+				"p95": 0.023667,
+				"p99": 0.14200000000000002,
+				"max": 137.362125,
+				"largest": [
+					{
+						"seconds": 0.395588708,
+						"frame": 7,
+						"milliseconds": 137.362125
+					},
+					{
+						"seconds": 12.834088,
+						"frame": 35922,
+						"milliseconds": 23.201791999999998
+					},
+					{
+						"seconds": 9.644001625,
+						"frame": 7,
+						"milliseconds": 15.540833000000001
+					}
+				]
+			}
+		},
+		"controlEvents": [
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.334µs }",
+				"seconds": 0.253063583,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 231.375µs }",
+				"seconds": 0.253304,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 142.441875ms, buffered_frames: 5, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 0.395619417,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 1.752ms, has_audio: true }",
+				"seconds": 0.397374083,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 144.338125ms }",
+				"seconds": 0.397375292,
+				"stage": "control"
+			},
+			{
+				"event": "RendererDropped { frame_number: 18134, replacement_frame_number: 18135 }",
+				"seconds": 6.265486167,
+				"stage": "control"
+			},
+			{
+				"event": "RendererDropped { frame_number: 18135, replacement_frame_number: 18136 }",
+				"seconds": 6.265523417,
+				"stage": "control"
+			},
+			{
+				"event": "RendererDropped { frame_number: 18136, replacement_frame_number: 18137 }",
+				"seconds": 6.2655337079999995,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 2.542µs }",
+				"seconds": 9.628234333,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 750ns }",
+				"seconds": 9.628246375,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 15.68325ms, buffered_frames: 5, target_frames: 30, start_frame_number: 7 }",
+				"seconds": 9.644043417,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 14.958541ms, has_audio: true }",
+				"seconds": 9.659016167,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 30.819791ms }",
+				"seconds": 9.659017,
+				"stage": "control"
+			},
+			{
+				"event": "AudioSegmentsResolved { elapsed: 3.458µs }",
+				"seconds": 12.777801125,
+				"stage": "control"
+			},
+			{
+				"event": "RendererPrepared { output_width: 1280, output_height: 720, duration: 1µs }",
+				"seconds": 12.777822542,
+				"stage": "control"
+			},
+			{
+				"event": "WarmupComplete { elapsed: 56.170667ms, buffered_frames: 4, target_frames: 30, start_frame_number: 35922 }",
+				"seconds": 12.834108292,
+				"stage": "control"
+			},
+			{
+				"event": "AudioPipelineReady { elapsed: 1.558709ms, has_audio: true }",
+				"seconds": 12.835669125,
+				"stage": "control"
+			},
+			{
+				"event": "ClockStarted { elapsed: 57.906416ms }",
+				"seconds": 12.835670667,
+				"stage": "control"
+			}
+		],
+		"scope": "Sampled windows of long timelines in native EditorInstance/GPU and production headless audio callback; not full-duration playback, physical audio or WebView display acceptance."
+	}
+]

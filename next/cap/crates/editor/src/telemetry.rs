@@ -1,20 +1,51 @@
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use tokio::sync::mpsc;
 
 #[derive(Clone)]
 pub struct PlaybackTelemetry {
-    tx: mpsc::UnboundedSender<PlaybackTelemetryEvent>,
+    sink: PlaybackTelemetrySink,
+}
+
+#[derive(Clone)]
+enum PlaybackTelemetrySink {
+    Event(mpsc::UnboundedSender<PlaybackTelemetryEvent>),
+    Timed(mpsc::UnboundedSender<(Instant, PlaybackTelemetryEvent)>),
 }
 
 impl PlaybackTelemetry {
     pub fn channel() -> (Self, mpsc::UnboundedReceiver<PlaybackTelemetryEvent>) {
         let (tx, rx) = mpsc::unbounded_channel();
-        (Self { tx }, rx)
+        (
+            Self {
+                sink: PlaybackTelemetrySink::Event(tx),
+            },
+            rx,
+        )
+    }
+
+    pub fn timed_channel() -> (
+        Self,
+        mpsc::UnboundedReceiver<(Instant, PlaybackTelemetryEvent)>,
+    ) {
+        let (tx, rx) = mpsc::unbounded_channel();
+        (
+            Self {
+                sink: PlaybackTelemetrySink::Timed(tx),
+            },
+            rx,
+        )
     }
 
     pub(crate) fn emit(&self, event: PlaybackTelemetryEvent) {
-        let _ = self.tx.send(event);
+        match &self.sink {
+            PlaybackTelemetrySink::Event(tx) => {
+                let _ = tx.send(event);
+            }
+            PlaybackTelemetrySink::Timed(tx) => {
+                let _ = tx.send((Instant::now(), event));
+            }
+        }
     }
 }
 
@@ -109,4 +140,24 @@ pub enum PlaybackRenderOutputFormat {
     Nv12,
     Rgba,
     Bgra,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn delayed_collection_preserves_producer_emission_time() {
+        let (telemetry, mut receiver) = PlaybackTelemetry::timed_channel();
+        let before = Instant::now();
+        telemetry.emit(PlaybackTelemetryEvent::ClockStarted {
+            elapsed: Duration::ZERO,
+        });
+        let after = Instant::now();
+        tokio::time::sleep(Duration::from_millis(15)).await;
+        let (emitted, event) = receiver.recv().await.unwrap();
+        assert!(emitted >= before && emitted <= after);
+        assert!(matches!(event, PlaybackTelemetryEvent::ClockStarted { .. }));
+        assert!(emitted < Instant::now());
+    }
 }

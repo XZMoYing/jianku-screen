@@ -1271,6 +1271,7 @@ async fn native_handoff_reuses_pcm_preserves_audio_across_candidate_disposal_and
         crate::EditorStartupInputs {
             recordings: None,
             completed_audio: Some(cache),
+            ..Default::default()
         },
     )
     .await
@@ -1473,6 +1474,7 @@ async fn native_silent_handoff_opens_and_renders_through_an_equivalent_editor_pa
             crate::EditorStartupInputs {
                 recordings: None,
                 completed_audio: Some(completed_audio),
+                ..Default::default()
             },
         )
         .await
@@ -1560,6 +1562,7 @@ async fn failed_handoff_installation_retires_native_candidate(cancelled: bool) {
         crate::EditorStartupInputs {
             recordings: None,
             completed_audio: if cancelled { Some(cache) } else { None },
+            ..Default::default()
         },
     )
     .await
@@ -1675,6 +1678,7 @@ async fn native_studio_sound_releases_preparing_audio_and_preserves_transport() 
             crate::EditorStartupInputs {
                 recordings: None,
                 completed_audio: Some(cache),
+                ..Default::default()
             },
         )
         .await

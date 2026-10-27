@@ -1,0 +1,22 @@
+[
+	{
+		"case": "existing-report",
+		"exitCode": 1,
+		"output": "Error: \"Choose a new output report path\""
+	},
+	{
+		"case": "unmarked-project",
+		"exitCode": 1,
+		"output": "Error: \"Only generated long-project fixtures are supported: No such file or directory (os error 2)\""
+	},
+	{
+		"case": "invalid-replays",
+		"exitCode": 1,
+		"output": "Error: \"Expected 1 to 20 replay rounds\""
+	},
+	{
+		"case": "invalid-trace",
+		"exitCode": 1,
+		"output": "Error: \"Expected trace option\""
+	}
+]

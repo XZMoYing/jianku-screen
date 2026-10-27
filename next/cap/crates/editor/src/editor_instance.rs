@@ -188,6 +188,7 @@ pub struct EditorInstance {
     pub export_active: AtomicBool,
     runtime_handle: tokio::runtime::Handle,
     audio_output: Arc<crate::AudioOutput>,
+    playback_telemetry: Option<crate::PlaybackTelemetry>,
 }
 
 impl EditorInstance {
@@ -285,6 +286,7 @@ impl EditorInstance {
             EditorStartupInputs {
                 recordings: Some(recordings),
                 completed_audio: None,
+                ..Default::default()
             },
         )
         .await
@@ -323,6 +325,7 @@ impl EditorInstance {
         let EditorStartupInputs {
             recordings: preloaded_recordings,
             completed_audio,
+            playback_telemetry,
         } = inputs;
         if !project_path.exists() {
             return Err(format!("Video path {} not found!", project_path.display()));
@@ -553,11 +556,12 @@ impl EditorInstance {
             .map_err(|e| format!("Segment setup task failed: {e}"))??;
         let layers_rx = editor::finish_renderer_layers_creation(layers_rx).await;
 
-        let renderer = Arc::new(editor::Renderer::spawn_with_format(
+        let renderer = Arc::new(editor::Renderer::spawn_with_format_and_telemetry(
             render_constants.clone(),
             frame_cb,
             layers_rx,
             frame_format,
+            playback_telemetry.clone(),
         )?);
 
         let (preview_tx, preview_rx) = watch::channel(None);
@@ -588,6 +592,7 @@ impl EditorInstance {
             playback_epoch: AtomicU64::new(0),
             runtime_handle: tokio::runtime::Handle::current(),
             audio_output,
+            playback_telemetry,
         });
 
         this.state.lock().await.preview_task =
@@ -680,11 +685,12 @@ impl EditorInstance {
         let project = self.project_config.1.borrow().clone();
         let layers = editor::start_renderer_layers_creation(&self.render_constants, &project);
         let layers = editor::finish_renderer_layers_creation(layers).await;
-        let renderer = Arc::new(editor::Renderer::spawn_with_format(
+        let renderer = Arc::new(editor::Renderer::spawn_with_format_and_telemetry(
             self.render_constants.clone(),
             frame_cb,
             layers,
             frame_format,
+            self.playback_telemetry.clone(),
         )?);
         let (preview_tx, preview_rx) = watch::channel(None);
         let (playback_active, playback_active_rx) = watch::channel(false);
@@ -713,6 +719,7 @@ impl EditorInstance {
             export_active: AtomicBool::new(false),
             runtime_handle: self.runtime_handle.clone(),
             audio_output: self.audio_output.clone(),
+            playback_telemetry: self.playback_telemetry.clone(),
         });
         next.state.lock().await.preview_task =
             Some(next.clone().spawn_preview_renderer(preview_rx));
@@ -870,7 +877,7 @@ impl EditorInstance {
                 start_frame_number,
                 project: self.project_config.0.subscribe(),
                 audio_output: self.audio_output.clone(),
-                telemetry: None,
+                telemetry: self.playback_telemetry.clone(),
             };
             let playback_handle = if let Some(adoption) = adoption {
                 playback
@@ -1427,6 +1434,7 @@ pub type AudioLoader = cap_audio::ProgressiveAudio;
 pub struct EditorStartupInputs {
     pub recordings: Option<Arc<ProjectRecordingsMeta>>,
     pub completed_audio: Option<CompletedAudioHandoff>,
+    pub playback_telemetry: Option<crate::PlaybackTelemetry>,
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]

@@ -343,6 +343,7 @@ impl PreparingConsumers {
                 cap_editor::EditorStartupInputs {
                     recordings: None,
                     completed_audio,
+                    ..Default::default()
                 },
                 continuing,
             ));
