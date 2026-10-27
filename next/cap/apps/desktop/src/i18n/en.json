@@ -1637,5 +1637,13 @@
 	"3D 镜头 · {name} · {duration}": "3D shot · {name} · {duration}",
 	"自动保存失败，当前编辑仍保留在窗口中。请检查磁盘空间和写入权限，再从「工程」菜单重试保存。": "Auto-save failed. Your edits are still in this window. Check disk space and write permissions, then retry Save from the Project menu.",
 	"自然运镜": "Natural glide",
-	"视角": "Field of view"
+	"视角": "Field of view",
+	"原始清晰度": "Original resolution",
+	"最高可用": "Highest available",
+	"不可用": "Unavailable",
+	"无法更新预览清晰度": "Unable to update preview resolution",
+	"2K（1440p）": "2K (1440p)",
+	"4K（2160p）": "4K (2160p)",
+	"清晰度按短边标注，实际尺寸随画幅变化": "Resolution uses the shorter edge; pixel dimensions follow the canvas aspect ratio.",
+	"Invalid preview canvas dimensions": "Invalid preview canvas dimensions"
 }

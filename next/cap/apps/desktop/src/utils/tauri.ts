@@ -355,6 +355,12 @@ async importAudioTrackFile(sourcePath: string) : Promise<ImportedAudioTrack> {
 async startPlayback(fps: number, resolutionBase: XY<number>) : Promise<null> {
     return await TAURI_INVOKE("start_playback", { fps, resolutionBase });
 },
+async getEditorPreviewResolutions(canvas: PreviewCanvasConfiguration) : Promise<PreviewResolutionOption[]> {
+    return await TAURI_INVOKE("get_editor_preview_resolutions", { canvas });
+},
+async setEditorPreviewResolution(resolutionBase: XY<number>) : Promise<boolean> {
+    return await TAURI_INVOKE("set_editor_preview_resolution", { resolutionBase });
+},
 async stopPlayback() : Promise<null> {
     return await TAURI_INVOKE("stop_playback");
 },
@@ -1125,7 +1131,7 @@ export type DisplayNotch = {
  */
 x: number; width: number; height: number }
 export type DownloadProgress = { progress: number; message: string }
-export type EditorPreviewQuality = "quarter" | "half" | "full"
+export type EditorPreviewQuality = "144p" | "360p" | "480p" | "540p" | "720p" | "1080p" | "1440p" | "2160p" | "original"
 export type EditorRecordingAdded = { editor_path: string; recording_path: string }
 export type EditorRecordingFlowChanged = { target: EditorRecordingFlowInfo | null }
 export type EditorRecordingFlowInfo = { projectPath: string; projectName: string }
@@ -1311,6 +1317,8 @@ export type PresentationSetup = { supported: boolean; displays: CaptureDisplay[]
 export type PresentationStatus = { active: boolean; curtain: boolean; frames: number; processingMs: number; error: string | null; wsPort: number; outputDetached: boolean }
 export type Preset = { name: string; config: ProjectConfiguration }
 export type PresetsStore = { presets: Preset[]; default: number | null }
+export type PreviewCanvasConfiguration = { aspectRatio: AspectRatio | null; crop: Crop | null; padding: number }
+export type PreviewResolutionOption = { quality: EditorPreviewQuality; resolutionBase: XY<number>; outputSize: XY<number>; available: boolean; limited: boolean }
 export type ProjectConfiguration = { aspectRatio: AspectRatio | null; background: BackgroundConfiguration; camera: Camera; audio: AudioConfiguration; cursor: CursorConfiguration; hotkeys: HotkeysConfiguration; timeline: TimelineConfiguration | null; overlayOrder: OverlayTrack[]; captions: CaptionsData | null; keyboard: KeyboardData | null; clips: ClipConfiguration[]; annotations: Annotation[]; screenMotionBlur?: number; screenMovementSpring?: ScreenMovementSpring;
 /**
  * Per-layer cinematic color grades. Field-level default keeps old
@@ -1378,7 +1386,7 @@ export type ScreenshotProjectExport = { imageBytes: number[]; config: ProjectCon
 export type ScreenshotProjectShareState = { config: ProjectConfiguration; sharing: ScreenshotSharingState | null }
 export type ScreenshotSharingState = { link: string; contentHash: string | null }
 export type SegmentRecordings = { display: Video; camera: Video | null; mic: Audio | null; system_audio: Audio | null }
-export type SerializedEditorInstance = { instanceId: string; preparingPlayback: boolean; framesSocketUrl: string; preparingSnapshot: PreparingEditorChanged | null; recordingDuration: number; savedProjectConfig: ProjectConfiguration; recordings: ProjectRecordingsMeta; path: string;
+export type SerializedEditorInstance = { instanceId: string; preparingPlayback: boolean; framesSocketUrl: string; preparingSnapshot: PreparingEditorChanged | null; recordingDuration: number; savedProjectConfig: ProjectConfiguration; previewResolutions: PreviewResolutionOption[]; recordings: ProjectRecordingsMeta; path: string;
 /**
  * Notch geometry the overlay uses when the project sets no manual
  * placement: this recording's own measurements where the recorder took

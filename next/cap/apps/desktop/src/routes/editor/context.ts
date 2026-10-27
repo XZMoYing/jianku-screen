@@ -53,6 +53,7 @@ import {
 	type FramesRendered,
 	type ImportedAudioTrack,
 	type MultipleSegments,
+	type PreviewCanvasConfiguration,
 	type ProjectConfiguration,
 	type RecordingMeta,
 	type SceneSegment,
@@ -100,6 +101,12 @@ import {
 import type { MaskSegment } from "./masks";
 import { usePreparingEditor } from "./preparing-editor-context";
 import { createPreparingPlaybackHandoff } from "./preparing-playback-handoff";
+import {
+	DEFAULT_PREVIEW_QUALITY,
+	previewCanvasConfiguration,
+	readPreviewQuality,
+	selectPreviewResolution,
+} from "./preview-resolution";
 import { createProjectConfigSave } from "./project-config-save";
 import { createRecordingBookmarks } from "./recording-bookmarks";
 import type { SnapGuide } from "./snapping";
@@ -194,24 +201,6 @@ export const FPS = 60;
 export const OUTPUT_SIZE = {
 	x: 1920,
 	y: 1080,
-};
-
-export const DEFAULT_PREVIEW_QUALITY: EditorPreviewQuality = "half";
-
-export const PREVIEW_QUALITY_SCALE: Record<EditorPreviewQuality, number> = {
-	full: 1,
-	half: 0.65,
-	quarter: 0.25,
-};
-
-export const getPreviewResolution = (
-	quality: EditorPreviewQuality,
-): XY<number> => {
-	const scale = PREVIEW_QUALITY_SCALE[quality];
-	const width = (Math.max(4, Math.round(OUTPUT_SIZE.x * scale)) + 3) & ~3;
-	const height = (Math.max(2, Math.round(OUTPUT_SIZE.y * scale)) + 1) & ~1;
-
-	return { x: width, y: height };
 };
 
 export type TimelineTrackType =
@@ -1732,22 +1721,39 @@ export const [EditorContextProvider, useBaseEditorContext] =
 			});
 
 			const [storedSettings] = createResource(() => generalSettingsStore.get());
-			const initialPreviewQuality = createMemo((): EditorPreviewQuality => {
-				const stored = storedSettings()?.editorPreviewQuality;
-				if (stored === "quarter" || stored === "half" || stored === "full") {
-					return stored;
-				}
-				return DEFAULT_PREVIEW_QUALITY;
-			});
-
-			const [previewQuality, _setPreviewQuality] =
+			const initialPreviewQuality = createMemo(() =>
+				readPreviewQuality(storedSettings()?.editorPreviewQuality),
+			);
+			const [preferredPreviewQuality, _setPreviewQuality] =
 				createSignal<EditorPreviewQuality>(DEFAULT_PREVIEW_QUALITY);
-
-			createEffect(() => {
-				const quality = initialPreviewQuality();
-				_setPreviewQuality(quality);
-			});
-
+			const [previewResolutionOptions, setPreviewResolutionOptions] =
+				createSignal(props.editorInstance.previewResolutions);
+			let previewResolutionRevision = 0;
+			onCleanup(() => previewResolutionRevision++);
+			const previewCanvas = createMemo(() =>
+				JSON.stringify(previewCanvasConfiguration(project)),
+			);
+			createEffect(
+				on(previewCanvas, (serialized) => {
+					const revision = ++previewResolutionRevision;
+					void commands
+						.getEditorPreviewResolutions(
+							JSON.parse(serialized) as PreviewCanvasConfiguration,
+						)
+						.then((options) => {
+							if (revision === previewResolutionRevision)
+								setPreviewResolutionOptions(options);
+						})
+						.catch((error) => {
+							if (revision !== previewResolutionRevision) return;
+							console.error("Failed to update preview resolutions", error);
+							toast.error(localize("无法更新预览清晰度"), {
+								id: "editor-preview-resolution",
+							});
+						});
+				}),
+			);
+			createEffect(() => _setPreviewQuality(initialPreviewQuality()));
 			const setPreviewQuality = (quality: EditorPreviewQuality) => {
 				_setPreviewQuality(quality);
 				generalSettingsStore
@@ -1756,9 +1762,18 @@ export const [EditorContextProvider, useBaseEditorContext] =
 						console.error("Failed to persist preview quality setting", error);
 					});
 			};
-
-			const previewResolutionBase = () =>
-				getPreviewResolution(previewQuality());
+			const previewResolutionOption = createMemo(() =>
+				selectPreviewResolution(
+					previewResolutionOptions(),
+					preferredPreviewQuality(),
+				),
+			);
+			const previewQuality = () => previewResolutionOption().quality;
+			const previewResolutionBase = createMemo(
+				() => previewResolutionOption().resolutionBase,
+				undefined,
+				{ equals: (left, right) => left.x === right.x && left.y === right.y },
+			);
 
 			const layoutModeStorageKey = `cap:editor:layoutMode:${props.editorInstance.path}`;
 
@@ -2526,6 +2541,38 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				},
 			);
 
+			let resolutionUpdate = Promise.resolve<unknown>(undefined);
+			let resolutionUpdateRevision = 0;
+			onCleanup(() => resolutionUpdateRevision++);
+			createEffect(
+				on(
+					previewResolutionBase,
+					(resolution) => {
+						const revision = ++resolutionUpdateRevision;
+						resolutionUpdate = resolutionUpdate
+							.catch(() => undefined)
+							.then(() => {
+								if (revision !== resolutionUpdateRevision) return;
+								if (
+									(props.editorInstance.preparingPlayback &&
+										!preparing?.ordinaryReady()) ||
+									playbackHandoff?.active()
+								) {
+									return requestHandoffPlayback(playbackIntent());
+								}
+								return commands.setEditorPreviewResolution(resolution);
+							})
+							.catch((error) =>
+								console.error(
+									"Failed to update playback preview resolution",
+									error,
+								),
+							);
+					},
+					{ defer: true },
+				),
+			);
+
 			return {
 				...editorInstanceContext,
 				recordingBookmarks,
@@ -2570,6 +2617,8 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				micWaveforms,
 				systemAudioWaveforms,
 				previewQuality,
+				previewResolutionOptions,
+				previewResolutionOption,
 				setPreviewQuality,
 				previewResolutionBase,
 			};
@@ -2713,7 +2762,10 @@ const createEditorInstanceContext = () => {
 				events.renderFrameEvent.emit({
 					frame_number: preparing?.handoffRequestedFrame() ?? 0,
 					fps: FPS,
-					resolution_base: getPreviewResolution(DEFAULT_PREVIEW_QUALITY),
+					resolution_base: selectPreviewResolution(
+						instance.previewResolutions,
+						DEFAULT_PREVIEW_QUALITY,
+					).resolutionBase,
 				});
 			};
 

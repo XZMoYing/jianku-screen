@@ -1,0 +1,35 @@
+{
+	"baseCommit": "67133575803066dead35de5acd3056780ff5fc00",
+	"componentPassed": true,
+	"fullFeatureComplete": false,
+	"nativeCatalogueTests": 3,
+	"canvasCombinations": 140,
+	"playbackRegressionTests": 28,
+	"frontendTests": 19,
+	"actualGpuObservations": 18,
+	"actualGpuSources": ["640x360", "3840x2160"],
+	"typescriptBindingsGeneratedByNativeTest": true,
+	"typescriptCheck": true,
+	"fullStaticFrontend": true,
+	"strictRenderingAndEditorClippy": true,
+	"formatting": true,
+	"installedApplication": "0.2.0-alpha.39",
+	"packagedInterfaceVerified": false,
+	"remaining": [
+		"Preparing playback still uses the old fixed 1248x702 bounds",
+		"Initial handoff/first-frame requests need the native source-aware preference",
+		"Actual packaged menu and preview/export UI checks"
+	],
+	"knownStrictDecoderFailures": "retained; see ../2026-10-27-decoder-parity/README.md",
+	"sourceSha256": {
+		"crates/rendering/src/preview_resolution.rs": "6448cc4e0ca75efefc82aad8d6f7df697ec743d707e45094a0b56a9d0af575a4",
+		"crates/editor/src/playback.rs": "544cc1e65a7f26a061b111400db528b7feee91b7300af850fbd3c002edbebec1",
+		"crates/editor/examples/preview-resolution-check.rs": "b295e4ab484076578e1221815fb286dc6aa6701e8bf9369d975a0a367b370e50",
+		"apps/desktop/src-tauri/src/lib.rs": "7aaa99f9900c4e5bb5b401e093e41e48ee2c2db33ba04709cf8f3638da384b3d",
+		"apps/desktop/src-tauri/src/general_settings.rs": "7ac898411cfb9d2cb05dfe159a4e30f5262cf75c6eab2a84f09b2855571eb8a1",
+		"apps/desktop/src/routes/editor/preview-resolution.ts": "1febe59b9887f65f56dead4cdf4770a5a2ea343e056b4a59d6d0221da5fd3945",
+		"apps/desktop/src/routes/editor/Player.tsx": "f3f8008fe5ee173420d4378ff9f3dbdbeed0becbfe84444bcc5529a4422620da",
+		"apps/desktop/src/routes/editor/context.ts": "af17daa713c4b8fd3335497eade5bbe8b5e9543550c0a17c8d41945cc459910a",
+		"apps/desktop/src/utils/tauri.ts": "6fe458cd3963cb72c7be542fc6522e2024ed9726c2ed65e1af1fc189fc883039"
+	}
+}

@@ -55,6 +55,7 @@ mod mask;
 pub mod notch_shape;
 mod numeric_spring;
 mod overlay_layers;
+pub mod preview_resolution;
 mod project_recordings;
 mod readiness;
 mod recorded_cursor_assets;

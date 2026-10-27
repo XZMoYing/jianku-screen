@@ -1,0 +1,624 @@
+{
+	"audioSamples": 234496,
+	"audioSetups": 1,
+	"catalogue": [
+		{
+			"available": true,
+			"limited": false,
+			"outputSize": {
+				"x": 256,
+				"y": 144
+			},
+			"quality": "144p",
+			"resolutionBase": {
+				"x": 8192,
+				"y": 144
+			}
+		},
+		{
+			"available": true,
+			"limited": false,
+			"outputSize": {
+				"x": 640,
+				"y": 360
+			},
+			"quality": "360p",
+			"resolutionBase": {
+				"x": 8192,
+				"y": 360
+			}
+		},
+		{
+			"available": true,
+			"limited": false,
+			"outputSize": {
+				"x": 856,
+				"y": 480
+			},
+			"quality": "480p",
+			"resolutionBase": {
+				"x": 8192,
+				"y": 480
+			}
+		},
+		{
+			"available": true,
+			"limited": false,
+			"outputSize": {
+				"x": 960,
+				"y": 540
+			},
+			"quality": "540p",
+			"resolutionBase": {
+				"x": 8192,
+				"y": 540
+			}
+		},
+		{
+			"available": true,
+			"limited": false,
+			"outputSize": {
+				"x": 1280,
+				"y": 720
+			},
+			"quality": "720p",
+			"resolutionBase": {
+				"x": 8192,
+				"y": 720
+			}
+		},
+		{
+			"available": true,
+			"limited": false,
+			"outputSize": {
+				"x": 1920,
+				"y": 1080
+			},
+			"quality": "1080p",
+			"resolutionBase": {
+				"x": 8192,
+				"y": 1080
+			}
+		},
+		{
+			"available": true,
+			"limited": false,
+			"outputSize": {
+				"x": 2560,
+				"y": 1440
+			},
+			"quality": "1440p",
+			"resolutionBase": {
+				"x": 8192,
+				"y": 1440
+			}
+		},
+		{
+			"available": true,
+			"limited": false,
+			"outputSize": {
+				"x": 3840,
+				"y": 2160
+			},
+			"quality": "2160p",
+			"resolutionBase": {
+				"x": 8192,
+				"y": 2160
+			}
+		},
+		{
+			"available": true,
+			"limited": false,
+			"outputSize": {
+				"x": 4272,
+				"y": 2402
+			},
+			"quality": "original",
+			"resolutionBase": {
+				"x": 4270,
+				"y": 2402
+			}
+		}
+	],
+	"clocks": 1,
+	"displayFpsVerified": false,
+	"frames": [
+		{
+			"bytes": 147456,
+			"frame": 0,
+			"height": 144,
+			"row_bytes": 1024,
+			"width": 256
+		},
+		{
+			"bytes": 147456,
+			"frame": 1,
+			"height": 144,
+			"row_bytes": 1024,
+			"width": 256
+		},
+		{
+			"bytes": 921600,
+			"frame": 2,
+			"height": 360,
+			"row_bytes": 2560,
+			"width": 640
+		},
+		{
+			"bytes": 921600,
+			"frame": 3,
+			"height": 360,
+			"row_bytes": 2560,
+			"width": 640
+		},
+		{
+			"bytes": 1720320,
+			"frame": 4,
+			"height": 480,
+			"row_bytes": 3584,
+			"width": 856
+		},
+		{
+			"bytes": 1720320,
+			"frame": 5,
+			"height": 480,
+			"row_bytes": 3584,
+			"width": 856
+		},
+		{
+			"bytes": 2073600,
+			"frame": 6,
+			"height": 540,
+			"row_bytes": 3840,
+			"width": 960
+		},
+		{
+			"bytes": 2073600,
+			"frame": 7,
+			"height": 540,
+			"row_bytes": 3840,
+			"width": 960
+		},
+		{
+			"bytes": 3686400,
+			"frame": 8,
+			"height": 720,
+			"row_bytes": 5120,
+			"width": 1280
+		},
+		{
+			"bytes": 3686400,
+			"frame": 9,
+			"height": 720,
+			"row_bytes": 5120,
+			"width": 1280
+		},
+		{
+			"bytes": 8294400,
+			"frame": 10,
+			"height": 1080,
+			"row_bytes": 7680,
+			"width": 1920
+		},
+		{
+			"bytes": 8294400,
+			"frame": 12,
+			"height": 1080,
+			"row_bytes": 7680,
+			"width": 1920
+		},
+		{
+			"bytes": 8294400,
+			"frame": 13,
+			"height": 1080,
+			"row_bytes": 7680,
+			"width": 1920
+		},
+		{
+			"bytes": 14745600,
+			"frame": 14,
+			"height": 1440,
+			"row_bytes": 10240,
+			"width": 2560
+		},
+		{
+			"bytes": 14745600,
+			"frame": 16,
+			"height": 1440,
+			"row_bytes": 10240,
+			"width": 2560
+		},
+		{
+			"bytes": 14745600,
+			"frame": 18,
+			"height": 1440,
+			"row_bytes": 10240,
+			"width": 2560
+		},
+		{
+			"bytes": 33177600,
+			"frame": 19,
+			"height": 2160,
+			"row_bytes": 15360,
+			"width": 3840
+		},
+		{
+			"bytes": 33177600,
+			"frame": 23,
+			"height": 2160,
+			"row_bytes": 15360,
+			"width": 3840
+		},
+		{
+			"bytes": 33177600,
+			"frame": 24,
+			"height": 2160,
+			"row_bytes": 15360,
+			"width": 3840
+		},
+		{
+			"bytes": 41199104,
+			"frame": 25,
+			"height": 2402,
+			"row_bytes": 17152,
+			"width": 4272
+		},
+		{
+			"bytes": 41199104,
+			"frame": 26,
+			"height": 2402,
+			"row_bytes": 17152,
+			"width": 4272
+		},
+		{
+			"bytes": 41199104,
+			"frame": 28,
+			"height": 2402,
+			"row_bytes": 17152,
+			"width": 4272
+		},
+		{
+			"bytes": 1247232,
+			"frame": 29,
+			"height": 406,
+			"row_bytes": 3072,
+			"width": 720
+		},
+		{
+			"bytes": 3932160,
+			"frame": 30,
+			"height": 1280,
+			"row_bytes": 3072,
+			"width": 720
+		},
+		{
+			"bytes": 3932160,
+			"frame": 31,
+			"height": 1280,
+			"row_bytes": 3072,
+			"width": 720
+		},
+		{
+			"bytes": 3932160,
+			"frame": 32,
+			"height": 1280,
+			"row_bytes": 3072,
+			"width": 720
+		},
+		{
+			"bytes": 2211840,
+			"frame": 33,
+			"height": 720,
+			"row_bytes": 3072,
+			"width": 720
+		},
+		{
+			"bytes": 2211840,
+			"frame": 34,
+			"height": 720,
+			"row_bytes": 3072,
+			"width": 720
+		},
+		{
+			"bytes": 245760,
+			"frame": 35,
+			"height": 240,
+			"row_bytes": 1024,
+			"width": 240
+		},
+		{
+			"bytes": 307200,
+			"frame": 36,
+			"height": 240,
+			"row_bytes": 1280,
+			"width": 320
+		},
+		{
+			"bytes": 307200,
+			"frame": 37,
+			"height": 240,
+			"row_bytes": 1280,
+			"width": 320
+		}
+	],
+	"observations": [
+		{
+			"case": "quality",
+			"choice": {
+				"available": true,
+				"limited": false,
+				"outputSize": {
+					"x": 256,
+					"y": 144
+				},
+				"quality": "144p",
+				"resolutionBase": {
+					"x": 8192,
+					"y": 144
+				}
+			},
+			"observed": {
+				"bytes": 147456,
+				"frame": 1,
+				"height": 144,
+				"row_bytes": 1024,
+				"width": 256
+			}
+		},
+		{
+			"case": "quality",
+			"choice": {
+				"available": true,
+				"limited": false,
+				"outputSize": {
+					"x": 640,
+					"y": 360
+				},
+				"quality": "360p",
+				"resolutionBase": {
+					"x": 8192,
+					"y": 360
+				}
+			},
+			"observed": {
+				"bytes": 921600,
+				"frame": 3,
+				"height": 360,
+				"row_bytes": 2560,
+				"width": 640
+			}
+		},
+		{
+			"case": "quality",
+			"choice": {
+				"available": true,
+				"limited": false,
+				"outputSize": {
+					"x": 856,
+					"y": 480
+				},
+				"quality": "480p",
+				"resolutionBase": {
+					"x": 8192,
+					"y": 480
+				}
+			},
+			"observed": {
+				"bytes": 1720320,
+				"frame": 5,
+				"height": 480,
+				"row_bytes": 3584,
+				"width": 856
+			}
+		},
+		{
+			"case": "quality",
+			"choice": {
+				"available": true,
+				"limited": false,
+				"outputSize": {
+					"x": 960,
+					"y": 540
+				},
+				"quality": "540p",
+				"resolutionBase": {
+					"x": 8192,
+					"y": 540
+				}
+			},
+			"observed": {
+				"bytes": 2073600,
+				"frame": 7,
+				"height": 540,
+				"row_bytes": 3840,
+				"width": 960
+			}
+		},
+		{
+			"case": "quality",
+			"choice": {
+				"available": true,
+				"limited": false,
+				"outputSize": {
+					"x": 1280,
+					"y": 720
+				},
+				"quality": "720p",
+				"resolutionBase": {
+					"x": 8192,
+					"y": 720
+				}
+			},
+			"observed": {
+				"bytes": 3686400,
+				"frame": 9,
+				"height": 720,
+				"row_bytes": 5120,
+				"width": 1280
+			}
+		},
+		{
+			"case": "quality",
+			"choice": {
+				"available": true,
+				"limited": false,
+				"outputSize": {
+					"x": 1920,
+					"y": 1080
+				},
+				"quality": "1080p",
+				"resolutionBase": {
+					"x": 8192,
+					"y": 1080
+				}
+			},
+			"observed": {
+				"bytes": 8294400,
+				"frame": 12,
+				"height": 1080,
+				"row_bytes": 7680,
+				"width": 1920
+			}
+		},
+		{
+			"case": "quality",
+			"choice": {
+				"available": true,
+				"limited": false,
+				"outputSize": {
+					"x": 2560,
+					"y": 1440
+				},
+				"quality": "1440p",
+				"resolutionBase": {
+					"x": 8192,
+					"y": 1440
+				}
+			},
+			"observed": {
+				"bytes": 14745600,
+				"frame": 16,
+				"height": 1440,
+				"row_bytes": 10240,
+				"width": 2560
+			}
+		},
+		{
+			"case": "quality",
+			"choice": {
+				"available": true,
+				"limited": false,
+				"outputSize": {
+					"x": 3840,
+					"y": 2160
+				},
+				"quality": "2160p",
+				"resolutionBase": {
+					"x": 8192,
+					"y": 2160
+				}
+			},
+			"observed": {
+				"bytes": 33177600,
+				"frame": 23,
+				"height": 2160,
+				"row_bytes": 15360,
+				"width": 3840
+			}
+		},
+		{
+			"case": "quality",
+			"choice": {
+				"available": true,
+				"limited": false,
+				"outputSize": {
+					"x": 4272,
+					"y": 2402
+				},
+				"quality": "original",
+				"resolutionBase": {
+					"x": 4270,
+					"y": 2402
+				}
+			},
+			"observed": {
+				"bytes": 41199104,
+				"frame": 26,
+				"height": 2402,
+				"row_bytes": 17152,
+				"width": 4272
+			}
+		},
+		{
+			"case": "portrait",
+			"choice": {
+				"available": true,
+				"limited": false,
+				"outputSize": {
+					"x": 720,
+					"y": 1280
+				},
+				"quality": "720p",
+				"resolutionBase": {
+					"x": 720,
+					"y": 8192
+				}
+			},
+			"observed": {
+				"bytes": 3932160,
+				"frame": 31,
+				"height": 1280,
+				"row_bytes": 3072,
+				"width": 720
+			}
+		},
+		{
+			"case": "square",
+			"choice": {
+				"available": true,
+				"limited": false,
+				"outputSize": {
+					"x": 720,
+					"y": 720
+				},
+				"quality": "720p",
+				"resolutionBase": {
+					"x": 720,
+					"y": 8192
+				}
+			},
+			"observed": {
+				"bytes": 2211840,
+				"frame": 34,
+				"height": 720,
+				"row_bytes": 3072,
+				"width": 720
+			}
+		},
+		{
+			"case": "small-crop",
+			"choice": {
+				"available": true,
+				"limited": false,
+				"outputSize": {
+					"x": 320,
+					"y": 240
+				},
+				"quality": "original",
+				"resolutionBase": {
+					"x": 320,
+					"y": 240
+				}
+			},
+			"observed": {
+				"bytes": 307200,
+				"frame": 37,
+				"height": 240,
+				"row_bytes": 1280,
+				"width": 320
+			}
+		}
+	],
+	"passed": true,
+	"warmups": 1
+}

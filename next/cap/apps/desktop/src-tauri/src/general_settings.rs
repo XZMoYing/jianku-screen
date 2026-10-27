@@ -1,5 +1,6 @@
 use crate::updates::UpdateChannel;
 use crate::window_exclusion::WindowExclusion;
+pub use cap_rendering::preview_resolution::EditorPreviewQuality;
 use scap_targets::DisplayId;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -36,15 +37,6 @@ pub enum PostDeletionBehaviour {
     #[default]
     DoNothing,
     ReopenRecordingWindow,
-}
-
-#[derive(Default, Serialize, Deserialize, Type, Debug, Clone, Copy)]
-#[serde(rename_all = "camelCase")]
-pub enum EditorPreviewQuality {
-    Quarter,
-    #[default]
-    Half,
-    Full,
 }
 
 #[derive(Serialize, Deserialize, Type, Debug, Clone, Copy, PartialEq, Eq)]
@@ -365,7 +357,7 @@ impl Default for GeneralSettingsStore {
             crash_recovery_recording: cap_recording::DEFAULT_CRASH_RECOVERY_RECORDING,
             max_fps: cap_recording::DEFAULT_STUDIO_MAX_FPS,
             transcription_hints: default_transcription_hints(),
-            editor_preview_quality: EditorPreviewQuality::Half,
+            editor_preview_quality: EditorPreviewQuality::P720,
             studio_recording_quality: default_studio_recording_quality(),
             main_window_position: None,
             camera_window_position: None,

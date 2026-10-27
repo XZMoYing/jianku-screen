@@ -1,0 +1,39 @@
+{
+	"small": {
+		".jianku-3d-comfort.json": "46427163023b17829c623cf487c6de3bba5f80d9b1a75a08182e3d09eeb7212a",
+		".jianku-3d-integration-fixture.json": "6f7cc11397fc1809b39c15daf34703b2b18ab48b006fbbafd64020f6f98699b7",
+		".jianku-3d-spring-fixture.json": "589fe3564272bb043df2d3ed0c601fb771078c1224fe7ead45c9c291a43e560c",
+		".jianku-preview-resolution-fixture.json": "101fba68a92539f10adfd7773bbfa9c1524b1324cd69dc6d4a1ef78544abd82f",
+		".recovery.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"assets/current-desktop-background-5a40c1ad-a19c-467b-babc-56433496ac8d.jpg": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983",
+		"assets/current-desktop-background-a679283a-07fe-4249-bc26-5d4160874048.jpg": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983",
+		"assets/current-desktop-background-c912eb39-605c-41fa-b14d-3c4d6cef1a2a.jpg": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983",
+		"assets/current-desktop-background-feeed432-5116-4d6a-9d99-f54ee5afde71.jpg": "c6c6d9415281f7ecfca5aa81a5aab288f15f14139e2ba1d6de288173a4ec4945",
+		"content/display.mp4": "a834cd37cb39ede8c82672412644be4a5e81a41d4780ab05b3f6ea568f3d7f1b",
+		"content/wallpaper.mp4": "bf93bccc84a9fdbaabb5d265cda5060bfeb866c81ed5a2ae1987909f67cdf73b",
+		"content/配乐一.wav": "4b244f2c3dcf65683ff661d16618f9e27146730152ded638e09e4c34c655f780",
+		"content/配乐二.wav": "da12cee9b7ef8434e2b68fe6a4452ff32cf43776a66066b460fbe9369484f17f",
+		"project-config.json": "44b9e5529f4aec72a67ad0b6e695668f4d04f5c6e5e6aaf71c09ee6248626499",
+		"recording-meta.json": "e54a1f5293cd811aff083e2569acc19273a2f07db9a6a8de004316058cd9e394",
+		"screenshots/display.jpg": "be445975d5de12b98f5ce40d0a15cda0c5e80ac30e8085e3fb0e5055cf0761b8"
+	},
+	"large": {
+		".jianku-3d-comfort.json": "46427163023b17829c623cf487c6de3bba5f80d9b1a75a08182e3d09eeb7212a",
+		".jianku-3d-integration-fixture.json": "6f7cc11397fc1809b39c15daf34703b2b18ab48b006fbbafd64020f6f98699b7",
+		".jianku-3d-spring-fixture.json": "589fe3564272bb043df2d3ed0c601fb771078c1224fe7ead45c9c291a43e560c",
+		".jianku-preview-resolution-fixture.json": "101fba68a92539f10adfd7773bbfa9c1524b1324cd69dc6d4a1ef78544abd82f",
+		".recovery.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"assets/current-desktop-background-5a40c1ad-a19c-467b-babc-56433496ac8d.jpg": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983",
+		"assets/current-desktop-background-a679283a-07fe-4249-bc26-5d4160874048.jpg": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983",
+		"assets/current-desktop-background-c912eb39-605c-41fa-b14d-3c4d6cef1a2a.jpg": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983",
+		"assets/current-desktop-background-feeed432-5116-4d6a-9d99-f54ee5afde71.jpg": "c6c6d9415281f7ecfca5aa81a5aab288f15f14139e2ba1d6de288173a4ec4945",
+		"content/display.mp4": "a834cd37cb39ede8c82672412644be4a5e81a41d4780ab05b3f6ea568f3d7f1b",
+		"content/resolution-4k.mp4": "b4a83475209466c30416c98a257404e56067b9f7340077f3768a7a8cd580019e",
+		"content/wallpaper.mp4": "bf93bccc84a9fdbaabb5d265cda5060bfeb866c81ed5a2ae1987909f67cdf73b",
+		"content/配乐一.wav": "4b244f2c3dcf65683ff661d16618f9e27146730152ded638e09e4c34c655f780",
+		"content/配乐二.wav": "da12cee9b7ef8434e2b68fe6a4452ff32cf43776a66066b460fbe9369484f17f",
+		"project-config.json": "44b9e5529f4aec72a67ad0b6e695668f4d04f5c6e5e6aaf71c09ee6248626499",
+		"recording-meta.json": "d48b481ed1ac38df182e8c7ab4851209e60556d72892589d586169104d3bbb79",
+		"screenshots/display.jpg": "be445975d5de12b98f5ce40d0a15cda0c5e80ac30e8085e3fb0e5055cf0761b8"
+	}
+}

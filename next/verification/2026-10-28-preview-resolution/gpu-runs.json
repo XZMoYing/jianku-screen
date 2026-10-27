@@ -1,0 +1,12 @@
+[
+	{
+		"case": "small",
+		"exitCode": 0,
+		"seconds": 1.1078452919900883
+	},
+	{
+		"case": "large",
+		"exitCode": 0,
+		"seconds": 2.5075317500159144
+	}
+]

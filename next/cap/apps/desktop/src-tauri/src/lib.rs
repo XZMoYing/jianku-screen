@@ -4740,6 +4740,33 @@ async fn start_playback(
 
 #[tauri::command]
 #[specta::specta]
+async fn get_editor_preview_resolutions(
+    editor_instance: WindowEditorInstance,
+    canvas: cap_rendering::preview_resolution::PreviewCanvasConfiguration,
+) -> Result<Vec<cap_rendering::preview_resolution::PreviewResolutionOption>, String> {
+    let constants = &editor_instance.render_constants;
+    cap_rendering::preview_resolution::preview_resolutions(
+        &constants.options,
+        &canvas,
+        constants.device.limits().max_texture_dimension_2d,
+    )
+}
+
+#[tauri::command]
+#[specta::specta]
+async fn set_editor_preview_resolution(
+    editor_instance: WindowEditorInstance,
+    resolution_base: XY<u32>,
+) -> Result<bool, String> {
+    let state = editor_instance.state.lock().await;
+    Ok(state
+        .playback_task
+        .as_ref()
+        .is_some_and(|handle| handle.set_resolution_base(resolution_base)))
+}
+
+#[tauri::command]
+#[specta::specta]
 #[instrument(skip(editor_instance))]
 async fn stop_playback(editor_instance: WindowEditorInstance) -> Result<(), String> {
     let mut state = editor_instance.state.lock().await;
@@ -4797,6 +4824,7 @@ struct SerializedEditorInstance {
     preparing_snapshot: Option<editor_preparing::PreparingEditorChanged>,
     recording_duration: f64,
     saved_project_config: ProjectConfiguration,
+    preview_resolutions: Vec<cap_rendering::preview_resolution::PreviewResolutionOption>,
     recordings: Arc<ProjectRecordingsMeta>,
     path: PathBuf,
     /// Notch geometry the overlay uses when the project sets no manual
@@ -4838,6 +4866,15 @@ async fn create_editor_instance(window: Window) -> Result<SerializedEditorInstan
         saved_project_config: {
             let project_config = editor_instance.project_config.1.borrow();
             project_config.clone()
+        },
+        preview_resolutions: {
+            let config = editor_instance.project_config.1.borrow();
+            let constants = &editor_instance.render_constants;
+            cap_rendering::preview_resolution::preview_resolutions(
+                &constants.options,
+                &cap_rendering::preview_resolution::PreviewCanvasConfiguration::from(&*config),
+                constants.device.limits().max_texture_dimension_2d,
+            )?
         },
         recordings: editor_instance.recordings.clone(),
         path: editor_instance.project_path.clone(),
@@ -6932,6 +6969,8 @@ fn specta_builder() -> tauri_specta::Builder {
             audio_library::add_audio_library_track,
             audio_library::import_audio_track_file,
             start_playback,
+            get_editor_preview_resolutions,
+            set_editor_preview_resolution,
             stop_playback,
             commit_editor_preparing_frame,
             start_editor_handoff_playback,

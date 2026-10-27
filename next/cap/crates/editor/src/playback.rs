@@ -252,6 +252,7 @@ pub struct PlaybackHandle {
     event_rx: watch::Receiver<PlaybackEvent>,
     seek_tx: Arc<watch::Sender<(u64, u32)>>,
     seek_generation: Arc<AtomicU64>,
+    resolution_tx: watch::Sender<XY<u32>>,
     adopted: Option<crate::PreparingPlaybackAdoption>,
 }
 
@@ -698,6 +699,7 @@ impl Playback {
         let (seek_tx, mut seek_rx) = watch::channel((0u64, self.start_frame_number));
         seek_rx.borrow_and_update();
 
+        let (resolution_tx, resolution_rx) = watch::channel(resolution_base);
         let preparing_audio_released = Arc::new(AtomicBool::new(false));
         let runtime = tokio::runtime::Handle::current();
         let handle = PlaybackHandle {
@@ -706,6 +708,7 @@ impl Playback {
             event_rx,
             seek_tx: Arc::new(seek_tx),
             seek_generation: Arc::new(AtomicU64::new(0)),
+            resolution_tx,
             adopted: adopted.clone(),
         };
         let seek_generation_counter = handle.seek_generation.clone();
@@ -1253,6 +1256,7 @@ impl Playback {
                     };
 
                     let precomputed_cursor = &cursor_timelines[segment_index as usize];
+                    let resolution_base = *resolution_rx.borrow();
                     let uniforms_start = Instant::now();
                     let uniforms = ProjectUniforms::new_with_precomputed_cursor(
                         &self.render_constants,
@@ -1956,6 +1960,7 @@ impl Playback {
 
                     let precomputed_cursor = &cursor_timelines[segment_index as usize];
 
+                    let resolution_base = *resolution_rx.borrow();
                     let uniforms_start = Instant::now();
                     let uniforms = ProjectUniforms::new_with_precomputed_cursor(
                         &self.render_constants,
@@ -2155,12 +2160,14 @@ impl PlaybackHandle {
         let (stop_tx, _) = watch::channel(false);
         let (_, event_rx) = watch::channel(PlaybackEvent::Start);
         let (seek_tx, _) = watch::channel((0, 0));
+        let (resolution_tx, _) = watch::channel(XY::new(1280, 720));
         Self {
             preparing_audio_released: Arc::new(AtomicBool::new(false)),
             stop_tx,
             event_rx,
             seek_tx: Arc::new(seek_tx),
             seek_generation: Arc::new(AtomicU64::new(0)),
+            resolution_tx,
             adopted: None,
         }
     }
@@ -2185,6 +2192,13 @@ impl PlaybackHandle {
         }
         let generation = self.seek_generation.fetch_add(1, Ordering::Relaxed) + 1;
         self.seek_tx.send((generation, frame)).is_ok()
+    }
+
+    pub fn set_resolution_base(&self, resolution: XY<u32>) -> bool {
+        if resolution.x < 4 || resolution.y < 2 || resolution.x > 8192 || resolution.y > 8192 {
+            return false;
+        }
+        self.resolution_tx.send(resolution).is_ok()
     }
 
     pub async fn receive_event(&mut self) -> watch::Ref<'_, PlaybackEvent> {
@@ -2279,6 +2293,7 @@ mod tests {
             let (stop_tx, stop_rx) = watch::channel(false);
             let (_, event_rx) = watch::channel(PlaybackEvent::Start);
             let (seek_tx, _) = watch::channel((0, 0));
+            let (resolution_tx, _) = watch::channel(XY::new(1280, 720));
             (
                 PlaybackHandle {
                     preparing_audio_released: Arc::new(AtomicBool::new(false)),
@@ -2287,6 +2302,7 @@ mod tests {
                     event_rx,
                     seek_tx: Arc::new(seek_tx),
                     seek_generation: Arc::new(AtomicU64::new(0)),
+                    resolution_tx,
                 },
                 stop_rx,
             )

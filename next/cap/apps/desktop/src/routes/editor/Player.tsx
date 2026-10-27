@@ -1,3 +1,4 @@
+import { Select as KSelect } from "@kobalte/core/select";
 import { ToggleButton as KToggleButton } from "@kobalte/core/toggle-button";
 import { createElementBounds } from "@solid-primitives/bounds";
 import { createEventListener } from "@solid-primitives/event-listener";
@@ -9,17 +10,17 @@ import { cx } from "cva";
 import {
 	createEffect,
 	createSignal,
-	For,
 	on,
 	onMount,
 	Show,
 	untrack,
+	type ValidComponent,
 } from "solid-js";
 import Tooltip from "~/components/Tooltip";
 import { captionsStore } from "~/store/captions";
 import { createTauriEventListener } from "~/utils/createEventListener";
 import { t as localize } from "~/utils/i18n";
-import { commands } from "~/utils/tauri";
+import { commands, type PreviewResolutionOption } from "~/utils/tauri";
 import AspectRatioSelect from "./AspectRatioSelect";
 import {
 	CanvasElementsOverlay,
@@ -28,12 +29,7 @@ import {
 import { CaptionOverlay } from "./CaptionOverlay";
 import { CaptionsRegenerateBadge } from "./CaptionsRegenerateBadge";
 import { createCaptionTrackSegments } from "./captions";
-import {
-	type EditorPreviewQuality,
-	FPS,
-	PREVIEW_QUALITY_SCALE,
-	useEditorContext,
-} from "./context";
+import { FPS, useEditorContext } from "./context";
 import { FrameButton } from "./FrameButton";
 import { ImageOverlay } from "./image-overlay";
 import { MaskOverlay } from "./MaskOverlay";
@@ -44,9 +40,17 @@ import {
 	createPreviewBoundsReaction,
 	createPreviewBoundsUpdater,
 } from "./preview-bounds";
+import { previewQualityLabel } from "./preview-resolution";
 import { SplitScreenOverlay } from "./SplitScreenOverlay";
 import { TextOverlay } from "./TextOverlay";
-import { EditorButton, Slider } from "./ui";
+import {
+	EditorButton,
+	MenuItem,
+	MenuItemList,
+	PopperContent,
+	Slider,
+	topSlideAnimateClasses,
+} from "./ui";
 import { useEditorShortcuts } from "./useEditorShortcuts";
 import { formatTime } from "./utils";
 
@@ -66,7 +70,8 @@ export function PlayerContent(props: { compactness?: number }) {
 		zoomOutLimit,
 		setProject,
 		previewResolutionBase,
-		previewQuality,
+		previewResolutionOptions,
+		previewResolutionOption,
 		setPreviewQuality,
 		playbackIntent,
 		requestHandoffPlayback,
@@ -93,13 +98,6 @@ export function PlayerContent(props: { compactness?: number }) {
 		setPanelHovered(false);
 		setPreviewPointerDown(false);
 	});
-
-	const previewOptions = (["full", "half", "quarter"] as const).map(
-		(value) => ({
-			label: `${Math.round(PREVIEW_QUALITY_SCALE[value] * 100)}%`,
-			value,
-		}),
-	);
 
 	const zoomHint = () =>
 		ostype() === "windows"
@@ -229,36 +227,6 @@ export function PlayerContent(props: { compactness?: number }) {
 		}
 		await commands.stopPlayback();
 		setEditorState("playing", false);
-	};
-
-	const handlePreviewQualityChange = async (quality: EditorPreviewQuality) => {
-		if (quality === previewQuality()) return;
-
-		const wasPlaying = playbackIntent();
-		const currentFrame = Math.max(
-			Math.floor(editorState.playbackTime * FPS),
-			0,
-		);
-
-		setPreviewQuality(quality);
-
-		if (!wasPlaying) return;
-		const pending = requestHandoffPlayback(true);
-		if (pending) {
-			await pending;
-			return;
-		}
-
-		try {
-			await commands.stopPlayback();
-			setEditorState("playing", false);
-			await commands.seekTo(currentFrame);
-			await commands.startPlayback(FPS, previewResolutionBase());
-			setEditorState("playing", true);
-		} catch (error) {
-			console.error("Failed to update preview quality:", error);
-			setEditorState("playing", false);
-		}
 	};
 
 	createEffect(() => {
@@ -401,34 +369,67 @@ export function PlayerContent(props: { compactness?: number }) {
 				</div>
 				<div class="flex flex-row flex-none gap-2 items-center">
 					<span class="text-xs text-ed-text-2">{localize("Preview")}</span>
-					<div
-						role="group"
-						aria-label={localize("预览画质")}
-						class="inline-flex gap-0.5 p-0.5 rounded-lg shrink-0 bg-ed-ctl"
+					<KSelect<PreviewResolutionOption>
+						options={previewResolutionOptions()}
+						optionValue="quality"
+						optionTextValue={(option) => localize(previewQualityLabel(option))}
+						optionDisabled={(option) => !option.available}
+						value={previewResolutionOption()}
+						onChange={(option) => {
+							if (option?.available) setPreviewQuality(option.quality);
+						}}
+						disallowEmptySelection
+						itemComponent={(itemProps) => (
+							<MenuItem<typeof KSelect.Item>
+								as={KSelect.Item}
+								item={itemProps.item}
+								class="gap-4"
+							>
+								<KSelect.ItemLabel class="flex-1">
+									{localize(previewQualityLabel(itemProps.item.rawValue))}
+								</KSelect.ItemLabel>
+								<span class="text-xs text-ed-text-3 tabular-nums">
+									{itemProps.item.rawValue.available
+										? `${itemProps.item.rawValue.outputSize.x} × ${itemProps.item.rawValue.outputSize.y}`
+										: localize("不可用")}
+								</span>
+							</MenuItem>
+						)}
 					>
-						<For each={previewOptions}>
-							{(option) => {
-								const selected = () => previewQuality() === option.value;
-								return (
-									<button
-										type="button"
-										title={`${option.label} ${localize("预览画质")}`}
-										aria-label={`${option.label} ${localize("预览画质")}`}
-										aria-pressed={selected()}
-										onClick={() => handlePreviewQualityChange(option.value)}
-										class={cx(
-											"flex items-center px-2.5 h-6 text-xs font-medium rounded-md transition-colors duration-100",
-											selected()
-												? "bg-ed-card text-ed-text-1 shadow-[0_1px_2px_rgba(0,0,0,0.12),0_0_0_0.5px_rgba(0,0,0,0.06)] dark:bg-white/12 dark:shadow-none"
-												: "text-ed-text-2 hover:text-ed-text-1",
-										)}
-									>
-										{option.label}
-									</button>
-								);
-							}}
-						</For>
-					</div>
+						<KSelect.Trigger
+							aria-label={localize("预览清晰度")}
+							title={`${localize(previewQualityLabel(previewResolutionOption()))} · ${previewResolutionOption().outputSize.x} × ${previewResolutionOption().outputSize.y}`}
+							class="flex flex-row gap-2 items-center px-3 h-8 min-w-24 max-w-40 rounded-full bg-ed-ctl text-xs text-ed-text-1 outline-hidden focus-visible:ring-2 focus-visible:ring-ed-accent"
+						>
+							<KSelect.Value<PreviewResolutionOption> class="flex-1 text-left truncate">
+								{(state) =>
+									localize(previewQualityLabel(state.selectedOption()))
+								}
+							</KSelect.Value>
+							<KSelect.Icon<ValidComponent>
+								as={(iconProps) => (
+									<IconCapChevronDown
+										{...iconProps}
+										class="size-3.5 shrink-0"
+									/>
+								)}
+							/>
+						</KSelect.Trigger>
+						<KSelect.Portal>
+							<PopperContent<typeof KSelect.Content>
+								as={KSelect.Content}
+								class={cx(topSlideAnimateClasses, "z-50 min-w-60")}
+							>
+								<MenuItemList<typeof KSelect.Listbox>
+									as={KSelect.Listbox}
+									class="max-h-80 overflow-y-auto"
+								/>
+								<p class="border-t border-ed-line px-3 py-2 text-xs text-ed-text-3">
+									{localize("清晰度按短边标注，实际尺寸随画幅变化")}
+								</p>
+							</PopperContent>
+						</KSelect.Portal>
+					</KSelect>
 				</div>
 			</div>
 			<PreviewCanvas
