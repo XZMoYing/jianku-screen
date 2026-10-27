@@ -376,7 +376,11 @@ export function PlayerContent(props: { compactness?: number }) {
 						optionDisabled={(option) => !option.available}
 						value={previewResolutionOption()}
 						onChange={(option) => {
-							if (option?.available) setPreviewQuality(option.quality);
+							if (
+								option?.available &&
+								option.quality !== previewResolutionOption().quality
+							)
+								setPreviewQuality(option.quality);
 						}}
 						disallowEmptySelection
 						itemComponent={(itemProps) => (
