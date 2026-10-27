@@ -9,10 +9,15 @@
 // plane half-extents (hx, hy) — the content plane spans [-hx, hx] × [-hy, hy]
 // in world units with its longest side equal to 2.
 
-struct Camera3DUniforms {
+struct Camera3DWarpSample {
     inv_row0: vec4<f32>,
     inv_row1: vec4<f32>,
     inv_row2: vec4<f32>,
+};
+
+struct Camera3DUniforms {
+    samples: array<Camera3DWarpSample, 13>,
+    params: vec4<f32>,
 };
 
 @group(0) @binding(0) var<uniform> u: Camera3DUniforms;
@@ -37,20 +42,12 @@ fn vs_main(@builtin(vertex_index) vertex_index: u32) -> VertexOutput {
     return out;
 }
 
-@fragment
-fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
-    let half_extents = vec2<f32>(u.inv_row1.w, u.inv_row2.w);
-    // y-up NDC of this output pixel.
-    let ndc = vec3<f32>(
-        in.screen_uv.x * 2.0 - 1.0,
-        1.0 - in.screen_uv.y * 2.0,
-        1.0,
-    );
-
+fn sample_content(ndc: vec3<f32>, sample: Camera3DWarpSample) -> vec4<f32> {
+    let half_extents = vec2<f32>(sample.inv_row1.w, sample.inv_row2.w);
     let q = vec3<f32>(
-        dot(u.inv_row0.xyz, ndc),
-        dot(u.inv_row1.xyz, ndc),
-        dot(u.inv_row2.xyz, ndc),
+        dot(sample.inv_row0.xyz, ndc),
+        dot(sample.inv_row1.xyz, ndc),
+        dot(sample.inv_row2.xyz, ndc),
     );
 
     // q.z <= 0 means the ray hits the plane behind the camera (past the
@@ -76,4 +73,21 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     // onto transparent black), so coverage scales the whole texel.
     let color = textureSampleLevel(t_content, s_content, clamped, 0.0);
     return color * coverage;
+}
+
+@fragment
+fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
+    let ndc = vec3<f32>(in.screen_uv.x * 2.0 - 1.0, 1.0 - in.screen_uv.y * 2.0, 1.0);
+    if u.params.x < 1.5 {
+        return sample_content(ndc, u.samples[0]);
+    }
+    var color = vec4<f32>(0.0);
+    var total = 0.0;
+    for (var index = 0u; index < 13u; index++) {
+        let position = f32(index) / 12.0;
+        let weight = 4.0 * position * (1.0 - position);
+        color += sample_content(ndc, u.samples[index]) * weight;
+        total += weight;
+    }
+    return color / total;
 }

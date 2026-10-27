@@ -1,0 +1,211 @@
+{
+	"cases": [
+		{
+			"case": "flat",
+			"before": {
+				"sha256": "1f3c0d4133cae39eddcab954cba9619f0885a53236e8bf6839a7c8535a65cb40",
+				"width": 1280,
+				"height": 720,
+				"fps": "60/1",
+				"frameCount": 540,
+				"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885",
+				"pcmBytes": 1728000
+			},
+			"after": {
+				"sha256": "1f3c0d4133cae39eddcab954cba9619f0885a53236e8bf6839a7c8535a65cb40",
+				"width": 1280,
+				"height": 720,
+				"fps": "60/1",
+				"frameCount": 540,
+				"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885",
+				"pcmBytes": 1728000
+			},
+			"changedFrameCount": 0,
+			"changedFrames": [],
+			"sameFormatAndPcm": true,
+			"passed": true
+		},
+		{
+			"case": "static",
+			"before": {
+				"sha256": "8f77e38226389e7641d7987490492c1ce871d238b84f6c935adf37595c3cd5d4",
+				"width": 1280,
+				"height": 720,
+				"fps": "60/1",
+				"frameCount": 540,
+				"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885",
+				"pcmBytes": 1728000
+			},
+			"after": {
+				"sha256": "8f77e38226389e7641d7987490492c1ce871d238b84f6c935adf37595c3cd5d4",
+				"width": 1280,
+				"height": 720,
+				"fps": "60/1",
+				"frameCount": 540,
+				"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885",
+				"pcmBytes": 1728000
+			},
+			"changedFrameCount": 0,
+			"changedFrames": [],
+			"sameFormatAndPcm": true,
+			"passed": true
+		},
+		{
+			"case": "disabled",
+			"before": {
+				"sha256": "74e819557015a31ba44c3f17347bb9dd42748e58ce111d20c001c1a9e27160a1",
+				"width": 1280,
+				"height": 720,
+				"fps": "60/1",
+				"frameCount": 540,
+				"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885",
+				"pcmBytes": 1728000
+			},
+			"after": {
+				"sha256": "74e819557015a31ba44c3f17347bb9dd42748e58ce111d20c001c1a9e27160a1",
+				"width": 1280,
+				"height": 720,
+				"fps": "60/1",
+				"frameCount": 540,
+				"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885",
+				"pcmBytes": 1728000
+			},
+			"changedFrameCount": 0,
+			"changedFrames": [],
+			"sameFormatAndPcm": true,
+			"passed": true
+		},
+		{
+			"case": "motion",
+			"before": {
+				"sha256": "74e819557015a31ba44c3f17347bb9dd42748e58ce111d20c001c1a9e27160a1",
+				"width": 1280,
+				"height": 720,
+				"fps": "60/1",
+				"frameCount": 540,
+				"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885",
+				"pcmBytes": 1728000
+			},
+			"after": {
+				"sha256": "ef4d6dbe51fc2891510c9e20543f45009deb0e0b83f7ab4deafdb13e422725bb",
+				"width": 1280,
+				"height": 720,
+				"fps": "60/1",
+				"frameCount": 540,
+				"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885",
+				"pcmBytes": 1728000
+			},
+			"changedFrameCount": 139,
+			"changedFrames": [
+				64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81,
+				82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 105, 106, 107,
+				110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 183, 184, 185, 186,
+				187, 188, 189, 190, 191, 302, 303, 304, 305, 306, 307, 308, 309, 310,
+				311, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 338, 339, 340,
+				341, 342, 343, 344, 345, 346, 347, 356, 357, 358, 359, 373, 374, 375,
+				376, 377, 378, 379, 380, 381, 382, 383, 452, 453, 454, 455, 456, 457,
+				458, 459, 460, 461, 462, 463, 464, 465, 466, 467, 468, 469, 470, 471,
+				472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 482, 483, 484, 485,
+				486, 487, 488, 489, 490, 491
+			],
+			"sameFormatAndPcm": true,
+			"passed": true
+		},
+		{
+			"case": "combined",
+			"before": {
+				"sha256": "fd001d279ea25a2506aa089c9cb56cde4cb7f5bfee82c5a24d80e9413a5008f4",
+				"width": 1280,
+				"height": 720,
+				"fps": "60/1",
+				"frameCount": 540,
+				"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885",
+				"pcmBytes": 1728000
+			},
+			"after": {
+				"sha256": "f3142da593529db25702905aa1f28dc61c8da66f3a8d1f9557d0fa51bfb600e2",
+				"width": 1280,
+				"height": 720,
+				"fps": "60/1",
+				"frameCount": 540,
+				"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885",
+				"pcmBytes": 1728000
+			},
+			"changedFrameCount": 181,
+			"changedFrames": [
+				61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78,
+				79, 80, 81, 82, 83, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 105,
+				106, 107, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 148, 149,
+				150, 151, 152, 153, 154, 155, 241, 242, 243, 244, 245, 246, 247, 248,
+				249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262,
+				263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 278,
+				279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292,
+				293, 294, 295, 296, 297, 298, 299, 302, 303, 304, 305, 306, 307, 308,
+				309, 310, 311, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 373,
+				374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 454, 455, 456, 457,
+				458, 459, 460, 461, 462, 463, 464, 465, 466, 467, 468, 469, 470, 471,
+				472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 482, 483, 484, 485,
+				486, 487, 488, 489, 490, 491
+			],
+			"sameFormatAndPcm": true,
+			"passed": true
+		},
+		{
+			"case": "static-focus",
+			"before": {
+				"sha256": "ae38ab76adca249713687e2eb8a0e1d5a0f67dbdb71386d9d503a36887d7fa3e",
+				"width": 1280,
+				"height": 720,
+				"fps": "60/1",
+				"frameCount": 540,
+				"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885",
+				"pcmBytes": 1728000
+			},
+			"after": {
+				"sha256": "ae38ab76adca249713687e2eb8a0e1d5a0f67dbdb71386d9d503a36887d7fa3e",
+				"width": 1280,
+				"height": 720,
+				"fps": "60/1",
+				"frameCount": 540,
+				"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885",
+				"pcmBytes": 1728000
+			},
+			"changedFrameCount": 0,
+			"changedFrames": [],
+			"sameFormatAndPcm": true,
+			"passed": true
+		},
+		{
+			"case": "motion-focus",
+			"before": {
+				"sha256": "7984dad1c0ea469d25ba34db845818070e14f56fbc56dcfcc11a60089b9d8b3e",
+				"width": 1280,
+				"height": 720,
+				"fps": "60/1",
+				"frameCount": 540,
+				"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885",
+				"pcmBytes": 1728000
+			},
+			"after": {
+				"sha256": "4f402f9a40c95b5f11ab999858f4c9bb43182d4d5ea879254b3579d994fbc822",
+				"width": 1280,
+				"height": 720,
+				"fps": "60/1",
+				"frameCount": 540,
+				"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885",
+				"pcmBytes": 1728000
+			},
+			"changedFrameCount": 70,
+			"changedFrames": [
+				64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81,
+				82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 454, 455, 456,
+				457, 458, 459, 460, 461, 462, 463, 464, 465, 466, 467, 468, 469, 470,
+				471, 472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 482, 483, 484,
+				485, 486, 487, 488, 489, 490, 491
+			],
+			"sameFormatAndPcm": true,
+			"passed": true
+		}
+	],
+	"passed": true
+}

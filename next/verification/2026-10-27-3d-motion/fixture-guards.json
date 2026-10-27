@@ -1,0 +1,6 @@
+{
+	"existingDirectoryRejected": true,
+	"existingConfigPreserved": true,
+	"exitCode": 1,
+	"message": "Use a new output directory; existing files are never replaced\n"
+}

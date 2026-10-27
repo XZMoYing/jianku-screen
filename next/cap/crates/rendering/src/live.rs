@@ -71,9 +71,9 @@ impl LiveMotion {
             mass: cursor.mass,
         };
         let camera = SpringMassDamperSimulationConfig {
-            tension: spring.stiffness as f32,
-            friction: spring.damping as f32,
-            mass: spring.mass as f32,
+            tension: spring.stiffness,
+            friction: spring.damping,
+            mass: spring.mass,
         };
         Self {
             screen,

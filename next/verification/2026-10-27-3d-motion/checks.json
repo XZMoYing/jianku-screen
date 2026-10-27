@@ -1,0 +1,44 @@
+{
+	"stage": "U18a",
+	"passed": true,
+	"nativeLibraryTests": {
+		"passed": 336,
+		"failed": 0,
+		"ignored": 6,
+		"camera3dSubset": 17
+	},
+	"cargoFmt": true,
+	"cargoCheckRelease": true,
+	"cargoClippyReleaseLibraryDenyWarnings": true,
+	"cliBuildRelease": true,
+	"actualGpuExportRuns": 14,
+	"comparedPairs": 7,
+	"framesPerPair": 540,
+	"unchangedDecodedFramePairs": 2160,
+	"allSevenPcmEqual": true,
+	"currentInstalledVersion": "0.2.0-alpha.38",
+	"speedCurveCompleted": false,
+	"whole3dComfortAccepted": false,
+	"sourceFiles": [
+		{
+			"path": "crates/rendering/src/camera3d.rs",
+			"sha256": "20697f32310839d8dcb8fcc6c6ce2fa33b424dd7cd03a5abe552636284364511"
+		},
+		{
+			"path": "crates/rendering/src/lib.rs",
+			"sha256": "6d3ab8f6413e1b862e6c73d747d1701c3786721779c522d4069c5b14d4db1d8a"
+		},
+		{
+			"path": "crates/rendering/src/live.rs",
+			"sha256": "8f01f417e06f2ad10fe3157a07b9639abeb524bc6df91e77a3bb1f4fb9016d64"
+		},
+		{
+			"path": "crates/rendering/src/layers/camera3d.rs",
+			"sha256": "1216aecd8abc2288f2e484049da87943f9cf687521493683e12212d9b52afe29"
+		},
+		{
+			"path": "crates/rendering/src/shaders/camera3d.wgsl",
+			"sha256": "19515a7fbda0f0bf6dec5a6794630c298e168d1d17c5f036d74929f989760636"
+		}
+	]
+}

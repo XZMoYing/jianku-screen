@@ -1,0 +1,498 @@
+{
+	"baselineCommit": "e14f63dcd4889020df84f059a65201ebc267c72e",
+	"baselineAppVersion": "0.2.0-alpha.38",
+	"baselineCliSha256": "682045873b6e67c54d558cd0d9e8c219c85d8bf2787eca30bebe9a5e2e106743",
+	"newCliSha256": "546968307eb2c859665b8b413fe47724e1c445c18fca4215eb19d09917769cef",
+	"cases": [
+		{
+			"name": "flat",
+			"files": [
+				{
+					"path": ".jianku-3d-comfort.json",
+					"bytes": 44,
+					"sha256": "46427163023b17829c623cf487c6de3bba5f80d9b1a75a08182e3d09eeb7212a"
+				},
+				{
+					"path": ".recovery.lock",
+					"bytes": 0,
+					"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+				},
+				{
+					"path": "assets/current-desktop-background-5a40c1ad-a19c-467b-babc-56433496ac8d.jpg",
+					"bytes": 568990,
+					"sha256": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983"
+				},
+				{
+					"path": "assets/current-desktop-background-a679283a-07fe-4249-bc26-5d4160874048.jpg",
+					"bytes": 568990,
+					"sha256": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983"
+				},
+				{
+					"path": "assets/current-desktop-background-c912eb39-605c-41fa-b14d-3c4d6cef1a2a.jpg",
+					"bytes": 568990,
+					"sha256": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983"
+				},
+				{
+					"path": "assets/current-desktop-background-feeed432-5116-4d6a-9d99-f54ee5afde71.jpg",
+					"bytes": 1197350,
+					"sha256": "c6c6d9415281f7ecfca5aa81a5aab288f15f14139e2ba1d6de288173a4ec4945"
+				},
+				{
+					"path": "content/display.mp4",
+					"bytes": 2936677,
+					"sha256": "a834cd37cb39ede8c82672412644be4a5e81a41d4780ab05b3f6ea568f3d7f1b"
+				},
+				{
+					"path": "content/wallpaper.mp4",
+					"bytes": 2368586,
+					"sha256": "bf93bccc84a9fdbaabb5d265cda5060bfeb866c81ed5a2ae1987909f67cdf73b"
+				},
+				{
+					"path": "content/配乐一.wav",
+					"bytes": 864044,
+					"sha256": "4b244f2c3dcf65683ff661d16618f9e27146730152ded638e09e4c34c655f780"
+				},
+				{
+					"path": "content/配乐二.wav",
+					"bytes": 864044,
+					"sha256": "da12cee9b7ef8434e2b68fe6a4452ff32cf43776a66066b460fbe9369484f17f"
+				},
+				{
+					"path": "project-config.json",
+					"bytes": 4707,
+					"sha256": "57ff6da22a8a2b7a71c52191458596b3055ad535d3f08c08a1ec8ee1407f179e"
+				},
+				{
+					"path": "recording-meta.json",
+					"bytes": 456,
+					"sha256": "a883c279f38cfcc57bda3e3c1c01b6728e9cd8d72e4081616ac0ecba1d00dd5d"
+				},
+				{
+					"path": "screenshots/display.jpg",
+					"bytes": 16384,
+					"sha256": "78ee84d3a39decb116d6e2f8abe9f8a0c0830276060f52f04717b3b8965f4a64"
+				}
+			]
+		},
+		{
+			"name": "static",
+			"files": [
+				{
+					"path": ".jianku-3d-comfort.json",
+					"bytes": 44,
+					"sha256": "46427163023b17829c623cf487c6de3bba5f80d9b1a75a08182e3d09eeb7212a"
+				},
+				{
+					"path": ".recovery.lock",
+					"bytes": 0,
+					"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+				},
+				{
+					"path": "assets/current-desktop-background-5a40c1ad-a19c-467b-babc-56433496ac8d.jpg",
+					"bytes": 568990,
+					"sha256": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983"
+				},
+				{
+					"path": "assets/current-desktop-background-a679283a-07fe-4249-bc26-5d4160874048.jpg",
+					"bytes": 568990,
+					"sha256": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983"
+				},
+				{
+					"path": "assets/current-desktop-background-c912eb39-605c-41fa-b14d-3c4d6cef1a2a.jpg",
+					"bytes": 568990,
+					"sha256": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983"
+				},
+				{
+					"path": "assets/current-desktop-background-feeed432-5116-4d6a-9d99-f54ee5afde71.jpg",
+					"bytes": 1197350,
+					"sha256": "c6c6d9415281f7ecfca5aa81a5aab288f15f14139e2ba1d6de288173a4ec4945"
+				},
+				{
+					"path": "content/display.mp4",
+					"bytes": 2936677,
+					"sha256": "a834cd37cb39ede8c82672412644be4a5e81a41d4780ab05b3f6ea568f3d7f1b"
+				},
+				{
+					"path": "content/wallpaper.mp4",
+					"bytes": 2368586,
+					"sha256": "bf93bccc84a9fdbaabb5d265cda5060bfeb866c81ed5a2ae1987909f67cdf73b"
+				},
+				{
+					"path": "content/配乐一.wav",
+					"bytes": 864044,
+					"sha256": "4b244f2c3dcf65683ff661d16618f9e27146730152ded638e09e4c34c655f780"
+				},
+				{
+					"path": "content/配乐二.wav",
+					"bytes": 864044,
+					"sha256": "da12cee9b7ef8434e2b68fe6a4452ff32cf43776a66066b460fbe9369484f17f"
+				},
+				{
+					"path": "project-config.json",
+					"bytes": 5060,
+					"sha256": "204c7cbcb3cf3f580ecf17b6534a4b9c9cb4f03ea563b0be8f8dd476b2077a8f"
+				},
+				{
+					"path": "recording-meta.json",
+					"bytes": 456,
+					"sha256": "a883c279f38cfcc57bda3e3c1c01b6728e9cd8d72e4081616ac0ecba1d00dd5d"
+				},
+				{
+					"path": "screenshots/display.jpg",
+					"bytes": 24576,
+					"sha256": "6142a609d6aea797b98e31a6ef2ea55098fdd0ed21a31897249f8e998fb06a2d"
+				}
+			]
+		},
+		{
+			"name": "disabled",
+			"files": [
+				{
+					"path": ".jianku-3d-comfort.json",
+					"bytes": 44,
+					"sha256": "46427163023b17829c623cf487c6de3bba5f80d9b1a75a08182e3d09eeb7212a"
+				},
+				{
+					"path": ".recovery.lock",
+					"bytes": 0,
+					"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+				},
+				{
+					"path": "assets/current-desktop-background-5a40c1ad-a19c-467b-babc-56433496ac8d.jpg",
+					"bytes": 568990,
+					"sha256": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983"
+				},
+				{
+					"path": "assets/current-desktop-background-a679283a-07fe-4249-bc26-5d4160874048.jpg",
+					"bytes": 568990,
+					"sha256": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983"
+				},
+				{
+					"path": "assets/current-desktop-background-c912eb39-605c-41fa-b14d-3c4d6cef1a2a.jpg",
+					"bytes": 568990,
+					"sha256": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983"
+				},
+				{
+					"path": "assets/current-desktop-background-feeed432-5116-4d6a-9d99-f54ee5afde71.jpg",
+					"bytes": 1197350,
+					"sha256": "c6c6d9415281f7ecfca5aa81a5aab288f15f14139e2ba1d6de288173a4ec4945"
+				},
+				{
+					"path": "content/display.mp4",
+					"bytes": 2936677,
+					"sha256": "a834cd37cb39ede8c82672412644be4a5e81a41d4780ab05b3f6ea568f3d7f1b"
+				},
+				{
+					"path": "content/wallpaper.mp4",
+					"bytes": 2368586,
+					"sha256": "bf93bccc84a9fdbaabb5d265cda5060bfeb866c81ed5a2ae1987909f67cdf73b"
+				},
+				{
+					"path": "content/配乐一.wav",
+					"bytes": 864044,
+					"sha256": "4b244f2c3dcf65683ff661d16618f9e27146730152ded638e09e4c34c655f780"
+				},
+				{
+					"path": "content/配乐二.wav",
+					"bytes": 864044,
+					"sha256": "da12cee9b7ef8434e2b68fe6a4452ff32cf43776a66066b460fbe9369484f17f"
+				},
+				{
+					"path": "project-config.json",
+					"bytes": 6074,
+					"sha256": "daf8c6d73ac29423a35ed1685cb79d374615a5524fecad0a18d907d146195b2b"
+				},
+				{
+					"path": "recording-meta.json",
+					"bytes": 456,
+					"sha256": "a883c279f38cfcc57bda3e3c1c01b6728e9cd8d72e4081616ac0ecba1d00dd5d"
+				},
+				{
+					"path": "screenshots/display.jpg",
+					"bytes": 32768,
+					"sha256": "c61673cf8cabc4b3d195475f78a8782522f5bfa858fa00ef9fca03cd646bbcbe"
+				}
+			]
+		},
+		{
+			"name": "motion",
+			"files": [
+				{
+					"path": ".jianku-3d-comfort.json",
+					"bytes": 44,
+					"sha256": "46427163023b17829c623cf487c6de3bba5f80d9b1a75a08182e3d09eeb7212a"
+				},
+				{
+					"path": ".recovery.lock",
+					"bytes": 0,
+					"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+				},
+				{
+					"path": "assets/current-desktop-background-5a40c1ad-a19c-467b-babc-56433496ac8d.jpg",
+					"bytes": 568990,
+					"sha256": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983"
+				},
+				{
+					"path": "assets/current-desktop-background-a679283a-07fe-4249-bc26-5d4160874048.jpg",
+					"bytes": 568990,
+					"sha256": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983"
+				},
+				{
+					"path": "assets/current-desktop-background-c912eb39-605c-41fa-b14d-3c4d6cef1a2a.jpg",
+					"bytes": 568990,
+					"sha256": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983"
+				},
+				{
+					"path": "assets/current-desktop-background-feeed432-5116-4d6a-9d99-f54ee5afde71.jpg",
+					"bytes": 1197350,
+					"sha256": "c6c6d9415281f7ecfca5aa81a5aab288f15f14139e2ba1d6de288173a4ec4945"
+				},
+				{
+					"path": "content/display.mp4",
+					"bytes": 2936677,
+					"sha256": "a834cd37cb39ede8c82672412644be4a5e81a41d4780ab05b3f6ea568f3d7f1b"
+				},
+				{
+					"path": "content/wallpaper.mp4",
+					"bytes": 2368586,
+					"sha256": "bf93bccc84a9fdbaabb5d265cda5060bfeb866c81ed5a2ae1987909f67cdf73b"
+				},
+				{
+					"path": "content/配乐一.wav",
+					"bytes": 864044,
+					"sha256": "4b244f2c3dcf65683ff661d16618f9e27146730152ded638e09e4c34c655f780"
+				},
+				{
+					"path": "content/配乐二.wav",
+					"bytes": 864044,
+					"sha256": "da12cee9b7ef8434e2b68fe6a4452ff32cf43776a66066b460fbe9369484f17f"
+				},
+				{
+					"path": "project-config.json",
+					"bytes": 6074,
+					"sha256": "afbd0bfc0c17fd830f44f6500f712d269117e813559cc022e3dd1694d66b771b"
+				},
+				{
+					"path": "recording-meta.json",
+					"bytes": 456,
+					"sha256": "a883c279f38cfcc57bda3e3c1c01b6728e9cd8d72e4081616ac0ecba1d00dd5d"
+				},
+				{
+					"path": "screenshots/display.jpg",
+					"bytes": 32768,
+					"sha256": "c61673cf8cabc4b3d195475f78a8782522f5bfa858fa00ef9fca03cd646bbcbe"
+				}
+			]
+		},
+		{
+			"name": "combined",
+			"files": [
+				{
+					"path": ".jianku-3d-comfort.json",
+					"bytes": 44,
+					"sha256": "46427163023b17829c623cf487c6de3bba5f80d9b1a75a08182e3d09eeb7212a"
+				},
+				{
+					"path": ".recovery.lock",
+					"bytes": 0,
+					"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+				},
+				{
+					"path": "assets/current-desktop-background-5a40c1ad-a19c-467b-babc-56433496ac8d.jpg",
+					"bytes": 568990,
+					"sha256": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983"
+				},
+				{
+					"path": "assets/current-desktop-background-a679283a-07fe-4249-bc26-5d4160874048.jpg",
+					"bytes": 568990,
+					"sha256": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983"
+				},
+				{
+					"path": "assets/current-desktop-background-c912eb39-605c-41fa-b14d-3c4d6cef1a2a.jpg",
+					"bytes": 568990,
+					"sha256": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983"
+				},
+				{
+					"path": "assets/current-desktop-background-feeed432-5116-4d6a-9d99-f54ee5afde71.jpg",
+					"bytes": 1197350,
+					"sha256": "c6c6d9415281f7ecfca5aa81a5aab288f15f14139e2ba1d6de288173a4ec4945"
+				},
+				{
+					"path": "content/display.mp4",
+					"bytes": 2936677,
+					"sha256": "a834cd37cb39ede8c82672412644be4a5e81a41d4780ab05b3f6ea568f3d7f1b"
+				},
+				{
+					"path": "content/wallpaper.mp4",
+					"bytes": 2368586,
+					"sha256": "bf93bccc84a9fdbaabb5d265cda5060bfeb866c81ed5a2ae1987909f67cdf73b"
+				},
+				{
+					"path": "content/配乐一.wav",
+					"bytes": 864044,
+					"sha256": "4b244f2c3dcf65683ff661d16618f9e27146730152ded638e09e4c34c655f780"
+				},
+				{
+					"path": "content/配乐二.wav",
+					"bytes": 864044,
+					"sha256": "da12cee9b7ef8434e2b68fe6a4452ff32cf43776a66066b460fbe9369484f17f"
+				},
+				{
+					"path": "project-config.json",
+					"bytes": 6270,
+					"sha256": "f63fade0c4ab57d29e4458577f68dac659f34a6b253e4e42c73199ef9b6c3953"
+				},
+				{
+					"path": "recording-meta.json",
+					"bytes": 456,
+					"sha256": "a883c279f38cfcc57bda3e3c1c01b6728e9cd8d72e4081616ac0ecba1d00dd5d"
+				},
+				{
+					"path": "screenshots/display.jpg",
+					"bytes": 40960,
+					"sha256": "bd0c9dfc7cc838ad5bf72fd536ee5898e07b911481aef679bcc5ac98c72278e8"
+				}
+			]
+		},
+		{
+			"name": "static-focus",
+			"files": [
+				{
+					"path": ".jianku-3d-comfort.json",
+					"bytes": 44,
+					"sha256": "46427163023b17829c623cf487c6de3bba5f80d9b1a75a08182e3d09eeb7212a"
+				},
+				{
+					"path": ".recovery.lock",
+					"bytes": 0,
+					"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+				},
+				{
+					"path": "assets/current-desktop-background-5a40c1ad-a19c-467b-babc-56433496ac8d.jpg",
+					"bytes": 568990,
+					"sha256": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983"
+				},
+				{
+					"path": "assets/current-desktop-background-a679283a-07fe-4249-bc26-5d4160874048.jpg",
+					"bytes": 568990,
+					"sha256": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983"
+				},
+				{
+					"path": "assets/current-desktop-background-c912eb39-605c-41fa-b14d-3c4d6cef1a2a.jpg",
+					"bytes": 568990,
+					"sha256": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983"
+				},
+				{
+					"path": "assets/current-desktop-background-feeed432-5116-4d6a-9d99-f54ee5afde71.jpg",
+					"bytes": 1197350,
+					"sha256": "c6c6d9415281f7ecfca5aa81a5aab288f15f14139e2ba1d6de288173a4ec4945"
+				},
+				{
+					"path": "content/display.mp4",
+					"bytes": 2936677,
+					"sha256": "a834cd37cb39ede8c82672412644be4a5e81a41d4780ab05b3f6ea568f3d7f1b"
+				},
+				{
+					"path": "content/wallpaper.mp4",
+					"bytes": 2368586,
+					"sha256": "bf93bccc84a9fdbaabb5d265cda5060bfeb866c81ed5a2ae1987909f67cdf73b"
+				},
+				{
+					"path": "content/配乐一.wav",
+					"bytes": 864044,
+					"sha256": "4b244f2c3dcf65683ff661d16618f9e27146730152ded638e09e4c34c655f780"
+				},
+				{
+					"path": "content/配乐二.wav",
+					"bytes": 864044,
+					"sha256": "da12cee9b7ef8434e2b68fe6a4452ff32cf43776a66066b460fbe9369484f17f"
+				},
+				{
+					"path": "project-config.json",
+					"bytes": 5060,
+					"sha256": "2d9207a2e369c9891c56abdea904d5a4f44eccfc714546e562e2744a7d6e02c9"
+				},
+				{
+					"path": "recording-meta.json",
+					"bytes": 456,
+					"sha256": "a883c279f38cfcc57bda3e3c1c01b6728e9cd8d72e4081616ac0ecba1d00dd5d"
+				},
+				{
+					"path": "screenshots/display.jpg",
+					"bytes": 0,
+					"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+				}
+			]
+		},
+		{
+			"name": "motion-focus",
+			"files": [
+				{
+					"path": ".jianku-3d-comfort.json",
+					"bytes": 44,
+					"sha256": "46427163023b17829c623cf487c6de3bba5f80d9b1a75a08182e3d09eeb7212a"
+				},
+				{
+					"path": ".recovery.lock",
+					"bytes": 0,
+					"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+				},
+				{
+					"path": "assets/current-desktop-background-5a40c1ad-a19c-467b-babc-56433496ac8d.jpg",
+					"bytes": 568990,
+					"sha256": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983"
+				},
+				{
+					"path": "assets/current-desktop-background-a679283a-07fe-4249-bc26-5d4160874048.jpg",
+					"bytes": 568990,
+					"sha256": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983"
+				},
+				{
+					"path": "assets/current-desktop-background-c912eb39-605c-41fa-b14d-3c4d6cef1a2a.jpg",
+					"bytes": 568990,
+					"sha256": "32629d49e16928cdc3451821e66859470b001fa9d7941779dd208703430c8983"
+				},
+				{
+					"path": "assets/current-desktop-background-feeed432-5116-4d6a-9d99-f54ee5afde71.jpg",
+					"bytes": 1197350,
+					"sha256": "c6c6d9415281f7ecfca5aa81a5aab288f15f14139e2ba1d6de288173a4ec4945"
+				},
+				{
+					"path": "content/display.mp4",
+					"bytes": 2936677,
+					"sha256": "a834cd37cb39ede8c82672412644be4a5e81a41d4780ab05b3f6ea568f3d7f1b"
+				},
+				{
+					"path": "content/wallpaper.mp4",
+					"bytes": 2368586,
+					"sha256": "bf93bccc84a9fdbaabb5d265cda5060bfeb866c81ed5a2ae1987909f67cdf73b"
+				},
+				{
+					"path": "content/配乐一.wav",
+					"bytes": 864044,
+					"sha256": "4b244f2c3dcf65683ff661d16618f9e27146730152ded638e09e4c34c655f780"
+				},
+				{
+					"path": "content/配乐二.wav",
+					"bytes": 864044,
+					"sha256": "da12cee9b7ef8434e2b68fe6a4452ff32cf43776a66066b460fbe9369484f17f"
+				},
+				{
+					"path": "project-config.json",
+					"bytes": 6074,
+					"sha256": "beafb33c451d0577b4052cd3d6c2bb741973d0d113a4ec91f63be6775be0bdb5"
+				},
+				{
+					"path": "recording-meta.json",
+					"bytes": 456,
+					"sha256": "a883c279f38cfcc57bda3e3c1c01b6728e9cd8d72e4081616ac0ecba1d00dd5d"
+				},
+				{
+					"path": "screenshots/display.jpg",
+					"bytes": 24576,
+					"sha256": "be445975d5de12b98f5ce40d0a15cda0c5e80ac30e8085e3fb0e5055cf0761b8"
+				}
+			]
+		}
+	]
+}

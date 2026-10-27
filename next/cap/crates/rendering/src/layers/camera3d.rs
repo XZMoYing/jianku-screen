@@ -2,7 +2,9 @@ use bytemuck::{Pod, Zeroable};
 use wgpu::util::DeviceExt;
 
 use crate::ProjectUniforms;
-use crate::camera3d::{CAMERA3D_BLUR_BASE_HEIGHT, camera3d_inverse_homography};
+use crate::camera3d::{
+    CAMERA3D_BLUR_BASE_HEIGHT, CAMERA3D_MOTION_SAMPLES, camera3d_inverse_homography,
+};
 use cap_project::Camera3DBlurMode;
 
 /// Which blur kernel runs this frame.
@@ -86,18 +88,43 @@ impl Camera3DLayer {
         let (out_w, out_h) = (uniforms.output_size.0.max(1), uniforms.output_size.1.max(1));
         let aspect = out_w as f64 / out_h as f64;
 
-        if let Some(pose) = frame.pose
-            && let Some(homography) =
-                camera3d_inverse_homography(&pose, aspect, uniforms.camera3d_zoom.as_ref())
-        {
+        let sample_uniforms = |homography: crate::camera3d::Camera3DHomography| {
             let rows = homography.inverse_rows;
             let (hx, hy) = homography.half_extents;
-            let warp_uniforms = Camera3DUniforms {
+            Camera3DWarpSample {
                 inv_row0: [rows[0][0], rows[0][1], rows[0][2], 0.0],
                 inv_row1: [rows[1][0], rows[1][1], rows[1][2], hx],
                 inv_row2: [rows[2][0], rows[2][1], rows[2][2], hy],
-            };
-
+            }
+        };
+        let warp_uniforms = if let Some(motion) = &uniforms.camera3d_motion {
+            Some(Camera3DUniforms {
+                samples: motion.samples.map(sample_uniforms),
+                params: [CAMERA3D_MOTION_SAMPLES as f32, 0.0, 0.0, 0.0],
+            })
+        } else if frame.pose.is_some() || uniforms.camera3d_zoom.is_some() {
+            let pose = frame.pose.unwrap_or_else(|| {
+                let pose = cap_project::Camera3DProperties::default();
+                cap_project::Camera3DProperties {
+                    zoom: crate::camera3d::plane_half_extents(aspect).1
+                        / (pose.fov.to_radians() / 2.0).tan(),
+                    ..pose
+                }
+            });
+            camera3d_inverse_homography(&pose, aspect, uniforms.camera3d_zoom.as_ref()).map(
+                |homography| {
+                    let mut samples = [Camera3DWarpSample::default(); CAMERA3D_MOTION_SAMPLES];
+                    samples[0] = sample_uniforms(homography);
+                    Camera3DUniforms {
+                        samples,
+                        params: [1.0, 0.0, 0.0, 0.0],
+                    }
+                },
+            )
+        } else {
+            None
+        };
+        if let Some(warp_uniforms) = warp_uniforms {
             if self.cached_warp_uniforms.as_ref() != Some(&warp_uniforms) {
                 queue.write_buffer(
                     &self.warp_uniforms_buffer,
@@ -215,6 +242,13 @@ impl Camera3DLayer {
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Pod, Zeroable, Default, PartialEq)]
 struct Camera3DUniforms {
+    samples: [Camera3DWarpSample; CAMERA3D_MOTION_SAMPLES],
+    params: [f32; 4],
+}
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Pod, Zeroable, Default, PartialEq)]
+struct Camera3DWarpSample {
     inv_row0: [f32; 4],
     inv_row1: [f32; 4],
     inv_row2: [f32; 4],

@@ -1,0 +1,30 @@
+{
+	"platform": "MacOS",
+	"pretty_name": "导出一致性示例",
+	"segments": [
+		{
+			"display": {
+				"path": "content/display.mp4",
+				"fps": 60,
+				"start_time": 0.0
+			},
+			"camera": null,
+			"audio": null,
+			"cursor": null
+		},
+		{
+			"display": {
+				"path": "content/display.mp4",
+				"fps": 60,
+				"start_time": 0.0
+			},
+			"camera": null,
+			"audio": null,
+			"cursor": null
+		}
+	],
+	"cursors": {},
+	"status": {
+		"status": "Complete"
+	}
+}

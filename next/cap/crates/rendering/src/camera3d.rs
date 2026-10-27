@@ -190,12 +190,18 @@ pub fn sample_track(base: f64, keys: &[Camera3DKeyframe], time: f64) -> f64 {
         return base;
     }
 
-    let mut sorted = keys.to_vec();
-    sorted.sort_by(|a, b| {
-        a.time
-            .partial_cmp(&b.time)
-            .unwrap_or(std::cmp::Ordering::Equal)
-    });
+    let mut owned;
+    let sorted = if keys.windows(2).all(|pair| pair[0].time <= pair[1].time) {
+        keys
+    } else {
+        owned = keys.to_vec();
+        owned.sort_by(|a, b| {
+            a.time
+                .partial_cmp(&b.time)
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
+        &owned
+    };
 
     if time <= sorted[0].time {
         return sorted[0].value;
@@ -307,6 +313,131 @@ pub struct Camera3DScreenZoom {
 pub struct Camera3DHomography {
     pub inverse_rows: [[f32; 3]; 3],
     pub half_extents: (f32, f32),
+}
+
+pub const CAMERA3D_MOTION_SAMPLES: usize = 13;
+
+#[derive(Clone, Copy, Debug)]
+pub struct Camera3DMotion {
+    pub samples: [Camera3DHomography; CAMERA3D_MOTION_SAMPLES],
+}
+
+pub fn has_camera3d_shutter_tail(
+    time: f64,
+    segments: &[Camera3DSegment],
+    aspect: f64,
+    amount: f64,
+) -> bool {
+    if !amount.is_finite() || amount <= 0.0 {
+        return false;
+    }
+    segments
+        .iter()
+        .find(|segment| segment.enabled && time >= segment.start && time <= segment.end)
+        .is_some_and(|segment| {
+            interpolate_camera3d(
+                (time - amount.min(1.0) / f64::from(crate::MOTION_BLUR_BASELINE_FPS))
+                    .max(segment.start),
+                std::slice::from_ref(segment),
+                aspect,
+            )
+            .is_some_and(|frame| frame.pose.is_some())
+        })
+}
+
+pub fn screen_zoom_for_layout(
+    zoom: &crate::zoom::InterpolatedZoom,
+    offset: cap_project::XY<f64>,
+    size: cap_project::XY<f64>,
+    output: cap_project::XY<f64>,
+) -> Option<Camera3DScreenZoom> {
+    let span = zoom.bounds.bottom_right - zoom.bounds.top_left;
+    let amount = ((span.x + span.y) / 2.0).max(1.0);
+    (amount > 1.001).then(|| Camera3DScreenZoom {
+        content_uv: cap_project::XY::new(
+            (offset.x + (0.5 - zoom.bounds.top_left.x) / span.x.max(1e-6) * size.x)
+                / output.x.max(1.0),
+            (offset.y + (0.5 - zoom.bounds.top_left.y) / span.y.max(1e-6) * size.y)
+                / output.y.max(1.0),
+        ),
+        amount,
+    })
+}
+
+pub fn interpolate_camera3d_motion(
+    time: f64,
+    segments: &[Camera3DSegment],
+    output_size: (u32, u32),
+    amount: f64,
+    zoom_at: impl Fn(f64) -> Option<Camera3DScreenZoom>,
+) -> Option<Camera3DMotion> {
+    if !amount.is_finite() || amount <= 0.0 || output_size.0 == 0 || output_size.1 == 0 {
+        return None;
+    }
+    let segment = segments
+        .iter()
+        .find(|segment| segment.enabled && time >= segment.start && time <= segment.end)?;
+    let aspect = f64::from(output_size.0) / f64::from(output_size.1.max(1));
+    let sample = |time: f64| {
+        // Keep authored shot cuts sharp; temporal samples belong to this shot,
+        // never the preceding shot's pose or media.
+        let time = time.max(segment.start);
+        let frame = interpolate_camera3d(time, std::slice::from_ref(segment), aspect)?;
+        let pose = frame.pose.unwrap_or_else(|| {
+            let pose = Camera3DProperties::default();
+            Camera3DProperties {
+                zoom: plane_half_extents(aspect).1 / (pose.fov.to_radians() / 2.0).tan(),
+                ..pose
+            }
+        });
+        camera3d_inverse_homography(&pose, aspect, zoom_at(time).as_ref())
+    };
+    let current = sample(time)?;
+    let exposure = amount.min(1.0) / f64::from(crate::MOTION_BLUR_BASELINE_FPS);
+    let previous = sample(time - exposure)?;
+    let travel = projected_travel_pixels(&current, &previous, output_size)?;
+    if travel < f64::from(crate::MOTION_ACTIVATION_PX) {
+        return None;
+    }
+    let cap = f64::from(output_size.0.min(output_size.1)) * f64::from(crate::MOTION_VECTOR_CAP);
+    let exposure = exposure * (cap / travel).min(1.0);
+    let mut samples = [current; CAMERA3D_MOTION_SAMPLES];
+    for (index, target) in samples.iter_mut().enumerate().skip(1) {
+        let age = index as f64 / (CAMERA3D_MOTION_SAMPLES - 1) as f64;
+        *target = sample(time - exposure * age).unwrap_or(current);
+    }
+    Some(Camera3DMotion { samples })
+}
+
+fn projected_travel_pixels(
+    current: &Camera3DHomography,
+    previous: &Camera3DHomography,
+    output_size: (u32, u32),
+) -> Option<f64> {
+    let current_forward = invert3(&current.inverse_rows.map(|row| row.map(f64::from)))?;
+    let previous_forward = invert3(&previous.inverse_rows.map(|row| row.map(f64::from)))?;
+    let mut maximum: f64 = 0.0;
+    for u in [-0.8, 0.0, 0.8] {
+        for v in [-0.8, 0.0, 0.8] {
+            let point = [
+                u * f64::from(current.half_extents.0),
+                v * f64::from(current.half_extents.1),
+                1.0,
+            ];
+            let project = |forward: &Mat3| {
+                let projected =
+                    forward.map(|row| row.iter().zip(point).map(|(a, b)| a * b).sum::<f64>());
+                (projected[2] > 1e-6)
+                    .then(|| [projected[0] / projected[2], projected[1] / projected[2]])
+            };
+            if let (Some(a), Some(b)) = (project(&current_forward), project(&previous_forward)) {
+                let dx = (a[0] - b[0]) * f64::from(output_size.0) * 0.5;
+                let dy = (a[1] - b[1]) * f64::from(output_size.1) * 0.5;
+                maximum = maximum.max(dx.hypot(dy));
+            }
+        }
+    }
+    Some(maximum)
 }
 
 type Mat3 = [[f64; 3]; 3];
@@ -768,5 +899,147 @@ mod tests {
         ];
         let frame = interpolate_camera3d(5.0, std::slice::from_ref(&seg), ASPECT).unwrap();
         assert_close(frame.blur.unwrap().strength, 15.0, 1e-6, "keyed strength");
+    }
+
+    #[test]
+    fn temporal_motion_preserves_still_poses_disabled_blur_and_hard_cuts() {
+        let mut seg = segment();
+        seg.transition_in = 0.0;
+        seg.transition_out = 0.0;
+        assert!(
+            interpolate_camera3d_motion(3.0, std::slice::from_ref(&seg), (1280, 720), 1.0, |_| {
+                None
+            })
+            .is_none()
+        );
+        seg.tracks.pan_x = vec![
+            Camera3DKeyframe {
+                time: 0.0,
+                value: -0.5,
+                out_easing: Some([0.0, 0.0]),
+                in_easing: None,
+            },
+            Camera3DKeyframe {
+                time: 6.0,
+                value: 0.5,
+                out_easing: None,
+                in_easing: Some([1.0, 1.0]),
+            },
+        ];
+        assert!(
+            interpolate_camera3d_motion(3.0, std::slice::from_ref(&seg), (1280, 720), 0.0, |_| {
+                None
+            })
+            .is_none()
+        );
+        assert!(
+            interpolate_camera3d_motion(
+                seg.start,
+                std::slice::from_ref(&seg),
+                (1280, 720),
+                1.0,
+                |_| None
+            )
+            .is_none()
+        );
+        assert!(
+            interpolate_camera3d_motion(
+                seg.end + 0.001,
+                std::slice::from_ref(&seg),
+                (1280, 720),
+                1.0,
+                |_| { None }
+            )
+            .is_none()
+        );
+        let motion =
+            interpolate_camera3d_motion(5.0, std::slice::from_ref(&seg), (1280, 720), 1.0, |_| {
+                None
+            })
+            .unwrap();
+        let current = camera3d_inverse_homography(
+            &interpolate_camera3d(5.0, &[seg], ASPECT)
+                .unwrap()
+                .pose
+                .unwrap(),
+            ASPECT,
+            None,
+        )
+        .unwrap();
+        assert_eq!(motion.samples[0], current);
+        assert_ne!(
+            motion.samples[0],
+            motion.samples[CAMERA3D_MOTION_SAMPLES - 1]
+        );
+    }
+
+    #[test]
+    fn temporal_motion_tracks_card_zoom_and_respects_shutter_amount() {
+        let mut seg = segment();
+        seg.transition_in = 0.0;
+        seg.transition_out = 0.0;
+        let zoom = |time: f64| {
+            Some(Camera3DScreenZoom {
+                content_uv: cap_project::XY::new(0.7, 0.3),
+                amount: 1.0 + (time - 2.0) * 0.5,
+            })
+        };
+        let full =
+            interpolate_camera3d_motion(4.0, std::slice::from_ref(&seg), (1920, 1080), 1.0, zoom)
+                .unwrap();
+        let half = interpolate_camera3d_motion(4.0, &[seg], (1920, 1080), 0.5, zoom).unwrap();
+        let full_travel = projected_travel_pixels(
+            &full.samples[0],
+            &full.samples[CAMERA3D_MOTION_SAMPLES - 1],
+            (1920, 1080),
+        )
+        .unwrap();
+        let half_travel = projected_travel_pixels(
+            &half.samples[0],
+            &half.samples[CAMERA3D_MOTION_SAMPLES - 1],
+            (1920, 1080),
+        )
+        .unwrap();
+        assert!((half_travel / full_travel - 0.5).abs() < 0.01);
+        assert!(full_travel > 1.0);
+    }
+
+    #[test]
+    fn temporal_motion_caps_extreme_jumps_and_keeps_samples_finite() {
+        let mut seg = segment();
+        seg.transition_in = 0.0;
+        seg.transition_out = 0.0;
+        seg.properties.tilt_x = 0.0;
+        seg.properties.tilt_y = 0.0;
+        seg.tracks.pan_x = vec![
+            Camera3DKeyframe {
+                time: 0.0,
+                value: -100.0,
+                out_easing: Some([0.0, 0.0]),
+                in_easing: None,
+            },
+            Camera3DKeyframe {
+                time: 6.0,
+                value: 100.0,
+                out_easing: None,
+                in_easing: Some([1.0, 1.0]),
+            },
+        ];
+        let motion = interpolate_camera3d_motion(5.0, &[seg], (1920, 1080), 1.0, |_| None).unwrap();
+        let travel = projected_travel_pixels(
+            &motion.samples[0],
+            &motion.samples[CAMERA3D_MOTION_SAMPLES - 1],
+            (1920, 1080),
+        )
+        .unwrap();
+        assert!(travel <= 1080.0 * f64::from(crate::MOTION_VECTOR_CAP) + 0.1);
+        assert!(
+            motion
+                .samples
+                .iter()
+                .flat_map(|sample| sample.inverse_rows)
+                .flatten()
+                .all(f32::is_finite)
+        );
     }
 }

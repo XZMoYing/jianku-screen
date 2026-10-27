@@ -1,0 +1,91 @@
+{
+	"scope": "Only superseded synthetic U18a media; final comparison projects and before/after videos retained in /private/tmp/jianku-3d-final",
+	"removed": [
+		{
+			"path": "/private/tmp/jianku-3d-comfort/before-flat.mp4",
+			"bytes": 14804622
+		},
+		{
+			"path": "/private/tmp/jianku-3d-comfort/after-flat.mp4",
+			"bytes": 14804622
+		},
+		{
+			"path": "/private/tmp/jianku-3d-comfort/flat.jks",
+			"bytes": 9983869
+		},
+		{
+			"path": "/private/tmp/jianku-3d-comfort/before-static.mp4",
+			"bytes": 15020647
+		},
+		{
+			"path": "/private/tmp/jianku-3d-comfort/after-static.mp4",
+			"bytes": 15020647
+		},
+		{
+			"path": "/private/tmp/jianku-3d-comfort/static.jks",
+			"bytes": 10000606
+		},
+		{
+			"path": "/private/tmp/jianku-3d-comfort/before-disabled.mp4",
+			"bytes": 14866006
+		},
+		{
+			"path": "/private/tmp/jianku-3d-comfort/after-disabled.mp4",
+			"bytes": 14866006
+		},
+		{
+			"path": "/private/tmp/jianku-3d-comfort/disabled.jks",
+			"bytes": 9985436
+		},
+		{
+			"path": "/private/tmp/jianku-3d-comfort/before-motion.mp4",
+			"bytes": 14866006
+		},
+		{
+			"path": "/private/tmp/jianku-3d-comfort/after-motion.mp4",
+			"bytes": 14866728
+		},
+		{
+			"path": "/private/tmp/jianku-3d-comfort/motion.jks",
+			"bytes": 9960860
+		},
+		{
+			"path": "/private/tmp/jianku-3d-comfort/before-combined.mp4",
+			"bytes": 14866462
+		},
+		{
+			"path": "/private/tmp/jianku-3d-comfort/after-combined.mp4",
+			"bytes": 14866448
+		},
+		{
+			"path": "/private/tmp/jianku-3d-comfort/combined.jks",
+			"bytes": 9985632
+		},
+		{
+			"path": "/private/tmp/jianku-3d-comfort/before-static-focus.mp4",
+			"bytes": 644260
+		},
+		{
+			"path": "/private/tmp/jianku-3d-comfort/after-static-focus.mp4",
+			"bytes": 644260
+		},
+		{
+			"path": "/private/tmp/jianku-3d-comfort/static-focus.jks",
+			"bytes": 9959646
+		},
+		{
+			"path": "/private/tmp/jianku-3d-comfort/before-motion-focus.mp4",
+			"bytes": 4059369
+		},
+		{
+			"path": "/private/tmp/jianku-3d-comfort/after-motion-focus.mp4",
+			"bytes": 4056516
+		},
+		{
+			"path": "/private/tmp/jianku-3d-comfort/motion-focus.jks",
+			"bytes": 10018204
+		}
+	],
+	"logicalBytes": 228146852,
+	"observedFreeBytesDelta": 237006848
+}

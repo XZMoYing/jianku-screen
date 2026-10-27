@@ -1,0 +1,92 @@
+{
+	"runs": [
+		{
+			"phase": "before",
+			"case": "flat",
+			"exitCode": 0,
+			"elapsedSeconds": 4.201183625002159
+		},
+		{
+			"phase": "before",
+			"case": "static",
+			"exitCode": 0,
+			"elapsedSeconds": 3.64151104199118
+		},
+		{
+			"phase": "before",
+			"case": "disabled",
+			"exitCode": 0,
+			"elapsedSeconds": 3.5943369999877177
+		},
+		{
+			"phase": "before",
+			"case": "motion",
+			"exitCode": 0,
+			"elapsedSeconds": 3.496350542001892
+		},
+		{
+			"phase": "before",
+			"case": "combined",
+			"exitCode": 0,
+			"elapsedSeconds": 3.51136437500827
+		},
+		{
+			"phase": "before",
+			"case": "static-focus",
+			"exitCode": 0,
+			"elapsedSeconds": 4.7887243749864865
+		},
+		{
+			"phase": "before",
+			"case": "motion-focus",
+			"exitCode": 0,
+			"elapsedSeconds": 5.189630375010893
+		},
+		{
+			"phase": "after",
+			"case": "flat",
+			"exitCode": 0,
+			"elapsedSeconds": 3.8559058330138214
+		},
+		{
+			"phase": "after",
+			"case": "static",
+			"exitCode": 0,
+			"elapsedSeconds": 3.6732056250039022
+		},
+		{
+			"phase": "after",
+			"case": "disabled",
+			"exitCode": 0,
+			"elapsedSeconds": 3.615760875021806
+		},
+		{
+			"phase": "after",
+			"case": "motion",
+			"exitCode": 0,
+			"elapsedSeconds": 3.750991457985947
+		},
+		{
+			"phase": "after",
+			"case": "combined",
+			"exitCode": 0,
+			"elapsedSeconds": 3.931198417005362
+		},
+		{
+			"phase": "after",
+			"case": "static-focus",
+			"exitCode": 0,
+			"elapsedSeconds": 5.654442041995935
+		},
+		{
+			"phase": "after",
+			"case": "motion-focus",
+			"exitCode": 0,
+			"elapsedSeconds": 5.161397791991476
+		}
+	],
+	"cliSha256": {
+		"before": "682045873b6e67c54d558cd0d9e8c219c85d8bf2787eca30bebe9a5e2e106743",
+		"after": "546968307eb2c859665b8b413fe47724e1c445c18fca4215eb19d09917769cef"
+	}
+}

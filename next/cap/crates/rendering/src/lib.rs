@@ -2484,6 +2484,7 @@ pub struct ProjectUniforms {
     /// The 2D zoom re-expressed as an on-screen card magnification while a 3D
     /// pose is active (the display itself renders unzoomed into the card).
     pub camera3d_zoom: Option<camera3d::Camera3DScreenZoom>,
+    pub camera3d_motion: Option<camera3d::Camera3DMotion>,
 }
 
 fn cursor_time_for_interpolation(time: f32, stop_time: Option<f32>) -> f32 {
@@ -3815,7 +3816,17 @@ impl ProjectUniforms {
         // cutting content off). The content renders unzoomed and the sampled
         // zoom becomes a screen-space magnification of the whole card about
         // the zoom target instead (see `camera3d_zoom` below).
-        let camera3d_pose_active = camera3d.as_ref().is_some_and(|c| c.pose.is_some());
+        let camera3d_trailing_pose = has_previous
+            && project.timeline.as_ref().is_some_and(|timeline| {
+                camera3d::has_camera3d_shutter_tail(
+                    timeline_time,
+                    &timeline.camera3d_segments,
+                    output_size.0 as f64 / output_size.1.max(1) as f64,
+                    f64::from(screen_motion_blur),
+                )
+            });
+        let camera3d_pose_active =
+            camera3d.as_ref().is_some_and(|c| c.pose.is_some()) || camera3d_trailing_pose;
         let raw_zoom = zoom;
         let (zoom, prev_zoom, motion_prev_zoom) = if camera3d_pose_active {
             (
@@ -3955,6 +3966,7 @@ impl ProjectUniforms {
         });
 
         let mut camera3d_zoom: Option<camera3d::Camera3DScreenZoom> = None;
+        let mut camera3d_motion = None;
         let (
             display,
             display_motion_parent,
@@ -3984,21 +3996,33 @@ impl ProjectUniforms {
             if camera3d_pose_active {
                 // Re-express the (neutralized) 2D zoom as a magnification of
                 // the whole card about the zoom target's on-card position.
-                let bounds = raw_zoom.bounds;
-                let span = bounds.bottom_right - bounds.top_left;
-                let amount = ((span.x + span.y) / 2.0).max(1.0);
-                if amount > 1.001 {
-                    let center_u = (0.5 - bounds.top_left.x) / span.x.max(1e-6);
-                    let center_v = (0.5 - bounds.top_left.y) / span.y.max(1e-6);
-                    let frame_x = display_offset.coord.x + center_u * display_size.coord.x;
-                    let frame_y = display_offset.coord.y + center_v * display_size.coord.y;
-                    camera3d_zoom = Some(camera3d::Camera3DScreenZoom {
-                        content_uv: XY::new(
-                            frame_x / output_size.x.max(1.0),
-                            frame_y / output_size.y.max(1.0),
-                        ),
-                        amount,
-                    });
+                camera3d_zoom = camera3d::screen_zoom_for_layout(
+                    &raw_zoom,
+                    display_offset.coord,
+                    display_size.coord,
+                    output_size,
+                );
+                if has_previous
+                    && !zoom_snapped(
+                        (frame_time - screen_motion_blur / MOTION_BLUR_BASELINE_FPS).max(0.0),
+                        frame_time,
+                    )
+                    && let Some(timeline) = &project.timeline
+                {
+                    camera3d_motion = camera3d::interpolate_camera3d_motion(
+                        timeline_time,
+                        &timeline.camera3d_segments,
+                        (output_size.x as u32, output_size.y as u32),
+                        f64::from(screen_motion_blur),
+                        |time| {
+                            camera3d::screen_zoom_for_layout(
+                                &zoom_sample(time as f32),
+                                display_offset.coord,
+                                display_size.coord,
+                                output_size,
+                            )
+                        },
+                    );
                 }
             }
 
@@ -4892,6 +4916,7 @@ impl ProjectUniforms {
             texts,
             camera3d,
             camera3d_zoom,
+            camera3d_motion,
             screen_color_grade,
         }
     }
