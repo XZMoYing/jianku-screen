@@ -1,0 +1,35 @@
+{
+	"date": "2026-10-27",
+	"sourceBase": "69ba2c0f88e4f65c63733063de72ff9a34b02974",
+	"projectTests": {
+		"command": "cargo test --locked --release -p cap-project --lib",
+		"passed": 159,
+		"failed": 0,
+		"configurationWriteFaultCases": 6
+	},
+	"frontendTests": {
+		"command": "vitest run project-config-save editor-title-save-bridge recording-title-save project-copy i18n (explicit file paths in frontend-tests.log)",
+		"passed": 39,
+		"failed": 0
+	},
+	"desktopTypecheck": {
+		"command": "tsc --noEmit -p apps/desktop/tsconfig.json",
+		"exitCode": 0
+	},
+	"rustDesktopCheck": {
+		"command": "cargo check --locked --release -p cap-desktop",
+		"exitCode": 0
+	},
+	"clippy": {
+		"command": "cargo clippy --locked --release -p cap-project --lib --tests --no-deps -- -D warnings",
+		"exitCode": 0
+	},
+	"rustFormat": "passed",
+	"scopedBiome": "3 files passed",
+	"uiStatus": "Source and component regressions verified; packaged persistent-toast, retry and close verification belongs to U03. Installed application remains alpha.37.",
+	"notCovered": [
+		"Windows rename fallback runtime validation",
+		"Actual disk exhaustion, abrupt power loss and crash recovery of edits never written",
+		"Two known strict hardware-chroma parity failures remain open; not part of this test selection"
+	]
+}

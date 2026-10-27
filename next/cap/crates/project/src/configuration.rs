@@ -2,6 +2,7 @@ use std::{
     borrow::Cow,
     collections::BTreeMap,
     fmt,
+    io::Write,
     ops::{Add, Div, Mul, Sub, SubAssign},
     path::Path,
     sync::LazyLock,
@@ -2937,21 +2938,61 @@ impl ProjectConfiguration {
     }
 
     pub fn write(&self, project_path: impl AsRef<Path>) -> Result<(), std::io::Error> {
+        self.write_with(project_path.as_ref(), |file, bytes| {
+            file.write_all(bytes)?;
+            file.sync_all()
+        })
+    }
+
+    fn write_with(
+        &self,
+        project_path: &Path,
+        prepare: impl FnOnce(&mut std::fs::File, &[u8]) -> std::io::Result<()>,
+    ) -> std::io::Result<()> {
         self.validate()
             .map_err(|error| std::io::Error::new(std::io::ErrorKind::InvalidData, error))?;
-
-        let project_path = project_path.as_ref();
+        let bytes = serde_json::to_vec_pretty(self)?;
         let config_path = project_path.join("project-config.json");
-        let temp_path =
-            project_path.join(format!(".project-config-{}.json.tmp", uuid::Uuid::new_v4()));
-
-        std::fs::write(&temp_path, serde_json::to_string_pretty(self)?)?;
-
-        if let Err(error) = std::fs::rename(&temp_path, &config_path) {
-            let _ = std::fs::remove_file(&temp_path);
-            return Err(error);
+        let permissions = match std::fs::symlink_metadata(&config_path) {
+            Ok(metadata) if !metadata.is_file() => {
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::InvalidInput,
+                    "Project configuration must be a regular file",
+                ));
+            }
+            Ok(metadata) if metadata.permissions().readonly() => {
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::PermissionDenied,
+                    "Project configuration is read-only",
+                ));
+            }
+            Ok(metadata) => Some(metadata.permissions()),
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => None,
+            Err(error) => return Err(error),
+        };
+        let mut temporary = tempfile::Builder::new()
+            .prefix(".project-config-")
+            .suffix(".json.tmp")
+            .tempfile_in(project_path)?;
+        if let Some(permissions) = permissions {
+            temporary.as_file().set_permissions(permissions)?;
         }
-
+        prepare(temporary.as_file_mut(), &bytes)?;
+        #[cfg(windows)]
+        {
+            // Match the metadata writer's open-reader rename fallback on Windows.
+            let (file, path) = temporary.keep().map_err(|error| error.error)?;
+            let mut path = tempfile::TempPath::from_path(path);
+            std::fs::rename(&path, &config_path)?;
+            path.disable_cleanup(true);
+            drop(file);
+        }
+        #[cfg(not(windows))]
+        drop(
+            temporary
+                .persist(&config_path)
+                .map_err(|error| error.error)?,
+        );
         Ok(())
     }
 
@@ -4765,6 +4806,158 @@ mod overlay_order_tests {
         assert_eq!(
             project.resolved_overlay_order(&[text, new_image, image]),
             [new_image, image, text]
+        );
+    }
+}
+
+#[cfg(test)]
+mod configuration_write_tests {
+    use super::*;
+
+    fn entries(path: &Path) -> Vec<String> {
+        let mut names = std::fs::read_dir(path)
+            .unwrap()
+            .map(|entry| entry.unwrap().file_name().to_string_lossy().into_owned())
+            .collect::<Vec<_>>();
+        names.sort();
+        names
+    }
+
+    #[test]
+    fn preparation_failures_preserve_original_and_remove_temporary_files() {
+        let directory = tempfile::tempdir().unwrap();
+        let original = ProjectConfiguration::default();
+        original.write(directory.path()).unwrap();
+        let path = directory.path().join("project-config.json");
+        let before = std::fs::read(&path).unwrap();
+        let mut changed = original.clone();
+        changed.background.padding = 17.0;
+        for full_write in [false, true] {
+            let error = changed
+                .write_with(directory.path(), |file, bytes| {
+                    let count = if full_write {
+                        bytes.len()
+                    } else {
+                        bytes.len() / 2
+                    };
+                    file.write_all(&bytes[..count])?;
+                    Err(std::io::Error::other(
+                        "injected write or synchronization failure",
+                    ))
+                })
+                .unwrap_err();
+            assert_eq!(error.kind(), std::io::ErrorKind::Other);
+            assert_eq!(std::fs::read(&path).unwrap(), before);
+            assert_eq!(entries(directory.path()), ["project-config.json"]);
+        }
+        changed.write(directory.path()).unwrap();
+        let saved: ProjectConfiguration =
+            serde_json::from_slice(&std::fs::read(path).unwrap()).unwrap();
+        assert_eq!(saved.background.padding, 17.0);
+        assert_eq!(entries(directory.path()), ["project-config.json"]);
+    }
+
+    #[test]
+    fn initial_save_failure_removes_partial_temporary_file_and_can_retry() {
+        let directory = tempfile::tempdir().unwrap();
+        let config = ProjectConfiguration::default();
+        let result = config.write_with(directory.path(), |file, bytes| {
+            file.write_all(&bytes[..bytes.len() / 2])?;
+            Err(std::io::Error::other("injected initial write failure"))
+        });
+        assert!(result.is_err());
+        assert!(entries(directory.path()).is_empty());
+        config.write(directory.path()).unwrap();
+        let saved = ProjectConfiguration::load(directory.path()).unwrap();
+        assert_eq!(saved.background.padding, config.background.padding);
+        assert_eq!(entries(directory.path()), ["project-config.json"]);
+    }
+
+    #[test]
+    fn replacement_failure_preserves_destination_and_removes_temporary_file() {
+        let directory = tempfile::tempdir().unwrap();
+        let config = ProjectConfiguration::default();
+        let path = directory.path().join("project-config.json");
+        let result = config.write_with(directory.path(), |file, bytes| {
+            file.write_all(bytes)?;
+            file.sync_all()?;
+            std::fs::create_dir(&path)?;
+            std::fs::write(path.join("keep"), b"external destination")
+        });
+        assert!(result.is_err());
+        assert_eq!(
+            std::fs::read(path.join("keep")).unwrap(),
+            b"external destination"
+        );
+        assert_eq!(entries(directory.path()), ["project-config.json"]);
+    }
+
+    #[test]
+    fn readonly_configuration_is_preserved_without_creating_temporary_files() {
+        let directory = tempfile::tempdir().unwrap();
+        let config = ProjectConfiguration::default();
+        config.write(directory.path()).unwrap();
+        let path = directory.path().join("project-config.json");
+        let before = std::fs::read(&path).unwrap();
+        let original_permissions = std::fs::metadata(&path).unwrap().permissions();
+        let mut readonly = original_permissions.clone();
+        readonly.set_readonly(true);
+        std::fs::set_permissions(&path, readonly).unwrap();
+        let result = config.write(directory.path());
+        std::fs::set_permissions(&path, original_permissions).unwrap();
+        assert_eq!(
+            result.unwrap_err().kind(),
+            std::io::ErrorKind::PermissionDenied
+        );
+        assert_eq!(std::fs::read(path).unwrap(), before);
+        assert_eq!(entries(directory.path()), ["project-config.json"]);
+    }
+
+    #[test]
+    fn configuration_directory_is_not_replaced() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("project-config.json");
+        std::fs::create_dir(&path).unwrap();
+        std::fs::write(path.join("keep"), b"original").unwrap();
+        let error = ProjectConfiguration::default()
+            .write(directory.path())
+            .unwrap_err();
+        assert_eq!(error.kind(), std::io::ErrorKind::InvalidInput);
+        assert_eq!(std::fs::read(path.join("keep")).unwrap(), b"original");
+        assert_eq!(entries(directory.path()), ["project-config.json"]);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn configuration_symlink_target_and_permissions_are_preserved() {
+        use std::os::unix::fs::{PermissionsExt, symlink};
+        let directory = tempfile::tempdir().unwrap();
+        let target = directory.path().join("original.json");
+        std::fs::write(&target, b"original").unwrap();
+        let path = directory.path().join("project-config.json");
+        symlink(&target, &path).unwrap();
+        assert_eq!(
+            ProjectConfiguration::default()
+                .write(directory.path())
+                .unwrap_err()
+                .kind(),
+            std::io::ErrorKind::InvalidInput
+        );
+        assert!(
+            std::fs::symlink_metadata(&path)
+                .unwrap()
+                .file_type()
+                .is_symlink()
+        );
+        assert_eq!(std::fs::read(&target).unwrap(), b"original");
+        std::fs::remove_file(&path).unwrap();
+        let config = ProjectConfiguration::default();
+        config.write(directory.path()).unwrap();
+        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o640)).unwrap();
+        config.write(directory.path()).unwrap();
+        assert_eq!(
+            std::fs::metadata(path).unwrap().permissions().mode() & 0o777,
+            0o640
         );
     }
 }

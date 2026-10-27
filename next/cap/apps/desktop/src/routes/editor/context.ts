@@ -1701,9 +1701,19 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				getConfig: () => serializeProjectConfiguration(project),
 				save: async (config) => {
 					await commands.setProjectConfig(config);
+					toast.dismiss("editor-autosave-failed");
 				},
 				onError: (error) => {
 					console.error("Failed to persist project config", error);
+					toast.error(
+						localize(
+							"自动保存失败，当前编辑仍保留在窗口中。请检查磁盘空间和写入权限，再从「工程」菜单重试保存。",
+						),
+						{
+							id: "editor-autosave-failed",
+							duration: Number.POSITIVE_INFINITY,
+						},
+					);
 				},
 			});
 

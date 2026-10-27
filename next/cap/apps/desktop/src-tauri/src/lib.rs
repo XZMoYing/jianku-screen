@@ -5105,8 +5105,10 @@ async fn set_project_config(
 ) -> Result<(), String> {
     editor_instance.project_config.0.send(config.clone()).ok();
 
-    config
-        .write(&editor_instance.project_path)
+    let project_path = editor_instance.project_path.clone();
+    tauri::async_runtime::spawn_blocking(move || config.write(project_path))
+        .await
+        .map_err(|error| format!("Project configuration save task failed: {error}"))?
         .map_err(|error| format!("Failed to write project config: {error}"))?;
 
     Ok(())
