@@ -2331,12 +2331,14 @@ pub fn set_motion(
         }
         *track = vec![
             Camera3DKeyframe {
+                out_spring: None,
                 time: 0.,
                 value: from,
                 out_easing: Some(easing.0),
                 in_easing: None,
             },
             Camera3DKeyframe {
+                out_spring: None,
                 time: length,
                 value: to,
                 out_easing: None,

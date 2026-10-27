@@ -912,7 +912,8 @@ outEasing?: [number, number] | null;
 /**
  * Bezier P2 for the track segment entering this keyframe.
  */
-inEasing?: [number, number] | null }
+inEasing?: [number, number] | null; outSpring?: Camera3DMotionSpring | null }
+export type Camera3DMotionSpring = { range?: [number, number] }
 /**
  * A 3D camera pose for the composed content plane. Angles are degrees.
  *

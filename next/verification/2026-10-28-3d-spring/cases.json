@@ -1,0 +1,62 @@
+[
+	{
+		"name": "flat",
+		"base": "flat",
+		"expected": "identical"
+	},
+	{
+		"name": "static",
+		"base": "static",
+		"expected": "identical"
+	},
+	{
+		"name": "disabled",
+		"base": "disabled",
+		"expected": "identical"
+	},
+	{
+		"name": "motion",
+		"base": "motion",
+		"expected": "identical"
+	},
+	{
+		"name": "combined",
+		"base": "combined",
+		"expected": "identical"
+	},
+	{
+		"name": "static-focus",
+		"base": "static-focus",
+		"expected": "identical"
+	},
+	{
+		"name": "motion-focus",
+		"base": "motion-focus",
+		"expected": "identical"
+	},
+	{
+		"name": "natural-motion",
+		"base": "motion",
+		"expected": "different"
+	},
+	{
+		"name": "natural-combined",
+		"base": "combined",
+		"expected": "different"
+	},
+	{
+		"name": "natural-focus",
+		"base": "motion-focus",
+		"expected": "different"
+	},
+	{
+		"name": "natural-sharp",
+		"base": "disabled",
+		"expected": "different"
+	},
+	{
+		"name": "natural-split-sharp",
+		"base": "disabled",
+		"expected": "different"
+	}
+]

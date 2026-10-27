@@ -1130,12 +1130,14 @@ mod tests {
                 tracks: Camera3DTracks {
                     tilt_x: vec![
                         Camera3DKeyframe {
+                            out_spring: None,
                             time: 0.0,
                             value: 0.0,
                             out_easing: None,
                             in_easing: None,
                         },
                         Camera3DKeyframe {
+                            out_spring: None,
                             time: 10.0,
                             value: 15.0,
                             out_easing: None,

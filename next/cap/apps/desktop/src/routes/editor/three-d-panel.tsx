@@ -958,7 +958,7 @@ export function Camera3DShotPanel(props: {
 
 			<DrillSection
 				name="Timing & advanced"
-				summary={`${motionEasing().label} · Lens ${Math.round(selectedPose().fov)}`}
+				summary={`${localize(motionEasing().label)} · ${localize("视角")} ${Math.round(selectedPose().fov)}°`}
 				open={advancedOpen()}
 				onOpenChange={setAdvancedOpen}
 			>
@@ -982,14 +982,16 @@ export function Camera3DShotPanel(props: {
 									item={itemProps.item}
 								>
 									<KSelect.ItemLabel class="flex-1">
-										{itemProps.item.rawValue.label}
+										{localize(itemProps.item.rawValue.label)}
 									</KSelect.ItemLabel>
 								</MenuItem>
 							)}
 						>
 							<KSelect.Trigger class="flex flex-row gap-1.5 items-center px-2 w-full h-[26px] rounded-[7px] transition-colors bg-ed-ctl hover:bg-ed-ctl-hover outline-hidden disabled:text-ed-text-3">
 								<KSelect.Value<Camera3DMotionEasing> class="flex-1 text-[12px] text-left truncate text-ed-text-1 font-normal">
-									{(state) => <span>{state.selectedOption().label}</span>}
+									{(state) => (
+										<span>{localize(state.selectedOption().label)}</span>
+									)}
 								</KSelect.Value>
 								<KSelect.Icon<ValidComponent>
 									as={(iconProps) => (

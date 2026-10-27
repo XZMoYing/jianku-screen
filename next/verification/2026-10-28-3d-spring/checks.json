@@ -1,0 +1,30 @@
+{
+	"stage": "U18b",
+	"componentPassed": true,
+	"renderingLibrary": {
+		"passed": 341,
+		"failed": 0,
+		"ignored": 6
+	},
+	"frontend": {
+		"passed": 121,
+		"failed": 0,
+		"nativeReferencePoints": 2424,
+		"decimalTolerance": 1e-11
+	},
+	"strictClippy": true,
+	"cargoCheck": ["cap-project", "cap-rendering", "cap-recording"],
+	"typescript": true,
+	"staticFrontendBuild": true,
+	"actualGeneratedBindings": true,
+	"gpuExports": 24,
+	"gpuPairs": 13,
+	"legacyIdenticalFramePairs": 3780,
+	"splitIdenticalFramePairs": 540,
+	"pcmAllIdentical": true,
+	"gpuiCheck": "blocked: existing local gpui dependency missing; experimental workspace is not in the shipped application",
+	"currentInstalledVersion": "0.2.0-alpha.38",
+	"newPackageDelivered": false,
+	"whole3dComfortAccepted": false,
+	"projectSchemaTest": true
+}

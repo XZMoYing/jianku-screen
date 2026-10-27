@@ -1333,6 +1333,32 @@ fn ripple_camera3d_keyframes(
     if keyframes.is_empty() {
         return;
     }
+    if keyframes.iter().any(|key| key.out_spring.is_some()) {
+        let old = std::mem::take(keyframes);
+        let duration = old.iter().map(|key| key.time).fold(0.0_f64, f64::max);
+        if ripple.retains_left {
+            keyframes.extend(cap_rendering::camera3d::slice_track(
+                &old,
+                0.0,
+                ripple.cut_start - ripple.old_start,
+            ));
+        }
+        if ripple.retains_right {
+            keyframes.extend(
+                cap_rendering::camera3d::slice_track(
+                    &old,
+                    ripple.cut_end - ripple.old_start,
+                    duration,
+                )
+                .into_iter()
+                .map(|mut key| {
+                    key.time += ripple.cut_end - ripple.shift - ripple.new_start;
+                    key
+                }),
+            );
+        }
+        return;
+    }
     let mut old = std::mem::take(keyframes);
     old.sort_by(|left, right| left.time.total_cmp(&right.time));
     let cut_start_local = ripple.cut_start - ripple.old_start;
@@ -1341,6 +1367,7 @@ fn ripple_camera3d_keyframes(
         let previous = old.iter().rev().find(|keyframe| keyframe.time <= time);
         let next = old.iter().find(|keyframe| keyframe.time >= time);
         cap_project::Camera3DKeyframe {
+            out_spring: None,
             time,
             value: cap_rendering::camera3d::sample_track(0.0, &old, time),
             out_easing: if left {
@@ -3579,6 +3606,7 @@ mod tests {
             .tracks
             .tilt_x
             .push(cap_project::Camera3DKeyframe {
+                out_spring: None,
                 time: 0.5,
                 value: 1.0,
                 out_easing: None,
@@ -3589,6 +3617,7 @@ mod tests {
             .tracks
             .tilt_x
             .push(cap_project::Camera3DKeyframe {
+                out_spring: None,
                 time: 2.0,
                 value: 2.0,
                 out_easing: None,
@@ -3681,6 +3710,7 @@ mod tests {
         camera.tracks.tilt_x = [2.0, 5.0, 8.0]
             .into_iter()
             .map(|time| cap_project::Camera3DKeyframe {
+                out_spring: None,
                 time,
                 value: time,
                 out_easing: Some([0.0, 0.0]),

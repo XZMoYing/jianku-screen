@@ -130,6 +130,7 @@ import {
 	placeCamera3DShot,
 	scaleKeyframeTimes,
 	setMotion,
+	splitCamera3DMotion,
 } from "./three-d";
 import {
 	effectiveToOutput,
@@ -813,6 +814,19 @@ export const [EditorContextProvider, useBaseEditorContext] =
 							const duration = segment.end - segment.start;
 							const remaining = duration - time;
 							if (time < 1 || remaining < 1) return;
+							if (
+								Object.values(segment.tracks).some((track) =>
+									track.some((key) => key.outSpring),
+								)
+							) {
+								segments.splice(
+									index,
+									1,
+									...splitCamera3DMotion(segment, time),
+								);
+								sortTrackSegments(segments);
+								return;
+							}
 
 							// A split must not change what plays: both halves meet on the pose
 							// the segment held at the cut, so the left half moves start -> mid

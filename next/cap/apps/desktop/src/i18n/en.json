@@ -1635,5 +1635,7 @@
 	"选择轨道：{track}": "Select track: {track}",
 	"{seconds} 秒": "{seconds}s",
 	"3D 镜头 · {name} · {duration}": "3D shot · {name} · {duration}",
-	"自动保存失败，当前编辑仍保留在窗口中。请检查磁盘空间和写入权限，再从「工程」菜单重试保存。": "Auto-save failed. Your edits are still in this window. Check disk space and write permissions, then retry Save from the Project menu."
+	"自动保存失败，当前编辑仍保留在窗口中。请检查磁盘空间和写入权限，再从「工程」菜单重试保存。": "Auto-save failed. Your edits are still in this window. Check disk space and write permissions, then retry Save from the Project menu.",
+	"自然运镜": "Natural glide",
+	"视角": "Field of view"
 }

@@ -33,6 +33,7 @@ use std::{path::PathBuf, time::Instant};
 use tokio::sync::{mpsc, watch};
 
 pub mod camera3d;
+mod camera3d_spring;
 pub mod composite_frame;
 mod coord;
 pub mod cpu_yuv;

@@ -215,7 +215,10 @@ pub fn sample_track(base: f64, keys: &[Camera3DKeyframe], time: f64) -> f64 {
             let progress = ((time - prev.time) / span).clamp(0.0, 1.0);
             let p1 = prev.out_easing.unwrap_or(DEFAULT_OUT_EASING);
             let p2 = next.in_easing.unwrap_or(DEFAULT_IN_EASING);
-            let eased = bezier_ease(p1, p2, progress);
+            let eased = prev.out_spring.as_ref().map_or_else(
+                || bezier_ease(p1, p2, progress),
+                |motion| crate::camera3d_spring::progress(motion, progress),
+            );
             return prev.value + (next.value - prev.value) * eased;
         }
     }
@@ -226,6 +229,64 @@ pub fn sample_track(base: f64, keys: &[Camera3DKeyframe], time: f64) -> f64 {
 fn bezier_component(p1: f64, p2: f64, t: f64) -> f64 {
     let inv = 1.0 - t;
     3.0 * inv * inv * t * p1 + 3.0 * inv * t * t * p2 + t * t * t
+}
+
+pub fn slice_track(keys: &[Camera3DKeyframe], start: f64, end: f64) -> Vec<Camera3DKeyframe> {
+    if keys.is_empty() || end <= start {
+        return Vec::new();
+    }
+    let mut sorted = keys.to_vec();
+    sorted.sort_by(|a, b| a.time.total_cmp(&b.time));
+    let boundary = |time: f64, incoming: bool| {
+        let existing = if incoming {
+            sorted.iter().rev().find(|key| key.time == time)
+        } else {
+            sorted.iter().find(|key| key.time == time)
+        };
+        Camera3DKeyframe {
+            time: time - start,
+            value: existing.map_or_else(|| sample_track(0.0, &sorted, time), |key| key.value),
+            out_easing: existing.and_then(|key| key.out_easing),
+            in_easing: existing.and_then(|key| key.in_easing),
+            out_spring: None,
+        }
+    };
+    let mut output = vec![boundary(start, true)];
+    output.extend(
+        sorted
+            .iter()
+            .filter(|key| key.time > start && key.time < end)
+            .map(|key| Camera3DKeyframe {
+                time: key.time - start,
+                ..*key
+            }),
+    );
+    output.push(boundary(end, false));
+    let times: Vec<_> = output.iter().map(|key| key.time + start).collect();
+    for (index, window) in times.windows(2).enumerate() {
+        let from_time = window[0];
+        let to_time = window[1];
+        let middle = (from_time + to_time) / 2.0;
+        let Some(right) = sorted.iter().position(|key| key.time > middle) else {
+            continue;
+        };
+        if right == 0 {
+            continue;
+        }
+        let previous = &sorted[right - 1];
+        let next = &sorted[right];
+        if let Some(motion) = previous.out_spring {
+            let [from, to] = motion.range;
+            let span = next.time - previous.time;
+            output[index].out_spring = Some(cap_project::Camera3DMotionSpring {
+                range: [
+                    from + (from_time - previous.time) / span * (to - from),
+                    from + (to_time - previous.time) / span * (to - from),
+                ],
+            });
+        }
+    }
+    output
 }
 
 fn bezier_derivative(p1: f64, p2: f64, t: f64) -> f64 {
@@ -394,6 +455,29 @@ pub fn interpolate_camera3d_motion(
     };
     let current = sample(time)?;
     let exposure = amount.min(1.0) / f64::from(crate::MOTION_BLUR_BASELINE_FPS);
+    let tracks = &segment.tracks;
+    if [
+        &tracks.tilt_x,
+        &tracks.tilt_y,
+        &tracks.roll,
+        &tracks.rotate_x,
+        &tracks.rotate_y,
+        &tracks.fov,
+        &tracks.zoom,
+        &tracks.pan_x,
+        &tracks.pan_y,
+    ]
+    .into_iter()
+    .any(|track| {
+        track.windows(2).any(|keys| {
+            keys[0].time == keys[1].time
+                && keys[0].value != keys[1].value
+                && segment.start + keys[0].time >= time - exposure
+                && segment.start + keys[0].time <= time
+        })
+    }) {
+        return None;
+    }
     let previous = sample(time - exposure)?;
     let travel = projected_travel_pixels(&current, &previous, output_size)?;
     if travel < f64::from(crate::MOTION_ACTIVATION_PX) {
@@ -756,12 +840,14 @@ mod tests {
     fn track_sampling_holds_and_lerps() {
         let keys = vec![
             Camera3DKeyframe {
+                out_spring: None,
                 time: 1.0,
                 value: 10.0,
                 out_easing: Some([0.0, 0.0]),
                 in_easing: None,
             },
             Camera3DKeyframe {
+                out_spring: None,
                 time: 3.0,
                 value: 20.0,
                 out_easing: None,
@@ -779,12 +865,14 @@ mod tests {
     fn default_handles_are_cubic_ease_in_out() {
         let keys = vec![
             Camera3DKeyframe {
+                out_spring: None,
                 time: 0.0,
                 value: 0.0,
                 out_easing: None,
                 in_easing: None,
             },
             Camera3DKeyframe {
+                out_spring: None,
                 time: 1.0,
                 value: 1.0,
                 out_easing: None,
@@ -885,12 +973,14 @@ mod tests {
         seg.blur.mode = Camera3DBlurMode::TiltShift;
         seg.tracks.blur_strength = vec![
             Camera3DKeyframe {
+                out_spring: None,
                 time: 0.0,
                 value: 0.0,
                 out_easing: Some([0.0, 0.0]),
                 in_easing: None,
             },
             Camera3DKeyframe {
+                out_spring: None,
                 time: 6.0,
                 value: 30.0,
                 out_easing: None,
@@ -914,12 +1004,14 @@ mod tests {
         );
         seg.tracks.pan_x = vec![
             Camera3DKeyframe {
+                out_spring: None,
                 time: 0.0,
                 value: -0.5,
                 out_easing: Some([0.0, 0.0]),
                 in_easing: None,
             },
             Camera3DKeyframe {
+                out_spring: None,
                 time: 6.0,
                 value: 0.5,
                 out_easing: None,
@@ -1013,12 +1105,14 @@ mod tests {
         seg.properties.tilt_y = 0.0;
         seg.tracks.pan_x = vec![
             Camera3DKeyframe {
+                out_spring: None,
                 time: 0.0,
                 value: -100.0,
                 out_easing: Some([0.0, 0.0]),
                 in_easing: None,
             },
             Camera3DKeyframe {
+                out_spring: None,
                 time: 6.0,
                 value: 100.0,
                 out_easing: None,
@@ -1041,5 +1135,96 @@ mod tests {
                 .flatten()
                 .all(f32::is_finite)
         );
+    }
+
+    #[test]
+    fn temporal_motion_does_not_smear_deleted_middle_cuts() {
+        let mut seg = segment();
+        seg.transition_in = 0.0;
+        seg.transition_out = 0.0;
+        seg.tracks.pan_x = vec![
+            Camera3DKeyframe {
+                time: 0.0,
+                value: -0.5,
+                out_easing: Some([0.0, 0.0]),
+                in_easing: None,
+                out_spring: None,
+            },
+            Camera3DKeyframe {
+                time: 2.0,
+                value: 0.0,
+                out_easing: None,
+                in_easing: Some([1.0, 1.0]),
+                out_spring: None,
+            },
+            Camera3DKeyframe {
+                time: 2.0,
+                value: 0.5,
+                out_easing: Some([0.0, 0.0]),
+                in_easing: None,
+                out_spring: None,
+            },
+            Camera3DKeyframe {
+                time: 6.0,
+                value: 1.0,
+                out_easing: None,
+                in_easing: Some([1.0, 1.0]),
+                out_spring: None,
+            },
+        ];
+        assert!(
+            interpolate_camera3d_motion(
+                seg.start + 2.005,
+                std::slice::from_ref(&seg),
+                (1920, 1080),
+                1.0,
+                |_| None
+            )
+            .is_none()
+        );
+        assert!(
+            interpolate_camera3d_motion(seg.start + 2.05, &[seg], (1920, 1080), 1.0, |_| None)
+                .is_some()
+        );
+    }
+
+    #[test]
+    fn spring_track_slicing_preserves_pose_and_retimed_phase() {
+        let keys = [
+            Camera3DKeyframe {
+                time: 0.0,
+                value: -5.0,
+                out_easing: None,
+                in_easing: None,
+                out_spring: Some(Default::default()),
+            },
+            Camera3DKeyframe {
+                time: 7.0,
+                value: 10.0,
+                out_easing: None,
+                in_easing: None,
+                out_spring: None,
+            },
+        ];
+        let sliced = slice_track(&keys, 1.0, 6.0);
+        let mut twice = slice_track(&sliced, 1.0, 4.0);
+        for index in 0..=300 {
+            let time = index as f64 / 100.0;
+            assert!(
+                (sample_track(0.0, &twice, time) - sample_track(0.0, &keys, time + 2.0)).abs()
+                    < 1e-12
+            );
+        }
+        for key in &mut twice {
+            key.time *= 0.5;
+        }
+        for index in 0..=300 {
+            let time = index as f64 / 100.0;
+            assert!(
+                (sample_track(0.0, &twice, time * 0.5) - sample_track(0.0, &keys, time + 2.0))
+                    .abs()
+                    < 1e-12
+            );
+        }
     }
 }

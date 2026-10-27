@@ -1569,6 +1569,8 @@ pub struct Camera3DKeyframe {
     /// Bezier P2 for the track segment entering this keyframe.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub in_easing: Option<[f64; 2]>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub out_spring: Option<Camera3DMotionSpring>,
 }
 
 /// Per-property keyframe tracks. A property with an empty track holds the
@@ -1632,6 +1634,27 @@ impl Camera3DTracks {
             &mut self.blur_angle,
             &mut self.blur_dir_position,
         ]
+    }
+}
+
+#[derive(Type, Serialize, Deserialize, Clone, Copy, Debug, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct Camera3DMotionSpring {
+    #[serde(default = "Camera3DMotionSpring::full_range")]
+    pub range: [f64; 2],
+}
+
+impl Camera3DMotionSpring {
+    fn full_range() -> [f64; 2] {
+        [0.0, 1.0]
+    }
+}
+
+impl Default for Camera3DMotionSpring {
+    fn default() -> Self {
+        Self {
+            range: Self::full_range(),
+        }
     }
 }
 
@@ -4001,12 +4024,14 @@ mod tests {
             tracks: Camera3DTracks {
                 zoom: vec![
                     Camera3DKeyframe {
+                        out_spring: None,
                         time: 0.0,
                         value: 0.715,
                         out_easing: Some([0.0, 0.0]),
                         in_easing: None,
                     },
                     Camera3DKeyframe {
+                        out_spring: None,
                         time: 2.0,
                         value: 2.1,
                         out_easing: None,
@@ -4036,6 +4061,7 @@ mod tests {
         assert_eq!(segment["tracks"]["zoom"][0]["value"], 0.715);
         assert_eq!(segment["tracks"]["zoom"][0]["outEasing"][1], 0.0);
         assert!(segment["tracks"]["zoom"][0].get("inEasing").is_none());
+        assert!(segment["tracks"]["zoom"][0].get("outSpring").is_none());
         assert!(segment["tracks"].get("tiltX").is_none());
         assert_eq!(segment["transitionIn"], 0.3);
         assert_eq!(

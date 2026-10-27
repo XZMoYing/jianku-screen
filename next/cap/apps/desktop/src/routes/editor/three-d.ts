@@ -1,5 +1,7 @@
+import { camera3DSpringProgress } from "~/utils/camera3d-spring";
 import type {
 	Camera3DBlurMode,
+	Camera3DMotionSpring,
 	Camera3DBlur as RawCamera3DBlur,
 	Camera3DKeyframe as RawCamera3DKeyframe,
 	Camera3DProperties as RawCamera3DProperties,
@@ -46,6 +48,7 @@ export type Camera3DKeyframe = {
 	outEasing: [number, number] | null;
 	/** Bezier P2 for the span entering this keyframe. */
 	inEasing: [number, number] | null;
+	outSpring?: Camera3DMotionSpring | null;
 };
 
 export type Camera3DPropertyKey = keyof Camera3DProperties;
@@ -628,10 +631,7 @@ export const flipCamera3DSegment = (
 };
 
 /**
- * Replaces the segment's motion with the template's two poses. Linear is the
- * explicit pair the template writes, so the move reads exactly as authored
- * instead of picking up the default cubic ease.
- *
+ * Replaces the segment's motion with the template's two poses.
  * The template's defocus goes on with it: a card is one complete look, so what
  * the preview promises is what the segment ends up holding.
  */
@@ -639,7 +639,7 @@ export const applyMotionTemplate = (
 	segment: Camera3DSegment,
 	template: Camera3DMotionTemplate,
 ) => {
-	setMotion(segment, template.from, template.to, LINEAR_MOTION_EASING);
+	setMotion(segment, template.from, template.to);
 	segment.blur = { ...template.blur };
 	// A template owns the whole move, so the segment cuts in and out of it.
 	// Segments authored before the 0 default can still carry a ramp.
@@ -1048,7 +1048,7 @@ export const applySceneToRange = (
 			transitionIn: 0,
 			transitionOut: 0,
 		};
-		setMotion(segment, shot.from, shot.to, LINEAR_MOTION_EASING);
+		setMotion(segment, shot.from, shot.to);
 		return segment;
 	});
 };
@@ -1084,15 +1084,22 @@ export type Camera3DMotionEasing = {
 	in: [number, number];
 };
 
+export const NATURAL_MOTION_EASING: Camera3DMotionEasing = {
+	id: "natural",
+	label: "Natural glide",
+	out: [0, 0],
+	in: [1, 1],
+};
+
 export const MOTION_EASINGS: Camera3DMotionEasing[] = [
-	// Linear is the default: it is what every template is authored in.
+	NATURAL_MOTION_EASING,
 	{ id: "linear", label: "Linear", out: [0, 0], in: [1, 1] },
 	{ id: "smooth", label: "Smooth", out: [0.65, 0], in: [0.35, 1] },
 	{ id: "easeIn", label: "Ease in", out: [0.32, 0], in: [1, 1] },
 	{ id: "easeOut", label: "Ease out", out: [0, 0], in: [0.68, 1] },
 ];
 
-export const LINEAR_MOTION_EASING = MOTION_EASINGS[0];
+export const LINEAR_MOTION_EASING = MOTION_EASINGS[1];
 
 // -----------------------------------------------------------------------------
 // Normalization
@@ -1143,6 +1150,14 @@ const normalizeKeyframes = (
 			value: keyframe.value,
 			outEasing: keyframe.outEasing ?? null,
 			inEasing: keyframe.inEasing ?? null,
+			outSpring: keyframe.outSpring
+				? {
+						range: [...(keyframe.outSpring.range ?? [0, 1])] as [
+							number,
+							number,
+						],
+					}
+				: null,
 		}))
 		.sort((a, b) => a.time - b.time);
 
@@ -1313,15 +1328,86 @@ export const sampleTrack = (
 		if (time > next.time) continue;
 		const span = Math.max(next.time - prev.time, 1e-6);
 		const progress = clamp((time - prev.time) / span, 0, 1);
-		const eased = bezierEase(
-			prev.outEasing ?? DEFAULT_OUT_EASING,
-			next.inEasing ?? DEFAULT_IN_EASING,
-			progress,
-		);
+		const eased = prev.outSpring
+			? camera3DSpringProgress(prev.outSpring, progress)
+			: bezierEase(
+					prev.outEasing ?? DEFAULT_OUT_EASING,
+					next.inEasing ?? DEFAULT_IN_EASING,
+					progress,
+				);
 		return prev.value + (next.value - prev.value) * eased;
 	}
 
 	return sorted[sorted.length - 1].value;
+};
+
+export const sliceCamera3DTrack = (
+	keys: Camera3DKeyframe[],
+	start: number,
+	end: number,
+): Camera3DKeyframe[] => {
+	if (!keys.length || end <= start) return [];
+	const sorted = sortedByTime(keys);
+	const boundary = (time: number, incoming: boolean): Camera3DKeyframe => {
+		const matches = sorted.filter((key) => key.time === time);
+		const existing = incoming ? matches.at(-1) : matches[0];
+		return {
+			time: time - start,
+			value: existing?.value ?? sampleTrack(0, sorted, time),
+			outEasing: existing?.outEasing ?? null,
+			inEasing: existing?.inEasing ?? null,
+			outSpring: null,
+		};
+	};
+	const result: Camera3DKeyframe[] = [
+		boundary(start, true),
+		...sorted
+			.filter((key) => key.time > start && key.time < end)
+			.map((key) => ({ ...key, time: key.time - start })),
+		boundary(end, false),
+	];
+	const times = result.map((key) => key.time + start);
+	for (let index = 0; index < result.length - 1; index++) {
+		const middle = (times[index] + times[index + 1]) / 2;
+		const right = sorted.findIndex((key) => key.time > middle);
+		if (right <= 0) continue;
+		const previous = sorted[right - 1];
+		const next = sorted[right];
+		const motion = previous.outSpring;
+		if (!motion) continue;
+		const span = next.time - previous.time;
+		const [from, to] = motion.range ?? [0, 1];
+		result[index].outSpring = {
+			range: [
+				from + ((times[index] - previous.time) / span) * (to - from),
+				from + ((times[index + 1] - previous.time) / span) * (to - from),
+			],
+		};
+	}
+	return result;
+};
+
+export const splitCamera3DMotion = (
+	segment: Camera3DSegment,
+	time: number,
+): [Camera3DSegment, Camera3DSegment] => {
+	const slice = (start: number, end: number): Camera3DSegment => ({
+		...segment,
+		start: segment.start + start,
+		end: segment.start + end,
+		properties: { ...segment.properties },
+		blur: { ...segment.blur },
+		tracks: Object.fromEntries(
+			CAMERA3D_TRACK_KEYS.map((key) => [
+				key,
+				sliceCamera3DTrack(segment.tracks[key], start, end),
+			]),
+		) as Camera3DTracks,
+		transitionIn: start === 0 ? segment.transitionIn : 0,
+		transitionOut:
+			end === segment.end - segment.start ? segment.transitionOut : 0,
+	});
+	return [slice(0, time), slice(time, segment.end - segment.start)];
 };
 
 export const evaluatePose = (
@@ -1460,7 +1546,7 @@ export const setMotion = (
 	segment: Camera3DSegment,
 	start: Camera3DProperties,
 	end: Camera3DProperties,
-	easing: Camera3DMotionEasing = LINEAR_MOTION_EASING,
+	easing: Camera3DMotionEasing = NATURAL_MOTION_EASING,
 ) => {
 	const length = Math.max(segment.end - segment.start, 0);
 	for (const key of CAMERA3D_PROPERTY_KEYS) {
@@ -1474,7 +1560,13 @@ export const setMotion = (
 			continue;
 		}
 		segment.tracks[key] = [
-			{ time: 0, value: from, outEasing: [...easing.out], inEasing: null },
+			{
+				time: 0,
+				value: from,
+				outEasing: [...easing.out],
+				inEasing: null,
+				outSpring: easing.id === "natural" ? { range: [0, 1] } : null,
+			},
 			{ time: length, value: to, outEasing: null, inEasing: [...easing.in] },
 		];
 	}
@@ -1500,12 +1592,15 @@ export const getMotionEasing = (
 	for (const key of CAMERA3D_PROPERTY_KEYS) {
 		const track = segment.tracks[key];
 		if (track.length < 2) continue;
+		if (track[0].outSpring) return NATURAL_MOTION_EASING;
 		const out = track[0].outEasing ?? DEFAULT_OUT_EASING;
 		const into = track[track.length - 1].inEasing ?? DEFAULT_IN_EASING;
 		return (
 			MOTION_EASINGS.find(
 				(easing) =>
-					handlesMatch(easing.out, out) && handlesMatch(easing.in, into),
+					easing.id !== "natural" &&
+					handlesMatch(easing.out, out) &&
+					handlesMatch(easing.in, into),
 			) ?? LINEAR_MOTION_EASING
 		);
 	}

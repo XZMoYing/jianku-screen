@@ -1,0 +1,65 @@
+{
+	"cliSha256": "4efc6e131b26b023ed31efd0ddda01d2e310cb48acd8592b938bbe07c83e2994",
+	"runs": [
+		{
+			"case": "flat",
+			"exitCode": 0,
+			"elapsedSeconds": 4.097671250026906
+		},
+		{
+			"case": "static",
+			"exitCode": 0,
+			"elapsedSeconds": 3.955830374994548
+		},
+		{
+			"case": "disabled",
+			"exitCode": 0,
+			"elapsedSeconds": 4.038814083003672
+		},
+		{
+			"case": "motion",
+			"exitCode": 0,
+			"elapsedSeconds": 3.9467318750103004
+		},
+		{
+			"case": "combined",
+			"exitCode": 0,
+			"elapsedSeconds": 3.9812134579988196
+		},
+		{
+			"case": "static-focus",
+			"exitCode": 0,
+			"elapsedSeconds": 4.981552000012016
+		},
+		{
+			"case": "motion-focus",
+			"exitCode": 0,
+			"elapsedSeconds": 4.902535500004888
+		},
+		{
+			"case": "natural-motion",
+			"exitCode": 0,
+			"elapsedSeconds": 4.40662108300603
+		},
+		{
+			"case": "natural-combined",
+			"exitCode": 0,
+			"elapsedSeconds": 4.477635958988685
+		},
+		{
+			"case": "natural-focus",
+			"exitCode": 0,
+			"elapsedSeconds": 4.812288083019666
+		},
+		{
+			"case": "natural-sharp",
+			"exitCode": 0,
+			"elapsedSeconds": 3.941461166978115
+		},
+		{
+			"case": "natural-split-sharp",
+			"exitCode": 0,
+			"elapsedSeconds": 3.9473464170005172
+		}
+	]
+}

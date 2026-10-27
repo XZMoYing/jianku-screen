@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import {
 	ANGLE_PRESETS,
 	AUTO_SHOT_POOL,
@@ -39,14 +38,19 @@ import {
 	MOTION_TEMPLATES,
 	matchCamera3DLook,
 	maxAutoCamera3DShots,
+	NATURAL_MOTION_EASING,
 	newCamera3DShot,
 	normalizeCamera3DSegments,
 	placeCamera3DShot,
 	sampleTrack,
+	scaleKeyframeTimes,
 	sceneWithShotCount,
 	setMotion,
 	showcaseCamera3DBlur,
+	sliceCamera3DTrack,
+	splitCamera3DMotion,
 } from "./three-d";
+import { rippleDeleteAllTracks } from "./timeline-utils";
 
 const key = (
 	time: number,
@@ -157,6 +161,37 @@ describe("bezierEase", () => {
 });
 
 describe("setMotion", () => {
+	it("keeps an explicit linear selection linear after loading and switching styles", () => {
+		const segment = newCamera3DShot(0, 4);
+		setMotion(
+			segment,
+			getStartPose(segment),
+			getEndPose(segment),
+			LINEAR_MOTION_EASING,
+		);
+		const [loaded] = normalizeCamera3DSegments([segment]);
+		expect(getMotionEasing(loaded)).toBe(LINEAR_MOTION_EASING);
+		for (const property of CAMERA3D_PROPERTY_KEYS) {
+			const track = loaded.tracks[property];
+			if (!track.length) continue;
+			expect(track[0].outSpring).toBeNull();
+			expect(sampleTrack(0, track, 1)).toBeCloseTo(
+				track[0].value + (track[1].value - track[0].value) / 4,
+				12,
+			);
+		}
+	});
+
+	it("does not convert imported custom keyframes into natural motion", () => {
+		const segment = defaultCamera3DSegment(0, 4);
+		segment.tracks.zoom = [
+			key(0, 1, { outEasing: [0.11, 0.22] }),
+			key(4, 2, { inEasing: [0.33, 0.44] }),
+		];
+		const [loaded] = normalizeCamera3DSegments([segment]);
+		for (let t = 0; t <= 4; t += 0.025)
+			expect(evaluatePose(loaded, t)).toEqual(evaluatePose(segment, t));
+	});
 	it("collapses equal poses to a still shot with no keyframes", () => {
 		const segment = defaultCamera3DSegment(2, 6);
 		const pose = poseWith(segment, { zoom: 1.4, tiltY: 12 });
@@ -237,11 +272,13 @@ describe("setMotion", () => {
 });
 
 describe("MOTION_EASINGS", () => {
-	it("defaults to linear", () => {
-		expect(LINEAR_MOTION_EASING).toBe(MOTION_EASINGS[0]);
+	it("defaults new moves to the real spring while retaining explicit linear", () => {
+		expect(NATURAL_MOTION_EASING).toBe(MOTION_EASINGS[0]);
+		expect(LINEAR_MOTION_EASING).toBe(MOTION_EASINGS[1]);
 		expect(LINEAR_MOTION_EASING.out).toEqual([0, 0]);
 		expect(LINEAR_MOTION_EASING.in).toEqual([1, 1]);
 		expect(MOTION_EASINGS.map((easing) => easing.label)).toEqual([
+			"Natural glide",
 			"Linear",
 			"Smooth",
 			"Ease in",
@@ -348,14 +385,14 @@ describe("MOTION_TEMPLATES", () => {
 		expect(new Set(MOTION_TEMPLATES.map((t) => t.id)).size).toBe(8);
 	});
 
-	it("writes two explicitly linear keyframes on every moving camera track", () => {
+	it("writes natural spring spans on every moving camera track", () => {
 		for (const template of MOTION_TEMPLATES) {
 			const segment = defaultCamera3DSegment(2, 6);
 			applyMotionTemplate(segment, template);
 
 			expectPose(getStartPose(segment), template.from);
 			expectPose(getEndPose(segment), template.to);
-			expect(getMotionEasing(segment)).toBe(LINEAR_MOTION_EASING);
+			expect(getMotionEasing(segment)).toBe(NATURAL_MOTION_EASING);
 
 			for (const property of CAMERA3D_PROPERTY_KEYS) {
 				const track = segment.tracks[property];
@@ -394,15 +431,16 @@ describe("MOTION_TEMPLATES", () => {
 		expect(segment.transitionOut).toBe(0);
 	});
 
-	it("samples linearly between the two poses", () => {
+	it("starts and ends at rest rather than running linearly", () => {
 		const template = MOTION_TEMPLATES[0];
 		const segment = defaultCamera3DSegment(0, 4);
 		applyMotionTemplate(segment, template);
 
-		expect(sampleTrack(0, segment.tracks.panX, 2)).toBeCloseTo(
-			(template.from.panX + template.to.panX) / 2,
-			6,
-		);
+		const at = (time: number) => sampleTrack(0, segment.tracks.panX, time);
+		expect(at(0)).toBeCloseTo(template.from.panX, 12);
+		expect(at(4)).toBeCloseTo(template.to.panX, 12);
+		expect(Math.abs(at(0.01) - at(0))).toBeLessThan(Math.abs(at(2.01) - at(2)));
+		expect(Math.abs(at(4) - at(3.99))).toBeLessThan(Math.abs(at(2.01) - at(2)));
 	});
 });
 
@@ -812,7 +850,7 @@ describe("applySceneToRange", () => {
 					!camera3DPosesEqual(shot.from, shot.to),
 				);
 				if (hasCamera3DMotion(segment))
-					expect(getMotionEasing(segment)).toBe(LINEAR_MOTION_EASING);
+					expect(getMotionEasing(segment)).toBe(NATURAL_MOTION_EASING);
 
 				// Motion always spans the shot it was written onto.
 				for (const property of CAMERA3D_PROPERTY_KEYS) {
@@ -847,6 +885,76 @@ describe("applySceneToRange", () => {
 });
 
 describe("split continuity", () => {
+	it("preserves the complete natural trajectory and its velocity through a split", () => {
+		const original = newCamera3DShot(1, 8);
+		const [left, right] = splitCamera3DMotion(original, 2.59);
+		for (let index = 0; index <= 700; index++) {
+			const time = index / 100;
+			const actual =
+				time <= 2.59
+					? evaluatePose(left, time)
+					: evaluatePose(right, time - 2.59);
+			expectPose(actual, evaluatePose(original, time));
+		}
+		const velocity = (segment: Camera3DSegment, time: number) => {
+			const a = evaluatePose(segment, time - 1e-5);
+			const b = evaluatePose(segment, time + 1e-5);
+			return (b.panX - a.panX) / 2e-5;
+		};
+		expect(velocity(left, 2.5899)).toBeCloseTo(velocity(original, 2.5899), 8);
+		expect(velocity(right, 0.0001)).toBeCloseTo(velocity(original, 2.5901), 8);
+	});
+
+	it("keeps a split trajectory continuous when both pieces are retimed", () => {
+		const original = newCamera3DShot(0, 7);
+		const [left, right] = splitCamera3DMotion(original, 2.59);
+		for (const segment of [left, right]) {
+			segment.start *= 0.5;
+			segment.end *= 0.5;
+			scaleKeyframeTimes(segment.tracks, 0.5);
+		}
+		for (let index = 0; index <= 700; index++) {
+			const time = index / 200;
+			const actual =
+				time <= left.end
+					? evaluatePose(left, time)
+					: evaluatePose(right, time - right.start);
+			expectPose(actual, evaluatePose(original, time * 2));
+		}
+	});
+
+	it("preserves source phases on either side of a middle deletion", () => {
+		const original = newCamera3DShot(0, 7);
+		const segment = structuredClone(original);
+		const timeline = {
+			segments: [{ start: 0, end: 7, timescale: 1 }],
+			camera3dSegments: [segment],
+		};
+		rippleDeleteAllTracks(timeline, 2, 3);
+		for (let index = 0; index <= 600; index++) {
+			const time = index / 100;
+			const sourceTime = time <= 2 ? time : time + 1;
+			expectPose(
+				evaluatePose(segment, time),
+				evaluatePose(original, sourceTime),
+			);
+		}
+		const [left, right] = splitCamera3DMotion(segment, 2);
+		expectPose(getEndPose(left), evaluatePose(original, 2));
+		expectPose(getStartPose(right), evaluatePose(original, 3));
+	});
+
+	it("can trim a previously trimmed natural span without restarting it", () => {
+		const segment = newCamera3DShot(0, 7);
+		const original = segment.tracks.panX;
+		const trimmed = sliceCamera3DTrack(original, 1, 6);
+		const trimmedAgain = sliceCamera3DTrack(trimmed, 1, 4);
+		for (let index = 0; index <= 300; index++)
+			expect(sampleTrack(0, trimmedAgain, index / 100)).toBeCloseTo(
+				sampleTrack(0, original, 2 + index / 100),
+				12,
+			);
+	});
 	// Mirrors projectActions.splitCamera3DSegment: both halves have to meet on
 	// the pose the original segment held at the cut.
 	const split = (segment: Camera3DSegment, time: number) => {

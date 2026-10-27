@@ -13,6 +13,7 @@ import {
 	CAMERA3D_TRACK_KEYS,
 	type Camera3DTracks,
 	sampleTrack,
+	sliceCamera3DTrack,
 } from "./three-d";
 import {
 	effectiveToOutput,
@@ -184,6 +185,31 @@ function rippleDeleteCamera3DTrack(
 		const newEnd = keepsRight ? oldEnd - shift : cutStart;
 		const leftCutTime = cutStart - oldStart;
 		const rightCutTime = cutEnd - oldStart;
+		if (
+			Object.values(segment.tracks).some((track) =>
+				track.some((key) => key.outSpring),
+			)
+		) {
+			for (const trackKey of CAMERA3D_TRACK_KEYS) {
+				const track = segment.tracks[trackKey];
+				segment.tracks[trackKey] = [
+					...(keepsLeft ? sliceCamera3DTrack(track, 0, leftCutTime) : []),
+					...(keepsRight
+						? sliceCamera3DTrack(track, rightCutTime, oldEnd - oldStart).map(
+								(key) => ({
+									...key,
+									time: key.time + cutEnd - shift - newStart,
+								}),
+							)
+						: []),
+				];
+			}
+			segment.start = newStart;
+			segment.end = Math.max(newStart, newEnd);
+			if (!keepsLeft) segment.transitionIn = 0;
+			if (!keepsRight) segment.transitionOut = 0;
+			continue;
+		}
 
 		for (const trackKey of CAMERA3D_TRACK_KEYS) {
 			const keyframes = segment.tracks[trackKey];
