@@ -358,8 +358,8 @@ async startPlayback(fps: number, resolutionBase: XY<number>) : Promise<null> {
 async getEditorPreviewResolutions(canvas: PreviewCanvasConfiguration) : Promise<PreviewResolutionOption[]> {
     return await TAURI_INVOKE("get_editor_preview_resolutions", { canvas });
 },
-async setEditorPreviewResolution(resolutionBase: XY<number>) : Promise<boolean> {
-    return await TAURI_INVOKE("set_editor_preview_resolution", { resolutionBase });
+async setEditorPreviewResolution(resolutionBase: XY<number>, quality: EditorPreviewQuality) : Promise<boolean> {
+    return await TAURI_INVOKE("set_editor_preview_resolution", { resolutionBase, quality });
 },
 async stopPlayback() : Promise<null> {
     return await TAURI_INVOKE("stop_playback");

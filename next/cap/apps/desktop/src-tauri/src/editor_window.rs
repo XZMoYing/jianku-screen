@@ -223,7 +223,23 @@ async fn recreate_preparing_instance(
         render_frame_event_id,
     });
     let fps = crate::EDITOR_PREVIEW_FPS;
-    let resolution = crate::default_editor_preview_resolution();
+    let resolution = {
+        let config = instance.inner.project_config.1.borrow();
+        let constants = &instance.inner.render_constants;
+        crate::editor_preview_resolution(
+            &constants.options,
+            &config,
+            crate::editor_preview_quality(&instance.app_handle),
+            constants.device.limits().max_texture_dimension_2d,
+        )
+    };
+    let resolution = match resolution {
+        Ok(resolution) => resolution,
+        Err(error) => {
+            instance.dispose().await;
+            return Err(error);
+        }
+    };
     let started = match instance
         .inner
         .start_preparing_handoff(fps, resolution)

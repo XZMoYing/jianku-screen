@@ -364,6 +364,11 @@ pub const HEADLESS_BLOCK_FRAMES: usize = 512;
 pub type HeadlessAudioTap = Box<dyn FnMut(&[f32], Instant) + Send>;
 
 impl AudioOutput {
+    #[cfg(test)]
+    pub(crate) fn test_playback_generations(&self) -> u64 {
+        self.next_generation.load(Ordering::Relaxed)
+    }
+
     pub fn new() -> Self {
         let (control_tx, control_rx) = std_mpsc::channel();
 

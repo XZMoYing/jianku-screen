@@ -71,6 +71,25 @@ pub struct PreviewResolutionOption {
     pub limited: bool,
 }
 
+pub fn resolve_preview_resolution(
+    options: &RenderOptions,
+    canvas: &PreviewCanvasConfiguration,
+    quality: EditorPreviewQuality,
+    max_dimension: u32,
+) -> Result<PreviewResolutionOption, String> {
+    let choices = preview_resolutions(options, canvas, max_dimension)?;
+    choices
+        .iter()
+        .find(|choice| choice.quality == quality && choice.available)
+        .or_else(|| {
+            choices
+                .iter()
+                .find(|choice| choice.quality == EditorPreviewQuality::Original && choice.available)
+        })
+        .copied()
+        .ok_or_else(|| "Preview resolutions unavailable".into())
+}
+
 pub fn preview_resolutions(
     options: &RenderOptions,
     canvas: &PreviewCanvasConfiguration,

@@ -84,6 +84,7 @@ pub struct PreparingPreviewReady {
     pub screen_size: XY<u32>,
     pub camera_size: Option<XY<u32>>,
     pub duration: f64,
+    pub max_texture_dimension_2d: u32,
 }
 
 #[derive(Clone, Debug)]
@@ -574,6 +575,7 @@ async fn run_preview(
             screen_size,
             camera_size,
             duration,
+            max_texture_dimension_2d: constants.device.limits().max_texture_dimension_2d,
         })
     });
     'requests: loop {

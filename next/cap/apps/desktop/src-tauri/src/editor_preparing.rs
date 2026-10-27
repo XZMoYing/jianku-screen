@@ -466,6 +466,7 @@ pub(crate) async fn create_preparing_editor_frame(
             })),
         });
         let runner = Runner {
+            quality: crate::editor_preview_quality(app),
             control: control.clone(),
             previous,
             response: Some(response),
@@ -556,6 +557,52 @@ fn playback_controller(
         .ok_or_else(|| "Preparing playback is not available".into())
 }
 
+pub(crate) async fn set_preview_quality(
+    window: &Window,
+    quality: cap_rendering::preview_resolution::EditorPreviewQuality,
+) -> Result<bool, String> {
+    let id = editor_window_id(window)?;
+    let Some(control) = window
+        .state::<PreparingConsumers>()
+        .control_for_window(id, None)
+    else {
+        return Ok(false);
+    };
+    if !control.is_active() {
+        return Ok(false);
+    }
+    let controller = {
+        let binding = control.playback.lock().unwrap();
+        if binding
+            .handoff
+            .as_ref()
+            .is_some_and(|handoff| handoff.committed())
+        {
+            return Ok(false);
+        }
+        binding.controller.clone()
+    };
+    let Some(controller) = controller else {
+        return Ok(false);
+    };
+    match controller.set_preview_quality(quality).await {
+        Ok(()) => Ok(true),
+        Err(_)
+            if !control.is_active()
+                || control
+                    .playback
+                    .lock()
+                    .unwrap()
+                    .handoff
+                    .as_ref()
+                    .is_some_and(|handoff| handoff.committed()) =>
+        {
+            Ok(false)
+        }
+        Err(error) => Err(error),
+    }
+}
+
 #[tauri::command]
 #[specta::specta]
 pub(crate) async fn seek_preparing_editor(
@@ -591,6 +638,7 @@ pub(crate) async fn join_before_ordinary(app: &AppHandle, path: &Path) -> Result
 }
 
 struct Runner {
+    quality: cap_rendering::preview_resolution::EditorPreviewQuality,
     control: Arc<ConsumerControl>,
     previous: Vec<(RetainedJoin, Arc<ConsumerControl>)>,
     response: Option<oneshot::Sender<Option<String>>>,
@@ -767,7 +815,7 @@ impl Runner {
             });
         }
         self.control.accepts_frames.store(true, Ordering::Release);
-        let session = PreparingPlaybackSession::spawn_with_expected_metadata(
+        let session = PreparingPlaybackSession::spawn_with_preview_quality(
             input,
             audio.tracks,
             PreparingPlaybackOptions {
@@ -776,7 +824,7 @@ impl Runner {
                     frame_format: EditorFrameFormat::Rgba,
                 },
                 fps: crate::EDITOR_PREVIEW_FPS,
-                resolution: crate::default_editor_preview_resolution(),
+                resolution: cap_project::XY::new(1280, 720),
             },
             audio_output,
             Box::new(move |_, output, _| {
@@ -795,6 +843,7 @@ impl Runner {
                 }
             }),
             audio.expected_metadata,
+            Some(self.quality),
         )?;
         self.stop = Some(session.stop_handle());
         let handoff = session.handoff_handle();
@@ -1075,6 +1124,7 @@ mod tests {
         let (response, receiver) = oneshot::channel();
         drop(receiver);
         let runner = Runner {
+            quality: Default::default(),
             control: control.clone(),
             previous: Vec::new(),
             response: Some(response),
@@ -1151,6 +1201,7 @@ mod tests {
         let (response, receiver) = oneshot::channel();
         drop(receiver);
         let runner = Runner {
+            quality: Default::default(),
             control: next,
             previous: vec![(joined, previous)],
             response: Some(response),

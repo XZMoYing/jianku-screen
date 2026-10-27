@@ -1206,6 +1206,152 @@ fn handoff_fixture() -> Fixture {
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn native_preparing_quality_preserves_paused_seek_audio_and_source_ceiling() {
+    use cap_rendering::preview_resolution::EditorPreviewQuality;
+    use std::sync::atomic::AtomicUsize;
+
+    let mut fixture = handoff_fixture();
+    fixture.project.aspect_ratio = Some(cap_project::AspectRatio::Vertical);
+    fixture.project.background.crop = None;
+    fixture.project.background.padding = 0.0;
+    let frames = Arc::new(Mutex::new(Vec::new()));
+    let samples = Arc::new(AtomicUsize::new(0));
+    let output = Arc::new(crate::AudioOutput::new_headless(Box::new({
+        let samples = samples.clone();
+        move |data, _| {
+            samples.fetch_add(data.len(), Ordering::Relaxed);
+        }
+    })));
+    let session = crate::PreparingPlaybackSession::spawn_with_preview_quality(
+        fixture.input(),
+        (0..fixture.project.clips.len())
+            .map(|_| crate::PreparingAudioSegmentInput {
+                mic: Some(
+                    cap_audio::ManagedAudioInput::new(
+                        fixture.source.clone(),
+                        PathBuf::from("mic.aac"),
+                    )
+                    .unwrap(),
+                ),
+                system_audio: None,
+                timing_repair: Default::default(),
+            })
+            .collect(),
+        crate::PreparingPlaybackOptions {
+            preview: PreparingPreviewOptions {
+                use_hardware_decoding: cfg!(target_os = "macos"),
+                frame_format: crate::EditorFrameFormat::Rgba,
+            },
+            fps: 30,
+            resolution: XY::new(1280, 720),
+        },
+        output.clone(),
+        Box::new({
+            let frames = frames.clone();
+            move |_, output, _| {
+                if let crate::EditorFrameOutput::Rgba(frame) = output {
+                    assert!(
+                        frame.data.len()
+                            >= frame.height as usize * frame.padded_bytes_per_row as usize
+                    );
+                    frames
+                        .lock()
+                        .unwrap()
+                        .push((frame.frame_number, frame.width, frame.height));
+                }
+            }
+        }),
+        fixture.metadata.clone(),
+        Some(EditorPreviewQuality::P720),
+    )
+    .unwrap();
+    let mut updates = session.updates();
+    tokio::time::timeout(Duration::from_secs(30), async {
+        loop {
+            let ready = {
+                let state = updates.borrow_and_update();
+                state.progress.playable_until >= 3.0 && state.progress.preview_available
+            };
+            if ready {
+                break;
+            }
+            updates.changed().await.unwrap();
+        }
+    })
+    .await
+    .unwrap();
+    assert_eq!(frames.lock().unwrap()[0], (0, 160, 286));
+    let controller = session.controller();
+    let position = updates.borrow().playback.playhead_seconds;
+    let count = frames.lock().unwrap().len();
+    let adoption = session.handoff_handle().prepare_adoption().unwrap();
+    controller
+        .set_preview_quality(EditorPreviewQuality::P144)
+        .await
+        .unwrap();
+    assert!(!adoption.invalidated());
+    tokio::time::timeout(Duration::from_secs(10), async {
+        while !frames.lock().unwrap()[count..]
+            .iter()
+            .any(|(_, w, h)| (*w, *h) == (144, 258))
+        {
+            tokio::time::sleep(Duration::from_millis(5)).await;
+        }
+    })
+    .await
+    .unwrap();
+    assert_eq!(updates.borrow().playback.playhead_seconds, position);
+    assert!(!updates.borrow().playback.playing);
+    let (seek, quality) = tokio::join!(
+        controller.seek(0.5),
+        controller.set_preview_quality(EditorPreviewQuality::P720)
+    );
+    seek.unwrap();
+    quality.unwrap();
+    assert_eq!(updates.borrow().playback.playhead_seconds, 0.5);
+    controller.set_playing(true).await.unwrap();
+    let generation = output.test_playback_generations();
+    let before_samples = samples.load(Ordering::Relaxed);
+    let before_position = session
+        .handoff_handle()
+        .snapshot()
+        .unwrap()
+        .playback
+        .playhead_seconds;
+    for (quality, expected) in [
+        (EditorPreviewQuality::P144, (144, 258)),
+        (EditorPreviewQuality::Original, (160, 286)),
+    ] {
+        let count = frames.lock().unwrap().len();
+        controller.set_preview_quality(quality).await.unwrap();
+        tokio::time::timeout(Duration::from_secs(10), async {
+            while !frames.lock().unwrap()[count..]
+                .iter()
+                .any(|(_, w, h)| (*w, *h) == expected)
+            {
+                tokio::time::sleep(Duration::from_millis(5)).await;
+            }
+        })
+        .await
+        .unwrap();
+        assert_eq!(output.test_playback_generations(), generation);
+        assert!(
+            session
+                .handoff_handle()
+                .snapshot()
+                .unwrap()
+                .playback
+                .playhead_seconds
+                >= before_position
+        );
+    }
+    assert!(samples.load(Ordering::Relaxed) > before_samples);
+    let exit = session.stop_handle().stop_and_wait().await;
+    assert!(exit.error.is_none(), "{:?}", exit.error);
+    assert!(!exit.cleanup_failed);
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn native_handoff_reuses_pcm_preserves_audio_across_candidate_disposal_and_joins_before_restart()
  {
     use std::sync::atomic::AtomicUsize;

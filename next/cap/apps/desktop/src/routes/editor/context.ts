@@ -1720,12 +1720,10 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				},
 			});
 
-			const [storedSettings] = createResource(() => generalSettingsStore.get());
-			const initialPreviewQuality = createMemo(() =>
-				readPreviewQuality(storedSettings()?.editorPreviewQuality),
-			);
 			const [preferredPreviewQuality, _setPreviewQuality] =
-				createSignal<EditorPreviewQuality>(DEFAULT_PREVIEW_QUALITY);
+				createSignal<EditorPreviewQuality>(
+					editorInstanceContext.initialPreviewQuality(),
+				);
 			const [previewResolutionOptions, setPreviewResolutionOptions] =
 				createSignal(props.editorInstance.previewResolutions);
 			let previewResolutionRevision = 0;
@@ -1753,7 +1751,6 @@ export const [EditorContextProvider, useBaseEditorContext] =
 						});
 				}),
 			);
-			createEffect(() => _setPreviewQuality(initialPreviewQuality()));
 			const setPreviewQuality = (quality: EditorPreviewQuality) => {
 				_setPreviewQuality(quality);
 				generalSettingsStore
@@ -1773,6 +1770,9 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				() => previewResolutionOption().resolutionBase,
 				undefined,
 				{ equals: (left, right) => left.x === right.x && left.y === right.y },
+			);
+			onCleanup(
+				editorInstanceContext.registerPreviewResolution(previewResolutionBase),
 			);
 
 			const layoutModeStorageKey = `cap:editor:layoutMode:${props.editorInstance.path}`;
@@ -2545,32 +2545,21 @@ export const [EditorContextProvider, useBaseEditorContext] =
 			let resolutionUpdateRevision = 0;
 			onCleanup(() => resolutionUpdateRevision++);
 			createEffect(
-				on(
-					previewResolutionBase,
-					(resolution) => {
-						const revision = ++resolutionUpdateRevision;
-						resolutionUpdate = resolutionUpdate
-							.catch(() => undefined)
-							.then(() => {
-								if (revision !== resolutionUpdateRevision) return;
-								if (
-									(props.editorInstance.preparingPlayback &&
-										!preparing?.ordinaryReady()) ||
-									playbackHandoff?.active()
-								) {
-									return requestHandoffPlayback(playbackIntent());
-								}
-								return commands.setEditorPreviewResolution(resolution);
-							})
-							.catch((error) =>
-								console.error(
-									"Failed to update playback preview resolution",
-									error,
-								),
-							);
-					},
-					{ defer: true },
-				),
+				on([previewResolutionBase, previewQuality], ([resolution, quality]) => {
+					const revision = ++resolutionUpdateRevision;
+					resolutionUpdate = resolutionUpdate
+						.catch(() => undefined)
+						.then(() => {
+							if (revision !== resolutionUpdateRevision) return;
+							return commands.setEditorPreviewResolution(resolution, quality);
+						})
+						.catch((error) =>
+							console.error(
+								"Failed to update playback preview resolution",
+								error,
+							),
+						);
+				}),
 			);
 
 			return {
@@ -2685,6 +2674,8 @@ export type TransformedMeta = ReturnType<typeof transformMeta>;
 
 const createEditorInstanceContext = () => {
 	const preparing = usePreparingEditor();
+	const [initialPreviewQuality, setInitialPreviewQuality] =
+		createSignal<EditorPreviewQuality>(DEFAULT_PREVIEW_QUALITY);
 	const [latestFrame, setLatestFrame] = createLazySignal<FrameData>();
 	const [playbackActive, setPlaybackActive] = createSignal(false);
 
@@ -2704,6 +2695,14 @@ const createEditorInstanceContext = () => {
 	let activeInstanceId: string | undefined;
 	let closeSocket: (() => void) | undefined;
 	let alive = true;
+	let currentPreviewResolution: (() => XY<number>) | undefined;
+	const registerPreviewResolution = (getResolution: () => XY<number>) => {
+		currentPreviewResolution = getResolution;
+		return () => {
+			if (currentPreviewResolution === getResolution)
+				currentPreviewResolution = undefined;
+		};
+	};
 
 	onCleanup(() => {
 		alive = false;
@@ -2757,15 +2756,22 @@ const createEditorInstanceContext = () => {
 			disposeWorkerReadyEffect?.();
 			canvasControls()?.dispose();
 			preparing?.acceptSnapshot(instance.preparingSnapshot);
+			const settings = await generalSettingsStore.get().catch((error) => {
+				console.error("Failed to load initial preview quality", error);
+				return undefined;
+			});
+			if (!alive || activeInstanceId !== instanceId) return instance;
+			const initialQuality = readPreviewQuality(settings?.editorPreviewQuality);
+			setInitialPreviewQuality(initialQuality);
 			const requestFrame = () => {
 				if (!alive || activeInstanceId !== instanceId) return;
 				events.renderFrameEvent.emit({
 					frame_number: preparing?.handoffRequestedFrame() ?? 0,
 					fps: FPS,
-					resolution_base: selectPreviewResolution(
-						instance.previewResolutions,
-						DEFAULT_PREVIEW_QUALITY,
-					).resolutionBase,
+					resolution_base:
+						currentPreviewResolution?.() ??
+						selectPreviewResolution(instance.previewResolutions, initialQuality)
+							.resolutionBase,
 				});
 			};
 
@@ -2831,6 +2837,8 @@ const createEditorInstanceContext = () => {
 		canvasControls,
 		performanceMode,
 		setPerformanceMode,
+		registerPreviewResolution,
+		initialPreviewQuality,
 	};
 };
 

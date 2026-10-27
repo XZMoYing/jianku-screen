@@ -391,44 +391,27 @@ impl FinalizationProject {
 }
 
 const EDITOR_PREVIEW_FPS: u32 = 60;
-const EDITOR_OUTPUT_SIZE: XY<u32> = XY::new(1920, 1080);
-const DEFAULT_EDITOR_PREVIEW_SCALE_NUMERATOR: u32 = 65;
-const DEFAULT_EDITOR_PREVIEW_SCALE_DENOMINATOR: u32 = 100;
-
-fn default_editor_preview_resolution() -> XY<u32> {
-    scaled_editor_preview_resolution(
-        EDITOR_OUTPUT_SIZE,
-        DEFAULT_EDITOR_PREVIEW_SCALE_NUMERATOR,
-        DEFAULT_EDITOR_PREVIEW_SCALE_DENOMINATOR,
-    )
+fn editor_preview_quality(app: &AppHandle) -> general_settings::EditorPreviewQuality {
+    GeneralSettingsStore::get(app)
+        .ok()
+        .flatten()
+        .map(|settings| settings.editor_preview_quality)
+        .unwrap_or_default()
 }
 
-fn scaled_editor_preview_resolution(
-    output_size: XY<u32>,
-    numerator: u32,
-    denominator: u32,
-) -> XY<u32> {
-    XY::new(
-        scaled_editor_preview_dimension(output_size.x, numerator, denominator, 4, 4),
-        scaled_editor_preview_dimension(output_size.y, numerator, denominator, 2, 2),
+fn editor_preview_resolution(
+    options: &cap_rendering::RenderOptions,
+    config: &ProjectConfiguration,
+    quality: general_settings::EditorPreviewQuality,
+    max_dimension: u32,
+) -> Result<XY<u32>, String> {
+    cap_rendering::preview_resolution::resolve_preview_resolution(
+        options,
+        &cap_rendering::preview_resolution::PreviewCanvasConfiguration::from(config),
+        quality,
+        max_dimension,
     )
-}
-
-fn scaled_editor_preview_dimension(
-    value: u32,
-    numerator: u32,
-    denominator: u32,
-    minimum: u32,
-    alignment: u32,
-) -> u32 {
-    let denominator = denominator.max(1);
-    let alignment = alignment.max(1);
-    let scaled = ((u64::from(value) * u64::from(numerator)) + (u64::from(denominator) / 2))
-        / u64::from(denominator);
-    let rounded = u32::try_from(scaled).unwrap_or(u32::MAX).max(minimum);
-    let aligned = u64::from(rounded).div_ceil(u64::from(alignment)) * u64::from(alignment);
-
-    u32::try_from(aligned).unwrap_or(u32::MAX)
+    .map(|choice| choice.resolution_base)
 }
 
 #[cfg(test)]
@@ -468,16 +451,30 @@ mod tests {
     }
 
     #[test]
-    fn default_editor_preview_resolution_matches_frontend_defaults() {
-        assert_eq!(default_editor_preview_resolution(), XY::new(1248, 702));
-    }
-
-    #[test]
-    fn scaled_editor_preview_resolution_rounds_like_frontend() {
+    fn editor_preview_uses_native_source_limits_and_shared_default_quality() {
+        let quality = general_settings::EditorPreviewQuality::default();
         assert_eq!(
-            scaled_editor_preview_resolution(XY::new(1919, 1079), 65, 100),
-            XY::new(1248, 702)
+            GeneralSettingsStore::default().editor_preview_quality,
+            quality
         );
+        let mut config = ProjectConfiguration::default();
+        config.background.padding = 0.0;
+        for (source, expected) in [
+            (XY::new(3840, 2160), (1280, 720)),
+            (XY::new(2160, 3840), (720, 1280)),
+            (XY::new(640, 360), (640, 360)),
+        ] {
+            let options = cap_rendering::RenderOptions {
+                screen_size: source,
+                camera_size: None,
+                preserve_screen_alpha: false,
+            };
+            let base = editor_preview_resolution(&options, &config, quality, 8192).unwrap();
+            assert_eq!(
+                cap_rendering::ProjectUniforms::get_output_size(&options, &config, base),
+                expected
+            );
+        }
     }
 
     #[cfg(target_os = "linux")]
@@ -4755,14 +4752,20 @@ async fn get_editor_preview_resolutions(
 #[tauri::command]
 #[specta::specta]
 async fn set_editor_preview_resolution(
+    window: Window,
     editor_instance: WindowEditorInstance,
     resolution_base: XY<u32>,
+    quality: general_settings::EditorPreviewQuality,
 ) -> Result<bool, String> {
-    let state = editor_instance.state.lock().await;
-    Ok(state
-        .playback_task
-        .as_ref()
-        .is_some_and(|handle| handle.set_resolution_base(resolution_base)))
+    let ordinary = {
+        let state = editor_instance.state.lock().await;
+        state
+            .playback_task
+            .as_ref()
+            .is_some_and(|handle| handle.set_resolution_base(resolution_base))
+    };
+    let preparing = editor_preparing::set_preview_quality(&window, quality).await?;
+    Ok(ordinary || preparing)
 }
 
 #[tauri::command]
@@ -9113,6 +9116,27 @@ async fn create_editor_instance_impl(
         instance.install_preparing_handoff(handoff).await?;
     }
 
+    let resolution = {
+        let config = instance.project_config.1.borrow();
+        editor_preview_resolution(
+            &instance.render_constants.options,
+            &config,
+            editor_preview_quality(&app),
+            instance
+                .render_constants
+                .device
+                .limits()
+                .max_texture_dimension_2d,
+        )
+    };
+    let resolution = match resolution {
+        Ok(resolution) => resolution,
+        Err(error) => {
+            instance.dispose().await;
+            return Err(error);
+        }
+    };
+
     let event_id = RenderFrameEvent::listen_any(&app, {
         let preview_tx = instance.preview_tx.clone();
         move |e| {
@@ -9127,7 +9151,7 @@ async fn create_editor_instance_impl(
     });
 
     let started = match instance
-        .start_preparing_handoff(EDITOR_PREVIEW_FPS, default_editor_preview_resolution())
+        .start_preparing_handoff(EDITOR_PREVIEW_FPS, resolution)
         .await
     {
         Ok(started) => started,
@@ -9153,13 +9177,9 @@ async fn create_editor_instance_impl(
             .preparing_adoption()
             .and_then(|adoption| adoption.frame_number(EDITOR_PREVIEW_FPS))
             .unwrap_or(0);
-        instance.preview_tx.send_modify(|v| {
-            *v = Some((
-                frame,
-                EDITOR_PREVIEW_FPS,
-                default_editor_preview_resolution(),
-            ))
-        });
+        instance
+            .preview_tx
+            .send_modify(|v| *v = Some((frame, EDITOR_PREVIEW_FPS, resolution)));
     }
 
     Ok((instance, event_id))

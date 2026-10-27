@@ -5,6 +5,12 @@ use std::{
 
 use cap_audio::{ManagedAudioInput, ManagedAudioStopHandle, ManagedProgressiveAudio};
 use cap_project::{StudioRecordingMeta, XY};
+use cap_rendering::{
+    RenderOptions,
+    preview_resolution::{
+        EditorPreviewQuality, PreviewCanvasConfiguration, resolve_preview_resolution,
+    },
+};
 use futures::{
     FutureExt,
     future::{BoxFuture, Shared},
@@ -50,6 +56,7 @@ type CommandResult = oneshot::Sender<Result<(), String>>;
 enum PreparingPlaybackCommand {
     Seek(f64, CommandResult),
     Playing(bool, CommandResult),
+    Quality(EditorPreviewQuality, CommandResult),
 }
 
 #[derive(Clone)]
@@ -59,6 +66,20 @@ pub struct PreparingPlaybackController {
 }
 
 impl PreparingPlaybackController {
+    pub async fn set_preview_quality(&self, quality: EditorPreviewQuality) -> Result<(), String> {
+        if self.handoff.committed() {
+            return Err("Preparing playback has been adopted".into());
+        }
+        let (reply, received) = oneshot::channel();
+        self.commands
+            .send(PreparingPlaybackCommand::Quality(quality, reply))
+            .await
+            .map_err(|_| "Preparing playback has ended".to_string())?;
+        received
+            .await
+            .map_err(|_| "Preparing resolution update has ended".to_string())?
+    }
+
     pub async fn seek(&self, seconds: f64) -> Result<(), String> {
         let _intent = self.handoff.begin_command()?;
         let (reply, received) = oneshot::channel();
@@ -166,6 +187,26 @@ impl PreparingPlaybackSession {
         callback: crate::PreparingPreviewCallback,
         expected_finalized_metadata: cap_project::RecordingMeta,
     ) -> Result<Self, String> {
+        Self::spawn_with_preview_quality(
+            input,
+            audio,
+            options,
+            audio_output,
+            callback,
+            expected_finalized_metadata,
+            None,
+        )
+    }
+
+    pub fn spawn_with_preview_quality(
+        input: crate::PreparingPreviewInput,
+        audio: Vec<PreparingAudioSegmentInput>,
+        options: PreparingPlaybackOptions,
+        audio_output: Arc<crate::AudioOutput>,
+        callback: crate::PreparingPreviewCallback,
+        expected_finalized_metadata: cap_project::RecordingMeta,
+        quality: Option<EditorPreviewQuality>,
+    ) -> Result<Self, String> {
         validate_expected_metadata(&input.recording_meta, &expected_finalized_metadata)?;
         crate::preparing_preview::validate_input(&input).map_err(|error| error.to_string())?;
         if options.fps == 0
@@ -216,6 +257,9 @@ impl PreparingPlaybackSession {
             source_metadata: input.recording_meta.clone(),
             clock,
             options,
+            quality,
+            preview_ready: None,
+            resolution_dirty: false,
             project: input.project.clone(),
             expected_finalized_metadata,
             audio_output,
@@ -344,6 +388,9 @@ struct PreparingPlaybackRunner {
     source_metadata: cap_project::RecordingMeta,
     clock: PreparingPlaybackClock,
     options: PreparingPlaybackOptions,
+    quality: Option<EditorPreviewQuality>,
+    preview_ready: Option<crate::PreparingPreviewReady>,
+    resolution_dirty: bool,
     project: cap_project::ProjectConfiguration,
     expected_finalized_metadata: cap_project::RecordingMeta,
     audio_output: Arc<crate::AudioOutput>,
@@ -538,12 +585,16 @@ impl PreparingPlaybackRunner {
         )
         .map_err(|error| error.to_string())?;
         self.preview = Some(preview);
-        tokio::select! {
+        let ready = tokio::select! {
             biased;
             _ = self.cancelled.cancelled() => return Ok(()),
             ready = self.preview.as_mut().ok_or("Preparing preview is absent")?.wait_ready() => {
-                ready.map_err(|error| error.to_string())?;
+                ready.map_err(|error| error.to_string())?
             }
+        };
+        self.preview_ready = Some(ready);
+        if let Some(quality) = self.quality {
+            self.options.resolution = self.quality_resolution(quality)?;
         }
         self.request(
             0,
@@ -579,7 +630,29 @@ impl PreparingPlaybackRunner {
         }
     }
 
+    fn quality_resolution(&self, quality: EditorPreviewQuality) -> Result<XY<u32>, String> {
+        let ready = self
+            .preview_ready
+            .as_ref()
+            .ok_or("Preparing preview is not ready")?;
+        let options = RenderOptions {
+            screen_size: ready.screen_size,
+            camera_size: ready.camera_size,
+            preserve_screen_alpha: false,
+        };
+        resolve_preview_resolution(
+            &options,
+            &PreviewCanvasConfiguration::from(&self.project),
+            quality,
+            ready.max_texture_dimension_2d,
+        )
+        .map(|choice| choice.resolution_base)
+    }
+
     fn request(&mut self, frame: u32, purpose: FramePurpose) -> Result<(), String> {
+        if matches!(&purpose, FramePurpose::Display { .. }) {
+            self.resolution_dirty = false;
+        }
         if let Some(PendingFrame {
             purpose: FramePurpose::Display {
                 reply: Some(reply), ..
@@ -794,6 +867,19 @@ impl PreparingPlaybackRunner {
 
     async fn command(&mut self, command: PreparingPlaybackCommand) -> Result<(), String> {
         match command {
+            PreparingPlaybackCommand::Quality(quality, reply) => {
+                match self.quality_resolution(quality) {
+                    Ok(resolution) => {
+                        self.quality = Some(quality);
+                        self.resolution_dirty |= self.options.resolution != resolution;
+                        self.options.resolution = resolution;
+                        let _ = reply.send(Ok(()));
+                    }
+                    Err(error) => {
+                        let _ = reply.send(Err(error));
+                    }
+                }
+            }
             PreparingPlaybackCommand::Seek(seconds, reply) => {
                 let was_playing = self.clock.snapshot.playback.playing;
                 if let Err(error) = self.clock.validate_seek(seconds) {
@@ -967,14 +1053,16 @@ impl PreparingPlaybackRunner {
         if self.handoff.committed() {
             return self.publish();
         }
-        if (self.clock.snapshot.playback.playing || has_audio_clock)
+        if (self.clock.snapshot.playback.playing || has_audio_clock || self.resolution_dirty)
             && self.clock.snapshot.progress.playable_until > 0.0
         {
             let fps = f64::from(self.options.fps);
             let last_frame = (self.clock.snapshot.progress.playable_until * fps).ceil() as u32;
             let frame = ((self.clock.position_at(now) * fps).floor() as u32)
                 .min(last_frame.saturating_sub(1));
-            if f64::from(frame) / fps != self.clock.snapshot.playback.playhead_seconds {
+            if self.resolution_dirty
+                || f64::from(frame) / fps != self.clock.snapshot.playback.playhead_seconds
+            {
                 self.request(
                     frame,
                     FramePurpose::Display {

@@ -1,0 +1,71 @@
+{
+	"baseCommit": "8067de56057e370fdc89a32bc1b6682ce4a85a9e",
+	"componentPassed": true,
+	"fullFeatureComplete": false,
+	"installedApplication": "0.2.0-alpha.39",
+	"desktopReleaseCheck": true,
+	"nativePreparingQualityTests": 1,
+	"nativePcmHandoffRegressionTests": 1,
+	"nativeDesktopDefaultTests": 1,
+	"catalogueTests": 3,
+	"canvasCombinations": 140,
+	"playbackRegressionTests": 28,
+	"frontendTests": 104,
+	"actualPreparingGpuDimensions": {
+		"source": "160x120",
+		"canvas": "9:16",
+		"higherPreferenceFallsBackToOriginal": "160x286",
+		"144p": "144x258"
+	},
+	"preparingPausedPositionPreserved": true,
+	"pendingSeekSurvivesQualityCommand": true,
+	"audioGenerationUnchangedWhilePlaying": true,
+	"audioSamplesAdvanced": true,
+	"reservedAdoptionRemainsValid": true,
+	"workersJoined": true,
+	"bindingsGeneratedByNativeTest": true,
+	"typescriptCheck": true,
+	"fullStaticFrontend": true,
+	"strictRenderingEditorClippy": true,
+	"formatting": true,
+	"initialFailuresResolved": [
+		"Removed-helper caller in editor_window.rs",
+		"First frontend invocation used the wrong working directory, missing desktop aliases"
+	],
+	"knownStrictDecoderFailures": "Retained, not covered/waived by these scoped tests; see ../2026-10-27-decoder-parity/README.md",
+	"remaining": [
+		"U04c actual packaged menu, switching, persistence, small-source limits and preview/export independence",
+		"U05 fullscreen and remaining release queue"
+	],
+	"sourceSha256": {
+		"apps/desktop/src-tauri/src/editor_preparing.rs": "6797e4feeeb07f6ba1254e9669200268a744ed5eeb8f49f6d08184d0d4e66dd9",
+		"apps/desktop/src-tauri/src/editor_window.rs": "705d26673a4a3f80205bd14ef24a1b6b174b11b5bf44448c344c7e54c9502992",
+		"apps/desktop/src-tauri/src/lib.rs": "9bf6a1a915de215c0bdb726089b94924c90599ee66d2af379ae8dfa7317f1b27",
+		"apps/desktop/src/routes/editor/context.ts": "cc070a8836856766df50e9b1d0424aa8e78ddfe98abe44f825f289d37b3debaf",
+		"apps/desktop/src/utils/tauri.ts": "52bc1ae65b16cc9fa989e8c6ef4ba3d532ef6f7be03cad0ce515aa11e7b95bb1",
+		"crates/editor/src/audio_output.rs": "8cf7aa9d58b389dea279913a7f649a120b853b87d7abaf5b9e18e7d3428dbf9f",
+		"crates/editor/src/preparing_playback.rs": "0a7255581fb1ecbd02575c256d8d077db82d6d7ce267e1d8ac64f96fb838f167",
+		"crates/editor/src/preparing_preview.rs": "b67c9b2df381687ad623605e6f44403b17f4c55a772cdfd6a39493abb13ac3f3",
+		"crates/editor/src/preparing_preview/native_tests.rs": "5c9b7ae4c8112b0fe40a668f3edee051954626f8cec867cf061a0389d7113373",
+		"crates/rendering/src/preview_resolution.rs": "9440c09116efb82af284e1e5ac6c378176c79dc8e66619a2265614cec7a1c8d9"
+	},
+	"logsSha256": {
+		"bindings.log.gz": "3033dc8b2f4207aaad0ed44a6899973ea4787ccc36e22c46cd4a72f216f10519",
+		"biome-checked.log.gz": "7da9558bff4bd850966a928b553e0bd5dbb37fda7785a1bd7deb69f447deab95",
+		"biome-final.log.gz": "abdd9383ecface2bc282c73440a0d5faa1a27d9f4577dd23502329ed660249d6",
+		"biome.log.gz": "4a9da70d43c2ba52f1ecf4232e3c72b260fef8e7c8ded521f9daa2f93d42d009",
+		"catalogue-tests.log.gz": "2f00cce0aa5143221ea5c20c3284bd14c78b8fbcbc833e550d53468f88eb708b",
+		"check-desktop-final.log.gz": "44227b1ef7b57cecdcefbd52710ee99e00d106d5749a55dc1d70315725c41c06",
+		"check-desktop.log.gz": "b9a4cec72ebc9069d6db18c2be73e061110d0ccd4f0b0b05fda3261d591803a3",
+		"clippy.log.gz": "dd0dc43e8097033f70a1f7d0d2ac0e3513e18911b5b7c54c84ab3785f054bc88",
+		"desktop-resolution.log.gz": "65e501f0016173bc4df25829bfd78897e40cbb00c7f2fc0eee0f7abf190905cb",
+		"fmt.log.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+		"frontend-build.log.gz": "cdda8e441b0824cfb36a198f9550029a6693df6e4c89a3fa2d445a23b3c61fa2",
+		"frontend-tests-final.log.gz": "1eadfac3f537d742b4cf8143bffb6bb00addb70330d7b3be489a9b79eb38a557",
+		"frontend-tests.log.gz": "a3608242cadd1371997b8316651106750dd85b6c8243c0a11d21ad74fc36ddc0",
+		"native-handoff.log.gz": "8d812819acb652c252724cfc128fdad799ea28968e0e57adad5e1a616bf76024",
+		"native-quality.log.gz": "940b9b1a891c147a24f0876bf0bc0c228f0cba8d02aa56cf5eb500e86585752d",
+		"playback-tests.log.gz": "7a59eda5c946622c90fe88561da9bfb91abe99128c99cdb72a4f64c9ae7697a5",
+		"typecheck.log.gz": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+	}
+}
