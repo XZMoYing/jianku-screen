@@ -1,0 +1,17 @@
+{
+	"buildAndProbeProcessesStopped": true,
+	"productSourceRestored": true,
+	"objectCount": 320,
+	"objectAllocatedBytes": 245379072,
+	"objectLogicalBytes": 218428320,
+	"testRunner": {
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/release/deps/cap_editor-6a51d48ad0c977f0",
+		"bytes": 24390712,
+		"sha256": "3c6e88da0f9f3316d79ff27714080926a63c911790fb4eecea96eb4ae42cafab"
+	},
+	"ownTemporaryAllocatedBytes": 133070848,
+	"freeBytesBefore": 78688264192,
+	"freeBytesAfter": 79002664960,
+	"observedFreeDeltaBytes": 314400768,
+	"scope": "Only completed release test intermediates, owned test runner, and task-generated temporary directory; application rollback packages, native dependencies, source/Git, user projects retained"
+}

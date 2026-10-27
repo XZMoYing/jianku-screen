@@ -1,0 +1,114 @@
+[
+	{
+		"track": "display",
+		"index": 0,
+		"avBytes": 23163,
+		"ffmpegBytes": 23163,
+		"same": true,
+		"firstDifference": null
+	},
+	{
+		"track": "display",
+		"index": 1,
+		"avBytes": 26238,
+		"ffmpegBytes": 26238,
+		"same": true,
+		"firstDifference": null
+	},
+	{
+		"track": "display",
+		"index": 7,
+		"avBytes": 12245,
+		"ffmpegBytes": 12245,
+		"same": true,
+		"firstDifference": null
+	},
+	{
+		"track": "display",
+		"index": 9,
+		"avBytes": 8822,
+		"ffmpegBytes": 8822,
+		"same": true,
+		"firstDifference": null
+	},
+	{
+		"track": "display",
+		"index": 19,
+		"avBytes": 6415,
+		"ffmpegBytes": 6415,
+		"same": true,
+		"firstDifference": null
+	},
+	{
+		"track": "display",
+		"index": 45,
+		"avBytes": 8229,
+		"ffmpegBytes": 8229,
+		"same": true,
+		"firstDifference": null
+	},
+	{
+		"track": "display",
+		"index": 90,
+		"avBytes": 9393,
+		"ffmpegBytes": 9393,
+		"same": true,
+		"firstDifference": null
+	},
+	{
+		"track": "camera",
+		"index": 0,
+		"avBytes": 4304,
+		"ffmpegBytes": 4304,
+		"same": true,
+		"firstDifference": null
+	},
+	{
+		"track": "camera",
+		"index": 1,
+		"avBytes": 6078,
+		"ffmpegBytes": 6078,
+		"same": true,
+		"firstDifference": null
+	},
+	{
+		"track": "camera",
+		"index": 7,
+		"avBytes": 3871,
+		"ffmpegBytes": 3871,
+		"same": true,
+		"firstDifference": null
+	},
+	{
+		"track": "camera",
+		"index": 9,
+		"avBytes": 3941,
+		"ffmpegBytes": 3941,
+		"same": true,
+		"firstDifference": null
+	},
+	{
+		"track": "camera",
+		"index": 19,
+		"avBytes": 3694,
+		"ffmpegBytes": 3694,
+		"same": true,
+		"firstDifference": null
+	},
+	{
+		"track": "camera",
+		"index": 45,
+		"avBytes": 3969,
+		"ffmpegBytes": 3969,
+		"same": true,
+		"firstDifference": null
+	},
+	{
+		"track": "camera",
+		"index": 90,
+		"avBytes": 4036,
+		"ffmpegBytes": 4036,
+		"same": true,
+		"firstDifference": null
+	}
+]

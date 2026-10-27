@@ -1,0 +1,16 @@
+[
+	{
+		"bytes": 307200,
+		"differentBytes": 1155,
+		"maxDifference": 7,
+		"actualSha256": "e6085ac1b81f562c71fb8969f3cc1c1e858bd7aafc8b3a60c341020cd265ef8b",
+		"expectedSha256": "31426fc5cfef0438897c3d9ae88b52c64fed9e7feeb7168d3e3bd00039b20ce2"
+	},
+	{
+		"bytes": 307200,
+		"differentBytes": 1155,
+		"maxDifference": 7,
+		"actualSha256": "e6085ac1b81f562c71fb8969f3cc1c1e858bd7aafc8b3a60c341020cd265ef8b",
+		"expectedSha256": "31426fc5cfef0438897c3d9ae88b52c64fed9e7feeb7168d3e3bd00039b20ce2"
+	}
+]

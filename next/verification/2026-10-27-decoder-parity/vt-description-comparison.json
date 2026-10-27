@@ -1,0 +1,38 @@
+[
+	{
+		"track": "display",
+		"variant": "attrs",
+		"differentFromAv": 0,
+		"differentFromFfmpeg": 4
+	},
+	{
+		"track": "display",
+		"variant": "minimal",
+		"differentFromAv": 0,
+		"differentFromFfmpeg": 4
+	},
+	{
+		"track": "display",
+		"variant": "description",
+		"differentFromAv": 0,
+		"differentFromFfmpeg": 4
+	},
+	{
+		"track": "camera",
+		"variant": "attrs",
+		"differentFromAv": 0,
+		"differentFromFfmpeg": 148
+	},
+	{
+		"track": "camera",
+		"variant": "minimal",
+		"differentFromAv": 0,
+		"differentFromFfmpeg": 148
+	},
+	{
+		"track": "camera",
+		"variant": "description",
+		"differentFromAv": 0,
+		"differentFromFfmpeg": 148
+	}
+]

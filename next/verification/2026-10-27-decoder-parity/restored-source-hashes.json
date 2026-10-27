@@ -1,0 +1,5 @@
+{
+	"crates/editor/src/preparing_preview/native_tests.rs": "582c83229a86738c6d10e98663fdce882d2d87f1a6a38e3668623385c1f1a1fa",
+	"crates/editor/src/preparing_preview.rs": "6a89169811231e7749deac57d82a8c6ceb45374bbc6905d26dc347ffe154cfa6",
+	"crates/rendering/src/decoder/mod.rs": "eb87e27bcd90f7fa2b37ef69c0d2ea778108f47684f34344ba86a3131565db2c"
+}

@@ -1,0 +1,132 @@
+[
+	{
+		"track": "display",
+		"mode": "early",
+		"kind": "native",
+		"ordinary": {
+			"differentBytes": 4,
+			"maxDifference": 4
+		},
+		"preparing": {
+			"differentBytes": 0,
+			"maxDifference": 0
+		}
+	},
+	{
+		"track": "display",
+		"mode": "early",
+		"kind": "cpu",
+		"ordinary": {
+			"differentBytes": 4,
+			"maxDifference": 4
+		},
+		"preparing": {
+			"differentBytes": 0,
+			"maxDifference": 0
+		}
+	},
+	{
+		"track": "display",
+		"mode": "late",
+		"kind": "native",
+		"ordinary": {
+			"differentBytes": 4,
+			"maxDifference": 4
+		},
+		"preparing": {
+			"differentBytes": 0,
+			"maxDifference": 0
+		}
+	},
+	{
+		"track": "display",
+		"mode": "late",
+		"kind": "cpu",
+		"ordinary": {
+			"differentBytes": 4,
+			"maxDifference": 4
+		},
+		"preparing": {
+			"differentBytes": 0,
+			"maxDifference": 0
+		}
+	},
+	{
+		"track": "display",
+		"mode": "software",
+		"kind": "cpu",
+		"ordinary": {
+			"differentBytes": 0,
+			"maxDifference": 0
+		},
+		"preparing": {
+			"differentBytes": 4,
+			"maxDifference": 4
+		}
+	},
+	{
+		"track": "camera",
+		"mode": "early",
+		"kind": "native",
+		"ordinary": {
+			"differentBytes": 148,
+			"maxDifference": 3
+		},
+		"preparing": {
+			"differentBytes": 0,
+			"maxDifference": 0
+		}
+	},
+	{
+		"track": "camera",
+		"mode": "early",
+		"kind": "cpu",
+		"ordinary": {
+			"differentBytes": 148,
+			"maxDifference": 3
+		},
+		"preparing": {
+			"differentBytes": 0,
+			"maxDifference": 0
+		}
+	},
+	{
+		"track": "camera",
+		"mode": "late",
+		"kind": "native",
+		"ordinary": {
+			"differentBytes": 148,
+			"maxDifference": 3
+		},
+		"preparing": {
+			"differentBytes": 0,
+			"maxDifference": 0
+		}
+	},
+	{
+		"track": "camera",
+		"mode": "late",
+		"kind": "cpu",
+		"ordinary": {
+			"differentBytes": 148,
+			"maxDifference": 3
+		},
+		"preparing": {
+			"differentBytes": 0,
+			"maxDifference": 0
+		}
+	},
+	{
+		"track": "camera",
+		"mode": "software",
+		"kind": "cpu",
+		"ordinary": {
+			"differentBytes": 0,
+			"maxDifference": 0
+		},
+		"preparing": {
+			"differentBytes": 148,
+			"maxDifference": 3
+		}
+	}
+]

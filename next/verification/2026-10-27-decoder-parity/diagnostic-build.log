@@ -1,0 +1,28 @@
+   Compiling objc2-foundation v0.3.1
+   Compiling cap-enc-ffmpeg v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/enc-ffmpeg)
+   Compiling objc2-core-audio v0.3.1
+   Compiling objc2-core-video v0.3.1
+   Compiling objc2-core-audio-types v0.3.1
+   Compiling cap-rnnoise v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rnnoise)
+   Compiling objc2-core-media v0.3.1
+   Compiling ffmpeg-hw-device v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/ffmpeg-hw-device)
+   Compiling cap-video-decode v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/video-decode)
+   Compiling cap-camera-effects v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/camera-effects)
+   Compiling objc2-core-image v0.3.1
+   Compiling objc2-quartz-core v0.3.1
+   Compiling objc2-cloud-kit v0.3.1
+   Compiling objc2-core-data v0.3.1
+   Compiling objc2-app-kit v0.3.1
+   Compiling objc2-avf-audio v0.3.1
+   Compiling objc2-av-foundation v0.3.1
+   Compiling cap-flags v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/flags)
+   Compiling cap-utils v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/utils)
+   Compiling sentry v0.42.0
+   Compiling cap-cursor-info v0.0.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/cursor-info)
+   Compiling cap-project v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/project)
+   Compiling cap-rendering v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/rendering)
+   Compiling cap-audio v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/audio)
+   Compiling cap-media v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/media)
+   Compiling cap-editor v0.1.0 (/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/crates/editor)
+    Finished `release` profile [optimized + debuginfo] target(s) in 2m 06s
+  Executable unittests src/lib.rs (target/release/deps/cap_editor-6a51d48ad0c977f0)

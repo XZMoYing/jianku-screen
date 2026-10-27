@@ -2,7 +2,7 @@
 
 新版在 `rewrite/cap-foundation` 分支开发，源代码位于 `next/cap/`，当前工作目录为 `Jianku Screen Next`。旧版目录仍保留共用的 Git 仓库及历史源码；旧版应用与构建已经清理。
 
-当前阶段为 `0.2.0-alpha.37`：补齐动态轨道、3D 镜头与加载界面的中文，修正构建链路由解析错误，并区分准备预览测试的解码配置。保留全部视觉效果，实际中文界面、完整导出及当前/上一版回滚已核对；另有两项 AVAssetReader 画面差异继续待办。见 [alpha.37 记录](verification/2026-10-26-alpha37-localization-preview/README.md)。下方早期说明保留作历史参考。
+当前阶段为 `0.2.0-alpha.37`：补齐动态轨道、3D 镜头与加载界面的中文，修正构建链路由解析错误，并区分准备预览测试的解码配置。保留全部视觉效果，实际中文界面、完整导出及当前/上一版回滚已核对；另有两项 AVAssetReader 画面差异继续待办。见 [alpha.37 记录](verification/2026-10-26-alpha37-localization-preview/README.md)。2026-10-27 已用独立程序进一步定位到内置 FFmpeg VideoToolbox 解码的色度差异，严格失败仍保留；应用继续 alpha.37，见 [解码调查](verification/2026-10-27-decoder-parity/README.md)。下方早期说明保留作历史参考。
 
 ## 版本与来源
 

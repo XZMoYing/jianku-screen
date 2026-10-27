@@ -1,0 +1,606 @@
+{
+	"scope": "Diagnostic comparison of 110 decoded frames per track; no product changes, no tolerance-based pass classification",
+	"bundledCodecSha256": "7d3f5dac39dcb2d2c23dd497c2c4b8ae0ce7249f09314e2b26fb135833ce1335",
+	"inputs": {
+		"display": {
+			"bytes": 1729859,
+			"sha256": "4382adcc539de0266cad27f77acce02ee46ae14c2687ec2b7c8cd8abbd47c923"
+		},
+		"camera": {
+			"bytes": 577103,
+			"sha256": "b1996466d2d9fdc8b9f54a084ed0a5b5311aee29b2b97e069a679370c91518ca"
+		}
+	},
+	"tracks": [
+		{
+			"track": "display",
+			"mode": "early",
+			"frames": 110,
+			"differentLumaBytes": 0,
+			"differentChromaBytes": 2952,
+			"maxLumaDifference": 0,
+			"maxChromaDifference": 9,
+			"changedFrames": 92,
+			"nativeVsDownloadDifferentBytes": 0,
+			"explicitSizeVsNativeSizeDifferentBytes": 0,
+			"samples": [
+				{
+					"sourceFrame": 7,
+					"planes": [
+						{
+							"plane": "Luma",
+							"bytes": 19200,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "a31806dbe7d944027a2fd70aa599210433d14ba5471ed63dfce2fbf04d9be89d",
+							"secondSha256": "a31806dbe7d944027a2fd70aa599210433d14ba5471ed63dfce2fbf04d9be89d"
+						},
+						{
+							"plane": "Chroma",
+							"bytes": 9600,
+							"differentBytes": 4,
+							"maxDifference": 4,
+							"firstSha256": "19ada4a581dc37fc72fdd87750633887f614647ad3b3ab5361df9d122cc2072b",
+							"secondSha256": "4b93cf7abe706d9e3a937cf2fea90bed95a1dfeb8234c45c12f0bddee57bff4b"
+						}
+					]
+				},
+				{
+					"sourceFrame": 19,
+					"planes": [
+						{
+							"plane": "Luma",
+							"bytes": 19200,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "0f324198435dd21cc24d0dbb8d9abbb0cb4e3f8ebd82884a92d455df9d2a2562",
+							"secondSha256": "0f324198435dd21cc24d0dbb8d9abbb0cb4e3f8ebd82884a92d455df9d2a2562"
+						},
+						{
+							"plane": "Chroma",
+							"bytes": 9600,
+							"differentBytes": 40,
+							"maxDifference": 8,
+							"firstSha256": "696a8950370a725f5e72cb73ceb6dd4f436a16ee3bdf43ee33d08bb91463202c",
+							"secondSha256": "9d2f61cff1c76c4f1b830d1cfc3d35d3762a8c3a8f26d319d8be913b33c0605f"
+						}
+					]
+				},
+				{
+					"sourceFrame": 52,
+					"planes": [
+						{
+							"plane": "Luma",
+							"bytes": 19200,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "9c1ab96a509397f199a7b6f6303afb70a6d50ffec50cfd08699ff98b71a69dd7",
+							"secondSha256": "9c1ab96a509397f199a7b6f6303afb70a6d50ffec50cfd08699ff98b71a69dd7"
+						},
+						{
+							"plane": "Chroma",
+							"bytes": 9600,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "ca12f4fb6a2aefc0a90701ffeae2a7bf10235b1d0616af428992e1dd30a9823c",
+							"secondSha256": "ca12f4fb6a2aefc0a90701ffeae2a7bf10235b1d0616af428992e1dd30a9823c"
+						}
+					]
+				},
+				{
+					"sourceFrame": 97,
+					"planes": [
+						{
+							"plane": "Luma",
+							"bytes": 19200,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "d7643cf8a7b3a1d12477f068fdd3db1d114a6e98f2fe72fb9f8bfdf5bc2a62a0",
+							"secondSha256": "d7643cf8a7b3a1d12477f068fdd3db1d114a6e98f2fe72fb9f8bfdf5bc2a62a0"
+						},
+						{
+							"plane": "Chroma",
+							"bytes": 9600,
+							"differentBytes": 12,
+							"maxDifference": 4,
+							"firstSha256": "af82fb218a994eb95db088e741893824de383879af1daf4a81446d120fcfa7b9",
+							"secondSha256": "b0b3ce707039787a4d259bd3f6679e2a2bc8b79889a80d4c624ff16a1cb27498"
+						}
+					]
+				}
+			]
+		},
+		{
+			"track": "display",
+			"mode": "late",
+			"frames": 110,
+			"differentLumaBytes": 0,
+			"differentChromaBytes": 2952,
+			"maxLumaDifference": 0,
+			"maxChromaDifference": 9,
+			"changedFrames": 92,
+			"nativeVsDownloadDifferentBytes": 0,
+			"explicitSizeVsNativeSizeDifferentBytes": 0,
+			"samples": [
+				{
+					"sourceFrame": 7,
+					"planes": [
+						{
+							"plane": "Luma",
+							"bytes": 19200,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "a31806dbe7d944027a2fd70aa599210433d14ba5471ed63dfce2fbf04d9be89d",
+							"secondSha256": "a31806dbe7d944027a2fd70aa599210433d14ba5471ed63dfce2fbf04d9be89d"
+						},
+						{
+							"plane": "Chroma",
+							"bytes": 9600,
+							"differentBytes": 4,
+							"maxDifference": 4,
+							"firstSha256": "19ada4a581dc37fc72fdd87750633887f614647ad3b3ab5361df9d122cc2072b",
+							"secondSha256": "4b93cf7abe706d9e3a937cf2fea90bed95a1dfeb8234c45c12f0bddee57bff4b"
+						}
+					]
+				},
+				{
+					"sourceFrame": 19,
+					"planes": [
+						{
+							"plane": "Luma",
+							"bytes": 19200,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "0f324198435dd21cc24d0dbb8d9abbb0cb4e3f8ebd82884a92d455df9d2a2562",
+							"secondSha256": "0f324198435dd21cc24d0dbb8d9abbb0cb4e3f8ebd82884a92d455df9d2a2562"
+						},
+						{
+							"plane": "Chroma",
+							"bytes": 9600,
+							"differentBytes": 40,
+							"maxDifference": 8,
+							"firstSha256": "696a8950370a725f5e72cb73ceb6dd4f436a16ee3bdf43ee33d08bb91463202c",
+							"secondSha256": "9d2f61cff1c76c4f1b830d1cfc3d35d3762a8c3a8f26d319d8be913b33c0605f"
+						}
+					]
+				},
+				{
+					"sourceFrame": 52,
+					"planes": [
+						{
+							"plane": "Luma",
+							"bytes": 19200,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "9c1ab96a509397f199a7b6f6303afb70a6d50ffec50cfd08699ff98b71a69dd7",
+							"secondSha256": "9c1ab96a509397f199a7b6f6303afb70a6d50ffec50cfd08699ff98b71a69dd7"
+						},
+						{
+							"plane": "Chroma",
+							"bytes": 9600,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "ca12f4fb6a2aefc0a90701ffeae2a7bf10235b1d0616af428992e1dd30a9823c",
+							"secondSha256": "ca12f4fb6a2aefc0a90701ffeae2a7bf10235b1d0616af428992e1dd30a9823c"
+						}
+					]
+				},
+				{
+					"sourceFrame": 97,
+					"planes": [
+						{
+							"plane": "Luma",
+							"bytes": 19200,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "d7643cf8a7b3a1d12477f068fdd3db1d114a6e98f2fe72fb9f8bfdf5bc2a62a0",
+							"secondSha256": "d7643cf8a7b3a1d12477f068fdd3db1d114a6e98f2fe72fb9f8bfdf5bc2a62a0"
+						},
+						{
+							"plane": "Chroma",
+							"bytes": 9600,
+							"differentBytes": 12,
+							"maxDifference": 4,
+							"firstSha256": "af82fb218a994eb95db088e741893824de383879af1daf4a81446d120fcfa7b9",
+							"secondSha256": "b0b3ce707039787a4d259bd3f6679e2a2bc8b79889a80d4c624ff16a1cb27498"
+						}
+					]
+				}
+			]
+		},
+		{
+			"track": "display",
+			"mode": "software",
+			"frames": 110,
+			"differentLumaBytes": 0,
+			"differentChromaBytes": 0,
+			"maxLumaDifference": 0,
+			"maxChromaDifference": 0,
+			"changedFrames": 0,
+			"nativeVsDownloadDifferentBytes": 0,
+			"explicitSizeVsNativeSizeDifferentBytes": 0,
+			"samples": [
+				{
+					"sourceFrame": 7,
+					"planes": [
+						{
+							"plane": "Luma",
+							"bytes": 19200,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "a31806dbe7d944027a2fd70aa599210433d14ba5471ed63dfce2fbf04d9be89d",
+							"secondSha256": "a31806dbe7d944027a2fd70aa599210433d14ba5471ed63dfce2fbf04d9be89d"
+						},
+						{
+							"plane": "Chroma",
+							"bytes": 9600,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "4b93cf7abe706d9e3a937cf2fea90bed95a1dfeb8234c45c12f0bddee57bff4b",
+							"secondSha256": "4b93cf7abe706d9e3a937cf2fea90bed95a1dfeb8234c45c12f0bddee57bff4b"
+						}
+					]
+				},
+				{
+					"sourceFrame": 19,
+					"planes": [
+						{
+							"plane": "Luma",
+							"bytes": 19200,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "0f324198435dd21cc24d0dbb8d9abbb0cb4e3f8ebd82884a92d455df9d2a2562",
+							"secondSha256": "0f324198435dd21cc24d0dbb8d9abbb0cb4e3f8ebd82884a92d455df9d2a2562"
+						},
+						{
+							"plane": "Chroma",
+							"bytes": 9600,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "9d2f61cff1c76c4f1b830d1cfc3d35d3762a8c3a8f26d319d8be913b33c0605f",
+							"secondSha256": "9d2f61cff1c76c4f1b830d1cfc3d35d3762a8c3a8f26d319d8be913b33c0605f"
+						}
+					]
+				},
+				{
+					"sourceFrame": 52,
+					"planes": [
+						{
+							"plane": "Luma",
+							"bytes": 19200,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "9c1ab96a509397f199a7b6f6303afb70a6d50ffec50cfd08699ff98b71a69dd7",
+							"secondSha256": "9c1ab96a509397f199a7b6f6303afb70a6d50ffec50cfd08699ff98b71a69dd7"
+						},
+						{
+							"plane": "Chroma",
+							"bytes": 9600,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "ca12f4fb6a2aefc0a90701ffeae2a7bf10235b1d0616af428992e1dd30a9823c",
+							"secondSha256": "ca12f4fb6a2aefc0a90701ffeae2a7bf10235b1d0616af428992e1dd30a9823c"
+						}
+					]
+				},
+				{
+					"sourceFrame": 97,
+					"planes": [
+						{
+							"plane": "Luma",
+							"bytes": 19200,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "d7643cf8a7b3a1d12477f068fdd3db1d114a6e98f2fe72fb9f8bfdf5bc2a62a0",
+							"secondSha256": "d7643cf8a7b3a1d12477f068fdd3db1d114a6e98f2fe72fb9f8bfdf5bc2a62a0"
+						},
+						{
+							"plane": "Chroma",
+							"bytes": 9600,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "b0b3ce707039787a4d259bd3f6679e2a2bc8b79889a80d4c624ff16a1cb27498",
+							"secondSha256": "b0b3ce707039787a4d259bd3f6679e2a2bc8b79889a80d4c624ff16a1cb27498"
+						}
+					]
+				}
+			]
+		},
+		{
+			"track": "camera",
+			"mode": "early",
+			"frames": 110,
+			"differentLumaBytes": 0,
+			"differentChromaBytes": 9986,
+			"maxLumaDifference": 0,
+			"maxChromaDifference": 9,
+			"changedFrames": 99,
+			"nativeVsDownloadDifferentBytes": 0,
+			"explicitSizeVsNativeSizeDifferentBytes": 0,
+			"samples": [
+				{
+					"sourceFrame": 9,
+					"planes": [
+						{
+							"plane": "Luma",
+							"bytes": 6400,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "00ab8d8b7d0fcb7b805c41455cf7de01a18ebba11006d23149c9c0afab7a9b63",
+							"secondSha256": "00ab8d8b7d0fcb7b805c41455cf7de01a18ebba11006d23149c9c0afab7a9b63"
+						},
+						{
+							"plane": "Chroma",
+							"bytes": 3200,
+							"differentBytes": 148,
+							"maxDifference": 3,
+							"firstSha256": "68b587fcd7db4996adc0d42fdc548b5a9e6472cfe8c24f077c9bf0ac043d975b",
+							"secondSha256": "d4002f0fdb0055c64a098fd1c2aab0aad43c8fe87a0734eed0998b7b14ee462b"
+						}
+					]
+				},
+				{
+					"sourceFrame": 18,
+					"planes": [
+						{
+							"plane": "Luma",
+							"bytes": 6400,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "1a38311c42ded1a333767a15676282836d6f91c3ad73ff3b6ee322eba8f4dbae",
+							"secondSha256": "1a38311c42ded1a333767a15676282836d6f91c3ad73ff3b6ee322eba8f4dbae"
+						},
+						{
+							"plane": "Chroma",
+							"bytes": 3200,
+							"differentBytes": 80,
+							"maxDifference": 4,
+							"firstSha256": "62c95ef19d592eaad9500225ab751c3cb9ea5966f7b8a56b4d88f16c903d3584",
+							"secondSha256": "48c77764d8d940101d2897a7dc223341df3645ea5cd9e54eff141210ecaf2d1b"
+						}
+					]
+				},
+				{
+					"sourceFrame": 45,
+					"planes": [
+						{
+							"plane": "Luma",
+							"bytes": 6400,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "b55ee52ad913bf2d5830dfd2ca6692ad1becce740ef0d9bdd51ad79d7411ce9a",
+							"secondSha256": "b55ee52ad913bf2d5830dfd2ca6692ad1becce740ef0d9bdd51ad79d7411ce9a"
+						},
+						{
+							"plane": "Chroma",
+							"bytes": 3200,
+							"differentBytes": 182,
+							"maxDifference": 4,
+							"firstSha256": "661a2c3142508843f16792e6f7f07dcdf3436ba0db3e8a244f26cecb7e884973",
+							"secondSha256": "59b18bd3b2cc9306ce8884b433471f3559c22e445a9538d521c6fbebdbfe5f19"
+						}
+					]
+				},
+				{
+					"sourceFrame": 81,
+					"planes": [
+						{
+							"plane": "Luma",
+							"bytes": 6400,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "dcf4f41bd8f88a6b960336c4df2e0346b7860925326a0bd086980cfdb3d223a0",
+							"secondSha256": "dcf4f41bd8f88a6b960336c4df2e0346b7860925326a0bd086980cfdb3d223a0"
+						},
+						{
+							"plane": "Chroma",
+							"bytes": 3200,
+							"differentBytes": 100,
+							"maxDifference": 5,
+							"firstSha256": "53baea4c5265953fea3e998e60249c70bdb690b352433151539d7852214018aa",
+							"secondSha256": "6e1b237d50e1815d21a8d3bd6d47f79b01c16a1e5bcedea4dc4046db3957f042"
+						}
+					]
+				}
+			]
+		},
+		{
+			"track": "camera",
+			"mode": "late",
+			"frames": 110,
+			"differentLumaBytes": 0,
+			"differentChromaBytes": 9986,
+			"maxLumaDifference": 0,
+			"maxChromaDifference": 9,
+			"changedFrames": 99,
+			"nativeVsDownloadDifferentBytes": 0,
+			"explicitSizeVsNativeSizeDifferentBytes": 0,
+			"samples": [
+				{
+					"sourceFrame": 9,
+					"planes": [
+						{
+							"plane": "Luma",
+							"bytes": 6400,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "00ab8d8b7d0fcb7b805c41455cf7de01a18ebba11006d23149c9c0afab7a9b63",
+							"secondSha256": "00ab8d8b7d0fcb7b805c41455cf7de01a18ebba11006d23149c9c0afab7a9b63"
+						},
+						{
+							"plane": "Chroma",
+							"bytes": 3200,
+							"differentBytes": 148,
+							"maxDifference": 3,
+							"firstSha256": "68b587fcd7db4996adc0d42fdc548b5a9e6472cfe8c24f077c9bf0ac043d975b",
+							"secondSha256": "d4002f0fdb0055c64a098fd1c2aab0aad43c8fe87a0734eed0998b7b14ee462b"
+						}
+					]
+				},
+				{
+					"sourceFrame": 18,
+					"planes": [
+						{
+							"plane": "Luma",
+							"bytes": 6400,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "1a38311c42ded1a333767a15676282836d6f91c3ad73ff3b6ee322eba8f4dbae",
+							"secondSha256": "1a38311c42ded1a333767a15676282836d6f91c3ad73ff3b6ee322eba8f4dbae"
+						},
+						{
+							"plane": "Chroma",
+							"bytes": 3200,
+							"differentBytes": 80,
+							"maxDifference": 4,
+							"firstSha256": "62c95ef19d592eaad9500225ab751c3cb9ea5966f7b8a56b4d88f16c903d3584",
+							"secondSha256": "48c77764d8d940101d2897a7dc223341df3645ea5cd9e54eff141210ecaf2d1b"
+						}
+					]
+				},
+				{
+					"sourceFrame": 45,
+					"planes": [
+						{
+							"plane": "Luma",
+							"bytes": 6400,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "b55ee52ad913bf2d5830dfd2ca6692ad1becce740ef0d9bdd51ad79d7411ce9a",
+							"secondSha256": "b55ee52ad913bf2d5830dfd2ca6692ad1becce740ef0d9bdd51ad79d7411ce9a"
+						},
+						{
+							"plane": "Chroma",
+							"bytes": 3200,
+							"differentBytes": 182,
+							"maxDifference": 4,
+							"firstSha256": "661a2c3142508843f16792e6f7f07dcdf3436ba0db3e8a244f26cecb7e884973",
+							"secondSha256": "59b18bd3b2cc9306ce8884b433471f3559c22e445a9538d521c6fbebdbfe5f19"
+						}
+					]
+				},
+				{
+					"sourceFrame": 81,
+					"planes": [
+						{
+							"plane": "Luma",
+							"bytes": 6400,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "dcf4f41bd8f88a6b960336c4df2e0346b7860925326a0bd086980cfdb3d223a0",
+							"secondSha256": "dcf4f41bd8f88a6b960336c4df2e0346b7860925326a0bd086980cfdb3d223a0"
+						},
+						{
+							"plane": "Chroma",
+							"bytes": 3200,
+							"differentBytes": 100,
+							"maxDifference": 5,
+							"firstSha256": "53baea4c5265953fea3e998e60249c70bdb690b352433151539d7852214018aa",
+							"secondSha256": "6e1b237d50e1815d21a8d3bd6d47f79b01c16a1e5bcedea4dc4046db3957f042"
+						}
+					]
+				}
+			]
+		},
+		{
+			"track": "camera",
+			"mode": "software",
+			"frames": 110,
+			"differentLumaBytes": 0,
+			"differentChromaBytes": 0,
+			"maxLumaDifference": 0,
+			"maxChromaDifference": 0,
+			"changedFrames": 0,
+			"nativeVsDownloadDifferentBytes": 0,
+			"explicitSizeVsNativeSizeDifferentBytes": 0,
+			"samples": [
+				{
+					"sourceFrame": 9,
+					"planes": [
+						{
+							"plane": "Luma",
+							"bytes": 6400,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "00ab8d8b7d0fcb7b805c41455cf7de01a18ebba11006d23149c9c0afab7a9b63",
+							"secondSha256": "00ab8d8b7d0fcb7b805c41455cf7de01a18ebba11006d23149c9c0afab7a9b63"
+						},
+						{
+							"plane": "Chroma",
+							"bytes": 3200,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "d4002f0fdb0055c64a098fd1c2aab0aad43c8fe87a0734eed0998b7b14ee462b",
+							"secondSha256": "d4002f0fdb0055c64a098fd1c2aab0aad43c8fe87a0734eed0998b7b14ee462b"
+						}
+					]
+				},
+				{
+					"sourceFrame": 18,
+					"planes": [
+						{
+							"plane": "Luma",
+							"bytes": 6400,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "1a38311c42ded1a333767a15676282836d6f91c3ad73ff3b6ee322eba8f4dbae",
+							"secondSha256": "1a38311c42ded1a333767a15676282836d6f91c3ad73ff3b6ee322eba8f4dbae"
+						},
+						{
+							"plane": "Chroma",
+							"bytes": 3200,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "48c77764d8d940101d2897a7dc223341df3645ea5cd9e54eff141210ecaf2d1b",
+							"secondSha256": "48c77764d8d940101d2897a7dc223341df3645ea5cd9e54eff141210ecaf2d1b"
+						}
+					]
+				},
+				{
+					"sourceFrame": 45,
+					"planes": [
+						{
+							"plane": "Luma",
+							"bytes": 6400,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "b55ee52ad913bf2d5830dfd2ca6692ad1becce740ef0d9bdd51ad79d7411ce9a",
+							"secondSha256": "b55ee52ad913bf2d5830dfd2ca6692ad1becce740ef0d9bdd51ad79d7411ce9a"
+						},
+						{
+							"plane": "Chroma",
+							"bytes": 3200,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "59b18bd3b2cc9306ce8884b433471f3559c22e445a9538d521c6fbebdbfe5f19",
+							"secondSha256": "59b18bd3b2cc9306ce8884b433471f3559c22e445a9538d521c6fbebdbfe5f19"
+						}
+					]
+				},
+				{
+					"sourceFrame": 81,
+					"planes": [
+						{
+							"plane": "Luma",
+							"bytes": 6400,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "dcf4f41bd8f88a6b960336c4df2e0346b7860925326a0bd086980cfdb3d223a0",
+							"secondSha256": "dcf4f41bd8f88a6b960336c4df2e0346b7860925326a0bd086980cfdb3d223a0"
+						},
+						{
+							"plane": "Chroma",
+							"bytes": 3200,
+							"differentBytes": 0,
+							"maxDifference": 0,
+							"firstSha256": "6e1b237d50e1815d21a8d3bd6d47f79b01c16a1e5bcedea4dc4046db3957f042",
+							"secondSha256": "6e1b237d50e1815d21a8d3bd6d47f79b01c16a1e5bcedea4dc4046db3957f042"
+						}
+					]
+				}
+			]
+		}
+	],
+	"ffmpegLog": "display early 110 libavcodec=4002660\ndisplay late 110 libavcodec=4002660\ndisplay software 110 libavcodec=4002660\ncamera early 110 libavcodec=4002660\ncamera late 110 libavcodec=4002660\ncamera software 110 libavcodec=4002660\n",
+	"avLog": "display sized 110\ndisplay native 110\ncamera sized 110\ncamera native 110\n"
+}

@@ -1,0 +1,6 @@
+display early 110 libavcodec=4002660
+display late 110 libavcodec=4002660
+display software 110 libavcodec=4002660
+camera early 110 libavcodec=4002660
+camera late 110 libavcodec=4002660
+camera software 110 libavcodec=4002660

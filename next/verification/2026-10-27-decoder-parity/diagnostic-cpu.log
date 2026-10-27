@@ -1,0 +1,82 @@
+DIAGNOSTIC SAMPLING ONLY: composed equality assertions temporarily replaced with file snapshots; these statuses are not acceptance passes. Product source was restored before strict tests.
+
+
+running 1 test
+test preparing_preview::native_tests::native_preparing_matches_default_avasset_editor_decoder ... [dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/display/init.mp4' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/display/segment_001.m4s.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/display/master.m3u8.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/display/segment_002.m4s.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/display/segment_003.m4s.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/display/segment_004.m4s.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/display/segment_005.m4s.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/camera/init.mp4' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/camera/segment_001.m4s.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/camera/master.m3u8.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/camera/segment_002.m4s.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/camera/segment_003.m4s.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/camera/segment_004.m4s.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/camera/segment_005.m4s.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/camera/segment_006.m4s.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x133e5e000] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpfpTqBi/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/display/init.mp4' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/display/segment_001.m4s.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/display/master.m3u8.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/display/segment_002.m4s.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/display/segment_003.m4s.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/display/segment_004.m4s.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/display/segment_005.m4s.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/display/dash_manifest.mpd.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/display/media_0.m3u8.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/camera/init.mp4' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/camera/segment_001.m4s.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/camera/master.m3u8.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/camera/segment_002.m4s.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/camera/segment_003.m4s.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/camera/segment_004.m4s.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/camera/segment_005.m4s.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/camera/media_0.m3u8.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/camera/segment_006.m4s.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/camera/dash_manifest.mpd.tmp' for writing
+[dash @ 0x133eb0a10] Opening '/var/folders/ny/7c7zw83d0ws4tw65jbmpfhqr0000gn/T/.tmpYz9tvV/original/camera/media_0.m3u8.tmp' for writing
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 192 filtered out; finished in 1.42s
+

@@ -1,0 +1,14 @@
+[
+	{
+		"track": "display",
+		"avHex": "014d0015ffe1000f274d0015ab41823c232cd40404040801000428ee3c80",
+		"ffmpegHex": "014d0015ffe1000f274d0015ab41823c232cd40404040801000428ee3c80",
+		"differentBytes": []
+	},
+	{
+		"track": "camera",
+		"avHex": "014d000dffe1000f274d000dab4186f07313350101010201000428ee3c80",
+		"ffmpegHex": "014d000dffe1000f274d000dab4186f07313350101010201000428ee3c80",
+		"differentBytes": []
+	}
+]

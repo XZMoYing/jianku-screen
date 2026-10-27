@@ -1,0 +1,130 @@
+[
+	{
+		"track": "display",
+		"frame": 0,
+		"variant": "sized",
+		"sourceIndex": 7,
+		"differentUvBytes": 4,
+		"maxUvDifference": 4
+	},
+	{
+		"track": "display",
+		"frame": 0,
+		"variant": "native",
+		"sourceIndex": 7,
+		"differentUvBytes": 4,
+		"maxUvDifference": 4
+	},
+	{
+		"track": "display",
+		"frame": 12,
+		"variant": "sized",
+		"sourceIndex": 19,
+		"differentUvBytes": 40,
+		"maxUvDifference": 8
+	},
+	{
+		"track": "display",
+		"frame": 12,
+		"variant": "native",
+		"sourceIndex": 19,
+		"differentUvBytes": 40,
+		"maxUvDifference": 8
+	},
+	{
+		"track": "display",
+		"frame": 45,
+		"variant": "sized",
+		"sourceIndex": 52,
+		"differentUvBytes": 0,
+		"maxUvDifference": 0
+	},
+	{
+		"track": "display",
+		"frame": 45,
+		"variant": "native",
+		"sourceIndex": 52,
+		"differentUvBytes": 0,
+		"maxUvDifference": 0
+	},
+	{
+		"track": "display",
+		"frame": 90,
+		"variant": "sized",
+		"sourceIndex": 97,
+		"differentUvBytes": 12,
+		"maxUvDifference": 4
+	},
+	{
+		"track": "display",
+		"frame": 90,
+		"variant": "native",
+		"sourceIndex": 97,
+		"differentUvBytes": 12,
+		"maxUvDifference": 4
+	},
+	{
+		"track": "camera",
+		"frame": 0,
+		"variant": "sized",
+		"sourceIndex": 9,
+		"differentUvBytes": 148,
+		"maxUvDifference": 3
+	},
+	{
+		"track": "camera",
+		"frame": 0,
+		"variant": "native",
+		"sourceIndex": 9,
+		"differentUvBytes": 148,
+		"maxUvDifference": 3
+	},
+	{
+		"track": "camera",
+		"frame": 12,
+		"variant": "sized",
+		"sourceIndex": 18,
+		"differentUvBytes": 80,
+		"maxUvDifference": 4
+	},
+	{
+		"track": "camera",
+		"frame": 12,
+		"variant": "native",
+		"sourceIndex": 18,
+		"differentUvBytes": 80,
+		"maxUvDifference": 4
+	},
+	{
+		"track": "camera",
+		"frame": 45,
+		"variant": "sized",
+		"sourceIndex": 45,
+		"differentUvBytes": 182,
+		"maxUvDifference": 4
+	},
+	{
+		"track": "camera",
+		"frame": 45,
+		"variant": "native",
+		"sourceIndex": 45,
+		"differentUvBytes": 182,
+		"maxUvDifference": 4
+	},
+	{
+		"track": "camera",
+		"frame": 90,
+		"variant": "sized",
+		"sourceIndex": 81,
+		"differentUvBytes": 100,
+		"maxUvDifference": 5
+	},
+	{
+		"track": "camera",
+		"frame": 90,
+		"variant": "native",
+		"sourceIndex": 81,
+		"differentUvBytes": 100,
+		"maxUvDifference": 5
+	}
+]

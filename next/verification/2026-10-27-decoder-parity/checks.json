@@ -1,0 +1,37 @@
+{
+	"baselineCommit": "cb42e8bb18a3fe2b18cd9f82695ef3644d50f10a",
+	"productSourceUnchanged": true,
+	"productVersion": "0.2.0-alpha.37",
+	"productMainSha256": "65636e03b17e5024a5a8e8eaf541d992b31d212d0a00d4c907f20ba494138b0f",
+	"strictAdhocSignature": true,
+	"restoredNativeTests": {
+		"passed": 15,
+		"failed": 2,
+		"failedFingerprintsMatchAlpha37": true,
+		"strictPixelAssertionsRetained": true
+	},
+	"pixelUploadComparisons": {
+		"pairs": 16,
+		"differentBytes": 0,
+		"scope": "Four timeline positions; PNG/SVG cursors; actual and reference outputs; CPU materialization vs retained IOSurface"
+	},
+	"standaloneReproduction": {
+		"framesPerTrack": 110,
+		"tracks": 2,
+		"initializationTimingVariants": 2,
+		"softwareVariant": true,
+		"rerunFromCommittedHelperSources": true,
+		"scope": "Diagnostic, no tolerance-based pass classification"
+	},
+	"rustCheck": true,
+	"rustFmt": true,
+	"fullLocalizationAuditComplete": false,
+	"releaseAuditComplete": false,
+	"physicalAcceptance": false,
+	"newAppPackageBuilt": false,
+	"diagnosticCodeRemovedFromProduct": true,
+	"markdownLinksChecked": 191,
+	"pythonCompile": true,
+	"jsonBiome": true,
+	"installedAppOpenedAndWindowDetected": true
+}

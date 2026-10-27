@@ -1,0 +1,218 @@
+[
+	{
+		"track": "display",
+		"frame": 0,
+		"variant": "default",
+		"sourceIndex": 7,
+		"differentFromFfmpeg": 4,
+		"maxFfmpegDifference": 4,
+		"differentFromAv": 0
+	},
+	{
+		"track": "display",
+		"frame": 0,
+		"variant": "software",
+		"sourceIndex": 7,
+		"differentFromFfmpeg": 4,
+		"maxFfmpegDifference": 4,
+		"differentFromAv": 0
+	},
+	{
+		"track": "display",
+		"frame": 0,
+		"variant": "hardware",
+		"sourceIndex": 7,
+		"differentFromFfmpeg": 4,
+		"maxFfmpegDifference": 4,
+		"differentFromAv": 0
+	},
+	{
+		"track": "display",
+		"frame": 12,
+		"variant": "default",
+		"sourceIndex": 19,
+		"differentFromFfmpeg": 40,
+		"maxFfmpegDifference": 8,
+		"differentFromAv": 0
+	},
+	{
+		"track": "display",
+		"frame": 12,
+		"variant": "software",
+		"sourceIndex": 19,
+		"differentFromFfmpeg": 40,
+		"maxFfmpegDifference": 8,
+		"differentFromAv": 0
+	},
+	{
+		"track": "display",
+		"frame": 12,
+		"variant": "hardware",
+		"sourceIndex": 19,
+		"differentFromFfmpeg": 40,
+		"maxFfmpegDifference": 8,
+		"differentFromAv": 0
+	},
+	{
+		"track": "display",
+		"frame": 45,
+		"variant": "default",
+		"sourceIndex": 52,
+		"differentFromFfmpeg": 0,
+		"maxFfmpegDifference": 0,
+		"differentFromAv": 0
+	},
+	{
+		"track": "display",
+		"frame": 45,
+		"variant": "software",
+		"sourceIndex": 52,
+		"differentFromFfmpeg": 0,
+		"maxFfmpegDifference": 0,
+		"differentFromAv": 0
+	},
+	{
+		"track": "display",
+		"frame": 45,
+		"variant": "hardware",
+		"sourceIndex": 52,
+		"differentFromFfmpeg": 0,
+		"maxFfmpegDifference": 0,
+		"differentFromAv": 0
+	},
+	{
+		"track": "display",
+		"frame": 90,
+		"variant": "default",
+		"sourceIndex": 97,
+		"differentFromFfmpeg": 12,
+		"maxFfmpegDifference": 4,
+		"differentFromAv": 0
+	},
+	{
+		"track": "display",
+		"frame": 90,
+		"variant": "software",
+		"sourceIndex": 97,
+		"differentFromFfmpeg": 12,
+		"maxFfmpegDifference": 4,
+		"differentFromAv": 0
+	},
+	{
+		"track": "display",
+		"frame": 90,
+		"variant": "hardware",
+		"sourceIndex": 97,
+		"differentFromFfmpeg": 12,
+		"maxFfmpegDifference": 4,
+		"differentFromAv": 0
+	},
+	{
+		"track": "camera",
+		"frame": 0,
+		"variant": "default",
+		"sourceIndex": 9,
+		"differentFromFfmpeg": 148,
+		"maxFfmpegDifference": 3,
+		"differentFromAv": 0
+	},
+	{
+		"track": "camera",
+		"frame": 0,
+		"variant": "software",
+		"sourceIndex": 9,
+		"differentFromFfmpeg": 148,
+		"maxFfmpegDifference": 3,
+		"differentFromAv": 0
+	},
+	{
+		"track": "camera",
+		"frame": 0,
+		"variant": "hardware",
+		"sourceIndex": 9,
+		"differentFromFfmpeg": 148,
+		"maxFfmpegDifference": 3,
+		"differentFromAv": 0
+	},
+	{
+		"track": "camera",
+		"frame": 12,
+		"variant": "default",
+		"sourceIndex": 18,
+		"differentFromFfmpeg": 80,
+		"maxFfmpegDifference": 4,
+		"differentFromAv": 0
+	},
+	{
+		"track": "camera",
+		"frame": 12,
+		"variant": "software",
+		"sourceIndex": 18,
+		"differentFromFfmpeg": 80,
+		"maxFfmpegDifference": 4,
+		"differentFromAv": 0
+	},
+	{
+		"track": "camera",
+		"frame": 12,
+		"variant": "hardware",
+		"sourceIndex": 18,
+		"differentFromFfmpeg": 80,
+		"maxFfmpegDifference": 4,
+		"differentFromAv": 0
+	},
+	{
+		"track": "camera",
+		"frame": 45,
+		"variant": "default",
+		"sourceIndex": 45,
+		"differentFromFfmpeg": 182,
+		"maxFfmpegDifference": 4,
+		"differentFromAv": 0
+	},
+	{
+		"track": "camera",
+		"frame": 45,
+		"variant": "software",
+		"sourceIndex": 45,
+		"differentFromFfmpeg": 182,
+		"maxFfmpegDifference": 4,
+		"differentFromAv": 0
+	},
+	{
+		"track": "camera",
+		"frame": 45,
+		"variant": "hardware",
+		"sourceIndex": 45,
+		"differentFromFfmpeg": 182,
+		"maxFfmpegDifference": 4,
+		"differentFromAv": 0
+	},
+	{
+		"track": "camera",
+		"frame": 90,
+		"variant": "default",
+		"sourceIndex": 81,
+		"differentFromFfmpeg": 100,
+		"maxFfmpegDifference": 5,
+		"differentFromAv": 0
+	},
+	{
+		"track": "camera",
+		"frame": 90,
+		"variant": "software",
+		"sourceIndex": 81,
+		"differentFromFfmpeg": 100,
+		"maxFfmpegDifference": 5,
+		"differentFromAv": 0
+	},
+	{
+		"track": "camera",
+		"frame": 90,
+		"variant": "hardware",
+		"sourceIndex": 81,
+		"differentFromFfmpeg": 100,
+		"maxFfmpegDifference": 5,
+		"differentFromAv": 0
+	}
+]

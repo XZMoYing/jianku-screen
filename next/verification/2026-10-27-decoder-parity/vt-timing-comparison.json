@@ -1,0 +1,38 @@
+[
+	{
+		"track": "display",
+		"variant": "untimed",
+		"differentFromAv": 0,
+		"differentFromFfmpeg": 4
+	},
+	{
+		"track": "display",
+		"variant": "unsized",
+		"differentFromAv": 0,
+		"differentFromFfmpeg": 4
+	},
+	{
+		"track": "display",
+		"variant": "no-timing-sizes",
+		"differentFromAv": 0,
+		"differentFromFfmpeg": 4
+	},
+	{
+		"track": "camera",
+		"variant": "untimed",
+		"differentFromAv": 0,
+		"differentFromFfmpeg": 148
+	},
+	{
+		"track": "camera",
+		"variant": "unsized",
+		"differentFromAv": 0,
+		"differentFromFfmpeg": 148
+	},
+	{
+		"track": "camera",
+		"variant": "no-timing-sizes",
+		"differentFromAv": 0,
+		"differentFromFfmpeg": 148
+	}
+]
