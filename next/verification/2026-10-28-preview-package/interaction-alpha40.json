@@ -1,0 +1,60 @@
+{
+	"version": "0.2.0-alpha.40",
+	"sourceCommit": "ab34b41c36aa2438387811bf99c1f805f367b136",
+	"actualDimensions": [
+		{
+			"case": "large-initial",
+			"size": [1280, 720],
+			"actualFrameReceived": true,
+			"packetReport": "large-initial-frame.json"
+		},
+		{
+			"case": "large-144p",
+			"size": [256, 144],
+			"actualFrameReceived": true,
+			"packetReport": "large-144p-frame.json"
+		},
+		{
+			"case": "large-2k",
+			"size": [2560, 1440],
+			"actualFrameReceived": true,
+			"packetReport": "large-2k-frame.json"
+		},
+		{
+			"case": "large-4k",
+			"size": [3840, 2160],
+			"actualFrameReceived": true,
+			"packetReport": "large-4k-frame.json"
+		},
+		{
+			"case": "large-original",
+			"size": [4272, 2402],
+			"actualFrameReceived": true,
+			"packetReport": "large-original-frame.json"
+		},
+		{
+			"case": "small-ceiling",
+			"size": [712, 400],
+			"actualFrameReceived": true,
+			"packetReport": "small-ceiling-frame.json"
+		}
+	],
+	"playbackObservedFrame": 534,
+	"uiExportComparison": {
+		"report": "export-comparison.json",
+		"previewQualities": ["720p", "144p"],
+		"framesCompared": 540,
+		"allDecodedFramesAndPcmIdentical": true
+	},
+	"preferenceRegression": {
+		"requested": "2160p",
+		"observed": "original",
+		"effectiveLabel": "原始清晰度"
+	},
+	"preferenceBugFixedInSource": "0b99a05126727c52ec69dfb357218ea5175c7c8f",
+	"higherPreferenceRetentionPassed": false,
+	"actualQualityDropdownSelectionVerified": false,
+	"foregroundGuard": "Global mouse input stopped because foreground is com.apple.UserNotificationCenter; no guard relaxed or system alert acted upon. Background AX buttons and native SavePanel actions worked.",
+	"fullFeatureComplete": false,
+	"replacedBy": "alpha.41 must be tested before final handoff"
+}

@@ -1,0 +1,35 @@
+{
+	"current": "0.2.0-alpha.41",
+	"previousStable": "0.2.0-alpha.39",
+	"beforeAvailableBytes": 73086599168,
+	"removed": [
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.38/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.38",
+			"sha256": "25311e7a64b040b6294f5d3d9c88011a26430f6de396eb528bad3b0c87fc2973",
+			"logicalBytes": 315713627
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.40/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.40",
+			"sha256": "403c7119d2f8364e8e0128af8ea31ef2124a0d29cb9280e877d38828bd2725c2",
+			"logicalBytes": 315984315
+		},
+		{
+			"path": "/Applications/.jianku-next-update-Z5NzD1/previous.app",
+			"version": "0.2.0-alpha.39",
+			"sha256": "9419e30b49a935f8498c21714d643eaecea5c73fbc240f256d2af00db1f9d9d4",
+			"logicalBytes": 315838347
+		},
+		{
+			"path": "/Applications/.jianku-next-update-sNJ3bS/previous.app",
+			"version": "0.2.0-alpha.40",
+			"sha256": "403c7119d2f8364e8e0128af8ea31ef2124a0d29cb9280e877d38828bd2725c2",
+			"logicalBytes": 315984315
+		}
+	],
+	"preserved": "all .jks projects and media, current/previous stable apps, source/Git/native dependencies, diagnostic evidence and build cache",
+	"afterAvailableBytes": 74254610432,
+	"availableByteDelta": 1168011264,
+	"logicalBytesRemoved": 1263520604
+}

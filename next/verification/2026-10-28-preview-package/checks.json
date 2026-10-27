@@ -1,0 +1,59 @@
+{
+	"version": "0.2.0-alpha.41",
+	"build": "2026.41.0",
+	"sourceCommit": "0b99a05126727c52ec69dfb357218ea5175c7c8f",
+	"artifactAndBoundedRuntimeChecksPassed": true,
+	"fullU04FeatureComplete": false,
+	"fullReleaseAuditComplete": false,
+	"threeBundlesSixBinaryHashesAndStrictSignaturesMatch": true,
+	"signature": "ad-hoc; no Developer ID or notarization",
+	"actualAlpha40DimensionCases": 6,
+	"actualAlpha41DimensionCases": 3,
+	"oldPreferenceRegressionPreserved": "small-preference-observed.json",
+	"alpha41HigherPreferenceRetained": true,
+	"uiExportComparisons": {
+		"reports": ["export-comparison.json", "export-comparison-alpha41.json"],
+		"pairedFrames": 1080,
+		"allDecodedFramesAndPcmIdentical": true
+	},
+	"frontendTests": 19,
+	"typescriptCheck": true,
+	"fullReleaseFrontend": true,
+	"formatting": true,
+	"previewPreferenceRestored": "720p",
+	"exportPreferencesRestored": {
+		"resolution": "1080p",
+		"compression": "Social",
+		"optimizeFilesize": true
+	},
+	"foregroundObservation": {
+		"foregroundBundle": "com.apple.UserNotificationCenter",
+		"targetForeground": false
+	},
+	"pending": [
+		"actual menu selections and disabled options",
+		"direct preview-quality changes during playback",
+		"U05 fullscreen",
+		"full Chinese/localization inventory and fixes",
+		"file/process/privacy/network/dependency audit",
+		"Windows/Linux target builds and runtime tests",
+		"two existing strict decoder chroma failures and actual display timing",
+		"physical device/display/conference acceptance remains deferred"
+	],
+	"cleanupAvailableByteDelta": 1168011264,
+	"cleanupLogicalBytes": 1263520604,
+	"usageAtWrapUsedPercent": 94,
+	"sourceSha256": {
+		"apps/desktop/src/routes/editor/Player.tsx": "3c0382df9d310f028944bdef32ee280c3597c1db58096deeb883090099695ef4",
+		"apps/desktop/src-tauri/tauri.jianku.conf.json": "3550588594150f3892b804e12c9096158b55c03ace662d2a4248dd2ff1207aa1"
+	},
+	"qaScriptSha256": {
+		"set-preference.py": "1b11fd79f65a4420802e8df01eba77cd1a1a0cce972615b6b9fbb629b1c6a448",
+		"ui.py": "04dc0676f3e492166bd66f9ab008c0c8adfe8fe5d490289d684f12fc55987cee",
+		"compare-exports.py": "f51f99737e3a6a437d90145ec639b962a97061042ea82c1c116afb79a2097c3a",
+		"capture-preview.mjs": "e4243227d179d1423b8aea62540b2ae7b09de45f86971bca52f0ee94c2b42d92",
+		"check-bundles.py": "5df204061d16635a3d62fba3692953da1c796209559a2a07294b3dcf54e03ae7",
+		"ax-control.swift": "49d8d6970a4cb19f9f910d4c2776c11a64a651102acecfd06cd1753236031115",
+		"windows.swift": "33aec6b203333f207659924e53912a61be27603c2ea904a90790bc6790606db5"
+	}
+}

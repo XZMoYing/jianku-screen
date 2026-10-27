@@ -1,0 +1,51 @@
+{
+	"sourceCommit": "0b99a05126727c52ec69dfb357218ea5175c7c8f",
+	"bundles": [
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/release/bundle/macos/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.41",
+			"build": "2026.41.0",
+			"binaries": {
+				"Jianku Screen Next": "2fdd1a299b2123e5a531e87d92f47223734da3e778eef911b958a8a036e96e9f",
+				"cap-cli": "83fcf46281101b2777f06cf24baec224a2d7480353436c6f16391fc4a864783b",
+				"cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+				"cap-exporter": "a51b8416bb9a63219f2f7e316e2e64d64cc24be7049e6ada538c537ecdc329b9",
+				"jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+				"jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+			},
+			"strictSignature": true,
+			"signature": "ad-hoc; no Developer ID or notarization"
+		},
+		{
+			"path": "/Applications/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.41",
+			"build": "2026.41.0",
+			"binaries": {
+				"Jianku Screen Next": "2fdd1a299b2123e5a531e87d92f47223734da3e778eef911b958a8a036e96e9f",
+				"cap-cli": "83fcf46281101b2777f06cf24baec224a2d7480353436c6f16391fc4a864783b",
+				"cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+				"cap-exporter": "a51b8416bb9a63219f2f7e316e2e64d64cc24be7049e6ada538c537ecdc329b9",
+				"jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+				"jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+			},
+			"strictSignature": true,
+			"signature": "ad-hoc; no Developer ID or notarization"
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.41/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.41",
+			"build": "2026.41.0",
+			"binaries": {
+				"Jianku Screen Next": "2fdd1a299b2123e5a531e87d92f47223734da3e778eef911b958a8a036e96e9f",
+				"cap-cli": "83fcf46281101b2777f06cf24baec224a2d7480353436c6f16391fc4a864783b",
+				"cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+				"cap-exporter": "a51b8416bb9a63219f2f7e316e2e64d64cc24be7049e6ada538c537ecdc329b9",
+				"jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+				"jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+			},
+			"strictSignature": true,
+			"signature": "ad-hoc; no Developer ID or notarization"
+		}
+	],
+	"passed": true
+}

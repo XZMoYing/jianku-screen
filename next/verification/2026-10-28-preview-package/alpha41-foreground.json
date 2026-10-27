@@ -1,0 +1,4 @@
+{
+	"foregroundBundle": "com.apple.UserNotificationCenter",
+	"targetForeground": false
+}

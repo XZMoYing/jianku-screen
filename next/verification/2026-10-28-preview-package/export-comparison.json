@@ -1,0 +1,64 @@
+{
+	"left": {
+		"path": "/private/tmp/jianku-preview-package/gui-preview-720p.mp4",
+		"movieSha256": "e23f79b7a1b9f1e6beef69259125cd43f8f9eacbd049f1dfcaeb84dffda2a531",
+		"probe": {
+			"programs": [],
+			"stream_groups": [],
+			"streams": [
+				{
+					"codec_name": "h264",
+					"codec_type": "video",
+					"width": 1280,
+					"height": 720,
+					"r_frame_rate": "60/1",
+					"nb_frames": "540"
+				},
+				{
+					"codec_name": "aac",
+					"codec_type": "audio",
+					"r_frame_rate": "0/0",
+					"nb_frames": "423"
+				}
+			],
+			"format": {
+				"duration": "9.000000"
+			}
+		},
+		"pcmSha256": "dc745dc32274dbeebce5e335bfc83566d686d064f4b63274bf24f77d9ea54f81",
+		"pcmBytes": 3456000
+	},
+	"right": {
+		"path": "/private/tmp/jianku-preview-package/gui-preview-144p.mp4",
+		"movieSha256": "e23f79b7a1b9f1e6beef69259125cd43f8f9eacbd049f1dfcaeb84dffda2a531",
+		"probe": {
+			"programs": [],
+			"stream_groups": [],
+			"streams": [
+				{
+					"codec_name": "h264",
+					"codec_type": "video",
+					"width": 1280,
+					"height": 720,
+					"r_frame_rate": "60/1",
+					"nb_frames": "540"
+				},
+				{
+					"codec_name": "aac",
+					"codec_type": "audio",
+					"r_frame_rate": "0/0",
+					"nb_frames": "423"
+				}
+			],
+			"format": {
+				"duration": "9.000000"
+			}
+		},
+		"pcmSha256": "dc745dc32274dbeebce5e335bfc83566d686d064f4b63274bf24f77d9ea54f81",
+		"pcmBytes": 3456000
+	},
+	"framesCompared": 540,
+	"changedFrames": [],
+	"samePcm": true,
+	"passed": true
+}
