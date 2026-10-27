@@ -1,0 +1,22 @@
+{
+	"date": "2026-10-27T22:31:00.016094+08:00",
+	"baseCommit": "fce4fb740167f0eeca3e5994651884b60c197eee",
+	"workingPatchSha256": "12435cac6723b7f21a9aa48880d3018ad0f2ab72830508e7f5f36224cf26066d",
+	"scope": "Current working tree including 10 pre-existing in-session implementation changes; not a clean original-HEAD baseline.",
+	"rustc": "rustc 1.88.0 (6b00bc388 2025-06-23)",
+	"checks": {
+		"rustFmt": "passed",
+		"desktopReleaseCheck": "passed",
+		"configurationWriteTests": 4,
+		"producerTimestampTests": 1,
+		"frontendTests": 34,
+		"frontendStaticBuild": "passed",
+		"scriptBiome": "passed",
+		"markdownLocalChecks": 5
+	},
+	"knownFailuresNotClosed": [
+		"Two existing strict preparing-preview hardware chroma parity failures; previous native baseline 15 passed / 2 failed. Not rerun or waived by this scoped check."
+	],
+	"application": "Installed alpha.37 unchanged; no new application delivered by this setup checkpoint.",
+	"logSha256": "d7caa9146b30c21658a5a4472ead1e31e424e610debecfa84ebbb4178f7b92e9"
+}
