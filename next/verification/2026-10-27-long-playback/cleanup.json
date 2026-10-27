@@ -1,0 +1,37 @@
+{
+	"ownedProcessesStopped": true,
+	"productionTrackedSourcesUnchanged": true,
+	"objectsRemoved": 277,
+	"objectsAllocatedBytes": 135417856,
+	"exampleArtifacts": [
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/release/examples/long_project_check-2c44fb6ca9f8e92e.d",
+			"bytes": 410
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/release/examples/long-project-check.d",
+			"bytes": 28731
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/release/examples/long_project_check-2c44fb6ca9f8e92e",
+			"bytes": 21032096
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/release/examples/long_project_check-223660f0eb35768b.d",
+			"bytes": 576
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/release/examples/long-project-check",
+			"bytes": 21032096
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/release/examples/long_project_check-44b9858a5098ff9b.d",
+			"bytes": 419
+		}
+	],
+	"ownedTemporaryDirectoryRemoved": "/private/tmp/jianku-decode-stability",
+	"freeBytesBefore": 88561610752,
+	"freeBytesAfter": 89905164288,
+	"observedFreeDeltaBytes": 1343553536,
+	"retained": "Current and previous application packages, installed running application, native runtime/dependency cache, source/Git, all user projects; only this task synthetic data and completed intermediates removed"
+}

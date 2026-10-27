@@ -1,0 +1,60 @@
+{
+	"files": [
+		{
+			"name": "base.wav",
+			"bytes": 1920044,
+			"sha256": "f9da0eef12404ad57166cde6965c1e0487de7432364edc381b68500584f3a0cd"
+		},
+		{
+			"name": "camera-cycle.mp4",
+			"bytes": 141887,
+			"sha256": "1d901b4818099ae52e4a40b0f44c05674c720cb30a47acc6251b8f7d5912e997"
+		},
+		{
+			"name": "camera.mp4",
+			"bytes": 126933337,
+			"sha256": "f7ecf3838618b0c97c038c52efa25f8370b2c9008fb93313698a0cd68dfbaf23"
+		},
+		{
+			"name": "cycle.mp4",
+			"bytes": 474532,
+			"sha256": "f219ab7f5a7a29cd9ff6e38e0d1bd226d1c654811180e8b71bbbf3e9afb40dac"
+		},
+		{
+			"name": "display.mp4",
+			"bytes": 426316544,
+			"sha256": "7b7e37396b47f2203297ef9240d8654f98251863916eab7fa7e6085edc085aa9"
+		},
+		{
+			"name": "fast.wav",
+			"bytes": 1920044,
+			"sha256": "448db0120aafaf50e8387e0bdb9c1d3c141bf004ca3f767eaf36764eee264ad6"
+		},
+		{
+			"name": "normal.wav",
+			"bytes": 1920044,
+			"sha256": "7c2207dfbbd16137ec5822c0a66fe0bd7f4e0b63b53890e9acabb7d37e5155cc"
+		},
+		{
+			"name": "slow.wav",
+			"bytes": 1920044,
+			"sha256": "5c2e050e2c8cc362dfe28490d011d21440b3849ec37bb44daf5a6a1b92655909"
+		},
+		{
+			"name": "wallpaper.mp4",
+			"bytes": 215803,
+			"sha256": "1becd33826d8506a74c80fe5e540c06c40c12152f36325595ef59bb7eacb721b"
+		}
+	],
+	"sourceDurationSeconds": 3600,
+	"sourceFps": 30,
+	"displaySize": [1280, 720],
+	"cameraSize": [160, 160],
+	"projectMinutes": [10, 30, 60],
+	"environment": {
+		"macOS": "14.7.4",
+		"cpu": "Apple M1",
+		"memoryBytes": 17179869184,
+		"ffmpeg": "ffmpeg version 9.0.2 Copyright (c) 2000-2026 the FFmpeg developers"
+	}
+}

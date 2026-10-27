@@ -1,0 +1,20 @@
+{
+	"changedProduct": false,
+	"candidate": "Copy compressed CMBlockBuffer into owned storage and specify sample size before VT decode",
+	"effect": "Difference remains in sampled chroma planes",
+	"samples": [
+		{
+			"track": "screen",
+			"sourceFrame": 7,
+			"differentChromaBytes": 4,
+			"maxDifference": 4
+		},
+		{
+			"track": "camera",
+			"sourceFrame": 9,
+			"differentChromaBytes": 148,
+			"maxDifference": 3
+		}
+	],
+	"scope": "Small original synthetic inputs from prior investigation; no quality compensation, decoder-policy change or assertion relaxation."
+}

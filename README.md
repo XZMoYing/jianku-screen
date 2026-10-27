@@ -1,6 +1,6 @@
 # 简库镜传 · Jianku Screen
 
-当前阶段为 `0.2.0-alpha.37`：补齐动态轨道、3D 镜头与加载界面的中文，修正构建链路由解析错误，并区分准备预览测试的解码配置。保留全部视觉效果，实际中文界面、完整导出及当前/上一版回滚已核对；另有两项 AVAssetReader 画面差异继续待办。见 [alpha.37 记录](next/verification/2026-10-26-alpha37-localization-preview/README.md)。2026-10-27 已用独立程序进一步定位到内置 FFmpeg VideoToolbox 解码的色度差异，严格失败仍保留；应用继续 alpha.37，见 [解码调查](next/verification/2026-10-27-decoder-parity/README.md)。下方早期说明保留作历史参考。
+当前阶段为 `0.2.0-alpha.37`：补齐动态轨道、3D 镜头与加载界面的中文，修正构建链路由解析错误，并区分准备预览测试的解码配置。保留全部视觉效果，实际中文界面、完整导出及当前/上一版回滚已核对；另有两项 AVAssetReader 画面差异继续待办。见 [alpha.37 记录](next/verification/2026-10-26-alpha37-localization-preview/README.md)。2026-10-27 已用独立程序进一步定位到内置 FFmpeg VideoToolbox 解码的色度差异，严格失败仍保留；应用继续 alpha.37，见 [解码调查](next/verification/2026-10-27-decoder-parity/README.md)。另新增 [10/30/60 分钟工程抽样检查](next/verification/2026-10-27-long-playback/README.md)，操作通过，偶发时序离群点继续跟踪。下方早期说明保留作历史参考。
 
 macOS 录屏与实时演示工具。录制画面经由**指针平滑、自动/手动焦点缩放、画面包装与动态模糊**处理，
 输出成片；同一套外观定义也用于实时演示输出（第二屏 / 会议软件可选的共享窗口）。

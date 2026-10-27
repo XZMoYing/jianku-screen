@@ -1,0 +1,60 @@
+{
+	"cases": [
+		{
+			"minutes": 10,
+			"targetFps": 60,
+			"windows": 6,
+			"phaseChecks": 617,
+			"sampledWindowFrames": 819,
+			"maxAbsNativeTransitionOffsetMs": 12.596471000000165,
+			"peakSampledProcessRssBytes": 358301696,
+			"naturalEnd": true
+		},
+		{
+			"minutes": 30,
+			"targetFps": 60,
+			"windows": 6,
+			"phaseChecks": 614,
+			"sampledWindowFrames": 810,
+			"maxAbsNativeTransitionOffsetMs": 142.3827089999996,
+			"peakSampledProcessRssBytes": 158138368,
+			"naturalEnd": true
+		},
+		{
+			"minutes": 60,
+			"targetFps": 60,
+			"windows": 6,
+			"phaseChecks": 609,
+			"sampledWindowFrames": 812,
+			"maxAbsNativeTransitionOffsetMs": 51.85264300000014,
+			"peakSampledProcessRssBytes": 162103296,
+			"naturalEnd": true
+		}
+	],
+	"allFunctionalChecksPassed": true,
+	"performanceAcceptanceComplete": false,
+	"timingOutliers": [
+		{
+			"run": "first-pass",
+			"minutes": 60,
+			"window": "rewind-replay-2",
+			"offsetMs": 143.43799699999948
+		},
+		{
+			"run": "guarded-reproduction",
+			"minutes": 30,
+			"window": "rewind-replay-1",
+			"offsetMs": 142.3827089999996
+		},
+		{
+			"run": "guarded-reproduction",
+			"minutes": 60,
+			"window": "rewind-replay-0",
+			"offsetMs": 51.85264300000014
+		}
+	],
+	"sourcePhaseTolerance": 3.0,
+	"audioLevelTolerance": 0.004,
+	"coarseTransitionAssociationGuardMs": 150,
+	"scope": "Phase identification on periodic synthetic sources; 150ms is a coarse checker guard, not product acceptance. Original exact RGBA parity assertions are unchanged."
+}

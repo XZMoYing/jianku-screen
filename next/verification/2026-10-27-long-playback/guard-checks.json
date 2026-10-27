@@ -1,0 +1,8 @@
+{
+	"unmarkedProjectRejected": true,
+	"existingReportPreserved": true,
+	"stderr": [
+		"Error: \"Only generated long-project fixtures are supported: No such file or directory (os error 2)\"",
+		"Error: \"Choose a new output report path\""
+	]
+}
