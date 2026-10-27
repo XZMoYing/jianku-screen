@@ -1,0 +1,69 @@
+{
+	"sourceCommit": "414969023fa06535583bd368b459f1066634d2c9",
+	"bundles": [
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/release/bundle/macos/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.38",
+			"build": "2026.38.0",
+			"binaries": {
+				"Jianku Screen Next": "25311e7a64b040b6294f5d3d9c88011a26430f6de396eb528bad3b0c87fc2973",
+				"cap-cli": "682045873b6e67c54d558cd0d9e8c219c85d8bf2787eca30bebe9a5e2e106743",
+				"cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+				"cap-exporter": "8af4c68c0aa697cd56649129eef15df9715ad2b58eaf517972308890a1211435",
+				"jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+				"jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+			},
+			"strictSignature": true,
+			"signature": "ad-hoc; no Developer ID or notarization"
+		},
+		{
+			"path": "/Applications/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.38",
+			"build": "2026.38.0",
+			"binaries": {
+				"Jianku Screen Next": "25311e7a64b040b6294f5d3d9c88011a26430f6de396eb528bad3b0c87fc2973",
+				"cap-cli": "682045873b6e67c54d558cd0d9e8c219c85d8bf2787eca30bebe9a5e2e106743",
+				"cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+				"cap-exporter": "8af4c68c0aa697cd56649129eef15df9715ad2b58eaf517972308890a1211435",
+				"jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+				"jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+			},
+			"strictSignature": true,
+			"signature": "ad-hoc; no Developer ID or notarization"
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.38/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.38",
+			"build": "2026.38.0",
+			"binaries": {
+				"Jianku Screen Next": "25311e7a64b040b6294f5d3d9c88011a26430f6de396eb528bad3b0c87fc2973",
+				"cap-cli": "682045873b6e67c54d558cd0d9e8c219c85d8bf2787eca30bebe9a5e2e106743",
+				"cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+				"cap-exporter": "8af4c68c0aa697cd56649129eef15df9715ad2b58eaf517972308890a1211435",
+				"jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+				"jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+			},
+			"strictSignature": true,
+			"signature": "ad-hoc; no Developer ID or notarization"
+		}
+	],
+	"finalProject": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.38/安全保存与多轨示例.jks",
+	"previousVersion": "0.2.0-alpha.37",
+	"comparisonPassed": true,
+	"ordinaryLaunch": {
+		"pid": 48526,
+		"path": "/Applications/Jianku Screen Next.app",
+		"window": {
+			"bounds": {
+				"Height": 800,
+				"Width": 1275,
+				"X": 202,
+				"Y": 101
+			},
+			"id": 2613,
+			"name": "简库镜传 · 视频编辑",
+			"pid": 48526
+		},
+		"title": "安全保存与多轨示例"
+	}
+}

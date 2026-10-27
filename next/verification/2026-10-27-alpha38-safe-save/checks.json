@@ -1,0 +1,40 @@
+{
+	"application": "0.2.0-alpha.38",
+	"build": "2026.38.0",
+	"sourceCommit": "414969023fa06535583bd368b459f1066634d2c9",
+	"releaseBuild": "node scripts/jianku.mjs release passed",
+	"packagedUi": {
+		"passed": true,
+		"cases": 5,
+		"repeatRuns": 2,
+		"finalQuitFailureWaitSeconds": 7,
+		"persistentToastWaitSeconds": 9.2,
+		"nativeQuitCancellationLog": true
+	},
+	"export": {
+		"frames": 540,
+		"identicalDecodedFrames": 540,
+		"decodedPcmIdentical": true,
+		"fullDecodePassed": true,
+		"resolution": "1280x720",
+		"fps": 60,
+		"quality": "maximum",
+		"durationSeconds": 9
+	},
+	"signatures": "Source, installed and archive strict ad-hoc checks passed; no Developer ID/notarization",
+	"bundledBinariesCompared": 6,
+	"priorComponentTests": {
+		"project": 159,
+		"frontend": 39,
+		"evidence": "../2026-10-27-project-save/README.md"
+	},
+	"notRerunOrClosed": [
+		"Two existing strict hardware decoder chroma parity failures",
+		"Physical mobile/display/conference acceptance",
+		"Full Chinese localization and internal release audit",
+		"Windows/Linux runtime validation",
+		"3D comfort changes and fullscreen/resolution options are subsequent queue items"
+	],
+	"cleanupObservedFreeDeltaBytes": 3494023168,
+	"next": "U18 3D movement comfort"
+}

@@ -1,0 +1,36 @@
+{
+	"entries": [
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.36/Jianku Screen Next.app",
+			"logicalBytes": 315683419,
+			"kind": "obsolete alpha36 application only; project preserved"
+		},
+		{
+			"path": "/Applications/.jianku-next-update-JXackM/previous.app",
+			"logicalBytes": 315683355,
+			"kind": "verified alpha37 installation staging copy"
+		},
+		{
+			"path": "/private/tmp/jianku-timing-trace",
+			"logicalBytes": 2260998028,
+			"kind": "owned generated long fixtures and raw diagnostic temporaries; evidence already stored"
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/release",
+			"objects": 1962,
+			"logicalBytes": 2145081136,
+			"kind": "regenerable rcgu objects only; libraries/native runtime preserved"
+		}
+	],
+	"logicalBytes": 5037445938,
+	"observedFreeBeforeBytes": 84780646400,
+	"observedFreeAfterBytes": 88274669568,
+	"observedFreeDeltaBytes": 3494023168,
+	"preserved": [
+		"Current alpha38 and previous alpha37 applications",
+		"alpha36 多轨剪辑示例.jks and all other user projects",
+		"shared Git metadata",
+		"native libraries and current release outputs"
+	],
+	"note": "Logical sums count paths, including repeated hard links; APFS cloning and concurrent system activity mean they do not equal reclaimed physical space."
+}

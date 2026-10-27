@@ -1,5 +1,7 @@
 # 简库镜传 · Jianku Screen
 
+当前安装版本为 **0.2.0-alpha.38**：安全保存、持续失败提示与恢复重试已完成打包实测，源包/安装/归档和完整短片导出核对通过；上一版 alpha.37 保留。见 [alpha.38 交付](next/verification/2026-10-27-alpha38-safe-save/README.md)。下一步处理 3D 舒适度，再推进预览功能、中文/内部审计和 Windows/Linux。下文各 alpha.37 及早期记录为历史阶段，不代表当前完整发布审计通过。
+
 当前阶段为 `0.2.0-alpha.37`：补齐动态轨道、3D 镜头与加载界面的中文，修正构建链路由解析错误，并区分准备预览测试的解码配置。保留全部视觉效果，实际中文界面、完整导出及当前/上一版回滚已核对；另有两项 AVAssetReader 画面差异继续待办。见 [alpha.37 记录](next/verification/2026-10-26-alpha37-localization-preview/README.md)。2026-10-27 已用独立程序进一步定位到内置 FFmpeg VideoToolbox 解码的色度差异，严格失败仍保留；应用继续 alpha.37，见 [解码调查](next/verification/2026-10-27-decoder-parity/README.md)。另新增 [10/30/60 分钟工程抽样检查](next/verification/2026-10-27-long-playback/README.md)，操作通过，偶发时序离群点继续跟踪。后续发现并修正 headless 主线程循环遗漏，旧壁纸时序证据范围已更正；新的 [播放分段计时](next/verification/2026-10-27-playback-timing/README.md)已完成，仍有读回等待与严格色度差异待跟踪。下方早期说明保留作历史参考。
 
 macOS 录屏与实时演示工具。录制画面经由**指针平滑、自动/手动焦点缩放、画面包装与动态模糊**处理，

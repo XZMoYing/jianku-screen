@@ -1,0 +1,36 @@
+{
+	"version": "0.2.0-alpha.38",
+	"checks": [
+		{
+			"case": "readonly-autosave",
+			"passed": true,
+			"originalBytesPreserved": true,
+			"memoryPadding": 14.1,
+			"diskPadding": 14.0
+		},
+		{
+			"case": "persistent-error",
+			"passed": true,
+			"waitSeconds": 9.2
+		},
+		{
+			"case": "quit-blocked-on-unsaved-config",
+			"passed": true,
+			"originalBytesPreserved": true
+		},
+		{
+			"case": "restore-permission-and-shortcut-retry",
+			"passed": true,
+			"savedPadding": 14.1,
+			"toastCleared": true,
+			"temporaryFiles": 0
+		},
+		{
+			"case": "normal-quit-after-retry",
+			"passed": true,
+			"exitCode": 0
+		}
+	],
+	"passed": true,
+	"configSha256": "54db47a641abffc421616964f9552263f1464251fda9de71ba8561145f6c1333"
+}
