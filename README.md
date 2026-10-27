@@ -1,8 +1,8 @@
 # 简库镜传 · Jianku Screen
 
-3D 进展：新建镜头默认自然运镜，复用缩放解析弹簧的默认依据并保存裁切进度；旧配置 3780 帧保持，清晰路径分割前后 540 帧相同。曲线组件已验证，[U18b 证据](next/verification/2026-10-28-3d-spring/README.md)已保存，带模糊的接缝/构图/整包与整体观感继续 U18c，安装仍 alpha.38。
+3D 运镜阶段包 **0.2.0-alpha.39** 已安装打开：新建镜头默认自然曲线，补齐透视运动模糊及连续分割的曝光历史，保留普通缩放和旧项目的明确曲线。实际界面切换/保存重开/回零重播与完整导出通过，整体舒适度仍待用户确认。见 [集成交付](next/verification/2026-10-28-3d-integration/README.md)。
 
-当前安装版本为 **0.2.0-alpha.38**：安全保存、持续失败提示与恢复重试已完成打包实测，源包/安装/归档和完整短片导出核对通过；上一版 alpha.37 保留。见 [alpha.38 交付](next/verification/2026-10-27-alpha38-safe-save/README.md)。下一步处理 3D 舒适度，再推进预览功能、中文/内部审计和 Windows/Linux。下文各 alpha.37 及早期记录为历史阶段，不代表当前完整发布审计通过。
+当前/上一版应用为 **alpha.39/alpha.38**，源码已备份 GitHub，旧 alpha.37 应用和重复临时成片已清理，工程与原生依赖保留。下一步推进预览具体分辨率/全屏，再继续完整中文、内部审计和 Windows/Linux；下方旧版本说明为历史记录，不能视为正式发布审计已完成。
 
 当前阶段为 `0.2.0-alpha.37`：补齐动态轨道、3D 镜头与加载界面的中文，修正构建链路由解析错误，并区分准备预览测试的解码配置。保留全部视觉效果，实际中文界面、完整导出及当前/上一版回滚已核对；另有两项 AVAssetReader 画面差异继续待办。见 [alpha.37 记录](next/verification/2026-10-26-alpha37-localization-preview/README.md)。2026-10-27 已用独立程序进一步定位到内置 FFmpeg VideoToolbox 解码的色度差异，严格失败仍保留；应用继续 alpha.37，见 [解码调查](next/verification/2026-10-27-decoder-parity/README.md)。另新增 [10/30/60 分钟工程抽样检查](next/verification/2026-10-27-long-playback/README.md)，操作通过，偶发时序离群点继续跟踪。后续发现并修正 headless 主线程循环遗漏，旧壁纸时序证据范围已更正；新的 [播放分段计时](next/verification/2026-10-27-playback-timing/README.md)已完成，仍有读回等待与严格色度差异待跟踪。下方早期说明保留作历史参考。
 

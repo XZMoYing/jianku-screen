@@ -1,0 +1,184 @@
+{
+	"checks": [
+		{
+			"case": "ui-and-packaged-cli",
+			"frames": 540,
+			"changedFrames": [],
+			"samePcm": true,
+			"passed": true,
+			"left": "/private/tmp/jianku-3d-integration/gui-export.mp4",
+			"right": "/private/tmp/jianku-3d-integration/package-ui.mp4"
+		},
+		{
+			"case": "packaged-split-and-component",
+			"frames": 540,
+			"changedFrames": [],
+			"samePcm": true,
+			"passed": true,
+			"left": "/private/tmp/jianku-3d-integration/package-offgrid.mp4",
+			"right": "/private/tmp/jianku-3d-integration/after-offgrid-60.mp4"
+		},
+		{
+			"case": "ordinary-zoom-preserved",
+			"frames": 540,
+			"changedFrames": [],
+			"samePcm": true,
+			"passed": true,
+			"left": "/private/tmp/jianku-3d-integration/package-flat.mp4",
+			"right": "/private/tmp/jianku-3d-spring/fixtures/after-flat.mp4"
+		}
+	],
+	"passed": true,
+	"media": {
+		"/private/tmp/jianku-3d-integration/gui-export.mp4": {
+			"pcmSha256": "dc745dc32274dbeebce5e335bfc83566d686d064f4b63274bf24f77d9ea54f81",
+			"movieSha256": "62a30617eed7294f3557c9e15734b15744bf7d8ce7d2c30cfd4ccad706c8b683",
+			"probe": {
+				"programs": [],
+				"stream_groups": [],
+				"streams": [
+					{
+						"codec_name": "h264",
+						"width": 1280,
+						"height": 720,
+						"r_frame_rate": "60/1",
+						"nb_frames": "540"
+					},
+					{
+						"codec_name": "aac",
+						"r_frame_rate": "0/0",
+						"nb_frames": "423"
+					}
+				],
+				"format": {
+					"duration": "9.000000"
+				}
+			}
+		},
+		"/private/tmp/jianku-3d-integration/package-ui.mp4": {
+			"pcmSha256": "dc745dc32274dbeebce5e335bfc83566d686d064f4b63274bf24f77d9ea54f81",
+			"movieSha256": "62a30617eed7294f3557c9e15734b15744bf7d8ce7d2c30cfd4ccad706c8b683",
+			"probe": {
+				"programs": [],
+				"stream_groups": [],
+				"streams": [
+					{
+						"codec_name": "h264",
+						"width": 1280,
+						"height": 720,
+						"r_frame_rate": "60/1",
+						"nb_frames": "540"
+					},
+					{
+						"codec_name": "aac",
+						"r_frame_rate": "0/0",
+						"nb_frames": "423"
+					}
+				],
+				"format": {
+					"duration": "9.000000"
+				}
+			}
+		},
+		"/private/tmp/jianku-3d-integration/package-offgrid.mp4": {
+			"pcmSha256": "dc745dc32274dbeebce5e335bfc83566d686d064f4b63274bf24f77d9ea54f81",
+			"movieSha256": "62a30617eed7294f3557c9e15734b15744bf7d8ce7d2c30cfd4ccad706c8b683",
+			"probe": {
+				"programs": [],
+				"stream_groups": [],
+				"streams": [
+					{
+						"codec_name": "h264",
+						"width": 1280,
+						"height": 720,
+						"r_frame_rate": "60/1",
+						"nb_frames": "540"
+					},
+					{
+						"codec_name": "aac",
+						"r_frame_rate": "0/0",
+						"nb_frames": "423"
+					}
+				],
+				"format": {
+					"duration": "9.000000"
+				}
+			}
+		},
+		"/private/tmp/jianku-3d-integration/after-offgrid-60.mp4": {
+			"pcmSha256": "dc745dc32274dbeebce5e335bfc83566d686d064f4b63274bf24f77d9ea54f81",
+			"movieSha256": "62a30617eed7294f3557c9e15734b15744bf7d8ce7d2c30cfd4ccad706c8b683",
+			"probe": {
+				"programs": [],
+				"stream_groups": [],
+				"streams": [
+					{
+						"codec_name": "h264",
+						"width": 1280,
+						"height": 720,
+						"r_frame_rate": "60/1",
+						"nb_frames": "540"
+					},
+					{
+						"codec_name": "aac",
+						"r_frame_rate": "0/0",
+						"nb_frames": "423"
+					}
+				],
+				"format": {
+					"duration": "9.000000"
+				}
+			}
+		},
+		"/private/tmp/jianku-3d-integration/package-flat.mp4": {
+			"pcmSha256": "dc745dc32274dbeebce5e335bfc83566d686d064f4b63274bf24f77d9ea54f81",
+			"movieSha256": "1f3c0d4133cae39eddcab954cba9619f0885a53236e8bf6839a7c8535a65cb40",
+			"probe": {
+				"programs": [],
+				"stream_groups": [],
+				"streams": [
+					{
+						"codec_name": "h264",
+						"width": 1280,
+						"height": 720,
+						"r_frame_rate": "60/1",
+						"nb_frames": "540"
+					},
+					{
+						"codec_name": "aac",
+						"r_frame_rate": "0/0",
+						"nb_frames": "423"
+					}
+				],
+				"format": {
+					"duration": "9.000000"
+				}
+			}
+		},
+		"/private/tmp/jianku-3d-spring/fixtures/after-flat.mp4": {
+			"pcmSha256": "dc745dc32274dbeebce5e335bfc83566d686d064f4b63274bf24f77d9ea54f81",
+			"movieSha256": "1f3c0d4133cae39eddcab954cba9619f0885a53236e8bf6839a7c8535a65cb40",
+			"probe": {
+				"programs": [],
+				"stream_groups": [],
+				"streams": [
+					{
+						"codec_name": "h264",
+						"width": 1280,
+						"height": 720,
+						"r_frame_rate": "60/1",
+						"nb_frames": "540"
+					},
+					{
+						"codec_name": "aac",
+						"r_frame_rate": "0/0",
+						"nb_frames": "423"
+					}
+				],
+				"format": {
+					"duration": "9.000000"
+				}
+			}
+		}
+	}
+}

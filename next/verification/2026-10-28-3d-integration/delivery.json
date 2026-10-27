@@ -1,0 +1,68 @@
+{
+	"sourceCommit": "92775e929f0f9820dd910b44b2909cf396591270",
+	"bundles": [
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/release/bundle/macos/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.39",
+			"build": "2026.39.0",
+			"binaries": {
+				"Jianku Screen Next": "9419e30b49a935f8498c21714d643eaecea5c73fbc240f256d2af00db1f9d9d4",
+				"cap-cli": "9a686d8acb9525b1778241aba6d7f30c1b52b9ecb9e2dbd0b8ad4089ebfdc81b",
+				"cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+				"cap-exporter": "01f9c2fce30261c62663eb08f068674cae9e14cc5c504488c49ab71bd84312b1",
+				"jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+				"jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+			},
+			"strictSignature": true,
+			"signature": "ad-hoc; no Developer ID or notarization"
+		},
+		{
+			"path": "/Applications/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.39",
+			"build": "2026.39.0",
+			"binaries": {
+				"Jianku Screen Next": "9419e30b49a935f8498c21714d643eaecea5c73fbc240f256d2af00db1f9d9d4",
+				"cap-cli": "9a686d8acb9525b1778241aba6d7f30c1b52b9ecb9e2dbd0b8ad4089ebfdc81b",
+				"cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+				"cap-exporter": "01f9c2fce30261c62663eb08f068674cae9e14cc5c504488c49ab71bd84312b1",
+				"jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+				"jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+			},
+			"strictSignature": true,
+			"signature": "ad-hoc; no Developer ID or notarization"
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.39/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.39",
+			"build": "2026.39.0",
+			"binaries": {
+				"Jianku Screen Next": "9419e30b49a935f8498c21714d643eaecea5c73fbc240f256d2af00db1f9d9d4",
+				"cap-cli": "9a686d8acb9525b1778241aba6d7f30c1b52b9ecb9e2dbd0b8ad4089ebfdc81b",
+				"cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+				"cap-exporter": "01f9c2fce30261c62663eb08f068674cae9e14cc5c504488c49ab71bd84312b1",
+				"jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+				"jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+			},
+			"strictSignature": true,
+			"signature": "ad-hoc; no Developer ID or notarization"
+		}
+	],
+	"passed": true,
+	"ordinaryLaunch": {
+		"pid": 87067,
+		"path": "/Applications/Jianku Screen Next.app",
+		"window": {
+			"bounds": {
+				"Height": 800,
+				"Width": 1275,
+				"X": 202,
+				"Y": 101
+			},
+			"id": 2655,
+			"name": "简库镜传 · 视频编辑",
+			"pid": 87067
+		},
+		"project": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.39/自然运镜与连续切分示例.jks"
+	},
+	"previousVersion": "0.2.0-alpha.38"
+}

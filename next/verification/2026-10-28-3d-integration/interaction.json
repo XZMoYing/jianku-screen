@@ -1,0 +1,42 @@
+{
+	"version": "0.2.0-alpha.39",
+	"checks": [
+		{
+			"case": "linear-clears-spring",
+			"passed": true
+		},
+		{
+			"case": "natural-persists-spring",
+			"passed": true
+		},
+		{
+			"case": "normal-quit-reopen-retains-natural",
+			"passed": true
+		},
+		{
+			"case": "play-pause-rewind-replay",
+			"passed": true,
+			"firstPauseTime": "0:03.27",
+			"replayPauseTime": "0:02.25",
+			"displayFpsVerified": false
+		},
+		{
+			"case": "actual-gui-export-720p60-maximum",
+			"passed": true,
+			"frames": 540,
+			"seconds": 9,
+			"sameDecodedFramesAndPcmAsPackagedCli": true
+		},
+		{
+			"case": "restore-prior-export-preferences",
+			"passed": true,
+			"resolution": "1080p",
+			"compression": "Social",
+			"optimizeFilesize": true
+		}
+	],
+	"passed": true,
+	"observerNotes": [
+		"One quit observer assertion saw a terminating process before its bundleURL was available; a fresh raw AX query confirmed normal exit, without force quit."
+	]
+}
