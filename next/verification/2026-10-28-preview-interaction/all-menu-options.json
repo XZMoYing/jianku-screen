@@ -1,0 +1,78 @@
+{
+	"checks": [
+		{
+			"quality": "144p",
+			"label": "144p",
+			"actualSize": [256, 144],
+			"realPointerMenuSelection": true,
+			"stored": "144p",
+			"passed": true
+		},
+		{
+			"quality": "360p",
+			"label": "360p",
+			"actualSize": [640, 360],
+			"realPointerMenuSelection": true,
+			"stored": "360p",
+			"passed": true
+		},
+		{
+			"quality": "480p",
+			"label": "480p",
+			"actualSize": [856, 480],
+			"realPointerMenuSelection": true,
+			"stored": "480p",
+			"passed": true
+		},
+		{
+			"quality": "540p",
+			"label": "540p",
+			"actualSize": [960, 540],
+			"realPointerMenuSelection": true,
+			"stored": "540p",
+			"passed": true
+		},
+		{
+			"quality": "720p",
+			"label": "720p",
+			"actualSize": [1280, 720],
+			"realPointerMenuSelection": true,
+			"stored": "720p",
+			"passed": true
+		},
+		{
+			"quality": "1080p",
+			"label": "1080p",
+			"actualSize": [1920, 1080],
+			"realPointerMenuSelection": true,
+			"stored": "1080p",
+			"passed": true
+		},
+		{
+			"quality": "1440p",
+			"label": "2K（1440p）",
+			"actualSize": [2560, 1440],
+			"realPointerMenuSelection": true,
+			"stored": "1440p",
+			"passed": true
+		},
+		{
+			"quality": "2160p",
+			"label": "4K（2160p）",
+			"actualSize": [3840, 2160],
+			"realPointerMenuSelection": true,
+			"stored": "2160p",
+			"passed": true
+		},
+		{
+			"quality": "original",
+			"label": "原始清晰度",
+			"actualSize": [4272, 2402],
+			"realPointerMenuSelection": true,
+			"stored": "original",
+			"passed": true
+		}
+	],
+	"projectConfigSha256Unchanged": "b4c5488155f626312b0f838cdaefa2a450c6005595c56640fd3fb37bbab82a6e",
+	"passed": true
+}

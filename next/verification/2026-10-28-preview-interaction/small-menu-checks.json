@@ -1,0 +1,16 @@
+{
+	"available": ["144p 256 × 144", "360p 640 × 360", "原始清晰度 712 × 400"],
+	"disabled": [
+		"480p 不可用",
+		"540p 不可用",
+		"720p 不可用",
+		"1080p 不可用",
+		"2K（1440p） 不可用",
+		"4K（2160p） 不可用"
+	],
+	"disabledClickIgnored": true,
+	"higherPreferenceRetained": "2160p",
+	"reopenSmallSourceUsesOriginal": true,
+	"escapeClosedMenu": true,
+	"passed": true
+}

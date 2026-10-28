@@ -1,8 +1,8 @@
 # 简库镜传 · Jianku Screen
 
-预览分辨率阶段包 **0.2.0-alpha.41** 已安装打开：144p 至 4K/原始清晰度对应实际画布像素，准备与普通播放尺寸统一，小素材回退保留高分辨率偏好；两个实际导出对照的画面与音频保持。菜单前台选择与播放中直接切换仍待验收，见 [阶段证据](next/verification/2026-10-28-preview-package/README.md)。
+预览分辨率阶段包 **0.2.0-alpha.41** 已安装打开：144p 至 4K/原始清晰度对应实际画布像素，准备与普通播放尺寸统一，小素材回退保留高分辨率偏好；两个实际导出对照的画面与音频保持。菜单逐项选择、小素材禁用、正常重开及播放中直接切换已实测通过，见 [菜单验收](next/verification/2026-10-28-preview-interaction/README.md)。
 
-当前/上一稳定应用为 **alpha.41/alpha.39**，中间 alpha.40 和旧 alpha.38 应用已清理，工程/Git/原生依赖保留。下一步先补菜单交互验收，再做预览全屏、完整中文、内部审计和 Windows/Linux；额度收尾按授权暂停，目标尚未完成。下方旧版本说明为历史记录。
+当前/上一稳定应用为 **alpha.41/alpha.39**，中间 alpha.40 和旧 alpha.38 应用已清理，工程/Git/原生依赖保留。额度刷新后继续目标，下一步做预览全屏、完整中文、内部审计和 Windows/Linux，完整目标尚未完成。下方旧版本说明为历史记录。
 
 当前阶段为 `0.2.0-alpha.37`：补齐动态轨道、3D 镜头与加载界面的中文，修正构建链路由解析错误，并区分准备预览测试的解码配置。保留全部视觉效果，实际中文界面、完整导出及当前/上一版回滚已核对；另有两项 AVAssetReader 画面差异继续待办。见 [alpha.37 记录](next/verification/2026-10-26-alpha37-localization-preview/README.md)。2026-10-27 已用独立程序进一步定位到内置 FFmpeg VideoToolbox 解码的色度差异，严格失败仍保留；应用继续 alpha.37，见 [解码调查](next/verification/2026-10-27-decoder-parity/README.md)。另新增 [10/30/60 分钟工程抽样检查](next/verification/2026-10-27-long-playback/README.md)，操作通过，偶发时序离群点继续跟踪。后续发现并修正 headless 主线程循环遗漏，旧壁纸时序证据范围已更正；新的 [播放分段计时](next/verification/2026-10-27-playback-timing/README.md)已完成，仍有读回等待与严格色度差异待跟踪。下方早期说明保留作历史参考。
 

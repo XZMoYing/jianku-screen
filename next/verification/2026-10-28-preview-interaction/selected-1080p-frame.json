@@ -1,0 +1,30 @@
+{
+	"version": "0.2.0-alpha.41",
+	"pid": 23862,
+	"observation": "read-only first frame from application-owned loopback listeners; payload discarded",
+	"observations": [
+		{
+			"port": 56090,
+			"frame": null,
+			"reason": "no frame in timeout"
+		},
+		{
+			"port": 56091,
+			"frame": {
+				"width": 1920,
+				"height": 1080,
+				"stride": 7680,
+				"frameNumber": 0,
+				"targetTimeNs": "0",
+				"payloadBytes": 8294400,
+				"expectedBytes": 8294400,
+				"format": "RGBA"
+			}
+		},
+		{
+			"port": 56094,
+			"frame": null,
+			"reason": "no frame in timeout"
+		}
+	]
+}

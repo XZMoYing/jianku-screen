@@ -1,0 +1,8 @@
+{
+	"smallToLargeRestores4k": true,
+	"realMenu720pPersistsOnNormalReopen": true,
+	"exportOptionsUnchanged": ["文件", "MP4", "1080p", "60 FPS", "社交平台"],
+	"exportOptimizeFilesizeStillEnabled": true,
+	"finalPreviewQuality": "720p",
+	"passed": true
+}
