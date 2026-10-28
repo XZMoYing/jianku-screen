@@ -1,0 +1,107 @@
+{
+	"removed": [
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.39/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.39",
+			"binaries": {
+				"Jianku Screen Next": "9419e30b49a935f8498c21714d643eaecea5c73fbc240f256d2af00db1f9d9d4",
+				"cap-cli": "9a686d8acb9525b1778241aba6d7f30c1b52b9ecb9e2dbd0b8ad4089ebfdc81b",
+				"cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+				"cap-exporter": "01f9c2fce30261c62663eb08f068674cae9e14cc5c504488c49ab71bd84312b1",
+				"jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+				"jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+			},
+			"strictSignature": true,
+			"logicalBytes": 315838347
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.42/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.42",
+			"binaries": {
+				"Jianku Screen Next": "20a76759c78af777a67d06f1ea1eec4e205be4c363b40e659cb4e4804d06d242",
+				"cap-cli": "1fec7c4b146f6127ca50d6e90ceea2f367296e9ed54d27a35c00dd1601efd3f8",
+				"cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+				"cap-exporter": "501436b179d2b91211b398f973ed8dad3ce90f842073b895e8d1bb045bee177f",
+				"jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+				"jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+			},
+			"strictSignature": true,
+			"logicalBytes": 316000923
+		},
+		{
+			"path": "/Applications/.jianku-next-update-HXfKFG/previous.app",
+			"version": "0.2.0-alpha.42",
+			"binaries": {
+				"Jianku Screen Next": "20a76759c78af777a67d06f1ea1eec4e205be4c363b40e659cb4e4804d06d242",
+				"cap-cli": "1fec7c4b146f6127ca50d6e90ceea2f367296e9ed54d27a35c00dd1601efd3f8",
+				"cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+				"cap-exporter": "501436b179d2b91211b398f973ed8dad3ce90f842073b895e8d1bb045bee177f",
+				"jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+				"jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+			},
+			"strictSignature": true,
+			"logicalBytes": 316000923
+		},
+		{
+			"path": "/Applications/.jianku-next-update-IaatZa/previous.app",
+			"version": "0.2.0-alpha.41",
+			"binaries": {
+				"Jianku Screen Next": "2fdd1a299b2123e5a531e87d92f47223734da3e778eef911b958a8a036e96e9f",
+				"cap-cli": "83fcf46281101b2777f06cf24baec224a2d7480353436c6f16391fc4a864783b",
+				"cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+				"cap-exporter": "a51b8416bb9a63219f2f7e316e2e64d64cc24be7049e6ada538c537ecdc329b9",
+				"jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+				"jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+			},
+			"strictSignature": true,
+			"logicalBytes": 315967851
+		}
+	],
+	"retained": [
+		{
+			"path": "/Applications/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.43",
+			"binaries": {
+				"Jianku Screen Next": "a815c8f19644fb0d16bc5d7c1da2468274eb6318d2acf908c3efa1ff70e37ec0",
+				"cap-cli": "339cc3781804e110a78070d4bcb853c971efca0809c589b7c00272afa57c46d4",
+				"cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+				"cap-exporter": "347be5ceb76d168369f644ea36e60d5ca2f2fdf61b1f529b05fd66083b7d6fd3",
+				"jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+				"jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+			},
+			"strictSignature": true
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.43/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.43",
+			"binaries": {
+				"Jianku Screen Next": "a815c8f19644fb0d16bc5d7c1da2468274eb6318d2acf908c3efa1ff70e37ec0",
+				"cap-cli": "339cc3781804e110a78070d4bcb853c971efca0809c589b7c00272afa57c46d4",
+				"cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+				"cap-exporter": "347be5ceb76d168369f644ea36e60d5ca2f2fdf61b1f529b05fd66083b7d6fd3",
+				"jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+				"jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+			},
+			"strictSignature": true
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.41/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.41",
+			"binaries": {
+				"Jianku Screen Next": "2fdd1a299b2123e5a531e87d92f47223734da3e778eef911b958a8a036e96e9f",
+				"cap-cli": "83fcf46281101b2777f06cf24baec224a2d7480353436c6f16391fc4a864783b",
+				"cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+				"cap-exporter": "a51b8416bb9a63219f2f7e316e2e64d64cc24be7049e6ada538c537ecdc329b9",
+				"jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+				"jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+			},
+			"strictSignature": true
+		}
+	],
+	"logicalBytesRemoved": 1263808044,
+	"freeBytesBefore": 72420167680,
+	"freeBytesAfter": 73687371776,
+	"observedFreeBytesChange": 1267204096,
+	"preserved": "all .jks and media, current alpha43 and rollback alpha41, Git, native dependencies, active build cache",
+	"fixture": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.43/全屏预览验收.jks"
+}

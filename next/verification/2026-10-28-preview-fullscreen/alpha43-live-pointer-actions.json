@@ -1,0 +1,48 @@
+{
+	"actions": [
+		{
+			"name": "alpha43-verified-live-start",
+			"ms": 1948.1960000000004,
+			"nativeFullscreen": "0",
+			"playing": "1",
+			"timeLabels": ["0:00.00", "0:09.00"]
+		},
+		{
+			"name": "alpha43-verified-live-enter",
+			"ms": 4233.893041,
+			"nativeFullscreen": "1",
+			"playing": "1",
+			"timeLabels": ["0:01.34", "0:09.00"]
+		},
+		{
+			"name": "alpha43-verified-live-exit",
+			"ms": 6298.901291,
+			"nativeFullscreen": "0",
+			"playing": "1",
+			"timeLabels": ["0:03.07", "0:09.00"]
+		},
+		{
+			"name": "alpha43-verified-live-pause",
+			"ms": 8746.135666,
+			"nativeFullscreen": "0",
+			"playing": "0",
+			"timeLabels": ["0:05.17", "0:09.00"]
+		}
+	],
+	"frames": 304,
+	"first": {
+		"ms": 11.091916000000026,
+		"width": 1280,
+		"height": 720,
+		"frameNumber": 0,
+		"targetTimeNs": "0"
+	},
+	"last": {
+		"ms": 8365.274708,
+		"width": 1280,
+		"height": 720,
+		"frameNumber": 318,
+		"targetTimeNs": "5300000000"
+	},
+	"nondecreasing": true
+}

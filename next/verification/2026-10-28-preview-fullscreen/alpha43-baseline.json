@@ -1,0 +1,20 @@
+{
+	"window": {
+		"actions": ["AXRaise"],
+		"AXFocused": "0",
+		"AXFullScreen": "0",
+		"AXRole": "AXWindow",
+		"AXTitle": "简库镜传 · 视频编辑",
+		"depth": 0,
+		"index": 0,
+		"position": {
+			"x": 202,
+			"y": 102
+		},
+		"size": {
+			"height": 800,
+			"width": 1275
+		}
+	},
+	"projectSha256": "b4c5488155f626312b0f838cdaefa2a450c6005595c56640fd3fb37bbab82a6e"
+}

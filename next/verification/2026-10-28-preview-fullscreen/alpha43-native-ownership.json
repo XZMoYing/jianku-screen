@@ -1,0 +1,58 @@
+{
+	"actions": [
+		{
+			"step": "alpha43-native-ownership-retry",
+			"nativeFullscreen": "1",
+			"previewFullscreen": true,
+			"size": {
+				"height": 1050,
+				"width": 1680
+			},
+			"position": {
+				"x": 0,
+				"y": 0
+			}
+		},
+		{
+			"step": "alpha43-preserves-native-button",
+			"nativeFullscreen": "1",
+			"previewFullscreen": false,
+			"size": {
+				"height": 1050,
+				"width": 1680
+			},
+			"position": {
+				"x": 0,
+				"y": 0
+			}
+		},
+		{
+			"step": "alpha43-external-exit-ready",
+			"nativeFullscreen": "1",
+			"previewFullscreen": true,
+			"size": {
+				"height": 1050,
+				"width": 1680
+			},
+			"position": {
+				"x": 0,
+				"y": 0
+			}
+		},
+		{
+			"step": "alpha43-external-native-exit-verified",
+			"nativeFullscreen": "0",
+			"previewFullscreen": false,
+			"size": {
+				"height": 800,
+				"width": 1275
+			},
+			"position": {
+				"x": 202,
+				"y": 102
+			}
+		}
+	],
+	"passed": true,
+	"escapeInExistingNativeFullscreen": "unfocused synthetic global key inconclusive; exit button verified"
+}

@@ -1,0 +1,22 @@
+{
+	"version": "0.2.0-alpha.43",
+	"pid": 17575,
+	"port": 55992,
+	"frames": [
+		{
+			"ms": 9.640499999999975,
+			"width": 1280,
+			"height": 720,
+			"frameNumber": 244,
+			"targetTimeNs": "4066666666"
+		},
+		{
+			"ms": 11.148041999999975,
+			"width": 1280,
+			"height": 720,
+			"frameNumber": 244,
+			"targetTimeNs": "4066666666"
+		}
+	],
+	"observation": "actual preview frame metadata only; excludes display and audio cadence proof"
+}
