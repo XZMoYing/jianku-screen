@@ -1,0 +1,138 @@
+{
+	"observations": [
+		{
+			"snapshot": "preview-before-escape.json.gz",
+			"appForeground": true,
+			"focusedWindowTitle": "简库镜传 · 视频编辑",
+			"window": {
+				"AXTitle": "简库镜传 · 视频编辑",
+				"AXFullScreen": "1",
+				"size": {
+					"height": 1050,
+					"width": 1680
+				},
+				"position": {
+					"x": 0,
+					"y": 0
+				}
+			},
+			"previewFullscreen": true,
+			"playing": "0"
+		},
+		{
+			"snapshot": "preview-after-focused-escape.json.gz",
+			"appForeground": true,
+			"focusedWindowTitle": "简库镜传 · 视频编辑",
+			"window": {
+				"AXTitle": "简库镜传 · 视频编辑",
+				"AXFullScreen": "1",
+				"size": {
+					"height": 1050,
+					"width": 1680
+				},
+				"position": {
+					"x": 0,
+					"y": 0
+				}
+			},
+			"previewFullscreen": true,
+			"playing": "0"
+		},
+		{
+			"snapshot": "focused-space-control.json.gz",
+			"appForeground": true,
+			"focusedWindowTitle": "简库镜传 · 视频编辑",
+			"window": {
+				"AXTitle": "简库镜传 · 视频编辑",
+				"AXFullScreen": "1",
+				"size": {
+					"height": 1050,
+					"width": 1680
+				},
+				"position": {
+					"x": 0,
+					"y": 0
+				}
+			},
+			"previewFullscreen": true,
+			"playing": "1"
+		},
+		{
+			"snapshot": "focused-escape-after-space.json.gz",
+			"appForeground": true,
+			"focusedWindowTitle": "简库镜传 · 视频编辑",
+			"window": {
+				"AXTitle": "简库镜传 · 视频编辑",
+				"AXFullScreen": "1",
+				"size": {
+					"height": 1050,
+					"width": 1680
+				},
+				"position": {
+					"x": 0,
+					"y": 0
+				}
+			},
+			"previewFullscreen": false,
+			"playing": "1"
+		},
+		{
+			"snapshot": "native-preview-AX-enter.json.gz",
+			"appForeground": true,
+			"focusedWindowTitle": "简库镜传 · 视频编辑",
+			"window": {
+				"AXTitle": "简库镜传 · 视频编辑",
+				"AXFullScreen": "1",
+				"size": {
+					"height": 1050,
+					"width": 1680
+				},
+				"position": {
+					"x": 0,
+					"y": 0
+				}
+			},
+			"previewFullscreen": true,
+			"playing": "0"
+		},
+		{
+			"snapshot": "native-preview-AX-escape-0.json.gz",
+			"appForeground": true,
+			"focusedWindowTitle": "简库镜传 · 视频编辑",
+			"window": {
+				"AXTitle": "简库镜传 · 视频编辑",
+				"AXFullScreen": "1",
+				"size": {
+					"height": 1050,
+					"width": 1680
+				},
+				"position": {
+					"x": 0,
+					"y": 0
+				}
+			},
+			"previewFullscreen": true,
+			"playing": "0"
+		},
+		{
+			"snapshot": "native-preview-AX-escape-1.json.gz",
+			"appForeground": true,
+			"focusedWindowTitle": "简库镜传 · 视频编辑",
+			"window": {
+				"AXTitle": "简库镜传 · 视频编辑",
+				"AXFullScreen": "1",
+				"size": {
+					"height": 1050,
+					"width": 1680
+				},
+				"position": {
+					"x": 0,
+					"y": 0
+				}
+			},
+			"previewFullscreen": false,
+			"playing": "0"
+		}
+	],
+	"scope": "actual packaged UI key actions; source inspection identified tooltip Escape consumption; other helper setup failures are not product failures"
+}

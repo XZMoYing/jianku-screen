@@ -1,0 +1,16 @@
+{
+	"version": "0.2.0-alpha.43",
+	"rows": [
+		{
+			"press": 1,
+			"previewExited": false,
+			"nativeFullscreen": "0"
+		},
+		{
+			"press": 2,
+			"previewExited": true,
+			"nativeFullscreen": "0"
+		}
+	],
+	"reproduced": true
+}
