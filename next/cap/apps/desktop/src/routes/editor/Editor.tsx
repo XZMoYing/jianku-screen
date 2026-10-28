@@ -710,6 +710,8 @@ function Inner(props: {
 		throttledRenderFrame.clear();
 		trailingRenderFrame.clear();
 		setEditorState("playbackTime", payload.playhead_position / FPS);
+		// A seek acknowledgement can clear an already queued paused frame without changing its time.
+		if (!editorState.playing) renderFrame(frameNumberToRender());
 	});
 
 	let skipRenderFrameForConfigUpdate = false;
