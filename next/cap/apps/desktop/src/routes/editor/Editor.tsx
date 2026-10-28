@@ -44,6 +44,7 @@ import { composeEventHandlers } from "~/utils/composeEventHandlers";
 import { createTauriEventListener } from "~/utils/createEventListener";
 import { t as localize } from "~/utils/i18n";
 import { commands, events } from "~/utils/tauri";
+import { canExitPreviewOnEscape } from "~/utils/tooltip-escape";
 import { ConfigSidebar } from "./ConfigSidebar";
 import {
 	EditorContextProvider,
@@ -375,12 +376,7 @@ function Inner(props: {
 		setFullscreenBusy(false);
 	};
 	createEventListener(window, "keydown", (event) => {
-		if (
-			event.key !== "Escape" ||
-			event.defaultPrevented ||
-			!previewFullscreen()
-		)
-			return;
+		if (!previewFullscreen() || !canExitPreviewOnEscape(event)) return;
 		event.preventDefault();
 		void requestPreviewFullscreen(false);
 	});
