@@ -1,52 +1,52 @@
 [
-  {
-    "name": "overlay-motion",
-    "path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/工程/overlay-motion.jks",
-    "sha256": "22e0d312a74b2fc0ff7f05d8eacef11009270d25c2f4a671edf44ce2eaec718a"
-  },
-  {
-    "name": "camera-only-motion",
-    "path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/工程/camera-only-motion.jks",
-    "sha256": "8160e5aad0976bf2400728ae5b0ffb966ea851dd051dca503c6360b3ce09361b"
-  },
-  {
-    "name": "scene-transition",
-    "path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/工程/scene-transition.jks",
-    "sha256": "69a38287ff602e77fee954f49679e0c9926c940c2b10fe795a3c8ac145bca882"
-  },
-  {
-    "name": "camera-shadow-off",
-    "path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/工程/camera-shadow-off.jks",
-    "sha256": "23eab036dccf972f6190279694cecd8e281ddf743d4f0e437e7885a9fb64af74"
-  },
-  {
-    "name": "flat-camera",
-    "path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/工程/flat-camera.jks",
-    "sha256": "cd9855280edaeb979779ed6ae265abfdb603c776df6b113f488de611e963a0a8"
-  },
-  {
-    "name": "hidden-camera",
-    "path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/工程/hidden-camera.jks",
-    "sha256": "1974453fee8fceb6a65d8e69a71d2690025ba0d3b3b4c370f0a8bd0f1ac93a3a"
-  },
-  {
-    "name": "focus-blur-only",
-    "path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/工程/focus-blur-only.jks",
-    "sha256": "3fa983763bb7c8e1fb13dd01f57d403aaf79edf221c4a57845f438d214e652d2"
-  },
-  {
-    "name": "camera-only-padded-motion",
-    "path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/工程/camera-only-padded-motion.jks",
-    "sha256": "b6f2724d02dba7d8d06ce63ec4b5a9c2c696a066d9544bb47144d0b9cf2779eb"
-  },
-  {
-    "name": "macbook-camera",
-    "path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/工程/macbook-camera.jks",
-    "sha256": "b168dedcd1f1c40c12a885124a3b3f75e16c4a99642dd01c3c16afe73e7cd7e9"
-  },
-  {
-    "name": "scene-transition-padded",
-    "path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/工程/scene-transition-padded.jks",
-    "sha256": "94a9421a0843c7e168ca91299a530bdd1f9183e39d8641dca9c62eef0d848d52"
-  }
+	{
+		"name": "overlay-motion",
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/工程/overlay-motion.jks",
+		"sha256": "22e0d312a74b2fc0ff7f05d8eacef11009270d25c2f4a671edf44ce2eaec718a"
+	},
+	{
+		"name": "camera-only-motion",
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/工程/camera-only-motion.jks",
+		"sha256": "8160e5aad0976bf2400728ae5b0ffb966ea851dd051dca503c6360b3ce09361b"
+	},
+	{
+		"name": "scene-transition",
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/工程/scene-transition.jks",
+		"sha256": "69a38287ff602e77fee954f49679e0c9926c940c2b10fe795a3c8ac145bca882"
+	},
+	{
+		"name": "camera-shadow-off",
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/工程/camera-shadow-off.jks",
+		"sha256": "23eab036dccf972f6190279694cecd8e281ddf743d4f0e437e7885a9fb64af74"
+	},
+	{
+		"name": "flat-camera",
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/工程/flat-camera.jks",
+		"sha256": "cd9855280edaeb979779ed6ae265abfdb603c776df6b113f488de611e963a0a8"
+	},
+	{
+		"name": "hidden-camera",
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/工程/hidden-camera.jks",
+		"sha256": "1974453fee8fceb6a65d8e69a71d2690025ba0d3b3b4c370f0a8bd0f1ac93a3a"
+	},
+	{
+		"name": "focus-blur-only",
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/工程/focus-blur-only.jks",
+		"sha256": "3fa983763bb7c8e1fb13dd01f57d403aaf79edf221c4a57845f438d214e652d2"
+	},
+	{
+		"name": "camera-only-padded-motion",
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/工程/camera-only-padded-motion.jks",
+		"sha256": "b6f2724d02dba7d8d06ce63ec4b5a9c2c696a066d9544bb47144d0b9cf2779eb"
+	},
+	{
+		"name": "macbook-camera",
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/工程/macbook-camera.jks",
+		"sha256": "b168dedcd1f1c40c12a885124a3b3f75e16c4a99642dd01c3c16afe73e7cd7e9"
+	},
+	{
+		"name": "scene-transition-padded",
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/工程/scene-transition-padded.jks",
+		"sha256": "94a9421a0843c7e168ca91299a530bdd1f9183e39d8641dca9c62eef0d848d52"
+	}
 ]
