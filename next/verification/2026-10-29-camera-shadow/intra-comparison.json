@@ -1,0 +1,20 @@
+{
+	"runs": [
+		{
+			"phase": "before",
+			"codec": "prores",
+			"pixelFormat": "yuva444p12le",
+			"frames": 540,
+			"seconds": 8.242599958000001
+		},
+		{
+			"phase": "after",
+			"codec": "prores",
+			"pixelFormat": "yuva444p12le",
+			"frames": 540,
+			"seconds": 31.796881458999998
+		}
+	],
+	"changedFrames": 0,
+	"audioStreamsMatch": true
+}

@@ -117,6 +117,7 @@ struct ShadowPipelines {
     spread: wgpu::RenderPipeline,
     horizontal: wgpu::RenderPipeline,
     vertical: wgpu::RenderPipeline,
+    camera_composite: Option<(wgpu::BindGroupLayout, wgpu::RenderPipeline)>,
 }
 
 pub struct ProjectedShadowLayer {
@@ -126,6 +127,7 @@ pub struct ProjectedShadowLayer {
     buffer: wgpu::Buffer,
     sampler: wgpu::Sampler,
     cached_uniforms: Option<ShadowUniforms>,
+    camera_mode: bool,
 }
 
 impl ProjectedShadowLayer {
@@ -146,7 +148,14 @@ impl ProjectedShadowLayer {
                 ..Default::default()
             }),
             cached_uniforms: None,
+            camera_mode: false,
         }
+    }
+
+    pub fn new_camera(device: &wgpu::Device) -> Self {
+        let mut layer = Self::new(device);
+        layer.camera_mode = true;
+        layer
     }
 
     pub fn prepare(
@@ -156,33 +165,56 @@ impl ProjectedShadowLayer {
         uniforms: &ProjectUniforms,
         warp_active: bool,
     ) {
+        self.prepare_sources(
+            device,
+            queue,
+            uniforms,
+            &uniforms.screen_shadow_sources,
+            warp_active
+                && uniforms.scene.should_render_screen()
+                && uniforms.display.opacity > 0.001,
+        );
+    }
+
+    pub fn prepare_camera(
+        &mut self,
+        device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        uniforms: &ProjectUniforms,
+        source: Option<ProjectedShadowSource>,
+        warp_active: bool,
+    ) {
+        self.prepare_sources(device, queue, uniforms, &[source], warp_active);
+    }
+
+    fn prepare_sources(
+        &mut self,
+        device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        uniforms: &ProjectUniforms,
+        sources: &[Option<ProjectedShadowSource>],
+        enabled: bool,
+    ) {
         self.settings = None;
-        if !warp_active
-            || !uniforms.scene.should_render_screen()
-            || uniforms.display.opacity <= 0.001
-        {
+        if !enabled {
             return;
         }
         let activity = uniforms.camera3d.map_or(0.0, |frame| frame.activity as f32);
-        let candidates = uniforms
-            .screen_shadow_sources
-            .iter()
-            .flatten()
-            .filter_map(|source| {
-                ShadowSettings::new(
-                    activity,
-                    source.strength,
-                    source.size,
-                    source.opacity,
-                    source.blur,
-                    source.half_edge,
-                )
-            });
+        let candidates = sources.iter().flatten().filter_map(|source| {
+            ShadowSettings::new(
+                activity,
+                source.strength,
+                source.size,
+                source.opacity,
+                source.blur,
+                source.half_edge,
+            )
+        });
         let Some(settings) = ShadowSettings::blend(candidates) else {
             return;
         };
         if self.pipelines.is_none() {
-            self.pipelines = Some(ShadowPipelines::new(device));
+            self.pipelines = Some(ShadowPipelines::new(device, self.camera_mode));
         }
         let (width, height) = (uniforms.output_size.0.max(1), uniforms.output_size.1.max(1));
         if !self.textures.as_ref().is_some_and(|textures| {
@@ -213,7 +245,7 @@ impl ProjectedShadowLayer {
             let mask_view = mask.create_view(&Default::default());
             let projection_view = projection.create_view(&Default::default());
             let pipelines = self.pipelines.as_ref().expect("shadow pipelines prepared");
-            let group = |source| {
+            let group = |source: &wgpu::TextureView| {
                 device.create_bind_group(&wgpu::BindGroupDescriptor {
                     label: Some("Projected shadow cached bind group"),
                     layout: &pipelines.layout,
@@ -269,6 +301,52 @@ impl ProjectedShadowLayer {
         self.settings.is_some_and(|settings| settings.spread > 0.01)
     }
 
+    pub fn render_camera_composite(
+        &self,
+        pass: &mut wgpu::RenderPass<'_>,
+        device: &wgpu::Device,
+        composed: &wgpu::TextureView,
+        foreground: &wgpu::TextureView,
+        source_is_mask: bool,
+    ) {
+        let Some(textures) = &self.textures else {
+            return;
+        };
+        let Some((layout, pipeline)) = self
+            .pipelines
+            .as_ref()
+            .and_then(|pipelines| pipelines.camera_composite.as_ref())
+        else {
+            return;
+        };
+        let group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+            label: Some("Camera shadow foreground recovery"),
+            layout,
+            entries: &[
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: wgpu::BindingResource::TextureView(foreground),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: wgpu::BindingResource::TextureView(composed),
+                },
+            ],
+        });
+        pass.set_pipeline(pipeline);
+        pass.set_bind_group(
+            0,
+            if source_is_mask {
+                &textures.mask_group
+            } else {
+                &textures.projection_group
+            },
+            &[],
+        );
+        pass.set_bind_group(1, &group, &[]);
+        pass.draw(0..3, 0..1);
+    }
+
     pub fn render_spread(&self, pass: &mut wgpu::RenderPass<'_>) {
         if let Some(pipelines) = &self.pipelines {
             self.render(pass, &pipelines.spread, false);
@@ -308,7 +386,7 @@ impl ProjectedShadowLayer {
 }
 
 impl ShadowPipelines {
-    fn new(device: &wgpu::Device) -> Self {
+    fn new(device: &wgpu::Device, camera_mode: bool) -> Self {
         let layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             label: Some("Projected shadow layout"),
             entries: &[
@@ -347,10 +425,10 @@ impl ShadowPipelines {
             bind_group_layouts: &[&layout],
             push_constant_ranges: &[],
         });
-        let create = |entry, blend| {
+        let create = |entry, blend, pipeline_layout: &wgpu::PipelineLayout| {
             device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
                 label: Some(entry),
-                layout: Some(&pipeline_layout),
+                layout: Some(pipeline_layout),
                 vertex: wgpu::VertexState {
                     module: &shader,
                     entry_point: Some("vs_main"),
@@ -374,14 +452,44 @@ impl ShadowPipelines {
                 cache: None,
             })
         };
+        let camera_composite = camera_mode.then(|| {
+            let recovery_layout =
+                device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+                    label: Some("Camera shadow foreground recovery layout"),
+                    entries: &[0, 1].map(|binding| wgpu::BindGroupLayoutEntry {
+                        binding,
+                        visibility: wgpu::ShaderStages::FRAGMENT,
+                        ty: wgpu::BindingType::Texture {
+                            sample_type: wgpu::TextureSampleType::Float { filterable: true },
+                            view_dimension: wgpu::TextureViewDimension::D2,
+                            multisampled: false,
+                        },
+                        count: None,
+                    }),
+                });
+            let recovery_pipeline_layout =
+                device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+                    label: Some("Camera shadow foreground recovery pipeline layout"),
+                    bind_group_layouts: &[&layout, &recovery_layout],
+                    push_constant_ranges: &[],
+                });
+            let pipeline = create(
+                "fs_camera_composite",
+                wgpu::BlendState::REPLACE,
+                &recovery_pipeline_layout,
+            );
+            (recovery_layout, pipeline)
+        });
         Self {
-            spread: create("fs_spread", wgpu::BlendState::REPLACE),
-            horizontal: create("fs_horizontal", wgpu::BlendState::REPLACE),
+            spread: create("fs_spread", wgpu::BlendState::REPLACE, &pipeline_layout),
+            horizontal: create("fs_horizontal", wgpu::BlendState::REPLACE, &pipeline_layout),
             vertical: create(
                 "fs_vertical",
                 wgpu::BlendState::PREMULTIPLIED_ALPHA_BLENDING,
+                &pipeline_layout,
             ),
             layout,
+            camera_composite,
         }
     }
 }

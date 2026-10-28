@@ -6,6 +6,8 @@ struct ShadowUniforms {
 @group(0) @binding(0) var<uniform> u: ShadowUniforms;
 @group(0) @binding(1) var source: texture_2d<f32>;
 @group(0) @binding(2) var source_sampler: sampler;
+@group(1) @binding(0) var camera_foreground: texture_2d<f32>;
+@group(1) @binding(1) var composed_frame: texture_2d<f32>;
 
 struct VertexOutput {
     @builtin(position) position: vec4<f32>,
@@ -61,4 +63,13 @@ fn fs_horizontal(in: VertexOutput) -> @location(0) vec4<f32> {
 @fragment
 fn fs_vertical(in: VertexOutput) -> @location(0) vec4<f32> {
     return vec4<f32>(0.0, 0.0, 0.0, blurred_alpha(in.uv, vec2<f32>(0.0, 1.0)) * u.opacity.x);
+}
+
+@fragment
+fn fs_camera_composite(in: VertexOutput) -> @location(0) vec4<f32> {
+    let shadow = blurred_alpha(in.uv, vec2<f32>(0.0, 1.0)) * u.opacity.x;
+    let composed = textureSampleLevel(composed_frame, source_sampler, in.uv, 0.0);
+    let foreground = textureSampleLevel(camera_foreground, source_sampler, in.uv, 0.0);
+    // Recover the premultiplied foreground so its shadow stays behind it without splitting temporal exposure.
+    return vec4<f32>(composed.rgb * (1.0 - shadow) + foreground.rgb * shadow, composed.a * (1.0 - shadow) + shadow);
 }

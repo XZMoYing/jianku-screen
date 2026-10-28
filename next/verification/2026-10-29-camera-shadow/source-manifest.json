@@ -1,0 +1,17 @@
+{
+	"baseCommit": "5cd92cac770f78989197dc17d06fd726ffecd2d3",
+	"testedSources": {
+		"crates/rendering/src/composite_frame.rs": "c8782809af3ecf6ceb547dd14e50421bd42714c954b8c131e39833bd92ef13a5",
+		"crates/rendering/src/layers/camera.rs": "634530f0c8fb47d069d3fe94159c8981246be6a1c8705572c4ac7645d93e099b",
+		"crates/rendering/src/layers/projected_shadow.rs": "2fb1a1bdab6e79f943f0ae4d33baa3216cdc315de1bd258d7503f2a4c007f261",
+		"crates/rendering/src/lib.rs": "c59977ce5c8569404bb18df60be25c5cce8da7b61c1debdf474181b714edae8b",
+		"crates/rendering/src/shaders/projected-shadow.wgsl": "fe3b4801c8db6c2946e9d0b7643bea1ceab2d218ad6071268b6c768efbf80464"
+	},
+	"cliSha256": "a28afb29818b8abc61a7fb1cd0f3ed7fa6525493e04e2e5ece4d2e282449a859",
+	"installedApplication": "0.2.0-alpha.45; no new desktop package for this component",
+	"nativeTests": {
+		"passed": 354,
+		"ignored": 6
+	},
+	"unresolved": "one first MP4 export differs on frames243..539; repeated new export and ProRes match; cause not established"
+}

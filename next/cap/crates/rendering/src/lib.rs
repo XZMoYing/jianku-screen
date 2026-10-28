@@ -2462,6 +2462,7 @@ pub struct ProjectUniforms {
     /// px. Equals `display.target_bounds` when no frame is active.
     display_outer_bounds: [f32; 4],
     screen_shadow_sources: [Option<ProjectedShadowSource>; 3],
+    camera_shadow_sources: [Option<ProjectedShadowSource>; 2],
     interpolated_cursor: Option<InterpolatedCursorPosition>,
     pub prev_cursor: Option<InterpolatedCursorPosition>,
     /// 0..1 multiplier from clips that hide the cursor (with the fade at
@@ -4678,10 +4679,7 @@ impl ProjectUniforms {
                         camera_descriptor.zoom_amount,
                         0.0,
                     ],
-                    shadow: project.camera.shadow
-                        * chrome_fade
-                        * camera3d_shadow_fade
-                        * takeover_fade,
+                    shadow: project.camera.shadow * chrome_fade * takeover_fade,
                     shadow_size: project
                         .camera
                         .advanced_shadow
@@ -4693,7 +4691,6 @@ impl ProjectUniforms {
                         .as_ref()
                         .map_or(18.0, |s| s.opacity)
                         * chrome_fade
-                        * camera3d_shadow_fade
                         * takeover_fade,
                     shadow_blur: project
                         .camera
@@ -4715,7 +4712,7 @@ impl ProjectUniforms {
                 }
             });
 
-        let camera_only = options
+        let mut camera_only = options
             .camera_size
             .filter(|_| !project.camera.hide && scene.is_transitioning_camera_only())
             .map(|camera_size| {
@@ -4851,7 +4848,7 @@ impl ProjectUniforms {
             }
             uniforms
         };
-        let camera = camera.map(cutout_uniforms);
+        let mut camera = camera.map(cutout_uniforms);
 
         let masks = project
             .timeline
@@ -4887,6 +4884,12 @@ impl ProjectUniforms {
                 .as_ref()
                 .map(|inset| ProjectedShadowSource::from_composite(&inset.composite)),
         ];
+        let camera_shadow_sources = [
+            camera.as_ref().map(ProjectedShadowSource::from_composite),
+            camera_only
+                .as_ref()
+                .map(ProjectedShadowSource::from_composite),
+        ];
         let fade_flat_shadow = |uniforms: &mut CompositeVideoFrameUniforms| {
             uniforms.shadow *= camera3d_shadow_fade;
             uniforms.shadow_opacity *= camera3d_shadow_fade;
@@ -4897,6 +4900,12 @@ impl ProjectUniforms {
         }
         if let Some(inset) = &mut inset {
             fade_flat_shadow(&mut inset.composite);
+        }
+        if let Some(camera) = &mut camera {
+            fade_flat_shadow(camera);
+        }
+        if let Some(camera) = &mut camera_only {
+            fade_flat_shadow(camera);
         }
 
         Self {
@@ -4913,6 +4922,7 @@ impl ProjectUniforms {
             notch,
             display_outer_bounds,
             screen_shadow_sources,
+            camera_shadow_sources,
             project: styled_project.into_owned(),
             zoom,
             scene,
@@ -5788,6 +5798,261 @@ pub struct FrameRenderStageTimings {
 mod style_image_tests {
     use super::*;
     use cap_project::{BackgroundSource, ImageSegment, StyleOverrides, StyleSegment};
+
+    #[tokio::test]
+    async fn projected_camera_shadow_stays_behind_foreground_and_over_screen() {
+        let recording_meta: RecordingMeta = serde_json::from_value(serde_json::json!({
+            "pretty_name":"jianku-camera-shadow",
+            "display":{"path":"display.mp4","fps":60},
+            "camera":{"path":"camera.mp4","fps":60},
+            "audio":null,"cursor":null
+        }))
+        .expect("metadata");
+        let meta = recording_meta.studio_meta().expect("studio").clone();
+        let size = XY::new(320, 180);
+        let camera_size = XY::new(128, 128);
+        let constants = RenderVideoConstants::new_with_options(
+            RenderOptions {
+                screen_size: size,
+                camera_size: Some(camera_size),
+                preserve_screen_alpha: false,
+            },
+            recording_meta,
+            meta,
+        )
+        .await
+        .expect("graphics device");
+        let frames = DecodedSegmentFrames {
+            screen_size: size,
+            screen_frame: Some(DecodedFrame::new(
+                [0, 0, 255, 255].repeat(320 * 180),
+                320,
+                180,
+            )),
+            camera_frame: Some(DecodedFrame::new(
+                [255, 0, 0, 255].repeat(128 * 128),
+                128,
+                128,
+            )),
+            segment_time: 3.0,
+            recording_time: 3.0,
+            segment_has_camera: true,
+        };
+        let cursor = CursorEvents::default();
+        for (name, camera_only, transparent) in [
+            ("overlay", false, false),
+            ("transparent", false, true),
+            ("camera-only", true, false),
+            ("camera-only-unpadded", true, false),
+            ("transition", true, false),
+        ] {
+            let mut project = ProjectConfiguration::default();
+            project.background.source = BackgroundSource::Color {
+                value: [255; 3],
+                alpha: if transparent { 0 } else { 255 },
+            };
+            project.background.padding = if transparent { 35.0 } else { 20.0 };
+            project.background.shadow = 0.0;
+            project.camera.hide = false;
+            project.camera.size = 45.0;
+            project.camera.manual_position = Some(if transparent {
+                XY::new(1.0, 1.0)
+            } else {
+                XY::new(0.5, 0.5)
+            });
+            project.camera.shadow = 0.0;
+            if name == "camera-only-unpadded" {
+                project.background.shadow = 75.0;
+                project.background.advanced_shadow = Some(cap_project::ShadowConfiguration {
+                    size: 10.0,
+                    opacity: 70.0,
+                    blur: 40.0,
+                });
+            }
+            let scene_transition_in = if name == "transition" { 2.0 } else { 0.3 };
+            let scene_start = if name == "transition" { 4.0 } else { 2.0 };
+            project.timeline = Some(serde_json::from_value(serde_json::json!({
+                "segments":[{"start":0.0,"end":6.0,"timescale":1.0}],
+                "zoomSegments":[],
+                "camera3dSegments":[{
+                    "start":1.0,"end":5.0,"enabled":true,"transitionIn":0.0,"transitionOut":0.0,
+                    "properties":{"fov":40.0,"zoom":2.5,"rotateX":12.0,"rotateY":-16.0},
+                    "tracks":{"panX":[
+                        {"time":0.0,"value":-0.1,"outEasing":null,"inEasing":null},
+                        {"time":4.0,"value":0.1,"outEasing":null,"inEasing":null}
+                    ]}
+                }],
+                "sceneSegments":if camera_only {serde_json::json!([{
+                    "start":scene_start,"end":5.0,"mode":"cameraOnly","transitionIn":scene_transition_in,"transitionOut":0.3
+                }])} else {serde_json::json!([])}
+            })).expect("timeline"));
+            if name == "camera-only" {
+                project
+                    .timeline
+                    .as_mut()
+                    .expect("timeline")
+                    .style_segments
+                    .push(StyleSegment {
+                        start: 2.0,
+                        end: 5.0,
+                        overrides: StyleOverrides {
+                            camera_only_padding: Some(10.0),
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    });
+            }
+            let zoom = ZoomTransformTimeline::from_project(&project, &cursor, 6.0, size);
+            let at = |project: &ProjectConfiguration| {
+                ProjectUniforms::new(
+                    &constants, project, 180, 60, size, &cursor, &frames, 6.0, &zoom,
+                )
+            };
+            let mut layers = RendererLayers::new(&constants.device, &constants.queue);
+            let mut renderer = FrameRenderer::new(&constants);
+            let off = renderer
+                .render_immediate(frames.clone(), at(&project), &cursor, true, &mut layers)
+                .await
+                .expect("without shadow");
+            assert!(!layers.camera_shadow_active());
+            let settings = cap_project::ShadowConfiguration {
+                size: 10.0,
+                opacity: 70.0,
+                blur: 40.0,
+            };
+            project.camera.shadow = 75.0;
+            project.camera.advanced_shadow = Some(settings.clone());
+            if name == "camera-only" || name == "camera-only-unpadded" {
+                project.background.shadow = 75.0;
+                project.background.advanced_shadow = Some(settings);
+            }
+            let uniforms = at(&project);
+            let on = renderer
+                .render_immediate(frames.clone(), uniforms.clone(), &cursor, true, &mut layers)
+                .await
+                .expect("camera shadow");
+            if name == "camera-only-unpadded" {
+                assert!(!layers.camera_shadow_active());
+                let differences = off
+                    .data
+                    .iter()
+                    .zip(on.data.iter())
+                    .enumerate()
+                    .filter(|(_, (a, b))| a != b)
+                    .map(|(index, (a, b))| (index, *a, *b))
+                    .take(8)
+                    .collect::<Vec<_>>();
+                assert!(
+                    off.data == on.data,
+                    "unpadded camera changed: {differences:?}; output {}x{}, stride {}; screen={}, cameraOnly={:?}",
+                    on.width,
+                    on.height,
+                    on.padded_bytes_per_row,
+                    uniforms.scene.should_render_screen(),
+                    uniforms.camera_only
+                );
+                continue;
+            }
+            assert!(layers.camera_shadow_active(), "{name}");
+            let mut foreground_pixels = 0;
+            let mut screen_shadow_pixels = 0;
+            let mut alpha_shadow_pixels = 0;
+            let mut background_shadow_pixels = 0;
+            for y in 0..on.height as usize {
+                for x in 0..on.width as usize {
+                    let a = y * off.padded_bytes_per_row as usize + x * 4;
+                    let b = y * on.padded_bytes_per_row as usize + x * 4;
+                    let before = &off.data[a..a + 4];
+                    let after = &on.data[b..b + 4];
+                    if before == [255, 0, 0, 255] {
+                        assert_eq!(before, after, "camera foreground {name} at {x},{y}");
+                        foreground_pixels += 1;
+                    }
+                    if before == [0, 0, 255, 255]
+                        && after[0] == 0
+                        && after[1] == 0
+                        && after[2] < 255
+                        && after[3] == 255
+                    {
+                        screen_shadow_pixels += 1;
+                    }
+                    if before[3] == 0 && after[3] > 0 {
+                        assert_eq!(after[..3], [0, 0, 0]);
+                        alpha_shadow_pixels += 1;
+                    }
+                    if before == [255; 4] && after != before {
+                        background_shadow_pixels += 1;
+                    }
+                }
+            }
+            if name == "transition" {
+                assert_eq!(
+                    background_shadow_pixels, 0,
+                    "a camera with no shadow must not enlarge the other camera's shadow"
+                );
+            } else {
+                assert!(foreground_pixels > 100, "{name}");
+            }
+            if name == "overlay" {
+                assert!(
+                    screen_shadow_pixels > 25,
+                    "shadow must land on the screen beneath the camera"
+                );
+            }
+            if transparent {
+                assert!(
+                    alpha_shadow_pixels > 25,
+                    "shadow must preserve transparent composition"
+                );
+            }
+            let export = match renderer
+                .render(frames.clone(), uniforms, &cursor, true, &mut layers)
+                .await
+                .expect("export")
+            {
+                Some(frame) => frame,
+                None => renderer
+                    .flush_pipeline()
+                    .await
+                    .expect("flush")
+                    .expect("frame"),
+            };
+            assert!(
+                on.data == export.data,
+                "preview/export {name}: first mismatch {:?}",
+                on.data
+                    .iter()
+                    .zip(export.data.iter())
+                    .position(|(a, b)| a != b)
+            );
+            if let Ok(directory) = std::env::var("JIANKU_SHADOW_DUMP_DIR") {
+                std::fs::create_dir_all(&directory).expect("directory");
+                for (state, frame) in [("off", &off), ("on", &on)] {
+                    let pixels = frame
+                        .data
+                        .chunks_exact(frame.padded_bytes_per_row as usize)
+                        .take(frame.height as usize)
+                        .flat_map(|row| row[..frame.width as usize * 4].iter().copied())
+                        .collect();
+                    image::RgbaImage::from_raw(frame.width, frame.height, pixels)
+                        .expect("RGBA")
+                        .save(
+                            std::path::Path::new(&directory)
+                                .join(format!("camera-shadow-{name}-{state}.png")),
+                        )
+                        .expect("PNG");
+                }
+            }
+            project.camera.hide = true;
+            if !camera_only {
+                renderer
+                    .render_immediate(frames.clone(), at(&project), &cursor, true, &mut layers)
+                    .await
+                    .expect("hidden camera");
+                assert!(!layers.camera_shadow_active());
+            }
+        }
+    }
 
     #[tokio::test]
     async fn projected_screen_shadow_preserves_foreground_and_preview_export_parity() {
@@ -7348,6 +7613,11 @@ impl<'a> FrameRenderer<'a> {
     }
 }
 
+struct CameraShadowForeground {
+    texture: wgpu::Texture,
+    view: wgpu::TextureView,
+}
+
 pub struct RendererLayers {
     background: BackgroundLayer,
     background_blur: BlurLayer,
@@ -7364,12 +7634,19 @@ pub struct RendererLayers {
     overlays: Option<OverlayLayers>,
     camera3d: Camera3DLayer,
     projected_shadow: ProjectedShadowLayer,
+    camera_shadow: ProjectedShadowLayer,
+    camera_only_shadow: ProjectedShadowLayer,
+    camera_shadow_foreground: Option<CameraShadowForeground>,
     camera_blur_processor: Option<cap_camera_effects::BlurProcessor>,
     camera_blur_init_failed: bool,
     camera_blur_unavailable: bool,
 }
 
 impl RendererLayers {
+    fn camera_shadow_active(&self) -> bool {
+        self.camera_shadow.views().is_some() || self.camera_only_shadow.views().is_some()
+    }
+
     pub fn interrupt_paused_background_on_playback(
         &mut self,
         requests: watch::Receiver<Option<u64>>,
@@ -7473,6 +7750,9 @@ impl RendererLayers {
             overlays: include_overlays.then(|| OverlayLayers::new(device, queue)),
             camera3d: readiness::measure("layers.camera3d", || Camera3DLayer::new(device)),
             projected_shadow: ProjectedShadowLayer::new(device),
+            camera_shadow: ProjectedShadowLayer::new_camera(device),
+            camera_only_shadow: ProjectedShadowLayer::new_camera(device),
+            camera_shadow_foreground: None,
             camera_blur_processor: None,
             camera_blur_init_failed: false,
             camera_blur_unavailable: false,
@@ -7960,6 +8240,53 @@ impl RendererLayers {
             uniforms,
             self.camera3d.is_active(),
         );
+        self.camera_shadow.prepare_camera(
+            &constants.device,
+            &constants.queue,
+            uniforms,
+            uniforms.camera_shadow_sources[0].filter(|_| {
+                uniforms.scene.should_render_camera()
+                    && uniforms.scene.regular_camera_transition_opacity() > 0.01
+                    && self.camera.has_content()
+            }),
+            self.camera3d.is_active(),
+        );
+        self.camera_only_shadow.prepare_camera(
+            &constants.device,
+            &constants.queue,
+            uniforms,
+            uniforms.camera_shadow_sources[1].filter(|_| {
+                uniforms.scene.is_transitioning_camera_only() && self.camera_only.has_content()
+            }),
+            self.camera3d.is_active(),
+        );
+        if self.camera_shadow_active()
+            && !self
+                .camera_shadow_foreground
+                .as_ref()
+                .is_some_and(|foreground| {
+                    foreground.texture.width() == uniforms.output_size.0.max(1)
+                        && foreground.texture.height() == uniforms.output_size.1.max(1)
+                })
+        {
+            let texture = constants.device.create_texture(&wgpu::TextureDescriptor {
+                label: Some("Projected camera foreground"),
+                size: wgpu::Extent3d {
+                    width: uniforms.output_size.0.max(1),
+                    height: uniforms.output_size.1.max(1),
+                    depth_or_array_layers: 1,
+                },
+                mip_level_count: 1,
+                sample_count: 1,
+                dimension: wgpu::TextureDimension::D2,
+                format: wgpu::TextureFormat::Rgba8Unorm,
+                usage: wgpu::TextureUsages::RENDER_ATTACHMENT
+                    | wgpu::TextureUsages::TEXTURE_BINDING,
+                view_formats: &[],
+            });
+            let view = texture.create_view(&Default::default());
+            self.camera_shadow_foreground = Some(CameraShadowForeground { texture, view });
+        }
 
         Ok(timings)
     }
@@ -8070,6 +8397,69 @@ impl RendererLayers {
             };
         }
 
+        let mut camera_shadow_from_mask = [false; 2];
+        if let (Some((mask, _)), Some(foreground)) = (
+            self.camera_shadow
+                .views()
+                .or_else(|| self.camera_only_shadow.views()),
+            self.camera_shadow_foreground.as_ref(),
+        ) {
+            {
+                let mut pass = render_pass!(mask, wgpu::LoadOp::Clear(wgpu::Color::TRANSPARENT));
+                if uniforms.scene.is_transitioning_camera_only() {
+                    self.camera_only.render_without_shadow(&mut pass, device);
+                }
+                if uniforms.scene.should_render_camera()
+                    && uniforms.scene.regular_camera_transition_opacity() > 0.01
+                {
+                    self.camera.render_without_shadow(&mut pass, device);
+                }
+            }
+            {
+                let mut pass = render_pass!(
+                    &foreground.view,
+                    wgpu::LoadOp::Clear(wgpu::Color::TRANSPARENT)
+                );
+                self.camera3d.render(&mut pass, device, mask);
+            }
+            for (index, (shadow, camera)) in [
+                (&self.camera_shadow, &self.camera),
+                (&self.camera_only_shadow, &self.camera_only),
+            ]
+            .into_iter()
+            .enumerate()
+            {
+                let Some((mask, projection)) = shadow.views() else {
+                    continue;
+                };
+                {
+                    let mut pass =
+                        render_pass!(mask, wgpu::LoadOp::Clear(wgpu::Color::TRANSPARENT));
+                    camera.render_shadow_mask(&mut pass, device);
+                }
+                {
+                    let mut pass =
+                        render_pass!(projection, wgpu::LoadOp::Clear(wgpu::Color::TRANSPARENT));
+                    self.camera3d.render(&mut pass, device, mask);
+                }
+                if shadow.has_spread() {
+                    {
+                        let mut pass =
+                            render_pass!(mask, wgpu::LoadOp::Clear(wgpu::Color::TRANSPARENT));
+                        shadow.render_spread(&mut pass);
+                    }
+                    let mut pass =
+                        render_pass!(projection, wgpu::LoadOp::Clear(wgpu::Color::TRANSPARENT));
+                    shadow.render_horizontal(&mut pass, true);
+                } else {
+                    let mut pass =
+                        render_pass!(mask, wgpu::LoadOp::Clear(wgpu::Color::TRANSPARENT));
+                    shadow.render_horizontal(&mut pass, false);
+                    camera_shadow_from_mask[index] = true;
+                }
+            }
+        }
+
         if should_render_screen && let Some((mask, projection)) = self.projected_shadow.views() {
             {
                 let mut pass = render_pass!(mask, wgpu::LoadOp::Clear(wgpu::Color::TRANSPARENT));
@@ -8150,6 +8540,31 @@ impl RendererLayers {
             let mut pass = render_pass!(session.current_texture_view(), wgpu::LoadOp::Load);
             self.camera3d
                 .render(&mut pass, device, session.other_texture_view());
+        }
+
+        if let Some(foreground) = &self.camera_shadow_foreground {
+            for (index, shadow) in [&self.camera_shadow, &self.camera_only_shadow]
+                .into_iter()
+                .enumerate()
+            {
+                if shadow.views().is_none() {
+                    continue;
+                }
+                {
+                    let mut pass = render_pass!(
+                        session.other_texture_view(),
+                        wgpu::LoadOp::Clear(wgpu::Color::TRANSPARENT)
+                    );
+                    shadow.render_camera_composite(
+                        &mut pass,
+                        device,
+                        session.current_texture_view(),
+                        &foreground.view,
+                        camera_shadow_from_mask[index],
+                    );
+                }
+                session.swap_textures();
+            }
         }
 
         // Focus blur over the composed frame (background and warped content

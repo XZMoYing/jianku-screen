@@ -1,0 +1,38 @@
+[
+	{
+		"a": "before-camera-shadow-off",
+		"b": "after-camera-shadow-off",
+		"differentFrames": 297,
+		"first": [243, 244, 245]
+	},
+	{
+		"a": "before-camera-shadow-off",
+		"b": "repeat-before-camera-shadow-off",
+		"differentFrames": 0,
+		"first": []
+	},
+	{
+		"a": "before-camera-shadow-off",
+		"b": "repeat-after-camera-shadow-off",
+		"differentFrames": 0,
+		"first": []
+	},
+	{
+		"a": "after-camera-shadow-off",
+		"b": "repeat-before-camera-shadow-off",
+		"differentFrames": 297,
+		"first": [243, 244, 245]
+	},
+	{
+		"a": "after-camera-shadow-off",
+		"b": "repeat-after-camera-shadow-off",
+		"differentFrames": 297,
+		"first": [243, 244, 245]
+	},
+	{
+		"a": "repeat-before-camera-shadow-off",
+		"b": "repeat-after-camera-shadow-off",
+		"differentFrames": 0,
+		"first": []
+	}
+]

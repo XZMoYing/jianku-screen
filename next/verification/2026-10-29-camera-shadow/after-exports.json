@@ -1,0 +1,66 @@
+{
+	"cli": "/Users/moyingxz/Documents/Zzx/05_\u9879\u76ee\u5f00\u53d1/Jianku Screen Next/next/cap/target/release/cap",
+	"cliSha256": "a28afb29818b8abc61a7fb1cd0f3ed7fa6525493e04e2e5ece4d2e282449a859",
+	"runs": [
+		{
+			"case": "overlay-motion",
+			"exitCode": 0,
+			"seconds": 7.698227042,
+			"output": "/private/tmp/jianku-camera-shadow/after-overlay-motion.mp4"
+		},
+		{
+			"case": "camera-only-motion",
+			"exitCode": 0,
+			"seconds": 6.9721389579999995,
+			"output": "/private/tmp/jianku-camera-shadow/after-camera-only-motion.mp4"
+		},
+		{
+			"case": "scene-transition",
+			"exitCode": 0,
+			"seconds": 7.977800374999999,
+			"output": "/private/tmp/jianku-camera-shadow/after-scene-transition.mp4"
+		},
+		{
+			"case": "camera-shadow-off",
+			"exitCode": 0,
+			"seconds": 6.664864416,
+			"output": "/private/tmp/jianku-camera-shadow/after-camera-shadow-off.mp4"
+		},
+		{
+			"case": "flat-camera",
+			"exitCode": 0,
+			"seconds": 5.910563417000002,
+			"output": "/private/tmp/jianku-camera-shadow/after-flat-camera.mp4"
+		},
+		{
+			"case": "hidden-camera",
+			"exitCode": 0,
+			"seconds": 6.802883458000004,
+			"output": "/private/tmp/jianku-camera-shadow/after-hidden-camera.mp4"
+		},
+		{
+			"case": "focus-blur-only",
+			"exitCode": 0,
+			"seconds": 6.348665665999995,
+			"output": "/private/tmp/jianku-camera-shadow/after-focus-blur-only.mp4"
+		},
+		{
+			"case": "camera-only-padded-motion",
+			"exitCode": 0,
+			"seconds": 7.464049166000002,
+			"output": "/private/tmp/jianku-camera-shadow/after-camera-only-padded-motion.mp4"
+		},
+		{
+			"case": "macbook-camera",
+			"exitCode": 0,
+			"seconds": 7.015272957999997,
+			"output": "/private/tmp/jianku-camera-shadow/after-macbook-camera.mp4"
+		},
+		{
+			"case": "scene-transition-padded",
+			"exitCode": 0,
+			"seconds": 8.346050667,
+			"output": "/private/tmp/jianku-camera-shadow/after-scene-transition-padded.mp4"
+		}
+	]
+}

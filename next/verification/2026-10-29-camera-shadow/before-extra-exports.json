@@ -1,0 +1,18 @@
+{
+	"cli": "/Applications/Jianku Screen Next.app/Contents/MacOS/cap-cli",
+	"cliSha256": "a8157bc6d3bea1b225331e9e4a4c447c93335bf1a8b7782ca120f310ae5bafcf",
+	"runs": [
+		{
+			"case": "macbook-camera",
+			"exitCode": 0,
+			"seconds": 6.320809875,
+			"output": "/private/tmp/jianku-camera-shadow/before-extra-macbook-camera.mp4"
+		},
+		{
+			"case": "scene-transition-padded",
+			"exitCode": 0,
+			"seconds": 7.505748667000001,
+			"output": "/private/tmp/jianku-camera-shadow/before-extra-scene-transition-padded.mp4"
+		}
+	]
+}

@@ -1,0 +1,12 @@
+{
+	"cli": "/Applications/Jianku Screen Next.app/Contents/MacOS/cap-cli",
+	"cliSha256": "a8157bc6d3bea1b225331e9e4a4c447c93335bf1a8b7782ca120f310ae5bafcf",
+	"runs": [
+		{
+			"case": "camera-only-padded-motion",
+			"exitCode": 0,
+			"seconds": 7.558388666,
+			"output": "/private/tmp/jianku-camera-shadow/before-padded-camera-only-padded-motion.mp4"
+		}
+	]
+}

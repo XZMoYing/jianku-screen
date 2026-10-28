@@ -588,6 +588,26 @@ impl CameraLayer {
     pub fn copy_to_texture(&mut self, _encoder: &mut wgpu::CommandEncoder) {}
 
     pub fn render(&self, pass: &mut wgpu::RenderPass<'_>) {
+        self.render_with_pipeline(pass, &self.pipeline.render_pipeline);
+    }
+
+    pub fn has_content(&self) -> bool {
+        !self.hidden
+    }
+
+    pub fn render_without_shadow(&self, pass: &mut wgpu::RenderPass<'_>, device: &wgpu::Device) {
+        self.render_with_pipeline(pass, self.pipeline.unshadowed_color_pipeline(device));
+    }
+
+    pub fn render_shadow_mask(&self, pass: &mut wgpu::RenderPass<'_>, device: &wgpu::Device) {
+        self.render_with_pipeline(pass, self.pipeline.shadow_mask_pipeline(device));
+    }
+
+    fn render_with_pipeline(
+        &self,
+        pass: &mut wgpu::RenderPass<'_>,
+        pipeline: &wgpu::RenderPipeline,
+    ) {
         if self.hidden {
             return;
         }
@@ -601,7 +621,7 @@ impl CameraLayer {
         };
 
         if let Some(bind_group) = bind_group {
-            pass.set_pipeline(&self.pipeline.render_pipeline);
+            pass.set_pipeline(pipeline);
             pass.set_bind_group(0, bind_group, &[]);
             pass.draw(0..3, 0..1);
         }

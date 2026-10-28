@@ -1,0 +1,82 @@
+[
+	{
+		"case": "overlay-motion",
+		"frames": 540,
+		"changedFrames": 440,
+		"expectedUnchanged": false,
+		"pcmIdentical": true,
+		"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885"
+	},
+	{
+		"case": "camera-only-motion",
+		"frames": 540,
+		"changedFrames": 0,
+		"expectedUnchanged": true,
+		"pcmIdentical": true,
+		"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885"
+	},
+	{
+		"case": "scene-transition",
+		"frames": 540,
+		"changedFrames": 275,
+		"expectedUnchanged": false,
+		"pcmIdentical": true,
+		"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885"
+	},
+	{
+		"case": "camera-shadow-off",
+		"frames": 540,
+		"changedFrames": 297,
+		"expectedUnchanged": true,
+		"pcmIdentical": true,
+		"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885"
+	},
+	{
+		"case": "flat-camera",
+		"frames": 540,
+		"changedFrames": 0,
+		"expectedUnchanged": true,
+		"pcmIdentical": true,
+		"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885"
+	},
+	{
+		"case": "hidden-camera",
+		"frames": 540,
+		"changedFrames": 0,
+		"expectedUnchanged": true,
+		"pcmIdentical": true,
+		"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885"
+	},
+	{
+		"case": "focus-blur-only",
+		"frames": 540,
+		"changedFrames": 0,
+		"expectedUnchanged": true,
+		"pcmIdentical": true,
+		"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885"
+	},
+	{
+		"case": "camera-only-padded-motion",
+		"frames": 540,
+		"changedFrames": 419,
+		"expectedUnchanged": false,
+		"pcmIdentical": true,
+		"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885"
+	},
+	{
+		"case": "macbook-camera",
+		"frames": 540,
+		"changedFrames": 428,
+		"expectedUnchanged": false,
+		"pcmIdentical": true,
+		"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885"
+	},
+	{
+		"case": "scene-transition-padded",
+		"frames": 540,
+		"changedFrames": 437,
+		"expectedUnchanged": false,
+		"pcmIdentical": true,
+		"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885"
+	}
+]

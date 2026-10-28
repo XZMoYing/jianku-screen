@@ -6,6 +6,7 @@ pub struct CompositeVideoFramePipeline {
     pub bind_group_layout: wgpu::BindGroupLayout,
     pub render_pipeline: wgpu::RenderPipeline,
     shadow_mask_pipeline: std::sync::OnceLock<wgpu::RenderPipeline>,
+    unshadowed_color_pipeline: std::sync::OnceLock<wgpu::RenderPipeline>,
     sampler: wgpu::Sampler,
 }
 
@@ -287,7 +288,8 @@ impl CompositeVideoFrameUniforms {
 impl CompositeVideoFramePipeline {
     pub fn new(device: &wgpu::Device) -> Self {
         let bind_group_layout = Self::bind_group_layout(device);
-        let render_pipeline = Self::create_render_pipeline(device, &bind_group_layout, false);
+        let render_pipeline =
+            Self::create_render_pipeline(device, &bind_group_layout, false, false);
 
         let sampler = device.create_sampler(&wgpu::SamplerDescriptor {
             address_mode_u: wgpu::AddressMode::ClampToEdge,
@@ -303,20 +305,29 @@ impl CompositeVideoFramePipeline {
             bind_group_layout,
             render_pipeline,
             shadow_mask_pipeline: std::sync::OnceLock::new(),
+            unshadowed_color_pipeline: std::sync::OnceLock::new(),
             sampler,
         }
     }
 
     pub fn shadow_mask_pipeline(&self, device: &wgpu::Device) -> &wgpu::RenderPipeline {
         // Both draws read the shared buffer after submission, so specialize instead of rewriting it.
-        self.shadow_mask_pipeline
-            .get_or_init(|| Self::create_render_pipeline(device, &self.bind_group_layout, true))
+        self.shadow_mask_pipeline.get_or_init(|| {
+            Self::create_render_pipeline(device, &self.bind_group_layout, true, true)
+        })
+    }
+
+    pub fn unshadowed_color_pipeline(&self, device: &wgpu::Device) -> &wgpu::RenderPipeline {
+        self.unshadowed_color_pipeline.get_or_init(|| {
+            Self::create_render_pipeline(device, &self.bind_group_layout, true, false)
+        })
     }
 
     fn create_render_pipeline(
         device: &wgpu::Device,
         bind_group_layout: &wgpu::BindGroupLayout,
-        shadow_mask: bool,
+        omit_shadow: bool,
+        alpha_only: bool,
     ) -> wgpu::RenderPipeline {
         let pipeline_cache = load_pipeline_cache(device);
         let shader_desc = include_wgsl!("shaders/composite-video-frame.wgsl");
@@ -342,14 +353,14 @@ impl CompositeVideoFramePipeline {
             },
             fragment: Some(wgpu::FragmentState {
                 module: &shader,
-                entry_point: Some(if shadow_mask { "fs_mask" } else { "fs_main" }),
+                entry_point: Some(if alpha_only { "fs_mask" } else { "fs_main" }),
                 targets: &[Some(wgpu::ColorTargetState {
                     format: wgpu::TextureFormat::Rgba8Unorm,
                     blend: Some(wgpu::BlendState::ALPHA_BLENDING),
                     write_mask: wgpu::ColorWrites::ALL,
                 })],
                 compilation_options: wgpu::PipelineCompilationOptions {
-                    constants: if shadow_mask {
+                    constants: if omit_shadow {
                         &[("OMIT_SHADOW", 1.0)]
                     } else {
                         &[]

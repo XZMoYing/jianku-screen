@@ -1,0 +1,48 @@
+{
+	"cli": "/Applications/Jianku Screen Next.app/Contents/MacOS/cap-cli",
+	"cliSha256": "a8157bc6d3bea1b225331e9e4a4c447c93335bf1a8b7782ca120f310ae5bafcf",
+	"runs": [
+		{
+			"case": "overlay-motion",
+			"exitCode": 0,
+			"seconds": 7.051276583,
+			"output": "/private/tmp/jianku-camera-shadow/before-overlay-motion.mp4"
+		},
+		{
+			"case": "camera-only-motion",
+			"exitCode": 0,
+			"seconds": 7.040762207999999,
+			"output": "/private/tmp/jianku-camera-shadow/before-camera-only-motion.mp4"
+		},
+		{
+			"case": "scene-transition",
+			"exitCode": 0,
+			"seconds": 7.3292687910000005,
+			"output": "/private/tmp/jianku-camera-shadow/before-scene-transition.mp4"
+		},
+		{
+			"case": "camera-shadow-off",
+			"exitCode": 0,
+			"seconds": 6.028353333999998,
+			"output": "/private/tmp/jianku-camera-shadow/before-camera-shadow-off.mp4"
+		},
+		{
+			"case": "flat-camera",
+			"exitCode": 0,
+			"seconds": 5.8900076660000025,
+			"output": "/private/tmp/jianku-camera-shadow/before-flat-camera.mp4"
+		},
+		{
+			"case": "hidden-camera",
+			"exitCode": 0,
+			"seconds": 6.839867165999998,
+			"output": "/private/tmp/jianku-camera-shadow/before-hidden-camera.mp4"
+		},
+		{
+			"case": "focus-blur-only",
+			"exitCode": 0,
+			"seconds": 6.334798624999998,
+			"output": "/private/tmp/jianku-camera-shadow/before-focus-blur-only.mp4"
+		}
+	]
+}
