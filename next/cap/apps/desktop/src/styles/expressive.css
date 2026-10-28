@@ -1395,3 +1395,36 @@
 :root .jk-motion-group > button[aria-selected="true"] {
 	background: transparent;
 }
+
+:root .jk-editor-preview-fullscreen .jk-preview-chrome {
+	display: none;
+}
+:root .jk-editor-preview-fullscreen .jk-preview-card {
+	position: fixed;
+	inset: 0;
+	z-index: 40;
+	width: 100vw;
+	height: 100vh;
+	border: 0;
+	border-radius: 0;
+}
+.jk-preview-scrubber {
+	appearance: none;
+	height: 6px;
+	border-radius: 999px;
+	background: var(--jk-secondary-container);
+	accent-color: var(--jk-primary);
+	cursor: pointer;
+}
+.jk-preview-scrubber::-webkit-slider-thumb {
+	appearance: none;
+	width: 4px;
+	height: 20px;
+	border-radius: 3px;
+	background: var(--jk-primary);
+	box-shadow: 0 0 0 4px var(--jk-surface);
+}
+.jk-preview-scrubber:focus-visible {
+	outline: 2px solid var(--jk-primary);
+	outline-offset: 8px;
+}

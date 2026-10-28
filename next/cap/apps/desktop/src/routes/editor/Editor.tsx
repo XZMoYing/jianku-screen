@@ -69,6 +69,7 @@ import { Header } from "./Header";
 import { ImportProgress } from "./ImportProgress";
 import { PlayerContent } from "./Player";
 import { usePreparingEditor } from "./preparing-editor-context";
+import { createPreviewFullscreen } from "./preview-fullscreen";
 import { Timeline } from "./Timeline";
 import { Dialog, DialogContent, EditorButton, Input, Subfield } from "./ui";
 
@@ -358,6 +359,55 @@ function Inner(props: {
 	} = useEditorContext();
 
 	const [projectBusy, setProjectBusy] = createSignal(false);
+	const [previewFullscreen, setPreviewFullscreen] = createSignal(false);
+	const [fullscreenBusy, setFullscreenBusy] = createSignal(false);
+	const fullscreen = createPreviewFullscreen({
+		window: getCurrentWindow(),
+		changed: setPreviewFullscreen,
+		failed: (error) => {
+			console.error("Failed to change preview fullscreen", error);
+			toast.error(localize("无法切换全屏预览，请重试"));
+		},
+	});
+	const requestPreviewFullscreen = async (enabled: boolean) => {
+		setFullscreenBusy(true);
+		await fullscreen.request(enabled);
+		setFullscreenBusy(false);
+	};
+	createEventListener(window, "keydown", (event) => {
+		if (
+			event.key !== "Escape" ||
+			event.defaultPrevented ||
+			!previewFullscreen()
+		)
+			return;
+		event.preventDefault();
+		void requestPreviewFullscreen(false);
+	});
+	let fullscreenDisposed = false;
+	let stopFullscreenResize: (() => void) | undefined;
+	const syncFullscreen = debounce(() => {
+		void fullscreen
+			.nativeChanged()
+			.catch((error) =>
+				console.error("Failed to read preview fullscreen state", error),
+			);
+	}, 350);
+	onMount(() => {
+		void getCurrentWindow()
+			.onResized(syncFullscreen)
+			.then((unlisten) => {
+				if (fullscreenDisposed) unlisten();
+				else stopFullscreenResize = unlisten;
+			})
+			.catch(console.error);
+	});
+	onCleanup(() => {
+		fullscreenDisposed = true;
+		syncFullscreen.clear();
+		stopFullscreenResize?.();
+		void fullscreen.dispose();
+	});
 	const preparingSession = usePreparingEditor();
 	const editorReady = () =>
 		preparingSession?.ordinaryReady() ??
@@ -890,13 +940,16 @@ function Inner(props: {
 		>
 			<div
 				class="relative flex flex-col flex-1 min-h-0"
+				classList={{ "jk-editor-preview-fullscreen": previewFullscreen() }}
 				aria-busy={!editorReady() && !preparingSession?.handoffFailed()}
 			>
-				<Header
-					registerTitleSave={registerEditorSave}
-					disabled={!editorReady() || projectBusy()}
-					onProjectBusyChange={setProjectBusy}
-				/>
+				<div class="jk-preview-chrome contents" inert={previewFullscreen()}>
+					<Header
+						registerTitleSave={registerEditorSave}
+						disabled={!editorReady() || projectBusy()}
+						onProjectBusyChange={setProjectBusy}
+					/>
+				</div>
 				<Show when={projectBusy()}>
 					<div
 						role="status"
@@ -958,7 +1011,7 @@ function Inner(props: {
 							}}
 						>
 							<div
-								class="jk-editor-card flex overflow-hidden flex-col rounded-xl bg-ed-card shadow-ed-card"
+								class="jk-editor-card jk-preview-card flex overflow-hidden flex-col rounded-xl bg-ed-card shadow-ed-card"
 								style={{
 									flex: isTranscriptMode()
 										? `0 0 ${splitRatio() * 100}%`
@@ -966,11 +1019,19 @@ function Inner(props: {
 									"min-width": "0",
 								}}
 							>
-								<PlayerContent compactness={layoutLimits().compactness} />
+								<PlayerContent
+									compactness={layoutLimits().compactness}
+									fullscreen={previewFullscreen()}
+									fullscreenBusy={fullscreenBusy()}
+									onToggleFullscreen={() =>
+										void requestPreviewFullscreen(!previewFullscreen())
+									}
+								/>
 							</div>
 							<Show when={!isTranscriptMode()}>
 								<div
-									class="jk-inspector-divider"
+									class="jk-inspector-divider jk-preview-chrome"
+									inert={previewFullscreen()}
 									role="separator"
 									aria-label={localize("调整预览和编辑栏宽度")}
 									aria-orientation="vertical"
@@ -990,7 +1051,8 @@ function Inner(props: {
 									<span />
 								</div>
 								<div
-									class="jk-inspector-pane flex min-h-0 min-w-0 flex-none overflow-hidden"
+									class="jk-inspector-pane jk-preview-chrome flex min-h-0 min-w-0 flex-none overflow-hidden"
+									inert={previewFullscreen()}
 									style={{ width: `${inspectorWidth()}px` }}
 								>
 									<div
@@ -1014,7 +1076,8 @@ function Inner(props: {
 							</Show>
 							<Show when={isTranscriptMode()}>
 								<div
-									class="flex-none flex items-center justify-center cursor-col-resize select-none group z-10"
+									class="jk-preview-chrome flex-none flex items-center justify-center cursor-col-resize select-none group z-10"
+									inert={previewFullscreen()}
 									style={{ width: "12px" }}
 									onMouseDown={handleSplitResizeStart}
 									aria-label={localize("Resize captions panel")}
@@ -1029,7 +1092,8 @@ function Inner(props: {
 									/>
 								</div>
 								<div
-									class="flex overflow-hidden flex-col min-h-0 rounded-xl duration-150 bg-ed-card shadow-ed-card animate-in fade-in"
+									class="jk-preview-chrome flex overflow-hidden flex-col min-h-0 rounded-xl duration-150 bg-ed-card shadow-ed-card animate-in fade-in"
+									inert={previewFullscreen()}
 									style={{
 										flex: isResizingSplit()
 											? `0 0 calc(${(1 - splitRatio()) * 100}% - 12px)`
@@ -1044,7 +1108,8 @@ function Inner(props: {
 							</Show>
 						</div>
 						<div
-							class="relative flex-none px-2 min-h-0"
+							class="jk-preview-chrome relative flex-none px-2 min-h-0"
+							inert={previewFullscreen()}
 							style={{ height: `${timelineHeight()}px` }}
 						>
 							<div
@@ -1064,6 +1129,7 @@ function Inner(props: {
 							<div class="jk-timeline-card overflow-hidden relative px-3 pt-2.5 pb-3 h-full rounded-xl bg-ed-card shadow-ed-card">
 								<div class="h-full">
 									<Timeline
+										inactive={previewFullscreen()}
 										onViewportOverflowChange={setTimelineViewportOverflow}
 										onContentHeightChange={updateTimelineContentHeight}
 									/>

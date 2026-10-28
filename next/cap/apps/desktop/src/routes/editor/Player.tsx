@@ -11,6 +11,7 @@ import {
 	createEffect,
 	createSignal,
 	on,
+	onCleanup,
 	onMount,
 	Show,
 	untrack,
@@ -21,6 +22,7 @@ import { captionsStore } from "~/store/captions";
 import { createTauriEventListener } from "~/utils/createEventListener";
 import { t as localize } from "~/utils/i18n";
 import { commands, type PreviewResolutionOption } from "~/utils/tauri";
+import IconMinimize from "~icons/lucide/minimize-2";
 import AspectRatioSelect from "./AspectRatioSelect";
 import {
 	CanvasElementsOverlay,
@@ -54,7 +56,12 @@ import {
 import { useEditorShortcuts } from "./useEditorShortcuts";
 import { formatTime } from "./utils";
 
-export function PlayerContent(props: { compactness?: number }) {
+export function PlayerContent(props: {
+	compactness?: number;
+	fullscreen?: boolean;
+	fullscreenBusy?: boolean;
+	onToggleFullscreen?: () => void;
+}) {
 	const {
 		previewStyle,
 		selectedStyle,
@@ -81,6 +88,39 @@ export function PlayerContent(props: { compactness?: number }) {
 	let panelRef: HTMLDivElement | undefined;
 	const [panelHovered, setPanelHovered] = createSignal(false);
 	const [previewPointerDown, setPreviewPointerDown] = createSignal(false);
+	const [seekDraft, setSeekDraft] = createSignal<number>();
+	let seekRevision = 0;
+	onCleanup(() => seekRevision++);
+	const seekPreview = async (seconds: number) => {
+		const time = Math.max(0, Math.min(seconds, totalDuration()));
+		const revision = ++seekRevision;
+		setSeekDraft(undefined);
+		setEditorState("previewTime", null);
+		const pending = requestHandoffPlayback(playbackIntent(), time);
+		if (pending) {
+			await pending;
+			return;
+		}
+		try {
+			if (editorState.playing) {
+				await commands.stopPlayback();
+				if (revision !== seekRevision) return;
+			}
+			await commands.seekTo(
+				Math.min(
+					Math.floor(time * FPS),
+					Math.max(0, Math.ceil(totalDuration() * FPS) - 1),
+				),
+			);
+			if (revision !== seekRevision) return;
+			setEditorState("playbackTime", time);
+			if (editorState.playing && time < totalDuration())
+				await commands.startPlayback(FPS, previewResolutionBase());
+			else if (time >= totalDuration()) setEditorState("playing", false);
+		} catch (error) {
+			console.error("Failed to seek fullscreen preview", error);
+		}
+	};
 
 	createEventListener(window, "mouseup", (event) => {
 		if (event.button !== 0 || !previewPointerDown()) return;
@@ -239,6 +279,8 @@ export function PlayerContent(props: { compactness?: number }) {
 	});
 
 	const handlePlayPauseClick = async () => {
+		seekRevision++;
+		setSeekDraft(undefined);
 		const pending = requestHandoffPlayback(
 			isAtEnd() || !playbackIntent(),
 			isAtEnd() ? 0 : undefined,
@@ -298,6 +340,7 @@ export function PlayerContent(props: { compactness?: number }) {
 	}, [
 		{
 			combo: "S",
+			when: () => !props.fullscreen,
 			handler: () =>
 				setEditorState(
 					"timeline",
@@ -307,6 +350,7 @@ export function PlayerContent(props: { compactness?: number }) {
 		},
 		{
 			combo: "Mod+=",
+			when: () => !props.fullscreen,
 			handler: () =>
 				editorState.timeline.transform.updateZoom(
 					editorState.timeline.transform.zoom / 1.1,
@@ -315,6 +359,7 @@ export function PlayerContent(props: { compactness?: number }) {
 		},
 		{
 			combo: "Mod+-",
+			when: () => !props.fullscreen,
 			handler: () =>
 				editorState.timeline.transform.updateZoom(
 					editorState.timeline.transform.zoom * 1.1,
@@ -353,7 +398,10 @@ export function PlayerContent(props: { compactness?: number }) {
 				class="flex overflow-x-auto relative z-10 flex-none flex-row gap-3 items-center px-3"
 				style={{ height: `${44 - 4 * (props.compactness ?? 0)}px` }}
 			>
-				<div class="flex flex-1 gap-0.5 items-center min-w-fit">
+				<div
+					class="flex flex-1 gap-0.5 items-center min-w-fit"
+					classList={{ hidden: props.fullscreen }}
+				>
 					<Show when={!selectedStyle()}>
 						<AspectRatioSelect />
 					</Show>
@@ -367,7 +415,7 @@ export function PlayerContent(props: { compactness?: number }) {
 					</EditorButton>
 					<FrameButton />
 				</div>
-				<div class="flex flex-row flex-none gap-2 items-center">
+				<div class="flex flex-row flex-none gap-2 items-center ml-auto">
 					<span class="text-xs text-ed-text-2">{localize("Preview")}</span>
 					<KSelect<PreviewResolutionOption>
 						options={previewResolutionOptions()}
@@ -434,6 +482,20 @@ export function PlayerContent(props: { compactness?: number }) {
 							</PopperContent>
 						</KSelect.Portal>
 					</KSelect>
+					<EditorButton
+						tooltipText={localize(
+							props.fullscreen ? "退出全屏预览" : "全屏预览",
+						)}
+						aria-label={localize(
+							props.fullscreen ? "退出全屏预览" : "全屏预览",
+						)}
+						aria-pressed={props.fullscreen ?? false}
+						disabled={props.fullscreenBusy}
+						onClick={props.onToggleFullscreen}
+						leftIcon={
+							props.fullscreen ? <IconMinimize /> : <IconLucideMaximize2 />
+						}
+					/>
 				</div>
 			</div>
 			<PreviewCanvas
@@ -441,6 +503,21 @@ export function PlayerContent(props: { compactness?: number }) {
 					if (event.button === 0) setPreviewPointerDown(true);
 				}}
 			/>
+			<Show when={props.fullscreen}>
+				<input
+					type="range"
+					class="jk-preview-scrubber mx-5 my-2 shrink-0"
+					aria-label={localize("预览播放进度")}
+					min={0}
+					max={totalDuration()}
+					step={1 / FPS}
+					value={seekDraft() ?? editorState.playbackTime}
+					onInput={(event) => setSeekDraft(event.currentTarget.valueAsNumber)}
+					onChange={(event) =>
+						void seekPreview(event.currentTarget.valueAsNumber)
+					}
+				/>
+			</Show>
 			<div
 				class="flex overflow-x-auto relative z-10 flex-none flex-row gap-3 items-center px-3.5"
 				style={{ height: `${48 - 4 * (props.compactness ?? 0)}px` }}
@@ -459,8 +536,11 @@ export function PlayerContent(props: { compactness?: number }) {
 				<div class="flex flex-row flex-none gap-3.5 items-center">
 					<button
 						type="button"
+						aria-label={localize("回到开头")}
 						class="text-ed-text-2 transition-opacity hover:opacity-70 will-change-[opacity]"
 						onClick={async () => {
+							seekRevision++;
+							setSeekDraft(undefined);
 							const pending = requestHandoffPlayback(false, 0);
 							if (pending) {
 								editorState.timeline.transform.setPosition(0);
@@ -492,8 +572,11 @@ export function PlayerContent(props: { compactness?: number }) {
 					</Tooltip>
 					<button
 						type="button"
+						aria-label={localize("跳到结尾")}
 						class="text-ed-text-2 transition-opacity hover:opacity-70 will-change-[opacity]"
 						onClick={async () => {
+							seekRevision++;
+							setSeekDraft(undefined);
 							const pending = requestHandoffPlayback(false, totalDuration());
 							if (pending) {
 								await pending;

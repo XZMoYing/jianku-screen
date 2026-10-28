@@ -1,0 +1,7 @@
+{
+	"$schema": "../gen/schemas/desktop-schema.json",
+	"identifier": "preview-fullscreen",
+	"description": "Fullscreen preview in recording editor windows",
+	"windows": ["editor-*"],
+	"permissions": ["core:window:allow-set-fullscreen"]
+}

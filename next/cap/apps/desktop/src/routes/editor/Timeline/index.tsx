@@ -189,6 +189,7 @@ function deleteTrackLane<T extends { track?: number }>(
 }
 
 export function Timeline(props: {
+	inactive?: boolean;
 	onViewportOverflowChange?: (value: {
 		overflow: number;
 		visibleTrackCount: number;
@@ -1153,6 +1154,7 @@ export function Timeline(props: {
 	}
 
 	createEventListener(window, "keydown", (e) => {
+		if (props.inactive || e.defaultPrevented) return;
 		const hasNoModifiers = !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey;
 
 		if (

@@ -1645,5 +1645,11 @@
 	"2K（1440p）": "2K (1440p)",
 	"4K（2160p）": "4K (2160p)",
 	"清晰度按短边标注，实际尺寸随画幅变化": "Resolution uses the shorter edge; pixel dimensions follow the canvas aspect ratio.",
-	"Invalid preview canvas dimensions": "Invalid preview canvas dimensions"
+	"Invalid preview canvas dimensions": "Invalid preview canvas dimensions",
+	"全屏预览": "Fullscreen preview",
+	"退出全屏预览": "Exit fullscreen preview",
+	"预览播放进度": "Preview playback position",
+	"无法切换全屏预览，请重试": "Could not change fullscreen preview. Please try again.",
+	"回到开头": "Go to start",
+	"跳到结尾": "Go to end"
 }
