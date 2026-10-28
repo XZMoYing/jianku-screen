@@ -1,0 +1,31 @@
+{
+	"version": "0.2.0-alpha.45",
+	"pid": 74948,
+	"observation": "read-only first frame from application-owned loopback listeners; payload discarded",
+	"observations": [
+		{
+			"port": 62704,
+			"frame": null,
+			"reason": "no frame in timeout"
+		},
+		{
+			"port": 62706,
+			"frame": {
+				"payloadSha256": "2a7f106eaef0082def8b5c3b397337afd61d436e57d064115d6134ef67bf5118",
+				"width": 1280,
+				"height": 720,
+				"stride": 5120,
+				"frameNumber": 180,
+				"targetTimeNs": "3000000000",
+				"payloadBytes": 3686400,
+				"expectedBytes": 3686400,
+				"format": "RGBA"
+			}
+		},
+		{
+			"port": 62707,
+			"frame": null,
+			"reason": "no frame in timeout"
+		}
+	]
+}

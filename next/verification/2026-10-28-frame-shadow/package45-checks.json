@@ -1,0 +1,41 @@
+{
+	"runs": [
+		{
+			"case": "neutral-demo",
+			"resolution": "1280x720",
+			"fps": 60,
+			"frames": 540,
+			"seconds": 7.895999290999999
+		},
+		{
+			"case": "neutral-demo",
+			"resolution": "3840x2160",
+			"fps": 60,
+			"frames": 540,
+			"seconds": 24.751659249999996
+		}
+	],
+	"comparisons": [
+		{
+			"case": "browser-motion",
+			"frames": 540,
+			"changedFrames": 0,
+			"pcmIdentical": true,
+			"seconds": 9.145568
+		},
+		{
+			"case": "stress-motion",
+			"frames": 540,
+			"changedFrames": 0,
+			"pcmIdentical": true,
+			"seconds": 8.656580958000001
+		},
+		{
+			"case": "flat-macos",
+			"frames": 540,
+			"changedFrames": 0,
+			"pcmIdentical": true,
+			"seconds": 7.378985957999998
+		}
+	]
+}

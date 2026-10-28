@@ -1,0 +1,65 @@
+{
+	"preserved": [
+		"/Users/moyingxz/Documents/Zzx/05_\u9879\u76ee\u5f00\u53d1/Jianku Screen Next Builds/0.2.0-alpha.44/Jianku Screen Next.app",
+		"/Users/moyingxz/Documents/Zzx/05_\u9879\u76ee\u5f00\u53d1/Jianku Screen Next Builds/0.2.0-alpha.45/Jianku Screen Next.app",
+		"/Applications/Jianku Screen Next.app"
+	],
+	"deleted": [
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_\u9879\u76ee\u5f00\u53d1/Jianku Screen Next Builds/0.2.0-alpha.41/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.41",
+			"logicalBytes": 315967851,
+			"binaries": {
+				"Jianku Screen Next": "2fdd1a299b2123e5a531e87d92f47223734da3e778eef911b958a8a036e96e9f",
+				"cap-cli": "83fcf46281101b2777f06cf24baec224a2d7480353436c6f16391fc4a864783b",
+				"cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+				"cap-exporter": "a51b8416bb9a63219f2f7e316e2e64d64cc24be7049e6ada538c537ecdc329b9",
+				"jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+				"jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+			}
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_\u9879\u76ee\u5f00\u53d1/Jianku Screen Next Builds/0.2.0-alpha.43/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.43",
+			"logicalBytes": 315984363,
+			"binaries": {
+				"Jianku Screen Next": "a815c8f19644fb0d16bc5d7c1da2468274eb6318d2acf908c3efa1ff70e37ec0",
+				"cap-cli": "339cc3781804e110a78070d4bcb853c971efca0809c589b7c00272afa57c46d4",
+				"cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+				"cap-exporter": "347be5ceb76d168369f644ea36e60d5ca2f2fdf61b1f529b05fd66083b7d6fd3",
+				"jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+				"jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+			}
+		},
+		{
+			"path": "/Applications/.jianku-next-update-AgmGMA/previous.app",
+			"version": "0.2.0-alpha.43",
+			"logicalBytes": 315984363,
+			"binaries": {
+				"Jianku Screen Next": "a815c8f19644fb0d16bc5d7c1da2468274eb6318d2acf908c3efa1ff70e37ec0",
+				"cap-cli": "339cc3781804e110a78070d4bcb853c971efca0809c589b7c00272afa57c46d4",
+				"cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+				"cap-exporter": "347be5ceb76d168369f644ea36e60d5ca2f2fdf61b1f529b05fd66083b7d6fd3",
+				"jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+				"jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+			}
+		},
+		{
+			"path": "/Applications/.jianku-next-update-HMariz/previous.app",
+			"version": "0.2.0-alpha.44",
+			"logicalBytes": 316000971,
+			"binaries": {
+				"Jianku Screen Next": "3f23eda74eb7b4bf2fc2a3227e51ebff3d0545f644883c837c0233ccba62d271",
+				"cap-cli": "36aa7e905ff4be4ef1f2155e002697f937a8df9fec76ff2214f3483a9d4e4298",
+				"cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+				"cap-exporter": "2076c08969ee7f977a4c9370fab3d71f8f04bd5ca299d2875133b5c0b20493d0",
+				"jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+				"jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+			}
+		}
+	],
+	"freeBefore": 70185058304,
+	"freeAfter": 71452450816,
+	"logicalBytesRemoved": 1263937548,
+	"projectAndMediaScope": "only exact .app trees above removed; parent project folders, every .jks/media, Git, native dependencies and build cache preserved"
+}

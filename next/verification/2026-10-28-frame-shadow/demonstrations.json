@@ -1,0 +1,39 @@
+[
+	{
+		"project": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.45/内边距压力示例.jks",
+		"background": {
+			"type": "image",
+			"path": "content/wallpaper.mp4"
+		},
+		"inset": 100,
+		"camera3d": {
+			"tiltX": -46.65,
+			"tiltY": 42.49,
+			"roll": 0.0,
+			"rotateX": -1.0,
+			"rotateY": -20.0,
+			"fov": 24.0,
+			"zoom": 1.785,
+			"panX": 0.673,
+			"panY": -0.133
+		}
+	},
+	{
+		"project": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.45/浏览器外框与自然运镜示例.jks",
+		"background": {
+			"type": "color",
+			"value": [239, 235, 225],
+			"alpha": 255
+		},
+		"inset": 0,
+		"camera3d": {
+			"rotateX": 12.0,
+			"rotateY": -16.0,
+			"roll": 0.0,
+			"fov": 40.0,
+			"zoom": 2.7,
+			"panX": 0.0,
+			"panY": 0.0
+		}
+	}
+]
