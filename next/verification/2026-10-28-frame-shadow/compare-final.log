@@ -1,0 +1,7 @@
+{'case': 'browser-light', 'frames': 540, 'changedFrames': 540, 'pcmIdentical': True, 'pcmSha256': '23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885', 'expectedUnchanged': False}
+{'case': 'browser-dark', 'frames': 540, 'changedFrames': 540, 'pcmIdentical': True, 'pcmSha256': '23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885', 'expectedUnchanged': False}
+{'case': 'browser-motion', 'frames': 540, 'changedFrames': 540, 'pcmIdentical': True, 'pcmSha256': '23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885', 'expectedUnchanged': False}
+{'case': 'stress-motion', 'frames': 540, 'changedFrames': 540, 'pcmIdentical': True, 'pcmSha256': '23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885', 'expectedUnchanged': False}
+{'case': 'flat-macos', 'frames': 540, 'changedFrames': 0, 'pcmIdentical': True, 'pcmSha256': '23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885', 'expectedUnchanged': True}
+{'case': 'shadow-off-motion', 'frames': 540, 'changedFrames': 0, 'pcmIdentical': True, 'pcmSha256': '23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885', 'expectedUnchanged': True}
+{'frames': 540, 'changedFrames': 0, 'pcmIdentical': True, 'pcmSha256': '23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885'}

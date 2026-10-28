@@ -1,0 +1,12 @@
+[
+	{
+		"name": "legacy-none",
+		"path": "/private/tmp/jianku-frame-3d/fixtures/legacy-none.jks",
+		"sha256": "1283dcbc57c104c4bb9db1dec8eb1da51f4974f916fc8aa246fb2c1d79567e96"
+	},
+	{
+		"name": "legacy-explicit",
+		"path": "/private/tmp/jianku-frame-3d/fixtures/legacy-explicit.jks",
+		"sha256": "5a08f7aa06e92dd84066237d79652f2f061c3ba8bf708ed1a16fd00493cfa480"
+	}
+]

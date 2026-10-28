@@ -5,6 +5,7 @@ use wgpu::{include_wgsl, util::DeviceExt};
 pub struct CompositeVideoFramePipeline {
     pub bind_group_layout: wgpu::BindGroupLayout,
     pub render_pipeline: wgpu::RenderPipeline,
+    shadow_mask_pipeline: std::sync::OnceLock<wgpu::RenderPipeline>,
     sampler: wgpu::Sampler,
 }
 
@@ -285,14 +286,45 @@ impl CompositeVideoFrameUniforms {
 
 impl CompositeVideoFramePipeline {
     pub fn new(device: &wgpu::Device) -> Self {
-        let pipeline_cache = load_pipeline_cache(device);
         let bind_group_layout = Self::bind_group_layout(device);
+        let render_pipeline = Self::create_render_pipeline(device, &bind_group_layout, false);
+
+        let sampler = device.create_sampler(&wgpu::SamplerDescriptor {
+            address_mode_u: wgpu::AddressMode::ClampToEdge,
+            address_mode_v: wgpu::AddressMode::ClampToEdge,
+            address_mode_w: wgpu::AddressMode::ClampToEdge,
+            mag_filter: wgpu::FilterMode::Linear,
+            min_filter: wgpu::FilterMode::Linear,
+            mipmap_filter: wgpu::FilterMode::Linear,
+            ..Default::default()
+        });
+
+        Self {
+            bind_group_layout,
+            render_pipeline,
+            shadow_mask_pipeline: std::sync::OnceLock::new(),
+            sampler,
+        }
+    }
+
+    pub fn shadow_mask_pipeline(&self, device: &wgpu::Device) -> &wgpu::RenderPipeline {
+        // Both draws read the shared buffer after submission, so specialize instead of rewriting it.
+        self.shadow_mask_pipeline
+            .get_or_init(|| Self::create_render_pipeline(device, &self.bind_group_layout, true))
+    }
+
+    fn create_render_pipeline(
+        device: &wgpu::Device,
+        bind_group_layout: &wgpu::BindGroupLayout,
+        shadow_mask: bool,
+    ) -> wgpu::RenderPipeline {
+        let pipeline_cache = load_pipeline_cache(device);
         let shader_desc = include_wgsl!("shaders/composite-video-frame.wgsl");
         let shader = device.create_shader_module(shader_desc);
 
         let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: Some("Composite Render Pipeline Layout"),
-            bind_group_layouts: &[&bind_group_layout],
+            bind_group_layouts: &[bind_group_layout],
             push_constant_ranges: &[],
         });
 
@@ -310,14 +342,18 @@ impl CompositeVideoFramePipeline {
             },
             fragment: Some(wgpu::FragmentState {
                 module: &shader,
-                entry_point: Some("fs_main"),
+                entry_point: Some(if shadow_mask { "fs_mask" } else { "fs_main" }),
                 targets: &[Some(wgpu::ColorTargetState {
                     format: wgpu::TextureFormat::Rgba8Unorm,
                     blend: Some(wgpu::BlendState::ALPHA_BLENDING),
                     write_mask: wgpu::ColorWrites::ALL,
                 })],
                 compilation_options: wgpu::PipelineCompilationOptions {
-                    constants: &[],
+                    constants: if shadow_mask {
+                        &[("OMIT_SHADOW", 1.0)]
+                    } else {
+                        &[]
+                    },
                     zero_initialize_workgroup_memory: false,
                 },
             }),
@@ -344,21 +380,7 @@ impl CompositeVideoFramePipeline {
             save_pipeline_cache(cache);
         }
 
-        let sampler = device.create_sampler(&wgpu::SamplerDescriptor {
-            address_mode_u: wgpu::AddressMode::ClampToEdge,
-            address_mode_v: wgpu::AddressMode::ClampToEdge,
-            address_mode_w: wgpu::AddressMode::ClampToEdge,
-            mag_filter: wgpu::FilterMode::Linear,
-            min_filter: wgpu::FilterMode::Linear,
-            mipmap_filter: wgpu::FilterMode::Linear,
-            ..Default::default()
-        });
-
-        Self {
-            bind_group_layout,
-            render_pipeline,
-            sampler,
-        }
+        render_pipeline
     }
 
     fn bind_group_layout(device: &wgpu::Device) -> wgpu::BindGroupLayout {

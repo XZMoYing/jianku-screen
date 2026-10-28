@@ -36,8 +36,7 @@ pub struct Camera3DFrame {
     pub pose: Option<Camera3DProperties>,
     /// `None` when no blur should render this frame.
     pub blur: Option<Camera3DBlurFrame>,
-    /// Boundary ramp 0..1. Decorations that read wrong in 3D (the flat drop
-    /// shadow baked into the content) fade out with this.
+    /// Boundary ramp 0..1, shared by the pose and the flat/projected shadow transition.
     pub activity: f64,
 }
 

@@ -1,3 +1,5 @@
+override OMIT_SHADOW: bool = false;
+
 struct Uniforms {
     crop_bounds: vec4<f32>,
     target_bounds: vec4<f32>,
@@ -231,6 +233,15 @@ fn composite_source_over(foreground: vec4<f32>, background: vec4<f32>) -> vec4<f
 
 @fragment
 fn fs_main(@builtin(position) frag_coord: vec4<f32>) -> @location(0) vec4<f32> {
+    return compose_frame(frag_coord);
+}
+
+@fragment
+fn fs_mask(@builtin(position) frag_coord: vec4<f32>) -> @location(0) vec4<f32> {
+    return vec4<f32>(0.0, 0.0, 0.0, compose_frame(frag_coord).a);
+}
+
+fn compose_frame(frag_coord: vec4<f32>) -> vec4<f32> {
     let p = frag_coord.xy;
     let center = (uniforms.target_bounds.xy + uniforms.target_bounds.zw) * 0.5;
     let size = (uniforms.target_bounds.zw - uniforms.target_bounds.xy) * 0.5;
@@ -266,7 +277,7 @@ fn fs_main(@builtin(position) frag_coord: vec4<f32>) -> @location(0) vec4<f32> {
 
     // Apply blur and size to shadow
     let shadow_strength_final = smoothstep(shadow_size + shadow_blur, -shadow_blur, abs(shadow_dist));
-    let shadow_color = vec4<f32>(0.0, 0.0, 0.0, shadow_strength_final * shadow_opacity);
+    let shadow_color = select(vec4<f32>(0.0, 0.0, 0.0, shadow_strength_final * shadow_opacity), vec4<f32>(0.0), OMIT_SHADOW);
 
     let target_uv = (p - uniforms.target_bounds.xy) / uniforms.target_size;
     let crop_bounds_uv = vec4<f32>(uniforms.crop_bounds.xy / uniforms.frame_size, uniforms.crop_bounds.zw / uniforms.frame_size);

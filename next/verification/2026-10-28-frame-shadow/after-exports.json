@@ -1,0 +1,42 @@
+{
+	"cli": "/Users/moyingxz/Documents/Zzx/05_\u9879\u76ee\u5f00\u53d1/Jianku Screen Next/next/cap/target/release/cap",
+	"cliSha256": "d514729c1bc48b4733e4be1cfd792aba3688b31e3a1062ab274856a2d15ab21a",
+	"runs": [
+		{
+			"case": "browser-light",
+			"exitCode": 0,
+			"seconds": 6.66759475,
+			"output": "/private/tmp/jianku-frame-3d/after-browser-light.mp4"
+		},
+		{
+			"case": "browser-dark",
+			"exitCode": 0,
+			"seconds": 6.128609125,
+			"output": "/private/tmp/jianku-frame-3d/after-browser-dark.mp4"
+		},
+		{
+			"case": "browser-motion",
+			"exitCode": 0,
+			"seconds": 7.228739000000001,
+			"output": "/private/tmp/jianku-frame-3d/after-browser-motion.mp4"
+		},
+		{
+			"case": "stress-motion",
+			"exitCode": 0,
+			"seconds": 7.374453250000002,
+			"output": "/private/tmp/jianku-frame-3d/after-stress-motion.mp4"
+		},
+		{
+			"case": "flat-macos",
+			"exitCode": 0,
+			"seconds": 6.109458208000003,
+			"output": "/private/tmp/jianku-frame-3d/after-flat-macos.mp4"
+		},
+		{
+			"case": "shadow-off-motion",
+			"exitCode": 0,
+			"seconds": 6.680094666999999,
+			"output": "/private/tmp/jianku-frame-3d/after-shadow-off-motion.mp4"
+		}
+	]
+}

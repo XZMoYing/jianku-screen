@@ -18,6 +18,7 @@ mod mask;
 mod notch;
 #[cfg(target_os = "macos")]
 mod precise_video_background;
+mod projected_shadow;
 mod text;
 mod video_background;
 
@@ -98,6 +99,7 @@ pub use inset::*;
 pub use keyboard::*;
 pub use mask::*;
 pub use notch::*;
+pub use projected_shadow::*;
 pub use text::*;
 
 #[cfg(test)]

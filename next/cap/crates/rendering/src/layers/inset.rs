@@ -70,10 +70,22 @@ impl InsetLayer {
     }
 
     pub fn render(&self, pass: &mut wgpu::RenderPass<'_>) {
+        self.render_with_pipeline(pass, &self.pipeline.render_pipeline);
+    }
+
+    pub fn render_shadow_mask(&self, pass: &mut wgpu::RenderPass<'_>, device: &wgpu::Device) {
+        self.render_with_pipeline(pass, self.pipeline.shadow_mask_pipeline(device));
+    }
+
+    fn render_with_pipeline(
+        &self,
+        pass: &mut wgpu::RenderPass<'_>,
+        pipeline: &wgpu::RenderPipeline,
+    ) {
         if !self.ready {
             return;
         }
-        pass.set_pipeline(&self.pipeline.render_pipeline);
+        pass.set_pipeline(pipeline);
         pass.set_bind_group(0, &self.bind_group, &[]);
         pass.draw(0..3, 0..1);
     }

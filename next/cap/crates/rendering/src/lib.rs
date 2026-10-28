@@ -21,7 +21,7 @@ use futures::future::OptionFuture;
 use layers::{
     Background, BackgroundLayer, BlurLayer, Camera3DBlurKind, Camera3DLayer, CameraLayer,
     ClickRippleLayer, ColorGradeLayer, CursorLayer, DisplayLayer, FrameLayer, MaskLayer,
-    NotchLayer, NotchUniforms,
+    NotchLayer, NotchUniforms, ProjectedShadowLayer, ProjectedShadowSource,
 };
 use specta::Type;
 use spring_mass_damper::SpringMassDamperSimulationConfig;
@@ -2461,6 +2461,7 @@ pub struct ProjectUniforms {
     /// Final placement of the outer display card (chrome included) in output
     /// px. Equals `display.target_bounds` when no frame is active.
     display_outer_bounds: [f32; 4],
+    screen_shadow_sources: [Option<ProjectedShadowSource>; 3],
     interpolated_cursor: Option<InterpolatedCursorPosition>,
     pub prev_cursor: Option<InterpolatedCursorPosition>,
     /// 0..1 multiplier from clips that hide the cursor (with the fade at
@@ -3808,11 +3809,6 @@ impl ProjectUniforms {
                 output_size.0 as f64 / output_size.1.max(1) as f64,
             )
         });
-        // The card's flat drop shadow is baked into the warped texture, so in
-        // 3D it would rotate with the plane and clip at the texture edge.
-        // A floating card has no baked shadow, so fade ours out.
-        let camera3d_shadow_fade = 1.0 - camera3d.map_or(0.0, |c| c.activity) as f32;
-
         // While a 3D pose is active the 2D zoom must not crop the display
         // inside the card texture (the crop edge reads as the card arbitrarily
         // cutting content off). The content renders unzoomed and the sampled
@@ -3829,6 +3825,11 @@ impl ProjectUniforms {
             });
         let camera3d_pose_active =
             camera3d.as_ref().is_some_and(|c| c.pose.is_some()) || camera3d_trailing_pose;
+        let camera3d_shadow_fade = if camera3d_pose_active {
+            1.0 - camera3d.map_or(0.0, |frame| frame.activity) as f32
+        } else {
+            1.0
+        };
         let raw_zoom = zoom;
         let (zoom, prev_zoom, motion_prev_zoom) = if camera3d_pose_active {
             (
@@ -3972,8 +3973,8 @@ impl ProjectUniforms {
         let (
             display,
             display_motion_parent,
-            frame_chrome,
-            inset,
+            mut frame_chrome,
+            mut inset,
             display_outer_bounds,
             notch,
             takeover_morph,
@@ -4231,10 +4232,7 @@ impl ProjectUniforms {
                             0.0,
                         ],
                         shadow: if decorated {
-                            project.background.shadow
-                                * split_fade
-                                * camera3d_shadow_fade
-                                * takeover_accessory_fade
+                            project.background.shadow * split_fade * takeover_accessory_fade
                         } else {
                             0.0
                         },
@@ -4249,7 +4247,6 @@ impl ProjectUniforms {
                             .as_ref()
                             .map_or(18.0, |s| s.opacity)
                             * split_fade
-                            * camera3d_shadow_fade
                             * takeover_accessory_fade,
                         shadow_blur: project
                             .background
@@ -4323,10 +4320,7 @@ impl ProjectUniforms {
                             0.0,
                         ],
                         shadow: if decorated {
-                            project.background.shadow
-                                * split_fade
-                                * camera3d_shadow_fade
-                                * takeover_accessory_fade
+                            project.background.shadow * split_fade * takeover_accessory_fade
                         } else {
                             0.0
                         },
@@ -4341,7 +4335,6 @@ impl ProjectUniforms {
                             .as_ref()
                             .map_or(18.0, |s| s.opacity)
                             * split_fade
-                            * camera3d_shadow_fade
                             * takeover_accessory_fade,
                         shadow_blur: project
                             .background
@@ -4447,7 +4440,6 @@ impl ProjectUniforms {
                     ],
                     shadow: project.background.shadow
                         * display_decoration_fade
-                        * camera3d_shadow_fade
                         * takeover_display_fade,
                     shadow_size: project
                         .background
@@ -4460,7 +4452,6 @@ impl ProjectUniforms {
                         .as_ref()
                         .map_or(18.0, |s| s.opacity)
                         * display_decoration_fade
-                        * camera3d_shadow_fade
                         * takeover_display_fade,
                     shadow_blur: project
                         .background
@@ -4508,7 +4499,7 @@ impl ProjectUniforms {
             .map_or(segment_frames.screen_size, |frame| {
                 XY::new(frame.width(), frame.height())
             });
-        let display = display.for_source_frame(source_size);
+        let mut display = display.for_source_frame(source_size);
         let display_outer_bounds = if frame_chrome.is_none() && inset.is_none() {
             display.target_bounds
         } else {
@@ -4887,6 +4878,27 @@ impl ProjectUniforms {
             })
             .unwrap_or_default();
 
+        let screen_shadow_sources = [
+            Some(ProjectedShadowSource::from_composite(&display)),
+            frame_chrome
+                .as_ref()
+                .map(|chrome| ProjectedShadowSource::from_composite(&chrome.composite)),
+            inset
+                .as_ref()
+                .map(|inset| ProjectedShadowSource::from_composite(&inset.composite)),
+        ];
+        let fade_flat_shadow = |uniforms: &mut CompositeVideoFrameUniforms| {
+            uniforms.shadow *= camera3d_shadow_fade;
+            uniforms.shadow_opacity *= camera3d_shadow_fade;
+        };
+        fade_flat_shadow(&mut display);
+        if let Some(chrome) = &mut frame_chrome {
+            fade_flat_shadow(&mut chrome.composite);
+        }
+        if let Some(inset) = &mut inset {
+            fade_flat_shadow(&mut inset.composite);
+        }
+
         Self {
             output_size,
             cursor_size: project.cursor.size as f32,
@@ -4900,6 +4912,7 @@ impl ProjectUniforms {
             inset,
             notch,
             display_outer_bounds,
+            screen_shadow_sources,
             project: styled_project.into_owned(),
             zoom,
             scene,
@@ -5775,6 +5788,193 @@ pub struct FrameRenderStageTimings {
 mod style_image_tests {
     use super::*;
     use cap_project::{BackgroundSource, ImageSegment, StyleOverrides, StyleSegment};
+
+    #[tokio::test]
+    async fn projected_screen_shadow_preserves_foreground_and_preview_export_parity() {
+        let recording_meta: RecordingMeta = serde_json::from_value(serde_json::json!({
+            "pretty_name": "jianku-projected-shadow",
+            "display": { "path": "synthetic.mp4", "fps": 60 },
+            "camera": null, "audio": null, "cursor": null
+        }))
+        .expect("synthetic metadata");
+        let meta = recording_meta.studio_meta().expect("studio").clone();
+        let size = XY::new(320, 180);
+        let constants = RenderVideoConstants::new_with_options(
+            RenderOptions {
+                screen_size: size,
+                camera_size: None,
+                preserve_screen_alpha: false,
+            },
+            recording_meta,
+            meta,
+        )
+        .await
+        .expect("graphics device");
+        let mut project = ProjectConfiguration::default();
+        project.background.source = BackgroundSource::Color {
+            value: [255; 3],
+            alpha: 255,
+        };
+        project.background.padding = 30.0;
+        project.background.rounding = 10.0;
+        project.background.frame = Some(cap_project::FrameConfiguration {
+            style: FrameStyle::Browser,
+            theme: cap_project::FrameTheme::Light,
+            url: "jianku.local".into(),
+            ..Default::default()
+        });
+        project.background.shadow = 0.0;
+        project.timeline = Some(
+            serde_json::from_value(serde_json::json!({
+                "segments": [{"start":0.0,"end":6.0,"timescale":1.0}],
+                "zoomSegments":[],
+                "camera3dSegments":[{
+                    "start":1.0,"end":5.0,"enabled":true,
+                    "transitionIn":0.0,"transitionOut":0.0,
+                    "properties":{"fov":40.0,"zoom":2.5,"rotateX":15.0,"rotateY":-20.0}
+                }]
+            }))
+            .expect("timeline"),
+        );
+        let frames = DecodedSegmentFrames {
+            screen_size: size,
+            screen_frame: Some(DecodedFrame::new(
+                [0, 0, 255, 255].repeat(320 * 180),
+                320,
+                180,
+            )),
+            camera_frame: None,
+            segment_time: 3.0,
+            recording_time: 3.0,
+            segment_has_camera: false,
+        };
+        let cursor = CursorEvents::default();
+        let zoom = ZoomTransformTimeline::from_project(&project, &cursor, 6.0, size);
+        let at = |project: &ProjectConfiguration| {
+            ProjectUniforms::new(
+                &constants, project, 180, 60, size, &cursor, &frames, 6.0, &zoom,
+            )
+        };
+        let mut layers = RendererLayers::new(&constants.device, &constants.queue);
+        let mut renderer = FrameRenderer::new(&constants);
+        let off = renderer
+            .render_immediate(frames.clone(), at(&project), &cursor, true, &mut layers)
+            .await
+            .expect("shadow disabled");
+        assert!(layers.projected_shadow.views().is_none());
+        project.background.shadow = 60.0;
+        let uniforms = at(&project);
+        assert_eq!(
+            uniforms
+                .frame_chrome
+                .as_ref()
+                .expect("chrome")
+                .composite
+                .shadow,
+            0.0
+        );
+        let on = renderer
+            .render_immediate(frames.clone(), uniforms.clone(), &cursor, true, &mut layers)
+            .await
+            .expect("projected shadow");
+        assert!(layers.projected_shadow.views().is_some());
+        let mut opaque_foreground = 0;
+        let mut shadow_pixels = 0;
+        for y in 0..on.height as usize {
+            for x in 0..on.width as usize {
+                let a = y * off.padded_bytes_per_row as usize + x * 4;
+                let b = y * on.padded_bytes_per_row as usize + x * 4;
+                let before = &off.data[a..a + 4];
+                let after = &on.data[b..b + 4];
+                if before == [0, 0, 255, 255] {
+                    assert_eq!(before, after, "opaque video pixels must not change");
+                    opaque_foreground += 1;
+                }
+                // Exclude the one-pixel coverage edge plus its bilinear footprint: warm chrome
+                // can round to white there before blending with the new darker backdrop.
+                let background_only = before == [255; 4]
+                    && (y.saturating_sub(2)..=(y + 2).min(off.height as usize - 1)).all(|row| {
+                        (x.saturating_sub(2)..=(x + 2).min(off.width as usize - 1)).all(|column| {
+                            let offset = row * off.padded_bytes_per_row as usize + column * 4;
+                            off.data[offset..offset + 4] == [255; 4]
+                        })
+                    });
+                if background_only && after != before {
+                    assert_eq!(after[0], after[1]);
+                    assert_eq!(after[1], after[2]);
+                    assert_eq!(after[3], 255);
+                    shadow_pixels += 1;
+                }
+            }
+        }
+        assert!(opaque_foreground > 100);
+        assert!(shadow_pixels > 100);
+        let export = match renderer
+            .render(frames.clone(), uniforms, &cursor, true, &mut layers)
+            .await
+            .expect("export")
+        {
+            Some(frame) => frame,
+            None => renderer
+                .flush_pipeline()
+                .await
+                .expect("flush")
+                .expect("export frame"),
+        };
+        assert_eq!(on.data, export.data);
+        if let Ok(directory) = std::env::var("JIANKU_SHADOW_DUMP_DIR") {
+            std::fs::create_dir_all(&directory).expect("dump directory");
+            for (name, frame) in [("off", &off), ("on", &on)] {
+                let pixels = frame
+                    .data
+                    .chunks_exact(frame.padded_bytes_per_row as usize)
+                    .take(frame.height as usize)
+                    .flat_map(|row| row[..frame.width as usize * 4].iter().copied())
+                    .collect();
+                image::RgbaImage::from_raw(frame.width, frame.height, pixels)
+                    .expect("RGBA")
+                    .save(
+                        std::path::Path::new(&directory)
+                            .join(format!("projected-shadow-{name}.png")),
+                    )
+                    .expect("PNG");
+            }
+        }
+        let segment = &mut project
+            .timeline
+            .as_mut()
+            .expect("timeline")
+            .camera3d_segments[0];
+        let (_, half_height) = camera3d::plane_half_extents(on.width as f64 / on.height as f64);
+        segment.properties = cap_project::Camera3DProperties {
+            fov: 45.0,
+            zoom: half_height / (22.5_f64.to_radians()).tan(),
+            ..Default::default()
+        };
+        segment.blur.mode = cap_project::Camera3DBlurMode::Radial;
+        segment.blur.strength = 5.0;
+        let uniforms = at(&project);
+        let pose = uniforms.camera3d.expect("focus effect");
+        assert!(pose.pose.is_none());
+        assert!(pose.blur.is_some());
+        assert!(
+            uniforms
+                .frame_chrome
+                .as_ref()
+                .expect("chrome")
+                .composite
+                .shadow
+                > 0.0
+        );
+        project.background.advanced_shadow = None;
+        let legacy = at(&project).screen_shadow_sources;
+        project.background.advanced_shadow = Some(cap_project::ShadowConfiguration {
+            size: 50.0,
+            opacity: 18.0,
+            blur: 50.0,
+        });
+        assert_eq!(legacy, at(&project).screen_shadow_sources);
+    }
 
     #[tokio::test]
     async fn camera_only_ignores_cutout_and_preserves_background_blur() {
@@ -7163,6 +7363,7 @@ pub struct RendererLayers {
     mask: MaskLayer,
     overlays: Option<OverlayLayers>,
     camera3d: Camera3DLayer,
+    projected_shadow: ProjectedShadowLayer,
     camera_blur_processor: Option<cap_camera_effects::BlurProcessor>,
     camera_blur_init_failed: bool,
     camera_blur_unavailable: bool,
@@ -7271,6 +7472,7 @@ impl RendererLayers {
             mask: readiness::measure("layers.mask", || MaskLayer::new(device)),
             overlays: include_overlays.then(|| OverlayLayers::new(device, queue)),
             camera3d: readiness::measure("layers.camera3d", || Camera3DLayer::new(device)),
+            projected_shadow: ProjectedShadowLayer::new(device),
             camera_blur_processor: None,
             camera_blur_init_failed: false,
             camera_blur_unavailable: false,
@@ -7752,6 +7954,12 @@ impl RendererLayers {
         }
 
         self.camera3d.prepare(&constants.queue, uniforms);
+        self.projected_shadow.prepare(
+            &constants.device,
+            &constants.queue,
+            uniforms,
+            self.camera3d.is_active(),
+        );
 
         Ok(timings)
     }
@@ -7860,6 +8068,40 @@ impl RendererLayers {
                     session.current_texture_view()
                 }
             };
+        }
+
+        if should_render_screen && let Some((mask, projection)) = self.projected_shadow.views() {
+            {
+                let mut pass = render_pass!(mask, wgpu::LoadOp::Clear(wgpu::Color::TRANSPARENT));
+                self.inset.render_shadow_mask(&mut pass, device);
+                self.frame.render_shadow_mask(&mut pass, device);
+                self.display.render_shadow_mask(&mut pass, device);
+            }
+            {
+                let mut pass =
+                    render_pass!(projection, wgpu::LoadOp::Clear(wgpu::Color::TRANSPARENT));
+                self.camera3d.render(&mut pass, device, mask);
+            }
+            let blurred_from_mask = if self.projected_shadow.has_spread() {
+                {
+                    let mut pass =
+                        render_pass!(mask, wgpu::LoadOp::Clear(wgpu::Color::TRANSPARENT));
+                    self.projected_shadow.render_spread(&mut pass);
+                }
+                {
+                    let mut pass =
+                        render_pass!(projection, wgpu::LoadOp::Clear(wgpu::Color::TRANSPARENT));
+                    self.projected_shadow.render_horizontal(&mut pass, true);
+                }
+                false
+            } else {
+                let mut pass = render_pass!(mask, wgpu::LoadOp::Clear(wgpu::Color::TRANSPARENT));
+                self.projected_shadow.render_horizontal(&mut pass, false);
+                true
+            };
+            let mut pass = render_pass!(session.current_texture_view(), wgpu::LoadOp::Load);
+            self.projected_shadow
+                .render_vertical(&mut pass, blurred_from_mask);
         }
 
         if should_render_screen && uniforms.inset.is_some() {

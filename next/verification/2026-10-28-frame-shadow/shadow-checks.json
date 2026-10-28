@@ -1,0 +1,22 @@
+[
+	{
+		"check": "check",
+		"exitCode": 0,
+		"seconds": 3.814261916
+	},
+	{
+		"check": "tests",
+		"exitCode": 0,
+		"seconds": 95.41392537499999
+	},
+	{
+		"check": "clippy",
+		"exitCode": 0,
+		"seconds": 5.510149708
+	},
+	{
+		"check": "cli-build",
+		"exitCode": 0,
+		"seconds": 264.814440417
+	}
+]

@@ -1,0 +1,18 @@
+{
+	"cli": "/Users/moyingxz/Documents/Zzx/05_\u9879\u76ee\u5f00\u53d1/Jianku Screen Next/next/cap/target/release/cap",
+	"cliSha256": "22272d925d5d30395b9ebe50a9d782d348f26af837a946bca5742dc0f444e0e9",
+	"runs": [
+		{
+			"case": "legacy-none",
+			"exitCode": 0,
+			"seconds": 7.754782790999999,
+			"output": "/private/tmp/jianku-frame-3d/legacy-before-legacy-none.mp4"
+		},
+		{
+			"case": "legacy-explicit",
+			"exitCode": 0,
+			"seconds": 6.874562833,
+			"output": "/private/tmp/jianku-frame-3d/legacy-before-legacy-explicit.mp4"
+		}
+	]
+}

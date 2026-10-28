@@ -1,0 +1,58 @@
+{
+	"comparisons": [
+		{
+			"case": "browser-light",
+			"frames": 540,
+			"changedFrames": 540,
+			"pcmIdentical": true,
+			"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885",
+			"expectedUnchanged": false
+		},
+		{
+			"case": "browser-dark",
+			"frames": 540,
+			"changedFrames": 540,
+			"pcmIdentical": true,
+			"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885",
+			"expectedUnchanged": false
+		},
+		{
+			"case": "browser-motion",
+			"frames": 540,
+			"changedFrames": 540,
+			"pcmIdentical": true,
+			"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885",
+			"expectedUnchanged": false
+		},
+		{
+			"case": "stress-motion",
+			"frames": 540,
+			"changedFrames": 540,
+			"pcmIdentical": true,
+			"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885",
+			"expectedUnchanged": false
+		},
+		{
+			"case": "flat-macos",
+			"frames": 540,
+			"changedFrames": 0,
+			"pcmIdentical": true,
+			"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885",
+			"expectedUnchanged": true
+		},
+		{
+			"case": "shadow-off-motion",
+			"frames": 540,
+			"changedFrames": 0,
+			"pcmIdentical": true,
+			"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885",
+			"expectedUnchanged": true
+		}
+	],
+	"legacy": {
+		"frames": 540,
+		"changedFrames": 0,
+		"pcmIdentical": true,
+		"pcmSha256": "23c93e2b82a6c4c11af9d52c2330afa51a32f65707ca6c8144e99b4c3ad02885"
+	}
+}
