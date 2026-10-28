@@ -47,7 +47,7 @@ const MACOS_BAR_FRAC: f64 = 0.055;
 /// Windows 11 window title bar height.
 const WINDOWS_BAR_FRAC: f64 = 0.05;
 /// Browser toolbar height.
-const BROWSER_BAR_FRAC: f64 = 0.075;
+const BROWSER_BAR_FRAC: f64 = 0.062;
 /// MacBook screen bezel thickness (all four sides of the panel).
 const MACBOOK_BEZEL_FRAC: f64 = 0.028;
 /// MacBook deck (keyboard base) height below the panel.
@@ -160,9 +160,6 @@ struct Palette {
     hairline: &'static str,
     title_text: &'static str,
     icon: &'static str,
-    pill_fill: &'static str,
-    pill_stroke: &'static str,
-    pill_text: &'static str,
 }
 
 fn palette(theme: FrameTheme) -> Palette {
@@ -173,9 +170,6 @@ fn palette(theme: FrameTheme) -> Palette {
             hairline: "rgba(0,0,0,0.12)",
             title_text: "#4B4B4E",
             icon: "#87868B",
-            pill_fill: "#FFFFFF",
-            pill_stroke: "rgba(0,0,0,0.07)",
-            pill_text: "#414145",
         },
         FrameTheme::Dark => Palette {
             bar: "#2E2E31",
@@ -183,9 +177,6 @@ fn palette(theme: FrameTheme) -> Palette {
             hairline: "rgba(0,0,0,0.55)",
             title_text: "#C9C9CE",
             icon: "#9A9AA1",
-            pill_fill: "#3C3C41",
-            pill_stroke: "rgba(255,255,255,0.06)",
-            pill_text: "#C9C9CE",
         },
     }
 }
@@ -333,168 +324,133 @@ fn windows_svg(w: f64, h: f64, bar_h: f64, theme: FrameTheme, title: &str) -> St
 }
 
 fn browser_svg(w: f64, h: f64, bar_h: f64, theme: FrameTheme, url: &str) -> String {
-    let p = palette(theme);
+    let (bar, field, glyph, text_color, line) = match theme {
+        FrameTheme::Light => ("#FAF9F6", "#ECEEE9", "#757C73", "#41483F", "#E1E4DD"),
+        FrameTheme::Dark => ("#232720", "#343A30", "#AAB3A4", "#E0E7DB", "#3B4236"),
+    };
     let cy = bar_h * 0.5;
-
-    // Navigation glyphs (back / forward chevrons, reload arc) to the right of
-    // the traffic lights.
-    let lights_end = bar_h * 0.45 + bar_h * 0.135 * 3.0 * 2.0 + bar_h * 0.135;
-    let glyph = bar_h * 0.14;
-    let nav_stroke = format!(
-        r##"stroke="{icon}" stroke-width="{sw}" stroke-linecap="round" stroke-linejoin="round" fill="none""##,
-        icon = p.icon,
-        sw = (bar_h * 0.032).max(1.2),
+    let lights = format!(
+        concat!(
+            r##"<circle cx="{x0}" cy="{cy}" r="{r}" fill="#F27870"/>"##,
+            r##"<circle cx="{x1}" cy="{cy}" r="{r}" fill="#E6BC61"/>"##,
+            r##"<circle cx="{x2}" cy="{cy}" r="{r}" fill="#78B782"/>"##,
+        ),
+        x0 = bar_h * 0.38,
+        x1 = bar_h * 0.69,
+        x2 = bar_h,
+        r = bar_h * 0.09,
+        cy = cy,
     );
-    let back_x = lights_end + bar_h * 0.42;
-    let fwd_x = back_x + bar_h * 0.62;
-    let reload_x = fwd_x + bar_h * 0.62;
-    // Reload: clockwise arc with the gap at the top-right and a solid arrow
-    // head at the arc's end pointing clockwise into the gap, like the
-    // standard material/Chrome refresh glyph. Angles are in y-down screen
-    // space, where increasing angle travels clockwise.
-    let reload = {
-        let r = glyph * 1.05;
-        let point = |deg: f64| {
-            let rad = deg.to_radians();
-            (reload_x + r * rad.cos(), cy + r * rad.sin())
-        };
-        let start_deg = -15.0; // just below the gap, ~2 o'clock
-        let end_deg = 300.0; // upper end of the gap, ~1 o'clock
-        let (sx, sy) = point(start_deg);
-        let (ex, ey) = point(end_deg);
-        // Tangent of clockwise travel at the arc end; the arrow head points
-        // along it.
-        let trad = end_deg.to_radians();
-        let (tx, ty) = (-trad.sin(), trad.cos());
-        let (nx, ny) = (-ty, tx);
-        let head = glyph * 0.85;
+    let show_navigation = w > bar_h * 10.0;
+    let nav = if show_navigation {
         format!(
             concat!(
-                r##"<path d="M {sx} {sy} A {r} {r} 0 1 1 {ex} {ey}" {stroke}/>"##,
-                r##"<path d="M {tipx} {tipy} L {b0x} {b0y} L {b1x} {b1y} Z" fill="{icon}"/>"##,
+                r##"<g stroke="{glyph}" stroke-width="{stroke}" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.72">"##,
+                r##"<path d="M {bx1} {top} L {bx0} {cy} L {bx1} {bottom}"/>"##,
+                r##"<path d="M {fx0} {top} L {fx1} {cy} L {fx0} {bottom}" opacity="0.45"/>"##,
+                r##"<path d="M {rx1} {ry} A {radius} {radius} 0 1 0 {rx2} {ry2} M {rx1} {ry0} V {ry} H {rx0}"/>"##,
+                "</g>",
             ),
-            sx = sx,
-            sy = sy,
-            r = r,
-            ex = ex,
-            ey = ey,
-            stroke = nav_stroke,
-            tipx = ex + tx * head,
-            tipy = ey + ty * head,
-            b0x = ex - tx * head * 0.25 + nx * head * 0.75,
-            b0y = ey - ty * head * 0.25 + ny * head * 0.75,
-            b1x = ex - tx * head * 0.25 - nx * head * 0.75,
-            b1y = ey - ty * head * 0.25 - ny * head * 0.75,
-            icon = p.icon,
+            glyph = glyph,
+            stroke = (bar_h * 0.022).max(0.8),
+            bx0 = bar_h * 1.67,
+            bx1 = bar_h * 1.79,
+            fx0 = bar_h * 2.25,
+            fx1 = bar_h * 2.37,
+            top = cy - bar_h * 0.12,
+            bottom = cy + bar_h * 0.12,
+            cy = cy,
+            rx0 = bar_h * 2.94,
+            rx1 = bar_h * 3.08,
+            rx2 = bar_h * 3.06,
+            ry0 = cy - bar_h * 0.23,
+            ry = cy - bar_h * 0.075,
+            ry2 = cy + bar_h * 0.13,
+            radius = bar_h * 0.145,
         )
+    } else {
+        String::new()
     };
-    let nav = format!(
-        concat!(
-            r##"<path d="M {bx1} {ty} L {bx0} {cy} L {bx1} {by}" {stroke}/>"##,
-            r##"<path d="M {fx0} {ty} L {fx1} {cy} L {fx0} {by}" {stroke}/>"##,
-            "{reload}",
-        ),
-        bx0 = back_x - glyph * 0.55,
-        bx1 = back_x + glyph * 0.55,
-        fx0 = fwd_x - glyph * 0.55,
-        fx1 = fwd_x + glyph * 0.55,
-        ty = cy - glyph,
-        by = cy + glyph,
-        cy = cy,
-        stroke = nav_stroke,
-        reload = reload,
-    );
-
-    // Centered URL pill; the padlock and address text are left-aligned inside
-    // it at fixed positions (like Chrome/Arc), so they stay perfectly aligned
-    // to each other no matter how the text renders.
-    let pill_h = bar_h * 0.60;
-    let pill_w = (w * 0.42).max(pill_h * 4.0).min(w * 0.8);
-    let pill_x = (w - pill_w) * 0.5;
-    let pill_y = cy - pill_h * 0.5;
-    let text = escape_xml(url.trim());
-    let font_size = bar_h * 0.30;
-    // Padlock: shackle arc over a rounded body, vertically centered on the
-    // text's optical middle.
-    let lock_x = pill_x + pill_h * 0.60;
-    let body_w = font_size * 0.74;
-    let body_h = font_size * 0.56;
-    let body_y = cy - font_size * 0.05;
-    let shackle_r = body_w * 0.30;
-    let lock = format!(
-        concat!(
-            r##"<path d="M {shx0} {shy} v {leg} a {sr} {sr} 0 0 1 {sdia} 0 v {leg_down}" stroke="{icon}" stroke-width="{ssw}" fill="none"/>"##,
-            r##"<rect x="{bx}" y="{by}" width="{bw}" height="{bh}" rx="{brx}" fill="{icon}"/>"##,
-        ),
-        shx0 = lock_x + body_w * 0.5 - shackle_r,
-        shy = body_y,
-        leg = -font_size * 0.14,
-        sr = shackle_r,
-        sdia = shackle_r * 2.0,
-        leg_down = font_size * 0.14,
-        ssw = (font_size * 0.16).max(1.0),
-        bx = lock_x,
-        by = body_y,
-        bw = body_w,
-        bh = body_h,
-        brx = body_w * 0.18,
-        icon = p.icon,
-    );
-    let url_el = if text.is_empty() {
+    let field_h = bar_h * 0.48;
+    let font_size = bar_h * 0.245;
+    let address = url.trim();
+    let estimated_text_width = address
+        .chars()
+        .map(|c| if c.is_ascii() { 0.53 } else { 1.0 })
+        .sum::<f64>()
+        * font_size;
+    let min_x = bar_h * if show_navigation { 3.7 } else { 1.45 };
+    let max_x = (w - bar_h * 0.8).max(min_x);
+    let field_w = (estimated_text_width + field_h * 1.85)
+        .max(field_h * 3.2)
+        .min(w * 0.52)
+        .min((max_x - min_x).max(0.0));
+    let center = (w * 0.5).clamp(min_x + field_w * 0.5, max_x - field_w * 0.5);
+    let field_x = center - field_w * 0.5;
+    let text_x = field_x + field_h * 1.1;
+    let address_bar = if address.is_empty() || field_w < field_h * 1.8 {
         String::new()
     } else {
         format!(
             concat!(
-                "{lock}",
-                r##"<text x="{tx}" y="{ty}" font-family="{fonts}" font-size="{size}" fill="{fill}" text-anchor="start">{text}</text>"##,
+                r##"<rect x="{x}" y="{y}" width="{width}" height="{height}" rx="{radius}" fill="{field}"/>"##,
+                r##"<defs><clipPath id="address"><rect x="{text_x}" y="{y}" width="{text_width}" height="{height}"/></clipPath></defs>"##,
+                r##"<g stroke="{glyph}" stroke-width="{stroke}" stroke-linecap="round" fill="none" opacity="0.7">"##,
+                r##"<path d="M {gx0} {gy0} H {gx1} M {gx0} {gy1} H {gx1}"/>"##,
+                r##"<circle cx="{gc0}" cy="{gy0}" r="{gr}" fill="{field}"/><circle cx="{gc1}" cy="{gy1}" r="{gr}" fill="{field}"/></g>"##,
+                r##"<text x="{text_x}" y="{baseline}" font-family="{fonts}" font-size="{font_size}" fill="{text_color}" clip-path="url(#address)">{text}</text>"##,
             ),
-            lock = lock,
-            tx = lock_x + body_w + font_size * 0.42,
-            ty = cy + font_size * 0.36,
+            x = field_x,
+            y = cy - field_h * 0.5,
+            width = field_w,
+            height = field_h,
+            radius = field_h * 0.5,
+            field = field,
+            glyph = glyph,
+            stroke = (bar_h * 0.017).max(0.65),
+            gx0 = field_x + field_h * 0.34,
+            gx1 = field_x + field_h * 0.77,
+            gy0 = cy - field_h * 0.105,
+            gy1 = cy + field_h * 0.105,
+            gc0 = field_x + field_h * 0.49,
+            gc1 = field_x + field_h * 0.65,
+            gr = field_h * 0.055,
+            text_x = text_x,
+            text_width = (field_w - field_h * 1.4).max(0.0),
+            baseline = cy + font_size * 0.35,
             fonts = CHROME_FONTS,
-            size = font_size,
-            fill = p.pill_text,
-            text = text,
+            font_size = font_size,
+            text_color = text_color,
+            text = escape_xml(address),
         )
     };
-
     format!(
         concat!(
             r##"<svg width="{w}" height="{h}" viewBox="0 0 {w} {h}" xmlns="http://www.w3.org/2000/svg">"##,
             r##"<rect width="{w}" height="{bar_fill}" fill="{bar}"/>"##,
-            r##"<rect width="{w}" height="{hl_h}" fill="{highlight}"/>"##,
-            r##"<rect y="{hair_y}" width="{w}" height="{hair_h}" fill="{hairline}"/>"##,
-            "{lights}",
-            "{nav}",
-            r##"<rect x="{px}" y="{py}" width="{pw}" height="{ph}" rx="{pr}" fill="{pill}" stroke="{pill_stroke}" stroke-width="1"/>"##,
-            "{url_el}",
-            "</svg>"
+            r##"<rect y="{line_y}" width="{w}" height="{line_h}" fill="{line}"/>"##,
+            "{lights}{nav}{address_bar}",
+            r##"<g fill="{glyph}" opacity="0.65"><circle cx="{menu_x}" cy="{menu_y0}" r="{menu_r}"/><circle cx="{menu_x}" cy="{cy}" r="{menu_r}"/><circle cx="{menu_x}" cy="{menu_y1}" r="{menu_r}"/></g>"##,
+            "</svg>",
         ),
         w = w,
         h = h,
         bar_fill = bar_fill_height(bar_h),
-        bar = p.bar,
-        hl_h = (bar_h * 0.03).max(1.0),
-        highlight = p.bar_top_highlight,
-        hair_y = bar_h - (bar_h * 0.022).max(1.0),
-        hair_h = (bar_h * 0.022).max(1.0),
-        hairline = p.hairline,
-        lights = traffic_lights(bar_h, cy),
+        bar = bar,
+        line_y = bar_h - (bar_h * 0.008).max(0.5),
+        line_h = (bar_h * 0.008).max(0.5),
+        line = line,
+        lights = lights,
         nav = nav,
-        px = pill_x,
-        py = pill_y,
-        pw = pill_w,
-        ph = pill_h,
-        pr = pill_h * 0.5,
-        pill = p.pill_fill,
-        pill_stroke = p.pill_stroke,
-        url_el = url_el,
+        address_bar = address_bar,
+        glyph = glyph,
+        menu_x = w - bar_h * 0.36,
+        menu_y0 = cy - bar_h * 0.1,
+        menu_y1 = cy + bar_h * 0.1,
+        menu_r = bar_h * 0.023,
+        cy = cy,
     )
 }
-
-/// MacBook mockup: black panel bezel around the screen, aluminum deck with a
-/// thumb scoop, camera dot, and a baked soft shadow (its silhouette is not a
-/// rectangle, so the shader's rect shadow stays off for this style).
 fn macbook_svg(w: f64, h: f64, content_h: f64, theme: FrameTheme) -> String {
     let bezel = content_h * MACBOOK_BEZEL_FRAC;
     let deck_h = content_h * MACBOOK_DECK_FRAC;

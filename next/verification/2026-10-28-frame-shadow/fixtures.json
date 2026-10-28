@@ -1,0 +1,32 @@
+[
+	{
+		"name": "browser-light",
+		"path": "/private/tmp/jianku-frame-3d/fixtures/browser-light.jks",
+		"sha256": "4ee51c3282d54887f1e748f309f6822eb1d2d18b07276dcc28cf84c8495d8d88"
+	},
+	{
+		"name": "browser-dark",
+		"path": "/private/tmp/jianku-frame-3d/fixtures/browser-dark.jks",
+		"sha256": "016835d713155ac9c7e3d612635864110a53d625069d2dcebcf761cde0791677"
+	},
+	{
+		"name": "browser-motion",
+		"path": "/private/tmp/jianku-frame-3d/fixtures/browser-motion.jks",
+		"sha256": "6bcd90d122132a536bf6721b5c2a83f5fc807a098ffe0721e6ecaa37357dc6d7"
+	},
+	{
+		"name": "stress-motion",
+		"path": "/private/tmp/jianku-frame-3d/fixtures/stress-motion.jks",
+		"sha256": "61ca35d929e837a5ed39237ded4385a4cf5e22b8fa6f22a8fea406567ba8b201"
+	},
+	{
+		"name": "flat-macos",
+		"path": "/private/tmp/jianku-frame-3d/fixtures/flat-macos.jks",
+		"sha256": "1e602f7af731395d26a20cd51a47462bf7022c14a35292fae4c957a91c23a1bd"
+	},
+	{
+		"name": "shadow-off-motion",
+		"path": "/private/tmp/jianku-frame-3d/fixtures/shadow-off-motion.jks",
+		"sha256": "0aab12f9418f56bfdbf9ddbec6f6c5b94115c11aa6a53938f567f81578785043"
+	}
+]

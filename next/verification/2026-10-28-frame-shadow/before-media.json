@@ -1,0 +1,152 @@
+[
+	{
+		"case": "browser-light",
+		"probe": {
+			"programs": [],
+			"stream_groups": [],
+			"streams": [
+				{
+					"codec_type": "video",
+					"width": 1280,
+					"height": 720,
+					"r_frame_rate": "60/1",
+					"nb_frames": "540"
+				},
+				{
+					"codec_type": "audio",
+					"r_frame_rate": "0/0",
+					"nb_frames": "423"
+				}
+			],
+			"format": {
+				"duration": "9.000000"
+			}
+		},
+		"fileSha256": "bd68367ab20461a6132cc6d7a99ca97af6ddf3040226de56da4d497de7bf1861"
+	},
+	{
+		"case": "browser-dark",
+		"probe": {
+			"programs": [],
+			"stream_groups": [],
+			"streams": [
+				{
+					"codec_type": "video",
+					"width": 1280,
+					"height": 720,
+					"r_frame_rate": "60/1",
+					"nb_frames": "540"
+				},
+				{
+					"codec_type": "audio",
+					"r_frame_rate": "0/0",
+					"nb_frames": "423"
+				}
+			],
+			"format": {
+				"duration": "9.000000"
+			}
+		},
+		"fileSha256": "e80b60274b98624c633a415a941a45c98b74e00c02729876eeac70d77a7ef3da"
+	},
+	{
+		"case": "browser-motion",
+		"probe": {
+			"programs": [],
+			"stream_groups": [],
+			"streams": [
+				{
+					"codec_type": "video",
+					"width": 1280,
+					"height": 720,
+					"r_frame_rate": "60/1",
+					"nb_frames": "540"
+				},
+				{
+					"codec_type": "audio",
+					"r_frame_rate": "0/0",
+					"nb_frames": "423"
+				}
+			],
+			"format": {
+				"duration": "9.000000"
+			}
+		},
+		"fileSha256": "ae532c0e94d075910b676fa099ca0275ff0f6ed75ec506e71def910b97941e0a"
+	},
+	{
+		"case": "stress-motion",
+		"probe": {
+			"programs": [],
+			"stream_groups": [],
+			"streams": [
+				{
+					"codec_type": "video",
+					"width": 1280,
+					"height": 720,
+					"r_frame_rate": "60/1",
+					"nb_frames": "540"
+				},
+				{
+					"codec_type": "audio",
+					"r_frame_rate": "0/0",
+					"nb_frames": "423"
+				}
+			],
+			"format": {
+				"duration": "9.000000"
+			}
+		},
+		"fileSha256": "6a28e9352ee8f214ff04571dd10ac876efe5e8239ed62f1eda602615c760974a"
+	},
+	{
+		"case": "flat-macos",
+		"probe": {
+			"programs": [],
+			"stream_groups": [],
+			"streams": [
+				{
+					"codec_type": "video",
+					"width": 1280,
+					"height": 720,
+					"r_frame_rate": "60/1",
+					"nb_frames": "540"
+				},
+				{
+					"codec_type": "audio",
+					"r_frame_rate": "0/0",
+					"nb_frames": "423"
+				}
+			],
+			"format": {
+				"duration": "9.000000"
+			}
+		},
+		"fileSha256": "b98a3da63981f933c6a788eb6b226eb97f86f07bf27b8418ccf11c163a01291b"
+	},
+	{
+		"case": "shadow-off-motion",
+		"probe": {
+			"programs": [],
+			"stream_groups": [],
+			"streams": [
+				{
+					"codec_type": "video",
+					"width": 1280,
+					"height": 720,
+					"r_frame_rate": "60/1",
+					"nb_frames": "540"
+				},
+				{
+					"codec_type": "audio",
+					"r_frame_rate": "0/0",
+					"nb_frames": "423"
+				}
+			],
+			"format": {
+				"duration": "9.000000"
+			}
+		},
+		"fileSha256": "c1da12b366c35045b99ba322d26db44d04799d5577885eb4e77087c4a49851b8"
+	}
+]

@@ -1,0 +1,42 @@
+{
+	"cli": "/Applications/Jianku Screen Next.app/Contents/MacOS/cap-cli",
+	"cliSha256": "339cc3781804e110a78070d4bcb853c971efca0809c589b7c00272afa57c46d4",
+	"runs": [
+		{
+			"case": "browser-light",
+			"exitCode": 0,
+			"seconds": 8.984792541,
+			"output": "/private/tmp/jianku-frame-3d/before-browser-light.mp4"
+		},
+		{
+			"case": "browser-dark",
+			"exitCode": 0,
+			"seconds": 8.819379917,
+			"output": "/private/tmp/jianku-frame-3d/before-browser-dark.mp4"
+		},
+		{
+			"case": "browser-motion",
+			"exitCode": 0,
+			"seconds": 8.031432499999998,
+			"output": "/private/tmp/jianku-frame-3d/before-browser-motion.mp4"
+		},
+		{
+			"case": "stress-motion",
+			"exitCode": 0,
+			"seconds": 7.878150457999997,
+			"output": "/private/tmp/jianku-frame-3d/before-stress-motion.mp4"
+		},
+		{
+			"case": "flat-macos",
+			"exitCode": 0,
+			"seconds": 8.291813125000004,
+			"output": "/private/tmp/jianku-frame-3d/before-flat-macos.mp4"
+		},
+		{
+			"case": "shadow-off-motion",
+			"exitCode": 0,
+			"seconds": 8.523470166000003,
+			"output": "/private/tmp/jianku-frame-3d/before-shadow-off-motion.mp4"
+		}
+	]
+}
