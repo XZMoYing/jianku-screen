@@ -1,11 +1,12 @@
 import { Button } from "@cap/ui-solid";
-import { CheckMenuItem, Menu } from "@tauri-apps/api/menu";
+import { Collapsible } from "@kobalte/core/collapsible";
 import { open } from "@tauri-apps/plugin-dialog";
 import { cx } from "cva";
 import {
 	type Component,
 	createResource,
 	createSignal,
+	createUniqueId,
 	For,
 	type JSX,
 	Show,
@@ -14,8 +15,16 @@ import {
 import { createStore, produce } from "solid-js/store";
 import { Dynamic } from "solid-js/web";
 import toast from "solid-toast";
+import { LocalizedChoiceSelect } from "~/components/LocalizedChoiceSelect";
 import { Toggle } from "~/components/Toggle";
 import { presetsStore } from "~/store";
+import {
+	automationRuleDefaultName,
+	automationRuleDisplayName,
+	automationRuleSummary,
+	automationTriggerExplanation,
+	automationUnsupportedMessage,
+} from "~/utils/automation-copy";
 import {
 	ACTION_LABELS,
 	type Action,
@@ -113,60 +122,6 @@ const TRIGGER_ICONS: Record<Trigger, IconComponent> = {
 	recordingDeleted: IconLucideTrash2,
 };
 
-const TRIGGER_PHRASE: Record<Trigger, string> = {
-	screenshotTaken: "Screenshot taken",
-	studioRecordingFinished: "Studio recording ends",
-	instantRecordingFinished: "Instant recording ends",
-	recordingStarted: "Recording starts",
-	uploadCompleted: "Upload completes",
-	videoImported: "Video imported",
-	recordingDeleted: "Recording deleted",
-};
-
-const ACTION_SHORT: Record<ActionType, string> = {
-	copyToClipboard: "Copy to clipboard",
-	saveToLocation: "Save to folder",
-	export: "Export",
-	upload: "Upload & copy link",
-	revealInFileManager: "Reveal in file manager",
-	openFile: "Open file",
-	recognizeTextToClipboard: "Copy text (OCR)",
-	notify: "Notify",
-	openEditor: "Open editor",
-	skipEditor: "Skip editor",
-	applyPreset: "Apply preset",
-	runCommand: "Run command",
-	webhook: "Send webhook",
-	deleteLocalFiles: "Delete local files",
-};
-
-const TRIGGER_NOUN: Record<Trigger, string> = {
-	screenshotTaken: "Screenshot",
-	studioRecordingFinished: "Studio recording",
-	instantRecordingFinished: "Instant recording",
-	recordingStarted: "Recording start",
-	uploadCompleted: "Upload",
-	videoImported: "Import",
-	recordingDeleted: "Deletion",
-};
-
-const ACTION_NOUN: Record<ActionType, string> = {
-	copyToClipboard: "Clipboard",
-	saveToLocation: "Folder",
-	export: "Export",
-	upload: "Upload",
-	revealInFileManager: "Reveal",
-	openFile: "Open",
-	recognizeTextToClipboard: "Text",
-	notify: "Notify",
-	openEditor: "Editor",
-	skipEditor: "Skip editor",
-	applyPreset: "Preset",
-	runCommand: "Command",
-	webhook: "Webhook",
-	deleteLocalFiles: "Delete",
-};
-
 const FPS_PRESETS = [15, 30, 60] as const;
 
 const RESOLUTION_PRESETS = [
@@ -193,7 +148,7 @@ function buildRule(opts: {
 }): AutomationRule {
 	return {
 		id: crypto.randomUUID(),
-		name: opts.name,
+		name: localize(opts.name),
 		enabled: true,
 		trigger: opts.trigger,
 		matchMode: opts.matchMode ?? "all",
@@ -218,7 +173,7 @@ const TEMPLATES: Template[] = [
 	{
 		id: "ocr-screenshot",
 		name: "Pull the text out of screenshots",
-		description: localize("识别截图中的文字并复制到剪贴板。"),
+		description: "识别截图中的文字并复制到剪贴板。",
 		icon: IconLucideScanText,
 		build: () =>
 			buildRule({
@@ -289,7 +244,7 @@ const TEMPLATES: Template[] = [
 					{
 						type: "notify",
 						titleTemplate: localize("简库镜传"),
-						bodyTemplate: "Your recording is ready to share.",
+						bodyTemplate: localize("Your recording is ready to share."),
 					},
 				],
 			}),
@@ -315,24 +270,6 @@ const TEMPLATES: Template[] = [
 			}),
 	},
 ];
-
-function ruleSummary(rule: AutomationRule): string {
-	const trigger = TRIGGER_PHRASE[rule.trigger];
-	if (rule.actions.length === 0) return `${trigger} → no actions yet`;
-	const actions = rule.actions.map((a) => ACTION_SHORT[a.type]).join(", ");
-	return `${trigger} → ${actions}`;
-}
-
-function autoRuleName(rule: AutomationRule): string {
-	const trigger = TRIGGER_NOUN[rule.trigger];
-	const first = rule.actions[0];
-	if (!first) return `${trigger} automation`;
-	return `${trigger} → ${ACTION_NOUN[first.type]}`;
-}
-
-function ruleDisplayName(rule: AutomationRule): string {
-	return rule.name.trim() || autoRuleName(rule);
-}
 
 const inputClass =
 	"w-full px-2.5 h-8 text-[13px] rounded-lg bg-gray-1 border border-gray-3 text-gray-12 outline-none transition-colors focus:border-gray-6 placeholder:text-gray-9";
@@ -367,45 +304,19 @@ function NumberInput(props: { value: number; onInput: (v: number) => void }) {
 function SelectInput<T extends string>(props: {
 	value: T;
 	options: { value: T; label: string }[];
-	onChange: (v: T) => void;
+	onChange: (value: T) => void;
 	class?: string;
+	preserveLabels?: boolean;
 }) {
-	const current = () => props.options.find((o) => o.value === props.value);
-
-	const openMenu = async () => {
-		const items = await Promise.all(
-			props.options.map((option) =>
-				CheckMenuItem.new({
-					text: option.label,
-					checked: option.value === props.value,
-					action: () => props.onChange(option.value),
-				}),
-			),
-		);
-		const menu = await Menu.new({ items });
-		await menu.popup();
-		await menu.close();
-	};
-
-	return (
-		<button
-			type="button"
-			onClick={() => void openMenu()}
-			class={cx(
-				"flex gap-2 justify-between items-center w-full px-2.5 h-8 text-[13px] rounded-lg border transition-colors bg-gray-1 border-gray-3 text-gray-12 outline-none hover:bg-gray-2 hover:border-gray-5 focus-visible:border-gray-6",
-				props.class,
-			)}
-		>
-			<span class="truncate">{current()?.label ?? props.value}</span>
-			<IconLucideChevronDown class="size-3.5 shrink-0 text-gray-10" />
-		</button>
-	);
+	return <LocalizedChoiceSelect {...props} />;
 }
 
 function Field(props: { label: string; children: JSX.Element }) {
 	return (
 		<label class="flex flex-col gap-1 min-w-0 flex-1">
-			<span class="text-[11px] font-medium text-gray-10">{props.label}</span>
+			<span class="text-[11px] font-medium text-gray-10">
+				{localize(props.label)}
+			</span>
 			{props.children}
 		</label>
 	);
@@ -486,7 +397,7 @@ export default function AutomationsSettings() {
 	const addFromTemplate = (template: Template) => {
 		addRule(template.build());
 		toast.success(
-			localize('已添加“{name}”', { name: localize(template.name) }),
+			localize("已添加“{name}”", { name: localize(template.name) }),
 		);
 	};
 
@@ -504,12 +415,12 @@ export default function AutomationsSettings() {
 			setTestReports(ruleId, report);
 			const unsupported = report.actionChecks.filter((c) => !c.supported);
 			if (unsupported.length === 0) {
-			toast.success(localize("All actions supported on this device"));
+				toast.success(localize("All actions supported on this device"));
 			} else {
 				toast(
-					`${unsupported.length} action(s) not supported here: ${unsupported
-						.map((c) => c.actionType)
-						.join(", ")}`,
+					automationUnsupportedMessage(
+						unsupported.map((check) => check.actionType),
+					),
 				);
 			}
 		} catch (e) {
@@ -524,7 +435,7 @@ export default function AutomationsSettings() {
 				<Section
 					title={localize("Automations")}
 					description={localize(
-					"根据指定事件自动执行操作。规则也可通过命令行工具管理。",
+						"根据指定事件自动执行操作。规则也可通过命令行工具管理。",
 					)}
 				>
 					<Suspense
@@ -657,65 +568,70 @@ function RuleCard(props: {
 	onRemove: () => void;
 	onTest: () => void;
 }) {
+	const bodyId = createUniqueId();
 	return (
 		<SectionCard class="overflow-hidden">
-			<div class="flex gap-3 items-center p-2.5">
-				<div
-					class={cx(
-						"flex justify-center items-center rounded-lg size-9 shrink-0 bg-gray-3 transition-opacity",
-						props.rule.enabled ? "text-gray-11" : "text-gray-9 opacity-60",
-					)}
-				>
-					<Dynamic
-						component={TRIGGER_ICONS[props.rule.trigger]}
-						class="size-[18px]"
-					/>
-				</div>
-				<button
-					type="button"
-					onClick={props.onToggleExpand}
-					class="flex-1 min-w-0 text-left"
-				>
-					<p
+			<Collapsible open={props.expanded} onOpenChange={props.onToggleExpand}>
+				<div class="flex gap-3 items-center p-2.5">
+					<div
 						class={cx(
-							"text-[13px] font-medium truncate",
-							props.rule.enabled ? "text-gray-12" : "text-gray-10",
+							"flex justify-center items-center rounded-lg size-9 shrink-0 bg-gray-3 transition-opacity",
+							props.rule.enabled ? "text-gray-11" : "text-gray-9 opacity-60",
 						)}
 					>
-						{ruleDisplayName(props.rule)}
-					</p>
-					<Show when={props.rule.name.trim()}>
-						<p class="text-[11px] truncate text-gray-10">
-							{ruleSummary(props.rule)}
+						<Dynamic
+							component={TRIGGER_ICONS[props.rule.trigger]}
+							class="size-[18px]"
+						/>
+					</div>
+					<button
+						type="button"
+						onClick={props.onToggleExpand}
+						class="flex-1 min-w-0 text-left"
+						aria-expanded={props.expanded}
+						aria-controls={bodyId}
+					>
+						<p
+							class={cx(
+								"text-[13px] font-medium truncate",
+								props.rule.enabled ? "text-gray-12" : "text-gray-10",
+							)}
+						>
+							{automationRuleDisplayName(props.rule)}
 						</p>
-					</Show>
-				</button>
-				<Toggle
-					size="sm"
-					checked={props.rule.enabled}
-					onChange={(v) =>
-						props.onChange((r) => {
-							r.enabled = v;
-						})
-					}
-				/>
-				<button
-					type="button"
-					onClick={props.onToggleExpand}
-					title={props.expanded ? "Collapse" : "Edit"}
-					class="flex justify-center items-center rounded-lg transition-colors size-7 text-gray-10 hover:text-gray-12 hover:bg-gray-3"
-				>
-					<IconLucideChevronDown
-						class={cx(
-							"size-4 transition-transform duration-200",
-							props.expanded && "rotate-180",
-						)}
+						<Show when={props.rule.name.trim()}>
+							<p class="text-[11px] truncate text-gray-10">
+								{automationRuleSummary(props.rule)}
+							</p>
+						</Show>
+					</button>
+					<Toggle
+						size="sm"
+						checked={props.rule.enabled}
+						onChange={(v) =>
+							props.onChange((r) => {
+								r.enabled = v;
+							})
+						}
 					/>
-				</button>
-			</div>
+					<Collapsible.Trigger
+						title={localize(props.expanded ? "Collapse" : "Edit")}
+						aria-label={localize(props.expanded ? "Collapse" : "Edit")}
+						class="flex justify-center items-center rounded-lg transition-colors size-7 text-gray-10 hover:text-gray-12 hover:bg-gray-3"
+					>
+						<IconLucideChevronDown
+							class={cx(
+								"size-4 transition-transform duration-[380ms] ease-[var(--jk-spatial)] motion-reduce:transition-none",
+								props.expanded && "rotate-180",
+							)}
+						/>
+					</Collapsible.Trigger>
+				</div>
 
-			<Show when={props.expanded}>
-				<div class="border-t border-gray-3 animate-in fade-in slide-in-from-top-1 duration-150">
+				<Collapsible.Content
+					id={bodyId}
+					class="jk-disclosure-content border-t border-gray-3"
+				>
 					<RuleEditorBody
 						rule={props.rule}
 						report={props.report}
@@ -723,8 +639,8 @@ function RuleCard(props: {
 						onRemove={props.onRemove}
 						onTest={props.onTest}
 					/>
-				</div>
-			</Show>
+				</Collapsible.Content>
+			</Collapsible>
 		</SectionCard>
 	);
 }
@@ -762,7 +678,7 @@ function RuleEditorBody(props: {
 			<Field label={localize("Name")}>
 				<TextInput
 					value={props.rule.name}
-					placeholder={autoRuleName(props.rule)}
+					placeholder={automationRuleDefaultName(props.rule)}
 					onInput={(v) =>
 						props.onChange((r) => {
 							r.name = v;
@@ -815,7 +731,7 @@ function RuleEditorBody(props: {
 					when={props.rule.conditions.length > 0}
 					fallback={
 						<p class="text-xs text-gray-9">
-							Runs for every {TRIGGER_PHRASE[props.rule.trigger].toLowerCase()}.
+							{automationTriggerExplanation(props.rule.trigger)}
 						</p>
 					}
 				>
@@ -1348,7 +1264,7 @@ function PresetSelect(props: {
 	const presets = presetsStore.createQuery();
 	const names = () => presets.data?.presets.map((p) => p.name) ?? [];
 	const options = () => [
-		...(props.allowNone ? [{ value: "", label: "None" }] : []),
+		...(props.allowNone ? [{ value: "", label: localize("None") }] : []),
 		...names().map((n) => ({ value: n, label: n })),
 	];
 
@@ -1362,6 +1278,7 @@ function PresetSelect(props: {
 			}
 		>
 			<SelectInput
+				preserveLabels
 				value={props.value}
 				options={options()}
 				onChange={props.onChange}

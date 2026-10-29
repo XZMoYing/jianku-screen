@@ -1,0 +1,49 @@
+{
+	"base": "5cb16e7a7a24136a9cbf5136d4bb3f80f0cb3a2d",
+	"unit": "U20b1",
+	"installed": "0.2.0-alpha.46 / 2026.46.1 / source 6938fa5",
+	"runtimeVerified": false,
+	"newDictionaryKeys": 61,
+	"placeholderMismatches": [],
+	"checks": [
+		{
+			"name": "automation copy / i18n / editor selection labels / spring",
+			"tests": 23,
+			"exitCode": 0
+		},
+		{
+			"name": "actual Solid/Kobalte DOM controls (Web Animations stubbed)",
+			"tests": 16,
+			"exitCode": 0
+		},
+		{
+			"name": "desktop tsc --noEmit",
+			"exitCode": 0
+		},
+		{
+			"name": "jianku frontend production build",
+			"exitCode": 0
+		},
+		{
+			"name": "Biome six touched files",
+			"exitCode": 0
+		}
+	],
+	"internalAutomationModelUnchanged": true,
+	"displayMapMissingTranslations": [],
+	"sourceHashes": {
+		"apps/desktop/src/components/LocalizedChoiceSelect.tsx": "6424ab7f0102204a81b793cc6161baaaa1502e30e4926c66041b786662be88d1",
+		"apps/desktop/src/components/interface-controls.test.tsx": "5b606b8e4d16dafc5ba5bffc25d556ab0d77a576470ec75dd1cbf7559dc71bdd",
+		"apps/desktop/src/utils/automation-copy.ts": "c1cc80ee3dab1217d177a47feb926d1efd3788a0aedebd4846583b4b46e31807",
+		"apps/desktop/src/utils/automation-copy.test.ts": "11edf040ab0e3aac15937f0aaf330f3fb9ad1ca26d9b89c5fda5ac9cc149b70c",
+		"apps/desktop/src/i18n/zh-CN.json": "ab157ac7f9df40605ad95f78e5cd583512ed11cd30550057a28b1a6163b2fbcb",
+		"apps/desktop/src/routes/(window-chrome)/settings/automations.tsx": "2f0ab942304e9e738b62645b4e54dcac67f897877716d0184b73495a15226212"
+	},
+	"scopeLimits": [
+		"No automation actions, shell commands, webhook or uploads were executed",
+		"Unknown stored values remain visible until explicit selection",
+		"Authored rule/preset names and executable templates remain user data",
+		"No actual WebView animation/Chinese-English round-trip acceptance claimed",
+		"Existing strict decoder 15 pass / 2 fail and MP4 inter-run variance remain release blockers"
+	]
+}

@@ -1,11 +1,15 @@
 import { createSignal, type ValidComponent } from "solid-js";
 import { render } from "solid-js/web";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { setInterfaceLanguage } from "~/utils/i18n";
 import { motionGlyphs } from "~/utils/interface-motion-tokens";
 import { type ChoiceOption, ChoiceSelect } from "./ChoiceSelect";
 import { Disclosure } from "./Disclosure";
 import { MotionSwitch } from "./InterfaceMotion";
+import { LocalizedChoiceSelect } from "./LocalizedChoiceSelect";
 import { MotionText } from "./MotionText";
+
+vi.mock("~/store", () => ({ languageStore: { set: vi.fn(async () => {}) } }));
 
 vi.mock("~/routes/editor/ui", async () => {
 	const { Polymorphic } = await import("@kobalte/core/polymorphic");
@@ -33,7 +37,8 @@ const key = (node: Element, value: string) =>
 	node.dispatchEvent(
 		new KeyboardEvent("keydown", { key: value, bubbles: true }),
 	);
-beforeEach(() => {
+beforeEach(async () => {
+	await setInterfaceLanguage("zh-CN");
 	const style = document.createElement("style");
 	style.textContent = "* { animation-name: none; }";
 	document.head.append(style);
@@ -290,4 +295,81 @@ it("expands and collapses shared detail sections", async () => {
 	trigger.click();
 	await settle();
 	expect(trigger.getAttribute("aria-expanded")).toBe("false");
+});
+
+describe("localized shared choices", () => {
+	it("updates option labels on language changes without writing a new value", async () => {
+		const changed = vi.fn();
+		dispose = render(
+			() => (
+				<LocalizedChoiceSelect
+					value="all"
+					options={[
+						{ value: "all", label: "Match all" },
+						{ value: "any", label: "Match any" },
+					]}
+					onChange={changed}
+				/>
+			),
+			document.body,
+		);
+		const trigger = required(document.querySelector("button"));
+		expect(trigger.textContent).toContain("满足全部条件");
+		await setInterfaceLanguage("en");
+		await settle();
+		expect(trigger.textContent).toContain("Match all");
+		await setInterfaceLanguage("zh-CN");
+		await settle();
+		expect(trigger.textContent).toContain("满足全部条件");
+		press(trigger);
+		await settle();
+		expect(document.body.textContent).toContain("满足任一条件");
+		expect(changed).not.toHaveBeenCalled();
+	});
+	it("preserves preset names even when they match a translation key", async () => {
+		dispose = render(
+			() => (
+				<LocalizedChoiceSelect
+					preserveLabels
+					value="Match all"
+					options={[{ value: "Match all", label: "Match all" }]}
+					onChange={vi.fn()}
+				/>
+			),
+			document.body,
+		);
+		expect(document.querySelector("button")?.textContent).toContain(
+			"Match all",
+		);
+		expect(document.querySelector("button")?.textContent).not.toContain(
+			"满足全部条件",
+		);
+	});
+	it("keeps an unknown saved value visible until an explicit replacement", async () => {
+		const [value, setValue] = createSignal("120");
+		const changed = vi.fn(setValue);
+		dispose = render(
+			() => (
+				<LocalizedChoiceSelect
+					value={value()}
+					options={[
+						{ value: "30", label: "30 FPS" },
+						{ value: "60", label: "60 FPS" },
+					]}
+					onChange={changed}
+				/>
+			),
+			document.body,
+		);
+		const trigger = required(document.querySelector("button"));
+		expect(trigger.textContent).toContain("120");
+		press(trigger);
+		await settle();
+		key(required(document.querySelector('[role="listbox"]')), "ArrowDown");
+		await settle();
+		key(required(document.activeElement), "Enter");
+		await settle();
+		expect(changed).toHaveBeenCalledWith("30");
+		expect(value()).toBe("30");
+	});
 });
