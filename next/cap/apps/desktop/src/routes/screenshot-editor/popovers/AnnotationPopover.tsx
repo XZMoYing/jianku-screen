@@ -38,7 +38,7 @@ export function AnnotationPopover() {
 				disabled={!selectedAnnotation()}
 			/>
 			<Popover.Portal>
-				<Popover.Content class="z-50 w-[240px] overflow-hidden rounded-xl border border-gray-3 bg-gray-1 shadow-xl animate-in fade-in zoom-in-95 p-4">
+				<Popover.Content class="jk-menu-surface z-50 w-[240px] overflow-hidden rounded-xl border border-gray-3 bg-gray-1 shadow-xl animate-in fade-in zoom-in-95 p-4">
 					<div class="flex flex-col gap-4">
 						<Show
 							when={selectedAnnotation()}

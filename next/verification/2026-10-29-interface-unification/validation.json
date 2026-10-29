@@ -1,0 +1,66 @@
+{
+  "controlsPassed": 12,
+  "checks": [
+    {
+      "name": "controls",
+      "command": [
+        "/Users/moyingxz/.npm-global/bin/bun",
+        "run",
+        "vitest",
+        "run",
+        "--config",
+        "vitest.interface.config.ts"
+      ],
+      "cwd": "apps/desktop",
+      "exitCode": 0,
+      "seconds": 2.38
+    },
+    {
+      "name": "regression",
+      "command": [
+        "/Users/moyingxz/.npm-global/bin/bun",
+        "run",
+        "vitest",
+        "run",
+        "src/utils/interface-spring.test.ts",
+        "src/utils/expressive-motion.test.ts",
+        "src/utils/i18n.test.ts",
+        "src/routes/editor/selection-label.test.ts"
+      ],
+      "cwd": "apps/desktop",
+      "exitCode": 0,
+      "seconds": 1.02
+    },
+    {
+      "name": "typecheck",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "apps/desktop/tsconfig.json"
+      ],
+      "cwd": ".",
+      "exitCode": 0,
+      "seconds": 9.34
+    },
+    {
+      "name": "frontend",
+      "command": [
+        "node",
+        "scripts/jianku.mjs",
+        "frontend"
+      ],
+      "cwd": ".",
+      "exitCode": 0,
+      "seconds": 39.96
+    }
+  ],
+  "format": "44 files Biome passed without warnings",
+  "installed": "0.2.0-alpha.45",
+  "planned": "0.2.0-alpha.46",
+  "runtimeVerified": false,
+  "newNativeSelectCallsites": 19,
+  "rawSurfacesMigrated": 23,
+  "testScope": "Actual Kobalte/Solid DOM behavior, test-only menu styling wrapper and Web Animations completion stub. Native WebView frame timings and CSS appearance require package verification."
+}

@@ -78,7 +78,7 @@ function trackHint(option: TrackManagerOption) {
 	const meta = TRACK_META[option.type];
 	if (!option.available) return localize(meta.unavailableHint);
 	if (!option.supportsMultiple && option.active)
-		return localize('移除“{track}”轨道', {
+		return localize("移除“{track}”轨道", {
 			track: localize(option.label),
 		});
 	return localize(meta.description);
@@ -202,7 +202,7 @@ export function TrackManager(props: {
 					// inline text editor on the canvas); returning focus to the
 					// trigger on close would steal it back.
 					onCloseAutoFocus={(e) => e.preventDefault()}
-					class="cap-track-tray z-50 flex origin-[var(--kb-popover-content-transform-origin)] flex-col overflow-hidden rounded-xl bg-ed-card shadow-ed-pop outline-hidden"
+					class="jk-menu-surface cap-track-tray z-50 flex origin-[var(--kb-popover-content-transform-origin)] flex-col overflow-hidden rounded-xl bg-ed-card shadow-ed-pop outline-hidden"
 				>
 					<div class="flex gap-1 p-1.5">
 						<Index each={selectable()}>

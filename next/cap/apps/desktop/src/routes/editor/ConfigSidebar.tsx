@@ -1395,7 +1395,7 @@ function BackgroundConfig(props: {
 					/>
 				</Field>
 				<KCollapsible open={project.background.notch?.enabled ?? false}>
-					<KCollapsible.Content class="overflow-hidden opacity-0 transition-opacity animate-collapsible-up data-expanded:animate-collapsible-down data-expanded:opacity-100">
+					<KCollapsible.Content class="jk-disclosure-content overflow-hidden opacity-0 transition-opacity animate-collapsible-up data-expanded:animate-collapsible-down data-expanded:opacity-100">
 						<div class="flex flex-col gap-2 pb-4">
 							<p class="text-[11px] text-ed-text-3">
 								{localize(

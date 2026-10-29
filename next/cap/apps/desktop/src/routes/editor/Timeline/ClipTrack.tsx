@@ -605,7 +605,7 @@ function ClipSettingsControl(props: {
 			<Popover.Portal>
 				<Popover.Content
 					onMouseDown={(event) => event.stopPropagation()}
-					class="z-50 flex w-[300px] max-w-[calc(100vw-16px)] flex-col gap-2 rounded-xl bg-ed-card p-1.5 text-ed-text-1 shadow-ed-pop outline-hidden animate-in fade-in zoom-in-95 duration-100"
+					class="jk-menu-surface z-50 flex w-[300px] max-w-[calc(100vw-16px)] flex-col gap-2 rounded-xl bg-ed-card p-1.5 text-ed-text-1 shadow-ed-pop outline-hidden animate-in fade-in zoom-in-95 duration-100"
 				>
 					<div class="flex items-center gap-2 px-2 pt-1">
 						<span class="min-w-0 flex-1 truncate text-[12px] font-medium text-ed-text-1">
@@ -1414,7 +1414,9 @@ export function ClipTrack(
 										type="button"
 										data-transition
 										class="absolute inset-y-0 left-0 z-[4] grid w-4 -translate-x-1/2 place-items-center bg-ed-accent/40 text-xs text-white opacity-0 transition-opacity hover:bg-ed-accent/60 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-ed-accent"
-										aria-label={`Add transition before clip ${i() + 1}`}
+										aria-label={localize("Add transition before clip {count}", {
+											count: i() + 1,
+										})}
 										onClick={(event) => {
 											event.stopPropagation();
 											projectActions.setClipTransition(i(), {
@@ -1472,7 +1474,7 @@ export function ClipTrack(
 											<Popover.Portal>
 												<Popover.Content
 													onMouseDown={(event) => event.stopPropagation()}
-													class="z-50 flex w-64 flex-col gap-3 rounded-xl bg-ed-card p-3 text-ed-text-1 shadow-ed-pop outline-hidden"
+													class="jk-menu-surface z-50 flex w-64 flex-col gap-3 rounded-xl bg-ed-card p-3 text-ed-text-1 shadow-ed-pop outline-hidden"
 												>
 													<div class="flex items-center justify-between">
 														<span class="text-sm font-medium">

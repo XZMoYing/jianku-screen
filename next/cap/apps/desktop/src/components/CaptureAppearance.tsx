@@ -1,8 +1,11 @@
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { unwrap } from "solid-js/store";
+import { Dynamic } from "solid-js/web";
 import toast from "solid-toast";
+import { ChoiceSelect } from "~/components/ChoiceSelect";
 import { FrameOptions } from "~/routes/editor/FrameButton";
+import { Field, SectionLabel, Slider } from "~/routes/editor/ui";
 import { generalSettingsStore } from "~/store";
 import { createPresets } from "~/utils/createPresets";
 import { t as localize } from "~/utils/i18n";
@@ -11,11 +14,17 @@ import {
 	type CaptureStyle,
 	commands,
 } from "~/utils/tauri";
+import IconCamera from "~icons/lucide/camera";
+import IconImage from "~icons/lucide/image";
+import IconCursor from "~icons/lucide/mouse-pointer-2";
+import IconAudio from "~icons/lucide/volume-2";
 import { BackgroundSettings } from "./BackgroundSettings";
 import { CameraSettings } from "./CameraSettings";
 import { CursorSettings } from "./CursorSettings";
+import { Disclosure } from "./Disclosure";
 import { MotionGroup, MotionSwitch } from "./InterfaceMotion";
 import { LayoutSettings } from "./LayoutSettings";
+import { Toggle } from "./Toggle";
 
 const rgb = (v: readonly number[]) => `rgb(${v.join(",")})`;
 export function appearanceBackground(source: BackgroundSource): string {
@@ -43,42 +52,33 @@ function Range(props: {
 	unit?: string;
 }) {
 	return (
-		<label class="jk-control-row">
-			<span>{props.name}</span>
-			<input
-				type="range"
-				min={props.min ?? 0}
-				max={props.max}
+		<Field
+			inline
+			name={props.name}
+			value={`${Number(props.value.toFixed(1))}${props.unit ?? ""}`}
+		>
+			<Slider
+				value={[props.value]}
+				minValue={props.min ?? 0}
+				maxValue={props.max}
 				step={props.step ?? 1}
-				value={props.value}
-				style={{
-					"--jk-progress": `${((props.value - (props.min ?? 0)) / (props.max - (props.min ?? 0))) * 100}%`,
-				}}
-				onInput={(e) => props.change(e.currentTarget.valueAsNumber)}
+				onChange={([value]) => props.change(value)}
 			/>
-			<output>
-				{Number(props.value.toFixed(1))}
-				{props.unit}
-			</output>
-		</label>
+		</Field>
 	);
 }
 function Check(props: {
 	name: string;
 	value: boolean;
-	change: (v: boolean) => void;
+	change: (value: boolean) => void;
 }) {
 	return (
-		<label class="jk-control-row">
-			<span>{props.name}</span>
-			<input
-				type="checkbox"
-				checked={props.value}
-				onChange={(e) => props.change(e.currentTarget.checked)}
-			/>
-		</label>
+		<Field inline name={props.name}>
+			<Toggle checked={props.value} onChange={props.change} />
+		</Field>
 	);
 }
+
 export default function CaptureAppearance(props: {
 	blocked: boolean;
 	onStyle: (style: CaptureStyle) => void;
@@ -177,10 +177,10 @@ export default function CaptureAppearance(props: {
 							>
 								<For
 									each={[
-										{ id: "background", name: "背景" },
-										{ id: "layout", name: "布局" },
-										{ id: "cursor", name: "光标" },
-										{ id: "camera", name: "摄像与声音" },
+										{ id: "background", name: "画面", icon: IconImage },
+										{ id: "camera", name: "摄像", icon: IconCamera },
+										{ id: "audio", name: "声音", icon: IconAudio },
+										{ id: "cursor", name: "光标", icon: IconCursor },
 									]}
 								>
 									{(item) => (
@@ -189,12 +189,16 @@ export default function CaptureAppearance(props: {
 											aria-pressed={tab() === item.id}
 											onClick={() => setTab(item.id)}
 										>
-															{localize(item.name)}
+											<Dynamic component={item.icon} />
+											<span class="jk-tab-label">{localize(item.name)}</span>
 										</button>
 									)}
 								</For>
 							</MotionGroup>
-							<MotionSwitch value={tab()}>
+							<MotionSwitch
+								value={tab()}
+								order={["background", "camera", "audio", "cursor"]}
+							>
 								{(panel) => (
 									<>
 										<Show when={panel() === "background"}>
@@ -209,8 +213,8 @@ export default function CaptureAppearance(props: {
 													})
 												}
 											/>
-										</Show>
-										<Show when={panel() === "layout"}>
+											<div class="w-full border-t border-ed-line" />
+											<SectionLabel name={localize("Layout")} />
 											<LayoutSettings
 												background={value().config.background}
 												aspectRatio={value().config.aspectRatio}
@@ -235,8 +239,10 @@ export default function CaptureAppearance(props: {
 													})
 												}
 											/>
-											<details class="jk-appearance-details">
-												<summary>{localize("画面外框")}</summary>
+											<Disclosure
+												class="jk-appearance-details"
+												title={localize("画面外框")}
+											>
 												<FrameOptions
 													frame={value().config.background.frame}
 													onChange={(frame) =>
@@ -245,28 +251,7 @@ export default function CaptureAppearance(props: {
 														})
 													}
 												/>
-											</details>
-										</Show>
-										<Show when={panel() === "cursor"}>
-											<CursorSettings
-												cursor={value().config.cursor}
-												onChange={(patch) =>
-													update((s) => Object.assign(s.config.cursor, patch))
-												}
-											/>
-											<Range
-												name={localize("画面动态模糊")}
-												value={value().config.screenMotionBlur ?? 0}
-												max={1}
-												step={0.01}
-												change={(n) =>
-													update((s) => {
-														s.config.screenMotionBlur = n;
-													})
-												}
-											/>
-										</Show>
-										<Show when={panel() === "camera"}>
+											</Disclosure>
 											<Check
 												name="录制后自动运镜"
 												value={general.data?.autoZoomOnClicks ?? true}
@@ -289,12 +274,24 @@ export default function CaptureAppearance(props: {
 														.catch((e: unknown) => toast.error(String(e)));
 												}}
 											/>
+										</Show>
+										<Show when={panel() === "cursor"}>
+											<CursorSettings
+												cursor={value().config.cursor}
+												onChange={(patch) =>
+													update((s) => Object.assign(s.config.cursor, patch))
+												}
+											/>
+										</Show>
+										<Show when={panel() === "camera"}>
 											<CameraSettings
 												camera={value().config.camera}
 												onChange={(patch) =>
 													update((s) => Object.assign(s.config.camera, patch))
 												}
 											/>
+										</Show>
+										<Show when={panel() === "audio"}>
 											<Check
 												name="工程静音"
 												value={value().config.audio.mute}
@@ -322,28 +319,29 @@ export default function CaptureAppearance(props: {
 										<Show when={presets.query.data?.presets.length}>
 											<label class="jk-control-row">
 												<span>{localize("已有预设")}</span>
-												<select
+												<ChoiceSelect
 													aria-label={localize("应用已有画面预设")}
 													value=""
-													onChange={(e) => {
+													onChange={(choiceValue) => {
 														const p =
-															presets.query.data?.presets[
-																Number(e.currentTarget.value)
-															];
+															presets.query.data?.presets[Number(choiceValue)];
 														if (p)
 															update((s) => {
 																s.config = structuredClone(unwrap(p.config));
 																s.desktopWallpaper = false;
 															});
 													}}
-												>
-													<option value="" disabled>
-														{localize("选择预设")}
-													</option>
-													<For each={presets.query.data?.presets}>
-														{(p, i) => <option value={i()}>{p.name}</option>}
-													</For>
-												</select>
+													options={[
+														{
+															value: "",
+															label: localize("选择预设"),
+															disabled: true,
+														},
+														...(presets.query.data?.presets ?? []).map(
+															(p, i) => ({ value: i, label: p.name }),
+														),
+													]}
+												/>
 											</label>
 										</Show>
 									</>

@@ -53,7 +53,7 @@ const ShadowSettings = (props: Props) => {
 				/>
 			</button>
 			<KCollapsible open={isOpen()}>
-				<KCollapsible.Content class="overflow-hidden opacity-0 transition-opacity animate-collapsible-up data-expanded:animate-collapsible-down data-expanded:opacity-100">
+				<KCollapsible.Content class="jk-disclosure-content overflow-hidden opacity-0 transition-opacity animate-collapsible-up data-expanded:animate-collapsible-down data-expanded:opacity-100">
 					<div class="flex flex-col mt-2">
 						<Field
 							inline

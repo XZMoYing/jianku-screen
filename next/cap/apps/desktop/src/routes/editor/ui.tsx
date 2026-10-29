@@ -563,7 +563,7 @@ export function EditorButton<T extends ValidComponent = "button">(
 }
 
 export const dropdownContainerClasses =
-	"z-60 flex flex-col rounded-xl bg-ed-card shadow-ed-pop overflow-y-hidden outline-hidden";
+	"jk-menu-surface z-60 flex flex-col rounded-xl bg-ed-card shadow-ed-pop overflow-y-hidden outline-hidden";
 
 export const topLeftAnimateClasses =
 	"data-expanded:animate-in data-expanded:fade-in data-expanded:zoom-in-95 data-closed:animate-out data-closed:fade-out data-closed:zoom-out-95 origin-top-left";

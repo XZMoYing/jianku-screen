@@ -12,6 +12,7 @@ import {
 	Show,
 } from "solid-js";
 import toast from "solid-toast";
+import { ChoiceSelect } from "~/components/ChoiceSelect";
 import { InsetSettings } from "~/components/InsetSettings";
 import {
 	ASPECT_RATIO_OPTIONS,
@@ -26,7 +27,6 @@ import {
 	type PresentationStatus,
 } from "~/utils/tauri";
 import IconCheck from "~icons/lucide/check";
-import IconChevronDown from "~icons/lucide/chevron-down";
 import IconImage from "~icons/lucide/image";
 import IconMonitor from "~icons/lucide/monitor";
 import IconMousePointer2 from "~icons/lucide/mouse-pointer-2";
@@ -324,54 +324,55 @@ export default function Presentation(props: {
 										<label class="studio-field">
 											<span>{localize("演示来源")}</span>
 											<div class="studio-select">
-												<select
+												<ChoiceSelect
 													aria-label={localize("演示来源")}
 													disabled={busy() || status()?.active}
 													value={value().sourceId}
-													onChange={(event) =>
+													onChange={(choiceValue) =>
 														update({
 															...value(),
-															sourceId: event.currentTarget.value,
+															sourceId: choiceValue,
 														})
 													}
-												>
-													<For each={setup()?.displays}>
-														{(display) => (
-															<option value={display.id}>{display.name}</option>
-														)}
-													</For>
-												</select>
-												<IconChevronDown />
+													options={[
+														...(setup()?.displays ?? []).map((display) => ({
+															value: display.id,
+															label: display.name,
+														})),
+													]}
+												/>
 											</div>
 										</label>
 										<label class="studio-field">
 											<span>{localize("输出位置")}</span>
 											<div class="studio-select">
-												<select
+												<ChoiceSelect
 													aria-label={localize("输出位置")}
 													disabled={busy() || status()?.active}
 													value={value().outputMonitor ?? "window"}
-													onChange={(event) =>
+													onChange={(choiceValue) =>
 														update({
 															...value(),
 															outputMonitor:
-																event.currentTarget.value === "window"
+																choiceValue === "window"
 																	? null
-																	: Number(event.currentTarget.value),
+																	: Number(choiceValue),
 														})
 													}
-												>
-													<option value="window">{localize("共享窗口")}</option>
-													<For each={setup()?.monitors}>
-														{(monitor) => (
-															<option value={monitor.index}>
-																{monitor.name} · {monitor.width}×
-																{monitor.height}
-															</option>
-														)}
-													</For>
-												</select>
-												<IconChevronDown />
+													options={[
+														{ value: "window", label: localize("共享窗口") },
+														...(setup()?.monitors ?? []).map((monitor) => ({
+															value: monitor.index,
+															label: [
+																monitor.name,
+																" · ",
+																monitor.width,
+																"×",
+																monitor.height,
+															].join(""),
+														})),
+													]}
+												/>
 											</div>
 											<small>
 												{value().outputMonitor == null
@@ -383,31 +384,29 @@ export default function Presentation(props: {
 										<label class="studio-field">
 											<span>{localize("输出比例")}</span>
 											<div class="studio-select">
-												<select
+												<ChoiceSelect
 													aria-label={localize("输出比例")}
 													disabled={busy() || status()?.active}
 													value={value().outputAspectRatio ?? "auto"}
-													onChange={(event) =>
+													onChange={(choiceValue) =>
 														update({
 															...value(),
 															outputAspectRatio:
-																event.currentTarget.value === "auto"
+																choiceValue === "auto"
 																	? null
-																	: (event.currentTarget.value as AspectRatio),
+																	: (choiceValue as AspectRatio),
 														})
 													}
-												>
-													<For each={ASPECT_RATIO_OPTIONS}>
-														{(aspect) => (
-															<option value={aspect}>
-																{aspect === "auto"
+													options={[
+														...(ASPECT_RATIO_OPTIONS ?? []).map((aspect) => ({
+															value: aspect,
+															label:
+																aspect === "auto"
 																	? localize("适合屏幕 · 默认")
-																	: `${ASPECT_RATIOS[aspect].ratio[0]}:${ASPECT_RATIOS[aspect].ratio[1]} · ${localize(ASPECT_RATIOS[aspect].name)}`}
-															</option>
-														)}
-													</For>
-												</select>
-												<IconChevronDown />
+																	: `${ASPECT_RATIOS[aspect].ratio[0]}:${ASPECT_RATIOS[aspect].ratio[1]} · ${localize(ASPECT_RATIOS[aspect].name)}`,
+														})),
+													]}
+												/>
 											</div>
 											<small>
 												{status()?.active
@@ -420,30 +419,22 @@ export default function Presentation(props: {
 										<label class="studio-field">
 											<span>{localize("输出清晰度")}</span>
 											<div class="studio-select">
-												<select
+												<ChoiceSelect
 													aria-label={localize("输出清晰度")}
 													value={value().outputResolution}
-													onChange={(event) =>
+													onChange={(choiceValue) =>
 														update({
 															...value(),
-															outputResolution: Number(
-																event.currentTarget.value,
-															),
+															outputResolution: Number(choiceValue),
 														})
 													}
-												>
-													<option value={1280}>
-														{localize("720p · 标准")}
-													</option>
-													<option value={1920}>
-														{localize("1080p · 默认")}
-													</option>
-													<option value={2560}>
-														{localize("1440p · 高清")}
-													</option>
-													<option value={3840}>{localize("2160p · 4K")}</option>
-												</select>
-												<IconChevronDown />
+													options={[
+														{ value: 1280, label: localize("720p · 标准") },
+														{ value: 1920, label: localize("1080p · 默认") },
+														{ value: 2560, label: localize("1440p · 高清") },
+														{ value: 3840, label: localize("2160p · 4K") },
+													]}
+												/>
 											</div>
 											<small>
 												{value().outputWidth} × {value().outputHeight}{" "}

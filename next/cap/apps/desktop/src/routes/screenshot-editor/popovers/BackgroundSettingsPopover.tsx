@@ -32,7 +32,7 @@ export function BackgroundSettingsPopover() {
 				kbd={["B"]}
 			/>
 			<Popover.Portal>
-				<Popover.Content class="z-50 w-[400px] overflow-hidden rounded-xl border border-gray-3 bg-gray-1 shadow-xl">
+				<Popover.Content class="jk-menu-surface z-50 w-[400px] overflow-hidden rounded-xl border border-gray-3 bg-gray-1 shadow-xl">
 					<div class="max-h-[600px] overflow-y-auto p-4 flex flex-col gap-6">
 						<BackgroundSettings
 							background={context.project.background}

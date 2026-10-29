@@ -10,6 +10,7 @@ import {
 	Show,
 } from "solid-js";
 import toast from "solid-toast";
+import { ChoiceSelect } from "~/components/ChoiceSelect";
 import { t as localize } from "~/utils/i18n";
 import {
 	mobileCaptureDefaults,
@@ -180,33 +181,36 @@ export default function MobileRecorder(props: {
 						{setup.loading ? localize("正在查找…") : localize("刷新设备")}
 					</button>
 				</div>
-				<select
+				<ChoiceSelect
 					id="mobile-device"
 					value={selection()}
 					disabled={busy() || status()?.active}
-					onChange={(event) => setSelection(event.currentTarget.value)}
-				>
-					<option value="">
-						{setup.loading
-							? localize("正在查找 USB 设备…")
-							: localize("请选择已连接的设备")}
-					</option>
-					<For each={setup()?.devices}>
-						{(device) => (
-							<option
-								value={`${device.platform}:${device.id}`}
-								disabled={!device.authorized}
-							>
-								{device.name} ·{" "}
-								{device.platform === "ios" ? "iOS / iPadOS" : localize("安卓")}
-				{device.authorized ? "" : ` · ${localize("请允许 USB 调试")}`}
-							</option>
-						)}
-					</For>
-				</select>
+					onChange={(choiceValue) => setSelection(choiceValue)}
+					options={[
+						{
+							value: "",
+							label: setup.loading
+								? localize("正在查找 USB 设备…")
+								: localize("请选择已连接的设备"),
+						},
+						...(setup()?.devices ?? []).map((device) => ({
+							value: `${device.platform}:${device.id}`,
+							label: [
+								device.name,
+								" · ",
+								" ",
+								device.platform === "ios" ? "iOS / iPadOS" : localize("安卓"),
+								device.authorized ? "" : ` · ${localize("请允许 USB 调试")}`,
+							].join(""),
+							disabled: !device.authorized,
+						})),
+					]}
+				/>
 				<Show when={selected()?.mi6Compatibility}>
 					<p class="mobile-hint">
-						{localize("已识别 MI 6，使用专用连接兼容；手机应用与网络设置保持运行。")}
+						{localize(
+							"已识别 MI 6，使用专用连接兼容；手机应用与网络设置保持运行。",
+						)}
 					</p>
 				</Show>
 				<Show when={selected()?.platform === "android"}>
@@ -216,73 +220,70 @@ export default function MobileRecorder(props: {
 					>
 						<label>
 							<span>{localize("录制尺寸")}</span>
-							<select
+							<ChoiceSelect
 								aria-label={localize("设备录制尺寸")}
 								value={captureSettings().maxSize}
 								disabled={status()?.active || busy()}
-								onChange={(event) =>
+								onChange={(choiceValue) =>
 									setCaptureSettings((settings) => ({
 										...settings,
-										maxSize: Number(event.currentTarget.value),
+										maxSize: Number(choiceValue),
 									}))
 								}
-							>
-								<For each={mobileSizeOptions}>
-									{(option) => (
-										<option
-											value={option.value}
-											selected={captureSettings().maxSize === option.value}
-										>
-											{option.label}
-										</option>
-									)}
-								</For>
-							</select>
+								options={[
+									...(mobileSizeOptions ?? []).map((option) => ({
+										value: option.value,
+										label: option.label,
+									})),
+								]}
+							/>
 						</label>
 						<label>
 							<span>{localize("帧率上限")}</span>
-							<select
+							<ChoiceSelect
 								aria-label={localize("设备录制帧率")}
 								value={captureSettings().maxFps}
 								disabled={status()?.active || busy()}
-								onChange={(event) =>
+								onChange={(choiceValue) =>
 									setCaptureSettings((settings) => ({
 										...settings,
-										maxFps: Number(event.currentTarget.value),
+										maxFps: Number(choiceValue),
 									}))
 								}
-							>
-								<option value={30}>{localize("最高 30 fps")}</option>
-								<option value={60}>{localize("最高 60 fps")}</option>
-							</select>
+								options={[
+									{ value: 30, label: localize("最高 30 fps") },
+									{ value: 60, label: localize("最高 60 fps") },
+								]}
+							/>
 						</label>
 						<label>
 							<span>{localize("编码画质")}</span>
-							<select
+							<ChoiceSelect
 								aria-label={localize("设备录制画质")}
 								value={captureSettings().bitRateMbps}
 								disabled={status()?.active || busy()}
-								onChange={(event) =>
+								onChange={(choiceValue) =>
 									setCaptureSettings((settings) => ({
 										...settings,
-										bitRateMbps: Number(event.currentTarget.value),
+										bitRateMbps: Number(choiceValue),
 									}))
 								}
-							>
-								<option value={8}>{localize("标准 · 8 Mbps")}</option>
-								<option value={16}>{localize("高画质 · 16 Mbps")}</option>
-								<option value={32}>{localize("更高画质 · 32 Mbps")}</option>
-							</select>
+								options={[
+									{ value: 8, label: localize("标准 · 8 Mbps") },
+									{ value: 16, label: localize("高画质 · 16 Mbps") },
+									{ value: 32, label: localize("更高画质 · 32 Mbps") },
+								]}
+							/>
 						</label>
 						<label>
 							<span>{localize("画面方向")}</span>
-							<select
+							<ChoiceSelect
 								aria-label={localize("设备录制方向")}
 								value={captureSettings().orientation}
 								disabled={status()?.active || busy()}
-								onChange={(event) => {
+								onChange={(choiceValue) => {
 									const orientation = mobileOrientationOptions.find(
-										(option) => option.value === event.currentTarget.value,
+										(option) => option.value === choiceValue,
 									)?.value;
 									if (orientation)
 										setCaptureSettings((settings) => ({
@@ -290,25 +291,24 @@ export default function MobileRecorder(props: {
 											orientation,
 										}));
 								}}
-							>
-								<For each={mobileOrientationOptions}>
-									{(option) => (
-										<option
-											value={option.value}
-											selected={captureSettings().orientation === option.value}
-										>
-											{option.label}
-										</option>
-									)}
-								</For>
-							</select>
+								options={[
+									...(mobileOrientationOptions ?? []).map((option) => ({
+										value: option.value,
+										label: option.label,
+									})),
+								]}
+							/>
 						</label>
 					</div>
 					<p class="mobile-capture-note">
-					{localize("按设备比例录制，不放大低分辨率来源。实际帧率由设备与画面变化决定。")}
+						{localize(
+							"按设备比例录制，不放大低分辨率来源。实际帧率由设备与画面变化决定。",
+						)}
 					</p>
 					<p class="mobile-capture-note">
-					{localize("画面方向在录制期间保持不变，设备仍可正常旋转。需要换画幅时，可停止后重新开始。")}
+						{localize(
+							"画面方向在录制期间保持不变，设备仍可正常旋转。需要换画幅时，可停止后重新开始。",
+						)}
 					</p>
 				</Show>
 				<label class="mobile-toggle">
@@ -316,10 +316,12 @@ export default function MobileRecorder(props: {
 						<strong>{localize("设备声音")}</strong>
 						<small>
 							{selected()?.audioSupported
-							? localize("录制设备播放的声音")
+								? localize("录制设备播放的声音")
 								: selected()?.platform === "ios"
 									? localize("这台设备暂未提供可录制的声音。")
-									: localize("安卓声音录制需 Android 11 或更新版本；应用也可限制录音。")}
+									: localize(
+											"安卓声音录制需 Android 11 或更新版本；应用也可限制录音。",
+										)}
 						</small>
 					</span>
 					<input
@@ -447,8 +449,8 @@ export default function MobileRecorder(props: {
 					fallback={
 						<p class="mobile-history-empty">
 							{projects.loading
-							? localize("正在读取录制…")
-							: localize("设备录制会保存在这里，重启后也能继续编辑。")}
+								? localize("正在读取录制…")
+								: localize("设备录制会保存在这里，重启后也能继续编辑。")}
 						</p>
 					}
 				>
@@ -461,10 +463,10 @@ export default function MobileRecorder(props: {
 										{project.phase === "complete"
 											? localize("已保存")
 											: project.phase === "recording"
-								? localize("录制或保存中")
+												? localize("录制或保存中")
 												: project.hasSource
-									? localize("待恢复 · 原始视频已保留")
-									: localize("原始视频缺失")}
+													? localize("待恢复 · 原始视频已保留")
+													: localize("原始视频缺失")}
 									</small>
 								</div>
 								<div class="mobile-history-actions">
@@ -488,9 +490,9 @@ export default function MobileRecorder(props: {
 											}
 										}}
 									>
-						{project.phase === "complete"
-							? localize("继续编辑")
-							: localize("恢复并编辑")}
+										{project.phase === "complete"
+											? localize("继续编辑")
+											: localize("恢复并编辑")}
 									</button>
 									<button
 										type="button"
@@ -528,7 +530,9 @@ export default function MobileRecorder(props: {
 					{localize("开启「开发者选项 → USB 调试」，连接后允许这台 Mac。")}
 				</p>
 				<p>
-					{localize("录制后可先按画幅选择手机或平板外框；可在编辑器中切换或关闭。支持缩放、运镜、动态模糊和画面设置。暂不支持自动跟随设备触摸，可手动添加镜头。")}
+					{localize(
+						"录制后可先按画幅选择手机或平板外框；可在编辑器中切换或关闭。支持缩放、运镜、动态模糊和画面设置。暂不支持自动跟随设备触摸，可手动添加镜头。",
+					)}
 				</p>
 			</div>
 		</div>

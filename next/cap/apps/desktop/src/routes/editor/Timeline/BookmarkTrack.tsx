@@ -82,7 +82,7 @@ export function BookmarkTrack(props: { gutter: number }) {
 									</Popover.Trigger>
 									<Popover.Portal>
 										<Popover.Content
-											class="z-[100] max-h-64 max-w-80 overflow-y-auto rounded-2xl border border-ed-divider bg-ed-card p-2 text-ed-text-1 shadow-lg"
+											class="jk-menu-surface z-[100] max-h-64 max-w-80 overflow-y-auto rounded-2xl border border-ed-divider bg-ed-card p-2 text-ed-text-1 shadow-lg"
 											onKeyDown={(event) => {
 												if (event.key !== "Escape") event.stopPropagation();
 											}}

@@ -32,7 +32,7 @@ export function BorderPopover() {
 				kbd={["E"]}
 			/>
 			<Popover.Portal>
-				<Popover.Content class="z-50 w-[280px] overflow-hidden rounded-xl border border-gray-3 bg-gray-1 shadow-xl animate-in fade-in zoom-in-95 p-4">
+				<Popover.Content class="jk-menu-surface z-50 w-[280px] overflow-hidden rounded-xl border border-gray-3 bg-gray-1 shadow-xl animate-in fade-in zoom-in-95 p-4">
 					<div class="flex flex-col gap-4">
 						<div class="flex flex-row justify-between items-center">
 							<span class="text-xs font-medium text-gray-11">
@@ -56,7 +56,7 @@ export function BorderPopover() {
 						</div>
 
 						<Collapsible open={project.background.border?.enabled ?? false}>
-							<Collapsible.Content class="overflow-hidden opacity-0 transition-opacity animate-collapsible-up data-expanded:animate-collapsible-down data-expanded:opacity-100">
+							<Collapsible.Content class="jk-disclosure-content overflow-hidden opacity-0 transition-opacity animate-collapsible-up data-expanded:animate-collapsible-down data-expanded:opacity-100">
 								<div class="flex flex-col gap-4">
 									<Field
 										name={localize("Width")}

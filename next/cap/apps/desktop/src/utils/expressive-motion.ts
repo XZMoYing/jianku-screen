@@ -1,3 +1,4 @@
+import { interfaceMotion } from "./interface-motion-tokens";
 import { InterfaceSpring, springFrames } from "./interface-spring";
 
 export function installExpressiveMotion() {
@@ -6,6 +7,15 @@ export function installExpressiveMotion() {
 		document.documentElement.style.setProperty(
 			"--jk-spatial",
 			`linear(${springFrames(0.38, 1)
+				.map((frame) => frame.progress.toFixed(5))
+				.join(",")})`,
+		);
+	}
+	const menu = interfaceMotion.menu;
+	if (CSS.supports("transition-timing-function", "linear(0, 1)")) {
+		document.documentElement.style.setProperty(
+			"--jk-menu-spring",
+			`linear(${springFrames(menu.response, menu.damping, menu.duration / 1000)
 				.map((frame) => frame.progress.toFixed(5))
 				.join(",")})`,
 		);

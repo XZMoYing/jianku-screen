@@ -1,0 +1,86 @@
+[
+  {
+    "file": "apps/desktop/src/routes/(window-chrome)/settings/general.tsx",
+    "changed": 1
+  },
+  {
+    "file": "apps/desktop/src/routes/editor/AnimatedGradientEditor.tsx",
+    "changed": 1
+  },
+  {
+    "file": "apps/desktop/src/routes/editor/ColorCorrectionSection.tsx",
+    "changed": 1
+  },
+  {
+    "file": "apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+    "changed": 1
+  },
+  {
+    "file": "apps/desktop/src/routes/editor/CursorStylePicker.tsx",
+    "changed": 1
+  },
+  {
+    "file": "apps/desktop/src/routes/editor/FrameButton.tsx",
+    "changed": 1
+  },
+  {
+    "file": "apps/desktop/src/routes/editor/ShadowSettings.tsx",
+    "changed": 1
+  },
+  {
+    "file": "apps/desktop/src/routes/editor/Timeline/BookmarkTrack.tsx",
+    "changed": 1
+  },
+  {
+    "file": "apps/desktop/src/routes/editor/Timeline/ClipTrack.tsx",
+    "changed": 2
+  },
+  {
+    "file": "apps/desktop/src/routes/editor/Timeline/TrackManager.tsx",
+    "changed": 1
+  },
+  {
+    "file": "apps/desktop/src/routes/editor/ZoomModeHelper.tsx",
+    "changed": 1
+  },
+  {
+    "file": "apps/desktop/src/routes/editor/three-d-panel.tsx",
+    "changed": 1
+  },
+  {
+    "file": "apps/desktop/src/routes/screenshot-editor/AnnotationConfig.tsx",
+    "changed": 1
+  },
+  {
+    "file": "apps/desktop/src/routes/screenshot-editor/popovers/AnnotationPopover.tsx",
+    "changed": 1
+  },
+  {
+    "file": "apps/desktop/src/routes/screenshot-editor/popovers/BackgroundSettingsPopover.tsx",
+    "changed": 1
+  },
+  {
+    "file": "apps/desktop/src/routes/screenshot-editor/popovers/BorderPopover.tsx",
+    "changed": 2
+  },
+  {
+    "file": "apps/desktop/src/routes/screenshot-editor/popovers/PaddingPopover.tsx",
+    "changed": 1
+  },
+  {
+    "file": "apps/desktop/src/routes/screenshot-editor/popovers/RoundingPopover.tsx",
+    "changed": 1
+  },
+  {
+    "file": "apps/desktop/src/routes/screenshot-editor/popovers/ShadowPopover.tsx",
+    "changed": 1
+  },
+  {
+    "file": "apps/desktop/src/routes/screenshot-editor/popovers/ShadowSettings.tsx",
+    "changed": 1
+  },
+  {
+    "file": "apps/desktop/src/routes/target-select-overlay.tsx",
+    "changed": 1
+  }
+]

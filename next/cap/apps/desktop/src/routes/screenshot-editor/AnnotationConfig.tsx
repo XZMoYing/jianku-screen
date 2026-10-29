@@ -46,7 +46,9 @@ export function AnnotationConfigBar() {
 						<div class="flex items-center justify-center gap-6 px-4 h-11">
 							<Show when={!isMask()}>
 								<ConfigItem
-									label={type() === "text" ? localize("文字颜色") : localize("描边")}
+									label={
+										type() === "text" ? localize("文字颜色") : localize("描边")
+									}
 								>
 									<ColorPickerButton
 										value={ann().strokeColor}
@@ -227,7 +229,7 @@ function ColorPickerButton(props: {
 				</div>
 			</Popover.Trigger>
 			<Popover.Portal>
-				<Popover.Content class="z-200 w-[220px] overflow-hidden rounded-lg border border-gray-4 bg-gray-1 dark:bg-gray-2 shadow-lg animate-in fade-in zoom-in-95 p-2.5">
+				<Popover.Content class="jk-menu-surface z-200 w-[220px] overflow-hidden rounded-lg border border-gray-4 bg-gray-1 dark:bg-gray-2 shadow-lg animate-in fade-in zoom-in-95 p-2.5">
 					<div class="flex flex-col gap-2.5">
 						<RgbInput
 							value={rgbValue()}
@@ -238,7 +240,7 @@ function ColorPickerButton(props: {
 
 						<div class="grid grid-cols-6 gap-1.5">
 							<Show when={props.allowTransparent}>
-							<Tooltip content={localize("Transparent")}>
+								<Tooltip content={localize("Transparent")}>
 									<button
 										type="button"
 										onClick={() => props.onChange("transparent")}

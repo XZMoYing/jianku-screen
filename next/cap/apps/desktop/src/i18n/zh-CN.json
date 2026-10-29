@@ -1542,5 +1542,9 @@
 	"{count} segments": "{count} 个片段",
 	"Recent items": "最近项目",
 	"No recent items": "暂无最近项目",
-	"Loading recent items…": "正在读取最近项目…"
+	"Loading recent items…": "正在读取最近项目…",
+	"Add transition before clip {count}": "在第 {count} 个片段前添加转场",
+	"Delete all 3D shots": "删除全部 3D 镜头",
+	"Delete all zoom segments": "删除全部缩放片段",
+	"Delete all scene segments": "删除全部场景片段"
 }

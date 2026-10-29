@@ -719,7 +719,7 @@ export function AnimatedGradientEditor(props: {
 								</EditorButton>
 							</Show>
 						</div>
-						<KCollapsible.Content class="overflow-hidden opacity-0 transition-opacity animate-collapsible-up data-expanded:animate-collapsible-down data-expanded:opacity-100">
+						<KCollapsible.Content class="jk-disclosure-content overflow-hidden opacity-0 transition-opacity animate-collapsible-up data-expanded:animate-collapsible-down data-expanded:opacity-100">
 							<div class="flex flex-col gap-3 pt-4">
 								<MotionGroup
 									label={localize("动态背景参数分类")}

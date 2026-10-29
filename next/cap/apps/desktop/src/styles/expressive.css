@@ -565,10 +565,10 @@
 	:root *,
 	:root *::before,
 	:root *::after {
-		animation-duration: 0.01ms !important;
-		animation-iteration-count: 1 !important;
-		transition-duration: 0.01ms !important;
-		scroll-behavior: auto !important;
+		animation-duration: 0.01ms;
+		animation-iteration-count: 1;
+		transition-duration: 0.01ms;
+		scroll-behavior: auto;
 	}
 }
 :root .jk-tab-label {
@@ -1350,15 +1350,19 @@
 	padding: 0 10px;
 }
 :root .jk-inspector > [role="tablist"] .jk-inspector-tab-motion .jk-tab-label {
-	display: block;
 	font-size: 12px;
 	max-width: 0;
 	opacity: 0;
 	overflow: hidden;
 	white-space: nowrap;
+	filter: blur(4px);
+	transform: scale(0.86);
+	transform-origin: left center;
 	transition:
-		max-width 380ms cubic-bezier(0.2, 0, 0, 1),
-		opacity 160ms ease-out;
+		max-width 650ms var(--jk-spatial, var(--jk-effects)),
+		opacity 80ms ease-in,
+		filter 80ms ease-in,
+		transform 80ms ease-in;
 }
 :root
 	.jk-inspector
@@ -1371,7 +1375,7 @@
 	filter: blur(0);
 	transform: scale(1);
 	transition:
-		max-width 380ms cubic-bezier(0.2, 0, 0, 1),
+		max-width 650ms var(--jk-spatial, var(--jk-effects)),
 		opacity 240ms ease-out 60ms,
 		filter 240ms ease-out 60ms,
 		transform 240ms ease-out 60ms;
@@ -1427,4 +1431,228 @@
 .jk-preview-scrubber:focus-visible {
 	outline: 2px solid var(--jk-primary);
 	outline-offset: 8px;
+}
+
+:root .jk-choice {
+	min-width: 0;
+	max-width: 100%;
+}
+:root .jk-choice-trigger {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	width: 100%;
+	min-height: 36px;
+	padding: 8px 12px;
+	border: 0;
+	border-radius: 14px;
+	background: var(--jk-container);
+	color: var(--jk-ink);
+	font-size: 13px;
+	text-align: start;
+	transition: background-color 150ms var(--jk-effects);
+}
+:root .jk-choice-trigger:hover,
+:root .jk-choice-trigger[data-expanded] {
+	background: var(--jk-container-high);
+}
+:root .jk-choice-trigger:disabled {
+	opacity: 0.45;
+}
+:root .jk-choice-trigger > span:first-child {
+	min-width: 0;
+	flex: 1;
+	overflow: hidden;
+}
+:root .jk-choice-chevron {
+	flex: none;
+	width: 16px;
+	height: 16px;
+	color: var(--jk-muted);
+	transition: transform 380ms var(--jk-spatial, var(--jk-effects));
+}
+:root .jk-choice-trigger[data-expanded] .jk-choice-chevron {
+	transform: rotate(180deg);
+}
+:root .jk-choice-menu {
+	min-width: var(--kb-popper-anchor-width);
+	max-height: min(360px, var(--kb-popper-content-available-height, 360px));
+	max-width: min(440px, calc(100vw - 24px));
+}
+:root .jk-choice-option {
+	min-height: 36px;
+	gap: 16px;
+	padding: 9px 12px;
+}
+:root .jk-choice-option[data-disabled] {
+	opacity: 0.45;
+}
+:root .jk-choice-check {
+	margin-inline-start: auto;
+	color: var(--jk-primary);
+}
+:root .jk-menu-surface {
+	border-radius: 20px;
+	background: var(--jk-paper);
+	box-shadow: var(--jk-pop-shadow);
+	transform-origin: top center;
+}
+:root .jk-menu-surface[data-expanded] {
+	animation:
+		jk-menu-arrive 450ms var(--jk-menu-spring, var(--jk-effects)) both,
+		jk-menu-fade 180ms ease-out both;
+}
+:root .jk-menu-surface[data-closed] {
+	pointer-events: none;
+	animation: jk-menu-leave 120ms ease-in both;
+}
+@keyframes jk-menu-arrive {
+	from {
+		transform: translateY(-6px);
+	}
+	to {
+		transform: translateY(0);
+	}
+}
+@keyframes jk-menu-fade {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+@keyframes jk-menu-leave {
+	from {
+		opacity: 1;
+		transform: translateY(0);
+	}
+	to {
+		opacity: 0;
+		transform: translateY(-3px);
+	}
+}
+:root .jk-motion-text {
+	position: relative;
+	display: inline-block;
+	max-width: 100%;
+	vertical-align: bottom;
+	white-space: nowrap;
+}
+:root .jk-motion-text-size {
+	visibility: hidden;
+}
+:root .jk-motion-text-glyphs,
+:root .jk-motion-text-outgoing {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+}
+:root .jk-motion-glyph {
+	display: inline-block;
+	white-space: pre;
+}
+:root .jk-disclosure-trigger {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	min-height: 36px;
+	padding: 6px 0;
+	gap: 12px;
+	color: var(--jk-muted);
+	font-size: 12px;
+	text-align: start;
+}
+:root .jk-disclosure-trigger svg {
+	width: 16px;
+	height: 16px;
+	transition: transform 380ms var(--jk-spatial, var(--jk-effects));
+}
+:root .jk-disclosure-trigger[data-expanded] svg {
+	transform: rotate(180deg);
+}
+:root .jk-disclosure-content {
+	overflow: hidden;
+}
+:root .jk-disclosure-content[data-expanded] {
+	animation: jk-disclosure-open 450ms var(--jk-menu-spring, var(--jk-effects));
+}
+:root .jk-disclosure-content[data-closed] {
+	animation: jk-disclosure-close 180ms var(--jk-effects);
+}
+@keyframes jk-disclosure-open {
+	from {
+		height: 0;
+		opacity: 0;
+	}
+	to {
+		height: var(--kb-collapsible-content-height);
+		opacity: 1;
+	}
+}
+@keyframes jk-disclosure-close {
+	from {
+		height: var(--kb-collapsible-content-height);
+		opacity: 1;
+	}
+	to {
+		height: 0;
+		opacity: 0;
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	:root .jk-menu-surface,
+	:root .jk-disclosure-content {
+		animation: none;
+	}
+	:root .jk-choice-chevron,
+	:root .jk-disclosure-trigger svg {
+		transition: none;
+	}
+}
+
+:root .jk-appearance-tabs button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 7px;
+	min-height: 44px;
+	padding-inline: 10px;
+}
+:root .jk-appearance-tabs button svg {
+	width: 17px;
+	height: 17px;
+	flex: none;
+}
+:root .jk-appearance-tabs .jk-tab-label {
+	max-width: 0;
+	opacity: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	filter: blur(4px);
+	transform: scale(0.86);
+	transform-origin: left center;
+	transition:
+		max-width 650ms var(--jk-spatial, var(--jk-effects)),
+		opacity 80ms ease-in,
+		filter 80ms ease-in,
+		transform 80ms ease-in;
+}
+:root .jk-appearance-tabs [aria-pressed="true"] .jk-tab-label {
+	max-width: 80px;
+	opacity: 1;
+	filter: blur(0);
+	transform: scale(1);
+	transition:
+		max-width 650ms var(--jk-spatial, var(--jk-effects)),
+		opacity 240ms ease-out 60ms,
+		filter 240ms ease-out 60ms,
+		transform 240ms ease-out 60ms;
+}
+:root .jk-appearance .jk-motion-content {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
 }

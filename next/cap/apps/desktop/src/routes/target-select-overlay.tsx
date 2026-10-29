@@ -2330,7 +2330,7 @@ function RecordingControls(props: {
 								</button>
 							</Popover.Anchor>
 							<Popover.Portal>
-								<Popover.Content class="z-200 w-[min(21rem,calc(100vw-1.5rem))] rounded-xl border border-amber-6 bg-gray-1 p-3.5 text-gray-12 shadow-xl outline-hidden data-expanded:animate-in data-expanded:fade-in data-expanded:zoom-in-95">
+								<Popover.Content class="jk-menu-surface z-200 w-[min(21rem,calc(100vw-1.5rem))] rounded-xl border border-amber-6 bg-gray-1 p-3.5 text-gray-12 shadow-xl outline-hidden data-expanded:animate-in data-expanded:fade-in data-expanded:zoom-in-95">
 									<div class="flex gap-2.5 items-start">
 										<IconLucideAlertTriangle class="mt-0.5 size-4 shrink-0 text-amber-10" />
 										<div class="flex flex-col gap-1">

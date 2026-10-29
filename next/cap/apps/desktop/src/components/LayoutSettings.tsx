@@ -1,4 +1,5 @@
 import { For, Show } from "solid-js";
+import { ChoiceSelect } from "~/components/ChoiceSelect";
 import { RgbInput } from "~/routes/editor/color-utils";
 import {
 	ASPECT_RATIO_OPTIONS,
@@ -11,6 +12,7 @@ import type {
 	BackgroundConfiguration,
 	CornerStyle,
 } from "~/utils/tauri";
+import { Disclosure } from "./Disclosure";
 import { InsetSettings } from "./InsetSettings";
 import { Toggle } from "./Toggle";
 
@@ -55,45 +57,43 @@ export function LayoutSettings(props: {
 		<div class="jk-layout-settings">
 			<label class="jk-control-row">
 				<span>{localize("画面比例")}</span>
-				<select
+				<ChoiceSelect
 					aria-label={localize("捕获画面比例")}
 					value={props.aspectRatio ?? "auto"}
-					onChange={(event) =>
+					onChange={(choiceValue) =>
 						props.onAspectRatio(
-							event.currentTarget.value === "auto"
-								? null
-								: (event.currentTarget.value as AspectRatio),
+							choiceValue === "auto" ? null : (choiceValue as AspectRatio),
 						)
 					}
-				>
-					<For each={ASPECT_RATIO_OPTIONS}>
-						{(ratio) => (
-							<option value={ratio}>
-								{ratio === "auto"
+					options={[
+						...(ASPECT_RATIO_OPTIONS ?? []).map((ratio) => ({
+							value: ratio,
+							label:
+								ratio === "auto"
 									? localize("适合屏幕")
-									: `${ASPECT_RATIOS[ratio].ratio.join(":")} · ${localize(ASPECT_RATIOS[ratio].name)}`}
-							</option>
-						)}
-					</For>
-				</select>
+									: `${ASPECT_RATIOS[ratio].ratio.join(":")} · ${localize(ASPECT_RATIOS[ratio].name)}`,
+						})),
+					]}
+				/>
 			</label>
 			{range("背景模糊", "blur")}
 			{range("留白", "padding", 40)}
 			{range("圆角", "rounding")}
 			<label class="jk-control-row">
 				<span>{localize("圆角样式")}</span>
-				<select
+				<ChoiceSelect
 					aria-label={localize("圆角样式")}
 					value={props.background.roundingType}
-					onChange={(event) =>
+					onChange={(choiceValue) =>
 						props.onChange({
-							roundingType: event.currentTarget.value as CornerStyle,
+							roundingType: choiceValue as CornerStyle,
 						})
 					}
-				>
-					<option value="rounded">{localize("圆润")}</option>
-					<option value="squircle">{localize("连续曲率")}</option>
-				</select>
+					options={[
+						{ value: "rounded", label: localize("圆润") },
+						{ value: "squircle", label: localize("连续曲率") },
+					]}
+				/>
 			</label>
 			<InsetSettings background={props.background} onChange={props.onChange} />
 			<Show when={props.background.displayPosition}>
@@ -120,8 +120,7 @@ export function LayoutSettings(props: {
 				/>
 			</Field>
 			{range("阴影", "shadow")}
-			<details class="jk-appearance-details">
-				<summary>{localize("阴影细节")}</summary>
+			<Disclosure class="jk-appearance-details" title={localize("阴影细节")}>
 				<div>
 					<For
 						each={
@@ -153,7 +152,7 @@ export function LayoutSettings(props: {
 						)}
 					</For>
 				</div>
-			</details>
+			</Disclosure>
 			<Field inline name={localize("细边框")}>
 				<Toggle
 					checked={border().enabled}

@@ -10,7 +10,7 @@ export function ZoomModeHelper(props: { mode: "auto" | "manual" }) {
 				{localize("How does it work?")}
 				<IconCapChevronDown class="ml-auto transition-transform duration-200 size-3.5 group-data-expanded:rotate-180" />
 			</KCollapsible.Trigger>
-			<KCollapsible.Content class="overflow-hidden opacity-0 transition-opacity animate-collapsible-up data-expanded:animate-collapsible-down data-expanded:opacity-100">
+			<KCollapsible.Content class="jk-disclosure-content overflow-hidden opacity-0 transition-opacity animate-collapsible-up data-expanded:animate-collapsible-down data-expanded:opacity-100">
 				<div class="pt-2 space-y-1.5">
 					<style>
 						{`

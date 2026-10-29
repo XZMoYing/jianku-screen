@@ -1,4 +1,5 @@
-import { For, Show } from "solid-js";
+import { Show } from "solid-js";
+import { ChoiceSelect } from "~/components/ChoiceSelect";
 import {
 	type CursorFamily,
 	CursorRippleControls,
@@ -97,13 +98,11 @@ export function CursorSettings(props: {
 				</Show>
 				<label class="jk-control-row">
 					<span>{localize("移动风格")}</span>
-					<select
+					<ChoiceSelect
 						aria-label={localize("光标移动风格")}
 						value={props.cursor.animationStyle}
-						onChange={(event) => {
-							const preset = presets.find(
-								(p) => p.id === event.currentTarget.value,
-							);
+						onChange={(choiceValue) => {
+							const preset = presets.find((p) => p.id === choiceValue);
 							props.onChange(
 								preset
 									? {
@@ -115,12 +114,14 @@ export function CursorSettings(props: {
 									: { animationStyle: "custom" as CursorAnimationStyle },
 							);
 						}}
-					>
-						<For each={presets}>
-							{(p) => <option value={p.id}>{localize(p.name)}</option>}
-						</For>
-						<option value="custom">{localize("自定义")}</option>
-					</select>
+						options={[
+							...(presets ?? []).map((p) => ({
+								value: p.id,
+								label: localize(p.name),
+							})),
+							{ value: "custom", label: localize("自定义") },
+						]}
+					/>
 				</label>
 				<Field inline name={localize("平滑移动")}>
 					<Toggle

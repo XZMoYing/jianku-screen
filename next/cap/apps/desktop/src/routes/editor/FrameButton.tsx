@@ -82,7 +82,9 @@ const THEME_TAB_TRIGGER_CLASS =
 function SettingRow(props: { name: string; children: JSX.Element }) {
 	return (
 		<div class="flex gap-3 justify-between items-center">
-		<span class="text-xs font-medium text-ed-text-2">{localize(props.name)}</span>
+			<span class="text-xs font-medium text-ed-text-2">
+				{localize(props.name)}
+			</span>
 			{props.children}
 		</div>
 	);
@@ -261,10 +263,10 @@ function ScopedFrameButton() {
 			</EditorButton>
 			<KPopover.Portal>
 				<KPopover.Content
-					class={cx(
+					class={`jk-menu-surface ${cx(
 						"z-60 flex w-[min(19rem,calc(100vw-1.5rem))] flex-col max-h-[min(40rem,calc(100vh-5rem))] overflow-y-auto rounded-2xl bg-ed-card shadow-ed-pop outline-hidden",
 						"origin-[var(--kb-popover-content-transform-origin)] data-expanded:animate-in data-expanded:fade-in data-expanded:zoom-in-95 data-closed:animate-out data-closed:fade-out data-closed:zoom-out-95",
-					)}
+					)}`}
 				>
 					<FrameSettings />
 				</KPopover.Content>

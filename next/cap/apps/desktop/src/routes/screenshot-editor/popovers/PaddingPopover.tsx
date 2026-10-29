@@ -70,7 +70,7 @@ export function PaddingPopover() {
 				kbd={["P"]}
 			/>
 			<Popover.Portal>
-				<Popover.Content class="z-50 w-[320px] overflow-hidden rounded-xl border border-gray-3 bg-gray-1 shadow-xl animate-in fade-in zoom-in-95 p-4">
+				<Popover.Content class="jk-menu-surface z-50 w-[320px] overflow-hidden rounded-xl border border-gray-3 bg-gray-1 shadow-xl animate-in fade-in zoom-in-95 p-4">
 					<div class="flex flex-col gap-2">
 						<span class="text-xs font-medium text-gray-11">
 							{localize("Padding")}

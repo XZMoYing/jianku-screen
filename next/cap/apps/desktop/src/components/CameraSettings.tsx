@@ -1,5 +1,6 @@
 import { type as ostype } from "@tauri-apps/plugin-os";
 import { For, Show } from "solid-js";
+import { ChoiceSelect } from "~/components/ChoiceSelect";
 import { Field, Slider } from "~/routes/editor/ui";
 import { t as localize } from "~/utils/i18n";
 import type {
@@ -9,6 +10,7 @@ import type {
 	CornerStyle,
 } from "~/utils/tauri";
 import { cameraBackgroundOptions } from "./CameraPreviewChrome";
+import { Disclosure } from "./Disclosure";
 import { Toggle } from "./Toggle";
 
 export function CameraSettings(props: {
@@ -85,38 +87,41 @@ export function CameraSettings(props: {
 				</Field>
 				<label class="jk-control-row">
 					<span>{localize("摄像头背景")}</span>
-					<select
+					<ChoiceSelect
 						aria-label={localize("摄像头背景")}
 						value={props.camera.backgroundBlur?.mode ?? "off"}
-						onChange={(event) =>
+						onChange={(choiceValue) =>
 							props.onChange({
 								backgroundBlur: {
-									mode: event.currentTarget.value as BackgroundBlurMode,
+									mode: choiceValue as BackgroundBlurMode,
 								},
 							})
 						}
-					>
-						<For each={cameraBackgroundOptions(ostype() === "macos")}>
-							{(option) => (
-								<option value={option.value}>{localize(option.name)}</option>
-							)}
-						</For>
-					</select>
+						options={[
+							...(cameraBackgroundOptions(ostype() === "macos") ?? []).map(
+								(option) => ({
+									value: option.value,
+									label: localize(option.name),
+								}),
+							),
+						]}
+					/>
 				</label>
 				<label class="jk-control-row">
 					<span>{localize("形状")}</span>
-					<select
+					<ChoiceSelect
 						aria-label={localize("摄像头形状")}
 						value={props.camera.shape}
-						onChange={(event) =>
+						onChange={(choiceValue) =>
 							props.onChange({
-								shape: event.currentTarget.value as CameraShape,
+								shape: choiceValue as CameraShape,
 							})
 						}
-					>
-						<option value="square">{localize("方形")}</option>
-						<option value="source">{localize("原始比例")}</option>
-					</select>
+						options={[
+							{ value: "square", label: localize("方形") },
+							{ value: "source", label: localize("原始比例") },
+						]}
+					/>
 				</label>
 				{range("摄像头大小", "size", 20, 80)}
 				{range("放大时大小", "zoomSize", 10, 60)}
@@ -131,22 +136,22 @@ export function CameraSettings(props: {
 				{range("圆角", "rounding", 0, 100)}
 				<label class="jk-control-row">
 					<span>{localize("圆角样式")}</span>
-					<select
+					<ChoiceSelect
 						aria-label={localize("摄像头圆角样式")}
 						value={props.camera.roundingType}
-						onChange={(event) =>
+						onChange={(choiceValue) =>
 							props.onChange({
-								roundingType: event.currentTarget.value as CornerStyle,
+								roundingType: choiceValue as CornerStyle,
 							})
 						}
-					>
-						<option value="rounded">{localize("圆润")}</option>
-						<option value="squircle">{localize("连续曲率")}</option>
-					</select>
+						options={[
+							{ value: "rounded", label: localize("圆润") },
+							{ value: "squircle", label: localize("连续曲率") },
+						]}
+					/>
 				</label>
 				{range("阴影", "shadow", 0, 100)}
-				<details class="jk-appearance-details">
-					<summary>{localize("阴影细节")}</summary>
+				<Disclosure class="jk-appearance-details" title={localize("阴影细节")}>
 					<div>
 						<For
 							each={
@@ -178,7 +183,7 @@ export function CameraSettings(props: {
 							)}
 						</For>
 					</div>
-				</details>
+				</Disclosure>
 			</Show>
 		</div>
 	);

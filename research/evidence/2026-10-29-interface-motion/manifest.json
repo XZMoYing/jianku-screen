@@ -1,0 +1,17 @@
+{
+  "repository": "https://github.com/laogou717/dogsc",
+  "commit": "567fd6ed3bf113227dcf3e815f87ce60f0b69497",
+  "files": {
+    "EditorDesignTokens.swift": "6ddb9bfa868c2c631c6b5ca0dd4cd549d2bb713df92e78af38b6ba1d7a939d71",
+    "LICENSE": "af8b353671e48b110269ab4b89c909ca580710044691f1c6c0da419c6e9b8ab4",
+    "AppSettingsComponents.swift": "89c0a730c69a277e710be1ff8a34847719d322b6b933bc4cfd8941015dc11c48",
+    "EditorPopover.swift": "93406c75630942ac8f4dabc47de341dfcc90de878fc7d70720c9fd3a30a7d2b7",
+    "RecorderSurfaceStyle.swift": "b60ab3d910dba78bdd763b61b1c8ca8916f7e39ed18a675c20876136e4667ab5",
+    "EditorInspectorTabBar.swift": "db04a0080490e882af17c66178f61c8c670bc5c66b59055400c1f21746db9860",
+    "EditorInspectorMotion.swift": "21e27aa7efaf52bd441a06b807e7f0540e1e67e3666dbb9a91644d4d66dc1d47",
+    "EditorCanvasRatioSelector.swift": "571ec3e00a8e1eedbd802d39320daa00d4d3b7b81ccc21bf87710a3b4648e55d",
+    "RecorderPopover.swift": "8fc328234f77839ae0fde6d9cbc6a8de216cb45d2d6bbd52257f3b5f49a761ad",
+    "AppChoiceFeedback.swift": "faad873b6a9563aa2c35c0b495ffe30d38015f3b9c9d38d1d34d31aa8f144795"
+  },
+  "scope": "Read native popover, page, selection and text timing. Independently implemented with existing WebView/Kobalte; no claim of frame equivalence."
+}

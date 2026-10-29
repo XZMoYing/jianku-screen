@@ -7,12 +7,13 @@ import {
 	onCleanup,
 	onMount,
 } from "solid-js";
+import { interfaceMotion } from "~/utils/interface-motion-tokens";
 import { InterfaceSpring, springFrames } from "~/utils/interface-spring";
 
 const arrivalFrames = (kind: "page" | "subpage", direction: number) =>
 	springFrames(
-		kind === "page" ? 0.42 : 0.4,
-		kind === "page" ? 0.86 : 0.84,
+		interfaceMotion[kind].response,
+		interfaceMotion[kind].damping,
 		0.7,
 	).map(({ offset, progress }) => ({
 		offset,
@@ -157,8 +158,8 @@ export function MotionSwitch<T>(props: {
 							},
 						],
 						{
-							duration: 140,
-							easing: "cubic-bezier(.5,0,.9,.5)",
+							duration: interfaceMotion.outgoing.duration,
+							easing: interfaceMotion.outgoing.easing,
 							fill: "forwards",
 						},
 					);
@@ -210,9 +211,25 @@ export function MotionSwitch<T>(props: {
 			{ defer: true },
 		),
 	);
+	onMount(() => {
+		const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+		const settle = () => {
+			revision++;
+			cancel();
+			setDisplayed(() => props.value);
+			root.inert = false;
+		};
+		reduced.addEventListener("change", settle);
+		document.addEventListener("visibilitychange", settle);
+		onCleanup(() => {
+			reduced.removeEventListener("change", settle);
+			document.removeEventListener("visibilitychange", settle);
+		});
+	});
 	onCleanup(() => {
 		revision++;
 		cancel();
+		root.inert = false;
 	});
 	return (
 		<div
@@ -259,8 +276,8 @@ export function MotionPresence(props: {
 								{ opacity: 0, transform: "translateY(26px) scale(.985)" },
 							],
 							{
-								duration: 140,
-								easing: "cubic-bezier(.5,0,.9,.5)",
+								duration: interfaceMotion.outgoing.duration,
+								easing: interfaceMotion.outgoing.easing,
 								fill: "forwards",
 							},
 						);
@@ -302,6 +319,8 @@ export async function transitionContent(
 	change: () => void,
 	direction = 1,
 ) {
+	const opacity = getComputedStyle(root).opacity;
+	const transform = getComputedStyle(root).transform;
 	const previous = pageChanges.get(root);
 	const revision = (previous?.revision ?? 0) + 1;
 	previous?.animation?.cancel();
@@ -313,10 +332,14 @@ export async function transitionContent(
 	}
 	state.animation = root.animate(
 		[
-			{ opacity: 1, transform: "none" },
+			{ opacity, transform },
 			{ opacity: 0, transform: `translateX(${-18 * direction}px) scale(.985)` },
 		],
-		{ duration: 140, easing: "cubic-bezier(.5,0,.9,.5)", fill: "forwards" },
+		{
+			duration: interfaceMotion.outgoing.duration,
+			easing: interfaceMotion.outgoing.easing,
+			fill: "forwards",
+		},
 	);
 	await state.animation.finished.catch(() => {});
 	if (pageChanges.get(root) !== state) return;

@@ -464,7 +464,7 @@ function DrillSection(
 					<IconCapChevronDown class="transition-transform duration-200 size-3.5 group-data-expanded:rotate-180" />
 				</span>
 			</KCollapsible.Trigger>
-			<KCollapsible.Content class="overflow-hidden opacity-0 transition-opacity animate-collapsible-up data-expanded:animate-collapsible-down data-expanded:opacity-100">
+			<KCollapsible.Content class="jk-disclosure-content overflow-hidden opacity-0 transition-opacity animate-collapsible-up data-expanded:animate-collapsible-down data-expanded:opacity-100">
 				<div class={cx(props.subtle ? "pt-1" : "px-3 pt-1 pb-3")}>
 					{props.children}
 				</div>

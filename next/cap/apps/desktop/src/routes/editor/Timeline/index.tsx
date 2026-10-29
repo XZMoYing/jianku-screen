@@ -2091,13 +2091,13 @@ function TrackRow(props: {
 					<button
 						type="button"
 						class="absolute right-0 top-1/2 z-30 flex size-5 -translate-y-1/2 items-center justify-center rounded-md text-ed-text-3 opacity-0 transition-opacity hover:bg-ed-ctl-active hover:text-red-9 group-hover/icon:opacity-100 focus-visible:opacity-100"
-						aria-label={props.deleteTitle ?? localize("删除轨道")}
+						aria-label={localize(props.deleteTitle ?? "删除轨道")}
 						onClick={(e) => {
 							e.stopPropagation();
 							props.onDelete?.();
 						}}
 						onMouseDown={(e) => e.stopPropagation()}
-						title={props.deleteTitle ?? localize("删除轨道")}
+						title={localize(props.deleteTitle ?? "删除轨道")}
 					>
 						<IconCapTrash class="size-3.5" />
 					</button>

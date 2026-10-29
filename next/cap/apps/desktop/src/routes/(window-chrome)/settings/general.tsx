@@ -5,6 +5,7 @@ import {
 } from "@tauri-apps/plugin-notification";
 import { type OsType, type } from "@tauri-apps/plugin-os";
 import BrandLogo from "~/components/BrandLogo";
+import { ChoiceSelect } from "~/components/ChoiceSelect";
 import ColorSchemeOptions from "~/components/ColorSchemeSettings";
 import {
 	type InterfaceLanguage,
@@ -449,19 +450,20 @@ function Inner(props: {
 
 				<Section title={t("界面语言")}>
 					<SettingItem label={t("界面语言")}>
-						<select
+						<ChoiceSelect
 							aria-label={t("界面语言")}
 							value={interfaceLanguage()}
-							onChange={(event) =>
+							onChange={(choiceValue) =>
 								void setInterfaceLanguage(
-									event.currentTarget.value as InterfaceLanguage,
+									choiceValue as InterfaceLanguage,
 								).catch((error) => toast.error(String(error)))
 							}
-						>
-							<option value="zh-CN">{localize("简体中文")}</option>
-							<option value="en">{localize("English")}</option>
-							<option value="system">{t("跟随系统")}</option>
-						</select>
+							options={[
+								{ value: "zh-CN", label: localize("简体中文") },
+								{ value: "en", label: localize("English") },
+								{ value: "system", label: t("跟随系统") },
+							]}
+						/>
 					</SettingItem>
 				</Section>
 
@@ -648,10 +650,10 @@ function Inner(props: {
 							label={localize("Max capture framerate")}
 							description={
 								(settings.maxFps ?? 60) > 60
-								? localize(
-										"屏幕录制的最高帧率。较高帧率可能导致部分设备丢帧或增加处理器占用。",
-									)
-								: localize("屏幕录制的最高帧率。")
+									? localize(
+											"屏幕录制的最高帧率。较高帧率可能导致部分设备丢帧或增加处理器占用。",
+										)
+									: localize("屏幕录制的最高帧率。")
 							}
 							value={settings.maxFps ?? 60}
 							onChange={(value) => handleChange("maxFps", value)}
@@ -674,7 +676,9 @@ function Inner(props: {
 							}
 						} catch (e) {
 							toast.error(
-								localize("选择录制文件夹失败：{reason}", { reason: e instanceof Error ? e.message : String(e) }),
+								localize("选择录制文件夹失败：{reason}", {
+									reason: e instanceof Error ? e.message : String(e),
+								}),
 							);
 						}
 					}}
@@ -831,7 +835,7 @@ function TelemetryCard(props: {
 				<ToggleSettingItem
 					label={localize("Share anonymous telemetry")}
 					description={localize(
-							"Share anonymous usage data to help improve reliability and fix bugs. Recording contents, window titles, file paths, and personal information are never collected.",
+						"Share anonymous usage data to help improve reliability and fix bugs. Recording contents, window titles, file paths, and personal information are never collected.",
 					)}
 					value={props.value}
 					onChange={props.onChange}
@@ -884,7 +888,7 @@ function UpdatesSection(props: {
 								{localize("Update channel")}
 							</p>
 							<p class="text-xs leading-snug text-gray-10">
-				{localize("设置应用使用的更新通道。")}
+								{localize("设置应用使用的更新通道。")}
 							</p>
 						</div>
 						<SegmentedControl
@@ -1082,7 +1086,7 @@ function DefaultProjectNameCard(props: {
 							<span>{localize("Available placeholders")}</span>
 						</Collapsible.Trigger>
 
-						<Collapsible.Content class="space-y-3 pt-3 text-xs text-gray-12 opacity-0 transition animate-collapsible-up data-expanded:animate-collapsible-down data-expanded:opacity-100">
+						<Collapsible.Content class="jk-disclosure-content space-y-3 pt-3 text-xs text-gray-12 opacity-0 transition animate-collapsible-up data-expanded:animate-collapsible-down data-expanded:opacity-100">
 							<p class="text-gray-10">
 								{localize(
 									"Click any placeholder to copy it. Time supports custom formats via",
@@ -1117,7 +1121,9 @@ function DefaultProjectNameCard(props: {
 							</div>
 
 							<div class="space-y-1">
-								<p class="font-medium text-gray-12">{localize("Date & time")}</p>
+								<p class="font-medium text-gray-12">
+									{localize("Date & time")}
+								</p>
 								<p>
 									<CodeView>{"{date}"}</CodeView> → {dateString}
 								</p>
@@ -1253,7 +1259,7 @@ function ExcludedWindowsCard(props: {
 							<IconLucideAlertTriangle class="mt-0.5 size-4 shrink-0 text-amber-11" />
 							<div class="min-w-0 flex-1 space-y-1">
 								<p class="text-xs font-medium text-amber-11">
-							{localize("Some recommended app windows are not excluded")}
+									{localize("Some recommended app windows are not excluded")}
 								</p>
 								<p class="text-[10px] leading-snug text-amber-11">
 									{localize(

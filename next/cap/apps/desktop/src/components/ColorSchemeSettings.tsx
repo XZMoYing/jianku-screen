@@ -1,5 +1,6 @@
 import { createMemo, createSignal, For, Show } from "solid-js";
 import toast from "solid-toast";
+import { ChoiceSelect } from "~/components/ChoiceSelect";
 import { colorSchemeStore } from "~/store";
 import {
 	basicColors,
@@ -35,7 +36,9 @@ export default function ColorSchemeOptions() {
 			await refreshWallpaperColors(true);
 			setError("");
 		} catch {
-			setError(localize("暂时无法读取当前壁纸。你可以重新取色或选择基本配色。"));
+			setError(
+				localize("暂时无法读取当前壁纸。你可以重新取色或选择基本配色。"),
+			);
 		} finally {
 			setBusy(false);
 		}
@@ -140,9 +143,7 @@ export default function ColorSchemeOptions() {
 						class="jk-tonal-button"
 						onClick={() => void refresh()}
 					>
-						{busy()
-							? localize("正在取色…")
-							: localize("重新取色")}
+						{busy() ? localize("正在取色…") : localize("重新取色")}
 					</button>
 				</div>
 			</Show>
@@ -162,16 +163,17 @@ export default function ColorSchemeOptions() {
 			<div class="jk-color-info">
 				<label>
 					{localize("对比度")}{" "}
-					<select
+					<ChoiceSelect
 						value={settings().contrast}
-						onChange={(event) =>
-							void save({ contrast: Number(event.currentTarget.value) })
+						onChange={(choiceValue) =>
+							void save({ contrast: Number(choiceValue) })
 						}
-					>
-						<option value={0}>{localize("标准")}</option>
-						<option value={0.5}>{localize("中")}</option>
-						<option value={1}>{localize("高")}</option>
-					</select>
+						options={[
+							{ value: 0, label: localize("标准") },
+							{ value: 0.5, label: localize("中") },
+							{ value: 1, label: localize("高") },
+						]}
+					/>
 				</label>
 				<Show when={settings().source === "custom"}>
 					<label>

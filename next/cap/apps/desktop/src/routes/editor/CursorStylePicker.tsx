@@ -183,7 +183,7 @@ export function CursorRippleControls(props: {
 					onChange={(value) => updateRipple({ enabled: value })}
 				/>
 			</Field>
-			<KCollapsible.Content class="overflow-hidden opacity-0 transition-opacity animate-collapsible-up data-expanded:animate-collapsible-down data-expanded:opacity-100">
+			<KCollapsible.Content class="jk-disclosure-content overflow-hidden opacity-0 transition-opacity animate-collapsible-up data-expanded:animate-collapsible-down data-expanded:opacity-100">
 				<div class="flex flex-col gap-2 pt-1 pb-3.5">
 					<Field name={localize("Color")}>
 						<RgbInput

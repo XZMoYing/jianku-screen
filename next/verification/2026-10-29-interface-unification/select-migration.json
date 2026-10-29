@@ -1,0 +1,38 @@
+[
+  {
+    "file": "apps/desktop/src/components/CameraSettings.tsx",
+    "selectors": 3
+  },
+  {
+    "file": "apps/desktop/src/components/CaptureAppearance.tsx",
+    "selectors": 1
+  },
+  {
+    "file": "apps/desktop/src/components/ColorSchemeSettings.tsx",
+    "selectors": 1
+  },
+  {
+    "file": "apps/desktop/src/components/CursorSettings.tsx",
+    "selectors": 1
+  },
+  {
+    "file": "apps/desktop/src/components/LayoutSettings.tsx",
+    "selectors": 2
+  },
+  {
+    "file": "apps/desktop/src/components/MobileRecorder.tsx",
+    "selectors": 5
+  },
+  {
+    "file": "apps/desktop/src/routes/(window-chrome)/settings/general.tsx",
+    "selectors": 1
+  },
+  {
+    "file": "apps/desktop/src/routes/(window-chrome)/settings/integrations/s3-config.tsx",
+    "selectors": 1
+  },
+  {
+    "file": "apps/desktop/src/routes/presentation.tsx",
+    "selectors": 4
+  }
+]

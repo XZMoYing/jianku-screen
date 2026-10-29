@@ -15,6 +15,7 @@ import {
 } from "solid-js";
 import { produce } from "solid-js/store";
 import toast from "solid-toast";
+import { MotionText } from "~/components/MotionText";
 import { Toggle } from "~/components/Toggle";
 import Tooltip from "~/components/Tooltip";
 import {
@@ -835,7 +836,11 @@ export function CaptionsTab(props: {
 							<div class="flex-1 min-w-0 text-left">
 								<div class="flex gap-1.5 items-center">
 									<span class="text-[13px] font-medium truncate">
-										{localize(selectedModelOption()?.label || "选择模型")}
+										<MotionText
+											text={localize(
+												selectedModelOption()?.label || "选择模型",
+											)}
+										/>
 									</span>
 									<Show when={selectedModelOption()}>
 										<Tooltip
