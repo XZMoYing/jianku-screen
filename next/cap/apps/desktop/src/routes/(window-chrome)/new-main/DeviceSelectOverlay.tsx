@@ -210,7 +210,9 @@ export default function DeviceSelectOverlay<T>(
 								)}
 							>
 								<IconLucideCircleOff class="size-4 shrink-0" />
-								<span class="truncate">{props.noneLabel ?? "None"}</span>
+								<span class="truncate">
+									{props.noneLabel ?? localize("None")}
+								</span>
 								<Show when={props.selectedItem === null}>
 									<IconLucideCheck class="size-4 ml-auto shrink-0" />
 								</Show>
@@ -222,8 +224,8 @@ export default function DeviceSelectOverlay<T>(
 							fallback={
 								<div class="px-3 py-6 text-center text-sm text-white/50">
 									{searchQuery()
-										? "No matching devices"
-										: (props.emptyMessage ?? "No devices found")}
+										? localize("No matching devices")
+										: (props.emptyMessage ?? localize("No devices found"))}
 								</div>
 							}
 						>

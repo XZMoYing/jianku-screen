@@ -1527,5 +1527,20 @@
 	"{count} scene segments selected": "已选择 {count} 个场景片段",
 	"to skip snapping": "可暂时关闭吸附",
 	"· Importing image…": "· 正在导入图片…",
-	"· Add image": "· 添加图片"
+	"· Add image": "· 添加图片",
+	"No matching devices": "没有符合条件的设备",
+	"No displays found": "未找到显示器",
+	"No windows found": "未找到可录制窗口",
+	"{count} clips": "{count} 个片段",
+	"Upload failed": "上传失败",
+	"No Camera": "不使用摄像头",
+	"No Microphone": "不使用麦克风",
+	"Clean Instant recording": "隐藏界面快速录制",
+	"Clean Studio recording": "隐藏界面录制",
+	"Press": "按下",
+	"{count} segment": "{count} 个片段",
+	"{count} segments": "{count} 个片段",
+	"Recent items": "最近项目",
+	"No recent items": "暂无最近项目",
+	"Loading recent items…": "正在读取最近项目…"
 }

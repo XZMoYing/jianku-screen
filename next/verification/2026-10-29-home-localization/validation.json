@@ -1,0 +1,42 @@
+{
+  "base": "501cf9ec9564eb367dd1bdb852b7d39bd04352cb",
+  "checks": [
+    {
+      "name": "typecheck",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "apps/desktop/tsconfig.json"
+      ],
+      "exitCode": 0,
+      "seconds": 10.2
+    },
+    {
+      "name": "native-check",
+      "command": [
+        "/Users/moyingxz/.cargo/bin/cargo",
+        "check",
+        "--release",
+        "-p",
+        "cap-desktop"
+      ],
+      "exitCode": 0,
+      "seconds": 79.17
+    }
+  ],
+  "i18nTests": 3,
+  "placeholderMismatches": 0,
+  "format": "scoped Biome and cargo fmt passed",
+  "runtimeVerified": false,
+  "installed": "0.2.0-alpha.45",
+  "resolvedSourceFindings": [
+    "L05",
+    "L06",
+    "L07",
+    "L08",
+    "L09",
+    "L11"
+  ]
+}

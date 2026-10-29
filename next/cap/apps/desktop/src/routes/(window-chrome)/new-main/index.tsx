@@ -1044,7 +1044,9 @@ function DeviceListPanel(props: DeviceListPanelProps) {
 				>
 					<IconLucideCircleOff class="size-4 shrink-0" />
 					<span class="truncate flex-1">
-						{props.variant === "camera" ? "No Camera" : "No Microphone"}
+						{props.variant === "camera"
+							? localize("No Camera")
+							: localize("No Microphone")}
 					</span>
 					<Show when={isNoneSelected()}>
 						<IconLucideCheck class="size-4 shrink-0" />
@@ -2980,8 +2982,8 @@ function Page() {
 					role="dialog"
 					aria-label={
 						cleanCapture.data?.mode === "instant"
-							? "Clean Instant recording"
-							: "Clean Studio recording"
+							? localize("Clean Instant recording")
+							: localize("Clean Studio recording")
 					}
 				>
 					<strong>{localize("录制时隐藏应用预览和控制条")}</strong>
@@ -2995,7 +2997,7 @@ function Page() {
 								)}
 					</p>
 					<p class="text-sm">
-						Press <strong>{cleanCapture.data?.shortcut}</strong>{" "}
+						{localize("Press")} <strong>{cleanCapture.data?.shortcut}</strong>{" "}
 						{localize("to start, then use it to stop.")}{" "}
 						{cleanCapture.data?.mode === "instant"
 							? localize("Open the app to stop and show controls.")

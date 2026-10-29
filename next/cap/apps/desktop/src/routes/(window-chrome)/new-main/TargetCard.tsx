@@ -376,7 +376,9 @@ export default function TargetCard(props: TargetCardProps) {
 				<div class="absolute inset-x-0 bottom-0 h-10 bg-linear-to-t to-transparent pointer-events-none from-black/40" />
 				<Show when={(recordingTarget()?.clip_count ?? 0) > 1}>
 					<div class="absolute left-1 top-1 rounded-full bg-black/55 px-1.5 py-0.5 text-[10px] font-medium text-white">
-						{recordingTarget()?.clip_count} clips
+						{localize("{count} clips", {
+							count: recordingTarget()?.clip_count ?? 0,
+						})}
 					</div>
 				</Show>
 				<Show when={recordingFailed() || recordingUploadFailed()}>
@@ -386,7 +388,7 @@ export default function TargetCard(props: TargetCardProps) {
 							<span class="text-[10px] font-medium">
 								{recordingFailed()
 									? localize("Recording failed")
-									: "Upload failed"}
+									: localize("Upload failed")}
 							</span>
 						</div>
 					</div>

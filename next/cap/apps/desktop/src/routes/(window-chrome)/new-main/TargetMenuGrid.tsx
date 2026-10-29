@@ -231,8 +231,8 @@ export default function TargetMenuGrid(props: TargetMenuGridProps) {
 			<div class="col-span-2 py-6 text-sm text-center text-gray-11">
 				{props.emptyMessage ??
 					(props.variant === "display"
-						? "No displays found"
-						: "No windows found")}
+						? localize("No displays found")
+						: localize("No windows found"))}
 			</div>
 		);
 	};

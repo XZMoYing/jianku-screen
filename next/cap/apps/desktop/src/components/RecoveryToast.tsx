@@ -86,8 +86,12 @@ export function RecoveryToast() {
 								{displayRecordingName(rec().prettyName)}
 							</p>
 							<p class="text-gray-11 text-[10px]">
-								{rec().segmentCount} segment
-								{rec().segmentCount !== 1 ? "s" : ""}
+								{localize(
+									rec().segmentCount === 1
+										? "{count} segment"
+										: "{count} segments",
+									{ count: rec().segmentCount },
+								)}
 								{duration() && ` · ~${duration()}`}
 							</p>
 							<Show when={recoverMutation.error}>
