@@ -1,0 +1,16 @@
+[
+	{
+		"installedVersion": "0.2.0-alpha.45",
+		"label": "Add transition before clip 2",
+		"source": "apps/desktop/src/routes/editor/Timeline/ClipTrack.tsx",
+		"status": "pending-U07b",
+		"readOnly": true
+	},
+	{
+		"installedVersion": "0.2.0-alpha.45",
+		"label": "Delete all 3D shots",
+		"source": "apps/desktop/src/routes/editor/Timeline/index.tsx",
+		"status": "pending-U07b",
+		"readOnly": true
+	}
+]

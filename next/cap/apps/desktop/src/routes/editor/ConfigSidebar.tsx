@@ -83,6 +83,7 @@ import {
 	DEFAULT_SCENE_TRANSITION,
 	DEFAULT_SPLIT_LAYOUT,
 } from "./projectConfig";
+import { selectedSegmentLabel } from "./selection-label";
 import { StyleGroupToggle, StyleSegmentConfig } from "./style-segment-config";
 import type { TextSegment } from "./text";
 import { TextSegmentConfig } from "./text-segment-config";
@@ -130,7 +131,9 @@ const STEREO_MODES = [
 ] satisfies Array<{ name: string; value: StereoMode }>;
 
 const formatVolumeDb = (value: number) =>
-	value <= -30 ? localize("静音") : `${value > 0 ? "+" : ""}${value.toFixed(1)} dB`;
+	value <= -30
+		? localize("静音")
+		: `${value > 0 ? "+" : ""}${value.toFixed(1)} dB`;
 
 const TAB_IDS = {
 	background: "background",
@@ -563,7 +566,7 @@ function ConfigSidebarContent() {
 											step={0.1}
 											formatTooltip={(v) =>
 												v <= -30
-								? localize("静音")
+													? localize("静音")
 													: `${v > 0 ? "+" : ""}${v.toFixed(1)} dB`
 											}
 										/>
@@ -586,7 +589,7 @@ function ConfigSidebarContent() {
 											step={0.1}
 											formatTooltip={(v) =>
 												v <= -30
-								? localize("静音")
+													? localize("静音")
 													: `${v > 0 ? "+" : ""}${v.toFixed(1)} dB`
 											}
 										/>
@@ -754,11 +757,10 @@ function ConfigSidebarContent() {
 													{localize("Done")}
 												</EditorButton>
 												<span class="text-[12px] text-ed-text-2">
-													{value().segments.length} caption{" "}
-													{value().segments.length === 1
-														? "segment"
-														: "segments"}{" "}
-													selected
+													{selectedSegmentLabel(
+														"caption",
+														value().segments.length,
+													)}
 												</span>
 											</div>
 											<EditorButton
@@ -827,11 +829,10 @@ function ConfigSidebarContent() {
 													{localize("Done")}
 												</EditorButton>
 												<span class="text-[12px] text-ed-text-2">
-													{value().segments.length} keyboard{" "}
-													{value().segments.length === 1
-														? "segment"
-														: "segments"}{" "}
-													selected
+													{selectedSegmentLabel(
+														"keyboard",
+														value().segments.length,
+													)}
 												</span>
 											</div>
 											<EditorButton
@@ -894,11 +895,10 @@ function ConfigSidebarContent() {
 													{localize("Done")}
 												</EditorButton>
 												<span class="text-[12px] text-ed-text-2">
-													{value().segments.length} text{" "}
-													{value().segments.length === 1
-														? "segment"
-														: "segments"}{" "}
-													selected
+													{selectedSegmentLabel(
+														"text",
+														value().segments.length,
+													)}
 												</span>
 											</div>
 											<EditorButton
@@ -966,11 +966,10 @@ function ConfigSidebarContent() {
 													{localize("Done")}
 												</EditorButton>
 												<span class="text-[12px] text-ed-text-2">
-													{value().segments.length} audio{" "}
-													{value().segments.length === 1
-														? "segment"
-														: "segments"}{" "}
-													selected
+													{selectedSegmentLabel(
+														"audio",
+														value().segments.length,
+													)}
 												</span>
 											</div>
 											<EditorButton
@@ -1033,11 +1032,10 @@ function ConfigSidebarContent() {
 													{localize("Done")}
 												</EditorButton>
 												<span class="text-[12px] text-ed-text-2">
-													{value().segments.length} mask{" "}
-													{value().segments.length === 1
-														? "segment"
-														: "segments"}{" "}
-													selected
+													{selectedSegmentLabel(
+														"mask",
+														value().segments.length,
+													)}
 												</span>
 											</div>
 											<EditorButton
@@ -1307,11 +1305,10 @@ function ConfigSidebarContent() {
 																{localize("Done")}
 															</EditorButton>
 															<span class="text-[12px] text-ed-text-2">
-																{value().segments.length} scene{" "}
-																{value().segments.length === 1
-																	? "segment"
-																	: "segments"}{" "}
-																selected
+																{selectedSegmentLabel(
+																	"scene",
+																	value().segments.length,
+																)}
 															</span>
 														</div>
 														<EditorButton
@@ -1717,7 +1714,9 @@ function KeyboardSegmentConfig(props: {
 								}
 							/>
 						</div>
-						<div class="pt-10 text-[11px] font-medium text-ed-text-3">{localize("to")}</div>
+						<div class="pt-10 text-[11px] font-medium text-ed-text-3">
+							{localize("to")}
+						</div>
 						<div class="rounded-lg bg-ed-card p-2.5 space-y-2">
 							<div class="flex items-center justify-between text-[10px] uppercase tracking-[0.08em] text-ed-text-3">
 								<span>{localize("End")}</span>
@@ -1837,7 +1836,9 @@ function CaptionSegmentConfig(props: {
 								}
 							/>
 						</div>
-						<div class="pt-10 text-[11px] font-medium text-ed-text-3">{localize("to")}</div>
+						<div class="pt-10 text-[11px] font-medium text-ed-text-3">
+							{localize("to")}
+						</div>
 						<div class="rounded-lg bg-ed-card p-2.5 space-y-2">
 							<div class="flex items-center justify-between text-[10px] uppercase tracking-[0.08em] text-ed-text-3">
 								<span>{localize("End")}</span>
@@ -2005,7 +2006,11 @@ function MaskSegmentConfig(props: {
 			<Show when={props.segment.maskType === "sensitive"}>
 				<Field
 					inline
-					name={maskEffect() === "blur" ? localize("模糊强度") : localize("像素大小")}
+					name={
+						maskEffect() === "blur"
+							? localize("模糊强度")
+							: localize("像素大小")
+					}
 					value={`${Math.round(maskEffectAmount())}px`}
 				>
 					<Slider

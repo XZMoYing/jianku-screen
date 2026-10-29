@@ -1,0 +1,14 @@
+{
+	"baseCommit": "1b6d67ccdf2b8da4e4f596e2521fb8ca20cd32e5",
+	"files": {
+		"apps/desktop/src/i18n/zh-CN.json": "d9077ef6096f6dd35d59d538029c041eb1ac0ee0cf8dadd5a904a5f9cce0c34b",
+		"apps/desktop/src/routes/editor/ConfigSidebar.tsx": "383e0b3ad4e28d0d127c7aac1622f3135fecf180bd0036b596690b4a7e83eef9",
+		"apps/desktop/src/routes/editor/Editor.tsx": "8fbdbeb9eb0929ca110603e4af9479ea5badb68a6666c19d65e61e931be86f7a",
+		"apps/desktop/src/routes/editor/Timeline/ThreeDTrack.tsx": "56ba95f3f3bc3fbf769f0e5a8160c20d232506bcc64b48e9b4c3d7f17dc708e9",
+		"apps/desktop/src/routes/editor/Timeline/style-track.tsx": "a316d15f8b7071396fb57238f014e1540a9c1a247754c9c0782e843345e47578",
+		"apps/desktop/src/routes/editor/selection-label.test.ts": "40bcc9229613d0f3de71e56841e8983066da782c7344de1ad726c45b618c71ec",
+		"apps/desktop/src/routes/editor/selection-label.ts": "109bbf43ae410259c3dd2f3d050249690047c421d8b0bb76e253de1da798cceb"
+	},
+	"installedVersion": "0.2.0-alpha.45",
+	"packagedFixes": false
+}

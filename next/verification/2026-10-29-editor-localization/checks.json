@@ -1,0 +1,20 @@
+[
+	{
+		"name": "typecheck",
+		"command": [
+			"/usr/local/bin/node",
+			"node_modules/typescript/bin/tsc",
+			"--noEmit",
+			"-p",
+			"apps/desktop/tsconfig.json"
+		],
+		"exitCode": 0,
+		"seconds": 9.177667792000001
+	},
+	{
+		"name": "frontend-build",
+		"command": ["/usr/local/bin/node", "scripts/jianku.mjs", "frontend"],
+		"exitCode": 0,
+		"seconds": 37.366649625
+	}
+]

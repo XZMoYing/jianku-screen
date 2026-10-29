@@ -215,8 +215,8 @@ export function OverlayTrack(
 						<span>{localize("Place images and logos on your video")}</span>
 						<span class="cap-empty-lane-action">
 							{editorState.importingImage
-								? "· Importing image…"
-								: "· Add image"}
+								? localize("· Importing image…")
+								: localize("· Add image")}
 						</span>
 					</Show>
 				</button>

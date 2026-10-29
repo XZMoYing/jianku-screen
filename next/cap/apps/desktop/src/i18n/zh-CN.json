@@ -1512,5 +1512,20 @@
 	"预览播放进度": "预览播放进度",
 	"无法切换全屏预览，请重试": "无法切换全屏预览，请重试",
 	"回到开头": "回到开头",
-	"跳到结尾": "跳到结尾"
+	"跳到结尾": "跳到结尾",
+	"{count} caption segment selected": "已选择 {count} 条字幕",
+	"{count} caption segments selected": "已选择 {count} 条字幕",
+	"{count} keyboard segment selected": "已选择 {count} 个按键片段",
+	"{count} keyboard segments selected": "已选择 {count} 个按键片段",
+	"{count} text segment selected": "已选择 {count} 个文字片段",
+	"{count} text segments selected": "已选择 {count} 个文字片段",
+	"{count} audio segment selected": "已选择 {count} 个音频片段",
+	"{count} audio segments selected": "已选择 {count} 个音频片段",
+	"{count} mask segment selected": "已选择 {count} 个遮罩片段",
+	"{count} mask segments selected": "已选择 {count} 个遮罩片段",
+	"{count} scene segment selected": "已选择 {count} 个场景片段",
+	"{count} scene segments selected": "已选择 {count} 个场景片段",
+	"to skip snapping": "可暂时关闭吸附",
+	"· Importing image…": "· 正在导入图片…",
+	"· Add image": "· 添加图片"
 }

@@ -1,0 +1,15 @@
+{
+	"containsNewSelectionKeys": [
+		{
+			"file": "apps/desktop/.output/public/_build/assets/i18n-UGMPMxOp.js",
+			"sha256": "99274ccb3b1e170d087e294ee9ad7f51ac616ad7abf2aab2c81959c8b86ff209",
+			"bytes": 169042
+		},
+		{
+			"file": "apps/desktop/.output/public/_build/assets/editor-title-save-bridge-CJqh8UOL.js",
+			"sha256": "781e4057b9e3e3660b1e44b09113cee1616bc4a0f20413b9dea6af6dfe1deaff",
+			"bytes": 470357
+		}
+	],
+	"doesNotProveInstalledUi": true
+}

@@ -1855,7 +1855,7 @@ function Dialogs() {
 											<kbd class="rounded-[4px] bg-ed-ctl px-1 font-sans text-ed-text-2">
 												⇧
 											</kbd>{" "}
-											to skip snapping
+											{localize("to skip snapping")}
 										</p>
 										<div class="flex h-14 shrink-0 items-center justify-between gap-3 border-t border-ed-line px-5">
 											<div class="min-w-0 text-xs text-ed-text-2">

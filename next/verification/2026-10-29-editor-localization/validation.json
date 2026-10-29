@@ -1,0 +1,14 @@
+{
+	"i18nTests": 3,
+	"selectionSummaryTests": 6,
+	"all9TestsPassed": true,
+	"formattingLanguageChanges": "zh-CN -> en -> zh-CN; 0/1/2/12 counts across six segment kinds",
+	"typecheckExitCode": 0,
+	"frontendBuildExitCode": 0,
+	"formerRawCallsitesRemaining": [],
+	"dictionaryPlaceholderMismatches": [],
+	"initializationTranslationCacheIntroduced": false,
+	"actualNewEditorUiVerified": false,
+	"ownInstalledEditorTreeReadNodes": 404,
+	"packageStagePending": true
+}

@@ -1,0 +1,26 @@
+[
+	{
+		"finding": "L01",
+		"state": "source-fixed-runtime-pending",
+		"evidence": "validation.json",
+		"next": "Verify installed staged application and language switching"
+	},
+	{
+		"finding": "L02",
+		"state": "source-fixed-runtime-pending",
+		"evidence": "validation.json",
+		"next": "Verify installed staged application and language switching"
+	},
+	{
+		"finding": "L03",
+		"state": "source-fixed-runtime-pending",
+		"evidence": "validation.json",
+		"next": "Verify installed staged application and language switching"
+	},
+	{
+		"finding": "L04",
+		"state": "source-fixed-runtime-pending",
+		"evidence": "validation.json",
+		"next": "Verify installed staged application and language switching"
+	}
+]

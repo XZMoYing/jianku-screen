@@ -244,7 +244,7 @@ export function ThreeDTrack(props: {
 										class="cap-lane-chip cap-lane-chip-ghost outline-hidden"
 										onClick={() => projectActions.addCamera3DShot()}
 									>
-										+ Add shot
+										+ {localize("Add shot")}
 									</button>
 								</div>
 							</>
@@ -273,7 +273,7 @@ export function ThreeDTrack(props: {
 								class="ml-1 cap-lane-chip cap-lane-chip-ghost outline-hidden"
 								onClick={() => projectActions.addCamera3DShot()}
 							>
-								+ Add shot
+								+ {localize("Add shot")}
 							</button>
 						</div>
 					</Show>
