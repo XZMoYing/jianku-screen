@@ -1,0 +1,83 @@
+[
+  {
+    "elapsed": 0.5,
+    "visible": [
+      {
+        "name": "",
+        "bounds": {
+          "Height": 1050,
+          "Width": 1680,
+          "X": 0,
+          "Y": 0
+        }
+      },
+      {
+        "name": "Item-0",
+        "bounds": {
+          "Height": 24,
+          "Width": 34,
+          "X": -614,
+          "Y": 0
+        }
+      },
+      {
+        "name": "简库镜传 Next",
+        "bounds": {
+          "Height": 800,
+          "Width": 1120,
+          "X": -1312,
+          "Y": 110
+        }
+      }
+    ],
+    "read": "not-visible"
+  },
+  {
+    "elapsed": 1.0,
+    "visible": [
+      {
+        "name": "",
+        "bounds": {
+          "Height": 44,
+          "Width": 1680,
+          "X": 0,
+          "Y": -44
+        }
+      },
+      {
+        "name": "简库镜传 · 视频编辑",
+        "bounds": {
+          "Height": 1050,
+          "Width": 1680,
+          "X": 0,
+          "Y": 0
+        }
+      }
+    ],
+    "nodes": 33,
+    "exitControls": [
+      {
+        "actions": [
+          "AXPress",
+          "AXShowMenu",
+          "AXScrollToVisible"
+        ],
+        "AXDescription": "退出全屏预览",
+        "AXRole": "AXCheckBox",
+        "AXTitle": "",
+        "AXValue": "1",
+        "depth": 1,
+        "index": 4,
+        "position": [
+          1639,
+          8
+        ],
+        "size": [
+          29,
+          28
+        ]
+      }
+    ],
+    "exitActionStatus": 0
+  }
+]

@@ -1,0 +1,30 @@
+{
+  "source": "ae3061a",
+  "installed": "0.2.0-alpha.46",
+  "build": "2026.46.1",
+  "baseline": {
+    "command": "node scripts/jianku-unattended-check.mjs",
+    "exitCode": 0,
+    "checks": [
+      "cargo fmt --check",
+      "cap-desktop release check",
+      "6 configuration write fault checks",
+      "1 telemetry check",
+      "34 frontend tests",
+      "frontend production build"
+    ]
+  },
+  "gui": {
+    "replayCyclesWithBuild": 3,
+    "replayCyclesAfterBuild": 3,
+    "fullscreenEntryObservedAfterSpaceTransitionMs": 1000,
+    "exitViaVisiblePreviewControl": true,
+    "normalBoundsRestored": true
+  },
+  "limits": [
+    "Does not disprove intermittent user-reported stalls on other projects.",
+    "Warmup near one second persists; no performance fix claimed.",
+    "Native Escape, tooltip/menu interaction and all U20 pages still pending.",
+    "Two pre-existing strict decoder chroma failures and MP4 export variability remain release blockers."
+  ]
+}

@@ -1,0 +1,196 @@
+{
+  "installed": "0.2.0-alpha.46",
+  "cycles": 3,
+  "baselineFinished": true,
+  "rows": [
+    {
+      "stage": "zero-1",
+      "elapsedMs": 269,
+      "timecodes": [
+        "0:00.00",
+        "0:09.00"
+      ],
+      "playing": "0"
+    },
+    {
+      "stage": "idle-replay-1",
+      "elapsedMs": 1397,
+      "timecodes": [
+        "0:00.07",
+        "0:09.00"
+      ],
+      "playing": "1"
+    },
+    {
+      "stage": "idle-replay-1",
+      "elapsedMs": 2278,
+      "timecodes": [
+        "0:01.00",
+        "0:09.00"
+      ],
+      "playing": "1"
+    },
+    {
+      "stage": "idle-replay-1",
+      "elapsedMs": 3160,
+      "timecodes": [
+        "0:01.53",
+        "0:09.00"
+      ],
+      "playing": "1"
+    },
+    {
+      "stage": "idle-replay-1",
+      "elapsedMs": 4044,
+      "timecodes": [
+        "0:02.46",
+        "0:09.00"
+      ],
+      "playing": "1"
+    },
+    {
+      "stage": "idle-replay-1",
+      "elapsedMs": 4926,
+      "timecodes": [
+        "0:03.38",
+        "0:09.00"
+      ],
+      "playing": "1"
+    },
+    {
+      "stage": "paused-1",
+      "elapsedMs": 5685,
+      "timecodes": [
+        "0:04.03",
+        "0:09.00"
+      ],
+      "playing": "0"
+    },
+    {
+      "stage": "zero-2",
+      "elapsedMs": 262,
+      "timecodes": [
+        "0:00.00",
+        "0:09.00"
+      ],
+      "playing": "0"
+    },
+    {
+      "stage": "idle-replay-2",
+      "elapsedMs": 1388,
+      "timecodes": [
+        "0:00.06",
+        "0:09.00"
+      ],
+      "playing": "1"
+    },
+    {
+      "stage": "idle-replay-2",
+      "elapsedMs": 2265,
+      "timecodes": [
+        "0:00.59",
+        "0:09.00"
+      ],
+      "playing": "1"
+    },
+    {
+      "stage": "idle-replay-2",
+      "elapsedMs": 3154,
+      "timecodes": [
+        "0:01.52",
+        "0:09.00"
+      ],
+      "playing": "1"
+    },
+    {
+      "stage": "idle-replay-2",
+      "elapsedMs": 4037,
+      "timecodes": [
+        "0:02.45",
+        "0:09.00"
+      ],
+      "playing": "1"
+    },
+    {
+      "stage": "idle-replay-2",
+      "elapsedMs": 4914,
+      "timecodes": [
+        "0:03.38",
+        "0:09.00"
+      ],
+      "playing": "1"
+    },
+    {
+      "stage": "paused-2",
+      "elapsedMs": 5675,
+      "timecodes": [
+        "0:04.02",
+        "0:09.00"
+      ],
+      "playing": "0"
+    },
+    {
+      "stage": "zero-3",
+      "elapsedMs": 264,
+      "timecodes": [
+        "0:00.00",
+        "0:09.00"
+      ],
+      "playing": "0"
+    },
+    {
+      "stage": "idle-replay-3",
+      "elapsedMs": 1386,
+      "timecodes": [
+        "0:00.06",
+        "0:09.00"
+      ],
+      "playing": "1"
+    },
+    {
+      "stage": "idle-replay-3",
+      "elapsedMs": 2261,
+      "timecodes": [
+        "0:00.59",
+        "0:09.00"
+      ],
+      "playing": "1"
+    },
+    {
+      "stage": "idle-replay-3",
+      "elapsedMs": 3148,
+      "timecodes": [
+        "0:01.52",
+        "0:09.00"
+      ],
+      "playing": "1"
+    },
+    {
+      "stage": "idle-replay-3",
+      "elapsedMs": 4030,
+      "timecodes": [
+        "0:02.45",
+        "0:09.00"
+      ],
+      "playing": "1"
+    },
+    {
+      "stage": "idle-replay-3",
+      "elapsedMs": 4906,
+      "timecodes": [
+        "0:03.37",
+        "0:09.00"
+      ],
+      "playing": "1"
+    },
+    {
+      "stage": "paused-3",
+      "elapsedMs": 5664,
+      "timecodes": [
+        "0:04.01",
+        "0:09.00"
+      ],
+      "playing": "0"
+    }
+  ]
+}

@@ -1,0 +1,2738 @@
+[
+  {
+    "schemaVersion": 2,
+    "id": 0,
+    "revision": 1,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 0
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793284815171,
+    "elapsedMs": 0,
+    "stage": "started",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 0,
+    "revision": 2,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 0
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793284815171,
+    "elapsedMs": 0,
+    "stage": "waiting_for_audio_decode",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 0,
+    "revision": 3,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 0
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793284815171,
+    "elapsedMs": 1,
+    "stage": "preparing_playback",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 0,
+    "revision": 4,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 0
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793284815171,
+    "elapsedMs": 1315,
+    "stage": "initializing_audio_output",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 1313
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 0,
+    "revision": 5,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 0
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793284815171,
+    "elapsedMs": 1325,
+    "stage": "playing",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 1313
+      },
+      {
+        "name": "audio_output_init_ms",
+        "value": 10
+      },
+      {
+        "name": "clock_start_ms",
+        "value": 1325
+      },
+      {
+        "name": "audio_output_started",
+        "value": true
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 0,
+    "revision": 6,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 0
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793284815171,
+    "elapsedMs": 5911,
+    "stage": "loop_ended",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 1313
+      },
+      {
+        "name": "audio_output_init_ms",
+        "value": 10
+      },
+      {
+        "name": "clock_start_ms",
+        "value": 1325
+      },
+      {
+        "name": "audio_output_started",
+        "value": true
+      },
+      {
+        "name": "frames_skipped",
+        "value": 0
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 0,
+    "revision": 7,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 0
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793284815171,
+    "elapsedMs": 5911,
+    "stage": "loop_ended",
+    "outcome": "returned_ok",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 1313
+      },
+      {
+        "name": "audio_output_init_ms",
+        "value": 10
+      },
+      {
+        "name": "clock_start_ms",
+        "value": 1325
+      },
+      {
+        "name": "audio_output_started",
+        "value": true
+      },
+      {
+        "name": "frames_skipped",
+        "value": 0
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 1,
+    "revision": 1,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 1
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793284821995,
+    "elapsedMs": 0,
+    "stage": "started",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 1,
+    "revision": 2,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 1
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793284821995,
+    "elapsedMs": 0,
+    "stage": "waiting_for_audio_decode",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 1,
+    "revision": 3,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 1
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793284821995,
+    "elapsedMs": 0,
+    "stage": "preparing_playback",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 1,
+    "revision": 4,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 1
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793284821995,
+    "elapsedMs": 958,
+    "stage": "initializing_audio_output",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 958
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 1,
+    "revision": 5,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 1
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793284821995,
+    "elapsedMs": 965,
+    "stage": "playing",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 958
+      },
+      {
+        "name": "audio_output_init_ms",
+        "value": 6
+      },
+      {
+        "name": "clock_start_ms",
+        "value": 965
+      },
+      {
+        "name": "audio_output_started",
+        "value": true
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 1,
+    "revision": 6,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 1
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793284821995,
+    "elapsedMs": 5833,
+    "stage": "loop_ended",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 958
+      },
+      {
+        "name": "audio_output_init_ms",
+        "value": 6
+      },
+      {
+        "name": "clock_start_ms",
+        "value": 965
+      },
+      {
+        "name": "audio_output_started",
+        "value": true
+      },
+      {
+        "name": "frames_skipped",
+        "value": 0
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 1,
+    "revision": 7,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 1
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793284821995,
+    "elapsedMs": 5833,
+    "stage": "loop_ended",
+    "outcome": "returned_ok",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 958
+      },
+      {
+        "name": "audio_output_init_ms",
+        "value": 6
+      },
+      {
+        "name": "clock_start_ms",
+        "value": 965
+      },
+      {
+        "name": "audio_output_started",
+        "value": true
+      },
+      {
+        "name": "frames_skipped",
+        "value": 0
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 2,
+    "revision": 1,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 2
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793284828728,
+    "elapsedMs": 0,
+    "stage": "started",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 2,
+    "revision": 2,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 2
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793284828728,
+    "elapsedMs": 0,
+    "stage": "waiting_for_audio_decode",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 2,
+    "revision": 3,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 2
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793284828728,
+    "elapsedMs": 0,
+    "stage": "preparing_playback",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 2,
+    "revision": 4,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 2
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793284828728,
+    "elapsedMs": 967,
+    "stage": "initializing_audio_output",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 967
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 2,
+    "revision": 5,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 2
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793284828728,
+    "elapsedMs": 973,
+    "stage": "playing",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 967
+      },
+      {
+        "name": "audio_output_init_ms",
+        "value": 6
+      },
+      {
+        "name": "clock_start_ms",
+        "value": 973
+      },
+      {
+        "name": "audio_output_started",
+        "value": true
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 2,
+    "revision": 6,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 2
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793284828728,
+    "elapsedMs": 5874,
+    "stage": "loop_ended",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 967
+      },
+      {
+        "name": "audio_output_init_ms",
+        "value": 6
+      },
+      {
+        "name": "clock_start_ms",
+        "value": 973
+      },
+      {
+        "name": "audio_output_started",
+        "value": true
+      },
+      {
+        "name": "frames_skipped",
+        "value": 0
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 2,
+    "revision": 7,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 2
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793284828728,
+    "elapsedMs": 5874,
+    "stage": "loop_ended",
+    "outcome": "returned_ok",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 967
+      },
+      {
+        "name": "audio_output_init_ms",
+        "value": 6
+      },
+      {
+        "name": "clock_start_ms",
+        "value": 973
+      },
+      {
+        "name": "audio_output_started",
+        "value": true
+      },
+      {
+        "name": "frames_skipped",
+        "value": 0
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 3,
+    "revision": 1,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 3
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793285078978,
+    "elapsedMs": 0,
+    "stage": "started",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 3,
+    "revision": 2,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 3
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793285078978,
+    "elapsedMs": 0,
+    "stage": "waiting_for_audio_decode",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 3,
+    "revision": 3,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 3
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793285078978,
+    "elapsedMs": 0,
+    "stage": "preparing_playback",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 3,
+    "revision": 4,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 3
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793285078978,
+    "elapsedMs": 616,
+    "stage": "initializing_audio_output",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 616
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 3,
+    "revision": 5,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 3
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793285078978,
+    "elapsedMs": 628,
+    "stage": "playing",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 616
+      },
+      {
+        "name": "audio_output_init_ms",
+        "value": 11
+      },
+      {
+        "name": "clock_start_ms",
+        "value": 628
+      },
+      {
+        "name": "audio_output_started",
+        "value": true
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 3,
+    "revision": 6,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 3
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793285078978,
+    "elapsedMs": 4712,
+    "stage": "loop_ended",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 616
+      },
+      {
+        "name": "audio_output_init_ms",
+        "value": 11
+      },
+      {
+        "name": "clock_start_ms",
+        "value": 628
+      },
+      {
+        "name": "audio_output_started",
+        "value": true
+      },
+      {
+        "name": "frames_skipped",
+        "value": 1
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 3,
+    "revision": 7,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 3
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793285078978,
+    "elapsedMs": 4712,
+    "stage": "loop_ended",
+    "outcome": "returned_ok",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 616
+      },
+      {
+        "name": "audio_output_init_ms",
+        "value": 11
+      },
+      {
+        "name": "clock_start_ms",
+        "value": 628
+      },
+      {
+        "name": "audio_output_started",
+        "value": true
+      },
+      {
+        "name": "frames_skipped",
+        "value": 1
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 4,
+    "revision": 1,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 4
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793285085095,
+    "elapsedMs": 0,
+    "stage": "started",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 4,
+    "revision": 2,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 4
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793285085095,
+    "elapsedMs": 0,
+    "stage": "waiting_for_audio_decode",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 4,
+    "revision": 3,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 4
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793285085095,
+    "elapsedMs": 0,
+    "stage": "preparing_playback",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 4,
+    "revision": 4,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 4
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793285085095,
+    "elapsedMs": 635,
+    "stage": "initializing_audio_output",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 635
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 4,
+    "revision": 5,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 4
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793285085095,
+    "elapsedMs": 645,
+    "stage": "playing",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 635
+      },
+      {
+        "name": "audio_output_init_ms",
+        "value": 9
+      },
+      {
+        "name": "clock_start_ms",
+        "value": 645
+      },
+      {
+        "name": "audio_output_started",
+        "value": true
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 4,
+    "revision": 6,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 4
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793285085095,
+    "elapsedMs": 4716,
+    "stage": "loop_ended",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 635
+      },
+      {
+        "name": "audio_output_init_ms",
+        "value": 9
+      },
+      {
+        "name": "clock_start_ms",
+        "value": 645
+      },
+      {
+        "name": "audio_output_started",
+        "value": true
+      },
+      {
+        "name": "frames_skipped",
+        "value": 0
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 4,
+    "revision": 7,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 4
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793285085095,
+    "elapsedMs": 4716,
+    "stage": "loop_ended",
+    "outcome": "returned_ok",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 635
+      },
+      {
+        "name": "audio_output_init_ms",
+        "value": 9
+      },
+      {
+        "name": "clock_start_ms",
+        "value": 645
+      },
+      {
+        "name": "audio_output_started",
+        "value": true
+      },
+      {
+        "name": "frames_skipped",
+        "value": 0
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 5,
+    "revision": 1,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 5
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793285091204,
+    "elapsedMs": 0,
+    "stage": "started",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 5,
+    "revision": 2,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 5
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793285091204,
+    "elapsedMs": 0,
+    "stage": "waiting_for_audio_decode",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 5,
+    "revision": 3,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 5
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793285091204,
+    "elapsedMs": 0,
+    "stage": "preparing_playback",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 5,
+    "revision": 4,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 5
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793285091204,
+    "elapsedMs": 638,
+    "stage": "initializing_audio_output",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 637
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 5,
+    "revision": 5,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 5
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793285091204,
+    "elapsedMs": 647,
+    "stage": "playing",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 637
+      },
+      {
+        "name": "audio_output_init_ms",
+        "value": 9
+      },
+      {
+        "name": "clock_start_ms",
+        "value": 647
+      },
+      {
+        "name": "audio_output_started",
+        "value": true
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 5,
+    "revision": 5,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 5
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793285091204,
+    "elapsedMs": 1706,
+    "stage": "playing",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 637
+      },
+      {
+        "name": "audio_output_init_ms",
+        "value": 9
+      },
+      {
+        "name": "clock_start_ms",
+        "value": 647
+      },
+      {
+        "name": "audio_output_started",
+        "value": true
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 5,
+    "revision": 6,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 5
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793285091204,
+    "elapsedMs": 4698,
+    "stage": "loop_ended",
+    "outcome": "in_progress",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 637
+      },
+      {
+        "name": "audio_output_init_ms",
+        "value": 9
+      },
+      {
+        "name": "clock_start_ms",
+        "value": 647
+      },
+      {
+        "name": "audio_output_started",
+        "value": true
+      },
+      {
+        "name": "frames_skipped",
+        "value": 0
+      }
+    ],
+    "omittedFields": 0
+  },
+  {
+    "schemaVersion": 2,
+    "id": 5,
+    "revision": 7,
+    "operationId": {
+      "session": 1793280172883,
+      "process": 70603,
+      "sequence": 5
+    },
+    "parentOperationId": null,
+    "app": {
+      "flavor": "tauri",
+      "version": "0.6.0",
+      "sourceRevision": "6938fa59d17ecc120ebbbe799a8a925230e8ff23",
+      "debugBuild": false,
+      "sourceDirty": true
+    },
+    "os": "macos",
+    "binaryArchitecture": "aarch64",
+    "operation": "editor_playback",
+    "startedAtUnixMs": 1793285091204,
+    "elapsedMs": 4698,
+    "stage": "loop_ended",
+    "outcome": "returned_ok",
+    "fields": [
+      {
+        "name": "requested_fps",
+        "value": 60
+      },
+      {
+        "name": "requested_width",
+        "value": 8192
+      },
+      {
+        "name": "requested_height",
+        "value": 720
+      },
+      {
+        "name": "start_frame",
+        "value": 0
+      },
+      {
+        "name": "source_segments",
+        "value": 2
+      },
+      {
+        "name": "music",
+        "value": true
+      },
+      {
+        "name": "audio_decode_wait_ms",
+        "value": 0
+      },
+      {
+        "name": "warmup_ms",
+        "value": 637
+      },
+      {
+        "name": "audio_output_init_ms",
+        "value": 9
+      },
+      {
+        "name": "clock_start_ms",
+        "value": 647
+      },
+      {
+        "name": "audio_output_started",
+        "value": true
+      },
+      {
+        "name": "frames_skipped",
+        "value": 0
+      }
+    ],
+    "omittedFields": 0
+  }
+]
