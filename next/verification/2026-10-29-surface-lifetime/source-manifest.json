@@ -1,0 +1,12 @@
+{
+	"head": "3c28f25fdc35d18d1e36b4121d7f518e0040a1ac",
+	"files": {
+		"next/cap/crates/rendering/src/frame_pipeline.rs": "288b412c8e6a81dfeb5b6080b71e8b41d451276b37c08078592809d97be363b7",
+		"next/cap/crates/rendering/src/iosurface_texture.rs": "8a02f7ff4b559bc54fbce14b1f063d155e09bcb6057097aab52737f3da1849e4",
+		"next/cap/crates/enc-ffmpeg/src/video/videotoolbox_hw.rs": "8b970bbeaa337b0cd66f44b04ce8d4804adc3f3c92990315ee4e9b43dd5d5e79",
+		"next/cap/crates/rendering/src/shaders/rgba_to_nv12.wgsl": "777748c56f8041268cc5e2bd42d1287714196246c9eb2ee48337aa52f9851428",
+		"next/cap/crates/enc-ffmpeg/src/video/h264.rs": "b25ee77912c2a37b8969b181381a3cf012767dd7880c8af59f300943fee0f7e5"
+	},
+	"cliSha256": "fae00752a03713bc07f0845944bac936820120cb2b5bcaec928d9e5cced0c873",
+	"productSourceUnmodified": true
+}

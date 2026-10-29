@@ -1,0 +1,151 @@
+{
+	"scope": "/private/tmp/jianku-surface-lifetime",
+	"removedOwnedSyntheticVideos": [
+		{
+			"name": "publish-01.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "publish-02.mp4",
+			"bytes": 12425977
+		},
+		{
+			"name": "publish-03.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "publish-04.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "publish-05.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "publish-06.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "publish-07.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "publish-08.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "publish-09.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "publish-10.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "publish-11.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "publish-12.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "publish-13.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "publish-14.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "publish-15.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "publish-16.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "publish-17.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "publish-18.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "publish-19.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "publish-20.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "publish-21.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "publish-22.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "publish-23.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "publish-24.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "release-01.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "release-02.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "release-03.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "release-04.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "release-05.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "release-06.mp4",
+			"bytes": 12435713
+		},
+		{
+			"name": "release-07.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "release-08.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "release-09.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "release-10.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "release-11.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "release-12.mp4",
+			"bytes": 12421746
+		}
+	],
+	"logicalBytes": 447201054,
+	"persistentFilesVerified": 3
+}

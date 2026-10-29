@@ -1,0 +1,24 @@
+{
+	"releaseRuns": 12,
+	"releaseCallbacks": 6480,
+	"mutatedAtReleaseFrames": 0,
+	"releaseAnomalies": [
+		{
+			"run": 6,
+			"count": 331,
+			"first": 209
+		}
+	],
+	"publishRuns": 24,
+	"publishedSeeds": 12960,
+	"publishPixelChanges": 0,
+	"publishAnomalies": [
+		{
+			"run": 2,
+			"count": 349,
+			"first": 191
+		}
+	],
+	"stabilityGateClosed": false,
+	"candidateFixApplied": false
+}
