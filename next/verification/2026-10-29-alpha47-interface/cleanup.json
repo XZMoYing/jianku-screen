@@ -1,0 +1,14 @@
+{
+	"removedApplications": [
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.45/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.45"
+		},
+		{
+			"path": "/Applications/.jianku-next-update-fqc8ll/previous.app",
+			"version": "0.2.0-alpha.46"
+		}
+	],
+	"freeBytesIncrease": 634101760,
+	"projectsAndMediaPreserved": true
+}
