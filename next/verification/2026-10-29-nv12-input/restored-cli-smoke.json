@@ -1,0 +1,10 @@
+{
+	"exitCode": 0,
+	"cliSha256": "fae00752a03713bc07f0845944bac936820120cb2b5bcaec928d9e5cced0c873",
+	"noTraceString": true,
+	"traceEnvironmentIgnored": true,
+	"frames": 540,
+	"changedDecodedFrames": [],
+	"seconds": 8.627878584000001,
+	"doesNotCloseIntermittentStabilityGate": true
+}

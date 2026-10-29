@@ -1,0 +1,17 @@
+[
+	{
+		"name": "libavcodec.61.19.100.dylib",
+		"sha256": "7d3f5dac39dcb2d2c23dd497c2c4b8ae0ce7249f09314e2b26fb135833ce1335",
+		"sameAsInstalled45": true
+	},
+	{
+		"name": "libavformat.61.7.100.dylib",
+		"sha256": "45642f74fcf6a0ace0e99e7a48f29ab1cf0670c372e553539261e18eec5e2aa6",
+		"sameAsInstalled45": true
+	},
+	{
+		"name": "libavutil.59.39.100.dylib",
+		"sha256": "a31af7189024007d43139f6627e4e92d3e4bfaa56a7a18bd5d45edbbc613296d",
+		"sameAsInstalled45": true
+	}
+]

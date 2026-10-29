@@ -1,0 +1,6 @@
+{
+	"frames": 540,
+	"allVisibleYAndUvMatchCapturedConsumerAndOriginalProducer": true,
+	"rawSha256": "40c2c993c13cc71650085efc405fe46874efb6a08d7b402267d273db8ed2dabc",
+	"captureScope": "only owned synthetic CLI process; GPU output captured at avcodec_send_frame; no app or device input"
+}

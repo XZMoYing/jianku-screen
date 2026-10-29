@@ -1,0 +1,94 @@
+{
+	"frames": 540,
+	"inputValidation": "captured-input-validation.json",
+	"allSurfacesHeldUntilFlush": true,
+	"inputPixelsRecheckedAfterFlush": true,
+	"bitrate": 13271040,
+	"maxRate": 19906560,
+	"runs": [
+		{
+			"run": 1,
+			"delayMicroseconds": 0,
+			"seconds": 3.357129167,
+			"changedPackets": [],
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 2,
+			"delayMicroseconds": 10000,
+			"seconds": 10.086246333,
+			"changedPackets": [],
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 3,
+			"delayMicroseconds": 12000,
+			"seconds": 11.243950583,
+			"changedPackets": [],
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 4,
+			"delayMicroseconds": 0,
+			"seconds": 3.3217715000000005,
+			"changedPackets": [],
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 5,
+			"delayMicroseconds": 10000,
+			"seconds": 10.07791825,
+			"changedPackets": [],
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 6,
+			"delayMicroseconds": 12000,
+			"seconds": 11.249498167000006,
+			"changedPackets": [],
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 7,
+			"delayMicroseconds": 0,
+			"seconds": 3.3240486669999996,
+			"changedPackets": [],
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 8,
+			"delayMicroseconds": 10000,
+			"seconds": 10.071768165999998,
+			"changedPackets": [],
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 9,
+			"delayMicroseconds": 12000,
+			"seconds": 11.269701165999997,
+			"changedPackets": [],
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 10,
+			"delayMicroseconds": 0,
+			"seconds": 3.3181199999999933,
+			"changedPackets": [],
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 11,
+			"delayMicroseconds": 10000,
+			"seconds": 10.037216959000006,
+			"changedPackets": [],
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 12,
+			"delayMicroseconds": 12000,
+			"seconds": 11.231959875000001,
+			"changedPackets": [],
+			"changedDecodedFrames": []
+		}
+	]
+}

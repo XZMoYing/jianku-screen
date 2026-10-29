@@ -1,0 +1,79 @@
+{
+	"sourceSha256": "8dbd15b347b398f5a3281d8493fc3710932ed36bad10b48f6270c12c82f249eb",
+	"frames": 540,
+	"input": "CPU NV12; all frames allocated and immutable until encoder flush; no GPU or pool",
+	"runs": [
+		{
+			"run": 1,
+			"seconds": 3.029527125,
+			"changedPackets": [],
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 2,
+			"seconds": 3.0146841249999996,
+			"changedPackets": [],
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 3,
+			"seconds": 3.021094958,
+			"changedPackets": [],
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 4,
+			"seconds": 3.0187047089999997,
+			"changedPackets": [],
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 5,
+			"seconds": 3.015666750000001,
+			"changedPackets": [],
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 6,
+			"seconds": 3.019433040999999,
+			"changedPackets": [],
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 7,
+			"seconds": 3.109304041999998,
+			"changedPackets": [],
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 8,
+			"seconds": 3.2284606249999968,
+			"changedPackets": [],
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 9,
+			"seconds": 3.3905594159999985,
+			"changedPackets": [],
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 10,
+			"seconds": 3.049776541,
+			"changedPackets": [],
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 11,
+			"seconds": 3.0254731250000013,
+			"changedPackets": [],
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 12,
+			"seconds": 3.014107541999998,
+			"changedPackets": [],
+			"changedDecodedFrames": []
+		}
+	]
+}

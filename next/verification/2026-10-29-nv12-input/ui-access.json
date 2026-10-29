@@ -1,0 +1,62 @@
+{
+	"actualOwnApp": [
+		{
+			"active": false,
+			"AXFocusedWindowStatus": 0,
+			"AXRoleStatus": 0,
+			"AXWindowsStatus": 0,
+			"cgWindows": [
+				{
+					"kCGWindowBounds": {
+						"Height": 800,
+						"Width": 1120,
+						"X": 331,
+						"Y": 110
+					},
+					"kCGWindowIsOnscreen": true,
+					"kCGWindowName": "简库镜传 Next",
+					"kCGWindowNumber": 4709
+				},
+				{
+					"kCGWindowBounds": {
+						"Height": 800,
+						"Width": 1275,
+						"X": 202,
+						"Y": 102
+					},
+					"kCGWindowIsOnscreen": true,
+					"kCGWindowName": "简库镜传 · 视频编辑",
+					"kCGWindowNumber": 4708
+				},
+				{
+					"kCGWindowBounds": {
+						"Height": 24,
+						"Width": 34,
+						"X": 905,
+						"Y": 0
+					},
+					"kCGWindowIsOnscreen": true,
+					"kCGWindowName": "Item-0",
+					"kCGWindowNumber": 4707
+				}
+			],
+			"path": "/Applications/Jianku Screen Next.app",
+			"pid": 12435,
+			"trusted": true,
+			"windows": [
+				{
+					"title": "简库镜传 Next",
+					"titleStatus": 0
+				},
+				{
+					"title": "简库镜传 Next",
+					"titleStatus": 0
+				}
+			]
+		}
+	],
+	"actions": "old process normal termination accepted and exited; installed alpha.45 reopened owned demo",
+	"titleGuard": "0 confirmed editor windows",
+	"geometryGuard": "0 matches; 1 own CG editor window",
+	"interactiveAcceptanceComplete": false
+}

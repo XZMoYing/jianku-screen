@@ -1,0 +1,11 @@
+{
+	"baseCommit": "b0c82ac194bd60ee8cefcea8a6636523d2d7ec84",
+	"cliSha256": "5b81641e286c885bc36822cfe3688ec359f44d77d42167e6036a6e84e7d88a12",
+	"probePatchSha256": "8454b7937874bfbdf80cd6a9c4fe0c761db0dd276500e1bbadec6a793e1f9135",
+	"originalFiles": {
+		"crates/export/Cargo.toml": "60bc33691899613132de70c5a79e9e2ea5d5f2243c47e4cd252b4f9e0f1916ce",
+		"Cargo.lock": "622018770f16148504e320417c6c7e91b86ba6faebc4eead38d31b79dc51a26f",
+		"crates/export/src/mp4.rs": "215ee78970d7550ff9256843da53fdb0257cfdff3cb05fe83ebed7e7ac88b289"
+	},
+	"sourceRestoredByteForByte": true
+}

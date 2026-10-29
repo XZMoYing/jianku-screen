@@ -1,0 +1,51 @@
+[
+	{
+		"name": "run-01.mp4",
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/NV12交接诊断/run-01.mp4",
+		"bytes": 12421746,
+		"sha256": "301ac8688b44f63d807a2e7128c7a5d80be8b9c0b0134c7d64d68ea678606437"
+	},
+	{
+		"name": "run-02.mp4",
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/NV12交接诊断/run-02.mp4",
+		"bytes": 12428379,
+		"sha256": "4c0a06a6c1e099a59b2a003bbb646e7acd5c85a6100ac02ab6eaf4b8029c1e0b"
+	},
+	{
+		"name": "run-09.mp4",
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/NV12交接诊断/run-09.mp4",
+		"bytes": 12151488,
+		"sha256": "5df5cf74bd1076ad2a4b5964efdf12eda9f3097519446a7ea403004026ef789c"
+	},
+	{
+		"name": "old-01.mp4",
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/NV12交接诊断/old-01.mp4",
+		"bytes": 12433443,
+		"sha256": "38532d817f7ef404420ad00ab9bb479f7239f7ca753b4db26265b4259bb23873"
+	},
+	{
+		"name": "exact-01.mp4",
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/NV12交接诊断/exact-01.mp4",
+		"bytes": 12350347,
+		"sha256": "1b8169fca2dd6c6e5184e579c394dc443039e9afc4e170cfd0b6b989c2b9ff20"
+	},
+	{
+		"name": "copied-01.mp4",
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/NV12交接诊断/copied-01.mp4",
+		"bytes": 12421746,
+		"sha256": "301ac8688b44f63d807a2e7128c7a5d80be8b9c0b0134c7d64d68ea678606437"
+	},
+	{
+		"name": "metadata-07.mp4",
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/NV12交接诊断/metadata-07.mp4",
+		"bytes": 12425528,
+		"sha256": "b44d10172132f6fe65d2eaa9cd70b43bb89208a3c37dfc73fe0b6b35b0affa95"
+	},
+	{
+		"name": "gpu-input.nv12.zst",
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/摄像头透视阴影对照/NV12交接诊断/gpu-input.nv12.zst",
+		"bytes": 38392009,
+		"sha256": "3d72d15010a1dac175978cd1575dcc323ff2bb5e4e08bfaefbd8cf9368170bae",
+		"uncompressedSha256": "40c2c993c13cc71650085efc405fe46874efb6a08d7b402267d273db8ed2dabc"
+	}
+]

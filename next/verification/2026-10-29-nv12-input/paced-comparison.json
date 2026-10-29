@@ -1,0 +1,30 @@
+{
+	"frames": 540,
+	"allSurfacesHeldUntilFlush": true,
+	"runs": [
+		{
+			"run": 1,
+			"delayMicroseconds": 10000,
+			"seconds": 8.546210708999999,
+			"changedPackets": []
+		},
+		{
+			"run": 2,
+			"delayMicroseconds": 12000,
+			"seconds": 9.697065083,
+			"changedPackets": []
+		},
+		{
+			"run": 3,
+			"delayMicroseconds": 18000,
+			"seconds": 14.756235833000002,
+			"changedPackets": []
+		},
+		{
+			"run": 4,
+			"delayMicroseconds": 10000,
+			"seconds": 8.537942417000004,
+			"changedPackets": []
+		}
+	]
+}

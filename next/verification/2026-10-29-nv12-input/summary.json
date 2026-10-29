@@ -1,0 +1,42 @@
+{
+	"currentRawHandoffFrames": 6480,
+	"currentRawHandoffMismatch": 0,
+	"currentChangedExports": [
+		{
+			"run": 2,
+			"frames": 175,
+			"first": 365
+		},
+		{
+			"run": 9,
+			"frames": 103,
+			"first": 437
+		}
+	],
+	"installed45ChangedExports": [
+		{
+			"run": 1,
+			"frames": 318,
+			"first": 222
+		}
+	],
+	"metadataOnlyChangedExports": [
+		{
+			"run": 7,
+			"frames": 431,
+			"first": 109
+		}
+	],
+	"pixelCopyDiagnostic": {
+		"runs": 12,
+		"framesPerRun": 540,
+		"changedDecodedFrames": 0
+	},
+	"exactReplay": {
+		"heldRuns": 12,
+		"jitterRuns": 4,
+		"changedDecodedFrames": 0
+	},
+	"productSourceRestored": true,
+	"stabilityGateClosed": false
+}

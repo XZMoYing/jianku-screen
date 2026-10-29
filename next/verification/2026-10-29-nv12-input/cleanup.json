@@ -1,0 +1,447 @@
+{
+	"scope": "/private/tmp/jianku-export-input-trace",
+	"onlyOwnedSyntheticMedia": true,
+	"persistentSamplesVerified": 8,
+	"removedFiles": [
+		{
+			"name": "captured-old.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "captured.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "copied-01.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "copied-02.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "copied-03.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "copied-04.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "copied-05.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "copied-06.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "copied-07.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "copied-08.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "copied-09.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "copied-10.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "copied-11.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "copied-12.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "exact-01.mp4",
+			"bytes": 12350347
+		},
+		{
+			"name": "exact-02.mp4",
+			"bytes": 12350347
+		},
+		{
+			"name": "exact-03.mp4",
+			"bytes": 12350347
+		},
+		{
+			"name": "exact-04.mp4",
+			"bytes": 12350347
+		},
+		{
+			"name": "exact-05.mp4",
+			"bytes": 12350347
+		},
+		{
+			"name": "exact-06.mp4",
+			"bytes": 12350347
+		},
+		{
+			"name": "exact-07.mp4",
+			"bytes": 12350347
+		},
+		{
+			"name": "exact-08.mp4",
+			"bytes": 12350347
+		},
+		{
+			"name": "exact-09.mp4",
+			"bytes": 12350347
+		},
+		{
+			"name": "exact-10.mp4",
+			"bytes": 12350347
+		},
+		{
+			"name": "exact-11.mp4",
+			"bytes": 12350347
+		},
+		{
+			"name": "exact-12.mp4",
+			"bytes": 12350347
+		},
+		{
+			"name": "fixed-01.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "fixed-02.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "fixed-03.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "fixed-04.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "fixed-05.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "fixed-06.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "fixed-07.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "fixed-08.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "fixed-09.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "fixed-10.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "fixed-11.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "fixed-12.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "fixed-surface-01.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "fixed-surface-02.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "fixed-surface-03.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "fixed-surface-04.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "fixed-surface-05.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "fixed-surface-06.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "fixed-surface-07.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "fixed-surface-08.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "fixed-surface-09.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "fixed-surface-10.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "fixed-surface-11.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "fixed-surface-12.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "fixed.nv12",
+			"bytes": 746496000
+		},
+		{
+			"name": "gpu-input.nv12",
+			"bytes": 746496000
+		},
+		{
+			"name": "jitter-01.mp4",
+			"bytes": 12350347
+		},
+		{
+			"name": "jitter-02.mp4",
+			"bytes": 12350347
+		},
+		{
+			"name": "jitter-03.mp4",
+			"bytes": 12350347
+		},
+		{
+			"name": "jitter-04.mp4",
+			"bytes": 12350347
+		},
+		{
+			"name": "metadata-01.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "metadata-02.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "metadata-03.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "metadata-04.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "metadata-05.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "metadata-06.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "metadata-07.mp4",
+			"bytes": 12425528
+		},
+		{
+			"name": "metadata-08.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "metadata-09.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "metadata-10.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "metadata-11.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "metadata-12.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "metadata-13.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "metadata-14.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "metadata-15.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "metadata-16.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "metadata-17.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "metadata-18.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "metadata-19.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "metadata-20.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "metadata-21.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "metadata-22.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "metadata-23.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "metadata-24.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "old-01.mp4",
+			"bytes": 12433443
+		},
+		{
+			"name": "old-02.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "old-03.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "old-04.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "old-05.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "old-06.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "old-07.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "old-08.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "old-09.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "old-10.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "old-11.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "old-12.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "old-gpu-input.nv12",
+			"bytes": 746496000
+		},
+		{
+			"name": "paced-01.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "paced-02.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "paced-03.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "paced-04.mp4",
+			"bytes": 188187
+		},
+		{
+			"name": "run-01.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "run-02.mp4",
+			"bytes": 12428379
+		},
+		{
+			"name": "run-03.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "run-04.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "run-05.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "run-06.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "run-07.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "run-08.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "run-09.mp4",
+			"bytes": 12151488
+		},
+		{
+			"name": "run-10.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "run-11.mp4",
+			"bytes": 12421746
+		},
+		{
+			"name": "run-12.mp4",
+			"bytes": 12421746
+		}
+	],
+	"logicalBytes": 3212262894,
+	"dfBefore": "Filesystem   1024-blocks      Used Available Capacity iused     ifree %iused  Mounted on\n/dev/disk3s5   482797652 389217552  61282308    87% 2877475 612823080    0%   /System/Volumes/Data\n",
+	"dfAfter": "Filesystem   1024-blocks      Used Available Capacity iused     ifree %iused  Mounted on\n/dev/disk3s5   482797652 386128552  64371308    86% 2877366 643713080    0%   /System/Volumes/Data\n",
+	"note": "selected baseline/anomalies and exact raw NV12 are retained outside tmp; raw stream compressed and decompression SHA verified before removal; actual APFS reclamation may differ from logical size"
+}

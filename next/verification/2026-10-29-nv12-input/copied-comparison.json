@@ -1,0 +1,66 @@
+{
+	"frames": 540,
+	"mode": "synthetic-only avcodec input interposer copies NV12 bytes to independent fresh IOSurface; product source unchanged",
+	"runs": [
+		{
+			"run": 1,
+			"seconds": 7.851137166000001,
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 2,
+			"seconds": 7.772647125000001,
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 3,
+			"seconds": 7.780780792000002,
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 4,
+			"seconds": 7.78017225,
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 5,
+			"seconds": 7.776834417000003,
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 6,
+			"seconds": 7.826784916999998,
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 7,
+			"seconds": 7.762645124999999,
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 8,
+			"seconds": 7.982243125000004,
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 9,
+			"seconds": 7.809690625000002,
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 10,
+			"seconds": 7.784095417000003,
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 11,
+			"seconds": 8.045407249999997,
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 12,
+			"seconds": 7.766409792000005,
+			"changedDecodedFrames": []
+		}
+	]
+}

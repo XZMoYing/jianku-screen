@@ -1,0 +1,31 @@
+{
+	"frames": 540,
+	"allSurfacesHeldUntilFlush": true,
+	"inputPixelsRecheckedAfterFlush": true,
+	"runs": [
+		{
+			"run": 1,
+			"mode": 1000000,
+			"seconds": 4.267488042,
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 2,
+			"mode": 2000000,
+			"seconds": 12.869830541000002,
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 3,
+			"mode": 3000000,
+			"seconds": 4.926385582999998,
+			"changedDecodedFrames": []
+		},
+		{
+			"run": 4,
+			"mode": 4000000,
+			"seconds": 11.74695525,
+			"changedDecodedFrames": []
+		}
+	]
+}
