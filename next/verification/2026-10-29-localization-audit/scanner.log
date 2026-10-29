@@ -1,0 +1,204 @@
+{
+  "files": 288,
+  "candidates": 2331,
+  "dictionaryKeys": {
+    "zh-CN": 1514,
+    "en": 1653
+  },
+  "placeholderMismatches": 0,
+  "upstreamDestinations": 1,
+  "byFamily": {
+    "(window-chrome)": {
+      "files": 1,
+      "candidates": 0,
+      "callsiteReview": 0,
+      "dictionaryReview": 0
+    },
+    "Context": {
+      "files": 1,
+      "candidates": 0,
+      "callsiteReview": 0,
+      "dictionaryReview": 0
+    },
+    "OptionsContext": {
+      "files": 1,
+      "candidates": 0,
+      "callsiteReview": 0,
+      "dictionaryReview": 0
+    },
+    "app.tsx": {
+      "files": 1,
+      "candidates": 0,
+      "callsiteReview": 0,
+      "dictionaryReview": 0
+    },
+    "camera": {
+      "files": 1,
+      "candidates": 4,
+      "callsiteReview": 0,
+      "dictionaryReview": 0
+    },
+    "capture-area": {
+      "files": 1,
+      "candidates": 6,
+      "callsiteReview": 1,
+      "dictionaryReview": 0
+    },
+    "components": {
+      "files": 31,
+      "candidates": 214,
+      "callsiteReview": 38,
+      "dictionaryReview": 0
+    },
+    "debug": {
+      "files": 1,
+      "candidates": 11,
+      "callsiteReview": 0,
+      "dictionaryReview": 0
+    },
+    "editor": {
+      "files": 113,
+      "candidates": 1120,
+      "callsiteReview": 340,
+      "dictionaryReview": 0
+    },
+    "entry-client.tsx": {
+      "files": 1,
+      "candidates": 0,
+      "callsiteReview": 0,
+      "dictionaryReview": 0
+    },
+    "entry-server.tsx": {
+      "files": 1,
+      "candidates": 1,
+      "callsiteReview": 1,
+      "dictionaryReview": 0
+    },
+    "icons": {
+      "files": 1,
+      "candidates": 0,
+      "callsiteReview": 0,
+      "dictionaryReview": 0
+    },
+    "icons.tsx": {
+      "files": 1,
+      "candidates": 0,
+      "callsiteReview": 0,
+      "dictionaryReview": 0
+    },
+    "in-progress-recording": {
+      "files": 1,
+      "candidates": 50,
+      "callsiteReview": 0,
+      "dictionaryReview": 0
+    },
+    "mode-select": {
+      "files": 1,
+      "candidates": 2,
+      "callsiteReview": 0,
+      "dictionaryReview": 0
+    },
+    "new-main": {
+      "files": 19,
+      "candidates": 110,
+      "callsiteReview": 24,
+      "dictionaryReview": 0
+    },
+    "notifications": {
+      "files": 1,
+      "candidates": 0,
+      "callsiteReview": 0,
+      "dictionaryReview": 0
+    },
+    "onboarding": {
+      "files": 1,
+      "candidates": 15,
+      "callsiteReview": 7,
+      "dictionaryReview": 0
+    },
+    "presentation": {
+      "files": 1,
+      "candidates": 65,
+      "callsiteReview": 10,
+      "dictionaryReview": 0
+    },
+    "presentation-output": {
+      "files": 1,
+      "candidates": 4,
+      "callsiteReview": 0,
+      "dictionaryReview": 0
+    },
+    "recordings-overlay": {
+      "files": 1,
+      "candidates": 21,
+      "callsiteReview": 3,
+      "dictionaryReview": 0
+    },
+    "screenshot-editor": {
+      "files": 26,
+      "candidates": 79,
+      "callsiteReview": 4,
+      "dictionaryReview": 0
+    },
+    "settings": {
+      "files": 19,
+      "candidates": 477,
+      "callsiteReview": 139,
+      "dictionaryReview": 0
+    },
+    "store": {
+      "files": 2,
+      "candidates": 10,
+      "callsiteReview": 10,
+      "dictionaryReview": 0
+    },
+    "store.ts": {
+      "files": 1,
+      "candidates": 0,
+      "callsiteReview": 0,
+      "dictionaryReview": 0
+    },
+    "target-select-overlay": {
+      "files": 1,
+      "candidates": 55,
+      "callsiteReview": 0,
+      "dictionaryReview": 0
+    },
+    "teleprompter": {
+      "files": 1,
+      "candidates": 19,
+      "callsiteReview": 1,
+      "dictionaryReview": 0
+    },
+    "teleprompter-utils": {
+      "files": 1,
+      "candidates": 0,
+      "callsiteReview": 0,
+      "dictionaryReview": 0
+    },
+    "update": {
+      "files": 1,
+      "candidates": 11,
+      "callsiteReview": 0,
+      "dictionaryReview": 0
+    },
+    "upgrade": {
+      "files": 1,
+      "candidates": 2,
+      "callsiteReview": 0,
+      "dictionaryReview": 0
+    },
+    "utils": {
+      "files": 53,
+      "candidates": 55,
+      "callsiteReview": 36,
+      "dictionaryReview": 2
+    },
+    "window-capture-occluder": {
+      "files": 1,
+      "candidates": 0,
+      "callsiteReview": 0,
+      "dictionaryReview": 0
+    }
+  }
+}

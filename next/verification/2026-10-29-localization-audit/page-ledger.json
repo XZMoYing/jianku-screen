@@ -1,0 +1,178 @@
+[
+	{
+		"area": "首页及录制/截图/演示入口",
+		"entrySources": [
+			"apps/desktop/src/routes/(window-chrome)/new-main/index.tsx",
+			"apps/desktop/src/routes/(window-chrome)/new-main/TargetCard.tsx"
+		],
+		"findings": ["L07", "L08"],
+		"sourceInventory": "recorded",
+		"runtimeLanguageSwitch": "pending",
+		"emptyErrorMenuStates": "pending-runtime",
+		"status": "not-accepted"
+	},
+	{
+		"area": "目标、设备、区域选择",
+		"entrySources": [
+			"apps/desktop/src/routes/(window-chrome)/new-main/DeviceSelectOverlay.tsx",
+			"apps/desktop/src/routes/(window-chrome)/new-main/TargetMenuGrid.tsx",
+			"apps/desktop/src/routes/capture-area.tsx",
+			"apps/desktop/src/routes/target-select-overlay.tsx"
+		],
+		"findings": ["L05", "L06"],
+		"sourceInventory": "recorded",
+		"runtimeLanguageSwitch": "pending",
+		"emptyErrorMenuStates": "pending-runtime",
+		"status": "not-accepted"
+	},
+	{
+		"area": "权限引导",
+		"entrySources": [
+			"apps/desktop/src/routes/(window-chrome)/onboarding.tsx",
+			"apps/desktop/src-tauri/src/permissions.rs"
+		],
+		"findings": [],
+		"sourceInventory": "recorded",
+		"runtimeLanguageSwitch": "pending",
+		"emptyErrorMenuStates": "pending-runtime",
+		"status": "not-accepted"
+	},
+	{
+		"area": "录制中、恢复与快速库",
+		"entrySources": [
+			"apps/desktop/src/routes/in-progress-recording.tsx",
+			"apps/desktop/src/components/RecoveryToast.tsx",
+			"apps/desktop/src/routes/recordings-overlay.tsx"
+		],
+		"findings": ["L09", "L13"],
+		"sourceInventory": "recorded",
+		"runtimeLanguageSwitch": "pending",
+		"emptyErrorMenuStates": "pending-runtime",
+		"status": "not-accepted"
+	},
+	{
+		"area": "录制库与截图库",
+		"entrySources": [
+			"apps/desktop/src/routes/(window-chrome)/settings/recordings.tsx",
+			"apps/desktop/src/routes/(window-chrome)/settings/screenshots.tsx"
+		],
+		"findings": [],
+		"sourceInventory": "recorded",
+		"runtimeLanguageSwitch": "pending",
+		"emptyErrorMenuStates": "pending-runtime",
+		"status": "not-accepted"
+	},
+	{
+		"area": "编辑器面板、预览与轨道",
+		"entrySources": [
+			"apps/desktop/src/routes/editor/ConfigSidebar.tsx",
+			"apps/desktop/src/routes/editor/Editor.tsx",
+			"apps/desktop/src/routes/editor/Timeline/ThreeDTrack.tsx",
+			"apps/desktop/src/routes/editor/KeyboardTab.tsx"
+		],
+		"findings": ["L01", "L02", "L03", "L04", "K01"],
+		"sourceInventory": "recorded",
+		"runtimeLanguageSwitch": "pending",
+		"emptyErrorMenuStates": "pending-runtime",
+		"status": "not-accepted"
+	},
+	{
+		"area": "导出、字幕及错误",
+		"entrySources": [
+			"apps/desktop/src/routes/editor/ExportPage.tsx",
+			"apps/desktop/src/routes/editor/TranscriptPage.tsx",
+			"apps/desktop/src/routes/editor/EditorErrorScreen.tsx"
+		],
+		"findings": ["K02"],
+		"sourceInventory": "recorded",
+		"runtimeLanguageSwitch": "pending",
+		"emptyErrorMenuStates": "pending-runtime",
+		"status": "not-accepted"
+	},
+	{
+		"area": "截图编辑",
+		"entrySources": [
+			"apps/desktop/src/routes/screenshot-editor/Editor.tsx",
+			"apps/desktop/src/routes/screenshot-editor/ui.tsx"
+		],
+		"findings": ["K01"],
+		"sourceInventory": "recorded",
+		"runtimeLanguageSwitch": "pending",
+		"emptyErrorMenuStates": "pending-runtime",
+		"status": "not-accepted"
+	},
+	{
+		"area": "实时演示控制与输出",
+		"entrySources": [
+			"apps/desktop/src/routes/presentation.tsx",
+			"apps/desktop/src/routes/presentation-output.tsx"
+		],
+		"findings": [],
+		"sourceInventory": "recorded",
+		"runtimeLanguageSwitch": "pending",
+		"emptyErrorMenuStates": "pending-runtime",
+		"status": "not-accepted"
+	},
+	{
+		"area": "摄像头预览与移动设备",
+		"entrySources": [
+			"apps/desktop/src/routes/camera.tsx",
+			"apps/desktop/src/components/MobileRecorder.tsx"
+		],
+		"findings": ["L12"],
+		"sourceInventory": "recorded",
+		"runtimeLanguageSwitch": "pending",
+		"emptyErrorMenuStates": "pending-runtime",
+		"status": "not-accepted"
+	},
+	{
+		"area": "提词器",
+		"entrySources": ["apps/desktop/src/routes/teleprompter.tsx"],
+		"findings": [],
+		"sourceInventory": "recorded",
+		"runtimeLanguageSwitch": "pending",
+		"emptyErrorMenuStates": "pending-runtime",
+		"status": "not-accepted"
+	},
+	{
+		"area": "设置、自动化及集成",
+		"entrySources": [
+			"apps/desktop/src/routes/(window-chrome)/settings/general.tsx",
+			"apps/desktop/src/routes/(window-chrome)/settings/automations.tsx",
+			"apps/desktop/src/routes/(window-chrome)/settings/quality.tsx",
+			"apps/desktop/src/routes/(window-chrome)/settings/integrations/index.tsx"
+		],
+		"findings": ["L10", "L12", "L14"],
+		"sourceInventory": "recorded",
+		"runtimeLanguageSwitch": "pending",
+		"emptyErrorMenuStates": "pending-runtime",
+		"status": "not-accepted"
+	},
+	{
+		"area": "托盘、系统菜单与原生窗口",
+		"entrySources": [
+			"apps/desktop/src-tauri/src/tray.rs",
+			"apps/desktop/src-tauri/src/windows.rs",
+			"apps/desktop/src-tauri/src/lib.rs",
+			"apps/desktop/src-tauri/src/interface_language.rs"
+		],
+		"findings": ["L11", "K03"],
+		"sourceInventory": "recorded",
+		"runtimeLanguageSwitch": "pending",
+		"emptyErrorMenuStates": "pending-runtime",
+		"status": "not-accepted"
+	},
+	{
+		"area": "许可、账户与品牌",
+		"entrySources": [
+			"apps/desktop/src/routes/(window-chrome)/settings/license.tsx",
+			"apps/desktop/src/routes/editor/ShareButton.tsx",
+			"apps/desktop/src/utils/env.ts"
+		],
+		"findings": ["L14", "K03"],
+		"sourceInventory": "recorded",
+		"runtimeLanguageSwitch": "pending",
+		"emptyErrorMenuStates": "pending-runtime",
+		"status": "not-accepted"
+	}
+]

@@ -1,0 +1,258 @@
+{
+	"sourceCommit": "f4db861c8ba23915189e2546c0d9e073ad534cde",
+	"sourceFiles": 288,
+	"candidates": 2331,
+	"status": {
+		"dictionary-present": 1715,
+		"callsite-review": 614,
+		"dictionary-review": 2
+	},
+	"dictionaryKeys": {
+		"zh-CN": 1514,
+		"en": 1653
+	},
+	"placeholderMismatches": [],
+	"upstreamDestinations": [
+		{
+			"file": "apps/desktop/src/utils/env.ts",
+			"line": 2,
+			"destination": "https://cap.so/",
+			"status": "reachability-and-purpose-review"
+		}
+	],
+	"moduleTranslations": [
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/settings/automations.tsx",
+			"line": 221,
+			"text": "识别截图中的文字并复制到剪贴板。",
+			"status": "language-switch-timing-review"
+		},
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/settings/experimental.tsx",
+			"line": 23,
+			"text": "正在切换到简库镜传原生界面。",
+			"status": "language-switch-timing-review"
+		},
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/settings/experimental.tsx",
+			"line": 25,
+			"text": "简库镜传原生界面针对性能重新构建。",
+			"status": "language-switch-timing-review"
+		},
+		{
+			"file": "apps/desktop/src/routes/(window-chrome)/settings/quality.tsx",
+			"line": 62,
+			"text": "文字清晰，文件体积适中，适合日常录制。",
+			"status": "language-switch-timing-review"
+		},
+		{
+			"file": "apps/desktop/src/routes/camera.tsx",
+			"line": 68,
+			"text": "摄像头已断开",
+			"status": "language-switch-timing-review"
+		},
+		{
+			"file": "apps/desktop/src/routes/camera.tsx",
+			"line": 69,
+			"text": "所选摄像头已停止传输画面。",
+			"status": "language-switch-timing-review"
+		}
+	],
+	"byFamily": {
+		"(window-chrome)": {
+			"files": 1,
+			"candidates": 0,
+			"callsiteReview": 0,
+			"dictionaryReview": 0
+		},
+		"Context": {
+			"files": 1,
+			"candidates": 0,
+			"callsiteReview": 0,
+			"dictionaryReview": 0
+		},
+		"OptionsContext": {
+			"files": 1,
+			"candidates": 0,
+			"callsiteReview": 0,
+			"dictionaryReview": 0
+		},
+		"app.tsx": {
+			"files": 1,
+			"candidates": 0,
+			"callsiteReview": 0,
+			"dictionaryReview": 0
+		},
+		"camera": {
+			"files": 1,
+			"candidates": 4,
+			"callsiteReview": 0,
+			"dictionaryReview": 0
+		},
+		"capture-area": {
+			"files": 1,
+			"candidates": 6,
+			"callsiteReview": 1,
+			"dictionaryReview": 0
+		},
+		"components": {
+			"files": 31,
+			"candidates": 214,
+			"callsiteReview": 38,
+			"dictionaryReview": 0
+		},
+		"debug": {
+			"files": 1,
+			"candidates": 11,
+			"callsiteReview": 0,
+			"dictionaryReview": 0
+		},
+		"editor": {
+			"files": 113,
+			"candidates": 1120,
+			"callsiteReview": 340,
+			"dictionaryReview": 0
+		},
+		"entry-client.tsx": {
+			"files": 1,
+			"candidates": 0,
+			"callsiteReview": 0,
+			"dictionaryReview": 0
+		},
+		"entry-server.tsx": {
+			"files": 1,
+			"candidates": 1,
+			"callsiteReview": 1,
+			"dictionaryReview": 0
+		},
+		"icons": {
+			"files": 1,
+			"candidates": 0,
+			"callsiteReview": 0,
+			"dictionaryReview": 0
+		},
+		"icons.tsx": {
+			"files": 1,
+			"candidates": 0,
+			"callsiteReview": 0,
+			"dictionaryReview": 0
+		},
+		"in-progress-recording": {
+			"files": 1,
+			"candidates": 50,
+			"callsiteReview": 0,
+			"dictionaryReview": 0
+		},
+		"mode-select": {
+			"files": 1,
+			"candidates": 2,
+			"callsiteReview": 0,
+			"dictionaryReview": 0
+		},
+		"new-main": {
+			"files": 19,
+			"candidates": 110,
+			"callsiteReview": 24,
+			"dictionaryReview": 0
+		},
+		"notifications": {
+			"files": 1,
+			"candidates": 0,
+			"callsiteReview": 0,
+			"dictionaryReview": 0
+		},
+		"onboarding": {
+			"files": 1,
+			"candidates": 15,
+			"callsiteReview": 7,
+			"dictionaryReview": 0
+		},
+		"presentation": {
+			"files": 1,
+			"candidates": 65,
+			"callsiteReview": 10,
+			"dictionaryReview": 0
+		},
+		"presentation-output": {
+			"files": 1,
+			"candidates": 4,
+			"callsiteReview": 0,
+			"dictionaryReview": 0
+		},
+		"recordings-overlay": {
+			"files": 1,
+			"candidates": 21,
+			"callsiteReview": 3,
+			"dictionaryReview": 0
+		},
+		"screenshot-editor": {
+			"files": 26,
+			"candidates": 79,
+			"callsiteReview": 4,
+			"dictionaryReview": 0
+		},
+		"settings": {
+			"files": 19,
+			"candidates": 477,
+			"callsiteReview": 139,
+			"dictionaryReview": 0
+		},
+		"store": {
+			"files": 2,
+			"candidates": 10,
+			"callsiteReview": 10,
+			"dictionaryReview": 0
+		},
+		"store.ts": {
+			"files": 1,
+			"candidates": 0,
+			"callsiteReview": 0,
+			"dictionaryReview": 0
+		},
+		"target-select-overlay": {
+			"files": 1,
+			"candidates": 55,
+			"callsiteReview": 0,
+			"dictionaryReview": 0
+		},
+		"teleprompter": {
+			"files": 1,
+			"candidates": 19,
+			"callsiteReview": 1,
+			"dictionaryReview": 0
+		},
+		"teleprompter-utils": {
+			"files": 1,
+			"candidates": 0,
+			"callsiteReview": 0,
+			"dictionaryReview": 0
+		},
+		"update": {
+			"files": 1,
+			"candidates": 11,
+			"callsiteReview": 0,
+			"dictionaryReview": 0
+		},
+		"upgrade": {
+			"files": 1,
+			"candidates": 2,
+			"callsiteReview": 0,
+			"dictionaryReview": 0
+		},
+		"utils": {
+			"files": 53,
+			"candidates": 55,
+			"callsiteReview": 36,
+			"dictionaryReview": 2
+		},
+		"window-capture-occluder": {
+			"files": 1,
+			"candidates": 0,
+			"callsiteReview": 0,
+			"dictionaryReview": 0
+		}
+	},
+	"inventorySha256": "41d70502ff2f661719d525761ae14174f10a0c21e22c426827a23a6a96f4eefd",
+	"compressedSha256": "fd04947afebb2e5eede5e7d7029f526cbcaf72c4b87f90620e4dd055516b5d32",
+	"runtimeAccepted": false
+}

@@ -1,0 +1,21 @@
+{
+	"baselineI18nTests": {
+		"command": "bun run vitest run src/utils/i18n.test.ts",
+		"cwd": "apps/desktop",
+		"tests": 3,
+		"passed": 3,
+		"exitCode": 0
+	},
+	"scannerExitCode": 0,
+	"repeatByteIdentical": true,
+	"existingReportRefused": true,
+	"existingReportPreservedSha256": "41d70502ff2f661719d525761ae14174f10a0c21e22c426827a23a6a96f4eefd",
+	"knownSharedLabelRecognized": true,
+	"conditionalDeviceEmptyStateRecognized": true,
+	"literalWhitespacePreserved": true,
+	"stylesScriptsExcluded": true,
+	"generatedBindingsExcluded": true,
+	"sourceFingerprintsMatch": true,
+	"nodeVersion": "v24.21.0",
+	"scriptSha256": "bc0ef28251e450374568f4c5c675f6a8690b0e92a2f749fd25ac99ead74df18b"
+}
