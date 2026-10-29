@@ -187,6 +187,8 @@ export default function CaptureAppearance(props: {
 										<button
 											type="button"
 											aria-pressed={tab() === item.id}
+											aria-label={localize(item.name)}
+											title={localize(item.name)}
 											onClick={() => setTab(item.id)}
 										>
 											<Dynamic component={item.icon} />

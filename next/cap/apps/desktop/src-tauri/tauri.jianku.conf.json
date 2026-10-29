@@ -44,7 +44,7 @@
 		},
 		"macOS": {
 			"bundleName": "简库镜传 Next",
-			"bundleVersion": "2026.46.0",
+			"bundleVersion": "2026.46.1",
 			"entitlements": "Entitlements.plist",
 			"frameworks": [
 				"../../../target/native-deps/Spacedrive.framework",

@@ -1,0 +1,28 @@
+{
+  "sourceBase": "33db10c",
+  "controlsPassed": 13,
+  "checks": [
+    {
+      "name": "controls-polish",
+      "exitCode": 0,
+      "seconds": 2.37
+    },
+    {
+      "name": "typecheck-polish",
+      "exitCode": 0,
+      "seconds": 8.67
+    }
+  ],
+  "changes": [
+    "assistive click activation",
+    "home icon labels and consistent expanding tab geometry",
+    "preserve pre-existing reduced-motion blanket rules; explicit menu state selectors win normally without relying on generic specificity"
+  ],
+  "lintWarnings": {
+    "count": 4,
+    "rule": "noImportantStyles",
+    "reason": "Restored existing four blanket accessibility overrides. Removing them for a clean warning count would break reduced motion on more specific utility selectors. No lint suppression was added."
+  },
+  "candidate": "2026.46.0 not installed",
+  "finalBuildPlanned": "2026.46.1"
+}

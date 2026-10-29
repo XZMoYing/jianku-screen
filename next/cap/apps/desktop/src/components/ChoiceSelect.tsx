@@ -83,6 +83,14 @@ export function ChoiceSelect(props: {
 				aria-label={props["aria-label"]}
 				class={`jk-choice-trigger ${props.class ?? ""}`}
 				style={props.style}
+				onClick={(event) => {
+					if (
+						event.detail === 0 &&
+						event.currentTarget.dataset.pointerType !== "touch" &&
+						!disabled()
+					)
+						setOpen((value) => !value);
+				}}
 			>
 				<Select.Value<ChoiceOption>>
 					{(state) => <MotionText text={state.selectedOption()?.label ?? ""} />}

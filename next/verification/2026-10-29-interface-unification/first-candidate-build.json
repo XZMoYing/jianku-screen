@@ -1,0 +1,12 @@
+{
+  "command": [
+    "/usr/bin/caffeinate",
+    "-i",
+    "node",
+    "scripts/jianku.mjs",
+    "release"
+  ],
+  "exitCode": 0,
+  "seconds": 978.52,
+  "source": "33db10c"
+}

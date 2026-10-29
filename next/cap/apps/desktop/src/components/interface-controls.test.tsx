@@ -107,6 +107,14 @@ function mount(
 	};
 }
 describe("shared choice controls", () => {
+	it("opens through assistive click activation", async () => {
+		const { trigger, changed } = mount();
+		trigger.click();
+		await settle();
+		expect(trigger.getAttribute("aria-expanded")).toBe("true");
+		expect(changed).not.toHaveBeenCalled();
+	});
+
 	it("keeps numeric zero selected without changing on open", async () => {
 		const { trigger, changed } = mount();
 		expect(trigger.getAttribute("aria-label")).toBe("效果");
