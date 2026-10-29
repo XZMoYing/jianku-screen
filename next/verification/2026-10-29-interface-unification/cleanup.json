@@ -1,0 +1,16 @@
+{
+  "removedApps": [
+    {
+      "path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.44/Jianku Screen Next.app",
+      "version": "0.2.0-alpha.44",
+      "duAllocatedBytes": 316686336
+    },
+    {
+      "path": "/Applications/.jianku-next-update-Ayqn0E/previous.app",
+      "version": "0.2.0-alpha.45",
+      "duAllocatedBytes": 316698624
+    }
+  ],
+  "freeSpaceChangeBytes": 633741312,
+  "note": "APFS shared blocks and concurrent system writes affect free-space delta; projects/media/source/Git/native caches preserved."
+}

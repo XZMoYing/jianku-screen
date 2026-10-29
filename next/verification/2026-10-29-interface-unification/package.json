@@ -1,0 +1,37 @@
+{
+  "installed": "/Applications/Jianku Screen Next.app",
+  "version": "0.2.0-alpha.46",
+  "buildVersion": "2026.46.1",
+  "sourceCommit": "6938fa5",
+  "archive": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.46/Jianku Screen Next.app",
+  "rollback": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.45/Jianku Screen Next.app",
+  "fixture": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.46/界面动效验收.jks",
+  "fingerprints": {
+    "source": {
+      "Jianku Screen Next": "09ed36de3a63eb229f54f6ab651d47856af3c2e008e47f71ed712c94e0708ac9",
+      "cap-cli": "726d276e86fc0d68072219d800c1519b46668fd4b47425fee29a04bece988651",
+      "cap-exporter": "93290fde685b4f424056c801ce3e52664f3e0771b649df5a41024eb4a6c3edc4",
+      "cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+      "jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672",
+      "jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981"
+    },
+    "archive": {
+      "Jianku Screen Next": "09ed36de3a63eb229f54f6ab651d47856af3c2e008e47f71ed712c94e0708ac9",
+      "cap-cli": "726d276e86fc0d68072219d800c1519b46668fd4b47425fee29a04bece988651",
+      "cap-exporter": "93290fde685b4f424056c801ce3e52664f3e0771b649df5a41024eb4a6c3edc4",
+      "cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+      "jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672",
+      "jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981"
+    },
+    "installed": {
+      "Jianku Screen Next": "09ed36de3a63eb229f54f6ab651d47856af3c2e008e47f71ed712c94e0708ac9",
+      "cap-cli": "726d276e86fc0d68072219d800c1519b46668fd4b47425fee29a04bece988651",
+      "cap-exporter": "93290fde685b4f424056c801ce3e52664f3e0771b649df5a41024eb4a6c3edc4",
+      "cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+      "jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672",
+      "jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981"
+    }
+  },
+  "opened": true,
+  "runtimeControlsVerified": false
+}

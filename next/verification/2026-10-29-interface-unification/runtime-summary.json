@@ -1,0 +1,37 @@
+{
+  "installed": "0.2.0-alpha.46",
+  "build": "2026.46.1",
+  "passed": [
+    "home grouped tabs visible",
+    "rapid home panel changes end on last requested page",
+    "shared movement-style menu opens via assistive click and closes via trigger",
+    "home shadow details reveal/expand/collapse",
+    "capture style unchanged after home interactions",
+    "editor keyboard/caption repeated changes render caption fields",
+    "Normal quit/reopen with synthetic project restores normal editor"
+  ],
+  "pending": [
+    "Native timing/subjective motion comfort",
+    "Full screen exit and repeated playback require settled foreground verification; fullscreen editor moved to another Space and disappeared from visible-only AX/CG selection",
+    "All other U20 page entries, actual bilingual/native tray checks"
+  ],
+  "playbackObserved": {
+    "new-editor-playing": [
+      "0:00.51",
+      "0:09.00"
+    ],
+    "new-editor-paused": [
+      "0:01.15",
+      "0:09.00"
+    ],
+    "new-editor-zero": [
+      "0:00.00",
+      "0:09.00"
+    ],
+    "new-editor-replayed": [
+      "0:00.00",
+      "0:09.00"
+    ]
+  },
+  "recovery": "Normal application quit/reopen restored the owned synthetic editor to 1275x800; no force quit or preference-file edits"
+}
