@@ -1,0 +1,78 @@
+[
+	{
+		"name": "Unknown stored 120 preserved",
+		"passed": true,
+		"fps": 120
+	},
+	{
+		"name": "Explicit fps selection 30",
+		"passed": true,
+		"storedNumber": 30,
+		"otherRuleFieldsUnchanged": true
+	},
+	{
+		"name": "Explicit fps selection 60",
+		"passed": true,
+		"storedNumber": 60,
+		"otherRuleFieldsUnchanged": true
+	},
+	{
+		"name": "Explicit fps selection 30",
+		"passed": true,
+		"storedNumber": 30,
+		"otherRuleFieldsUnchanged": true
+	},
+	{
+		"name": "Escape closes fps menu without changing rule",
+		"passed": true,
+		"fps": 30
+	},
+	{
+		"name": "Rule collapse removes controls",
+		"passed": true
+	},
+	{
+		"name": "Live Chinese to English",
+		"passed": true,
+		"storedLanguage": "en"
+	},
+	{
+		"name": "English rule controls preserve authored name and numeric value",
+		"passed": true
+	},
+	{
+		"name": "Live English to Chinese restored without rule writes",
+		"passed": true,
+		"storedLanguage": "zh-CN"
+	},
+	{
+		"name": "General framerate labels localized",
+		"passed": true,
+		"labels": [
+			"24 帧/秒",
+			"25 帧/秒",
+			"30 帧/秒",
+			"60 帧/秒（推荐）",
+			"120 帧/秒"
+		],
+		"settingsChanged": false
+	},
+	{
+		"name": "Own synthetic editor advances and pauses",
+		"passed": true,
+		"timecodeSamples": ["0:05.20", "0:06.20", "0:07.20", "0:08.22"],
+		"pausedValue": "0",
+		"notFrameRateMeasurement": true
+	},
+	{
+		"name": "Homepage info navigation/return three cycles",
+		"passed": true,
+		"separateDevicePopupActionsVisible": true,
+		"devicePermissionsRequested": false
+	},
+	{
+		"name": "Homepage appearance panels rapid switch returns to Picture",
+		"passed": true,
+		"selectedValue": "1"
+	}
+]

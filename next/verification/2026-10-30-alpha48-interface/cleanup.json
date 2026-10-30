@@ -1,0 +1,20 @@
+{
+	"removedApplications": [
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.46/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.46",
+			"allocatedBytesBefore": 316784640
+		},
+		{
+			"path": "/Applications/.jianku-next-update-YJxduM/previous.app",
+			"version": "0.2.0-alpha.47",
+			"allocatedBytesBefore": 316801024
+		}
+	],
+	"availableBytesBefore": 69203054592,
+	"availableBytesAfter": 69836976128,
+	"availableBytesDelta": 633921536,
+	"retainedCurrent": "0.2.0-alpha.48",
+	"retainedRollback": "0.2.0-alpha.47",
+	"projectMediaDeletion": false
+}

@@ -1,0 +1,32 @@
+{
+	"sourceCommit": "46001a29bfb30e4025b4ef265ea7a19cc79a3950",
+	"version": "0.2.0-alpha.48",
+	"build": "2026.48.0",
+	"releaseExitCode": 0,
+	"installExitCode": 0,
+	"threeLocationsSixExecutablesMatch": true,
+	"signature": "ad-hoc, deep strict verification; no notarization claim",
+	"actualRuntimeChecks": 13,
+	"userFixtureAndLanguageRestored": true,
+	"editorLeftOpen": true,
+	"rollbackVersion": "0.2.0-alpha.47",
+	"sourceChecks": {
+		"settingsUnit": 40,
+		"deviceUnit": 54,
+		"resumedBaseline": 41,
+		"typecheck": "passed",
+		"frontend": "passed",
+		"existingReducedMotionCssWarnings": 4
+	},
+	"unverified": [
+		"caption-model menu selection and subjective text/menu comfort",
+		"full remaining UI and Chinese page audit",
+		"actual frame rate and low-end performance",
+		"physical Android/iPad/display/conference tests",
+		"Windows/Linux target build and runtime"
+	],
+	"releaseBlockers": [
+		"strict decoder chroma baseline: 15 passed / 2 failed",
+		"existing hardware MP4 inter-run frame differences, root cause unproven"
+	]
+}
