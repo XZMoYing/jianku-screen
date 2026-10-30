@@ -2,7 +2,7 @@ import { createMemo } from "solid-js";
 import { t } from "~/utils/i18n";
 import { ChoiceSelect } from "./ChoiceSelect";
 
-export function LocalizedChoiceSelect<T extends string>(props: {
+export function LocalizedChoiceSelect<T extends string | number>(props: {
 	value: T;
 	options: readonly { value: T; label: string; disabled?: boolean }[];
 	onChange: (value: T) => void;
@@ -19,7 +19,7 @@ export function LocalizedChoiceSelect<T extends string>(props: {
 		if (!choices.some((option) => option.value === props.value))
 			choices.unshift({
 				value: props.value,
-				label: props.value,
+				label: String(props.value),
 				disabled: true,
 			});
 		return choices;
@@ -32,7 +32,9 @@ export function LocalizedChoiceSelect<T extends string>(props: {
 			disabled={props.disabled}
 			aria-label={props["aria-label"]}
 			onChange={(value) => {
-				const option = props.options.find((option) => option.value === value);
+				const option = props.options.find(
+					(option) => String(option.value) === value,
+				);
 				if (option && !option.disabled && option.value !== props.value)
 					props.onChange(option.value);
 			}}

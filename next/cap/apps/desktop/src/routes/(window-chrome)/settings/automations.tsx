@@ -1345,7 +1345,7 @@ function ExportParams(props: {
 						value={String(a.profile.fps)}
 						options={FPS_PRESETS.map((f) => ({
 							value: String(f),
-							label: `${f} FPS`,
+							label: localize("{fps} FPS", { fps: f }),
 						}))}
 						onChange={(v) =>
 							updateProfile((p) => {

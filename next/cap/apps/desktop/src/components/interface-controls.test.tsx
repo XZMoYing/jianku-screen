@@ -298,6 +298,48 @@ it("expands and collapses shared detail sections", async () => {
 });
 
 describe("localized shared choices", () => {
+	it("preserves numeric settings and zero without writing on language or controlled value updates", async () => {
+		const [value, setValue] = createSignal(120);
+		const changed = vi.fn(setValue);
+		dispose = render(
+			() => (
+				<LocalizedChoiceSelect
+					value={value()}
+					options={[
+						{ value: 0, label: "关闭" },
+						{ value: 30, label: "30 FPS" },
+						{ value: 60, label: "60 FPS" },
+					]}
+					onChange={changed}
+				/>
+			),
+			document.body,
+		);
+		const trigger = required(document.querySelector("button"));
+		expect(trigger.textContent).toContain("120");
+		expect(changed).not.toHaveBeenCalled();
+		press(trigger);
+		await settle();
+		key(required(document.querySelector('[role="listbox"]')), "ArrowDown");
+		await settle();
+		key(required(document.activeElement), "Enter");
+		await settle();
+		expect(value()).toBe(0);
+		expect(changed).toHaveBeenCalledTimes(1);
+		expect(changed).toHaveBeenCalledWith(0);
+		await setInterfaceLanguage("en");
+		await settle();
+		expect(value()).toBe(0);
+		expect(changed).toHaveBeenCalledTimes(1);
+		setValue(60);
+		await settle();
+		expect(trigger.textContent).toContain("60 FPS");
+		expect(changed).toHaveBeenCalledTimes(1);
+		await setInterfaceLanguage("zh-CN");
+		await settle();
+		expect(trigger.textContent).toContain("60 帧/秒");
+		expect(changed).toHaveBeenCalledTimes(1);
+	});
 	it("updates option labels on language changes without writing a new value", async () => {
 		const changed = vi.fn();
 		dispose = render(

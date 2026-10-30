@@ -7,6 +7,7 @@ import { type OsType, type } from "@tauri-apps/plugin-os";
 import BrandLogo from "~/components/BrandLogo";
 import { ChoiceSelect } from "~/components/ChoiceSelect";
 import ColorSchemeOptions from "~/components/ColorSchemeSettings";
+import { LocalizedChoiceSelect } from "~/components/LocalizedChoiceSelect";
 import {
 	type InterfaceLanguage,
 	interfaceLanguage,
@@ -16,7 +17,7 @@ import {
 } from "~/utils/i18n";
 import "@total-typescript/ts-reset/filter-boolean";
 import { Collapsible } from "@kobalte/core/collapsible";
-import { CheckMenuItem, Menu, MenuItem } from "@tauri-apps/api/menu";
+import { Menu, MenuItem } from "@tauri-apps/api/menu";
 import { confirm } from "@tauri-apps/plugin-dialog";
 import { cx } from "cva";
 import {
@@ -389,7 +390,6 @@ function Inner(props: {
 		await applyExcludedWindows(defaults);
 	};
 
-	// Helper function to render select dropdown for recording behaviors
 	const SelectSettingItem = <
 		T extends
 			| MainWindowRecordingStartBehaviour
@@ -405,34 +405,15 @@ function Inner(props: {
 	}) => {
 		return (
 			<SettingItem label={props.label} description={props.description}>
-				<button
-					type="button"
-					class="flex flex-row gap-1.5 text-xs items-center px-2.5 py-1.5 rounded-lg border transition-colors bg-gray-3 hover:bg-gray-4 text-gray-12 border-gray-4"
-					onClick={async () => {
-						const currentValue = props.value;
-						const items = props.options.map((option) =>
-							CheckMenuItem.new({
-								text: localize(option.text),
-								checked: currentValue === option.value,
-								action: () => props.onChange(option.value),
-							}),
-						);
-						const menu = await Menu.new({
-							items: await Promise.all(items),
-						});
-						await menu.popup();
-						await menu.close();
-					}}
-				>
-					{(() => {
-						const currentValue = props.value;
-						const option = props.options.find(
-							(opt) => opt.value === currentValue,
-						);
-						return option ? localize(option.text) : currentValue;
-					})()}
-					<IconCapChevronDown class="size-3.5 text-gray-10" />
-				</button>
+				<LocalizedChoiceSelect
+					aria-label={props.label}
+					value={props.value}
+					options={props.options.map((option) => ({
+						value: option.value,
+						label: option.text,
+					}))}
+					onChange={props.onChange}
+				/>
 			</SettingItem>
 		);
 	};

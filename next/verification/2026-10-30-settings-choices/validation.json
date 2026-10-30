@@ -1,0 +1,47 @@
+{
+	"base": "e2fc175c9ddf0bcd6c6767a4f631144e8f9cfb62",
+	"installed": "0.2.0-alpha.47 / 2026.47.0 / 7423bcd",
+	"newSourceInstalled": false,
+	"baseline": {
+		"nativeSaveTests": 6,
+		"editorTelemetryTests": 1,
+		"frontendTests": 34,
+		"exitCode": 0
+	},
+	"changedSourceChecks": {
+		"controls": 17,
+		"relatedRegression": 23,
+		"desktopTypes": 0,
+		"productionFrontend": 0,
+		"biomeFiles": 5,
+		"biomeExitCode": 0,
+		"placeholderMismatches": 0
+	},
+	"units": {
+		"FPS": "one parameterized key plus six corrected translations",
+		"generalChoices": 5,
+		"numericCallbacks": "preserved including zero and unknown stored values"
+	},
+	"actual47": {
+		"ruleExpandAndCollapse": true,
+		"unknown120Visible": true,
+		"pointerSelectionVerified": false,
+		"languageRoundTripVerified": false,
+		"escapeVerified": false,
+		"eventPostingPreflight": true,
+		"accessibilityTrusted": true,
+		"fixtureAndLanguageRestored": true
+	},
+	"sourceHashes": {
+		"apps/desktop/src/components/LocalizedChoiceSelect.tsx": "6b92950bb41e5af7c96ef211703caa7c94c5fdfc04e149e609e19de424b4409a",
+		"apps/desktop/src/components/interface-controls.test.tsx": "166647cd4e7fe6c20f8257ade595db4951cf58a42753df153b9f189066220c77",
+		"apps/desktop/src/routes/(window-chrome)/settings/automations.tsx": "54aaefb441def3bcf646f459ed62d91461ef4c48545744e959bf2ffd376d974f",
+		"apps/desktop/src/routes/(window-chrome)/settings/general.tsx": "b5ec01fe7fa0c15378871d5a55fdffa69fe18626d3d3247da639d3cdcc2249b5",
+		"apps/desktop/src/i18n/zh-CN.json": "24f2b836f364e42a4b9e8cf5a1790438b72df8b19b85e4f56b653693cf36e586"
+	},
+	"releaseBlockersPreserved": [
+		"strict decoder baseline 15 pass / 2 fail",
+		"MP4 inter-run variance",
+		"full localization/runtime audit and Windows/Linux target verification pending"
+	]
+}
