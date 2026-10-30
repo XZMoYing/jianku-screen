@@ -11,7 +11,10 @@ export default defineConfig({
 	plugins: [solid({ hot: false })],
 	test: {
 		environment: "jsdom",
-		include: ["src/components/interface-controls.test.tsx"],
+		include: [
+			"src/components/interface-controls.test.tsx",
+			"src/components/device-choice-controls.test.tsx",
+		],
 		server: {
 			deps: {
 				inline: [

@@ -18,6 +18,7 @@ import * as dialog from "@tauri-apps/plugin-dialog";
 import * as shell from "@tauri-apps/plugin-shell";
 import { cx } from "cva";
 import {
+	type Accessor,
 	createEffect,
 	createMemo,
 	createSignal,
@@ -30,13 +31,17 @@ import {
 } from "solid-js";
 import { createStore, produce, reconcile } from "solid-js/store";
 import toast from "solid-toast";
-import { Transition } from "solid-transition-group";
 import brandLogo from "~/assets/branding/logo.png";
 import CaptureAppearance from "~/components/CaptureAppearance";
 import CaptureStage from "~/components/CaptureStage";
-import { MotionGroup, MotionPresence } from "~/components/InterfaceMotion";
+import {
+	MotionGroup,
+	MotionPresence,
+	MotionSwitch,
+} from "~/components/InterfaceMotion";
 import MobileRecorder from "~/components/MobileRecorder";
 import Mode from "~/components/Mode";
+import { MotionText } from "~/components/MotionText";
 import { RecoveryToast } from "~/components/RecoveryToast";
 import WindowCaptureOptions from "~/components/WindowCaptureOptions";
 import { Input } from "~/routes/editor/ui";
@@ -1189,10 +1194,13 @@ function TargetMenuPanel(props: TargetMenuPanelProps & SharedTargetMenuProps) {
 	};
 
 	const settingsSubtitle = () =>
-		props.variant === "camera" ? "Camera settings" : "Microphone settings";
+		localize(
+			props.variant === "camera" ? "Camera settings" : "Microphone settings",
+		);
 
-	const settingsTitle = () => {
-		const target = settingsTarget();
+	const settingsTitle = (
+		target: CameraWithDetails | MicrophoneWithDetails | null,
+	) => {
 		if (!target) return "";
 		return "device_id" in target ? target.display_name : target.name;
 	};
@@ -1384,286 +1392,263 @@ function TargetMenuPanel(props: TargetMenuPanelProps & SharedTargetMenuProps) {
 		});
 	});
 
-	const renderCameraBody = () => {
+	const renderCameraBody = (
+		displayed: Accessor<CameraWithDetails | MicrophoneWithDetails | null>,
+	) => {
 		if (props.variant !== "camera") return null;
 		const cameraProps = props;
 		return (
-			<Transition
-				mode="outin"
-				enterActiveClass="transition-all duration-200 ease-out"
-				enterClass={
-					direction() === "forward"
-						? "opacity-0 translate-x-2"
-						: "opacity-0 -translate-x-2"
-				}
-				enterToClass="opacity-100 translate-x-0"
-				exitActiveClass="transition-all duration-150 ease-in"
-				exitClass="opacity-100 translate-x-0"
-				exitToClass={
-					direction() === "forward"
-						? "opacity-0 -translate-x-2"
-						: "opacity-0 translate-x-2"
+			<Show
+				when={displayed() !== null}
+				fallback={
+					<DeviceListPanel
+						variant="camera"
+						targets={filteredCameraTargets()}
+						selectedTarget={cameraProps.selectedTarget}
+						isLoading={cameraProps.isLoading}
+						errorMessage={cameraProps.errorMessage}
+						onSelect={cameraProps.onSelect}
+						onSettingsRequested={(camera) => handleSettingsTargetChange(camera)}
+						disabled={cameraProps.disabled}
+						emptyMessage={
+							trimmedSearch()
+								? localize(noResultsMessage)
+								: localize("No cameras found")
+						}
+						permissions={cameraProps.permissions}
+						deviceSettings={cameraProps.deviceSettings}
+					/>
 				}
 			>
-				<Show
-					when={inSettingsMode()}
-					fallback={
-						<DeviceListPanel
-							variant="camera"
-							targets={filteredCameraTargets()}
-							selectedTarget={cameraProps.selectedTarget}
-							isLoading={cameraProps.isLoading}
-							errorMessage={cameraProps.errorMessage}
-							onSelect={cameraProps.onSelect}
-							onSettingsRequested={(camera) =>
-								handleSettingsTargetChange(camera)
+				<Show when={displayed() as CameraWithDetails | null} keyed>
+					{(target) => (
+						<CameraSettingsPanel
+							camera={target}
+							value={cameraSettingFor(target)}
+							onChange={(settings) =>
+								cameraProps.onCameraSettingsChange(target, settings)
 							}
-							disabled={cameraProps.disabled}
-							emptyMessage={
-								trimmedSearch()
-									? localize(noResultsMessage)
-									: localize("No cameras found")
-							}
-							permissions={cameraProps.permissions}
-							deviceSettings={cameraProps.deviceSettings}
+							compatibilityStudioMode={cameraProps.compatibilityStudioMode}
 						/>
-					}
-				>
-					<Show when={settingsTarget() as CameraWithDetails | null} keyed>
-						{(target) => (
-							<CameraSettingsPanel
-								camera={target}
-								value={cameraSettingFor(target)}
-								onChange={(settings) =>
-									cameraProps.onCameraSettingsChange(target, settings)
-								}
-								compatibilityStudioMode={cameraProps.compatibilityStudioMode}
-							/>
-						)}
-					</Show>
+					)}
 				</Show>
-			</Transition>
+			</Show>
 		);
 	};
 
-	const renderMicrophoneBody = () => {
+	const renderMicrophoneBody = (
+		displayed: Accessor<CameraWithDetails | MicrophoneWithDetails | null>,
+	) => {
 		if (props.variant !== "microphone") return null;
 		const micProps = props;
 		return (
-			<Transition
-				mode="outin"
-				enterActiveClass="transition-all duration-200 ease-out"
-				enterClass={
-					direction() === "forward"
-						? "opacity-0 translate-x-2"
-						: "opacity-0 -translate-x-2"
-				}
-				enterToClass="opacity-100 translate-x-0"
-				exitActiveClass="transition-all duration-150 ease-in"
-				exitClass="opacity-100 translate-x-0"
-				exitToClass={
-					direction() === "forward"
-						? "opacity-0 -translate-x-2"
-						: "opacity-0 translate-x-2"
+			<Show
+				when={displayed() !== null}
+				fallback={
+					<DeviceListPanel
+						variant="microphone"
+						targets={filteredMicrophoneTargets()}
+						selectedTarget={micProps.selectedTarget}
+						isLoading={micProps.isLoading}
+						errorMessage={micProps.errorMessage}
+						onSelect={micProps.onSelect}
+						onSettingsRequested={(mic) => handleSettingsTargetChange(mic)}
+						disabled={micProps.disabled}
+						emptyMessage={
+							trimmedSearch()
+								? localize(noResultsMessage)
+								: localize("No microphones found")
+						}
+						permissions={micProps.permissions}
+						deviceSettings={micProps.deviceSettings}
+					/>
 				}
 			>
-				<Show
-					when={inSettingsMode()}
-					fallback={
-						<DeviceListPanel
-							variant="microphone"
-							targets={filteredMicrophoneTargets()}
-							selectedTarget={micProps.selectedTarget}
-							isLoading={micProps.isLoading}
-							errorMessage={micProps.errorMessage}
-							onSelect={micProps.onSelect}
-							onSettingsRequested={(mic) => handleSettingsTargetChange(mic)}
-							disabled={micProps.disabled}
-							emptyMessage={
-								trimmedSearch()
-									? localize(noResultsMessage)
-									: localize("No microphones found")
+				<Show when={displayed() as MicrophoneWithDetails | null} keyed>
+					{(target) => (
+						<MicrophoneSettingsPanel
+							mic={target}
+							value={microphoneSettingFor(target)}
+							onChange={(settings) =>
+								micProps.onMicrophoneSettingsChange(target.name, settings)
 							}
-							permissions={micProps.permissions}
-							deviceSettings={micProps.deviceSettings}
+							compatibilityStudioMode={micProps.compatibilityStudioMode}
 						/>
-					}
-				>
-					<Show when={settingsTarget() as MicrophoneWithDetails | null} keyed>
-						{(target) => (
-							<MicrophoneSettingsPanel
-								mic={target}
-								value={microphoneSettingFor(target)}
-								onChange={(settings) =>
-									micProps.onMicrophoneSettingsChange(target.name, settings)
-								}
-								compatibilityStudioMode={micProps.compatibilityStudioMode}
-							/>
-						)}
-					</Show>
+					)}
 				</Show>
-			</Transition>
+			</Show>
 		);
 	};
 
 	return (
-		<div class="flex flex-col w-full h-full min-h-0">
-			<div class="flex gap-3 items-center mt-3 min-h-[36px]">
-				<button
-					type="button"
-					onClick={handleHeaderBack}
-					class="flex h-[36px] gap-1 items-center shrink-0 rounded-md px-2 text-xs
+		<MotionSwitch
+			value={settingsTarget()}
+			kind="subpage"
+			direction={direction() === "forward" ? 1 : -1}
+			class="flex flex-col w-full h-full min-h-0"
+		>
+			{(displayed) => (
+				<>
+					<div class="flex gap-3 items-center mt-3 min-h-[36px]">
+						<button
+							type="button"
+							onClick={handleHeaderBack}
+							class="flex h-[36px] gap-1 items-center shrink-0 rounded-md px-2 text-xs
 					text-gray-11 transition-colors hover:text-gray-12 hover:bg-gray-4
 					focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-9 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-1"
-					aria-label={inSettingsMode() ? "Back to list" : "Back"}
-				>
-					<IconLucideArrowLeft class="size-3 text-gray-11" />
-					<span class="font-medium text-gray-12">{localize("Back")}</span>
-				</button>
-				<Show
-					when={inSettingsMode()}
-					fallback={
-						<div class="flex gap-2 flex-1 min-w-0">
-							<div class="relative flex-1 min-w-0 h-[36px] flex items-center">
-								<IconLucideSearch class="absolute left-2 top-[48%] -translate-y-1/2 pointer-events-none size-3 text-gray-10" />
-								<Input
-									type="search"
-									class="py-2 pl-6 h-full w-full"
-									value={search()}
-									onInput={(event) => setSearch(event.currentTarget.value)}
-									onKeyDown={(event) => {
-										if (event.key === "Escape" && search()) {
-											event.preventDefault();
-											setSearch("");
-										}
-									}}
-									placeholder={localize(placeholder)}
-									autoCapitalize="off"
-									autocorrect="off"
-									autocomplete="off"
-									spellcheck={false}
-									aria-label={localize(placeholder)}
-								/>
-							</div>
-							<Show
-								when={
-									props.variant === "recording" ||
-									props.variant === "screenshot"
-								}
-							>
-								<Button
-									variant="gray"
-									size="sm"
-									class="h-[36px] px-3 shrink-0 flex items-center gap-1.5"
-									onClick={
-										props.variant === "screenshot"
-											? handleImageImport
-											: handleVideoImport
-									}
-								>
-									<IconLucideImport class="size-3.5" />
-									<span>
-										{props.variant === "screenshot"
-											? localize("Import image")
-											: localize("Import")}
-									</span>
-								</Button>
-							</Show>
-						</div>
-					}
-				>
-					<div class="flex flex-1 items-center gap-2 min-w-0 pl-1">
+							aria-label={localize(
+								displayed() !== null ? "Back to list" : "Back",
+							)}
+						>
+							<IconLucideArrowLeft class="size-3 text-gray-11" />
+							<span class="font-medium text-gray-12">{localize("Back")}</span>
+						</button>
 						<Show
-							when={props.variant === "camera"}
+							when={displayed() !== null}
 							fallback={
-								<IconCapMicrophone class="size-4 shrink-0 text-gray-11" />
+								<div class="flex gap-2 flex-1 min-w-0">
+									<div class="relative flex-1 min-w-0 h-[36px] flex items-center">
+										<IconLucideSearch class="absolute left-2 top-[48%] -translate-y-1/2 pointer-events-none size-3 text-gray-10" />
+										<Input
+											type="search"
+											class="py-2 pl-6 h-full w-full"
+											value={search()}
+											onInput={(event) => setSearch(event.currentTarget.value)}
+											onKeyDown={(event) => {
+												if (event.key === "Escape" && search()) {
+													event.preventDefault();
+													setSearch("");
+												}
+											}}
+											placeholder={localize(placeholder)}
+											autoCapitalize="off"
+											autocorrect="off"
+											autocomplete="off"
+											spellcheck={false}
+											aria-label={localize(placeholder)}
+										/>
+									</div>
+									<Show
+										when={
+											props.variant === "recording" ||
+											props.variant === "screenshot"
+										}
+									>
+										<Button
+											variant="gray"
+											size="sm"
+											class="h-[36px] px-3 shrink-0 flex items-center gap-1.5"
+											onClick={
+												props.variant === "screenshot"
+													? handleImageImport
+													: handleVideoImport
+											}
+										>
+											<IconLucideImport class="size-3.5" />
+											<span>
+												{props.variant === "screenshot"
+													? localize("Import image")
+													: localize("Import")}
+											</span>
+										</Button>
+									</Show>
+								</div>
 							}
 						>
-							<IconCapCamera class="size-4 shrink-0 text-gray-11" />
+							<div class="flex flex-1 items-center gap-2 min-w-0 pl-1">
+								<Show
+									when={props.variant === "camera"}
+									fallback={
+										<IconCapMicrophone class="size-4 shrink-0 text-gray-11" />
+									}
+								>
+									<IconCapCamera class="size-4 shrink-0 text-gray-11" />
+								</Show>
+								<div class="min-w-0 flex-1 leading-tight">
+									<div class="text-sm font-medium text-gray-12 truncate">
+										<MotionText text={settingsTitle(displayed())} />
+									</div>
+									<div class="text-[11px] text-gray-10 truncate">
+										<MotionText text={settingsSubtitle()} />
+									</div>
+								</div>
+							</div>
 						</Show>
-						<div class="min-w-0 flex-1 leading-tight">
-							<div class="text-sm font-medium text-gray-12 truncate">
-								{settingsTitle()}
-							</div>
-							<div class="text-[11px] text-gray-10 truncate">
-								{settingsSubtitle()}
-							</div>
+					</div>
+					<div class="flex flex-col flex-1 min-h-0 pt-4">
+						<div
+							ref={scrollContainerRef}
+							class="px-2 custom-scroll flex-1 overflow-y-auto"
+							style={{ "overflow-anchor": "none" }}
+						>
+							{props.variant === "display" ? (
+								<TargetMenuGrid
+									variant="display"
+									targets={filteredDisplayTargets()}
+									isLoading={props.isLoading}
+									errorMessage={props.errorMessage}
+									onSelect={props.onSelect}
+									disabled={props.disabled}
+									highlightQuery={trimmedSearch()}
+									emptyMessage={
+										trimmedSearch() ? localize(noResultsMessage) : undefined
+									}
+								/>
+							) : props.variant === "window" ? (
+								<TargetMenuGrid
+									variant="window"
+									targets={filteredWindowTargets()}
+									isLoading={props.isLoading}
+									errorMessage={props.errorMessage}
+									onSelect={props.onSelect}
+									disabled={props.disabled}
+									highlightQuery={trimmedSearch()}
+									emptyMessage={
+										trimmedSearch() ? localize(noResultsMessage) : undefined
+									}
+								/>
+							) : props.variant === "recording" ? (
+								<TargetMenuGrid
+									variant="recording"
+									targets={filteredRecordingTargets()}
+									isLoading={props.isLoading}
+									errorMessage={props.errorMessage}
+									onSelect={props.onSelect}
+									disabled={props.disabled}
+									highlightQuery={trimmedSearch()}
+									emptyMessage={
+										trimmedSearch() ? localize(noResultsMessage) : undefined
+									}
+									uploadProgress={props.uploadProgress}
+									reuploadingPaths={props.reuploadingPaths}
+									onReupload={props.onReupload}
+									onRefetch={props.onRefetch}
+									onViewAll={props.onViewAll}
+								/>
+							) : props.variant === "camera" ? (
+								renderCameraBody(displayed)
+							) : props.variant === "microphone" ? (
+								renderMicrophoneBody(displayed)
+							) : (
+								<TargetMenuGrid
+									variant="screenshot"
+									targets={filteredScreenshotTargets()}
+									isLoading={props.isLoading}
+									errorMessage={props.errorMessage}
+									onSelect={props.onSelect}
+									disabled={props.disabled}
+									highlightQuery={trimmedSearch()}
+									emptyMessage={
+										trimmedSearch() ? localize(noResultsMessage) : undefined
+									}
+									onViewAll={props.onViewAll}
+								/>
+							)}
 						</div>
 					</div>
-				</Show>
-			</div>
-			<div class="flex flex-col flex-1 min-h-0 pt-4">
-				<div
-					ref={scrollContainerRef}
-					class="px-2 custom-scroll flex-1 overflow-y-auto"
-					style={{ "overflow-anchor": "none" }}
-				>
-					{props.variant === "display" ? (
-						<TargetMenuGrid
-							variant="display"
-							targets={filteredDisplayTargets()}
-							isLoading={props.isLoading}
-							errorMessage={props.errorMessage}
-							onSelect={props.onSelect}
-							disabled={props.disabled}
-							highlightQuery={trimmedSearch()}
-							emptyMessage={
-								trimmedSearch() ? localize(noResultsMessage) : undefined
-							}
-						/>
-					) : props.variant === "window" ? (
-						<TargetMenuGrid
-							variant="window"
-							targets={filteredWindowTargets()}
-							isLoading={props.isLoading}
-							errorMessage={props.errorMessage}
-							onSelect={props.onSelect}
-							disabled={props.disabled}
-							highlightQuery={trimmedSearch()}
-							emptyMessage={
-								trimmedSearch() ? localize(noResultsMessage) : undefined
-							}
-						/>
-					) : props.variant === "recording" ? (
-						<TargetMenuGrid
-							variant="recording"
-							targets={filteredRecordingTargets()}
-							isLoading={props.isLoading}
-							errorMessage={props.errorMessage}
-							onSelect={props.onSelect}
-							disabled={props.disabled}
-							highlightQuery={trimmedSearch()}
-							emptyMessage={
-								trimmedSearch() ? localize(noResultsMessage) : undefined
-							}
-							uploadProgress={props.uploadProgress}
-							reuploadingPaths={props.reuploadingPaths}
-							onReupload={props.onReupload}
-							onRefetch={props.onRefetch}
-							onViewAll={props.onViewAll}
-						/>
-					) : props.variant === "camera" ? (
-						renderCameraBody()
-					) : props.variant === "microphone" ? (
-						renderMicrophoneBody()
-					) : (
-						<TargetMenuGrid
-							variant="screenshot"
-							targets={filteredScreenshotTargets()}
-							isLoading={props.isLoading}
-							errorMessage={props.errorMessage}
-							onSelect={props.onSelect}
-							disabled={props.disabled}
-							highlightQuery={trimmedSearch()}
-							emptyMessage={
-								trimmedSearch() ? localize(noResultsMessage) : undefined
-							}
-							onViewAll={props.onViewAll}
-						/>
-					)}
-				</div>
-			</div>
-		</div>
+				</>
+			)}
+		</MotionSwitch>
 	);
 }
 
@@ -3293,163 +3278,191 @@ function Page() {
 										</div>
 									</Show>
 									<Show when={!signIn.isPending}>
-										<Show
-											when={activeMenu()}
-											keyed
-											fallback={<TargetSelectionHome />}
+										<MotionSwitch
+											value={activeMenu()}
+											kind="subpage"
+											order={[
+												null,
+												"display",
+												"window",
+												"recording",
+												"screenshot",
+												"modeInfo",
+												"camera",
+												"microphone",
+											]}
+											class="flex flex-col flex-1 min-h-0"
 										>
-											{(variant) =>
-												variant === "display" ? (
-													<TargetMenuPanel
-														variant="display"
-														targets={displayTargetsData()}
-														isLoading={displayMenuLoading()}
-														errorMessage={displayErrorMessage()}
-														onSelect={selectDisplayTarget}
-														disabled={isRecording() || styleBusy()}
-														onBack={() => {
-															setDisplayMenuOpen(false);
-															displayTriggerRef?.focus();
-														}}
-													/>
-												) : variant === "window" ? (
-													<TargetMenuPanel
-														variant="window"
-														targets={windowTargetsData()}
-														isLoading={windowMenuLoading()}
-														errorMessage={windowErrorMessage()}
-														onSelect={selectWindowTarget}
-														disabled={isRecording() || styleBusy()}
-														onBack={() => {
-															setWindowMenuOpen(false);
-															windowTriggerRef?.focus();
-														}}
-													/>
-												) : variant === "recording" ? (
-													<TargetMenuPanel
-														variant="recording"
-														targets={recordingsData()}
-														isLoading={recordings.isPending}
-														errorMessage={
-															recordings.error
-																? "Failed to load recordings"
-																: undefined
-														}
-														onSelect={openRecording}
-														disabled={isRecording() || styleBusy()}
-														onBack={() => {
-															setRecordingsMenuOpen(false);
-														}}
-														onViewAll={async () => {
-															await commands.showWindow({
-																Settings: { page: "recordings" },
-															});
-															hideCurrentWindow();
-														}}
-														uploadProgress={uploadProgress}
-														reuploadingPaths={reuploadingPaths()}
-														onReupload={handleReupload}
-														onRefetch={refreshRecordings}
-													/>
-												) : variant === "screenshot" ? (
-													<TargetMenuPanel
-														variant="screenshot"
-														targets={screenshotsData()}
-														isLoading={screenshots.isPending}
-														errorMessage={
-															screenshots.error
-																? "Failed to load screenshots"
-																: undefined
-														}
-														onSelect={openScreenshot}
-														disabled={isRecording() || styleBusy()}
-														onBack={() => {
-															setScreenshotsMenuOpen(false);
-														}}
-														onViewAll={async () => {
-															await commands.showWindow({
-																Settings: { page: "screenshots" },
-															});
-															hideCurrentWindow();
-														}}
-													/>
-												) : variant === "camera" ? (
-													<TargetMenuPanel
-														variant="camera"
-														targets={devices.cameras}
-														selectedTarget={options.camera() ?? null}
-														isLoading={devices.isPending}
-														onSelect={(c) => {
-															if (!c) {
-																setOptions("cameraLabel", null);
-																setCamera.mutate({ model: null });
-															} else if (c.model_id) {
-																setOptions("cameraLabel", c.display_name);
-																setCamera.mutate({
-																	model: { ModelID: c.model_id },
-																});
-															} else {
-																setOptions("cameraLabel", c.display_name);
-																setCamera.mutate({
-																	model: { DeviceID: c.device_id },
-																});
-															}
-															setCameraMenuOpen(false);
-															setCameraInitialSettings(null);
-														}}
-														disabled={isRecording() || styleBusy()}
-														onBack={() => {
-															setCameraMenuOpen(false);
-															setCameraInitialSettings(null);
-														}}
-														permissions={currentPermissions()}
-														deviceSettings={deviceSettings() ?? undefined}
-														onCameraSettingsChange={(camera, settings) => {
-															void setCameraDeviceSettings(camera, settings);
-														}}
-														compatibilityStudioMode={compatibilityStudioMode()}
-														initialSettingsTarget={cameraInitialSettings()}
-													/>
-												) : variant === "microphone" ? (
-													<TargetMenuPanel
-														variant="microphone"
-														targets={devices.microphones}
-														selectedTarget={options.micName() ?? null}
-														isLoading={devices.isPending}
-														onSelect={(v) => {
-															setMicInput.mutate(v?.name ?? null);
-															setMicrophoneMenuOpen(false);
-															setMicrophoneInitialSettings(null);
-														}}
-														disabled={isRecording() || styleBusy()}
-														onBack={() => {
-															setMicrophoneMenuOpen(false);
-															setMicrophoneInitialSettings(null);
-														}}
-														permissions={currentPermissions()}
-														deviceSettings={deviceSettings() ?? undefined}
-														onMicrophoneSettingsChange={(key, settings) => {
-															void setMicrophoneDeviceSettings(key, settings);
-														}}
-														compatibilityStudioMode={compatibilityStudioMode()}
-														initialSettingsTarget={microphoneInitialSettings()}
-													/>
-												) : (
-													<ModeInfoPanel
-														onBack={() => {
-															setModeInfoMenuOpen(false);
-														}}
-													/>
-												)
-											}
-										</Show>
+											{(menu) => (
+												<Show
+													when={menu()}
+													keyed
+													fallback={
+														<>
+															<TargetSelectionHome />
+															<p class="workspace-recording-note">
+																{localize(
+																	"屏幕与窗口支持独立选择；录制结束后可在编辑器调整画面、镜头与光标。",
+																)}
+															</p>
+														</>
+													}
+												>
+													{(variant) =>
+														variant === "display" ? (
+															<TargetMenuPanel
+																variant="display"
+																targets={displayTargetsData()}
+																isLoading={displayMenuLoading()}
+																errorMessage={displayErrorMessage()}
+																onSelect={selectDisplayTarget}
+																disabled={isRecording() || styleBusy()}
+																onBack={() => {
+																	setDisplayMenuOpen(false);
+																	displayTriggerRef?.focus();
+																}}
+															/>
+														) : variant === "window" ? (
+															<TargetMenuPanel
+																variant="window"
+																targets={windowTargetsData()}
+																isLoading={windowMenuLoading()}
+																errorMessage={windowErrorMessage()}
+																onSelect={selectWindowTarget}
+																disabled={isRecording() || styleBusy()}
+																onBack={() => {
+																	setWindowMenuOpen(false);
+																	windowTriggerRef?.focus();
+																}}
+															/>
+														) : variant === "recording" ? (
+															<TargetMenuPanel
+																variant="recording"
+																targets={recordingsData()}
+																isLoading={recordings.isPending}
+																errorMessage={
+																	recordings.error
+																		? "Failed to load recordings"
+																		: undefined
+																}
+																onSelect={openRecording}
+																disabled={isRecording() || styleBusy()}
+																onBack={() => {
+																	setRecordingsMenuOpen(false);
+																}}
+																onViewAll={async () => {
+																	await commands.showWindow({
+																		Settings: { page: "recordings" },
+																	});
+																	hideCurrentWindow();
+																}}
+																uploadProgress={uploadProgress}
+																reuploadingPaths={reuploadingPaths()}
+																onReupload={handleReupload}
+																onRefetch={refreshRecordings}
+															/>
+														) : variant === "screenshot" ? (
+															<TargetMenuPanel
+																variant="screenshot"
+																targets={screenshotsData()}
+																isLoading={screenshots.isPending}
+																errorMessage={
+																	screenshots.error
+																		? "Failed to load screenshots"
+																		: undefined
+																}
+																onSelect={openScreenshot}
+																disabled={isRecording() || styleBusy()}
+																onBack={() => {
+																	setScreenshotsMenuOpen(false);
+																}}
+																onViewAll={async () => {
+																	await commands.showWindow({
+																		Settings: { page: "screenshots" },
+																	});
+																	hideCurrentWindow();
+																}}
+															/>
+														) : variant === "camera" ? (
+															<TargetMenuPanel
+																variant="camera"
+																targets={devices.cameras}
+																selectedTarget={options.camera() ?? null}
+																isLoading={devices.isPending}
+																onSelect={(c) => {
+																	if (!c) {
+																		setOptions("cameraLabel", null);
+																		setCamera.mutate({ model: null });
+																	} else if (c.model_id) {
+																		setOptions("cameraLabel", c.display_name);
+																		setCamera.mutate({
+																			model: { ModelID: c.model_id },
+																		});
+																	} else {
+																		setOptions("cameraLabel", c.display_name);
+																		setCamera.mutate({
+																			model: { DeviceID: c.device_id },
+																		});
+																	}
+																	setCameraMenuOpen(false);
+																	setCameraInitialSettings(null);
+																}}
+																disabled={isRecording() || styleBusy()}
+																onBack={() => {
+																	setCameraMenuOpen(false);
+																	setCameraInitialSettings(null);
+																}}
+																permissions={currentPermissions()}
+																deviceSettings={deviceSettings() ?? undefined}
+																onCameraSettingsChange={(camera, settings) => {
+																	void setCameraDeviceSettings(
+																		camera,
+																		settings,
+																	);
+																}}
+																compatibilityStudioMode={compatibilityStudioMode()}
+																initialSettingsTarget={cameraInitialSettings()}
+															/>
+														) : variant === "microphone" ? (
+															<TargetMenuPanel
+																variant="microphone"
+																targets={devices.microphones}
+																selectedTarget={options.micName() ?? null}
+																isLoading={devices.isPending}
+																onSelect={(v) => {
+																	setMicInput.mutate(v?.name ?? null);
+																	setMicrophoneMenuOpen(false);
+																	setMicrophoneInitialSettings(null);
+																}}
+																disabled={isRecording() || styleBusy()}
+																onBack={() => {
+																	setMicrophoneMenuOpen(false);
+																	setMicrophoneInitialSettings(null);
+																}}
+																permissions={currentPermissions()}
+																deviceSettings={deviceSettings() ?? undefined}
+																onMicrophoneSettingsChange={(key, settings) => {
+																	void setMicrophoneDeviceSettings(
+																		key,
+																		settings,
+																	);
+																}}
+																compatibilityStudioMode={compatibilityStudioMode()}
+																initialSettingsTarget={microphoneInitialSettings()}
+															/>
+														) : (
+															<ModeInfoPanel
+																onBack={() => {
+																	setModeInfoMenuOpen(false);
+																}}
+															/>
+														)
+													}
+												</Show>
+											)}
+										</MotionSwitch>
 									</Show>
 								</div>
-								<Show when={!activeMenu()}>
-									<p class="workspace-recording-note">
-										屏幕与窗口支持独立选择；录制结束后可在编辑器调整画面、镜头与光标。
-									</p>
-								</Show>
 							</div>
 							<Suspense
 								fallback={

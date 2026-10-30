@@ -1,4 +1,3 @@
-import { CheckMenuItem, Menu, PredefinedMenuItem } from "@tauri-apps/api/menu";
 import { cx } from "cva";
 import {
 	type Component,
@@ -6,6 +5,8 @@ import {
 	createSignal,
 	Show,
 } from "solid-js";
+import { LocalizedChoiceSelect } from "~/components/LocalizedChoiceSelect";
+import { MotionText } from "~/components/MotionText";
 import { trackEvent } from "~/utils/analytics";
 import { createTauriEventListener } from "~/utils/createEventListener";
 import { t as localize } from "~/utils/i18n";
@@ -79,40 +80,46 @@ export default function MicrophoneSelect(props: {
 
 	return (
 		<div class="flex flex-col items-stretch text-(--text-primary)">
-			<button
-				type="button"
-				disabled={isDisabled()}
-				class={cx(DEVICE_ROW_CLASS, "KSelect")}
-				onClick={() => {
-					if (!permissionGranted()) {
-						requestPermission("microphone", props.permissions?.microphone);
-						return;
-					}
-					props.onOpen?.();
-				}}
-				aria-haspopup="menu"
+			<div
+				class={cx(DEVICE_ROW_CLASS, "KSelect jk-device-row")}
+				data-disabled={isDisabled() ? "" : undefined}
 			>
-				<Show when={showLevel()}>
-					<div
-						class="absolute inset-y-0 left-0 -z-10 transition-[right] duration-100 pointer-events-none bg-blue-9/10"
-						style={{ right: `${audioLevel() * 100}%` }}
-					/>
-					<div
-						class="absolute bottom-0 left-0 h-[2px] -z-10 transition-[right] duration-100 pointer-events-none bg-blue-9"
-						style={{ right: `${audioLevel() * 100}%` }}
-					/>
-				</Show>
-				<IconCapMicrophone class={DEVICE_ROW_ICON_CLASS} />
-				<p
-					class={cx(DEVICE_ROW_LABEL_CLASS, notConnected() && "text-gray-10")}
-					title={notConnected() ? "Not connected" : undefined}
+				<button
+					type="button"
+					disabled={isDisabled()}
+					class="jk-device-open"
+					onClick={() => {
+						if (!permissionGranted()) {
+							requestPermission("microphone", props.permissions?.microphone);
+							return;
+						}
+						props.onOpen?.();
+					}}
+					aria-haspopup="menu"
 				>
-					{props.value ?? NO_MICROPHONE}
-				</p>
+					<Show when={showLevel()}>
+						<div
+							class="absolute inset-y-0 left-0 -z-10 transition-[right] duration-100 pointer-events-none bg-blue-9/10"
+							style={{ right: `${audioLevel() * 100}%` }}
+						/>
+						<div
+							class="absolute bottom-0 left-0 h-[2px] -z-10 transition-[right] duration-100 pointer-events-none bg-blue-9"
+							style={{ right: `${audioLevel() * 100}%` }}
+						/>
+					</Show>
+					<IconCapMicrophone class={DEVICE_ROW_ICON_CLASS} />
+					<p
+						class={cx(DEVICE_ROW_LABEL_CLASS, notConnected() && "text-gray-10")}
+						title={notConnected() ? localize("Not connected") : undefined}
+					>
+						<MotionText text={props.value ?? localize(NO_MICROPHONE)} />
+					</p>
+				</button>
 				<div class={DEVICE_ROW_TRAILING_CLASS}>
 					<Show when={showSettingsShortcut()}>
 						<button
 							type="button"
+							disabled={isDisabled()}
 							onClick={(e) => {
 								e.preventDefault();
 								e.stopPropagation();
@@ -128,6 +135,7 @@ export default function MicrophoneSelect(props: {
 					</Show>
 					<TargetSelectInfoPill
 						PillComponent={InfoPill}
+						disabled={isDisabled()}
 						value={props.value}
 						disconnected={notConnected()}
 						permissionGranted={permissionGranted()}
@@ -138,11 +146,13 @@ export default function MicrophoneSelect(props: {
 							if (props.value !== null) {
 								e.stopPropagation();
 								void handleMicrophoneChange(null);
+							} else {
+								props.onOpen?.();
 							}
 						}}
 					/>
 				</div>
-			</button>
+			</div>
 		</div>
 	);
 }
@@ -160,6 +170,7 @@ export function MicrophoneSelectBase(props: {
 	>;
 	permissions?: OSPermissionsCheck;
 }) {
+	let choiceTrigger: HTMLButtonElement | undefined;
 	const DB_SCALE = 40;
 
 	const currentRecording = createCurrentRecordingQuery();
@@ -172,6 +183,24 @@ export function MicrophoneSelectBase(props: {
 		props.permissions === undefined ||
 		props.permissions.microphone === "granted" ||
 		props.permissions.microphone === "notNeeded";
+
+	const isDisabled = () => !!currentRecording.data || props.disabled;
+	const selectedValue = () =>
+		props.value === null ? "none" : `microphone:${props.value}`;
+	const choices = () => {
+		const items: { value: string; label: string; disabled?: boolean }[] =
+			props.options.map((name) => ({
+				value: `microphone:${name}`,
+				label: name,
+			}));
+		if (props.value !== null && !props.options.includes(props.value))
+			items.push({
+				value: selectedValue(),
+				label: props.value,
+				disabled: true,
+			});
+		return [{ value: "none", label: localize(NO_MICROPHONE) }, ...items];
+	};
 
 	type Option = { name: string };
 
@@ -195,68 +224,66 @@ export function MicrophoneSelectBase(props: {
 		(1 - Math.max((dbs() ?? 0) + DB_SCALE, 0) / DB_SCALE) ** 0.5;
 
 	return (
-		<div class="flex flex-col gap-1 items-stretch text-(--text-primary)">
-			<button
-				type="button"
-				disabled={!!currentRecording.data || props.disabled}
-				class={props.class}
-				onClick={() => {
-					if (!permissionGranted()) {
-						requestPermission("microphone", props.permissions?.microphone);
-						return;
-					}
-
-					Promise.all([
-						CheckMenuItem.new({
-							text: NO_MICROPHONE,
-							checked: props.value === null,
-							action: () => handleMicrophoneChange(null),
-						}),
-						PredefinedMenuItem.new({ item: "Separator" }),
-						...(props.options ?? []).map((name) =>
-							CheckMenuItem.new({
-								text: name,
-								checked: name === props.value,
-								action: () => handleMicrophoneChange({ name: name }),
-							}),
-						),
-					])
-						.then((items) => Menu.new({ items }))
-						.then((m) => {
-							m.popup();
-						});
-				}}
-			>
-				<Show when={props.value !== null && dbs()}>
-					{(_) => (
-						<div
-							class={cx(
-								"opacity-50 left-0 inset-y-0 absolute transition-[right] duration-100 -z-10",
-								props.levelIndicatorClass,
-							)}
-							style={{ right: `${audioLevel() * 100}%` }}
-						/>
+		<div
+			class={cx(props.class, "jk-device-choice")}
+			data-disabled={isDisabled() ? "" : undefined}
+		>
+			<Show when={props.value !== null && dbs() !== undefined}>
+				<div
+					class={cx(
+						"absolute inset-y-0 left-0 pointer-events-none opacity-50 transition-[right] duration-100 -z-10",
+						props.levelIndicatorClass,
 					)}
-				</Show>
-				<IconCapMicrophone class={props.iconClass} />
-				<p class="flex-1 text-sm text-left truncate">
-					{props.value ?? NO_MICROPHONE}
-				</p>
-				<TargetSelectInfoPill
-					PillComponent={props.PillComponent}
-					value={props.value}
-					permissionGranted={permissionGranted()}
-					requestPermission={() =>
-						requestPermission("microphone", props.permissions?.microphone)
-					}
-					onClick={(e) => {
-						if (props.value !== null) {
-							e.stopPropagation();
-							props.onChange(null);
+					style={{ right: `${audioLevel() * 100}%` }}
+				/>
+			</Show>
+			<IconCapMicrophone class={props.iconClass} />
+			<Show
+				when={permissionGranted()}
+				fallback={
+					<button
+						type="button"
+						class="jk-device-open"
+						disabled={isDisabled()}
+						onClick={() =>
+							requestPermission("microphone", props.permissions?.microphone)
 						}
+					>
+						<MotionText text={props.value ?? localize(NO_MICROPHONE)} />
+					</button>
+				}
+			>
+				<LocalizedChoiceSelect
+					preserveLabels
+					aria-label={localize("Microphone")}
+					triggerRef={(element) => {
+						choiceTrigger = element;
+					}}
+					value={selectedValue()}
+					options={choices()}
+					disabled={isDisabled()}
+					onChange={(value) => {
+						if (value === "none") return void handleMicrophoneChange(null);
+						const name = props.options.find(
+							(item) => `microphone:${item}` === value,
+						);
+						if (name !== undefined) void handleMicrophoneChange({ name });
 					}}
 				/>
-			</button>
+			</Show>
+			<TargetSelectInfoPill
+				PillComponent={props.PillComponent}
+				value={props.value}
+				disabled={isDisabled()}
+				permissionGranted={permissionGranted()}
+				requestPermission={() =>
+					requestPermission("microphone", props.permissions?.microphone)
+				}
+				onClick={() => {
+					if (props.value === null) choiceTrigger?.click();
+					else void handleMicrophoneChange(null);
+				}}
+			/>
 		</div>
 	);
 }

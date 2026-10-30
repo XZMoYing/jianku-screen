@@ -9,6 +9,7 @@ export function LocalizedChoiceSelect<T extends string | number>(props: {
 	class?: string;
 	disabled?: boolean;
 	preserveLabels?: boolean;
+	triggerRef?: (element: HTMLButtonElement) => void;
 	"aria-label"?: string;
 }) {
 	const options = createMemo(() => {
@@ -26,6 +27,7 @@ export function LocalizedChoiceSelect<T extends string | number>(props: {
 	});
 	return (
 		<ChoiceSelect
+			triggerRef={props.triggerRef}
 			value={props.value}
 			options={options()}
 			class={props.class}

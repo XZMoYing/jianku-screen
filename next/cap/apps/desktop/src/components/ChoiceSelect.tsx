@@ -24,6 +24,7 @@ export function ChoiceSelect(props: {
 	id?: string;
 	class?: string;
 	style?: JSX.CSSProperties;
+	triggerRef?: (element: HTMLButtonElement) => void;
 	"aria-label"?: string;
 }) {
 	let root!: HTMLDivElement;
@@ -79,6 +80,7 @@ export function ChoiceSelect(props: {
 			)}
 		>
 			<Select.Trigger
+				ref={(element) => props.triggerRef?.(element)}
 				id={props.id}
 				aria-label={props["aria-label"]}
 				class={`jk-choice-trigger ${props.class ?? ""}`}

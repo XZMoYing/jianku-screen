@@ -364,7 +364,7 @@
 	margin: 0;
 	min-width: 0;
 }
-:root .jk-device-controls button.group {
+:root .jk-device-controls :is(button.group, .jk-device-row) {
 	height: 38px;
 	gap: 6px;
 	border-radius: 10px;

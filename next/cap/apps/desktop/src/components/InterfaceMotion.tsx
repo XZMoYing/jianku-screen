@@ -120,6 +120,8 @@ export function MotionSwitch<T>(props: {
 	value: T;
 	kind?: "page" | "subpage";
 	order?: readonly T[];
+	direction?: 1 | -1;
+	class?: string;
 	children: (value: Accessor<T>) => JSX.Element;
 }) {
 	const [displayed, setDisplayed] = createSignal(props.value);
@@ -137,10 +139,11 @@ export function MotionSwitch<T>(props: {
 				const generation = ++revision;
 				const kind = props.kind ?? "page";
 				const direction =
-					!props.order ||
+					props.direction ??
+					(!props.order ||
 					props.order.indexOf(value) >= props.order.indexOf(displayed())
 						? 1
-						: -1;
+						: -1);
 				const opacity = getComputedStyle(root).opacity;
 				const transform = getComputedStyle(root).transform;
 				cancel();
@@ -234,7 +237,7 @@ export function MotionSwitch<T>(props: {
 	return (
 		<div
 			ref={root}
-			class="jk-motion-content"
+			class={`jk-motion-content ${props.class ?? ""}`}
 			data-motion-kind={props.kind ?? "page"}
 		>
 			{props.children(displayed)}

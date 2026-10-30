@@ -1,0 +1,52 @@
+{
+	"base": "8d62e00faddd7af45785b0940133724680d5657b",
+	"unit": "U20b3 source",
+	"installed": "0.2.0-alpha.47 / 2026.47.0 / source 7423bcd",
+	"newSourceInstalled": false,
+	"checks": {
+		"deviceAndSharedControls": 26,
+		"permissionAndRelatedRegression": 28,
+		"desktopTypesExitCode": 0,
+		"frontendProductionExitCode": 0,
+		"biomeFiles": 14,
+		"biomeExitCode": 0,
+		"preExistingReducedMotionImportantWarnings": 4,
+		"placeholderMismatches": 0
+	},
+	"scope": [
+		"Two overlay native device menus now use shared choice/menu/text components",
+		"Homepage device list/settings and target navigation use shared MotionSwitch; search/detail capabilities preserved",
+		"Nested row buttons replaced with siblings; permission gating and disabled state cover preview/settings/pill actions",
+		"Stable device IDs, literal device names, unavailable disabled selection and Off opens selector",
+		"0 dB visible and clearing selection resets the meter",
+		"Four dictionary entries for missing English empty-state/note and Chinese Back to list"
+	],
+	"sourceHashes": {
+		"apps/desktop/src/components/ChoiceSelect.tsx": "fa6106081de3d023126d211eabb1a888de158a9c7a7d25979acdde767bb5bf4a",
+		"apps/desktop/src/components/LocalizedChoiceSelect.tsx": "6fb7558e440501db1bcdc0cba12c6df96b8549208f16c45e0183270b199f2f0c",
+		"apps/desktop/src/components/InterfaceMotion.tsx": "d15529c55a43cadf23fba15aca0673dedffd8ca116bc216f371baf736d6809cb",
+		"apps/desktop/src/components/interface-controls.test.tsx": "7b61f005781e1982a9db76103814fbf4264248c44b75025b4c1b69f7157ffda4",
+		"apps/desktop/src/components/device-choice-controls.test.tsx": "938d41521a00d20de5596cb41974ad63a143578a6653a5e8f2709303bf6c76d6",
+		"apps/desktop/vitest.interface.config.ts": "0b7fca89a6d4bec31af5953f6461d1a0d9a008d46813d4d79ae21488aac7dcc8",
+		"apps/desktop/src/routes/(window-chrome)/new-main/CameraSelect.tsx": "a8549f5dfe02bdfd171c5932996830adfd288e12391c706a8026092bcd7c2810",
+		"apps/desktop/src/routes/(window-chrome)/new-main/MicrophoneSelect.tsx": "b4a96435419832355140ff2db8ed92d4a56a893948fcfe42d90f97b06febabc7",
+		"apps/desktop/src/routes/(window-chrome)/new-main/TargetSelectInfoPill.tsx": "c05f3953d994b763985d004df19675b3ee3a26c33d7e523c57361d0ca98b6ac6",
+		"apps/desktop/src/routes/(window-chrome)/new-main/index.tsx": "4e90fa404c21826d7c18a6bbb42d095c3a65dd11a4c1d0ab2d934d0ed3a20075",
+		"apps/desktop/src/styles/expressive.css": "ad22006240e1c06df8a2d671dcf8375738289fd3c2f14066a5ff6626fccf3327",
+		"apps/desktop/src/styles/workspace-polish.css": "c06a9567fe32ae98716c3fe298ce2f50c7ca56b086f4098bef3080e09ba849d8",
+		"apps/desktop/src/i18n/zh-CN.json": "747544eeaebc329898e14d4c3aeede618424230b0782b477a9b0d6734eaa0b59",
+		"apps/desktop/src/i18n/en.json": "042345d4c9e8e9c0034e295ef29b9478c1d3ce4ead879aedc4a752b495735c5b"
+	},
+	"unchanged": [
+		"Rust recording/rendering/export code",
+		"permission request service",
+		"device mutation/query services",
+		"shared animation curve tokens"
+	],
+	"runtimeLimits": [
+		"No camera/microphone hardware or permission requests were performed; those calls were mocked in DOM tests",
+		"Web Animations completion is stubbed; no WebView smoothness or real-device verification claim",
+		"New package and actual UI verification queued U20b3p",
+		"Strict decoder 15 pass / 2 fail, MP4 variance, full localization/audit and Windows/Linux target gates remain"
+	]
+}

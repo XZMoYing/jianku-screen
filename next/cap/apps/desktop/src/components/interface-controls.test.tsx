@@ -278,6 +278,38 @@ it("keeps only the latest page after rapid reversal", async () => {
 		false,
 	);
 });
+
+it("retains outgoing device content until a backward page transition completes", async () => {
+	const [device, setDevice] = createSignal<{ name: string } | null>({
+		name: "Camera",
+	});
+	dispose = render(
+		() => (
+			<MotionSwitch
+				value={device()}
+				kind="subpage"
+				direction={-1}
+				class="device-navigation"
+			>
+				{(current) => <span>{current()?.name ?? "设备列表"}</span>}
+			</MotionSwitch>
+		),
+		document.body,
+	);
+	setDevice(null);
+	expect(document.body.textContent).toBe("Camera");
+	expect(document.querySelector<HTMLElement>(".device-navigation")?.inert).toBe(
+		true,
+	);
+	const outgoing = animations.at(-1);
+	expect(outgoing).toBeDefined();
+	outgoing?.resolve();
+	await settle();
+	expect(document.body.textContent).toBe("设备列表");
+	expect(document.querySelector<HTMLElement>(".device-navigation")?.inert).toBe(
+		false,
+	);
+});
 it("expands and collapses shared detail sections", async () => {
 	dispose = render(
 		() => (

@@ -7,6 +7,7 @@ export default function TargetSelectInfoPill<T>(props: {
 	value: T | null;
 	permissionGranted: boolean;
 	disconnected?: boolean;
+	disabled?: boolean;
 	requestPermission: () => void;
 	onClick: (e: MouseEvent) => void;
 	PillComponent: Component<
@@ -23,6 +24,7 @@ export default function TargetSelectInfoPill<T>(props: {
 		<Dynamic
 			component={props.PillComponent}
 			variant={variant()}
+			disabled={props.disabled}
 			onPointerDown={(e) => {
 				if (!props.permissionGranted || props.value === null) return;
 
