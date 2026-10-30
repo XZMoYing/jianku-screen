@@ -1654,5 +1654,6 @@
 	"跳到结尾": "Go to end",
 	"未选择摄像头": "No camera selected",
 	"未选择麦克风": "No microphone selected",
-	"屏幕与窗口支持独立选择；录制结束后可在编辑器调整画面、镜头与光标。": "Choose a screen or window separately; adjust the framing, camera movements, and cursor after recording."
+	"屏幕与窗口支持独立选择；录制结束后可在编辑器调整画面、镜头与光标。": "Choose a screen or window separately; adjust the framing, camera movements, and cursor after recording.",
+	"About {mode}": "About {mode}"
 }

@@ -1,0 +1,20 @@
+{
+	"baseCommit": "171a556f755916ca39779aa7a2452ead2ff68359",
+	"sourceFiles": {
+		"apps/desktop/src/routes/target-select-overlay.tsx": "68cc1ab2d9694116e474545a4abae587273d06cb7e7db67cfb403109a9703150",
+		"apps/desktop/src/i18n/en.json": "d1806086655f66a96f22de53000e9f8a346246b3d8b7714c9d19bc6b3ff13af8",
+		"apps/desktop/src/i18n/zh-CN.json": "df9a1a053b0b371e3fb624239b008e59931c651e3c44a37a8dc9223bb6274413"
+	},
+	"sourceOnly": true,
+	"installedVersion": "0.2.0-alpha.48",
+	"controlsTests": 26,
+	"relatedTests": 9,
+	"typecheck": "passed",
+	"frontend": "passed",
+	"scopedBiome": "3 files passed",
+	"dictionaryPlaceholderMismatches": 0,
+	"nativeCodeModified": false,
+	"nativeMenusMigrated": false,
+	"physicalAndActualNewPackage": "not tested",
+	"remainingIntegration": "global picker Escape cancellation ownership before native menu migration"
+}

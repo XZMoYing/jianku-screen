@@ -1609,5 +1609,6 @@
 	"{count} actions are not supported on this device: {actions}": "此设备不支持 {count} 项操作：{actions}",
 	"Unknown action ({type})": "未知操作（{type}）",
 	"{fps} FPS": "{fps} 帧/秒",
-	"Back to list": "返回列表"
+	"Back to list": "返回列表",
+	"About {mode}": "了解{mode}"
 }

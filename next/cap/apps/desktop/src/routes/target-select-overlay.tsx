@@ -56,6 +56,7 @@ import {
 	type Ratio,
 } from "~/components/Cropper";
 import ModeSelect from "~/components/ModeSelect";
+import { MotionText } from "~/components/MotionText";
 import SelectionHint from "~/components/selection-hint";
 import {
 	authStore,
@@ -410,9 +411,9 @@ function Inner() {
 									<Show when={display.physical_size}>
 										{(size) => (
 											<span class="mb-2 text-xs">
-												{`${size().width}x${size().height} · ${
+												{`${size().width} × ${size().height} · ${
 													display.refresh_rate
-												}FPS`}
+												} Hz`}
 											</span>
 										)}
 									</Show>
@@ -1990,11 +1991,23 @@ function RecordingControls(props: {
 		setMicInput.isPending ||
 		setCamera.isPending;
 	const startDisabled = () => !!props.disabled || startLoading();
+	const modeName = () =>
+		rawOptions.mode === "instant"
+			? localize("实时模式")
+			: rawOptions.mode === "screenshot"
+				? localize("截图模式")
+				: localize("录制模式");
+	const actionName = () =>
+		rawOptions.mode === "instant" && !auth.data
+			? localize("敬请期待")
+			: rawOptions.mode === "screenshot"
+				? localize("截图")
+				: localize("开始录制");
 
 	const startRecording = async (confirmedWithoutMicrophone = false) => {
 		if (confirmingWithoutMicrophone() && !confirmedWithoutMicrophone) return;
 		if (rawOptions.mode === "instant" && !auth.data) {
-			toast("实时模式的账号功能敬请期待，目前可先使用录制模式。");
+			toast(localize("实时模式的账号功能敬请期待，目前可先使用录制模式。"));
 			return;
 		}
 		if (startDisabled()) return;
@@ -2303,20 +2316,10 @@ function RecordingControls(props: {
 									</Switch>
 									<div class="flex flex-col mr-2 ml-3 min-w-0">
 										<span class="text-[0.95rem] font-medium text-white text-nowrap">
-											{(() => {
-												if (rawOptions.mode === "instant" && !auth.data)
-													return localize("敬请期待");
-												if (rawOptions.mode === "screenshot")
-													return localize("截图");
-												return localize("开始录制");
-											})()}
+											<MotionText text={actionName()} />
 										</span>
 										<span class="text-[11px] flex items-center text-nowrap gap-1 transition-opacity duration-200 text-white/90 font-light -mt-0.5">
-											{rawOptions.mode === "instant"
-												? localize("实时模式")
-												: rawOptions.mode === "screenshot"
-													? localize("截图模式")
-													: localize("录制模式")}
+											<MotionText text={modeName()} />
 										</span>
 									</div>
 								</div>
@@ -2439,15 +2442,10 @@ function RecordingControls(props: {
 				>
 					<IconCapInfo class="opacity-70 will-change-transform size-3" />
 					<p class="text-sm text-white drop-shadow-md">
-						<span class="opacity-70">{localize("About")} </span>
-						<span class="font-medium">
-							{rawOptions.mode === "instant"
-								? localize("实时模式")
-								: rawOptions.mode === "screenshot"
-									? localize("截图模式")
-									: localize("录制模式")}
-						</span>
-						?
+						<MotionText
+							class="font-medium"
+							text={localize("About {mode}", { mode: modeName() })}
+						/>
 					</p>
 				</div>
 			</div>
