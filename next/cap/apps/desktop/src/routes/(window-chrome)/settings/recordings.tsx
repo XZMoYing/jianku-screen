@@ -21,6 +21,7 @@ import {
 	Show,
 } from "solid-js";
 import { createStore, produce } from "solid-js/store";
+import { MotionText } from "~/components/MotionText";
 import CapTooltip from "~/components/Tooltip";
 import { Input } from "~/routes/editor/ui";
 import { trackEvent } from "~/utils/analytics";
@@ -334,8 +335,14 @@ function RecordingItem(props: {
 		setImageExists(true);
 	});
 	const mode = () => props.recording.meta.mode;
-	const firstLetterUpperCase = () =>
-		mode().charAt(0).toUpperCase() + mode().slice(1);
+	const modeName = () =>
+		localize(
+			mode() === "studio"
+				? "录制模式"
+				: mode() === "instant"
+					? "实时模式"
+					: mode(),
+		);
 
 	const queryClient = useQueryClient();
 	const studioCompleteCheck = () =>
@@ -379,12 +386,20 @@ function RecordingItem(props: {
 							) : (
 								<IconCapFilmCut class="invert size-2.5 dark:invert-0" />
 							)}
-							<p>{firstLetterUpperCase()}</p>
+							<p>
+								<MotionText text={modeName()} />
+							</p>
 						</div>
 
 						<Show when={props.recording.meta.clip_count > 1}>
 							<div class="px-2 py-0.5 flex items-center font-medium text-[11px] text-gray-12 rounded-full w-fit bg-gray-4">
-								<p>{props.recording.meta.clip_count} clips</p>
+								<p>
+									<MotionText
+										text={localize("{count} clips", {
+											count: props.recording.meta.clip_count,
+										})}
+									/>
+								</p>
 							</div>
 						</Show>
 

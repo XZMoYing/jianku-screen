@@ -1610,5 +1610,10 @@
 	"Unknown action ({type})": "未知操作（{type}）",
 	"{fps} FPS": "{fps} 帧/秒",
 	"Back to list": "返回列表",
-	"About {mode}": "了解{mode}"
+	"About {mode}": "了解{mode}",
+	"Diagnostic passed": "诊断通过",
+	"Diagnostic needs attention": "发现需留意的问题",
+	"Diagnostic failed": "诊断失败",
+	"Diagnostic inconclusive": "暂时无法判定",
+	"System information only": "仅收集系统信息"
 }

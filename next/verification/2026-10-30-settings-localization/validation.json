@@ -1,0 +1,24 @@
+{
+	"baseCommit": "700cb3801aff98af36f187a5d114a41994efd892",
+	"sourceFiles": {
+		"apps/desktop/src/routes/(window-chrome)/settings/feedback.tsx": "0bfa6fa10b4ab35ffc0e319c6a04a5b19943299fb35259e474c9e59ce5cc2875",
+		"apps/desktop/src/routes/(window-chrome)/settings/recordings.tsx": "e41f82d8ed7f4c6715c7a3af53a8edeb62b9a1038346923784fa320a51857656",
+		"apps/desktop/src/i18n/zh-CN.json": "752ed4cf71d98b28ad3894e6c900cdd0ecf02a7825bde566919ec0870c523e1f"
+	},
+	"sourceOnly": true,
+	"installedVersion": "0.2.0-alpha.48",
+	"sharedControlsTests": 26,
+	"relatedTests": 6,
+	"typecheck": "passed",
+	"scopedBiome": "3 files passed",
+	"dictionaryPlaceholderMismatches": 0,
+	"diagnosticOrRecordingExecuted": false,
+	"userMediaModified": false,
+	"remaining": [
+		"actual package and live language/menus",
+		"remaining diagnostic summaries/errors and library pages",
+		"picker global Escape protocol and native menus",
+		"full Chinese/audit/platform gates"
+	],
+	"frontend": "passed"
+}

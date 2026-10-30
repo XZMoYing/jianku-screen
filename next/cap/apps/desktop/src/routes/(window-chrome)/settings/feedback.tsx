@@ -1,9 +1,10 @@
 import { Button } from "@cap/ui-solid";
 import { action, useAction, useSubmission } from "@solidjs/router";
-import { CheckMenuItem, Menu } from "@tauri-apps/api/menu";
 import { confirm } from "@tauri-apps/plugin-dialog";
 import { createResource, createSignal, For, Show } from "solid-js";
 import toast from "solid-toast";
+import { LocalizedChoiceSelect } from "~/components/LocalizedChoiceSelect";
+import { MotionText } from "~/components/MotionText";
 import { showAccountComingSoon } from "~/utils/auth";
 import { t as localize } from "~/utils/i18n";
 import {
@@ -59,6 +60,13 @@ const SYNC_STAGE_LABELS: Record<string, string> = {
 	done: "正在完成音画同步诊断",
 };
 
+const VERDICT_LABELS = new Map([
+	["pass", "Diagnostic passed"],
+	["warn", "Diagnostic needs attention"],
+	["fail", "Diagnostic failed"],
+	["inconclusive", "Diagnostic inconclusive"],
+]);
+
 const VERDICT_STYLES: Record<string, string> = {
 	pass: "bg-green-500/20 text-green-400",
 	warn: "bg-amber-500/20 text-amber-400",
@@ -90,29 +98,15 @@ function SelectDiagnosticItem<T extends string | number>(props: {
 }) {
 	return (
 		<SettingItem label={props.label} description={props.description}>
-			<button
-				type="button"
-				class="flex flex-row gap-1.5 text-xs items-center px-2.5 py-1.5 rounded-lg border transition-colors bg-gray-3 hover:bg-gray-4 text-gray-12 border-gray-4 disabled:opacity-60"
-				onClick={async () => {
-					const currentValue = props.value;
-					const items = props.options.map((option) =>
-						CheckMenuItem.new({
-						text: localize(option.text),
-							checked: currentValue === option.value,
-							action: () => props.onChange(option.value),
-						}),
-					);
-					const menu = await Menu.new({ items: await Promise.all(items) });
-					await menu.popup();
-					await menu.close();
-				}}
-			>
-				{localize(
-					props.options.find((option) => option.value === props.value)?.text ??
-						String(props.value),
-				)}
-				<IconCapChevronDown class="size-3.5 text-gray-10" />
-			</button>
+			<LocalizedChoiceSelect
+				aria-label={props.label}
+				value={props.value}
+				options={props.options.map((option) => ({
+					value: option.value,
+					label: option.text,
+				}))}
+				onChange={props.onChange}
+			/>
 		</SettingItem>
 	);
 }
@@ -209,7 +203,7 @@ export default function FeedbackTab() {
 								<textarea
 									value={feedback()}
 									onInput={(e) => setFeedback(e.currentTarget.value)}
-								placeholder={localize("分享建议或反馈问题…")}
+									placeholder={localize("分享建议或反馈问题…")}
 									required
 									minLength={10}
 									class="p-2 w-full h-32 text-[13px] rounded-md border transition-colors duration-200 resize-none bg-gray-2 placeholder:text-gray-10 border-gray-3 text-primary focus:outline-hidden focus:ring-1 focus:ring-gray-8 hover:border-gray-6"
@@ -235,9 +229,9 @@ export default function FeedbackTab() {
 								disabled={feedback().trim().length < 4}
 								class="mt-2"
 							>
-				{submission.pending
-					? localize("正在提交…")
-					: localize("提交反馈")}
+								{submission.pending
+									? localize("正在提交…")
+									: localize("提交反馈")}
 							</Button>
 						</fieldset>
 					</form>
@@ -310,7 +304,7 @@ export default function FeedbackTab() {
 								variant="dark"
 								disabled={running()}
 							>
-					{running() ? localize("正在运行…") : localize("开始诊断")}
+								{running() ? localize("正在运行…") : localize("开始诊断")}
 							</Button>
 							<Show when={running() && status()}>
 								{(label) => <p class="text-xs text-gray-10">{label()}</p>}
@@ -327,7 +321,13 @@ export default function FeedbackTab() {
 												"bg-gray-4 text-gray-11"
 											}`}
 										>
-											{report().verdict?.toUpperCase() ?? "SYSTEM INFO ONLY"}
+											<MotionText
+												text={localize(
+													VERDICT_LABELS.get(report().verdict ?? "") ??
+														report().verdict ??
+														"System information only",
+												)}
+											/>
 										</span>
 										<Show when={report().summary}>
 											{(summary) => (
