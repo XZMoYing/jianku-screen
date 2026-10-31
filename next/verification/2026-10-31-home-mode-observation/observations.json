@@ -1,0 +1,59 @@
+{
+  "version": "0.2.0-alpha.50",
+  "sourceCheckpoint": "aa9ebf484c795e66f5eb2484731b40523113dd2f",
+  "status": "interrupted-by-user-pause",
+  "observations": [
+    {
+      "phase": "initial",
+      "bounds": {
+        "Height": 800,
+        "Width": 1120,
+        "X": 250,
+        "Y": 98
+      },
+      "recording": "1",
+      "presentation": "0",
+      "desktop": "1",
+      "mobile": "0",
+      "pin": "0",
+      "captureRatioFitScreen": true
+    },
+    {
+      "phase": "presentation",
+      "bounds": {
+        "Height": 800,
+        "Width": 1120,
+        "X": 250,
+        "Y": 98
+      },
+      "recording": "0",
+      "presentation": "1",
+      "desktop": null,
+      "mobile": null,
+      "pin": "0",
+      "captureRatioFitScreen": true
+    },
+    {
+      "phase": "restored",
+      "bounds": {
+        "Height": 800,
+        "Width": 1120,
+        "X": 250,
+        "Y": 98
+      },
+      "recording": "1",
+      "presentation": "0",
+      "desktop": "1",
+      "mobile": "0",
+      "pin": "0",
+      "captureRatioFitScreen": true
+    }
+  ],
+  "limitations": [
+    "single mode round trip only",
+    "no mobile source or rapid reversal verification",
+    "no menu cancellation verification",
+    "no device/output/performance/visual-comfort acceptance"
+  ],
+  "restored": true
+}
