@@ -1,0 +1,26 @@
+{
+	"sourceCommit": "e07d9cfbdf8d3035e135d4a51dcac4fe93d5884e",
+	"installedVersion": "0.2.0-alpha.49",
+	"build": "2026.49.0",
+	"releaseAndInstall": "passed",
+	"threeLocationsSixExecutableHashesMatch": true,
+	"signature": "local ad-hoc deep strict, not notarized",
+	"verified": [
+		"Main AXStandardWindow, default native layer0, three native controls enabled",
+		"pin changes native layer to5 and saves true",
+		"normal restart changes PID and retains pin layer5 after raise",
+		"native minimize removes visible Main; restore returns same bounds/layer",
+		"pin restored false, other stored data unchanged, app normally closed to avoid foreground interruption"
+	],
+	"deferred": [
+		"fullscreen and pinned fullscreen transitions",
+		"close/reopen and final actual playback",
+		"remaining all-page UI/Chinese/audit",
+		"physical and Windows/Linux targets"
+	],
+	"stillReleaseBlockers": [
+		"strict decoder chroma 15 passed / 2 failed",
+		"hardware MP4 inter-run differences unresolved"
+	],
+	"notClaimed": "Input delivery or enabled buttons are not full feature acceptance"
+}

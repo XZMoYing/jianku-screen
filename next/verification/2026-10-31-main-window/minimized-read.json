@@ -1,0 +1,13 @@
+{
+	"close": { "available": true, "description": "", "enabled": true },
+	"fullscreen": false,
+	"minimize": { "available": true, "description": "", "enabled": true },
+	"minimized": true,
+	"mode": "read",
+	"path": "\/Applications\/Jianku Screen Next.app",
+	"pid": 40729,
+	"role": "AXWindow",
+	"subrole": "AXStandardWindow",
+	"visibleMainWindows": [],
+	"zoom": { "available": true, "description": "", "enabled": true }
+}
