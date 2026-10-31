@@ -2012,6 +2012,11 @@ impl ShowCapWindow {
                         let window = window.clone();
                         let app = app.clone();
                         move || {
+                            if let Err(error) = crate::platform::enable_main_window_fullscreen(
+                                &window.as_ref().window(),
+                            ) {
+                                warn!(%error, "Failed to enable Main window fullscreen");
+                            }
                             let resized_window = window.clone();
                             window.on_window_event(move |event| {
                                 if matches!(event, tauri::WindowEvent::Resized(_) | tauri::WindowEvent::ScaleFactorChanged { .. })

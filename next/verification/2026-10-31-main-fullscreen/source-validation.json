@@ -1,0 +1,26 @@
+{
+  "version": "0.2.0-alpha.50",
+  "build": "2026.50.0",
+  "installedBefore": "0.2.0-alpha.49",
+  "nativeCheck": "passed",
+  "baseline": "41 checks plus native/frontend passed",
+  "windowPermissionTests": "passed, see log",
+  "runtimeNewPackage": "pending",
+  "alpha49PinnedFullscreen": "failed: native green button zooms, AXFullScreen false",
+  "rootCauseReproduction": {
+    "floatingDefaultCollection": {
+      "collection": 0,
+      "fullscreen": false
+    },
+    "floatingExplicitPrimary": {
+      "collection": 128,
+      "fullscreen": true
+    }
+  },
+  "sourceFiles": {
+    "apps/desktop/src-tauri/src/platform/macos/mod.rs": "3682947225fd9be4f380cfcf736b8a904b28fbcd28c756e03542bcab67372647",
+    "apps/desktop/src-tauri/src/windows.rs": "5557e2ecf6c7a55da67e64b6a9d9daca01e9bcd79e08f07d5348f65ea176cf9d",
+    "apps/desktop/src-tauri/tauri.jianku.conf.json": "9162e2dfd97b7059a35e502905634454d046ea03c135ee88f2d726e27eda0dcb"
+  },
+  "scope": "Mac Main only; rendering, other floating windows and cross-platform branches unchanged"
+}

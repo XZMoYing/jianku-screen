@@ -1,0 +1,2 @@
+before level=3 collection=128 fullscreen=false greenAction=_setNeedsZoom:
+after level=3 collection=128 fullscreen=true greenAction=_setNeedsZoom:

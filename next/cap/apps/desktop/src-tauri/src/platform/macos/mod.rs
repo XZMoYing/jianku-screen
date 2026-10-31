@@ -103,6 +103,26 @@ fn constrain_frame_to_visible_area(
     (constrained != frame).then_some(constrained)
 }
 
+pub fn enable_main_window_fullscreen(window: &tauri::Window) -> Result<(), String> {
+    use objc2::MainThreadMarker;
+    use objc2_app_kit::{NSWindow, NSWindowCollectionBehavior};
+
+    if window.label() != "main" {
+        return Err("Only the main window can enable primary fullscreen behavior".into());
+    }
+    let _main_thread = MainThreadMarker::new()
+        .ok_or("Main window fullscreen must be configured on the main thread")?;
+    let ns_window = window.ns_window().map_err(|error| error.to_string())? as *const NSWindow;
+    let ns_window = unsafe { ns_window.as_ref() }.ok_or("Main window is unavailable")?;
+    // AppKit's automatic policy makes a floating window zoom instead of entering fullscreen.
+    unsafe {
+        ns_window.setCollectionBehavior(
+            ns_window.collectionBehavior() | NSWindowCollectionBehavior::FullScreenPrimary,
+        );
+    }
+    Ok(())
+}
+
 pub fn constrain_main_window_to_visible_frame(window: &tauri::Window) -> Result<(), String> {
     use objc2::{MainThreadMarker, runtime::NSObjectProtocol, sel};
     use objc2_app_kit::{NSScreen, NSWindow, NSWindowStyleMask};
