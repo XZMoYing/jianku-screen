@@ -1,0 +1,36 @@
+{
+	"sourceCommit": "6a2f03a1659c441a01af3d2f8716612fead54db1",
+	"version": "0.2.0-alpha.50",
+	"build": "2026.50.0",
+	"includedWorkspaceSource": "42c9e9ca3affce6811c99f09b5ca6d2840dd3ac5",
+	"nativeCompilation": "completed: release optimized + debuginfo",
+	"originalReleaseCommandExit": 1,
+	"originalFailure": "Signing errSecInternalComponent; dedicated project signing keychain is locked",
+	"recovery": "Explicit ad-hoc signing of generated release bundle, same signature class as installed alpha49; no keychain unlock or system-security changes",
+	"signRecoveryExit": 0,
+	"sourceArchiveInstalledSixHashesMatch": true,
+	"nativeMainChecks": 13,
+	"pauseRewindReplayCycles": 3,
+	"playbackObservations": 22,
+	"nativeMainExit": 0,
+	"playbackExit": 0,
+	"originalPinAndBoundsRestored": true,
+	"current": "alpha50",
+	"rollback": "alpha49",
+	"windowObservationAfterTests": {
+		"visibleOwnedWindows": 0,
+		"axWindowReadStatus": 0,
+		"axWindows": 0,
+		"processStillRunning": true,
+		"foreground": "browser",
+		"screenshot": "not captured; not counted as failure/pass; no further activation for optional screenshot"
+	},
+	"deferred": [
+		"actual recording control floating level",
+		"actual full UI motion/comfort and workspace source switches",
+		"rare replay issue not declared fixed by three successful trials",
+		"strict decoder 15 pass / 2 fail and hardware MP4 variation",
+		"physical devices/displays/conference tests",
+		"complete Chinese/internal audit/Windows/Linux target validation"
+	]
+}

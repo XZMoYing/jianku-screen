@@ -1,0 +1,138 @@
+{
+	"version": "0.2.0-alpha.50",
+	"fixture": "own synthetic media",
+	"rows": [
+		{
+			"stage": "rewound-0",
+			"timecodes": ["0:00.00", "0:09.00"],
+			"seconds": 0.0,
+			"playing": "0"
+		},
+		{
+			"stage": "playing-0",
+			"timecodes": ["0:00.00", "0:09.00"],
+			"seconds": 0.0,
+			"playing": "1"
+		},
+		{
+			"stage": "playing-0",
+			"timecodes": ["0:01.00", "0:09.00"],
+			"seconds": 1.0,
+			"playing": "1"
+		},
+		{
+			"stage": "playing-0",
+			"timecodes": ["0:02.23", "0:09.00"],
+			"seconds": 2.23,
+			"playing": "1"
+		},
+		{
+			"stage": "playing-0",
+			"timecodes": ["0:03.46", "0:09.00"],
+			"seconds": 3.46,
+			"playing": "1"
+		},
+		{
+			"stage": "playing-0",
+			"timecodes": ["0:05.09", "0:09.00"],
+			"seconds": 5.09,
+			"playing": "1"
+		},
+		{
+			"stage": "paused-0",
+			"timecodes": ["0:06.25", "0:09.00"],
+			"seconds": 6.25,
+			"playing": "0"
+		},
+		{
+			"stage": "rewound-1",
+			"timecodes": ["0:00.00", "0:09.00"],
+			"seconds": 0.0,
+			"playing": "0"
+		},
+		{
+			"stage": "playing-1",
+			"timecodes": ["0:01.00", "0:09.00"],
+			"seconds": 1.0,
+			"playing": "1"
+		},
+		{
+			"stage": "playing-1",
+			"timecodes": ["0:02.23", "0:09.00"],
+			"seconds": 2.23,
+			"playing": "1"
+		},
+		{
+			"stage": "playing-1",
+			"timecodes": ["0:03.46", "0:09.00"],
+			"seconds": 3.46,
+			"playing": "1"
+		},
+		{
+			"stage": "playing-1",
+			"timecodes": ["0:05.09", "0:09.00"],
+			"seconds": 5.09,
+			"playing": "1"
+		},
+		{
+			"stage": "playing-1",
+			"timecodes": ["0:06.30", "0:09.00"],
+			"seconds": 6.3,
+			"playing": "1"
+		},
+		{
+			"stage": "paused-1",
+			"timecodes": ["0:07.44", "0:09.00"],
+			"seconds": 7.44,
+			"playing": "0"
+		},
+		{
+			"stage": "rewound-2",
+			"timecodes": ["0:00.00", "0:09.00"],
+			"seconds": 0.0,
+			"playing": "0"
+		},
+		{
+			"stage": "playing-2",
+			"timecodes": ["0:01.00", "0:09.00"],
+			"seconds": 1.0,
+			"playing": "1"
+		},
+		{
+			"stage": "playing-2",
+			"timecodes": ["0:02.23", "0:09.00"],
+			"seconds": 2.23,
+			"playing": "1"
+		},
+		{
+			"stage": "playing-2",
+			"timecodes": ["0:03.46", "0:09.00"],
+			"seconds": 3.46,
+			"playing": "1"
+		},
+		{
+			"stage": "playing-2",
+			"timecodes": ["0:05.09", "0:09.00"],
+			"seconds": 5.09,
+			"playing": "1"
+		},
+		{
+			"stage": "playing-2",
+			"timecodes": ["0:06.31", "0:09.00"],
+			"seconds": 6.31,
+			"playing": "1"
+		},
+		{
+			"stage": "paused-2",
+			"timecodes": ["0:07.46", "0:09.00"],
+			"seconds": 7.46,
+			"playing": "0"
+		},
+		{
+			"stage": "final-paused-at-start",
+			"timecodes": ["0:00.00", "0:09.00"],
+			"seconds": 0.0,
+			"playing": "0"
+		}
+	]
+}

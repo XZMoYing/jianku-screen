@@ -22,8 +22,12 @@ func element(_ value: CFTypeRef?) -> AXUIElement? {
 }
 let windows = (read(application, kAXWindowsAttribute) as? [AXUIElement] ?? []).filter(own)
 let mainWindows = windows.filter { (read($0, kAXTitleAttribute) as? String) == "简库镜传 Next" || (read($0, kAXTitleAttribute) as? String) == "Jianku Screen Next" }
-guard mainWindows.count == 1, let main = mainWindows.first else { fatalError("Expected exact Main title") }
 let mode = CommandLine.arguments.dropFirst().first ?? "read"
+if mainWindows.count != 1 && mode == "read" {
+ print("{\"pending\":true}")
+ exit(2)
+}
+guard mainWindows.count == 1, let main = mainWindows.first else { fatalError("Expected exact Main title") }
 if mode == "restore-geometry" {
  guard (read(main, "AXFullScreen") as? Bool) == false else { fatalError("Exit fullscreen before restoring Main bounds") }
  var size = CGSize(width: 1120, height: 800)

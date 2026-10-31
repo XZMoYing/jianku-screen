@@ -1,0 +1,35 @@
+{
+	"close": {
+		"available": true,
+		"description": "",
+		"enabled": true
+	},
+	"fullscreen": false,
+	"minimize": {
+		"available": true,
+		"description": "",
+		"enabled": true
+	},
+	"minimized": false,
+	"mode": "read",
+	"path": "/Applications/Jianku Screen Next.app",
+	"pid": 16259,
+	"role": "AXWindow",
+	"subrole": "AXStandardWindow",
+	"visibleMainWindows": [
+		{
+			"bounds": {
+				"Height": 800,
+				"Width": 1120,
+				"X": 250,
+				"Y": 98
+			},
+			"layer": 5
+		}
+	],
+	"zoom": {
+		"available": true,
+		"description": "",
+		"enabled": true
+	}
+}

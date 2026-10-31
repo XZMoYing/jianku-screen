@@ -1,0 +1,14 @@
+{
+	"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next/next/cap/target/release/bundle/macos/Jianku Screen Next.app",
+	"version": "0.2.0-alpha.50",
+	"build": "2026.50.0",
+	"signature": "ad-hoc; strict deep verification passed",
+	"executables": {
+		"Jianku Screen Next": "1c84dea190f9f5b0179873307e062f2f59c057c6cdd1f364aa261eba9b6ac0bc",
+		"cap-cli": "1c2409dc90d689fe3c8dccf841c7058cfb8a04d25993995325c85957685f0d23",
+		"cap-exporter": "1c2409dc90d689fe3c8dccf841c7058cfb8a04d25993995325c85957685f0d23",
+		"cap-muxer": "a94d28f2f243a57180a7d01dfb2e7002215d10f4c6635880f5406da9325c947a",
+		"jianku-device-capture": "66345a304181dafa86d3980ca68ec9c13e5d7ef9acd67de746dd32ed2cf3dfef",
+		"jianku-android-capture": "bac5c35f6a684f9d3c7f37a9be6922b0770f33312c313cc226d0d3247413b539"
+	}
+}

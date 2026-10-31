@@ -1,0 +1,63 @@
+[
+	{
+		"name": "Fresh alpha50 Main is ordinary unpinned native window",
+		"passed": true
+	},
+	{
+		"name": "alpha50-unpinned native green enters system fullscreen",
+		"passed": true,
+		"nativeFullscreen": true
+	},
+	{
+		"name": "alpha50-unpinned fullscreen exit restores native window level",
+		"passed": true,
+		"layer": 0
+	},
+	{
+		"name": "Alpha50 pin enters native floating layer",
+		"passed": true,
+		"layer": 5
+	},
+	{
+		"name": "alpha50-pinned native green enters system fullscreen",
+		"passed": true,
+		"nativeFullscreen": true
+	},
+	{
+		"name": "alpha50-pinned fullscreen exit restores native window level",
+		"passed": true,
+		"layer": 5
+	},
+	{
+		"name": "Pinned preference survives normal app restart",
+		"passed": true,
+		"layer": 5
+	},
+	{
+		"name": "alpha50-restarted-pinned native green enters system fullscreen",
+		"passed": true,
+		"nativeFullscreen": true
+	},
+	{
+		"name": "alpha50-restarted-pinned fullscreen exit restores native window level",
+		"passed": true,
+		"layer": 5
+	},
+	{
+		"name": "Unpin restores ordinary native level",
+		"passed": true,
+		"layer": 0
+	},
+	{
+		"name": "Native minimize and restore",
+		"passed": true
+	},
+	{
+		"name": "Native close removes visible Main",
+		"passed": true
+	},
+	{
+		"name": "Closed Main reopens unpinned with original geometry restored",
+		"passed": true
+	}
+]

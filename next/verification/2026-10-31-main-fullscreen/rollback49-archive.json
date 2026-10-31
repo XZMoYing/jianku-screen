@@ -1,0 +1,14 @@
+{
+	"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.49/Jianku Screen Next.app",
+	"version": "0.2.0-alpha.49",
+	"build": "2026.49.0",
+	"signature": "ad-hoc; strict deep verification passed",
+	"executables": {
+		"Jianku Screen Next": "a03ac9146e9150f01e55721cac97a2a7ce339a2876bcf438825b7b9505fe9a79",
+		"cap-cli": "bdac0c676767108a418128b3ea526b8c841e0748f8d48677e2adcb22f489c376",
+		"cap-exporter": "a0e8b006d1956148a54de08926dc10a6e6161a7278f50707b695a6bb1ff64e81",
+		"cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+		"jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+		"jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+	}
+}

@@ -1,0 +1,42 @@
+{
+	"removed": [
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.48/Jianku Screen Next.app",
+			"logicalBytes": 316103835,
+			"allocatedKiB": 309360
+		},
+		{
+			"path": "/Applications/.jianku-next-update-8mTlkM/previous.app",
+			"logicalBytes": 316103579,
+			"allocatedKiB": 309360
+		}
+	],
+	"freeBytesBefore": 43600949248,
+	"freeBytesAfter": 44234833920,
+	"observedFreeDeltaBytes": 633884672,
+	"kept": [
+		"installed alpha50",
+		"archive alpha50",
+		"rollback archive alpha49",
+		"source/Git",
+		"user projects/media",
+		"active synthetic fixture",
+		"native dependencies/build caches"
+	],
+	"oldAlpha48Proof": {
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.48/Jianku Screen Next.app",
+		"version": "0.2.0-alpha.48",
+		"build": "2026.48.0",
+		"signature": "ad-hoc; strict deep verification passed",
+		"executables": {
+			"Jianku Screen Next": "2e5c6e968be00f99ea7433156b840a43bfa23a6789b862da82943d72e07110b7",
+			"cap-cli": "8ab81005f8747c8270fea0c05528098ca171c96e509e21aabfe99d7d4b2babee",
+			"cap-exporter": "8a0ded0e69eb1dd0241d9db1302a9367b09ab8dd06c06ac0a2e0cea95f0b17cf",
+			"cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+			"jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+			"jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+		}
+	},
+	"duplicateAlpha49MatchedRetainedRollback": true,
+	"note": "APFS sharing and concurrent activity mean logical/allocated sizes are not equal to observed volume free-space delta"
+}
