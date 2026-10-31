@@ -1382,8 +1382,8 @@ impl CapWindowId {
             Self::Editor { .. } | Self::ScreenshotEditor { .. } => {
                 Some(Some(LogicalPosition::new(20.0, 32.0)))
             }
+            Self::Main => Some(Some(LogicalPosition::new(16.0, 18.0))),
             Self::Camera
-            | Self::Main
             | Self::Onboarding
             | Self::WindowCaptureOccluder { .. }
             | Self::CaptureArea
@@ -1951,16 +1951,18 @@ impl ShowCapWindow {
                 let title = CapWindowId::Main.title();
                 let should_protect = should_protect_window(app, &title);
 
-                #[cfg(target_os = "macos")]
-                let panel_activation_guard = permissions::prepare_macos_panel_window(app);
+                let always_on_top = GeneralSettingsStore::get(app)
+                    .ok()
+                    .flatten()
+                    .is_some_and(|settings| settings.main_window_always_on_top);
 
                 let window = self
                     .window_builder(app, "/")
                     .resizable(true)
                     .maximized(false)
-                    .maximizable(false)
-                    .minimizable(false)
-                    .always_on_top(false)
+                    .maximizable(true)
+                    .minimizable(true)
+                    .always_on_top(always_on_top)
                     .visible_on_all_workspaces(false)
                     .content_protected(should_protect)
                     .transparent(true)
@@ -2009,27 +2011,7 @@ impl ShowCapWindow {
                     app.run_on_main_thread({
                         let window = window.clone();
                         let app = app.clone();
-                        let panel_activation_guard = panel_activation_guard;
                         move || {
-                            let _panel_activation_guard = panel_activation_guard;
-                            use tauri_nspanel::cocoa::appkit::NSWindowCollectionBehavior;
-                            use crate::panel_manager::try_to_panel;
-
-                            // Tao's delegate carries the native events from queued AppKit resizes.
-                            let panel = match try_to_panel(&window) {
-                                Ok(p) => p,
-                                Err(e) => {
-                                    tracing::error!("Failed to convert main window to panel: {}", e);
-                                    crate::permissions::sync_macos_dock_visibility(&app);
-                                    return;
-                                }
-                            };
-
-                            panel.set_level(0);
-                            panel.set_collection_behaviour(
-                                NSWindowCollectionBehavior::NSWindowCollectionBehaviorFullScreenAuxiliary,
-                            );
-
                             let resized_window = window.clone();
                             window.on_window_event(move |event| {
                                 if matches!(event, tauri::WindowEvent::Resized(_) | tauri::WindowEvent::ScaleFactorChanged { .. })

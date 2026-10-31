@@ -8,6 +8,10 @@ import useRequestPermission from "./useRequestPermission";
 const fixture = vi.hoisted(() => ({
 	client: undefined as QueryClient | undefined,
 	os: "macos",
+	pinned: true,
+	label: "main",
+	isAlwaysOnTop: vi.fn(),
+	getSettings: vi.fn(),
 	focusListeners: new Set<EventCallback<boolean>>(),
 	destroyListeners: new Set<() => void>(),
 	onFocusChanged: vi.fn(),
@@ -29,6 +33,10 @@ vi.mock("@tanstack/solid-query", async (importOriginal) => ({
 
 vi.mock("@tauri-apps/api/window", () => ({
 	getCurrentWindow: () => ({
+		get label() {
+			return fixture.label;
+		},
+		isAlwaysOnTop: fixture.isAlwaysOnTop,
 		setAlwaysOnTop: fixture.setAlwaysOnTop,
 		onFocusChanged: fixture.onFocusChanged,
 		once: fixture.onDestroyed,
@@ -37,6 +45,10 @@ vi.mock("@tauri-apps/api/window", () => ({
 }));
 
 vi.mock("@tauri-apps/plugin-os", () => ({ type: () => fixture.os }));
+
+vi.mock("~/store", () => ({
+	generalSettingsStore: { get: fixture.getSettings },
+}));
 
 vi.mock("~/utils/tauri", () => ({
 	commands: fixture.commands,
@@ -82,6 +94,12 @@ describe("first device permission", () => {
 	beforeEach(() => {
 		vi.resetAllMocks();
 		fixture.os = "macos";
+		fixture.pinned = true;
+		fixture.label = "main";
+		fixture.isAlwaysOnTop.mockResolvedValue(true);
+		fixture.getSettings.mockImplementation(async () => ({
+			mainWindowAlwaysOnTop: fixture.pinned,
+		}));
 		fixture.isFocused.mockResolvedValue(true);
 		fixture.setAlwaysOnTop.mockResolvedValue(undefined);
 		fixture.commands.requestPermission.mockResolvedValue(undefined);
@@ -391,6 +409,42 @@ describe("first device permission", () => {
 			expect(fixture.onDestroyed).not.toHaveBeenCalled();
 		},
 	);
+	it.each(["macos", "windows", "linux"])(
+		"does not pin an unpinned %s Main after permission",
+		async (os) => {
+			fixture.os = os;
+			fixture.pinned = false;
+			fixture.isAlwaysOnTop.mockResolvedValue(false);
+			fixture.commands.doPermissionsCheck.mockResolvedValue({
+				...denied,
+				microphone: "granted",
+			});
+			await useRequestPermission()("microphone", "empty");
+			expect(fixture.setAlwaysOnTop.mock.calls).toEqual([[false], [false]]);
+		},
+	);
+
+	it("uses the latest user pin choice when returning from Settings", async () => {
+		await useRequestPermission()("microphone", "denied");
+		fixture.pinned = false;
+		focusWindow(false);
+		focusWindow(true);
+		await flush();
+		expect(fixture.setAlwaysOnTop.mock.calls).toEqual([[false], [false]]);
+		expectListenersRemoved();
+	});
+
+	it("preserves a floating non-Main window independently of the Main preference", async () => {
+		fixture.label = "target-select-overlay-1";
+		fixture.pinned = false;
+		fixture.commands.doPermissionsCheck.mockResolvedValue({
+			...denied,
+			camera: "granted",
+		});
+		await useRequestPermission()("camera", "empty");
+		expect(fixture.setAlwaysOnTop.mock.calls).toEqual([[false], [true]]);
+	});
+
 	it("orders a new demotion after an already-issued restore before opening Settings", async () => {
 		const restore = deferred<void>();
 		fixture.commands.openPermissionSettings.mockImplementation(async () =>

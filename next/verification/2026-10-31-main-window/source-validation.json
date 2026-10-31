@@ -1,0 +1,50 @@
+{
+	"baseCommit": "c8bf3324f87a9093c19545df3f9f6a0def0c2106",
+	"sourceFiles": {
+		"apps/desktop/src-tauri/src/general_settings.rs": "eb6bf48c1e544fdedacb3e249c7343e39b25b05569bf3af15840c21a00060bc0",
+		"apps/desktop/src-tauri/src/windows.rs": "6cfa5d85afab00477982a7bb8264a1d43df8be67a36caf725f37f72d082e272c",
+		"apps/desktop/src-tauri/src/platform/macos/mod.rs": "f8460a2a5ec324c7ed093c555ffa03899f69ace0cc7e4d9438fe6c760fc4dd33",
+		"apps/desktop/src/routes/(window-chrome).tsx": "0e9ae1ac7a8f29d50e3e8ddc290d4b2ea5327b57c4668b572586c703d6cbf4ac",
+		"apps/desktop/src/routes/(window-chrome)/new-main/index.tsx": "03ae93fbd652d6d7322c340bd1f1444e3940ff1c5ee36165150070395d4bc3e8",
+		"apps/desktop/src/routes/(window-chrome)/new-main/useRequestPermission.ts": "6c23e916f6b0528289d09c84435e485df3f0bc60b40e7b2d9f1b2654c5f4dc3b",
+		"apps/desktop/src/components/MainWindowPinButton.tsx": "1165047b75efcb99cb72709c5cdb99f395cb44a3b3b4695392c4d67313324c89",
+		"apps/desktop/src/utils/window-level.ts": "0f4777ead36ff6a6de54034a0a67bf843fcaa09fc5a5c14ef6d5a782c5c37c19",
+		"apps/desktop/src/utils/window-level.test.ts": "3b1e1e8d8a0f3b60782ba9f88afa972d56e27b29ab9b8ffe65d39b23b69f6c1a",
+		"apps/desktop/src/routes/(window-chrome)/new-main/use-request-permission.test.ts": "f35049a6862ea7a0bdc64b61f28d48e3ce9b302bbfa8993506839dddbb4e007a",
+		"apps/desktop/src/utils/tauri.ts": "154baff59623259c1e1efd30984a3bef0b42092b4ae2472152a7066104e3041e",
+		"apps/desktop/src/i18n/zh-CN.json": "0f70ff18f41a2a1ae412fe23d754a6aeaf0b9f617b1b129297d15b7076a17d14"
+	},
+	"sourceOnly": true,
+	"installedVersion": "0.2.0-alpha.48",
+	"nextPackageVersion": "0.2.0-alpha.49",
+	"resumedBaselineTests": 41,
+	"windowPermissionAndDictionaryTests": 43,
+	"sharedControlsTests": 26,
+	"nativeSettingsTests": 12,
+	"actualBindingExportTests": 1,
+	"generatedChange": "one additional optional GeneralSettingsStore property; output actually generated",
+	"nativeCheck": "passed",
+	"typecheck": "passed",
+	"frontend": "passed",
+	"scopedBiome": "8 files passed",
+	"placeholderMismatches": 0,
+	"runtimeAlpha48": {
+		"role": "AXWindow",
+		"subrole": "AXDialog",
+		"layer": 5,
+		"nativeCloseMinimizeZoomAvailable": false
+	},
+	"runtimeNewPackage": "pending",
+	"unmodified": [
+		"recording controls/camera/source overlay native window builders",
+		"rendering and approved zoom/motion blur curves",
+		"project/media/network settings"
+	],
+	"remaining": [
+		"alpha49 complete package, signatures/install and actual Main window interactions",
+		"all other UI/motion consistency",
+		"full Chinese and audit",
+		"strict decoder 15 pass / 2 fail and MP4 variance",
+		"physical and Windows/Linux target validation"
+	]
+}

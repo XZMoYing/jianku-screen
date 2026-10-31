@@ -93,6 +93,7 @@ function Header() {
 	const isMacOS = ostype() === "macos";
 	const isLinux = ostype() === "linux";
 	const isSettings = () => location.pathname.startsWith("/settings");
+	const isMain = () => location.pathname === "/";
 
 	if (isMacOS && isSettings()) return null;
 
@@ -113,11 +114,11 @@ function Header() {
 					onMaximize={ctx.state()?.onMaximize}
 				/>
 			)}
-			{((isMacOS && !isSettings()) || isLinux) && (
+			{((isMacOS && !isSettings() && !isMain()) || isLinux) && (
 				<CaptionControlsMacOS
 					class="mr-auto! ml-3"
-					showMinimize={false}
-					showZoom={ctx.state()?.onMaximize !== undefined}
+					showMinimize={isMain()}
+					showZoom={isMain() || ctx.state()?.onMaximize !== undefined}
 					onZoom={ctx.state()?.onMaximize}
 				/>
 			)}

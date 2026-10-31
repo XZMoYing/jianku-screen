@@ -39,12 +39,13 @@ import {
 	MotionPresence,
 	MotionSwitch,
 } from "~/components/InterfaceMotion";
+import { MainWindowPinButton } from "~/components/MainWindowPinButton";
 import MobileRecorder from "~/components/MobileRecorder";
 import Mode from "~/components/Mode";
 import { MotionText } from "~/components/MotionText";
 import { RecoveryToast } from "~/components/RecoveryToast";
 import WindowCaptureOptions from "~/components/WindowCaptureOptions";
-import { Input } from "~/routes/editor/ui";
+import { EditorButton, Input } from "~/routes/editor/ui";
 import Presentation from "~/routes/presentation";
 import { generalSettingsStore, recordingSettingsStore } from "~/store";
 import { createSignInMutation } from "~/utils/auth";
@@ -2998,23 +2999,22 @@ function Page() {
 					</button>
 				</div>
 			</Show>
-			<WindowChromeHeader hideMaximize>
+			<WindowChromeHeader>
 				<div
 					class="flex flex-1 items-center gap-2 px-4 text-xs text-gray-10"
 					data-tauri-drag-region
 				>
 					<span class="flex-1" data-tauri-drag-region />
-					<button
+					<MainWindowPinButton />
+					<EditorButton
 						type="button"
-						class="p-1 rounded-md hover:bg-gray-4"
 						aria-label={localize("应用设置")}
 						title={localize("应用设置")}
 						onClick={() =>
 							void commands.showWindow({ Settings: { page: "general" } })
 						}
-					>
-						<IconLucideSettings class="size-3.5" />
-					</button>
+						leftIcon={<IconLucideSettings />}
+					/>
 				</div>
 			</WindowChromeHeader>
 			<header class="workspace-top">

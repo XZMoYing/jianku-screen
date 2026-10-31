@@ -1615,5 +1615,8 @@
 	"Diagnostic needs attention": "发现需留意的问题",
 	"Diagnostic failed": "诊断失败",
 	"Diagnostic inconclusive": "暂时无法判定",
-	"System information only": "仅收集系统信息"
+	"System information only": "仅收集系统信息",
+	"Pin main window": "主窗口置顶",
+	"Unpin main window": "取消主窗口置顶",
+	"Could not change the main window pin: {error}": "无法更改主窗口置顶状态：{error}"
 }

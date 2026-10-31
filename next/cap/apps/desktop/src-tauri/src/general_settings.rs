@@ -186,6 +186,8 @@ pub struct GeneralSettingsStore {
     pub post_studio_recording_behaviour: PostStudioRecordingBehaviour,
     #[serde(default)]
     pub main_window_recording_start_behaviour: MainWindowRecordingStartBehaviour,
+    #[serde(default)]
+    pub main_window_always_on_top: bool,
     #[serde(
         default = "default_custom_cursor_capture",
         rename = "custom_cursor_capture2"
@@ -338,6 +340,7 @@ impl Default for GeneralSettingsStore {
             window_transparency: false,
             post_studio_recording_behaviour: PostStudioRecordingBehaviour::OpenEditor,
             main_window_recording_start_behaviour: MainWindowRecordingStartBehaviour::Close,
+            main_window_always_on_top: false,
             custom_cursor_capture: cap_recording::DEFAULT_CUSTOM_CURSOR_CAPTURE,
             isolate_window_capture: false,
             server_url: default_server_url(),
@@ -788,6 +791,18 @@ mod tests {
         let saved = serde_json::to_value(&selected).unwrap();
         let reopened: GeneralSettingsStore = serde_json::from_value(saved).unwrap();
         assert!(reopened.isolate_window_capture);
+    }
+
+    #[test]
+    fn main_window_pin_is_opt_in_and_survives_settings_roundtrip() {
+        let old: GeneralSettingsStore = serde_json::from_value(json!({})).unwrap();
+        assert!(!old.main_window_always_on_top);
+        assert!(!GeneralSettingsStore::default().main_window_always_on_top);
+        let selected: GeneralSettingsStore =
+            serde_json::from_value(json!({ "mainWindowAlwaysOnTop": true })).unwrap();
+        let saved = serde_json::to_value(&selected).unwrap();
+        let reopened: GeneralSettingsStore = serde_json::from_value(saved).unwrap();
+        assert!(reopened.main_window_always_on_top);
     }
 
     fn settings_with_preserved_values() -> Value {

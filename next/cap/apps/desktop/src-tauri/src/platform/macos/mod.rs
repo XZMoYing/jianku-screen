@@ -105,12 +105,18 @@ fn constrain_frame_to_visible_area(
 
 pub fn constrain_main_window_to_visible_frame(window: &tauri::Window) -> Result<(), String> {
     use objc2::{MainThreadMarker, runtime::NSObjectProtocol, sel};
-    use objc2_app_kit::{NSScreen, NSWindow};
+    use objc2_app_kit::{NSScreen, NSWindow, NSWindowStyleMask};
 
     let main_thread =
         MainThreadMarker::new().ok_or("Main window bounds must be checked on the main thread")?;
     let ns_window = window.ns_window().map_err(|error| error.to_string())? as *const NSWindow;
     let ns_window = unsafe { ns_window.as_ref() }.ok_or("Main window is unavailable")?;
+    if ns_window
+        .styleMask()
+        .contains(NSWindowStyleMask::FullScreen)
+    {
+        return Ok(());
+    }
     let screen = ns_window
         .screen()
         .or_else(|| NSScreen::mainScreen(main_thread))

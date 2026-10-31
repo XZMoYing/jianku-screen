@@ -2,16 +2,18 @@ import { useQueryClient } from "@tanstack/solid-query";
 import { TauriEvent, type UnlistenFn } from "@tauri-apps/api/event";
 import { getCurrentWindow, type Window } from "@tauri-apps/api/window";
 import { type as ostype } from "@tauri-apps/plugin-os";
+import { generalSettingsStore } from "~/store";
 import { devicesSnapshot } from "~/utils/devices";
 import { requestAndVerifyPermission } from "~/utils/os-permissions";
 import { commands, type OSPermissionStatus } from "~/utils/tauri";
+import { enqueueWindowLevelUpdate } from "~/utils/window-level";
 
 type SettingsHandoff = { revision: number; wasUnfocused: boolean };
 
 let permissionWindow: PermissionWindow | undefined;
-let windowLevelUpdate = Promise.resolve();
 
 class PermissionWindow {
+	private originalAlwaysOnTop = false;
 	private pending = 0;
 	private disposed = false;
 	private revision = 0;
@@ -62,6 +64,9 @@ class PermissionWindow {
 			}),
 		);
 		if (this.disposed) return;
+		this.originalAlwaysOnTop = await enqueueWindowLevelUpdate(() =>
+			this.window.isAlwaysOnTop(),
+		);
 		const revision = this.revision;
 		const focused = await this.window.isFocused();
 		if (this.revision === revision) this.focused = focused;
@@ -79,20 +84,25 @@ class PermissionWindow {
 		);
 	}
 
-	private setAlwaysOnTop(value: boolean) {
-		const update = windowLevelUpdate.then(async () => {
-			if (!this.current() || (value && !this.canRestore())) return;
+	private updateWindowLevel(mode: "lower" | "restore") {
+		const restoring = mode === "restore";
+		return enqueueWindowLevelUpdate(async () => {
+			if (!this.current() || (restoring && !this.canRestore())) return;
+			const value = restoring
+				? this.window.label === "main"
+					? ((await generalSettingsStore.get())?.mainWindowAlwaysOnTop ?? false)
+					: this.originalAlwaysOnTop
+				: false;
+			if (!this.current() || (restoring && !this.canRestore())) return;
 			await this.window.setAlwaysOnTop(value);
 		});
-		windowLevelUpdate = update.catch(() => {});
-		return update;
 	}
 
 	async acquire() {
 		this.pending += 1;
 		try {
 			await this.ready;
-			await this.setAlwaysOnTop(false);
+			await this.updateWindowLevel("lower");
 			if (!this.current()) throw new Error("Permission window was closed");
 		} catch (error) {
 			this.pending -= 1;
@@ -119,7 +129,7 @@ class PermissionWindow {
 	private async restore() {
 		if (!this.canRestore()) return;
 		if (this.restoring) return this.restoring;
-		this.restoring = this.setAlwaysOnTop(true)
+		this.restoring = this.updateWindowLevel("restore")
 			.then(async () => {
 				if (!this.canRestore()) return;
 				const returnedFromSettings = this.settingsHandoff !== undefined;
@@ -168,11 +178,22 @@ export default function useRequestPermission() {
 					await session.release(settingsHandoff);
 				}
 			} else {
-				await window.setAlwaysOnTop(false);
+				const originalAlwaysOnTop = await enqueueWindowLevelUpdate(async () => {
+					const value = await window.isAlwaysOnTop();
+					await window.setAlwaysOnTop(false);
+					return value;
+				});
 				try {
 					await requestAndVerifyPermission(commands, type, currentStatus);
 				} finally {
-					await window.setAlwaysOnTop(true);
+					await enqueueWindowLevelUpdate(async () => {
+						const value =
+							window.label === "main"
+								? ((await generalSettingsStore.get())?.mainWindowAlwaysOnTop ??
+									false)
+								: originalAlwaysOnTop;
+						await window.setAlwaysOnTop(value);
+					});
 				}
 			}
 			await refreshDevices();
