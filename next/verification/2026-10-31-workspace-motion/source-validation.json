@@ -1,0 +1,65 @@
+{
+	"task": "U20b6a",
+	"sourceBaseCommit": "7d5ddb5fde804920647f78575ec1d9a689e77b20",
+	"checks": {
+		"restoreBaselineExit": 0,
+		"baselineTests": 41,
+		"interfaceBeforeTests": 26,
+		"interfaceTests": 45,
+		"newPanelTests": 19,
+		"modeRequestTests": 11,
+		"typecheckExit": 0,
+		"frontendExit": 0,
+		"scopedBiomeFiles": 9,
+		"scopedBiomeExit": 0,
+		"diffCheckExit": 0,
+		"newDocumentLinksValid": true
+	},
+	"installedVersion": "0.2.0-alpha.49",
+	"installedBuild": "2026.49.0",
+	"appActivatedOrReplaced": false,
+	"nativeRuntimeAcceptance": false,
+	"deviceAcceptance": false,
+	"pending": [
+		"U20b6b packaged WebView layout and visual acceptance",
+		"U21b2 fullscreen and close/reopen acceptance",
+		"remaining UI and localization audit",
+		"strict decoder chroma 15 pass / 2 fail",
+		"hardware MP4 inter-run differences",
+		"Windows/Linux target validation"
+	],
+	"sourceSha256": {
+		"apps/desktop/src/components/InterfaceMotion.tsx": "5c6fd7d2b1aee7c2d6b84d2fe66e2db8deabe64f674511ad66a556c8960944c2",
+		"apps/desktop/src/components/ChoiceSelect.tsx": "bf710b21612282287aa56b497958761770fa18e873341de1221df49104458cfe",
+		"apps/desktop/src/components/Mode.tsx": "e188663ad96aa0a40df90470c3c1076176bbedc2a75f990ee0b9968116933582",
+		"apps/desktop/src/components/workspace-motion.test.tsx": "48840a99404b9697b9d5d363f44e627f2adeb33993e3365e402897cd978b0889",
+		"apps/desktop/src/routes/(window-chrome)/new-main/index.tsx": "502e9bc9bd23018afe45adc58bc6e9b0e1c615761757f81e8d636f2207a07e99",
+		"apps/desktop/src/routes/(window-chrome)/new-main/workspace-mode.ts": "14d37d880ab316df461061cfa4aa46b6786f743f99b32d1dca7fbaab62235be0",
+		"apps/desktop/src/routes/(window-chrome)/new-main/workspace-mode.test.ts": "4052026e02f47a8142d4b0a990701149d3ee17bf6eb7720700fcfd07f7bf8ab9",
+		"apps/desktop/src/styles/workspace-polish.css": "8340ece35aaf1d8713cab5cea1d2dfc43263bb3cda89dda7f8b5d99b8c815e32",
+		"apps/desktop/vitest.interface.config.ts": "eda199ea137ccb32115a94b3b3a4c981e37415104d2cc8e6a6163a0faf2dffce"
+	},
+	"logsSha256": {
+		"baseline.log": "84f9a75e956d4963a46b42b4d0c1a9632e01b1f69c155f94c9d66354fa3da3f4",
+		"interface-before.log": "b2bc24d32f92a8104e38eb360678c82b85bc8b02bc5e4ed2c0a2ceaea79c4061",
+		"interface-final.log": "c6a1ba353c0fa4998bfbfd5b3673c29a560fd2d66465cf88bbf37c4cdef0df94",
+		"mode-requests.log": "83cca7fbf97a2adb5a676bdcb11d5ce2d89985a8dbfc349e8ab79bbe98659dcc",
+		"typecheck.log": "d8d56465b3961a1b51d2be497e4e0d9d2bb38c58462640a0007b9bcd00e15a76",
+		"mode-requests-final.log": "be3352112be5fc60cf68ca27986fbca04f562a9429e2e7164fe7d3b9c48b8f11",
+		"typecheck-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"frontend-final.log": "61be13821814bf1796d0313e3db1695ac8e65a60c49efed7ef3728d26ad62b99",
+		"format-final.log": "9f8d2ed053a5002f590a9d986cb5f594c682527cbea4d20e71bbb43ae441c82d",
+		"resume-baseline.log": "645b304ea06dbe58b937fd25cd2cacf8dc31e8d440c6661b39ae32a2ca84bf8a",
+		"interface-resumed.log": "4e10c97640952e4decfd100c021f77a8dc2ce069e39ea8381302a60119f72c0a",
+		"mode-requests-resumed.log": "68b7dd6134533a08407c20d1bcad093c4e80cfa01f937a6d53a4c9eb154ea9dd",
+		"typecheck-resumed.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"format-resumed.log": "72ebf76febd1cd538fd37092c5b4fda067aa817b9937ac377c6afee09b3ecb8b"
+	},
+	"finalLogs": {
+		"baselineAndFrontend": "resume-baseline.log",
+		"interface": "interface-resumed.log",
+		"modeRequests": "mode-requests-resumed.log",
+		"typecheck": "typecheck-resumed.log",
+		"scopedBiome": "format-resumed.log"
+	}
+}

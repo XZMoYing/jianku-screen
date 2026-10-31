@@ -1,12 +1,13 @@
 import { HoverCard } from "@kobalte/core/hover-card";
 import { cx } from "cva";
-import { type JSX, Show } from "solid-js";
+import { createEffect, createSignal, type JSX, Show } from "solid-js";
 import { useRecordingOptions } from "~/routes/(window-chrome)/OptionsContext";
 import { t as localize } from "~/utils/i18n";
 import { commands, events, type RecordingMode } from "~/utils/tauri";
 import IconImage from "~icons/lucide/image";
 import IconInfo from "~icons/lucide/info";
 import IconVideo from "~icons/lucide/video";
+import { useMotionInteraction } from "./InterfaceMotion";
 
 interface ModeProps {
 	onInfoClick?: () => void;
@@ -43,9 +44,14 @@ const MODE_BUTTONS: ModeButtonConfig[] = [
 
 const Mode = (props: ModeProps) => {
 	const { rawOptions, setOptions } = useRecordingOptions();
+	const interactive = useMotionInteraction();
+	const [hovered, setHovered] = createSignal<RecordingMode | null>(null);
+	createEffect(() => {
+		if (!interactive()) setHovered(null);
+	});
 
 	const handleInfoClick = () => {
-		if (props.locked) return;
+		if (props.locked || !interactive()) return;
 		if (props.onInfoClick) {
 			props.onInfoClick();
 		} else {
@@ -56,6 +62,7 @@ const Mode = (props: ModeProps) => {
 	const openQualitySettings = async (
 		section: "instant-quality" | "studio-quality",
 	) => {
+		if (!interactive()) return;
 		try {
 			localStorage.setItem("cap.settings.scrollToSection", section);
 		} catch {}
@@ -83,6 +90,16 @@ const Mode = (props: ModeProps) => {
 
 				return (
 					<HoverCard
+						open={interactive() && hovered() === button.mode}
+						onOpenChange={(open) =>
+							setHovered((current) =>
+								open && interactive()
+									? button.mode
+									: current === button.mode
+										? null
+										: current,
+							)
+						}
 						openDelay={120}
 						closeDelay={80}
 						placement="bottom-end"
@@ -92,7 +109,7 @@ const Mode = (props: ModeProps) => {
 							as="button"
 							type="button"
 							onClick={() => {
-								if (props.locked) return;
+								if (props.locked || !interactive()) return;
 								setOptions({ mode: button.mode });
 								commands.setRecordingMode(button.mode);
 							}}

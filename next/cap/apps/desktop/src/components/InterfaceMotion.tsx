@@ -1,11 +1,13 @@
 import {
 	type Accessor,
+	createContext,
 	createEffect,
 	createSignal,
 	type JSX,
 	on,
 	onCleanup,
 	onMount,
+	useContext,
 } from "solid-js";
 import { interfaceMotion } from "~/utils/interface-motion-tokens";
 import { InterfaceSpring, springFrames } from "~/utils/interface-spring";
@@ -27,6 +29,9 @@ const enterFrames = arrivalFrames("page", 1);
 const reducedMotion = () =>
 	document.visibilityState !== "visible" ||
 	window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const MotionInteractionContext = createContext<Accessor<boolean>>(() => true);
+export const useMotionInteraction = () => useContext(MotionInteractionContext);
 
 export function MotionGroup(props: {
 	class: string;
@@ -122,9 +127,12 @@ export function MotionSwitch<T>(props: {
 	order?: readonly T[];
 	direction?: 1 | -1;
 	class?: string;
+	focusFallback?: () => HTMLElement | undefined;
 	children: (value: Accessor<T>) => JSX.Element;
 }) {
 	const [displayed, setDisplayed] = createSignal(props.value);
+	const [interactive, setInteractive] = createSignal(true);
+	const parentInteractive = useMotionInteraction();
 	let root!: HTMLDivElement;
 	let revision = 0;
 	let animations: Animation[] = [];
@@ -147,7 +155,19 @@ export function MotionSwitch<T>(props: {
 				const opacity = getComputedStyle(root).opacity;
 				const transform = getComputedStyle(root).transform;
 				cancel();
+				const focused = document.activeElement;
 				root.inert = true;
+				setInteractive(false);
+				if (focused instanceof HTMLElement && root.contains(focused)) {
+					const fallback = props.focusFallback?.();
+					if (
+						fallback &&
+						!fallback.matches(":disabled") &&
+						!root.contains(fallback)
+					)
+						fallback.focus({ preventScroll: true });
+					else focused.blur();
+				}
 				if (!reducedMotion()) {
 					const exit = root.animate(
 						[
@@ -173,6 +193,7 @@ export function MotionSwitch<T>(props: {
 				setDisplayed(() => value);
 				cancel();
 				root.inert = false;
+				setInteractive(true);
 				if (reducedMotion()) return;
 				animations.push(
 					root.animate(arrivalFrames(kind, direction), {
@@ -221,6 +242,7 @@ export function MotionSwitch<T>(props: {
 			cancel();
 			setDisplayed(() => props.value);
 			root.inert = false;
+			setInteractive(true);
 		};
 		reduced.addEventListener("change", settle);
 		document.addEventListener("visibilitychange", settle);
@@ -240,7 +262,36 @@ export function MotionSwitch<T>(props: {
 			class={`jk-motion-content ${props.class ?? ""}`}
 			data-motion-kind={props.kind ?? "page"}
 		>
-			{props.children(displayed)}
+			<MotionInteractionContext.Provider
+				value={() => parentInteractive() && interactive()}
+			>
+				{props.children(displayed)}
+			</MotionInteractionContext.Provider>
+		</div>
+	);
+}
+
+export function MotionPanel(props: {
+	visible: boolean;
+	class?: string;
+	testId?: string;
+	children: JSX.Element;
+}) {
+	const parentInteractive = useMotionInteraction();
+	return (
+		<div
+			class={`jk-motion-panel ${props.class ?? ""}`}
+			data-testid={props.testId}
+			hidden={!props.visible}
+			inert={!props.visible}
+			aria-hidden={!props.visible}
+			style={{ display: props.visible ? "flex" : "none" }}
+		>
+			<MotionInteractionContext.Provider
+				value={() => parentInteractive() && props.visible}
+			>
+				{props.children}
+			</MotionInteractionContext.Provider>
 		</div>
 	);
 }
@@ -252,6 +303,7 @@ export function MotionPresence(props: {
 	children: JSX.Element;
 }) {
 	const [shown, setShown] = createSignal(props.visible);
+	const parentInteractive = useMotionInteraction();
 	let root!: HTMLDivElement;
 	let animation: Animation | undefined;
 	let revision = 0;
@@ -308,7 +360,11 @@ export function MotionPresence(props: {
 			aria-hidden={!props.visible}
 			inert={!props.visible}
 		>
-			{props.children}
+			<MotionInteractionContext.Provider
+				value={() => parentInteractive() && props.visible}
+			>
+				{props.children}
+			</MotionInteractionContext.Provider>
 		</div>
 	);
 }

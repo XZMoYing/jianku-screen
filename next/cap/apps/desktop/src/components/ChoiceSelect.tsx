@@ -8,6 +8,7 @@ import {
 	onMount,
 } from "solid-js";
 import { MenuItem, MenuItemList, PopperContent } from "~/routes/editor/ui";
+import { useMotionInteraction } from "./InterfaceMotion";
 import { MotionText } from "./MotionText";
 
 export type ChoiceOption = {
@@ -30,7 +31,8 @@ export function ChoiceSelect(props: {
 	let root!: HTMLDivElement;
 	const [open, setOpen] = createSignal(false);
 	const [fieldsetDisabled, setFieldsetDisabled] = createSignal(false);
-	const disabled = () => props.disabled || fieldsetDisabled();
+	const interactive = useMotionInteraction();
+	const disabled = () => props.disabled || fieldsetDisabled() || !interactive();
 	createEffect(() => {
 		if (disabled()) setOpen(false);
 	});
@@ -113,6 +115,9 @@ export function ChoiceSelect(props: {
 				<PopperContent<typeof Select.Content>
 					as={Select.Content}
 					class="jk-choice-menu"
+					onCloseAutoFocus={(event) => {
+						if (!interactive()) event.preventDefault();
+					}}
 				>
 					<MenuItemList<typeof Select.Listbox> as={Select.Listbox} />
 				</PopperContent>

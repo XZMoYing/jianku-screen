@@ -14,6 +14,7 @@ export default defineConfig({
 		include: [
 			"src/components/interface-controls.test.tsx",
 			"src/components/device-choice-controls.test.tsx",
+			"src/components/workspace-motion.test.tsx",
 		],
 		server: {
 			deps: {

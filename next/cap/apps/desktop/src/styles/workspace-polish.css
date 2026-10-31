@@ -268,6 +268,22 @@
 .jk-motion-presence[aria-hidden="true"] {
 	pointer-events: none;
 }
+.jk-motion-panel {
+	flex: 1;
+	flex-direction: column;
+	min-height: 0;
+	min-width: 0;
+}
+.jk-workspace-switch,
+.jk-source-switch {
+	flex: 1;
+	min-height: 0;
+	gap: 0;
+	overflow: hidden;
+}
+.jk-workspace-switch {
+	grid-area: 1 / 1;
+}
 :root .workspace-recording {
 	position: relative;
 	gap: 12px;
@@ -287,6 +303,7 @@
 }
 :root .workspace-recording-heading {
 	position: absolute;
+	flex-direction: row;
 	top: 0;
 	right: 0;
 	padding: 0;
