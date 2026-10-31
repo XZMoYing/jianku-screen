@@ -15,9 +15,7 @@
 		},
 		"deep-link": {
 			"desktop": {
-				"schemes": [
-					"jianku-screen-next"
-				]
+				"schemes": ["jianku-screen-next"]
 			}
 		}
 	},
@@ -25,9 +23,7 @@
 		"createUpdaterArtifacts": false,
 		"fileAssociations": [
 			{
-				"ext": [
-					"jks"
-				],
+				"ext": ["jks"],
 				"name": "简库录制工程",
 				"role": "Editor"
 			}
