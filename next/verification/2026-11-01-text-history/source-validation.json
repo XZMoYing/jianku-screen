@@ -1,0 +1,7 @@
+{
+	"apps/desktop/src/routes/editor/TextOverlay.tsx": "678092668ace686b870c15be35598a86be37a1ac07578788d9b09c7d8a564073",
+	"apps/desktop/src/routes/editor/context.ts": "12e61c327ba079a2f7d8f93f2c7548225b1e863db6a56bfb7641485c4048771d",
+	"apps/desktop/src/routes/editor/project-history.ts": "f537aeb77ea38d0e38fc73aaa64aa4059eeea114e52112ca1fe69238e2a72e93",
+	"apps/desktop/src/routes/editor/text-history.test.tsx": "4aeb352d7966b1a391623f223afaf0682645e0e1de43eec3bfdfae49ad9ccb2c",
+	"apps/desktop/vitest.interface.config.ts": "ae2af3a124a42f046a30b454c03cc6566bce9411a0783dc802698d9ee30f3429"
+}

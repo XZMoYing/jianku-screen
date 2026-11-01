@@ -1,0 +1,65 @@
+{
+	"rows": [
+		{
+			"name": "no-edits-before-visible",
+			"passed": true
+		},
+		{
+			"name": "undo-audio",
+			"passed": true
+		},
+		{
+			"name": "real-font-metrics-stored",
+			"passed": true
+		},
+		{
+			"name": "redo-survives-first-visible-measure",
+			"passed": true
+		},
+		{
+			"name": "redo-audio",
+			"passed": true
+		},
+		{
+			"name": "font-resize-measured",
+			"passed": true
+		},
+		{
+			"name": "undo-font-only",
+			"passed": true
+		},
+		{
+			"name": "redo-survives-restored-font-measure",
+			"passed": true
+		},
+		{
+			"name": "redo-font",
+			"passed": true
+		},
+		{
+			"name": "undo-in-order",
+			"passed": true
+		},
+		{
+			"name": "derived-layout-has-no-extra-undo",
+			"passed": true
+		},
+		{
+			"name": "pending-user-edit-recorded",
+			"passed": true
+		},
+		{
+			"name": "pending-user-edit-undo",
+			"passed": true
+		},
+		{
+			"name": "pending-user-edit-redo",
+			"passed": true
+		}
+	],
+	"firstMetric": {
+		"x": 0.0515625,
+		"y": 0.05333333333333334
+	},
+	"passed": true
+}

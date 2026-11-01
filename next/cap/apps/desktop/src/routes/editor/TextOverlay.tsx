@@ -386,19 +386,21 @@ function TextSegmentOverlay(props: {
 		)
 			return;
 		const align = seg.align;
-		props.updateSegment((s) => {
-			const topEdge = s.center.y - s.size.y / 2;
-			if (align === "left") {
-				const leftEdge = s.center.x - s.size.x / 2;
-				s.center.x = leftEdge + ink.x / 2;
-			} else if (align === "right") {
-				const rightEdge = s.center.x + s.size.x / 2;
-				s.center.x = rightEdge - ink.x / 2;
-			}
-			s.size.x = ink.x;
-			s.size.y = ink.y;
-			s.center.y = topEdge + ink.y / 2;
-		});
+		projectHistory.applyDerived(() =>
+			props.updateSegment((s) => {
+				const topEdge = s.center.y - s.size.y / 2;
+				if (align === "left") {
+					const leftEdge = s.center.x - s.size.x / 2;
+					s.center.x = leftEdge + ink.x / 2;
+				} else if (align === "right") {
+					const rightEdge = s.center.x + s.size.x / 2;
+					s.center.x = rightEdge - ink.x / 2;
+				}
+				s.size.x = ink.x;
+				s.size.y = ink.y;
+				s.center.y = topEdge + ink.y / 2;
+			}),
+		);
 	};
 
 	createEffect(
