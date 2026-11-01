@@ -1,0 +1,398 @@
+[
+	{
+		"reducedMotion": "no-preference",
+		"rows": [
+			{
+				"name": "blur/live-move",
+				"passed": true
+			},
+			{
+				"name": "blur/history-ended",
+				"passed": true
+			},
+			{
+				"name": "blur/queued-commit-cancelled x=0.6 expected=0.6",
+				"passed": true
+			},
+			{
+				"name": "blur/no-stale-writes",
+				"passed": true
+			},
+			{
+				"name": "escape/live-move",
+				"passed": true
+			},
+			{
+				"name": "escape/history-ended",
+				"passed": true
+			},
+			{
+				"name": "escape/queued-commit-cancelled x=0.6 expected=0.6",
+				"passed": true
+			},
+			{
+				"name": "escape/no-stale-writes",
+				"passed": true
+			},
+			{
+				"name": "unmount/live-move",
+				"passed": true
+			},
+			{
+				"name": "unmount/history-ended",
+				"passed": true
+			},
+			{
+				"name": "unmount/queued-commit-cancelled x=0.6 expected=0.6",
+				"passed": true
+			},
+			{
+				"name": "unmount/no-stale-writes",
+				"passed": true
+			},
+			{
+				"name": "delete/live-move",
+				"passed": true
+			},
+			{
+				"name": "delete/history-ended",
+				"passed": true
+			},
+			{
+				"name": "delete/queued-commit-cancelled x=undefined expected=undefined",
+				"passed": true
+			},
+			{
+				"name": "delete/no-stale-writes",
+				"passed": true
+			},
+			{
+				"name": "collection/live-move",
+				"passed": true
+			},
+			{
+				"name": "collection/history-ended",
+				"passed": true
+			},
+			{
+				"name": "collection/queued-commit-cancelled x=undefined expected=undefined",
+				"passed": true
+			},
+			{
+				"name": "collection/no-stale-writes",
+				"passed": true
+			},
+			{
+				"name": "time/live-move",
+				"passed": true
+			},
+			{
+				"name": "time/history-ended",
+				"passed": true
+			},
+			{
+				"name": "time/queued-commit-cancelled x=0.6 expected=0.6",
+				"passed": true
+			},
+			{
+				"name": "time/no-stale-writes",
+				"passed": true
+			},
+			{
+				"name": "disable/live-move",
+				"passed": true
+			},
+			{
+				"name": "disable/history-ended",
+				"passed": true
+			},
+			{
+				"name": "disable/queued-commit-cancelled x=0.6 expected=0.6",
+				"passed": true
+			},
+			{
+				"name": "disable/no-stale-writes",
+				"passed": true
+			},
+			{
+				"name": "resize/live-move",
+				"passed": true
+			},
+			{
+				"name": "resize/history-ended",
+				"passed": true
+			},
+			{
+				"name": "resize/queued-commit-cancelled x=0.6 expected=0.6",
+				"passed": true
+			},
+			{
+				"name": "resize/no-stale-writes",
+				"passed": true
+			},
+			{
+				"name": "replace/live-move",
+				"passed": true
+			},
+			{
+				"name": "replace/history-ended",
+				"passed": true
+			},
+			{
+				"name": "replace/queued-commit-cancelled x=0.5 expected=0.5",
+				"passed": true
+			},
+			{
+				"name": "replace/no-stale-writes",
+				"passed": true
+			},
+			{
+				"name": "undo/live-move",
+				"passed": true
+			},
+			{
+				"name": "undo/history-ended",
+				"passed": true
+			},
+			{
+				"name": "undo/queued-commit-cancelled x=0.5 expected=0.5",
+				"passed": true
+			},
+			{
+				"name": "undo/no-stale-writes",
+				"passed": true
+			},
+			{
+				"name": "selection/no-undo-entry",
+				"passed": true
+			},
+			{
+				"name": "release/exact-final",
+				"passed": true
+			},
+			{
+				"name": "release/undo",
+				"passed": true
+			},
+			{
+				"name": "release/redo",
+				"passed": true
+			},
+			{
+				"name": "disposed/no-new-drag",
+				"passed": true
+			},
+			{
+				"name": "inline/keeps-replacement",
+				"passed": true
+			},
+			{
+				"name": "inline/deletes-own-empty",
+				"passed": true
+			}
+		],
+		"passed": true,
+		"physical": {
+			"x": 0.6,
+			"paused": false
+		}
+	},
+	{
+		"reducedMotion": "reduce",
+		"rows": [
+			{
+				"name": "blur/live-move",
+				"passed": true
+			},
+			{
+				"name": "blur/history-ended",
+				"passed": true
+			},
+			{
+				"name": "blur/queued-commit-cancelled x=0.6 expected=0.6",
+				"passed": true
+			},
+			{
+				"name": "blur/no-stale-writes",
+				"passed": true
+			},
+			{
+				"name": "escape/live-move",
+				"passed": true
+			},
+			{
+				"name": "escape/history-ended",
+				"passed": true
+			},
+			{
+				"name": "escape/queued-commit-cancelled x=0.6 expected=0.6",
+				"passed": true
+			},
+			{
+				"name": "escape/no-stale-writes",
+				"passed": true
+			},
+			{
+				"name": "unmount/live-move",
+				"passed": true
+			},
+			{
+				"name": "unmount/history-ended",
+				"passed": true
+			},
+			{
+				"name": "unmount/queued-commit-cancelled x=0.6 expected=0.6",
+				"passed": true
+			},
+			{
+				"name": "unmount/no-stale-writes",
+				"passed": true
+			},
+			{
+				"name": "delete/live-move",
+				"passed": true
+			},
+			{
+				"name": "delete/history-ended",
+				"passed": true
+			},
+			{
+				"name": "delete/queued-commit-cancelled x=undefined expected=undefined",
+				"passed": true
+			},
+			{
+				"name": "delete/no-stale-writes",
+				"passed": true
+			},
+			{
+				"name": "collection/live-move",
+				"passed": true
+			},
+			{
+				"name": "collection/history-ended",
+				"passed": true
+			},
+			{
+				"name": "collection/queued-commit-cancelled x=undefined expected=undefined",
+				"passed": true
+			},
+			{
+				"name": "collection/no-stale-writes",
+				"passed": true
+			},
+			{
+				"name": "time/live-move",
+				"passed": true
+			},
+			{
+				"name": "time/history-ended",
+				"passed": true
+			},
+			{
+				"name": "time/queued-commit-cancelled x=0.6 expected=0.6",
+				"passed": true
+			},
+			{
+				"name": "time/no-stale-writes",
+				"passed": true
+			},
+			{
+				"name": "disable/live-move",
+				"passed": true
+			},
+			{
+				"name": "disable/history-ended",
+				"passed": true
+			},
+			{
+				"name": "disable/queued-commit-cancelled x=0.6 expected=0.6",
+				"passed": true
+			},
+			{
+				"name": "disable/no-stale-writes",
+				"passed": true
+			},
+			{
+				"name": "resize/live-move",
+				"passed": true
+			},
+			{
+				"name": "resize/history-ended",
+				"passed": true
+			},
+			{
+				"name": "resize/queued-commit-cancelled x=0.6 expected=0.6",
+				"passed": true
+			},
+			{
+				"name": "resize/no-stale-writes",
+				"passed": true
+			},
+			{
+				"name": "replace/live-move",
+				"passed": true
+			},
+			{
+				"name": "replace/history-ended",
+				"passed": true
+			},
+			{
+				"name": "replace/queued-commit-cancelled x=0.5 expected=0.5",
+				"passed": true
+			},
+			{
+				"name": "replace/no-stale-writes",
+				"passed": true
+			},
+			{
+				"name": "undo/live-move",
+				"passed": true
+			},
+			{
+				"name": "undo/history-ended",
+				"passed": true
+			},
+			{
+				"name": "undo/queued-commit-cancelled x=0.5 expected=0.5",
+				"passed": true
+			},
+			{
+				"name": "undo/no-stale-writes",
+				"passed": true
+			},
+			{
+				"name": "selection/no-undo-entry",
+				"passed": true
+			},
+			{
+				"name": "release/exact-final",
+				"passed": true
+			},
+			{
+				"name": "release/undo",
+				"passed": true
+			},
+			{
+				"name": "release/redo",
+				"passed": true
+			},
+			{
+				"name": "disposed/no-new-drag",
+				"passed": true
+			},
+			{
+				"name": "inline/keeps-replacement",
+				"passed": true
+			},
+			{
+				"name": "inline/deletes-own-empty",
+				"passed": true
+			}
+		],
+		"passed": true,
+		"physical": {
+			"x": 0.6,
+			"paused": false
+		}
+	}
+]

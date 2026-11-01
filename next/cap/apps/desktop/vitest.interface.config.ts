@@ -21,6 +21,7 @@ export default defineConfig({
 			"src/routes/editor/Timeline/hover-preview.test.tsx",
 			"src/routes/editor/Timeline/segment-drag.test.tsx",
 			"src/routes/editor/text-history.test.tsx",
+			"src/routes/editor/text-drag.test.tsx",
 		],
 		server: {
 			deps: {

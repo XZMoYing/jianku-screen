@@ -1,13 +1,9 @@
-import {
-	createEventListener,
-	createEventListenerMap,
-} from "@solid-primitives/event-listener";
+import { createEventListener } from "@solid-primitives/event-listener";
 import { throttle } from "@solid-primitives/scheduled";
 import { cx } from "cva";
 import {
 	createEffect,
 	createMemo,
-	createRoot,
 	createSignal,
 	For,
 	on,
@@ -18,6 +14,7 @@ import { produce } from "solid-js/store";
 import { t as localize } from "~/utils/i18n";
 import type { TextSegment as TauriTextSegment } from "~/utils/tauri";
 import { useCanvasSnapTargets } from "./CanvasElementsOverlay";
+import { createCanvasMouseDrag } from "./canvas-mouse-drag";
 import { FPS, useEditorContext } from "./context";
 import { createOverlaySegments } from "./overlay-segments";
 import { SNAP_PX, snapMovingRect } from "./snapping";
@@ -44,14 +41,8 @@ const clamp = (value: number, min: number, max: number) =>
 	min > max ? (min + max) / 2 : Math.min(Math.max(value, min), max);
 
 export function TextOverlay(props: TextOverlayProps) {
-	const {
-		project,
-		setProject,
-		editorState,
-		setEditorState,
-		projectHistory,
-		setSnapGuides,
-	} = useEditorContext();
+	const { project, setProject, editorState, setEditorState } =
+		useEditorContext();
 
 	const currentAbsoluteTime = () =>
 		editorState.previewTime ?? editorState.playbackTime ?? 0;
@@ -81,81 +72,6 @@ export function TextOverlay(props: TextOverlayProps) {
 			}),
 		);
 	};
-
-	// Drags update visuals once per display frame (rAF-coalesced mousemove) so
-	// the box tracks the cursor with no perceptible lag; the heavier work of
-	// committing to the project store (and thus pushing config to the preview
-	// renderer) is throttled separately by the handlers.
-	function createMouseDownDrag<T extends { moved: boolean }>(
-		setup: () => T | null,
-		update: (
-			e: MouseEvent,
-			value: T,
-			initialMouse: { x: number; y: number },
-			isFinal: boolean,
-		) => void,
-		onFinish?: () => void,
-	) {
-		return (downEvent: MouseEvent) => {
-			if (downEvent.button !== 0) return;
-			const initial = setup();
-			if (!initial) return;
-			const state = initial;
-
-			downEvent.preventDefault();
-			downEvent.stopPropagation();
-
-			const initialMouse = { x: downEvent.clientX, y: downEvent.clientY };
-			const resumeHistory = projectHistory.pause();
-
-			function handleUpdate(event: MouseEvent, isFinal: boolean) {
-				// A plain click (e.g. the first half of a double-click) must not
-				// write config.
-				if (
-					!state.moved &&
-					Math.hypot(
-						event.clientX - initialMouse.x,
-						event.clientY - initialMouse.y,
-					) < 2
-				)
-					return;
-				state.moved = true;
-				update(event, state, initialMouse, isFinal);
-			}
-
-			let pendingEvent: MouseEvent | null = null;
-			let rafId: number | undefined;
-			function scheduleUpdate(event: MouseEvent) {
-				pendingEvent = event;
-				if (rafId !== undefined) return;
-				rafId = requestAnimationFrame(() => {
-					rafId = undefined;
-					const next = pendingEvent;
-					pendingEvent = null;
-					if (next) handleUpdate(next, false);
-				});
-			}
-
-			function finish(finalEvent: MouseEvent) {
-				if (rafId !== undefined) cancelAnimationFrame(rafId);
-				rafId = undefined;
-				pendingEvent = null;
-				handleUpdate(finalEvent, true);
-				resumeHistory();
-				setSnapGuides([]);
-				onFinish?.();
-				dispose();
-			}
-
-			const dispose = createRoot((dispose) => {
-				createEventListenerMap(window, {
-					mousemove: scheduleUpdate,
-					mouseup: finish,
-				});
-				return dispose;
-			});
-		};
-	}
 
 	const handleSelectSegment = (index: number) => {
 		setEditorState("timeline", "selection", {
@@ -232,7 +148,6 @@ export function TextOverlay(props: TextOverlayProps) {
 						isSelected={selectedTextIndex() === index}
 						onSelect={() => handleSelectSegment(index)}
 						updateSegment={(fn) => updateSegmentByIndex(index, fn)}
-						createMouseDownDrag={createMouseDownDrag}
 					/>
 				)}
 			</For>
@@ -306,19 +221,10 @@ function TextSegmentOverlay(props: {
 	isSelected: boolean;
 	onSelect: () => void;
 	updateSegment: (fn: (segment: TextSegment) => void) => void;
-	createMouseDownDrag: <T extends { moved: boolean }>(
-		setup: () => T | null,
-		update: (
-			e: MouseEvent,
-			value: T,
-			initialMouse: { x: number; y: number },
-			isFinal: boolean,
-		) => void,
-		onFinish?: () => void,
-	) => (downEvent: MouseEvent) => void;
 }) {
 	const segment = createMemo(() => normalizeSegment(props.segment));
 	const {
+		project,
 		setProject,
 		setSnapGuides,
 		projectHistory,
@@ -327,6 +233,27 @@ function TextSegmentOverlay(props: {
 		setEditorState,
 	} = useEditorContext();
 	const snapTargetsFor = useCanvasSnapTargets();
+	const validTarget = () => {
+		const time = editorState.previewTime ?? editorState.playbackTime ?? 0;
+		return (
+			project.timeline?.textSegments?.[props.index] === props.segment &&
+			props.segment.enabled === true &&
+			time >= props.segment.start &&
+			time < props.segment.end
+		);
+	};
+	const createMouseDownDrag = createCanvasMouseDrag({
+		isValid: validTarget,
+		context: () => [props.size.width, props.size.height, project.timeline],
+		pauseHistory: () => projectHistory.pause(),
+		clearGuides: () => setSnapGuides([]),
+	});
+	let hugFrame: number | undefined;
+	const clearHugFrame = () => {
+		if (hugFrame !== undefined) cancelAnimationFrame(hugFrame);
+		hugFrame = undefined;
+	};
+	onCleanup(clearHugFrame);
 
 	let measureRef: HTMLDivElement | undefined;
 	let textareaRef: HTMLTextAreaElement | undefined;
@@ -453,9 +380,10 @@ function TextSegmentOverlay(props: {
 			s.center.y = center.y;
 		});
 
-	const onMove = props.createMouseDownDrag(
+	const onMove = createMouseDownDrag(
 		() => {
 			if (editing()) return null;
+			clearHugFrame();
 			const seg = segment();
 			return {
 				startCenter: { ...seg.center },
@@ -543,8 +471,9 @@ function TextSegmentOverlay(props: {
 	// the opposite corner/edge while the box fits; at a frame edge the box
 	// pins and keeps scaling toward the remaining space.
 	const createResizeHandler = (dirX: 1 | 0 | -1, dirY: 1 | 0 | -1) =>
-		props.createMouseDownDrag(
+		createMouseDownDrag(
 			() => {
+				clearHugFrame();
 				if (!props.isSelected) props.onSelect();
 				setResizing(true);
 				const seg = segment();
@@ -616,12 +545,14 @@ function TextSegmentOverlay(props: {
 					state.commit(next);
 				}
 			},
-			() => {
+			(completed) => {
 				setResizing(false);
 				setDragOverride(null);
-				// The box was scaled geometrically during the drag; snap it back
-				// to the true measured ink.
-				requestAnimationFrame(() => applyHug());
+				if (completed)
+					hugFrame = requestAnimationFrame(() => {
+						hugFrame = undefined;
+						if (validTarget()) applyHug();
+					});
 			},
 		);
 
@@ -644,7 +575,9 @@ function TextSegmentOverlay(props: {
 			setEditing(false);
 			setProject("hiddenTextSegments", []);
 			const empty = segment().content.trim() === "";
-			if (empty) projectActions.deleteTextSegments([props.index]);
+			const index =
+				project.timeline?.textSegments?.indexOf(props.segment) ?? -1;
+			if (empty && index >= 0) projectActions.deleteTextSegments([index]);
 			resumeHistory();
 		};
 	};

@@ -1,0 +1,8 @@
+{
+	"apps/desktop/src/routes/editor/TextOverlay.tsx": "ba62dd263286f809e2897c2fded1c801d2cd762c43537e3443cb2095825208ed",
+	"apps/desktop/src/routes/editor/canvas-mouse-drag.ts": "e749c34d1d6c4a1a99131e3f8acb9a0e7e55743d3f7bec776d75efac50a96560",
+	"apps/desktop/src/routes/editor/text-drag.test.tsx": "9d4cf7861a5c4e1e761dd07eb4f483a160f838c8081cd3738609b8ecc75508d0",
+	"apps/desktop/src/routes/editor/Timeline/mouse-drag.ts": "893b7af787e575470f15bb6d0442c26412e7e14ea8c2fdb6446a1f927b0cbd7b",
+	"apps/desktop/src/routes/editor/Timeline/segment-drag.test.tsx": "9027c3baea7e5f36039ecf4260653a000da6bb6692fdf7d64e4acf45afcae5ec",
+	"apps/desktop/vitest.interface.config.ts": "0810a594eca543ed69355c281f4556d9639c35f162d958be3ae022eaaa140f97"
+}

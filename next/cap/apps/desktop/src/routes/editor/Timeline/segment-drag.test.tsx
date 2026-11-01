@@ -296,3 +296,24 @@ it.each(["blur", "escape", "unmount", "mode", "delete"] as const)(
 		expect(context.resume).toHaveBeenCalledTimes(1);
 	},
 );
+
+for (const kind of ["text", "mask", "audio"] as const) {
+	it(`${kind}: releases ownership before a history shortcut and ignores later drag events`, () => {
+		const f = mount(kind);
+		begin(f.content);
+		window.dispatchEvent(
+			new KeyboardEvent("keydown", {
+				code: "KeyZ",
+				metaKey: true,
+				bubbles: true,
+			}),
+		);
+		expect(context.resume).toHaveBeenCalledTimes(1);
+		expect(f.onDragStateChanged).toHaveBeenLastCalledWith({ type: "idle" });
+		const saved = JSON.stringify(context.project);
+		mouse(window, "mousemove", 700);
+		mouse(window, "mouseup", 700, 0);
+		expect(JSON.stringify(context.project)).toBe(saved);
+		expect(context.resume).toHaveBeenCalledTimes(1);
+	});
+}

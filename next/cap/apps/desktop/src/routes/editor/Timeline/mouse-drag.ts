@@ -11,15 +11,21 @@ export function createTimelineMouseDrag() {
 		isValid(): boolean;
 		finish(): void;
 	} | null>(null);
+	let disposed = false;
 	createComputed(() => {
 		const drag = active();
 		if (drag && !drag.isValid()) untrack(drag.finish);
 	});
-	onCleanup(() => active()?.finish());
+	onCleanup(() => {
+		disposed = true;
+		active()?.finish();
+	});
 
-	return (setup: () => MouseDrag) => {
+	return (setup: () => MouseDrag | null) => {
+		if (disposed) return;
 		active()?.finish();
 		const drag = setup();
+		if (!drag) return;
 		let ended = false;
 		const finish = (event?: MouseEvent) => {
 			if (ended) return;
@@ -57,6 +63,13 @@ export function createTimelineMouseDrag() {
 			}
 		};
 		const keydown = (event: KeyboardEvent) => {
+			if (
+				(event.ctrlKey || event.metaKey) &&
+				(event.code === "KeyZ" || event.code === "KeyY")
+			) {
+				finish();
+				return;
+			}
 			if (event.key !== "Escape") return;
 			event.preventDefault();
 			event.stopImmediatePropagation();
@@ -67,5 +80,6 @@ export function createTimelineMouseDrag() {
 		window.addEventListener("blur", interrupt);
 		window.addEventListener("keydown", keydown, true);
 		setActive({ isValid: drag.isValid, finish: interrupt });
+		return interrupt;
 	};
 }
