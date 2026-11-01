@@ -1,0 +1,34 @@
+[
+	{
+		"check": "initial-unmeasured-text",
+		"passed": true
+	},
+	{
+		"check": "audio-move",
+		"passed": true
+	},
+	{
+		"check": "first-undo",
+		"passed": true
+	},
+	{
+		"check": "first-redo",
+		"passed": true
+	},
+	{
+		"check": "font-changed",
+		"passed": true
+	},
+	{
+		"check": "font-undo",
+		"passed": true
+	},
+	{
+		"check": "font-redo",
+		"passed": true
+	},
+	{
+		"check": "reopen-keeps-audio-font",
+		"passed": true
+	}
+]

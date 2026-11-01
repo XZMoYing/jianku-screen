@@ -1,0 +1,21 @@
+{
+	"removed": [
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.50/Jianku Screen Next.app",
+			"allocatedBytes": 316739584
+		},
+		{
+			"path": "/Applications/.jianku-next-update52-h2obg_b3/previous.app",
+			"allocatedBytes": 316784640
+		}
+	],
+	"freeBytesBefore": 57837252608,
+	"freeBytesAfter": 58471108608,
+	"kept": [
+		"installed alpha52",
+		"archive alpha52",
+		"rollback alpha51",
+		"all projects/media",
+		"Git/native dependencies/build cache"
+	]
+}

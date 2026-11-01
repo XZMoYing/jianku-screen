@@ -1,0 +1,15 @@
+{
+	"sourceCommit": "048d16e6052a263e2d7412bc554bdab9473c3ce3",
+	"fixCommit": "70529970ada6f053ab8cd8bda32f75d644bb40ca",
+	"version": "0.2.0-alpha.52",
+	"build": "2026.52.0",
+	"targetedHistoryAcceptance": "passed: clean serial trial, eight native checks and export",
+	"sourceArchiveInstalledSixHashesMatch": true,
+	"recoveredSession": "old 50398 handle missing; inspected terminal logs/processes instead of restarting build",
+	"initialProjectLaunch": "no editor observed in initial direct launch; serial homepage-first opening succeeded; cause unverified and separately queued",
+	"current": "alpha52",
+	"rollback": "alpha51",
+	"fullU22": "incomplete",
+	"physicalDevices": "deferred",
+	"strictColor": "existing 15 pass / 2 fail and hardware variation remain unresolved"
+}
