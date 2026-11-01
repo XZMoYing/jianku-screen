@@ -1,0 +1,21 @@
+{
+	"date": "2026-11-01",
+	"baselineCommit": "6dd40db",
+	"installed": "0.2.0-alpha.50",
+	"installedEditorVerified": false,
+	"checks": {
+		"interfaceTests": 70,
+		"newHoverTests": 8,
+		"typecheckExit": 0,
+		"frontendExit": 0,
+		"baselineExit": 0,
+		"browserConditions": 2,
+		"webKitPassed": true
+	},
+	"sha256": {
+		"next/cap/apps/desktop/src/routes/editor/Timeline/index.tsx": "28b7baa871ed9a62dc8816c701fb9efe25225d86886904a3d607b61053be21c5",
+		"next/cap/apps/desktop/src/routes/editor/Timeline/hover-preview.ts": "dd7da9818b5adc0a27c65fd3afccbbbd5035d7221bfce380921374cfb5f40b75",
+		"next/cap/apps/desktop/src/routes/editor/Timeline/hover-preview.test.tsx": "3f370ca6a33064e1fdbbac6212ddc7a72e3e41455a76dd604b8d261c44009cc3",
+		"next/cap/apps/desktop/vitest.interface.config.ts": "500cadd332bb45ce757b6c9ef195368256bbdc1924f9486a4204c0d509e96d22"
+	}
+}

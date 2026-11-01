@@ -1,0 +1,14 @@
+
+					const metrics = getTimelineContentMetrics();
+					if (playbackIntent()) return;
+					if (!metrics || metrics.width <= 0) return;
+					const offsetX = e.clientX - metrics.left;
+					if (offsetX < 0 || offsetX > metrics.width) {
+						setEditorState("previewTime", null);
+						return;
+					}
+					const hoverTime = transform().position + secsPerPixel() * offsetX;
+					setEditorState(
+						"previewTime",
+						hoverTime / secsPerPixel() <= START_SNAP_PX ? 0 : hoverTime,
+					);

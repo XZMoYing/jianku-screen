@@ -1,0 +1,6 @@
+{
+	"during": [4, 4],
+	"after": [4, 4, 6],
+	"passed": true,
+	"scope": "real hover-preview callbacks; simulated trim endpoint; browser event routing"
+}

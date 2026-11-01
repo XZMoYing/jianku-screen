@@ -1,0 +1,16 @@
+[
+	{
+		"reducedMotion": "no-preference",
+		"during": [4, 4],
+		"after": [4, 4, 6],
+		"passed": true,
+		"scope": "real hover-preview callbacks; simulated trim endpoint; browser event routing"
+	},
+	{
+		"reducedMotion": "reduce",
+		"during": [4, 4],
+		"after": [4, 4, 6],
+		"passed": true,
+		"scope": "real hover-preview callbacks; simulated trim endpoint; browser event routing"
+	}
+]

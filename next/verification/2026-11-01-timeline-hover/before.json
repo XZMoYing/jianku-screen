@@ -1,0 +1,6 @@
+{
+	"sourceSha256": "85c6f902aa1b2a3563ca80f51e2e99653e1b6ec3c644d6dae5abf05267dd6b4a",
+	"trace": [6, 4, null, 4],
+	"confirmedCompetingPreviewWrites": true,
+	"scope": "original hover handler extracted from source; browser event routing; simulated trim endpoint"
+}

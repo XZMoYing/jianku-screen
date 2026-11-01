@@ -69,6 +69,7 @@ import { BookmarkTrack } from "./BookmarkTrack";
 import { type CaptionSegmentDragState, CaptionsTrack } from "./CaptionsTrack";
 import { ClipTrack } from "./ClipTrack";
 import { TimelineContextProvider, useTimelineContext } from "./context";
+import { createTimelineHoverPreview } from "./hover-preview";
 import { type KeyboardSegmentDragState, KeyboardTrack } from "./KeyboardTrack";
 import { type MaskSegmentDragState, MaskTrack } from "./MaskTrack";
 import { Minimap } from "./Minimap";
@@ -1310,6 +1311,16 @@ export function Timeline(props: {
 		}
 	};
 
+	const hoverPreview = createTimelineHoverPreview({
+		pointerDown: () => timelinePointerDown,
+		playbackIntent,
+		metrics: getTimelineContentMetrics,
+		position: () => transform().position,
+		secondsPerPixel: secsPerPixel,
+		startSnapPixels: START_SNAP_PX,
+		setPreviewTime: (time) => setEditorState("previewTime", time),
+	});
+
 	const split = () => editorState.timeline.interactMode === "split";
 
 	return (
@@ -1336,25 +1347,9 @@ export function Timeline(props: {
 						});
 					});
 				}}
-				onMouseMove={(e) => {
-					const metrics = getTimelineContentMetrics();
-					if (playbackIntent()) return;
-					if (!metrics || metrics.width <= 0) return;
-					const offsetX = e.clientX - metrics.left;
-					if (offsetX < 0 || offsetX > metrics.width) {
-						setEditorState("previewTime", null);
-						return;
-					}
-					const hoverTime = transform().position + secsPerPixel() * offsetX;
-					setEditorState(
-						"previewTime",
-						hoverTime / secsPerPixel() <= START_SNAP_PX ? 0 : hoverTime,
-					);
-				}}
+				onMouseMove={hoverPreview.onMouseMove}
 				onMouseEnter={() => setEditorState("timeline", "hoveredTrack", null)}
-				onMouseLeave={() => {
-					setEditorState("previewTime", null);
-				}}
+				onMouseLeave={hoverPreview.onMouseLeave}
 				onWheel={(e) => {
 					if (e.ctrlKey) {
 						const zoomDelta = (e.deltaY * Math.sqrt(transform().zoom)) / 30;
