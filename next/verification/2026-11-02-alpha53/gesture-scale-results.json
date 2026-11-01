@@ -1,0 +1,36 @@
+[
+	{
+		"case": "normal-scale",
+		"beforeFont": 48,
+		"afterFont": 75.5,
+		"passed": true,
+		"input": {
+			"duration": 1.2,
+			"end": [445.8369591246448, 277.23726929602276],
+			"mode": "normal",
+			"pid": 95637,
+			"scope": "one installed app editor showing the named synthetic project",
+			"start": [425.8369591246448, 267.23726929602276],
+			"steps": 40,
+			"version": "0.2.0-alpha.53",
+			"windowID": 15573
+		}
+	},
+	{
+		"case": "scale-undo-mid-drag",
+		"beforeFont": 48,
+		"afterFont": 48.0,
+		"passed": true,
+		"input": {
+			"duration": 1.2,
+			"end": [445.8369591246448, 277.23726929602276],
+			"mode": "undo",
+			"pid": 95637,
+			"scope": "one installed app editor showing the named synthetic project",
+			"start": [425.8369591246448, 267.23726929602276],
+			"steps": 40,
+			"version": "0.2.0-alpha.53",
+			"windowID": 15573
+		}
+	}
+]

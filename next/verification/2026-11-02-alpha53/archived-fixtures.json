@@ -1,0 +1,35 @@
+[
+	{
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.53/拖动与缩放验收.jks",
+		"files": [
+			"assets/current-desktop-background-caf08781-c741-4f02-b4ec-8d22fbe11167.jpg",
+			"assets/current-desktop-background-d32f3041-7923-4e4a-937a-63d3c32dcef3.jpg",
+			"content/resolution-4k.mp4",
+			"content/配乐一.wav",
+			"content/配乐二.wav",
+			"project-config.json",
+			"recording-meta.json"
+		]
+	},
+	{
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.53/分段镜头验收.jks",
+		"files": [
+			"assets/current-desktop-background-1ca6c2bc-d8d2-4ca9-b94e-2ba4beb16c6c.jpg",
+			"assets/current-desktop-background-975e3324-6d26-489e-97f8-892638b10514.jpg",
+			"content/cursor-0.json",
+			"content/cursor-1.json",
+			"content/cursor-2.json",
+			"content/cursor-placeholder.png",
+			"content/eight-seconds.mp4",
+			"content/resolution-4k.mp4",
+			"content/配乐一.wav",
+			"content/配乐二.wav",
+			"project-config.json",
+			"recording-meta.json"
+		]
+	},
+	{
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.53/三段镜头验收.mp4",
+		"sha256": "a26ba2d160ea0c672b069ab9aa646dbc9a37dc32cc13358c2aa1c9e147f26f72"
+	}
+]

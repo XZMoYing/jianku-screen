@@ -1,0 +1,8 @@
+{
+	"version": "0.2.0-alpha.53",
+	"scope": "actual installed editor Generate button and autosaved synthetic project",
+	"expected": [[1.7, 4.58], [9.7, 12.58], [17.7, 20.58]],
+	"actual": [[1.7, 4.58], [9.7, 12.58], [17.7, 20.58]],
+	"modes": ["auto", "auto", "auto"],
+	"passed": true
+}

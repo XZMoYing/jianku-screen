@@ -1,0 +1,5 @@
+{
+	"passed": true,
+	"actual": [[1.7, 4.58], [9.7, 12.58], [17.7, 20.58]],
+	"scope": "actual synthetic editor close/reopen"
+}

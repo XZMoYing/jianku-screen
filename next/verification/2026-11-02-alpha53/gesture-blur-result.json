@@ -1,0 +1,17 @@
+{
+	"scope": "minimized state readback mid-drag, restored own geometry/focus before more native dragging/up",
+	"before": 0.5,
+	"after": 0.5397106019176136,
+	"passed": true,
+	"input": {
+		"duration": 1.2,
+		"end": [427, 259.5],
+		"mode": "blur",
+		"pid": 95637,
+		"scope": "one installed app editor showing the named synthetic project",
+		"start": [387, 259.5],
+		"steps": 40,
+		"version": "0.2.0-alpha.53",
+		"windowID": 15573
+	}
+}

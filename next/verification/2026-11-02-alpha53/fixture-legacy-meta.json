@@ -1,0 +1,36 @@
+{
+	"platform": "MacOS",
+	"pretty_name": "拖动与缩放验收（53分段镜头）",
+	"segments": [
+		{
+			"display": {
+				"path": "content/eight-seconds.mp4",
+				"fps": 60,
+				"start_time": 0.5
+			},
+			"cursor": "content/cursor-0.json"
+		},
+		{
+			"display": {
+				"path": "content/eight-seconds.mp4",
+				"fps": 60,
+				"start_time": 0.5
+			},
+			"cursor": "content/cursor-1.json"
+		},
+		{
+			"display": {
+				"path": "content/eight-seconds.mp4",
+				"fps": 60,
+				"start_time": 0.5
+			},
+			"cursor": "content/cursor-2.json"
+		}
+	],
+	"cursors": {
+		"synthetic": "content/cursor-placeholder.png"
+	},
+	"status": {
+		"status": "Complete"
+	}
+}

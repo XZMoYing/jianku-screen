@@ -1,0 +1,19 @@
+{
+	"scope": "synthetic fixture schema repair only; product inputs unchanged",
+	"oldError": "Cursor synthetic not found",
+	"oldErrorCount": 720,
+	"oldSchema": "Cursors::Old string path map is not resolved by rendering",
+	"currentSchema": {
+		"imagePath": "content/cursor-placeholder.png",
+		"hotspot": {
+			"x": 0,
+			"y": 0
+		},
+		"shape": "MacOS|Arrow"
+	},
+	"exportExitCode": 0,
+	"correctedErrorLogCount": 0,
+	"decodedFrames": 720,
+	"durationSeconds": 24,
+	"placeholderNotUsedForAppearanceAcceptance": true
+}

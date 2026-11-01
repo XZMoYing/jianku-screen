@@ -1,0 +1,81 @@
+{
+	"passed": true,
+	"scope": "native save and normal close/reopen of owned synthetic text editor",
+	"textSegments": [
+		{
+			"start": 2.0,
+			"end": 6.0,
+			"track": 0,
+			"enabled": true,
+			"content": "文字 A",
+			"center": {
+				"x": 0.5397106019176136,
+				"y": 0.49999998749999996
+			},
+			"size": {
+				"x": 0.07942116477272727,
+				"y": 0.05090909090909091
+			},
+			"fontFamily": "sans-serif",
+			"fontSize": 48.0,
+			"fontWeight": 700.0,
+			"italic": false,
+			"color": "#ffffff",
+			"backgroundStyle": "box",
+			"uppercase": false,
+			"strokeWidth": 0.0,
+			"strokeColor": "#000000",
+			"glow": 0.0,
+			"fadeDuration": 0.15,
+			"align": "center",
+			"letterSpacing": 0.0,
+			"lineHeight": 1.2,
+			"opacity": 1.0,
+			"shadow": 0.0,
+			"animationIn": "fade",
+			"animationOut": "fade",
+			"animationInDuration": 0.15,
+			"animationOutDuration": 0.15,
+			"layout": "overlay",
+			"layoutTransition": 0.5
+		},
+		{
+			"start": 10.0,
+			"end": 14.0,
+			"track": 0,
+			"enabled": true,
+			"content": "文字 B",
+			"center": {
+				"x": 0.5,
+				"y": 0.5
+			},
+			"size": {
+				"x": 0.1,
+				"y": 0.055
+			},
+			"fontFamily": "sans-serif",
+			"fontSize": 48.0,
+			"fontWeight": 700.0,
+			"italic": false,
+			"color": "#ffffff",
+			"backgroundStyle": "box",
+			"uppercase": false,
+			"strokeWidth": 0.0,
+			"strokeColor": "#000000",
+			"glow": 0.0,
+			"fadeDuration": 0.15,
+			"align": "center",
+			"letterSpacing": 0.0,
+			"lineHeight": 1.2,
+			"opacity": 1.0,
+			"shadow": 0.0,
+			"animationIn": "fade",
+			"animationOut": "fade",
+			"animationInDuration": 0.15,
+			"animationOutDuration": 0.15,
+			"layout": "overlay",
+			"layoutTransition": 0.5
+		}
+	],
+	"version": "0.2.0-alpha.53"
+}

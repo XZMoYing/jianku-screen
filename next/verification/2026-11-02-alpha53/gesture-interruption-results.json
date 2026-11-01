@@ -1,0 +1,19 @@
+[
+	{
+		"mode": "undo",
+		"before": 0.5,
+		"after": 0.5,
+		"passed": true,
+		"input": {
+			"duration": 1.2,
+			"end": [427, 259.5],
+			"mode": "undo",
+			"pid": 95637,
+			"scope": "one installed app editor showing the named synthetic project",
+			"start": [387, 259.5],
+			"steps": 40,
+			"version": "0.2.0-alpha.53",
+			"windowID": 15573
+		}
+	}
+]
