@@ -1,0 +1,18 @@
+{
+	"before": {
+		"top": 300,
+		"height": 300,
+		"scrollHeight": 1092,
+		"visibility": "visible",
+		"connected": true
+	},
+	"after": {
+		"top": 0,
+		"height": 300,
+		"scrollHeight": 1092,
+		"visibility": "hidden",
+		"connected": true
+	},
+	"sameNode": true,
+	"passed": false
+}

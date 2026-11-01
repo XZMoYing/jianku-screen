@@ -1,0 +1,50 @@
+[
+	{
+		"engine": "webkit",
+		"error": "Error: browserType.launch: Executable doesn't exist at /Users/moyingxz/Library/Caches/ms-playwright/webkit_mac14_arm64_special-2251/pw_run.sh\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+	},
+	{
+		"engine": "chromium",
+		"before": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"after": {
+			"top": 0,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"passed": false,
+		"trace": [
+			{
+				"time": 811.1999999880791,
+				"top": 300,
+				"height": 300,
+				"scrollHeight": 1096,
+				"connected": true
+			},
+			{
+				"time": 1010.6999999880791,
+				"top": 0,
+				"height": 0,
+				"scrollHeight": 0,
+				"connected": true
+			},
+			{
+				"time": 1970.3999999761581,
+				"top": 0,
+				"height": 0,
+				"scrollHeight": 0,
+				"connected": false
+			},
+			{
+				"time": 2201.7999999523163,
+				"top": 0,
+				"height": 300,
+				"scrollHeight": 1096,
+				"connected": true
+			}
+		]
+	}
+]

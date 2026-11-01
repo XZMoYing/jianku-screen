@@ -1,5 +1,6 @@
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
+import icons from "unplugin-icons/vite";
 import solid from "vite-plugin-solid";
 import { defineConfig } from "vitest/config";
 
@@ -8,13 +9,14 @@ const solidPath = dirname(
 );
 
 export default defineConfig({
-	plugins: [solid({ hot: false })],
+	plugins: [icons({ compiler: "solid" }), solid({ hot: false })],
 	test: {
 		environment: "jsdom",
 		include: [
 			"src/components/interface-controls.test.tsx",
 			"src/components/device-choice-controls.test.tsx",
 			"src/components/workspace-motion.test.tsx",
+			"src/components/mobile-resource-view.test.tsx",
 		],
 		server: {
 			deps: {

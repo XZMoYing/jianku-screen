@@ -1,0 +1,48 @@
+{
+	"baseCommit": "632bc09",
+	"installedVersion": "0.2.0-alpha.50",
+	"installedBuild": "2026.50.0",
+	"productPackaged": false,
+	"runtimeMainIntegrationPending": true,
+	"checks": {
+		"interfaceTests": {
+			"passed": 49,
+			"failed": 0,
+			"session": 91537,
+			"exitCode": 0
+		},
+		"typescript": {
+			"session": 61895,
+			"exitCode": 0
+		},
+		"frontend": {
+			"session": 40357,
+			"exitCode": 0
+		},
+		"chromiumMatrix": {
+			"session": 47796,
+			"exitCode": 0,
+			"passed": 14,
+			"failed": 0
+		},
+		"nativeWebkitComponent": {
+			"session": 38073,
+			"exitCode": 0,
+			"passed": true
+		}
+	},
+	"sourceSha256": {
+		"next/cap/apps/desktop/src/components/MobileRecorder.tsx": "a6795e9ddc0ebd18913a464df6e5618e7d618fe6616f7d35067ac49b583e28c9",
+		"next/cap/apps/desktop/src/components/mobile-resource-view.test.tsx": "5480fa545e8b11160d5d65cccf3b82fd171bec1dd3e2144a1c51c3bd3051d7d5",
+		"next/cap/apps/desktop/vitest.interface.config.ts": "5ddcc396f70cca0eb1dbca8d87bc31269d0a48015814bae8227527f45de7f93c"
+	},
+	"nextPriority": [
+		"U22 editor drag flicker/jumps/non-draggable controls",
+		"U23 automatic zoom generation",
+		"native package integration for U20b6b2b"
+	],
+	"releaseBlockersPreserved": [
+		"strict decoder chroma 15 pass / 2 fail",
+		"hardware MP4 inter-run differences"
+	]
+}

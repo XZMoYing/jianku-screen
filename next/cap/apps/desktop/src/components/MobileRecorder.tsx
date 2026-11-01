@@ -58,18 +58,19 @@ export default function MobileRecorder(props: {
 		historyKey,
 		() => commands.listMobileProjects(),
 	);
+	// Re-entering Suspense detaches this scroll container and resets its position.
 	const visibleProjects = createMemo(() =>
-		allProjects() ? projects() : projects()?.slice(0, 8),
+		allProjects() ? projects.latest : projects.latest?.slice(0, 8),
 	);
 	let disposed = false;
 	let polling = false;
 	const selected = createMemo(() =>
-		setup()?.devices.find(
+		setup.latest?.devices.find(
 			(device) => `${device.platform}:${device.id}` === selection(),
 		),
 	);
 	createEffect(() => {
-		const value = setup();
+		const value = setup.latest;
 		if (
 			value &&
 			!value.devices.some(
@@ -104,7 +105,7 @@ export default function MobileRecorder(props: {
 	});
 	const record = async () => {
 		const device = selected();
-		if (!device || busy() || status()?.active) return;
+		if (!device || setup.loading || busy() || status()?.active) return;
 		setBusy(true);
 		setError("");
 		try {
@@ -193,7 +194,7 @@ export default function MobileRecorder(props: {
 								? localize("正在查找 USB 设备…")
 								: localize("请选择已连接的设备"),
 						},
-						...(setup()?.devices ?? []).map((device) => ({
+						...(setup.latest?.devices ?? []).map((device) => ({
 							value: `${device.platform}:${device.id}`,
 							label: [
 								device.name,
@@ -354,10 +355,12 @@ export default function MobileRecorder(props: {
 						class="mobile-record-button"
 						disabled={
 							!selected()?.authorized ||
+							setup.loading ||
 							busy() ||
 							props.blocked ||
-							(selected()?.platform === "android" && !setup()?.androidReady) ||
-							(selected()?.platform === "ios" && !setup()?.iosReady)
+							(selected()?.platform === "android" &&
+								!setup.latest?.androidReady) ||
+							(selected()?.platform === "ios" && !setup.latest?.iosReady)
 						}
 						onClick={() => void record()}
 					>
@@ -395,7 +398,7 @@ export default function MobileRecorder(props: {
 					{status()?.notice}
 				</p>
 			</Show>
-			<For each={setup()?.warnings}>
+			<For each={setup.latest?.warnings}>
 				{(warning) => <p class="mobile-hint">{warning}</p>}
 			</For>
 			<Show when={status()?.phase === "complete" && status()?.projectPath}>
@@ -445,7 +448,7 @@ export default function MobileRecorder(props: {
 					<p class="mobile-error">{String(projects.error)}</p>
 				</Show>
 				<Show
-					when={projects()?.length}
+					when={projects.latest?.length}
 					fallback={
 						<p class="mobile-history-empty">
 							{projects.loading
@@ -506,7 +509,7 @@ export default function MobileRecorder(props: {
 						)}
 					</For>
 				</Show>
-				<Show when={(projects()?.length ?? 0) > 8}>
+				<Show when={(projects.latest?.length ?? 0) > 8}>
 					<button
 						type="button"
 						class="mobile-project-location mt-4"
@@ -515,7 +518,7 @@ export default function MobileRecorder(props: {
 						{allProjects()
 							? localize("收起列表")
 							: localize("显示全部 {count} 条设备录制", {
-									count: projects()?.length ?? 0,
+									count: projects.latest?.length ?? 0,
 								})}
 					</button>
 				</Show>

@@ -1,0 +1,212 @@
+[
+	{
+		"name": "Presentation-Recording-1",
+		"reducedMotion": "no-preference",
+		"initial": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"state": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"passed": true
+	},
+	{
+		"name": "Desktop-Mobile-1",
+		"reducedMotion": "no-preference",
+		"initial": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"state": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"passed": true
+	},
+	{
+		"name": "Presentation-Recording-2",
+		"reducedMotion": "no-preference",
+		"initial": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"state": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"passed": true
+	},
+	{
+		"name": "Desktop-Mobile-2",
+		"reducedMotion": "no-preference",
+		"initial": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"state": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"passed": true
+	},
+	{
+		"name": "Presentation-Recording-3",
+		"reducedMotion": "no-preference",
+		"initial": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"state": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"passed": true
+	},
+	{
+		"name": "Desktop-Mobile-3",
+		"reducedMotion": "no-preference",
+		"initial": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"state": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"passed": true
+	},
+	{
+		"name": "explicit-history-refresh",
+		"reducedMotion": "no-preference",
+		"initial": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"state": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"passed": true
+	},
+	{
+		"name": "Presentation-Recording-1",
+		"reducedMotion": "reduce",
+		"initial": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"state": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"passed": true
+	},
+	{
+		"name": "Desktop-Mobile-1",
+		"reducedMotion": "reduce",
+		"initial": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"state": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"passed": true
+	},
+	{
+		"name": "Presentation-Recording-2",
+		"reducedMotion": "reduce",
+		"initial": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"state": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"passed": true
+	},
+	{
+		"name": "Desktop-Mobile-2",
+		"reducedMotion": "reduce",
+		"initial": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"state": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"passed": true
+	},
+	{
+		"name": "Presentation-Recording-3",
+		"reducedMotion": "reduce",
+		"initial": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"state": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"passed": true
+	},
+	{
+		"name": "Desktop-Mobile-3",
+		"reducedMotion": "reduce",
+		"initial": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"state": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"passed": true
+	},
+	{
+		"name": "explicit-history-refresh",
+		"reducedMotion": "reduce",
+		"initial": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"state": {
+			"top": 300,
+			"height": 300,
+			"scrollHeight": 1096
+		},
+		"passed": true
+	}
+]
