@@ -1,0 +1,138 @@
+{
+	"version": "0.2.0-alpha.51",
+	"fixture": "own synthetic media",
+	"rows": [
+		{
+			"stage": "rewound-0",
+			"timecodes": ["0:00.00", "0:24.00"],
+			"seconds": 0.0,
+			"playing": "0"
+		},
+		{
+			"stage": "playing-0",
+			"timecodes": ["0:01.04", "0:24.00"],
+			"seconds": 1.04,
+			"playing": "1"
+		},
+		{
+			"stage": "playing-0",
+			"timecodes": ["0:02.47", "0:24.00"],
+			"seconds": 2.47,
+			"playing": "1"
+		},
+		{
+			"stage": "playing-0",
+			"timecodes": ["0:04.53", "0:24.00"],
+			"seconds": 4.53,
+			"playing": "1"
+		},
+		{
+			"stage": "playing-0",
+			"timecodes": ["0:06.44", "0:24.00"],
+			"seconds": 6.44,
+			"playing": "1"
+		},
+		{
+			"stage": "playing-0",
+			"timecodes": ["0:08.24", "0:24.00"],
+			"seconds": 8.24,
+			"playing": "1"
+		},
+		{
+			"stage": "paused-0",
+			"timecodes": ["0:10.31", "0:24.00"],
+			"seconds": 10.31,
+			"playing": "0"
+		},
+		{
+			"stage": "rewound-1",
+			"timecodes": ["0:00.00", "0:24.00"],
+			"seconds": 0.0,
+			"playing": "0"
+		},
+		{
+			"stage": "playing-1",
+			"timecodes": ["0:01.04", "0:24.00"],
+			"seconds": 1.04,
+			"playing": "1"
+		},
+		{
+			"stage": "playing-1",
+			"timecodes": ["0:02.46", "0:24.00"],
+			"seconds": 2.46,
+			"playing": "1"
+		},
+		{
+			"stage": "playing-1",
+			"timecodes": ["0:04.27", "0:24.00"],
+			"seconds": 4.27,
+			"playing": "1"
+		},
+		{
+			"stage": "playing-1",
+			"timecodes": ["0:06.06", "0:24.00"],
+			"seconds": 6.06,
+			"playing": "1"
+		},
+		{
+			"stage": "playing-1",
+			"timecodes": ["0:07.48", "0:24.00"],
+			"seconds": 7.48,
+			"playing": "1"
+		},
+		{
+			"stage": "paused-1",
+			"timecodes": ["0:09.56", "0:24.00"],
+			"seconds": 9.56,
+			"playing": "0"
+		},
+		{
+			"stage": "rewound-2",
+			"timecodes": ["0:00.00", "0:24.00"],
+			"seconds": 0.0,
+			"playing": "0"
+		},
+		{
+			"stage": "playing-2",
+			"timecodes": ["0:01.04", "0:24.00"],
+			"seconds": 1.04,
+			"playing": "1"
+		},
+		{
+			"stage": "playing-2",
+			"timecodes": ["0:02.45", "0:24.00"],
+			"seconds": 2.45,
+			"playing": "1"
+		},
+		{
+			"stage": "playing-2",
+			"timecodes": ["0:04.27", "0:24.00"],
+			"seconds": 4.27,
+			"playing": "1"
+		},
+		{
+			"stage": "playing-2",
+			"timecodes": ["0:06.10", "0:24.00"],
+			"seconds": 6.1,
+			"playing": "1"
+		},
+		{
+			"stage": "playing-2",
+			"timecodes": ["0:07.54", "0:24.00"],
+			"seconds": 7.54,
+			"playing": "1"
+		},
+		{
+			"stage": "paused-2",
+			"timecodes": ["0:10.00", "0:24.00"],
+			"seconds": 10.0,
+			"playing": "0"
+		},
+		{
+			"stage": "final-paused-at-start",
+			"timecodes": ["0:00.00", "0:24.00"],
+			"seconds": 0.0,
+			"playing": "0"
+		}
+	]
+}

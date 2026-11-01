@@ -1,0 +1,7 @@
+{
+	"afterNormalizedRepeat": true,
+	"AAfterUndo": 2.0,
+	"redoEnabled": true,
+	"scope": "repeat after auto text geometry already stored; original redo failure remains recorded",
+	"AAfterRedo": 10.85
+}

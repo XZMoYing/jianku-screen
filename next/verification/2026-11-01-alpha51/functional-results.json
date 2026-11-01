@@ -1,0 +1,87 @@
+[
+	{
+		"check": "recording-ready",
+		"passed": true,
+		"recording": "1",
+		"presentation": "0",
+		"desktop": "1",
+		"mobile": "0",
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "mobile-ready",
+		"passed": true,
+		"recording": "1",
+		"presentation": "0",
+		"desktop": "0",
+		"mobile": "1",
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "presentation-ready",
+		"passed": true,
+		"recording": "0",
+		"presentation": "1",
+		"desktop": null,
+		"mobile": null,
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "mobile-returned",
+		"passed": true,
+		"recording": "1",
+		"presentation": "0",
+		"desktop": "0",
+		"mobile": "1",
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "original-source-restored",
+		"passed": true,
+		"recording": "1",
+		"presentation": "0",
+		"desktop": "1",
+		"mobile": "0",
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	}
+]

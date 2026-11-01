@@ -1,0 +1,363 @@
+{
+	"aspectRatio": null,
+	"background": {
+		"source": {
+			"type": "color",
+			"value": [239, 235, 225],
+			"alpha": 255
+		},
+		"blur": 0,
+		"padding": 14,
+		"rounding": 7.5,
+		"roundingType": "squircle",
+		"inset": 4,
+		"insetStyle": {
+			"color": [20, 60, 90],
+			"opacity": 100
+		},
+		"crop": null,
+		"displayPosition": null,
+		"shadow": 60,
+		"advancedShadow": {
+			"size": 25,
+			"opacity": 30,
+			"blur": 30
+		},
+		"border": null,
+		"frame": null,
+		"notch": null
+	},
+	"camera": {
+		"hide": true,
+		"mirror": false,
+		"position": {
+			"x": "right",
+			"y": "bottom"
+		},
+		"manualPosition": null,
+		"size": 30,
+		"zoomSize": 60,
+		"rounding": 100,
+		"shadow": 62.5,
+		"advancedShadow": {
+			"size": 33.9,
+			"opacity": 44.2,
+			"blur": 10.5
+		},
+		"shape": "square",
+		"roundingType": "squircle",
+		"scaleDuringZoom": 0.7,
+		"backgroundBlur": {
+			"mode": "off"
+		}
+	},
+	"audio": {
+		"mute": false,
+		"improve": false,
+		"isolation": "balanced",
+		"micVolumeDb": 0,
+		"micStereoMode": "stereo",
+		"systemVolumeDb": 0
+	},
+	"cursor": {
+		"hide": false,
+		"hideWhenIdle": false,
+		"hideWhenIdleDelay": 2,
+		"size": 100,
+		"type": "auto",
+		"animationStyle": "mellow",
+		"tension": 470,
+		"mass": 3,
+		"friction": 70,
+		"raw": false,
+		"motionBlur": 1,
+		"useSvg": true,
+		"rotationAmount": 0.15,
+		"baseRotation": 0,
+		"clickSpring": null,
+		"stopMovementInLastSeconds": null,
+		"ripple": {
+			"enabled": false,
+			"color": [71, 133, 255],
+			"strength": 0.7,
+			"size": 1,
+			"duration": 0.6
+		}
+	},
+	"hotkeys": {
+		"show": false
+	},
+	"timeline": {
+		"segments": [
+			{
+				"recordingSegment": 0,
+				"timescale": 1,
+				"start": 0,
+				"end": 8,
+				"name": null
+			},
+			{
+				"recordingSegment": 0,
+				"timescale": 1,
+				"start": 0,
+				"end": 8,
+				"name": null
+			},
+			{
+				"recordingSegment": 0,
+				"timescale": 1,
+				"start": 0,
+				"end": 8,
+				"name": null
+			}
+		],
+		"zoomSegments": [],
+		"sceneSegments": [],
+		"maskSegments": [
+			{
+				"start": 3,
+				"end": 7,
+				"track": 0,
+				"enabled": true,
+				"maskType": "sensitive",
+				"center": {
+					"x": 0.5,
+					"y": 0.5
+				},
+				"size": {
+					"x": 0.35,
+					"y": 0.35
+				},
+				"feather": 0.1,
+				"opacity": 0.65,
+				"pixelation": 1016,
+				"darkness": 0.5,
+				"fadeDuration": 0,
+				"keyframes": {
+					"position": [],
+					"size": [],
+					"intensity": []
+				}
+			},
+			{
+				"start": 11,
+				"end": 15,
+				"track": 0,
+				"enabled": true,
+				"maskType": "sensitive",
+				"center": {
+					"x": 0.5,
+					"y": 0.5
+				},
+				"size": {
+					"x": 0.35,
+					"y": 0.35
+				},
+				"feather": 0.1,
+				"opacity": 0.65,
+				"pixelation": 1016,
+				"darkness": 0.5,
+				"fadeDuration": 0,
+				"keyframes": {
+					"position": [],
+					"size": [],
+					"intensity": []
+				}
+			}
+		],
+		"textSegments": [
+			{
+				"start": 2,
+				"end": 6,
+				"track": 0,
+				"enabled": true,
+				"content": "文字 A",
+				"center": {
+					"x": 0.5,
+					"y": 0.5
+				},
+				"size": {
+					"x": 0.1,
+					"y": 0.055
+				},
+				"fontFamily": "sans-serif",
+				"fontSize": 48,
+				"fontWeight": 700,
+				"italic": false,
+				"uppercase": false,
+				"color": "#ffffff",
+				"backgroundStyle": "box",
+				"strokeWidth": 0,
+				"strokeColor": "#000000",
+				"glow": 0,
+				"fadeDuration": 0.15,
+				"align": "center",
+				"letterSpacing": 0,
+				"lineHeight": 1.2,
+				"opacity": 1,
+				"shadow": 0,
+				"animationIn": "fade",
+				"animationOut": "fade",
+				"animationInDuration": 0.15,
+				"animationOutDuration": 0.15,
+				"layout": "overlay",
+				"layoutTransition": 0.5
+			},
+			{
+				"start": 10,
+				"end": 14,
+				"track": 0,
+				"enabled": true,
+				"content": "文字 B",
+				"center": {
+					"x": 0.5,
+					"y": 0.5
+				},
+				"size": {
+					"x": 0.1,
+					"y": 0.055
+				},
+				"fontFamily": "sans-serif",
+				"fontSize": 48,
+				"fontWeight": 700,
+				"italic": false,
+				"uppercase": false,
+				"color": "#ffffff",
+				"backgroundStyle": "box",
+				"strokeWidth": 0,
+				"strokeColor": "#000000",
+				"glow": 0,
+				"fadeDuration": 0.15,
+				"align": "center",
+				"letterSpacing": 0,
+				"lineHeight": 1.2,
+				"opacity": 1,
+				"shadow": 0,
+				"animationIn": "fade",
+				"animationOut": "fade",
+				"animationInDuration": 0.15,
+				"animationOutDuration": 0.15,
+				"layout": "overlay",
+				"layoutTransition": 0.5
+			}
+		],
+		"captionSegments": [],
+		"keyboardSegments": [],
+		"audioSegments": [
+			{
+				"start": 2,
+				"end": 6,
+				"track": 0,
+				"path": "content/配乐一.wav",
+				"name": "音频 A",
+				"enabled": true,
+				"trimStart": 0,
+				"volumeDb": -18,
+				"fadeIn": 0.1,
+				"fadeOut": 0.1,
+				"duration": 9
+			},
+			{
+				"start": 10,
+				"end": 14,
+				"track": 0,
+				"path": "content/配乐二.wav",
+				"name": "音频 B",
+				"enabled": true,
+				"trimStart": 0,
+				"volumeDb": -18,
+				"fadeIn": 0.1,
+				"fadeOut": 0.1,
+				"duration": 9
+			}
+		],
+		"camera3dSegments": []
+	},
+	"captions": {
+		"segments": [],
+		"settings": {
+			"enabled": false,
+			"font": "System Sans-Serif",
+			"size": 50,
+			"color": "#FFFFFF",
+			"backgroundColor": "#000000",
+			"backgroundOpacity": 90,
+			"position": "bottom-center",
+			"italic": false,
+			"fontWeight": 700,
+			"outline": false,
+			"outlineColor": "#000000",
+			"exportWithSubtitles": false,
+			"highlightColor": "#FFFFFF",
+			"fadeDuration": 0.2,
+			"lingerDuration": 0.4,
+			"wordTransitionDuration": 0.25,
+			"activeWordHighlight": false,
+			"manualPosition": null,
+			"preset": "classic",
+			"animation": "bounce",
+			"highlightStyle": "color",
+			"uppercase": false
+		},
+		"sourceTimed": true
+	},
+	"keyboard": null,
+	"clips": [
+		{
+			"index": 0,
+			"offsets": {
+				"camera": 0,
+				"mic": 0,
+				"system_audio": 0
+			},
+			"offsetsAutoCalculated": true
+		},
+		{
+			"index": 1,
+			"offsets": {
+				"camera": 0,
+				"mic": 0,
+				"system_audio": 0
+			},
+			"offsetsAutoCalculated": true
+		}
+	],
+	"annotations": [],
+	"screenMotionBlur": 1,
+	"screenMovementSpring": {
+		"stiffness": 200,
+		"damping": 40,
+		"mass": 2.25
+	},
+	"colorCorrection": {
+		"screen": {
+			"preset": "none",
+			"intensity": 1,
+			"exposure": 0,
+			"contrast": 0,
+			"saturation": 0,
+			"temperature": 0,
+			"tint": 0,
+			"fade": 0,
+			"splitTone": 0,
+			"vignette": 0,
+			"grain": 0
+		},
+		"camera": {
+			"preset": "none",
+			"intensity": 1,
+			"exposure": 0,
+			"contrast": 0,
+			"saturation": 0,
+			"temperature": 0,
+			"tint": 0,
+			"fade": 0,
+			"splitTone": 0,
+			"vignette": 0,
+			"grain": 0
+		},
+		"gradeCursor": true
+	},
+	"textSizeVersion": 1,
+	"textAnimVersion": 1
+}

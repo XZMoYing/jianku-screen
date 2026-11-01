@@ -1,0 +1,8 @@
+{
+	"scope": "installed alpha51 native mouse drag plus autosaved synthetic project",
+	"passed": true,
+	"pixelsPerSecond": 80.0,
+	"AStart": 10.85,
+	"BStart": 10.0,
+	"order": ["音频 B", "音频 A"]
+}

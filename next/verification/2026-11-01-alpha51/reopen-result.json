@@ -1,0 +1,9 @@
+{
+	"scope": "actual synthetic editor close and reopen; persisted target fields",
+	"checks": {
+		"paddingRestored": true,
+		"displayPositionRestored": true,
+		"audioPositionsRestored": true
+	},
+	"passed": true
+}

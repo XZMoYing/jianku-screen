@@ -1,0 +1,33 @@
+{
+	"scope": "installed native mouse drag, autosaved position and three native window captures of synthetic color bars; no all-controls/frame-by-frame claim",
+	"after": [
+		{
+			"sample": 0,
+			"displayPosition": {
+				"x": 0.55180447265625,
+				"y": 0.5
+			},
+			"bbox": [390, 278, 1258, 763]
+		},
+		{
+			"sample": 1,
+			"displayPosition": {
+				"x": 0.55180447265625,
+				"y": 0.5
+			},
+			"bbox": [390, 278, 1258, 763]
+		},
+		{
+			"sample": 2,
+			"displayPosition": {
+				"x": 0.55180447265625,
+				"y": 0.5
+			},
+			"bbox": [390, 278, 1258, 763]
+		}
+	],
+	"positionStored": true,
+	"stableStoredAfterRelease": true,
+	"beforeBBox": [338, 276, 1079, 765],
+	"stablePixelsAfterRelease": true
+}

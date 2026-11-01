@@ -1,0 +1,46 @@
+{
+	"sourceCommit": "11949bd64ed43179c8e788f1c3fc7e17c4990d97",
+	"productFixCommit": "e2ef4d565b9f61beda1c9d8a179958d8322a6c6d",
+	"version": "0.2.0-alpha.51",
+	"build": "2026.51.0",
+	"releaseExit": 0,
+	"sourceArchiveInstalledSixHashesMatch": true,
+	"actualMobileScrollAnchor": {
+		"beforeY": 722,
+		"afterY": 722,
+		"passed": true
+	},
+	"actualAudioCrossing": {
+		"scope": "installed alpha51 native mouse drag plus autosaved synthetic project",
+		"passed": true,
+		"pixelsPerSecond": 80.0,
+		"AStart": 10.85,
+		"BStart": 10.0,
+		"order": ["音频 B", "音频 A"]
+	},
+	"historyFirstUndoRedo": "failed: undo restored audio but redo disabled; text geometry also changed; precise causality awaits targeted investigation",
+	"historyAfterNormalization": {
+		"afterNormalizedRepeat": true,
+		"AAfterUndo": 2.0,
+		"redoEnabled": true,
+		"scope": "repeat after auto text geometry already stored; original redo failure remains recorded",
+		"AAfterRedo": 10.85
+	},
+	"canvasMove": "stored position and three post-release pixel boxes stable",
+	"canvasResize": "padding and position stable in three post-release samples; no all-controls/entire-motion flicker claim",
+	"reopen": "target geometry/audio retained",
+	"export": "packaged exporter produced and decoded 720 frames, 24s, H264/AAC 1280x720 30fps; no strict color parity claim",
+	"replayCycles": 3,
+	"current": "alpha51",
+	"rollback": "alpha50",
+	"wholeU22": "incomplete",
+	"deferred": [
+		"first text geometry/history redo defect",
+		"other drag controls and continuous-frame flicker audit",
+		"U23 automatic zoom generation",
+		"strict color 15 pass / 2 fail, hardware MP4 variation",
+		"complete Chinese/internal audit",
+		"Windows/Linux actual target validation",
+		"physical devices/displays/conference tests deferred"
+	]
+}

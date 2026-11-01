@@ -1,0 +1,10 @@
+{
+	"duration": 1.2,
+	"end": [407, 262],
+	"pid": 97759,
+	"scope": "one installed app editor showing the named synthetic project",
+	"start": [387, 262],
+	"steps": 40,
+	"version": "0.2.0-alpha.51",
+	"windowID": 13519
+}

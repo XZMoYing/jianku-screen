@@ -1,0 +1,29 @@
+{
+	"removed": [
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.49/Jianku Screen Next.app",
+			"allocatedBytesBefore": 316784640
+		},
+		{
+			"path": "/Applications/.jianku-next-update51-0ut90oqc/previous.app",
+			"allocatedBytesBefore": 316739584
+		}
+	],
+	"removedEmptyVersionDirectories": [
+		"0.2.0-alpha.47",
+		"0.2.0-alpha.40",
+		"0.2.0-alpha.42",
+		"0.2.0-alpha.44"
+	],
+	"freeBytesBefore": 58509389824,
+	"freeBytesAfter": 59143249920,
+	"observedFreeDeltaBytes": 633860096,
+	"kept": [
+		"installed alpha51",
+		"archive alpha51",
+		"rollback alpha50",
+		"all project/media fixtures",
+		"source/Git/native dependencies/build cache"
+	],
+	"note": "APFS sharing and concurrent filesystem changes can make logical/allocated bytes differ from volume free-space delta"
+}

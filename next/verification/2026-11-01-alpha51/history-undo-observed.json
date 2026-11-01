@@ -1,0 +1,7 @@
+{
+	"scope": "actual installed editor; after one undo A=2 B=10, redo control disabled",
+	"undoPositionRestored": true,
+	"redoEnabled": false,
+	"passed": false,
+	"note": "continue inspecting selection behavior and project normalization; no full history pass claimed"
+}

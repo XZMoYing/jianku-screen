@@ -1,0 +1,31 @@
+{
+	"scope": "installed native corner resize; synthetic project",
+	"after": [
+		{
+			"sample": 0,
+			"padding": 66.55945985112339,
+			"displayPosition": {
+				"x": 0.55180447265625,
+				"y": 0.5
+			}
+		},
+		{
+			"sample": 1,
+			"padding": 66.55945985112339,
+			"displayPosition": {
+				"x": 0.55180447265625,
+				"y": 0.5
+			}
+		},
+		{
+			"sample": 2,
+			"padding": 66.55945985112339,
+			"displayPosition": {
+				"x": 0.55180447265625,
+				"y": 0.5
+			}
+		}
+	],
+	"paddingStored": true,
+	"stableStoredAfterRelease": true
+}

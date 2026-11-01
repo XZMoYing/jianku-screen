@@ -1,0 +1,19 @@
+{
+	"kind": "generated synthetic color bars and tones reused from owned regression fixture",
+	"durationSeconds": 24,
+	"userMedia": false,
+	"media": {
+		"配乐二.wav": {
+			"bytes": 864044,
+			"sha256": "da12cee9b7ef8434e2b68fe6a4452ff32cf43776a66066b460fbe9369484f17f"
+		},
+		"resolution-4k.mp4": {
+			"bytes": 145020445,
+			"sha256": "b4a83475209466c30416c98a257404e56067b9f7340077f3768a7a8cd580019e"
+		},
+		"配乐一.wav": {
+			"bytes": 864044,
+			"sha256": "4b244f2c3dcf65683ff661d16618f9e27146730152ded638e09e4c34c655f780"
+		}
+	}
+}

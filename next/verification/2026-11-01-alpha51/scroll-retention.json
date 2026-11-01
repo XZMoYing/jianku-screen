@@ -1,0 +1,9 @@
+{
+	"check": "alpha51-mobile-scroll-after-source-refresh",
+	"beforeAnchorY": 722,
+	"afterAnchorY": 722,
+	"delta": 0,
+	"boundsUnchanged": true,
+	"passed": true,
+	"scope": "installed app AX anchor; no refresh/capture/device buttons pressed"
+}
