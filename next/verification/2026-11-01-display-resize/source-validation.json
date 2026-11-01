@@ -1,0 +1,35 @@
+{
+	"date": "2026-11-01",
+	"baselineCommit": "a7ede3b1be8e8f6daa1622e20ccaddd6ad5c3f82",
+	"installedVersion": "0.2.0-alpha.50",
+	"rollbackVersion": "0.2.0-alpha.49",
+	"completeInstalledEditorVerified": false,
+	"checks": {
+		"modelTests": 21,
+		"interfaceTests": 62,
+		"browserChecks": 22,
+		"webKitComponentPassed": true,
+		"nativeInsetTests": 9,
+		"nativeContinuitySamples": 42006,
+		"nativeBaseLayouts": 756,
+		"nativeStyledLayouts": 756,
+		"typecheckExitCode": 0,
+		"frontendExitCode": 0,
+		"renderingCheckExitCode": 0,
+		"nativeAspectTests": 5,
+		"nativeStyleContinuityTests": 1
+	},
+	"sha256": {
+		"next/cap/apps/desktop/src/routes/editor/CanvasElementsOverlay.tsx": "d2add26c66e74cb66aa594f66a1f8fef0f79db1e9c226176456a3aaaefd4f4c2",
+		"next/cap/apps/desktop/src/routes/editor/display-resize.ts": "11f5672de0e88372c5b1491e026078205d2ed5d525147e8ce2e368c0a4ffc419",
+		"next/cap/apps/desktop/src/routes/editor/display-resize.test.ts": "8fe14f0d3f40938149de887599d76ecadc003197e698f838cbd6ad7ee69ac488",
+		"next/cap/apps/desktop/src/routes/editor/canvas-drag.test.tsx": "3408b254a0087539e375dae920d9f2eb9d0bc36671d2a269828a2f4e7829f79b",
+		"next/cap/apps/desktop/src/routes/editor/canvas-layout.ts": "4663226f882397c67268bc19084102670f48b997ad409bc7f909f7b598e3028b",
+		"next/cap/apps/desktop/src/routes/editor/canvas-layout.test.ts": "37b537a0a52f5ea63ee2bcad64680acf217ce061ea07ed84746d0b631a0ba6aa",
+		"next/cap/apps/desktop/src/routes/screenshot-editor/layout.ts": "11bd8e24b6facd0288dc6d659032d16176f86a51209091276c96ddc77b04e966",
+		"next/cap/apps/desktop/src/routes/screenshot-editor/layout.test.ts": "a8d712081c22c360b66aa2bbd71ef15b945f4806a663f461450df0778fa25724",
+		"next/cap/apps/desktop/src/routes/screenshot-editor/inset-layout-fixtures.json": "cbc70fabdbb762cb8b432b70ca8d678ee80c4548b4c74671e7ed2f368ee84dce",
+		"next/cap/crates/rendering/src/lib.rs": "79c3d6b13978b5c24e280a1474e79f0ba22b4bc1a85348002863423a5238e077",
+		"next/cap/crates/rendering/src/inset_tests.rs": "0189a3e11e22278c9de6329ec4337da2288c7b9b2c5d510095c25f6c90765cb8"
+	}
+}

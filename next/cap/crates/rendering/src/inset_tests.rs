@@ -52,6 +52,12 @@ fn inset_layouts_preserve_aspect_and_generate_screenshot_geometry() {
                     let output = ProjectUniforms::get_output_size(&options, &project, resolution);
                     let layout = ProjectUniforms::display_layout(&options, &project, resolution);
                     let crop = ProjectUniforms::get_crop(&options, &project);
+                    let styled = ProjectUniforms::styled_display_layout(
+                        &options,
+                        &project,
+                        (1280, 720),
+                        resolution,
+                    );
                     if amount > 0 || style != FrameStyle::None {
                         assert!(
                             (layout.content_size.x / layout.content_size.y
@@ -78,6 +84,7 @@ fn inset_layouts_preserve_aspect_and_generate_screenshot_geometry() {
                         "padding": project.background.padding, "crop": project.background.crop,
                         "aspectRatio": project.aspect_ratio,
                         "decoration": {"inset": amount, "frame": project.background.frame, "displayPosition": project.background.display_position},
+                        "styledOuter": {"offset": {"x": styled.outer_offset.x, "y": styled.outer_offset.y}, "size": {"width": styled.outer_size.x, "height": styled.outer_size.y}},
                         "outer": {"offset": {"x": layout.outer_offset.x, "y": layout.outer_offset.y}, "size": {"width": layout.outer_size.x, "height": layout.outer_size.y}},
                         "expected": {"offset": {"x": layout.content_offset.x, "y": layout.content_offset.y}, "size": {"width": layout.content_size.x, "height": layout.content_size.y}}
                     }));
@@ -93,6 +100,60 @@ fn inset_layouts_preserve_aspect_and_generate_screenshot_geometry() {
         );
         serde::Serialize::serialize(&cases, &mut writer).unwrap();
         std::io::Write::write_all(&mut writer.into_inner(), b"\n").unwrap();
+    }
+}
+
+#[test]
+fn display_resize_layouts_fit_padding_and_remain_continuous() {
+    let resolution = XY::new(1280, 720);
+    for source in [
+        XY::new(1920, 1080),
+        XY::new(1080, 1920),
+        XY::new(1800, 1000),
+    ] {
+        let options = RenderOptions {
+            screen_size: source,
+            camera_size: None,
+            preserve_screen_alpha: false,
+        };
+        for aspect in [
+            cap_project::AspectRatio::Wide,
+            cap_project::AspectRatio::Square,
+        ] {
+            let mut project = ProjectConfiguration {
+                aspect_ratio: Some(aspect),
+                ..Default::default()
+            };
+            let mut previous: Option<XY<f64>> = None;
+            for step in 0..=7000 {
+                project.background.padding = f64::from(step) / 100.0;
+                let (width, height) =
+                    ProjectUniforms::get_output_size(&options, &project, resolution);
+                let (base_width, base_height) = ProjectUniforms::get_base_size(&options, &project);
+                let scale = (f64::from(width) / f64::from(base_width))
+                    .min(f64::from(height) / f64::from(base_height));
+                let padding = f64::from(source.x.max(source.y)) * project.background.padding
+                    / 100.0
+                    * SCREEN_MAX_PADDING
+                    * scale;
+                let offset =
+                    ProjectUniforms::display_base_offset(&options, &project, resolution).coord;
+                assert!(
+                    offset.x + 1e-6 >= padding && offset.y + 1e-6 >= padding,
+                    "source={source:?} padding={} offset={offset:?} minimum={padding}",
+                    project.background.padding
+                );
+                let size = XY::new(
+                    1.0 - 2.0 * offset.x / f64::from(width),
+                    1.0 - 2.0 * offset.y / f64::from(height),
+                );
+                if let Some(previous) = previous {
+                    assert!((previous.x - size.x).abs() * f64::from(width) < 2.0);
+                    assert!((previous.y - size.y).abs() * f64::from(height) < 2.0);
+                }
+                previous = Some(size);
+            }
+        }
     }
 }
 

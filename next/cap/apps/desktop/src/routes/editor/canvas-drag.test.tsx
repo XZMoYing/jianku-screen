@@ -2,8 +2,15 @@ import { createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 import { render } from "solid-js/web";
 import { afterEach, expect, it, vi } from "vitest";
-import type { FrameLayoutEvent, XY } from "~/utils/tauri";
+import type {
+	AspectRatio,
+	BackgroundConfiguration,
+	FrameLayoutEvent,
+	TimelineSegment,
+	XY,
+} from "~/utils/tauri";
 import { CanvasElementsOverlay } from "./CanvasElementsOverlay";
+import { displayResizeLayout } from "./display-resize";
 
 vi.mock("./context", () => ({
 	FPS: 60,
@@ -13,14 +20,21 @@ vi.mock("~/utils/i18n", () => ({ t: (value: string) => value }));
 
 function fixture() {
 	const [project, setProject] = createStore({
-		aspectRatio: null as string | null,
-		background: { padding: 10, displayPosition: null as XY<number> | null },
+		aspectRatio: null as AspectRatio | null,
+		background: {
+			padding: 31.25,
+			crop: null as BackgroundConfiguration["crop"],
+			frame: null as BackgroundConfiguration["frame"],
+			inset: 0,
+			displayPosition: null as XY<number> | null,
+		},
 		camera: {
 			position: { x: "right", y: "bottom" },
 			manualPosition: null as XY<number> | null,
 			size: 60,
 		},
 		timeline: {
+			segments: [] as TimelineSegment[],
 			zoomSegments: [],
 			sceneSegments: [],
 			textSegments: [],
@@ -52,6 +66,7 @@ function fixture() {
 		styleProject: project,
 		setStyleProject: setProject,
 		selectedStyle: () => undefined,
+		previewResolutionBase: () => ({ x: 1920, y: 1080 }),
 		toggleStyleGroup: vi.fn(),
 		styleScopeToken,
 		setScope,
@@ -255,4 +270,111 @@ it("disposes an active drag without leaving history paused", () => {
 	mouse(window, "mouseup", 300, 300);
 	expect(context.resumeHistory).toHaveBeenCalledTimes(1);
 	expect(context.project.background.displayPosition).toBeNull();
+});
+
+it.each([null, "wide"] as const)(
+	"keeps a decorated %s screen resize aligned through stale frames",
+	(aspectRatio) => {
+		mount();
+		context.setProject("aspectRatio", aspectRatio);
+		context.setProject("background", "crop", {
+			position: { x: 20, y: 20 },
+			size: { x: 1800, y: 1000 },
+		});
+		context.setProject("background", "frame", {
+			style: "browser",
+			theme: "light",
+			title: "",
+			url: "jianku.local",
+		});
+		context.setProject("background", "inset", 54);
+		const expected = () => {
+			const normalized = displayResizeLayout(
+				{
+					imageSize: { width: 1920, height: 1080 },
+					background: context.project.background,
+					aspectRatio,
+					resolutionBase: context.previewResolutionBase(),
+				},
+				context.project.background.padding,
+			);
+			return {
+				x: normalized.x * 800,
+				y: normalized.y * 450,
+				w: normalized.w * 800,
+				h: normalized.h * 450,
+			};
+		};
+		reportRect(expected());
+		context.setEditorState("canvasSelection", { type: "display" });
+		const corner = box().querySelector<HTMLElement>(
+			"[class*='cursor-se-resize']",
+		);
+		if (!corner) throw new Error("Expected resize handle");
+		const initial = rect();
+		mouse(corner, "mousedown", initial.x + initial.w, initial.y + initial.h);
+		mouse(
+			window,
+			"mousemove",
+			initial.x + initial.w - 30,
+			initial.y + initial.h - 30,
+		);
+		for (const key of ["x", "y", "w", "h"] as const)
+			expect(rect()[key]).toBeCloseTo(expected()[key], 6);
+		mouse(
+			window,
+			"mouseup",
+			initial.x + initial.w - 30,
+			initial.y + initial.h - 30,
+		);
+		const released = rect();
+		reportRect(initial);
+		expect(rect()).toEqual(released);
+		reportRect(expected());
+		for (const key of ["x", "y", "w", "h"] as const)
+			expect(rect()[key]).toBeCloseTo(expected()[key], 6);
+		reportRect({ ...released, x: released.x + 3 });
+		expect(rect().x).toBeCloseTo(released.x + 3);
+	},
+);
+
+it("uses the active recording dimensions after a clip boundary", () => {
+	mount();
+	context.editorInstance.recordings.segments.push({
+		display: { width: 1080, height: 1920 },
+	});
+	context.setProject("timeline", "segments", [
+		{ recordingSegment: 0, start: 0, end: 5, timescale: 1 },
+		{ recordingSegment: 1, start: 2, end: 7, timescale: 1 },
+	]);
+	context.setProject("aspectRatio", "wide");
+	context.setEditorState("playbackTime", 6);
+	const expected = () =>
+		displayResizeLayout(
+			{
+				imageSize: { width: 1080, height: 1920 },
+				background: context.project.background,
+				aspectRatio: "wide",
+				resolutionBase: context.previewResolutionBase(),
+			},
+			context.project.background.padding,
+		);
+	const initial = expected();
+	reportRect({
+		x: initial.x * 800,
+		y: initial.y * 450,
+		w: initial.w * 800,
+		h: initial.h * 450,
+	});
+	context.setEditorState("canvasSelection", { type: "display" });
+	const corner = box().querySelector<HTMLElement>(
+		"[class*='cursor-se-resize']",
+	);
+	if (!corner) throw new Error("Expected resize handle");
+	mouse(corner, "mousedown", 500, 300);
+	mouse(window, "mousemove", 480, 280);
+	const after = expected();
+	expect(rect().w).toBeCloseTo(after.w * 800, 6);
+	expect(rect().h).toBeCloseTo(after.h * 450, 6);
+	mouse(window, "mouseup", 480, 280);
 });

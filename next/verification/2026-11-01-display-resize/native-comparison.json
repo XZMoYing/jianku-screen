@@ -1,0 +1,510 @@
+[
+	{
+		"padding": 10,
+		"rows": 189,
+		"outerWidthChangedByMoreThanOnePixel": 21,
+		"example": {
+			"before": {
+				"aspectRatio": "wide",
+				"crop": {
+					"position": {
+						"x": 100,
+						"y": 150
+					},
+					"size": {
+						"x": 1800,
+						"y": 1000
+					}
+				},
+				"decoration": {
+					"displayPosition": {
+						"x": 0.55,
+						"y": 0.45
+					},
+					"frame": {
+						"style": "none",
+						"theme": "dark",
+						"title": "",
+						"url": "jianku.local"
+					},
+					"inset": 0
+				},
+				"expected": {
+					"offset": {
+						"x": 111.38574040219385,
+						"y": -5.230144221003393
+					},
+					"size": {
+						"height": 658.4602884420069,
+						"width": 1185.2285191956125
+					}
+				},
+				"frameSize": {
+					"height": 720,
+					"width": 1280
+				},
+				"imageSize": {
+					"height": 1600,
+					"width": 2560
+				},
+				"outer": {
+					"offset": {
+						"x": 111.38574040219385,
+						"y": -5.230144221003393
+					},
+					"size": {
+						"height": 658.4602884420069,
+						"width": 1185.2285191956125
+					}
+				},
+				"padding": 10.0
+			},
+			"after": {
+				"aspectRatio": "wide",
+				"crop": {
+					"position": {
+						"x": 100,
+						"y": 150
+					},
+					"size": {
+						"x": 1800,
+						"y": 1000
+					}
+				},
+				"decoration": {
+					"displayPosition": {
+						"x": 0.55,
+						"y": 0.45
+					},
+					"frame": {
+						"style": "none",
+						"theme": "dark",
+						"title": "",
+						"url": "jianku.local"
+					},
+					"inset": 0
+				},
+				"expected": {
+					"offset": {
+						"x": 141.2943327239489,
+						"y": 11.385740402193804
+					},
+					"size": {
+						"height": 625.2285191956123,
+						"width": 1125.4113345521023
+					}
+				},
+				"frameSize": {
+					"height": 720,
+					"width": 1280
+				},
+				"imageSize": {
+					"height": 1600,
+					"width": 2560
+				},
+				"outer": {
+					"offset": {
+						"x": 141.2943327239489,
+						"y": 11.385740402193804
+					},
+					"size": {
+						"height": 625.2285191956123,
+						"width": 1125.4113345521023
+					}
+				},
+				"padding": 10.0,
+				"styledOuter": {
+					"offset": {
+						"x": 141.2943327239489,
+						"y": 11.385740402193854
+					},
+					"size": {
+						"height": 625.2285191956123,
+						"width": 1125.4113345521023
+					}
+				}
+			}
+		}
+	},
+	{
+		"padding": 20,
+		"rows": 189,
+		"outerWidthChangedByMoreThanOnePixel": 21,
+		"example": {
+			"before": {
+				"aspectRatio": "wide",
+				"crop": {
+					"position": {
+						"x": 100,
+						"y": 150
+					},
+					"size": {
+						"x": 1800,
+						"y": 1000
+					}
+				},
+				"decoration": {
+					"displayPosition": {
+						"x": 0.55,
+						"y": 0.45
+					},
+					"frame": {
+						"style": "none",
+						"theme": "dark",
+						"title": "",
+						"url": "jianku.local"
+					},
+					"inset": 0
+				},
+				"expected": {
+					"offset": {
+						"x": 152.16326530612253,
+						"y": 17.424036281179106
+					},
+					"size": {
+						"height": 613.1519274376419,
+						"width": 1103.6734693877552
+					}
+				},
+				"frameSize": {
+					"height": 720,
+					"width": 1280
+				},
+				"imageSize": {
+					"height": 1600,
+					"width": 2560
+				},
+				"outer": {
+					"offset": {
+						"x": 152.16326530612253,
+						"y": 17.424036281179106
+					},
+					"size": {
+						"height": 613.1519274376419,
+						"width": 1103.6734693877552
+					}
+				},
+				"padding": 20.0
+			},
+			"after": {
+				"aspectRatio": "wide",
+				"crop": {
+					"position": {
+						"x": 100,
+						"y": 150
+					},
+					"size": {
+						"x": 1800,
+						"y": 1000
+					}
+				},
+				"decoration": {
+					"displayPosition": {
+						"x": 0.55,
+						"y": 0.45
+					},
+					"frame": {
+						"style": "none",
+						"theme": "dark",
+						"title": "",
+						"url": "jianku.local"
+					},
+					"inset": 0
+				},
+				"expected": {
+					"offset": {
+						"x": 214.69387755102048,
+						"y": 52.163265306122476
+					},
+					"size": {
+						"height": 543.6734693877552,
+						"width": 978.612244897959
+					}
+				},
+				"frameSize": {
+					"height": 720,
+					"width": 1280
+				},
+				"imageSize": {
+					"height": 1600,
+					"width": 2560
+				},
+				"outer": {
+					"offset": {
+						"x": 214.69387755102048,
+						"y": 52.163265306122476
+					},
+					"size": {
+						"height": 543.6734693877552,
+						"width": 978.612244897959
+					}
+				},
+				"padding": 20.0,
+				"styledOuter": {
+					"offset": {
+						"x": 214.69387755102053,
+						"y": 52.16326530612242
+					},
+					"size": {
+						"height": 543.6734693877552,
+						"width": 978.612244897959
+					}
+				}
+			}
+		}
+	},
+	{
+		"padding": 40,
+		"rows": 189,
+		"outerWidthChangedByMoreThanOnePixel": 21,
+		"example": {
+			"before": {
+				"aspectRatio": "wide",
+				"crop": {
+					"position": {
+						"x": 100,
+						"y": 150
+					},
+					"size": {
+						"x": 1800,
+						"y": 1000
+					}
+				},
+				"decoration": {
+					"displayPosition": {
+						"x": 0.55,
+						"y": 0.45
+					},
+					"frame": {
+						"style": "none",
+						"theme": "dark",
+						"title": "",
+						"url": "jianku.local"
+					},
+					"inset": 0
+				},
+				"expected": {
+					"offset": {
+						"x": 218.9775784753364,
+						"y": 54.543099152964665
+					},
+					"size": {
+						"height": 538.9138016940706,
+						"width": 970.0448430493274
+					}
+				},
+				"frameSize": {
+					"height": 720,
+					"width": 1280
+				},
+				"imageSize": {
+					"height": 1600,
+					"width": 2560
+				},
+				"outer": {
+					"offset": {
+						"x": 218.9775784753364,
+						"y": 54.543099152964665
+					},
+					"size": {
+						"height": 538.9138016940706,
+						"width": 970.0448430493274
+					}
+				},
+				"padding": 40.0
+			},
+			"after": {
+				"aspectRatio": "wide",
+				"crop": {
+					"position": {
+						"x": 100,
+						"y": 150
+					},
+					"size": {
+						"x": 1800,
+						"y": 1000
+					}
+				},
+				"decoration": {
+					"displayPosition": {
+						"x": 0.55,
+						"y": 0.45
+					},
+					"frame": {
+						"style": "none",
+						"theme": "dark",
+						"title": "",
+						"url": "jianku.local"
+					},
+					"inset": 0
+				},
+				"expected": {
+					"offset": {
+						"x": 334.95964125560545,
+						"y": 118.97757847533634
+					},
+					"size": {
+						"height": 410.04484304932726,
+						"width": 738.0807174887891
+					}
+				},
+				"frameSize": {
+					"height": 720,
+					"width": 1280
+				},
+				"imageSize": {
+					"height": 1600,
+					"width": 2560
+				},
+				"outer": {
+					"offset": {
+						"x": 334.95964125560545,
+						"y": 118.97757847533634
+					},
+					"size": {
+						"height": 410.04484304932726,
+						"width": 738.0807174887891
+					}
+				},
+				"padding": 40.0,
+				"styledOuter": {
+					"offset": {
+						"x": 334.9596412556055,
+						"y": 118.97757847533637
+					},
+					"size": {
+						"height": 410.04484304932726,
+						"width": 738.0807174887891
+					}
+				}
+			}
+		}
+	},
+	{
+		"padding": 70,
+		"rows": 189,
+		"outerWidthChangedByMoreThanOnePixel": 21,
+		"example": {
+			"before": {
+				"aspectRatio": "wide",
+				"crop": {
+					"position": {
+						"x": 100,
+						"y": 150
+					},
+					"size": {
+						"x": 1800,
+						"y": 1000
+					}
+				},
+				"decoration": {
+					"displayPosition": {
+						"x": 0.55,
+						"y": 0.45
+					},
+					"frame": {
+						"style": "none",
+						"theme": "dark",
+						"title": "",
+						"url": "jianku.local"
+					},
+					"inset": 0
+				},
+				"expected": {
+					"offset": {
+						"x": 293.6708860759494,
+						"y": 96.03938115330519
+					},
+					"size": {
+						"height": 455.9212376933897,
+						"width": 820.6582278481014
+					}
+				},
+				"frameSize": {
+					"height": 720,
+					"width": 1280
+				},
+				"imageSize": {
+					"height": 1600,
+					"width": 2560
+				},
+				"outer": {
+					"offset": {
+						"x": 293.6708860759494,
+						"y": 96.03938115330519
+					},
+					"size": {
+						"height": 455.9212376933897,
+						"width": 820.6582278481014
+					}
+				},
+				"padding": 70.0
+			},
+			"after": {
+				"aspectRatio": "wide",
+				"crop": {
+					"position": {
+						"x": 100,
+						"y": 150
+					},
+					"size": {
+						"x": 1800,
+						"y": 1000
+					}
+				},
+				"decoration": {
+					"displayPosition": {
+						"x": 0.55,
+						"y": 0.45
+					},
+					"frame": {
+						"style": "none",
+						"theme": "dark",
+						"title": "",
+						"url": "jianku.local"
+					},
+					"inset": 0
+				},
+				"expected": {
+					"offset": {
+						"x": 469.4075949367089,
+						"y": 193.67088607594934
+					},
+					"size": {
+						"height": 260.6582278481013,
+						"width": 469.1848101265823
+					}
+				},
+				"frameSize": {
+					"height": 720,
+					"width": 1280
+				},
+				"imageSize": {
+					"height": 1600,
+					"width": 2560
+				},
+				"outer": {
+					"offset": {
+						"x": 469.4075949367089,
+						"y": 193.67088607594934
+					},
+					"size": {
+						"height": 260.6582278481013,
+						"width": 469.1848101265823
+					}
+				},
+				"padding": 70.0,
+				"styledOuter": {
+					"offset": {
+						"x": 469.4075949367089,
+						"y": 193.67088607594934
+					},
+					"size": {
+						"height": 260.6582278481013,
+						"width": 469.1848101265823
+					}
+				}
+			}
+		}
+	}
+]

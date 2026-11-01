@@ -3255,8 +3255,6 @@ impl ProjectUniforms {
             ));
         }
 
-        let output_aspect = output_size.x / output_size.y;
-
         let crop_start =
             Coord::<RawDisplaySpace>::new(XY::new(crop.position.x as f64, crop.position.y as f64));
         let crop_end = Coord::<RawDisplaySpace>::new(XY::new(
@@ -3285,12 +3283,15 @@ impl ProjectUniforms {
             (base_padding * output_scale).min(max_padding)
         };
 
-        let is_height_constrained = cropped_aspect <= output_aspect;
-
         let available_size = XY::new(
             (output_size.x - 2.0 * padding).max(1.0),
             (output_size.y - 2.0 * padding).max(1.0),
         );
+
+        // Choosing against the padded canvas keeps both axes inside the
+        // available area and avoids fit-axis jumps when output rounding flips
+        // a nominally equal source/canvas aspect ratio.
+        let is_height_constrained = cropped_aspect <= available_size.x / available_size.y;
 
         let target_size = if is_height_constrained {
             XY::new(available_size.y * cropped_aspect, available_size.y)

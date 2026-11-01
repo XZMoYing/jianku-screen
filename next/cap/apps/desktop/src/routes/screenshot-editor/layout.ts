@@ -49,6 +49,30 @@ function getBaseSize(
 	};
 }
 
+export function calculateSceneOutputSize(
+	imageSize: { width: number; height: number },
+	padding: number,
+	crop: { position: XY<number>; size: XY<number> } | null,
+	aspectRatio: AspectRatio | null,
+	resolutionBase: XY<number>,
+) {
+	const base = getBaseSize(
+		crop?.size.x ?? imageSize.width,
+		crop?.size.y ?? imageSize.height,
+		(padding / 100) * SCREEN_MAX_PADDING,
+		aspectRatio,
+	);
+	const scale = Math.min(
+		Math.fround(Math.fround(resolutionBase.x) / Math.fround(base.width)),
+		Math.fround(Math.fround(resolutionBase.y) / Math.fround(base.height)),
+	);
+	return {
+		width: (Math.trunc(Math.fround(Math.fround(base.width) * scale)) + 3) & ~3,
+		height:
+			(Math.trunc(Math.fround(Math.fround(base.height) * scale)) + 1) & ~1,
+	};
+}
+
 function baseImageTransform(
 	frameSize: { width: number; height: number },
 	imageSize: { width: number; height: number },
@@ -75,7 +99,6 @@ function baseImageTransform(
 	}
 
 	const croppedAspect = cropWidth / cropHeight;
-	const outputAspect = frameSize.width / frameSize.height;
 
 	const paddingFactor = (padding / 100.0) * SCREEN_MAX_PADDING;
 	const baseSize = getBaseSize(
@@ -115,7 +138,7 @@ function baseImageTransform(
 	const availableWidth = Math.max(frameSize.width - 2 * paddingPixels, 1);
 	const availableHeight = Math.max(frameSize.height - 2 * paddingPixels, 1);
 
-	const isHeightConstrained = croppedAspect <= outputAspect;
+	const isHeightConstrained = croppedAspect <= availableWidth / availableHeight;
 
 	let targetWidth: number;
 	let targetHeight: number;
@@ -144,26 +167,47 @@ type ImageDecoration = Pick<
 	"inset" | "frame" | "displayPosition"
 >;
 
-export function calculateImageTransform(
+export function calculateDisplayLayout(
 	frameSize: { width: number; height: number },
 	imageSize: { width: number; height: number },
 	padding: number,
 	crop: { position: XY<number>; size: XY<number> } | null,
 	aspectRatio: AspectRatio | null,
 	decoration?: ImageDecoration,
+	canvasSize?: { width: number; height: number },
 ) {
-	const base = baseImageTransform(
+	let base = baseImageTransform(
 		frameSize,
 		imageSize,
 		padding,
 		crop,
 		aspectRatio,
 	);
-	if (!decoration || frameSize.width <= 0 || frameSize.height <= 0) return base;
+	if (canvasSize) {
+		const scale = Math.min(
+			canvasSize.width / frameSize.width,
+			canvasSize.height / frameSize.height,
+		);
+		const offset = {
+			x: (canvasSize.width - base.size.width * scale) / 2,
+			y: (canvasSize.height - base.size.height * scale) / 2,
+		};
+		frameSize = canvasSize;
+		base = {
+			offset,
+			size: {
+				width: frameSize.width - offset.x - offset.x,
+				height: frameSize.height - offset.y - offset.y,
+			},
+		};
+	}
+	if (!decoration || frameSize.width <= 0 || frameSize.height <= 0)
+		return { content: base, outer: base };
 	const style = decoration.frame?.style ?? "none";
 	const inset = Math.min(100, Math.max(0, decoration.inset || 0));
 	let offset = { ...base.offset };
 	let size = { ...base.size };
+	let outer = { offset: { ...offset }, size: { ...size } };
 	if (inset > 0 || style !== "none") {
 		const aspect =
 			(crop?.size.x ?? imageSize.width) /
@@ -175,7 +219,7 @@ export function calculateImageTransform(
 		let [top, right, bottom, left] = [0, 0, 0, 0];
 		if (style === "macOS") top = 0.055;
 		else if (style === "windows") top = 0.05;
-		else if (style === "browser") top = 0.075;
+		else if (style === "browser") top = 0.062;
 		else if (style === "macbook")
 			[top, right, bottom, left] = [0.028, 0.128, 0.108, 0.128];
 		else if (style === "phone" || style === "tablet") {
@@ -190,6 +234,13 @@ export function calculateImageTransform(
 			1,
 			Math.min(base.size.width / outerWidth, base.size.height / outerHeight),
 		);
+		outer = {
+			offset: {
+				x: base.offset.x + (base.size.width - outerWidth * height) / 2,
+				y: base.offset.y + (base.size.height - outerHeight * height) / 2,
+			},
+			size: { width: outerWidth * height, height: outerHeight * height },
+		};
 		offset = {
 			x:
 				base.offset.x +
@@ -203,14 +254,36 @@ export function calculateImageTransform(
 		size = { width: aspect * height, height };
 	}
 	if (decoration.displayPosition) {
-		offset.x +=
+		const dx =
 			(Math.min(1, Math.max(0, decoration.displayPosition.x)) - 0.5) *
 			frameSize.width;
-		offset.y +=
+		const dy =
 			(Math.min(1, Math.max(0, decoration.displayPosition.y)) - 0.5) *
 			frameSize.height;
+		offset.x += dx;
+		offset.y += dy;
+		outer.offset.x += dx;
+		outer.offset.y += dy;
 	}
-	return { offset, size };
+	return { content: { offset, size }, outer };
+}
+
+export function calculateImageTransform(
+	frameSize: { width: number; height: number },
+	imageSize: { width: number; height: number },
+	padding: number,
+	crop: { position: XY<number>; size: XY<number> } | null,
+	aspectRatio: AspectRatio | null,
+	decoration?: ImageDecoration,
+) {
+	return calculateDisplayLayout(
+		frameSize,
+		imageSize,
+		padding,
+		crop,
+		aspectRatio,
+		decoration,
+	).content;
 }
 
 export function getImageRect(

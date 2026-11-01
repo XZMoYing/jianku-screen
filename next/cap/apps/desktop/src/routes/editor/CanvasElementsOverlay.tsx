@@ -16,10 +16,16 @@ import {
 	onCleanup,
 	Show,
 } from "solid-js";
+import { unwrap } from "solid-js/store";
 import { t as localize } from "~/utils/i18n";
 import type { FrameLayoutEvent } from "~/utils/tauri";
 import { acknowledgeCanvasRects, type CanvasRects } from "./canvas-layout";
+import { clipSourceTimeAt } from "./clip-transitions";
 import { FPS, useEditorContext } from "./context";
+import {
+	type DisplayResizeInput,
+	resolveDisplayResize,
+} from "./display-resize";
 import {
 	buildSnapTargets,
 	type NormRect,
@@ -28,6 +34,7 @@ import {
 	snapMovingRect,
 	snapResizeCorner,
 } from "./snapping";
+import { heldTimeBefore, holdWindows } from "./timeline-holds";
 
 // In-canvas move/resize controls for the screen recording (display) and the
 // camera. Boxes track the exact rects the renderer reported for the latest
@@ -203,6 +210,8 @@ export function CanvasElementsOverlay(props: { size: Size }) {
 		projectHistory,
 		latestFrameLayout,
 		setSnapGuides,
+		editorInstance,
+		previewResolutionBase,
 	} = useEditorContext();
 
 	const snapTargetsFor = useCanvasSnapTargets();
@@ -237,8 +246,8 @@ export function CanvasElementsOverlay(props: { size: Size }) {
 		});
 	};
 
-	// A layout may still precede mouseup; keep moved outlines until their final
-	// position arrives. Resize outlines still adopt the renderer's sizing law.
+	// A layout may still precede mouseup; keep the final move/resize outline
+	// until matching geometry arrives instead of rolling back to a stale frame.
 	const [dragRects, setDragRects] = createSignal<CanvasRects | null>(null);
 	let dragging = false;
 	let finishCanvasDrag: (() => void) | undefined;
@@ -259,7 +268,7 @@ export function CanvasElementsOverlay(props: { size: Size }) {
 			() => {
 				trackDeep(project.background);
 				trackDeep(project.camera);
-				return project.aspectRatio;
+				return [project.aspectRatio, previewResolutionBase()];
 			},
 			() => {
 				if (!dragging) setDragRects(null);
@@ -579,31 +588,28 @@ export function CanvasElementsOverlay(props: { size: Size }) {
 				select("display");
 
 				const { output_width: W, output_height: H } = layout;
-				const contentAspect = (rect.w * W) / Math.max(rect.h * H, 1e-6);
-				const frameAspect = W / H;
-				// Normalized display width at padding 0 (aspect-fit).
-				const maxWidth = Math.min(1, contentAspect / frameAspect);
-				// Mirror of the renderer's sizing law (get_base_size /
-				// display_base_offset in crates/rendering):
-				//   width = maxWidth / (1 + paddingScale * padding)
-				// with padding in [0, 100] and paddingScale = 2k * 0.4 / 100
-				// (0.4 = SCREEN_MAX_PADDING). Without a fixed aspect ratio the
-				// padded base keeps the content aspect (k = 1); with one,
-				// padding is measured against the crop's larger dimension
-				// while the fit is constrained by a single axis, so k rescales
-				// that basis onto the constrained axis.
-				const k = !project.aspectRatio
-					? 1
-					: contentAspect <= frameAspect
-						? Math.max(1, contentAspect)
-						: Math.max(1, 1 / contentAspect);
-				const paddingScale = (2 * k * 0.4) / 100;
+				const source = clipSourceTimeAt(
+					project.timeline?.segments ?? [],
+					project.timeline?.transitions ?? [],
+					time() -
+						heldTimeBefore(holdWindows(project.timeline?.textSegments), time()),
+				);
+				const raw =
+					editorInstance.recordings.segments[source?.recordingSegment ?? 0]
+						?.display ?? editorInstance.recordings.segments[0]?.display;
+				if (!raw) return null;
+				const input: DisplayResizeInput = {
+					imageSize: { width: raw.width, height: raw.height },
+					background: structuredClone(unwrap(project.background)),
+					aspectRatio: project.aspectRatio ?? null,
+					resolutionBase: previewResolutionBase(),
+					canvasSize: selectedStyle() ? { width: W, height: H } : undefined,
+				};
 
 				return {
 					rect,
 					targets: snapTargetsFor("display"),
-					maxWidth,
-					paddingScale,
+					input,
 					moved: false,
 				};
 			},
@@ -614,29 +620,17 @@ export function CanvasElementsOverlay(props: { size: Size }) {
 				};
 				const scale = resolveScale(e, state, initialMouse, dirX, dirY, anchor);
 
-				// Invert the renderer's law for the dragged width, then re-derive
-				// the outline from the clamped padding so the outline always lands
-				// exactly where the renderer will draw the display — including at
-				// the minimum size (padding 100).
 				const targetWidth = Math.max(state.rect.w * scale, 1e-6);
-				const newPadding = clamp(
-					(state.maxWidth / targetWidth - 1) / state.paddingScale,
-					0,
-					100,
+				const result = resolveDisplayResize(
+					{ ...state.input, resolutionBase: previewResolutionBase() },
+					targetWidth,
 				);
-				setProject("background", "padding", newPadding);
-
-				const newWidth = state.maxWidth / (1 + state.paddingScale * newPadding);
-				const applied = newWidth / state.rect.w;
-				const w = state.rect.w * applied;
-				const h = state.rect.h * applied;
+				setProject("background", "padding", result.padding);
 				setDragRects((prev) => ({
 					...prev,
 					display: {
-						x: anchor.x - w / 2,
-						y: anchor.y - h / 2,
-						w,
-						h,
+						...result.rect,
+						awaitingPosition: true,
 					},
 				}));
 			},
