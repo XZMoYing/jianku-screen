@@ -1,0 +1,165 @@
+{
+	"candidateAccepted": false,
+	"comparisonCount": 567,
+	"overOnePixel": 69,
+	"maxWidthErrorOutputPixels": 158.3302426330962,
+	"candidateFormula": "w_new = w_old * (1 + 0.008*k*oldPadding) / (1 + 0.008*k*newPadding); k from crop/output aspect",
+	"failureExamples": [
+		{
+			"errorOutputPixels": 158.3302426330962,
+			"source": {
+				"height": 1080,
+				"width": 1920
+			},
+			"aspect": "wide",
+			"frame": "none",
+			"inset": 0,
+			"padding": 70,
+			"predictedWidth": 0.4859730821282809,
+			"actualWidth": 0.3622775800711745
+		},
+		{
+			"errorOutputPixels": 158.3302426330962,
+			"source": {
+				"height": 1080,
+				"width": 1920
+			},
+			"aspect": "wide",
+			"frame": "macbook",
+			"inset": 0,
+			"padding": 70,
+			"predictedWidth": 0.4859730821282809,
+			"actualWidth": 0.3622775800711745
+		},
+		{
+			"errorOutputPixels": 156.85049302502898,
+			"source": {
+				"height": 1080,
+				"width": 1920
+			},
+			"aspect": "wide",
+			"frame": "macbook",
+			"inset": 24,
+			"padding": 70,
+			"predictedWidth": 0.4814311925571462,
+			"actualWidth": 0.35889174488134234
+		},
+		{
+			"errorOutputPixels": 155.38260513726703,
+			"source": {
+				"height": 1080,
+				"width": 1920
+			},
+			"aspect": "wide",
+			"frame": "none",
+			"inset": 24,
+			"padding": 70,
+			"predictedWidth": 0.4769257109184457,
+			"actualWidth": 0.35553305065495583
+		},
+		{
+			"errorOutputPixels": 155.1575946414023,
+			"source": {
+				"height": 1080,
+				"width": 1920
+			},
+			"aspect": "wide",
+			"frame": "phone",
+			"inset": 0,
+			"padding": 70,
+			"predictedWidth": 0.47623507189479425,
+			"actualWidth": 0.3550182010811987
+		},
+		{
+			"errorOutputPixels": 153.19916995517167,
+			"source": {
+				"height": 1080,
+				"width": 1920
+			},
+			"aspect": "wide",
+			"frame": "tablet",
+			"inset": 0,
+			"padding": 70,
+			"predictedWidth": 0.47022395446671617,
+			"actualWidth": 0.3505371029392383
+		},
+		{
+			"errorOutputPixels": 152.34496344309235,
+			"source": {
+				"height": 1080,
+				"width": 1920
+			},
+			"aspect": "wide",
+			"frame": "phone",
+			"inset": 24,
+			"padding": 70,
+			"predictedWidth": 0.4676020840991502,
+			"actualWidth": 0.3485825814092343
+		},
+		{
+			"errorOutputPixels": 150.79070726961527,
+			"source": {
+				"height": 1080,
+				"width": 1920
+			},
+			"aspect": "wide",
+			"frame": "windows",
+			"inset": 0,
+			"padding": 70,
+			"predictedWidth": 0.46283150678883883,
+			"actualWidth": 0.3450262667344519
+		},
+		{
+			"errorOutputPixels": 150.46987597755233,
+			"source": {
+				"height": 1080,
+				"width": 1920
+			},
+			"aspect": "wide",
+			"frame": "tablet",
+			"inset": 24,
+			"padding": 70,
+			"predictedWidth": 0.4618467589020541,
+			"actualWidth": 0.34429216829459136
+		},
+		{
+			"errorOutputPixels": 150.07605936786354,
+			"source": {
+				"height": 1080,
+				"width": 1920
+			},
+			"aspect": "wide",
+			"frame": "macOS",
+			"inset": 0,
+			"padding": 70,
+			"predictedWidth": 0.4606379925386548,
+			"actualWidth": 0.3433910711575114
+		},
+		{
+			"errorOutputPixels": 149.91764185058543,
+			"source": {
+				"height": 1080,
+				"width": 1920
+			},
+			"aspect": "wide",
+			"frame": "macbook",
+			"inset": 100,
+			"padding": 70,
+			"predictedWidth": 0.46015175157890864,
+			"actualWidth": 0.3430285938831388
+		},
+		{
+			"errorOutputPixels": 149.08685746995866,
+			"source": {
+				"height": 1080,
+				"width": 1920
+			},
+			"aspect": "wide",
+			"frame": "browser",
+			"inset": 0,
+			"padding": 70,
+			"predictedWidth": 0.45760177224885196,
+			"actualWidth": 0.34112766485044677
+		}
+	]
+}

@@ -1,3 +1,4 @@
+import { trackDeep } from "@solid-primitives/deep";
 import {
 	createEventListener,
 	createEventListenerMap,
@@ -17,6 +18,7 @@ import {
 } from "solid-js";
 import { t as localize } from "~/utils/i18n";
 import type { FrameLayoutEvent } from "~/utils/tauri";
+import { acknowledgeCanvasRects, type CanvasRects } from "./canvas-layout";
 import { FPS, useEditorContext } from "./context";
 import {
 	buildSnapTargets,
@@ -235,13 +237,9 @@ export function CanvasElementsOverlay(props: { size: Size }) {
 		});
 	};
 
-	// Optimistic rects follow the pointer at input rate during a drag; the
-	// video catches up a frame later. Cleared once the next rendered layout
-	// arrives so the box never flashes back to a stale position.
-	const [dragRects, setDragRects] = createSignal<{
-		display?: NormRect;
-		camera?: NormRect;
-	} | null>(null);
+	// A layout may still precede mouseup; keep moved outlines until their final
+	// position arrives. Resize outlines still adopt the renderer's sizing law.
+	const [dragRects, setDragRects] = createSignal<CanvasRects | null>(null);
 	let dragging = false;
 	let finishCanvasDrag: (() => void) | undefined;
 	onCleanup(() => finishCanvasDrag?.());
@@ -249,8 +247,32 @@ export function CanvasElementsOverlay(props: { size: Size }) {
 	createEffect(
 		on(
 			latestFrameLayout,
+			(layout) => {
+				if (!dragging && layout)
+					setDragRects((pending) => acknowledgeCanvasRects(pending, layout));
+			},
+			{ defer: true },
+		),
+	);
+	createEffect(
+		on(
+			() => {
+				trackDeep(project.background);
+				trackDeep(project.camera);
+				return project.aspectRatio;
+			},
 			() => {
 				if (!dragging) setDragRects(null);
+			},
+			{ defer: true },
+		),
+	);
+	createEffect(
+		on(
+			() => [styleScopeToken(), time(), editorState.playing],
+			() => {
+				finishCanvasDrag?.();
+				setDragRects(null);
 			},
 			{ defer: true },
 		),
@@ -419,7 +441,10 @@ export function CanvasElementsOverlay(props: { size: Size }) {
 					: clamp(raw.y + dy, 0, Math.max(0, 1 - raw.h));
 				const center = { x: x + raw.w / 2, y: y + raw.h / 2 };
 
-				setDragRects((prev) => ({ ...prev, [element]: { ...raw, x, y } }));
+				setDragRects((prev) => ({
+					...prev,
+					[element]: { ...raw, x, y, awaitingPosition: true },
+				}));
 				if (element === "display") {
 					setProject("background", "displayPosition", center);
 				} else {
@@ -608,8 +633,8 @@ export function CanvasElementsOverlay(props: { size: Size }) {
 				setDragRects((prev) => ({
 					...prev,
 					display: {
-						x: clamp(anchor.x - w / 2, 0, Math.max(0, 1 - w)),
-						y: clamp(anchor.y - h / 2, 0, Math.max(0, 1 - h)),
+						x: anchor.x - w / 2,
+						y: anchor.y - h / 2,
 						w,
 						h,
 					},
@@ -699,15 +724,17 @@ export function CanvasElementsOverlay(props: { size: Size }) {
 							locked={
 								selectedStyle() && selectedStyle()?.overrides.background == null
 									? {
-									message: localize("启用背景自定义后即可编辑此样式中的屏幕画面"),
-									actionLabel: localize("启用自定义"),
+											message: localize(
+												"启用背景自定义后即可编辑此样式中的屏幕画面",
+											),
+											actionLabel: localize("启用自定义"),
 											onAction: () => toggleStyleGroup("background", true),
 										}
 									: displayDraggable()
 										? null
 										: {
-										message: localize("缩放片段生效时，屏幕画面不可移动"),
-										actionLabel: localize("编辑缩放"),
+												message: localize("缩放片段生效时，屏幕画面不可移动"),
+												actionLabel: localize("编辑缩放"),
 												onAction: selectActiveZoom,
 											}
 							}
@@ -732,15 +759,19 @@ export function CanvasElementsOverlay(props: { size: Size }) {
 							locked={
 								selectedStyle() && selectedStyle()?.overrides.camera == null
 									? {
-									message: localize("启用摄像头自定义后即可编辑此样式中的摄像头"),
-									actionLabel: localize("启用自定义"),
+											message: localize(
+												"启用摄像头自定义后即可编辑此样式中的摄像头",
+											),
+											actionLabel: localize("启用自定义"),
 											onAction: () => toggleStyleGroup("camera", true),
 										}
 									: cameraResizable()
 										? null
 										: {
-											message: localize("摄像头尺寸会随缩放变化；可拖动调整位置"),
-											actionLabel: localize("编辑缩放"),
+												message: localize(
+													"摄像头尺寸会随缩放变化；可拖动调整位置",
+												),
+												actionLabel: localize("编辑缩放"),
 												onAction: selectActiveZoom,
 											}
 							}

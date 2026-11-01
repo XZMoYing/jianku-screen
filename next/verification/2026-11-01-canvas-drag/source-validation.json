@@ -1,0 +1,13 @@
+{
+	"baselineHead": "0b3109b",
+	"installedVersion": "0.2.0-alpha.50",
+	"sourceOnly": true,
+	"files": {
+		"next/cap/apps/desktop/src/routes/editor/CanvasElementsOverlay.tsx": "e00071481bda8ddd5e66c9cbdb66e5047d62d4196d44aec38a8752bd3d3a7307",
+		"next/cap/apps/desktop/src/routes/editor/canvas-layout.ts": "4663226f882397c67268bc19084102670f48b997ad409bc7f909f7b598e3028b",
+		"next/cap/apps/desktop/src/routes/editor/canvas-layout.test.ts": "37b537a0a52f5ea63ee2bcad64680acf217ce061ea07ed84746d0b631a0ba6aa",
+		"next/cap/apps/desktop/src/routes/editor/canvas-drag.test.tsx": "c67006672a7794433c3cf6cb9fd1e9fd04407bae5e8b95ac4643d79df6ee782a",
+		"next/cap/apps/desktop/vitest.interface.config.ts": "e578c801e6b7b3c1e36ecc0bbb74702792b7898971d283fa9e88a7b003d9262f",
+		"next/cap/crates/rendering/src/inset_tests.rs": "ebdde1968ea6f0509f3d498d2fda53e7cb99f526bb313b5995b78278704ff6ea"
+	}
+}

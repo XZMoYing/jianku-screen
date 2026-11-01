@@ -3,6 +3,10 @@ use cap_project::InsetStyle;
 
 #[test]
 fn inset_layouts_preserve_aspect_and_generate_screenshot_geometry() {
+    let padding = std::env::var_os("JIANKU_LAYOUT_PADDING")
+        .map(|value| value.to_str().unwrap().parse::<f64>().unwrap())
+        .unwrap_or(20.0);
+    assert!((0.0..=100.0).contains(&padding));
     let mut cases = Vec::new();
     for source in [
         XY::new(1920, 1080),
@@ -31,7 +35,7 @@ fn inset_layouts_preserve_aspect_and_generate_screenshot_geometry() {
                     };
                     let mut project = ProjectConfiguration::default();
                     project.aspect_ratio = aspect.clone();
-                    project.background.padding = 20.0;
+                    project.background.padding = padding;
                     project.background.inset = amount;
                     project.background.frame = Some(FrameConfiguration {
                         style,
@@ -74,6 +78,7 @@ fn inset_layouts_preserve_aspect_and_generate_screenshot_geometry() {
                         "padding": project.background.padding, "crop": project.background.crop,
                         "aspectRatio": project.aspect_ratio,
                         "decoration": {"inset": amount, "frame": project.background.frame, "displayPosition": project.background.display_position},
+                        "outer": {"offset": {"x": layout.outer_offset.x, "y": layout.outer_offset.y}, "size": {"width": layout.outer_size.x, "height": layout.outer_size.y}},
                         "expected": {"offset": {"x": layout.content_offset.x, "y": layout.content_offset.y}, "size": {"width": layout.content_size.x, "height": layout.content_size.y}}
                     }));
                 }
