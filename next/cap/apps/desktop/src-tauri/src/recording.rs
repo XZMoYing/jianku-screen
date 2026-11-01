@@ -6676,10 +6676,27 @@ pub fn generate_zoom_segments_for_project(
             }
         }
         StudioRecordingMeta::MultipleSegments { inner, .. } => {
-            for segment in inner.segments.iter() {
+            let mut timeline_offset_ms = 0.0;
+            for (segment, recording) in inner.segments.iter().zip(&recordings.segments) {
                 let events = segment.cursor_events(recording_meta);
-                all_clicks.extend(events.clicks);
-                all_moves.extend(events.moves);
+                let source_origin_ms = segment.latest_start_time().unwrap_or(0.0) * 1000.0;
+                let duration_ms = recording.duration() * 1000.0;
+                // Cursor events use the take's capture epoch; preview time zero is
+                // its latest track start, and resumed takes have separate epochs.
+                let to_timeline = |time_ms: f64| {
+                    let local = time_ms - source_origin_ms;
+                    (local.is_finite() && (0.0..=duration_ms).contains(&local))
+                        .then_some(local + timeline_offset_ms)
+                };
+                all_clicks.extend(events.clicks.into_iter().filter_map(|mut event| {
+                    event.time_ms = to_timeline(event.time_ms)?;
+                    Some(event)
+                }));
+                all_moves.extend(events.moves.into_iter().filter_map(|mut event| {
+                    event.time_ms = to_timeline(event.time_ms)?;
+                    Some(event)
+                }));
+                timeline_offset_ms += duration_ms;
             }
         }
     }
@@ -7451,6 +7468,140 @@ mod tests {
     #[test]
     fn mic_feed_locked_ignores_unrelated_errors() {
         assert!(!mic_feed_locked(&anyhow!("different failure")));
+    }
+
+    fn auto_zoom_project_fixture(
+        durations: &[f64],
+        offsets: &[f64],
+        clicks: &[Vec<f64>],
+    ) -> (tempfile::TempDir, RecordingMeta, ProjectRecordingsMeta) {
+        let directory = tempdir().unwrap();
+        let mut meta_segments = Vec::new();
+        let mut recording_segments = Vec::new();
+        for (index, duration) in durations.iter().copied().enumerate() {
+            let path = format!("cursor-{index}.json");
+            let events = CursorEvents {
+                clicks: clicks[index].iter().copied().map(click_event).collect(),
+                moves: vec![],
+            };
+            std::fs::write(
+                directory.path().join(&path),
+                serde_json::to_vec(&events).unwrap(),
+            )
+            .unwrap();
+            meta_segments.push(serde_json::json!({
+                "display": {"path": format!("display-{index}.mp4"), "fps": 60, "start_time": offsets[index]},
+                "cursor": path,
+            }));
+            recording_segments.push(cap_rendering::SegmentRecordings {
+                display: cap_rendering::Video {
+                    duration,
+                    width: 1920,
+                    height: 1080,
+                    fps: 60,
+                    start_time: offsets[index],
+                },
+                camera: None,
+                mic: None,
+                system_audio: None,
+            });
+        }
+        let meta = RecordingMeta {
+            platform: None,
+            project_path: directory.path().to_path_buf(),
+            pretty_name: String::new(),
+            sharing: None,
+            upload: None,
+            inner: RecordingMetaInner::Studio(Box::new(
+                serde_json::from_value(serde_json::json!({"segments": meta_segments})).unwrap(),
+            )),
+        };
+        (
+            directory,
+            meta,
+            ProjectRecordingsMeta {
+                segments: recording_segments,
+            },
+        )
+    }
+
+    #[test]
+    fn auto_zoom_project_keeps_resumed_takes_on_their_timeline() {
+        let (_directory, meta, recordings) = auto_zoom_project_fixture(
+            &[8.0, 8.0, 8.0],
+            &[0.0, 0.0, 0.0],
+            &[vec![2000.0], vec![2000.0], vec![2000.0]],
+        );
+        let segments =
+            generate_zoom_segments_for_project(&meta, &recordings, DEFAULT_AUTO_ZOOM_AMOUNT);
+        assert_eq!(segments.len(), 3);
+        assert_eq!(
+            segments
+                .iter()
+                .map(|segment| (segment.start, segment.end))
+                .collect::<Vec<_>>(),
+            vec![(1.7, 4.5), (9.7, 12.5), (17.7, 20.5)]
+        );
+    }
+
+    #[test]
+    fn auto_zoom_project_uses_the_same_media_epoch_as_preview() {
+        let (_directory, meta, recordings) =
+            auto_zoom_project_fixture(&[8.0, 8.0], &[0.5, 0.25], &[vec![2500.0], vec![2250.0]]);
+        let segments =
+            generate_zoom_segments_for_project(&meta, &recordings, DEFAULT_AUTO_ZOOM_AMOUNT);
+        assert_eq!(segments.len(), 2);
+        assert_eq!((segments[0].start, segments[1].start), (1.7, 9.7));
+    }
+
+    #[test]
+    fn auto_zoom_project_offsets_a_take_without_cursor_data() {
+        let (_directory, mut meta, recordings) =
+            auto_zoom_project_fixture(&[8.0, 8.0], &[0.0, 0.0], &[vec![], vec![2000.0]]);
+        let RecordingMetaInner::Studio(studio) = &mut meta.inner else {
+            panic!("Expected Studio fixture")
+        };
+        let StudioRecordingMeta::MultipleSegments { inner } = studio.as_mut() else {
+            panic!("Expected multiple takes")
+        };
+        inner.segments[0].cursor = None;
+        let segments =
+            generate_zoom_segments_for_project(&meta, &recordings, DEFAULT_AUTO_ZOOM_AMOUNT);
+        assert_eq!(segments.len(), 1);
+        assert_eq!((segments[0].start, segments[0].end), (9.7, 12.5));
+    }
+
+    #[test]
+    fn auto_zoom_project_does_not_leak_capture_padding_into_another_take() {
+        let (_directory, meta, recordings) = auto_zoom_project_fixture(
+            &[8.0, 8.0],
+            &[0.5, 0.25],
+            &[vec![100.0, 2500.0, 9000.0], vec![2250.0]],
+        );
+        let segments =
+            generate_zoom_segments_for_project(&meta, &recordings, DEFAULT_AUTO_ZOOM_AMOUNT);
+        assert_eq!(
+            segments
+                .iter()
+                .map(|segment| (segment.start, segment.end))
+                .collect::<Vec<_>>(),
+            vec![(1.7, 4.5), (9.7, 12.5)]
+        );
+    }
+
+    #[test]
+    fn auto_zoom_project_accepts_legacy_shared_capture_epochs() {
+        let (_directory, meta, recordings) =
+            auto_zoom_project_fixture(&[8.0, 8.0], &[0.0, 50.0], &[vec![2000.0], vec![52000.0]]);
+        let segments =
+            generate_zoom_segments_for_project(&meta, &recordings, DEFAULT_AUTO_ZOOM_AMOUNT);
+        assert_eq!(
+            segments
+                .iter()
+                .map(|segment| (segment.start, segment.end))
+                .collect::<Vec<_>>(),
+            vec![(1.7, 4.5), (9.7, 12.5)]
+        );
     }
 
     #[test]

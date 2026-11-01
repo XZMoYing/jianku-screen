@@ -1,0 +1,10 @@
+{
+	"source": "apps/desktop/src-tauri/src/recording.rs",
+	"sha256": "d883893ef5067f47b8c36d3e35b58adc5e8b8129ce5a8e6cf6681fa935d0e300",
+	"upstreamCommit": "6cfdd172cd53b1d6861852288c2192a8ab743687",
+	"upstreamUrl": "https://raw.githubusercontent.com/CapSoftware/Cap/6cfdd172cd53b1d6861852288c2192a8ab743687/apps/desktop/src-tauri/src/recording.rs",
+	"downloadSha256": "3e40d29159652e82dd3587fee3e3cc23e3d670f201e87dc0e6e79fede6cec4e4",
+	"intervalGeneratorStillIdentical": true,
+	"installed": "alpha52",
+	"nativePackageWithFix": "pending"
+}
