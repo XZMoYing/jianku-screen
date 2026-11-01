@@ -1,6 +1,5 @@
-import { createEventListenerMap } from "@solid-primitives/event-listener";
 import { cx } from "cva";
-import { createMemo, createRoot, createSignal, For, Show } from "solid-js";
+import { batch, createMemo, createSignal, For, Show } from "solid-js";
 import { produce } from "solid-js/store";
 import { t as localize } from "~/utils/i18n";
 
@@ -8,6 +7,7 @@ import { type AudioTrackSegment, MIN_AUDIO_SEGMENT_DURATION } from "../audio";
 import { useEditorContext } from "../context";
 import { getSegmentTrack, sortTrackSegments } from "../timelineTracks";
 import { useTimelineContext } from "./context";
+import { createTimelineMouseDrag } from "./mouse-drag";
 import {
 	SegmentContent,
 	SegmentHandle,
@@ -223,9 +223,10 @@ export function AudioTrack(props: {
 	} = useEditorContext();
 	const { secsPerPixel } = useTimelineContext();
 	const setPreviewTime = useSetPreviewTime();
-	const [draggingIndex, setDraggingIndex] = createSignal<number | null>(null);
+	const [draggingSegment, setDraggingSegment] =
+		createSignal<AudioTrackSegment | null>(null);
 	const [fadeDrag, setFadeDrag] = createSignal<{
-		index: number;
+		segment: AudioTrackSegment;
 		edge: "in" | "out";
 	} | null>(null);
 
@@ -234,9 +235,9 @@ export function AudioTrack(props: {
 
 	const audioSegments = () => project.timeline?.audioSegments ?? [];
 	const laneSegments = createMemo(() =>
-		audioSegments()
-			.map((segment, index) => ({ segment, index }))
-			.filter(({ segment }) => getSegmentTrack(segment) === props.laneIndex),
+		audioSegments().filter(
+			(segment) => getSegmentTrack(segment) === props.laneIndex,
+		),
 	);
 	const selectedAudioIndices = createMemo(() => {
 		const selection = editorState.timeline.selection;
@@ -244,151 +245,197 @@ export function AudioTrack(props: {
 		return new Set(selection.indices);
 	});
 
+	function writeSegment(
+		segment: AudioTrackSegment,
+		changes: Partial<AudioTrackSegment>,
+	) {
+		const index = audioSegments().indexOf(segment);
+		if (index < 0) return;
+		const selection = editorState.timeline.selection;
+		const selected =
+			selection?.type === "audio"
+				? selection.indices.map((value) => audioSegments()[value])
+				: undefined;
+		batch(() => {
+			setProject("timeline", "audioSegments", index, changes);
+			setProject(
+				"timeline",
+				"audioSegments",
+				produce((items) => {
+					sortTrackSegments(items ?? []);
+				}),
+			);
+			if (selected && selection?.type === "audio") {
+				const indices = selected
+					.map((item) => audioSegments().indexOf(item))
+					.filter((value) => value >= 0);
+				if (
+					indices.some(
+						(value, position) => value !== selection.indices[position],
+					) ||
+					indices.length !== selection.indices.length
+				)
+					setEditorState(
+						"timeline",
+						"selection",
+						indices.length ? { type: "audio", indices } : null,
+					);
+			}
+		});
+	}
+
+	const startDrag = createTimelineMouseDrag();
+
 	function createMouseDownDrag<T>(
 		segmentIndex: () => number,
 		setup: () => T,
 		update: (e: MouseEvent, value: T, initialMouseX: number) => void,
 	) {
 		return (downEvent: MouseEvent) => {
-			if (editorState.timeline.interactMode !== "seek") return;
+			if (
+				downEvent.button !== 0 ||
+				editorState.timeline.interactMode !== "seek"
+			)
+				return;
 			downEvent.stopPropagation();
-			const initial = setup();
-			let moved = false;
-			let initialMouseX: number | null = null;
+			startDrag(() => {
+				const segment = audioSegments()[segmentIndex()];
+				const lane = props.laneIndex;
+				const initial = setup();
+				let moved = false;
+				let initialMouseX: number | null = null;
 
-			const resumeHistory = projectHistory.pause();
-			props.onDragStateChanged({ type: "movePending" });
+				const resumeHistory = projectHistory.pause();
+				props.onDragStateChanged({ type: "movePending" });
 
-			function finish(e: MouseEvent) {
-				resumeHistory();
-				setDraggingIndex(null);
-				if (!moved) {
-					e.stopPropagation();
-					setEditorState("timeline", "audioPicker", null);
-					const currentSelection = editorState.timeline.selection;
-					const index = segmentIndex();
-					const isMultiSelect = e.ctrlKey || e.metaKey;
-					const isRangeSelect = e.shiftKey;
+				function finish(e?: MouseEvent) {
+					resumeHistory();
+					setDraggingSegment(null);
+					if (!moved && e) {
+						e.stopPropagation();
+						setEditorState("timeline", "audioPicker", null);
+						const currentSelection = editorState.timeline.selection;
+						const index = segmentIndex();
+						const isMultiSelect = e.ctrlKey || e.metaKey;
+						const isRangeSelect = e.shiftKey;
 
-					if (isRangeSelect && currentSelection?.type === "audio") {
-						const existingIndices = currentSelection.indices;
-						const lastIndex = existingIndices[existingIndices.length - 1];
-						const start = Math.min(lastIndex, index);
-						const end = Math.max(lastIndex, index);
-						const rangeIndices: number[] = [];
-						for (let idx = start; idx <= end; idx++) rangeIndices.push(idx);
-						setEditorState("timeline", "selection", {
-							type: "audio",
-							indices: rangeIndices,
-						});
-					} else if (isMultiSelect) {
-						if (currentSelection?.type === "audio") {
-							const base = currentSelection.indices;
-							const exists = base.includes(index);
-							const next = exists
-								? base.filter((i) => i !== index)
-								: [...base, index];
-							setEditorState(
-								"timeline",
-								"selection",
-								next.length > 0 ? { type: "audio", indices: next } : null,
-							);
+						if (isRangeSelect && currentSelection?.type === "audio") {
+							const existingIndices = currentSelection.indices;
+							const lastIndex = existingIndices[existingIndices.length - 1];
+							const start = Math.min(lastIndex, index);
+							const end = Math.max(lastIndex, index);
+							const rangeIndices: number[] = [];
+							for (let idx = start; idx <= end; idx++) rangeIndices.push(idx);
+							setEditorState("timeline", "selection", {
+								type: "audio",
+								indices: rangeIndices,
+							});
+						} else if (isMultiSelect) {
+							if (currentSelection?.type === "audio") {
+								const base = currentSelection.indices;
+								const exists = base.includes(index);
+								const next = exists
+									? base.filter((i) => i !== index)
+									: [...base, index];
+								setEditorState(
+									"timeline",
+									"selection",
+									next.length > 0 ? { type: "audio", indices: next } : null,
+								);
+							} else {
+								setEditorState("timeline", "selection", {
+									type: "audio",
+									indices: [index],
+								});
+							}
 						} else {
 							setEditorState("timeline", "selection", {
 								type: "audio",
 								indices: [index],
 							});
 						}
-					} else {
-						setEditorState("timeline", "selection", {
-							type: "audio",
-							indices: [index],
-						});
+						props.handleUpdatePlayhead(e);
 					}
-					props.handleUpdatePlayhead(e);
-				}
-				props.onDragStateChanged({ type: "idle" });
-			}
-
-			function handleUpdate(event: MouseEvent) {
-				if (Math.abs(event.clientX - downEvent.clientX) > 2) {
-					if (!moved) {
-						moved = true;
-						initialMouseX = event.clientX;
-						setDraggingIndex(segmentIndex());
-						props.onDragStateChanged({ type: "moving" });
-					}
+					props.onDragStateChanged({ type: "idle" });
 				}
 
-				if (initialMouseX === null) return;
-				update(event, initial, initialMouseX);
-			}
+				function handleUpdate(event: MouseEvent) {
+					if (Math.abs(event.clientX - downEvent.clientX) > 2) {
+						if (!moved) {
+							moved = true;
+							initialMouseX = event.clientX;
+							setDraggingSegment(segment ?? null);
+							props.onDragStateChanged({ type: "moving" });
+						}
+					}
 
-			createRoot((dispose) => {
-				createEventListenerMap(window, {
-					mousemove: (e) => handleUpdate(e),
-					mouseup: (e) => {
-						handleUpdate(e);
-						finish(e);
-						dispose();
-					},
-				});
+					if (initialMouseX === null) return;
+					update(event, initial, initialMouseX);
+				}
+
+				return {
+					isValid: () =>
+						editorState.timeline.interactMode === "seek" &&
+						props.laneIndex === lane &&
+						!!segment &&
+						getSegmentTrack(segment) === lane &&
+						audioSegments().includes(segment),
+					update: handleUpdate,
+					finish,
+				};
 			});
 		};
 	}
 
-	function createFadeDrag(index: number, edge: "in" | "out") {
+	function createFadeDrag(segmentIndex: () => number, edge: "in" | "out") {
 		return (downEvent: MouseEvent) => {
-			if (editorState.timeline.interactMode !== "seek") return;
+			if (
+				downEvent.button !== 0 ||
+				editorState.timeline.interactMode !== "seek"
+			)
+				return;
 			downEvent.stopPropagation();
 			downEvent.preventDefault();
-
 			const trackEl = (downEvent.currentTarget as HTMLElement).closest(
 				".cap-track-fill",
 			);
-			if (!(trackEl instanceof HTMLElement)) return;
-
-			const resumeHistory = projectHistory.pause();
-			setFadeDrag({ index, edge });
-
-			const updateFade = (e: MouseEvent) => {
-				const segment = audioSegments()[index];
-				if (!segment) return;
-
-				const rect = trackEl.getBoundingClientRect();
-				if (rect.width <= 0) return;
-
-				const segmentDuration = segment.end - segment.start;
-				const otherFade = edge === "in" ? segment.fadeOut : segment.fadeIn;
-				const maxFade = Math.max(0, segmentDuration - otherFade);
-				const pointerFrac =
-					edge === "in"
-						? (e.clientX - rect.left) / rect.width
-						: (rect.right - e.clientX) / rect.width;
-				const next = Math.max(
-					0,
-					Math.min(pointerFrac * segmentDuration, maxFade),
-				);
-				setProject(
-					"timeline",
-					"audioSegments",
-					index,
-					edge === "in" ? "fadeIn" : "fadeOut",
-					next,
-				);
-			};
-
-			updateFade(downEvent);
-
-			createRoot((dispose) => {
-				createEventListenerMap(window, {
-					mousemove: updateFade,
-					mouseup: () => {
+			const segment = audioSegments()[segmentIndex()];
+			if (!(trackEl instanceof HTMLElement) || !segment) return;
+			const lane = props.laneIndex;
+			startDrag(() => {
+				const resumeHistory = projectHistory.pause();
+				setFadeDrag({ segment, edge });
+				const update = (event: MouseEvent) => {
+					const rect = trackEl.getBoundingClientRect();
+					if (rect.width <= 0) return;
+					const segmentDuration = segment.end - segment.start;
+					const otherFade = edge === "in" ? segment.fadeOut : segment.fadeIn;
+					const maxFade = Math.max(0, segmentDuration - otherFade);
+					const fraction =
+						edge === "in"
+							? (event.clientX - rect.left) / rect.width
+							: (rect.right - event.clientX) / rect.width;
+					setProject(
+						"timeline",
+						"audioSegments",
+						audioSegments().indexOf(segment),
+						edge === "in" ? "fadeIn" : "fadeOut",
+						Math.max(0, Math.min(fraction * segmentDuration, maxFade)),
+					);
+				};
+				update(downEvent);
+				return {
+					isValid: () =>
+						editorState.timeline.interactMode === "seek" &&
+						props.laneIndex === lane &&
+						getSegmentTrack(segment) === lane &&
+						audioSegments().includes(segment),
+					update,
+					finish: () => {
 						resumeHistory();
 						setFadeDrag(null);
-						dispose();
 					},
-				});
+				};
 			});
 		};
 	}
@@ -422,11 +469,12 @@ export function AudioTrack(props: {
 					</button>
 				}
 			>
-				{({ segment, index }) => {
+				{(segment) => {
+					const index = () => audioSegments().indexOf(segment);
 					const isSelected = createMemo(() => {
 						const indices = selectedAudioIndices();
 						if (!indices) return false;
-						return indices.has(index);
+						return indices.has(index());
 					});
 
 					const segmentDuration = () =>
@@ -435,16 +483,16 @@ export function AudioTrack(props: {
 						Math.max(0, Math.min(1, segment.fadeIn / segmentDuration()));
 					const fadeOutFrac = () =>
 						Math.max(0, Math.min(1, segment.fadeOut / segmentDuration()));
-					const isDragging = () => draggingIndex() === index;
+					const isDragging = () => draggingSegment() === segment;
 					const fadeInActive = () =>
-						fadeDrag()?.index === index && fadeDrag()?.edge === "in";
+						fadeDrag()?.segment === segment && fadeDrag()?.edge === "in";
 					const fadeOutActive = () =>
-						fadeDrag()?.index === index && fadeDrag()?.edge === "out";
+						fadeDrag()?.segment === segment && fadeDrag()?.edge === "out";
 
 					return (
 						<SegmentRoot
 							data-audio-segment
-							data-index={index}
+							data-index={index()}
 							forceVisible={isDragging()}
 							segColor="var(--track-audio)"
 							class="group"
@@ -458,14 +506,14 @@ export function AudioTrack(props: {
 									const rect = e.currentTarget.getBoundingClientRect();
 									const fraction = (e.clientX - rect.left) / rect.width;
 									const splitTime = fraction * (segment.end - segment.start);
-									projectActions.splitAudioSegment(index, splitTime);
+									projectActions.splitAudioSegment(index(), splitTime);
 								}
 							}}
 						>
 							<SegmentHandle
 								position="start"
 								onMouseDown={createMouseDownDrag(
-									() => index,
+									() => index(),
 									() => {
 										const start = segment.start;
 										const trimStart = segment.trimStart;
@@ -483,17 +531,10 @@ export function AudioTrack(props: {
 											Math.min(value.maxValue, value.start + delta),
 										);
 										const trimDelta = next - value.start;
-										setProject("timeline", "audioSegments", index, {
+										writeSegment(segment, {
 											start: next,
 											trimStart: Math.max(0, value.trimStart + trimDelta),
 										});
-										setProject(
-											"timeline",
-											"audioSegments",
-											produce((items) => {
-												sortTrackSegments(items ?? []);
-											}),
-										);
 										setPreviewTime(next);
 									},
 								)}
@@ -501,7 +542,7 @@ export function AudioTrack(props: {
 							<SegmentContent
 								class="relative z-0 flex items-center cursor-grab overflow-hidden"
 								onMouseDown={createMouseDownDrag(
-									() => index,
+									() => index(),
 									() => ({ original: { ...segment } }),
 									(e, value, initialMouseX) => {
 										const delta = (e.clientX - initialMouseX) * secsPerPixel();
@@ -511,14 +552,7 @@ export function AudioTrack(props: {
 											totalDuration(),
 											minDuration(),
 										);
-										setProject("timeline", "audioSegments", index, next);
-										setProject(
-											"timeline",
-											"audioSegments",
-											produce((items) => {
-												sortTrackSegments(items ?? []);
-											}),
-										);
+										writeSegment(segment, next);
 									},
 								)}
 							>
@@ -546,7 +580,7 @@ export function AudioTrack(props: {
 							<SegmentHandle
 								position="end"
 								onMouseDown={createMouseDownDrag(
-									() => index,
+									() => index(),
 									() => {
 										const end = segment.end;
 										const minValue = segment.start + minDuration();
@@ -566,14 +600,7 @@ export function AudioTrack(props: {
 											value.minValue,
 											Math.min(value.maxValue, value.end + delta),
 										);
-										setProject("timeline", "audioSegments", index, "end", next);
-										setProject(
-											"timeline",
-											"audioSegments",
-											produce((items) => {
-												sortTrackSegments(items ?? []);
-											}),
-										);
+										writeSegment(segment, { end: next });
 										setPreviewTime(next);
 									},
 								)}
@@ -586,7 +613,7 @@ export function AudioTrack(props: {
 								onMouseDown={createFadeDrag(index, "in")}
 								onDblClick={(e) => {
 									e.stopPropagation();
-									setProject("timeline", "audioSegments", index, "fadeIn", 0);
+									setProject("timeline", "audioSegments", index(), "fadeIn", 0);
 								}}
 							/>
 							<FadeControl
@@ -597,7 +624,13 @@ export function AudioTrack(props: {
 								onMouseDown={createFadeDrag(index, "out")}
 								onDblClick={(e) => {
 									e.stopPropagation();
-									setProject("timeline", "audioSegments", index, "fadeOut", 0);
+									setProject(
+										"timeline",
+										"audioSegments",
+										index(),
+										"fadeOut",
+										0,
+									);
 								}}
 							/>
 						</SegmentRoot>

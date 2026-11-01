@@ -1,12 +1,12 @@
-import { createEventListenerMap } from "@solid-primitives/event-listener";
-import { createMemo, createRoot, createSignal, For, Show } from "solid-js";
+import { batch, createMemo, createSignal, For, Show } from "solid-js";
 import { produce } from "solid-js/store";
 import { t as localize } from "~/utils/i18n";
 
 import { useEditorContext } from "../context";
-import { defaultMaskSegment } from "../masks";
+import { defaultMaskSegment, type MaskSegment } from "../masks";
 import { getSegmentTrack, sortTrackSegments } from "../timelineTracks";
 import { useTimelineContext } from "./context";
+import { createTimelineMouseDrag } from "./mouse-drag";
 import {
 	SegmentContent,
 	SegmentHandle,
@@ -48,22 +48,20 @@ export function MaskTrack(props: {
 
 	const maskSegments = () => project.timeline?.maskSegments ?? [];
 	const laneSegments = createMemo(() =>
-		maskSegments()
-			.map((segment, index) => ({ segment, index }))
-			.filter(({ segment }) => getSegmentTrack(segment) === props.laneIndex),
+		maskSegments().filter(
+			(segment) => getSegmentTrack(segment) === props.laneIndex,
+		),
 	);
 	const laneSegmentPositionByIndex = createMemo(() => {
 		const positions = new Map<number, number>();
 		const segments = laneSegments();
 		for (let i = 0; i < segments.length; i++) {
-			positions.set(segments[i].index, i);
+			positions.set(maskSegments().indexOf(segments[i]), i);
 		}
 		return positions;
 	});
 	const sortedLaneSegments = createMemo(() => {
-		const sorted = laneSegments()
-			.map(({ segment }) => segment)
-			.slice();
+		const sorted = laneSegments().slice();
 		sorted.sort((a, b) => a.start - b.start);
 		return sorted;
 	});
@@ -77,8 +75,8 @@ export function MaskTrack(props: {
 		const segments = laneSegments();
 		const laneIndex = laneSegmentPositionByIndex().get(index) ?? -1;
 		return {
-			prevEnd: segments[laneIndex - 1]?.segment.end ?? 0,
-			nextStart: segments[laneIndex + 1]?.segment.start ?? totalDuration(),
+			prevEnd: segments[laneIndex - 1]?.end ?? 0,
+			nextStart: segments[laneIndex + 1]?.start ?? totalDuration(),
 		};
 	};
 
@@ -162,8 +160,7 @@ export function MaskTrack(props: {
 
 		if (
 			laneSegments().some(
-				({ segment }) =>
-					previewTime > segment.start && previewTime < segment.end,
+				(segment) => previewTime > segment.start && previewTime < segment.end,
 			)
 		)
 			return;
@@ -207,10 +204,49 @@ export function MaskTrack(props: {
 		index: number,
 		segment: { start: number; end: number },
 	) => {
+		if (e.buttons !== 0 || draggingSegment()) return;
 		const time = syncPreviewTimeToSegment(e, segment);
 		setEditorState("timeline", "hoveredMaskIndex", index);
 		setEditorState("timeline", "hoveredMaskTime", time);
 	};
+
+	function writeSegment(segment: MaskSegment, changes: Partial<MaskSegment>) {
+		const index = maskSegments().indexOf(segment);
+		if (index < 0) return;
+		const selection = editorState.timeline.selection;
+		const selected =
+			selection?.type === "mask"
+				? selection.indices.map((value) => maskSegments()[value])
+				: undefined;
+		batch(() => {
+			setProject("timeline", "maskSegments", index, changes);
+			setProject(
+				"timeline",
+				"maskSegments",
+				produce((items) => {
+					sortTrackSegments(items);
+				}),
+			);
+			if (selected && selection?.type === "mask") {
+				const indices = selected
+					.map((item) => maskSegments().indexOf(item))
+					.filter((value) => value >= 0);
+				if (
+					indices.some(
+						(value, position) => value !== selection.indices[position],
+					) ||
+					indices.length !== selection.indices.length
+				)
+					setEditorState(
+						"timeline",
+						"selection",
+						indices.length ? { type: "mask", indices } : null,
+					);
+			}
+		});
+	}
+
+	const startDrag = createTimelineMouseDrag();
 
 	function createMouseDownDrag<T>(
 		segmentIndex: () => number,
@@ -218,93 +254,101 @@ export function MaskTrack(props: {
 		update: (e: MouseEvent, value: T, initialMouseX: number) => void,
 	) {
 		return (downEvent: MouseEvent) => {
-			if (editorState.timeline.interactMode !== "seek") return;
+			if (
+				downEvent.button !== 0 ||
+				editorState.timeline.interactMode !== "seek"
+			)
+				return;
 			downEvent.stopPropagation();
-			const initial = setup();
-			let moved = false;
-			let initialMouseX: number | null = null;
+			startDrag(() => {
+				const segment = maskSegments()[segmentIndex()];
+				const lane = props.laneIndex;
+				const initial = setup();
+				let moved = false;
+				let initialMouseX: number | null = null;
 
-			const resumeHistory = projectHistory.pause();
-			setDraggingSegment(true);
-			props.onDragStateChanged({ type: "movePending" });
+				const resumeHistory = projectHistory.pause();
+				setDraggingSegment(true);
+				props.onDragStateChanged({ type: "movePending" });
 
-			function finish(e: MouseEvent) {
-				resumeHistory();
-				if (!moved) {
-					e.stopPropagation();
-					const currentSelection = editorState.timeline.selection;
-					const index = segmentIndex();
-					const isMultiSelect = e.ctrlKey || e.metaKey;
-					const isRangeSelect = e.shiftKey;
+				function finish(e?: MouseEvent) {
+					resumeHistory();
+					if (!moved && e) {
+						e.stopPropagation();
+						const currentSelection = editorState.timeline.selection;
+						const index = segmentIndex();
+						const isMultiSelect = e.ctrlKey || e.metaKey;
+						const isRangeSelect = e.shiftKey;
 
-					if (isRangeSelect && currentSelection?.type === "mask") {
-						const existingIndices = currentSelection.indices;
-						const lastIndex = existingIndices[existingIndices.length - 1];
-						const start = Math.min(lastIndex, index);
-						const end = Math.max(lastIndex, index);
-						const rangeIndices: number[] = [];
-						for (let idx = start; idx <= end; idx++) rangeIndices.push(idx);
-						setEditorState("timeline", "selection", {
-							type: "mask",
-							indices: rangeIndices,
-						});
-					} else if (isMultiSelect) {
-						if (currentSelection?.type === "mask") {
-							const base = currentSelection.indices;
-							const exists = base.includes(index);
-							const next = exists
-								? base.filter((i) => i !== index)
-								: [...base, index];
-							setEditorState(
-								"timeline",
-								"selection",
-								next.length > 0
-									? {
-											type: "mask",
-											indices: next,
-										}
-									: null,
-							);
+						if (isRangeSelect && currentSelection?.type === "mask") {
+							const existingIndices = currentSelection.indices;
+							const lastIndex = existingIndices[existingIndices.length - 1];
+							const start = Math.min(lastIndex, index);
+							const end = Math.max(lastIndex, index);
+							const rangeIndices: number[] = [];
+							for (let idx = start; idx <= end; idx++) rangeIndices.push(idx);
+							setEditorState("timeline", "selection", {
+								type: "mask",
+								indices: rangeIndices,
+							});
+						} else if (isMultiSelect) {
+							if (currentSelection?.type === "mask") {
+								const base = currentSelection.indices;
+								const exists = base.includes(index);
+								const next = exists
+									? base.filter((i) => i !== index)
+									: [...base, index];
+								setEditorState(
+									"timeline",
+									"selection",
+									next.length > 0
+										? {
+												type: "mask",
+												indices: next,
+											}
+										: null,
+								);
+							} else {
+								setEditorState("timeline", "selection", {
+									type: "mask",
+									indices: [index],
+								});
+							}
 						} else {
 							setEditorState("timeline", "selection", {
 								type: "mask",
 								indices: [index],
 							});
 						}
-					} else {
-						setEditorState("timeline", "selection", {
-							type: "mask",
-							indices: [index],
-						});
+						props.handleUpdatePlayhead(e);
 					}
-					props.handleUpdatePlayhead(e);
-				}
-				props.onDragStateChanged({ type: "idle" });
-				setDraggingSegment(false);
-			}
-
-			function handleUpdate(event: MouseEvent) {
-				if (Math.abs(event.clientX - downEvent.clientX) > 2) {
-					if (!moved) {
-						moved = true;
-						initialMouseX = event.clientX;
-						props.onDragStateChanged({ type: "moving" });
-					}
+					props.onDragStateChanged({ type: "idle" });
+					setDraggingSegment(false);
 				}
 
-				if (initialMouseX === null) return;
-				update(event, initial, initialMouseX);
-			}
+				function handleUpdate(event: MouseEvent) {
+					if (Math.abs(event.clientX - downEvent.clientX) > 2) {
+						if (!moved) {
+							moved = true;
+							initialMouseX = event.clientX;
+							props.onDragStateChanged({ type: "moving" });
+						}
+					}
 
-			createRoot((dispose) => {
-				createEventListenerMap(window, {
-					mousemove: (e) => handleUpdate(e),
-					mouseup: (e) => {
-						handleUpdate(e);
-						finish(e);
-						dispose();
-					},
-				});
+					if (initialMouseX === null) return;
+					update(event, initial, initialMouseX);
+				}
+
+				return {
+					isValid: () =>
+						editorState.timeline.interactMode === "seek" &&
+						props.laneIndex === lane &&
+						!!segment &&
+						getSegmentTrack(segment) === lane &&
+						maskSegments().includes(segment),
+					update: handleUpdate,
+					finish,
+				};
 			});
 		};
 	}
@@ -341,11 +385,12 @@ export function MaskTrack(props: {
 					</Show>
 				}
 			>
-				{({ segment, index }) => {
+				{(segment) => {
+					const index = () => maskSegments().indexOf(segment);
 					const isSelected = createMemo(() => {
 						const indices = selectedMaskIndices();
 						if (!indices) return false;
-						return indices.has(index);
+						return indices.has(index());
 					});
 
 					const contentLabel = () =>
@@ -358,20 +403,20 @@ export function MaskTrack(props: {
 					return (
 						<SegmentRoot
 							data-mask-segment
-							data-index={index}
+							data-index={index()}
 							segColor="var(--track-mask)"
 							class="group"
 							selected={isSelected()}
 							title={`${localize("遮罩")} · ${contentLabel()}`}
 							segment={segment}
 							onMouseEnter={(e) => {
-								setHoveredSegmentState(e, index, segment);
+								setHoveredSegmentState(e, index(), segment);
 							}}
 							onMouseOver={(e) => {
-								setHoveredSegmentState(e, index, segment);
+								setHoveredSegmentState(e, index(), segment);
 							}}
 							onMouseMove={(e) => {
-								setHoveredSegmentState(e, index, segment);
+								setHoveredSegmentState(e, index(), segment);
 							}}
 							onMouseLeave={() => {
 								setEditorState("timeline", "hoveredMaskIndex", null);
@@ -394,16 +439,16 @@ export function MaskTrack(props: {
 									const rect = e.currentTarget.getBoundingClientRect();
 									const fraction = (e.clientX - rect.left) / rect.width;
 									const splitTime = fraction * segmentWidth();
-									projectActions.splitMaskSegment(index, splitTime);
+									projectActions.splitMaskSegment(index(), splitTime);
 								}
 							}}
 						>
 							<SegmentHandle
 								position="start"
 								onMouseDown={createMouseDownDrag(
-									() => index,
+									() => index(),
 									() => {
-										const bounds = neighborBounds(index);
+										const bounds = neighborBounds(index());
 										const start = segment.start;
 										const minValue = bounds.prevEnd;
 										const maxValue = Math.max(
@@ -421,20 +466,7 @@ export function MaskTrack(props: {
 											value.minValue,
 											Math.min(value.maxValue, value.start + delta),
 										);
-										setProject(
-											"timeline",
-											"maskSegments",
-											index,
-											"start",
-											next,
-										);
-										setProject(
-											"timeline",
-											"maskSegments",
-											produce((items) => {
-												sortTrackSegments(items);
-											}),
-										);
+										writeSegment(segment, { start: next });
 										setPreviewTime(next);
 									},
 								)}
@@ -442,10 +474,10 @@ export function MaskTrack(props: {
 							<SegmentContent
 								class="flex items-center cursor-grab"
 								onMouseDown={createMouseDownDrag(
-									() => index,
+									() => index(),
 									() => {
 										const original = { ...segment };
-										const bounds = neighborBounds(index);
+										const bounds = neighborBounds(index());
 										const minDelta = bounds.prevEnd - original.start;
 										const maxDelta = bounds.nextStart - original.end;
 										return {
@@ -462,18 +494,11 @@ export function MaskTrack(props: {
 											upperBound,
 											Math.max(lowerBound, delta),
 										);
-										setProject("timeline", "maskSegments", index, {
+										writeSegment(segment, {
 											...value.original,
 											start: value.original.start + clampedDelta,
 											end: value.original.end + clampedDelta,
 										});
-										setProject(
-											"timeline",
-											"maskSegments",
-											produce((items) => {
-												sortTrackSegments(items);
-											}),
-										);
 									},
 								)}
 							>
@@ -496,9 +521,9 @@ export function MaskTrack(props: {
 							<SegmentHandle
 								position="end"
 								onMouseDown={createMouseDownDrag(
-									() => index,
+									() => index(),
 									() => {
-										const bounds = neighborBounds(index);
+										const bounds = neighborBounds(index());
 										const end = segment.end;
 										const minValue = segment.start + minDuration();
 										const maxValue = Math.max(minValue, bounds.nextStart);
@@ -510,14 +535,7 @@ export function MaskTrack(props: {
 											value.minValue,
 											Math.min(value.maxValue, value.end + delta),
 										);
-										setProject("timeline", "maskSegments", index, "end", next);
-										setProject(
-											"timeline",
-											"maskSegments",
-											produce((items) => {
-												sortTrackSegments(items);
-											}),
-										);
+										writeSegment(segment, { end: next });
 										setPreviewTime(next);
 									},
 								)}

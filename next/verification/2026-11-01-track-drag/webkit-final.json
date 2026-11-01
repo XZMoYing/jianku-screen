@@ -1,0 +1,161 @@
+{
+	"observations": [
+		{
+			"name": "text/blur/finish",
+			"passed": true
+		},
+		{
+			"name": "text/blur/stale",
+			"passed": true
+		},
+		{
+			"name": "text/escape/finish",
+			"passed": true
+		},
+		{
+			"name": "text/escape/stale",
+			"passed": true
+		},
+		{
+			"name": "text/unmount/finish",
+			"passed": true
+		},
+		{
+			"name": "text/unmount/stale",
+			"passed": true
+		},
+		{
+			"name": "text/mode/finish",
+			"passed": true
+		},
+		{
+			"name": "text/mode/stale",
+			"passed": true
+		},
+		{
+			"name": "text/lane/finish",
+			"passed": true
+		},
+		{
+			"name": "text/lane/stale",
+			"passed": true
+		},
+		{
+			"name": "text/delete/finish",
+			"passed": true
+		},
+		{
+			"name": "text/delete/stale",
+			"passed": true
+		},
+		{
+			"name": "mask/blur/finish",
+			"passed": true
+		},
+		{
+			"name": "mask/blur/stale",
+			"passed": true
+		},
+		{
+			"name": "mask/escape/finish",
+			"passed": true
+		},
+		{
+			"name": "mask/escape/stale",
+			"passed": true
+		},
+		{
+			"name": "mask/unmount/finish",
+			"passed": true
+		},
+		{
+			"name": "mask/unmount/stale",
+			"passed": true
+		},
+		{
+			"name": "mask/mode/finish",
+			"passed": true
+		},
+		{
+			"name": "mask/mode/stale",
+			"passed": true
+		},
+		{
+			"name": "mask/lane/finish",
+			"passed": true
+		},
+		{
+			"name": "mask/lane/stale",
+			"passed": true
+		},
+		{
+			"name": "mask/delete/finish",
+			"passed": true
+		},
+		{
+			"name": "mask/delete/stale",
+			"passed": true
+		},
+		{
+			"name": "audio/blur/finish",
+			"passed": true
+		},
+		{
+			"name": "audio/blur/stale",
+			"passed": true
+		},
+		{
+			"name": "audio/escape/finish",
+			"passed": true
+		},
+		{
+			"name": "audio/escape/stale",
+			"passed": true
+		},
+		{
+			"name": "audio/unmount/finish",
+			"passed": true
+		},
+		{
+			"name": "audio/unmount/stale",
+			"passed": true
+		},
+		{
+			"name": "audio/mode/finish",
+			"passed": true
+		},
+		{
+			"name": "audio/mode/stale",
+			"passed": true
+		},
+		{
+			"name": "audio/lane/finish",
+			"passed": true
+		},
+		{
+			"name": "audio/lane/stale",
+			"passed": true
+		},
+		{
+			"name": "audio/delete/finish",
+			"passed": true
+		},
+		{
+			"name": "audio/delete/stale",
+			"passed": true
+		},
+		{
+			"name": "audio/sorting/identity",
+			"passed": true
+		},
+		{
+			"name": "audio/sorting/node",
+			"passed": true
+		},
+		{
+			"name": "audio/sorting/selection",
+			"passed": true
+		}
+	],
+	"passed": true
+}

@@ -1,12 +1,12 @@
-import { createEventListenerMap } from "@solid-primitives/event-listener";
-import { createMemo, createRoot, createSignal, For, Show } from "solid-js";
+import { batch, createMemo, createSignal, For, Show } from "solid-js";
 import { produce } from "solid-js/store";
 import { cssFontFamily } from "~/utils/fonts";
 import { t as localize } from "~/utils/i18n";
 import { useEditorContext } from "../context";
-import { autoTextColorAt, defaultTextSegment } from "../text";
+import { autoTextColorAt, defaultTextSegment, type TextSegment } from "../text";
 import { getSegmentTrack, sortTrackSegments } from "../timelineTracks";
 import { useTimelineContext } from "./context";
+import { createTimelineMouseDrag } from "./mouse-drag";
 import {
 	SegmentContent,
 	SegmentHandle,
@@ -49,22 +49,20 @@ export function TextTrack(props: {
 
 	const textSegments = () => project.timeline?.textSegments ?? [];
 	const laneSegments = createMemo(() =>
-		textSegments()
-			.map((segment, index) => ({ segment, index }))
-			.filter(({ segment }) => getSegmentTrack(segment) === props.laneIndex),
+		textSegments().filter(
+			(segment) => getSegmentTrack(segment) === props.laneIndex,
+		),
 	);
 	const laneSegmentPositionByIndex = createMemo(() => {
 		const positions = new Map<number, number>();
 		const segments = laneSegments();
 		for (let i = 0; i < segments.length; i++) {
-			positions.set(segments[i].index, i);
+			positions.set(textSegments().indexOf(segments[i]), i);
 		}
 		return positions;
 	});
 	const sortedLaneSegments = createMemo(() => {
-		const sorted = laneSegments()
-			.map(({ segment }) => segment)
-			.slice();
+		const sorted = laneSegments().slice();
 		sorted.sort((a, b) => a.start - b.start);
 		return sorted;
 	});
@@ -78,8 +76,8 @@ export function TextTrack(props: {
 		const segments = laneSegments();
 		const laneIndex = laneSegmentPositionByIndex().get(index) ?? -1;
 		return {
-			prevEnd: segments[laneIndex - 1]?.segment.end ?? 0,
-			nextStart: segments[laneIndex + 1]?.segment.start ?? totalDuration(),
+			prevEnd: segments[laneIndex - 1]?.end ?? 0,
+			nextStart: segments[laneIndex + 1]?.start ?? totalDuration(),
 		};
 	};
 
@@ -164,8 +162,7 @@ export function TextTrack(props: {
 
 		if (
 			laneSegments().some(
-				({ segment }) =>
-					previewTime > segment.start && previewTime < segment.end,
+				(segment) => previewTime > segment.start && previewTime < segment.end,
 			)
 		)
 			return;
@@ -189,99 +186,145 @@ export function TextTrack(props: {
 		props.handleUpdatePlayhead(e);
 	};
 
+	function writeSegment(segment: TextSegment, changes: Partial<TextSegment>) {
+		const index = textSegments().indexOf(segment);
+		if (index < 0) return;
+		const selection = editorState.timeline.selection;
+		const selected =
+			selection?.type === "text"
+				? selection.indices.map((value) => textSegments()[value])
+				: undefined;
+		batch(() => {
+			setProject("timeline", "textSegments", index, changes);
+			setProject(
+				"timeline",
+				"textSegments",
+				produce((items) => {
+					sortTrackSegments(items);
+				}),
+			);
+			if (selected && selection?.type === "text") {
+				const indices = selected
+					.map((item) => textSegments().indexOf(item))
+					.filter((value) => value >= 0);
+				if (
+					indices.some(
+						(value, position) => value !== selection.indices[position],
+					) ||
+					indices.length !== selection.indices.length
+				)
+					setEditorState(
+						"timeline",
+						"selection",
+						indices.length ? { type: "text", indices } : null,
+					);
+			}
+		});
+	}
+
+	const startDrag = createTimelineMouseDrag();
+
 	function createMouseDownDrag<T>(
 		segmentIndex: () => number,
 		setup: () => T,
 		update: (e: MouseEvent, value: T, initialMouseX: number) => void,
 	) {
 		return (downEvent: MouseEvent) => {
-			if (editorState.timeline.interactMode !== "seek") return;
+			if (
+				downEvent.button !== 0 ||
+				editorState.timeline.interactMode !== "seek"
+			)
+				return;
 			downEvent.stopPropagation();
-			const initial = setup();
-			let moved = false;
-			let initialMouseX: number | null = null;
+			startDrag(() => {
+				const segment = textSegments()[segmentIndex()];
+				const lane = props.laneIndex;
+				const initial = setup();
+				let moved = false;
+				let initialMouseX: number | null = null;
 
-			const resumeHistory = projectHistory.pause();
-			setDraggingSegment(true);
-			props.onDragStateChanged({ type: "movePending" });
+				const resumeHistory = projectHistory.pause();
+				setDraggingSegment(true);
+				props.onDragStateChanged({ type: "movePending" });
 
-			function finish(e: MouseEvent) {
-				resumeHistory();
-				if (!moved) {
-					e.stopPropagation();
-					const currentSelection = editorState.timeline.selection;
-					const index = segmentIndex();
-					const isMultiSelect = e.ctrlKey || e.metaKey;
-					const isRangeSelect = e.shiftKey;
+				function finish(e?: MouseEvent) {
+					resumeHistory();
+					if (!moved && e) {
+						e.stopPropagation();
+						const currentSelection = editorState.timeline.selection;
+						const index = segmentIndex();
+						const isMultiSelect = e.ctrlKey || e.metaKey;
+						const isRangeSelect = e.shiftKey;
 
-					if (isRangeSelect && currentSelection?.type === "text") {
-						const existingIndices = currentSelection.indices;
-						const lastIndex = existingIndices[existingIndices.length - 1];
-						const start = Math.min(lastIndex, index);
-						const end = Math.max(lastIndex, index);
-						const rangeIndices: number[] = [];
-						for (let idx = start; idx <= end; idx++) rangeIndices.push(idx);
-						setEditorState("timeline", "selection", {
-							type: "text",
-							indices: rangeIndices,
-						});
-					} else if (isMultiSelect) {
-						if (currentSelection?.type === "text") {
-							const base = currentSelection.indices;
-							const exists = base.includes(index);
-							const next = exists
-								? base.filter((i) => i !== index)
-								: [...base, index];
-							setEditorState(
-								"timeline",
-								"selection",
-								next.length > 0
-									? {
-											type: "text",
-											indices: next,
-										}
-									: null,
-							);
+						if (isRangeSelect && currentSelection?.type === "text") {
+							const existingIndices = currentSelection.indices;
+							const lastIndex = existingIndices[existingIndices.length - 1];
+							const start = Math.min(lastIndex, index);
+							const end = Math.max(lastIndex, index);
+							const rangeIndices: number[] = [];
+							for (let idx = start; idx <= end; idx++) rangeIndices.push(idx);
+							setEditorState("timeline", "selection", {
+								type: "text",
+								indices: rangeIndices,
+							});
+						} else if (isMultiSelect) {
+							if (currentSelection?.type === "text") {
+								const base = currentSelection.indices;
+								const exists = base.includes(index);
+								const next = exists
+									? base.filter((i) => i !== index)
+									: [...base, index];
+								setEditorState(
+									"timeline",
+									"selection",
+									next.length > 0
+										? {
+												type: "text",
+												indices: next,
+											}
+										: null,
+								);
+							} else {
+								setEditorState("timeline", "selection", {
+									type: "text",
+									indices: [index],
+								});
+							}
 						} else {
 							setEditorState("timeline", "selection", {
 								type: "text",
 								indices: [index],
 							});
 						}
-					} else {
-						setEditorState("timeline", "selection", {
-							type: "text",
-							indices: [index],
-						});
+						props.handleUpdatePlayhead(e);
 					}
-					props.handleUpdatePlayhead(e);
-				}
-				props.onDragStateChanged({ type: "idle" });
-				setDraggingSegment(false);
-			}
-
-			function handleUpdate(event: MouseEvent) {
-				if (Math.abs(event.clientX - downEvent.clientX) > 2) {
-					if (!moved) {
-						moved = true;
-						initialMouseX = event.clientX;
-						props.onDragStateChanged({ type: "moving" });
-					}
+					props.onDragStateChanged({ type: "idle" });
+					setDraggingSegment(false);
 				}
 
-				if (initialMouseX === null) return;
-				update(event, initial, initialMouseX);
-			}
+				function handleUpdate(event: MouseEvent) {
+					if (Math.abs(event.clientX - downEvent.clientX) > 2) {
+						if (!moved) {
+							moved = true;
+							initialMouseX = event.clientX;
+							props.onDragStateChanged({ type: "moving" });
+						}
+					}
 
-			createRoot((dispose) => {
-				createEventListenerMap(window, {
-					mousemove: (e) => handleUpdate(e),
-					mouseup: (e) => {
-						handleUpdate(e);
-						finish(e);
-						dispose();
-					},
-				});
+					if (initialMouseX === null) return;
+					update(event, initial, initialMouseX);
+				}
+
+				return {
+					isValid: () =>
+						editorState.timeline.interactMode === "seek" &&
+						props.laneIndex === lane &&
+						!!segment &&
+						getSegmentTrack(segment) === lane &&
+						textSegments().includes(segment),
+					update: handleUpdate,
+					finish,
+				};
 			});
 		};
 	}
@@ -314,11 +357,12 @@ export function TextTrack(props: {
 					</Show>
 				}
 			>
-				{({ segment, index }) => {
+				{(segment) => {
+					const index = () => textSegments().indexOf(segment);
 					const isSelected = createMemo(() => {
 						const indices = selectedTextIndices();
 						if (!indices) return false;
-						return indices.has(index);
+						return indices.has(index());
 					});
 
 					const segmentWidth = () => segment.end - segment.start;
@@ -356,7 +400,7 @@ export function TextTrack(props: {
 					return (
 						<SegmentRoot
 							data-text-segment
-							data-index={index}
+							data-index={index()}
 							segColor="var(--track-text)"
 							class="group"
 							selected={isSelected()}
@@ -369,16 +413,16 @@ export function TextTrack(props: {
 									const rect = e.currentTarget.getBoundingClientRect();
 									const fraction = (e.clientX - rect.left) / rect.width;
 									const splitTime = fraction * segmentWidth();
-									projectActions.splitTextSegment(index, splitTime);
+									projectActions.splitTextSegment(index(), splitTime);
 								}
 							}}
 						>
 							<SegmentHandle
 								position="start"
 								onMouseDown={createMouseDownDrag(
-									() => index,
+									() => index(),
 									() => {
-										const bounds = neighborBounds(index);
+										const bounds = neighborBounds(index());
 										const start = segment.start;
 										const minValue = bounds.prevEnd;
 										const maxValue = Math.max(
@@ -396,20 +440,7 @@ export function TextTrack(props: {
 											value.minValue,
 											Math.min(value.maxValue, value.start + delta),
 										);
-										setProject(
-											"timeline",
-											"textSegments",
-											index,
-											"start",
-											next,
-										);
-										setProject(
-											"timeline",
-											"textSegments",
-											produce((items) => {
-												sortTrackSegments(items);
-											}),
-										);
+										writeSegment(segment, { start: next });
 										setPreviewTime(next);
 									},
 								)}
@@ -417,10 +448,10 @@ export function TextTrack(props: {
 							<SegmentContent
 								class="flex items-center cursor-grab overflow-hidden"
 								onMouseDown={createMouseDownDrag(
-									() => index,
+									() => index(),
 									() => {
 										const original = { ...segment };
-										const bounds = neighborBounds(index);
+										const bounds = neighborBounds(index());
 										const minDelta = bounds.prevEnd - original.start;
 										const maxDelta = bounds.nextStart - original.end;
 										return {
@@ -437,18 +468,11 @@ export function TextTrack(props: {
 											upperBound,
 											Math.max(lowerBound, delta),
 										);
-										setProject("timeline", "textSegments", index, {
+										writeSegment(segment, {
 											...value.original,
 											start: value.original.start + clampedDelta,
 											end: value.original.end + clampedDelta,
 										});
-										setProject(
-											"timeline",
-											"textSegments",
-											produce((items) => {
-												sortTrackSegments(items);
-											}),
-										);
 									},
 								)}
 							>
@@ -475,9 +499,9 @@ export function TextTrack(props: {
 							<SegmentHandle
 								position="end"
 								onMouseDown={createMouseDownDrag(
-									() => index,
+									() => index(),
 									() => {
-										const bounds = neighborBounds(index);
+										const bounds = neighborBounds(index());
 										const end = segment.end;
 										const minValue = segment.start + minDuration();
 										const maxValue = Math.max(minValue, bounds.nextStart);
@@ -489,14 +513,7 @@ export function TextTrack(props: {
 											value.minValue,
 											Math.min(value.maxValue, value.end + delta),
 										);
-										setProject("timeline", "textSegments", index, "end", next);
-										setProject(
-											"timeline",
-											"textSegments",
-											produce((items) => {
-												sortTrackSegments(items);
-											}),
-										);
+										writeSegment(segment, { end: next });
 										setPreviewTime(next);
 									},
 								)}

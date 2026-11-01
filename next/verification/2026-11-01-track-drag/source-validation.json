@@ -1,0 +1,7 @@
+{
+	"apps/desktop/src/routes/editor/Timeline/TextTrack.tsx": "f911b1eed80beb2e6efa5df62553ab369197e4f25263449f3661961ae894705e",
+	"apps/desktop/src/routes/editor/Timeline/MaskTrack.tsx": "747666cbb844bd89f9a8a92dfeb35509d802063e69593528190fd77a1230433f",
+	"apps/desktop/src/routes/editor/Timeline/AudioTrack.tsx": "b1c453df6016b4afe11dc55654d69aa4a54c2d233a5fcd0207c2d8b5e87b419e",
+	"apps/desktop/src/routes/editor/Timeline/mouse-drag.ts": "9996088c730a90ec351fd84bb3600baca3bf6f781790e79118cfe724c23b0496",
+	"apps/desktop/src/routes/editor/Timeline/segment-drag.test.tsx": "6715591ae25a6542cecf82248d1073af53bc6216fe1d9054b247901d595fe411"
+}

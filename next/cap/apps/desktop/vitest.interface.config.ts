@@ -19,6 +19,7 @@ export default defineConfig({
 			"src/components/mobile-resource-view.test.tsx",
 			"src/routes/editor/canvas-drag.test.tsx",
 			"src/routes/editor/Timeline/hover-preview.test.tsx",
+			"src/routes/editor/Timeline/segment-drag.test.tsx",
 		],
 		server: {
 			deps: {
