@@ -1,0 +1,21 @@
+{
+	"version": "0.2.0-alpha.50",
+	"build": "2026.50.0",
+	"sourceCheckpoint": "eea9b76",
+	"applicationExecutableSha256": "1c84dea190f9f5b0179873307e062f2f59c057c6cdd1f364aa261eba9b6ac0bc",
+	"scope": "native accessibility interaction on installed application",
+	"functionalObservationsPassed": 26,
+	"scrollRetentionPassed": false,
+	"initialAndFinalMode": "recording/desktop",
+	"recordingOrPresentationStarted": false,
+	"privateAxTreesUploaded": false,
+	"deviceConnectionVerified": false,
+	"performanceOrVisualComfortVerified": false,
+	"restoredPin": false,
+	"restoredGeometry": {
+		"x": 250,
+		"y": 98,
+		"width": 1120,
+		"height": 800
+	}
+}

@@ -1,0 +1,11 @@
+{
+	"check": "mobile-scroll-retained-across-mode",
+	"passed": false,
+	"beforeAnchorY": 765,
+	"afterAnchorY": 1009,
+	"delta": 244,
+	"modeRestored": true,
+	"mobileRestored": true,
+	"boundsUnchanged": true,
+	"note": "AXScrollToVisible on refresh-list button only; did not press refresh or open user recordings"
+}

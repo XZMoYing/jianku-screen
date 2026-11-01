@@ -1,0 +1,444 @@
+[
+	{
+		"check": "presentation-menu-open",
+		"passed": true,
+		"recording": "0",
+		"presentation": "1",
+		"desktop": null,
+		"mobile": null,
+		"openLists": 1,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "hide-presentation-cancels-menu",
+		"passed": true,
+		"recording": "1",
+		"presentation": "0",
+		"desktop": "1",
+		"mobile": "0",
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "presentation-ratio-retained",
+		"passed": true,
+		"recording": "0",
+		"presentation": "1",
+		"desktop": null,
+		"mobile": null,
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "presentation-menu-reopen",
+		"passed": true,
+		"recording": "0",
+		"presentation": "1",
+		"desktop": null,
+		"mobile": null,
+		"openLists": 1,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "escape-cancels-menu-without-value-change",
+		"passed": true,
+		"recording": "0",
+		"presentation": "1",
+		"desktop": null,
+		"mobile": null,
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "recording-restored",
+		"passed": true,
+		"recording": "1",
+		"presentation": "0",
+		"desktop": "1",
+		"mobile": "0",
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "mobile-source-active",
+		"passed": true,
+		"recording": "1",
+		"presentation": "0",
+		"desktop": "0",
+		"mobile": "1",
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "mobile-content-ready",
+		"passed": true,
+		"recording": "1",
+		"presentation": "0",
+		"desktop": "0",
+		"mobile": "1",
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "mobile-device-menu-open",
+		"passed": true,
+		"recording": "1",
+		"presentation": "0",
+		"desktop": "0",
+		"mobile": "1",
+		"openLists": 1,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "desktop-hides-mobile-menu",
+		"passed": true,
+		"recording": "1",
+		"presentation": "0",
+		"desktop": "1",
+		"mobile": "0",
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "mobile-settings-retained",
+		"passed": true,
+		"recording": "1",
+		"presentation": "0",
+		"desktop": "0",
+		"mobile": "1",
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "mobile-content-scrolls",
+		"passed": true,
+		"recording": "1",
+		"presentation": "0",
+		"desktop": "0",
+		"mobile": "1",
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "presentation-from-mobile",
+		"passed": true,
+		"recording": "0",
+		"presentation": "1",
+		"desktop": null,
+		"mobile": null,
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "mobile-source-retained-through-mode",
+		"passed": true,
+		"recording": "1",
+		"presentation": "0",
+		"desktop": "0",
+		"mobile": "1",
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "desktop-after-mobile",
+		"passed": true,
+		"recording": "1",
+		"presentation": "0",
+		"desktop": "1",
+		"mobile": "0",
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "mode-rapid-reverse-1",
+		"passed": true,
+		"recording": "1",
+		"presentation": "0",
+		"desktop": "1",
+		"mobile": "0",
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "source-rapid-reverse-1",
+		"passed": true,
+		"recording": "1",
+		"presentation": "0",
+		"desktop": "1",
+		"mobile": "0",
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "mode-rapid-reverse-2",
+		"passed": true,
+		"recording": "1",
+		"presentation": "0",
+		"desktop": "1",
+		"mobile": "0",
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "source-rapid-reverse-2",
+		"passed": true,
+		"recording": "1",
+		"presentation": "0",
+		"desktop": "1",
+		"mobile": "0",
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "mode-rapid-reverse-3",
+		"passed": true,
+		"recording": "1",
+		"presentation": "0",
+		"desktop": "1",
+		"mobile": "0",
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "source-rapid-reverse-3",
+		"passed": true,
+		"recording": "1",
+		"presentation": "0",
+		"desktop": "1",
+		"mobile": "0",
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "final-original-state",
+		"passed": true,
+		"recording": "1",
+		"presentation": "0",
+		"desktop": "1",
+		"mobile": "0",
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "scroll-probe-mobile-ready",
+		"passed": true,
+		"recording": "1",
+		"presentation": "0",
+		"desktop": "0",
+		"mobile": "1",
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "scroll-probe-presentation",
+		"passed": true,
+		"recording": "0",
+		"presentation": "1",
+		"desktop": null,
+		"mobile": null,
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "scroll-probe-mobile-returned",
+		"passed": true,
+		"recording": "1",
+		"presentation": "0",
+		"desktop": "0",
+		"mobile": "1",
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	},
+	{
+		"check": "scroll-probe-restored-original",
+		"passed": true,
+		"recording": "1",
+		"presentation": "0",
+		"desktop": "1",
+		"mobile": "0",
+		"openLists": 0,
+		"pin": "0",
+		"bounds": {
+			"Height": 800,
+			"Width": 1120,
+			"X": 250,
+			"Y": 98
+		},
+		"captureRatioFit": true
+	}
+]
