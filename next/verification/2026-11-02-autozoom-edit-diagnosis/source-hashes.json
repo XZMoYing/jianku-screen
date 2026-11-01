@@ -1,0 +1,5 @@
+{
+	"apps/desktop/src-tauri/src/lib.rs": "9bf6a1a915de215c0bdb726089b94924c90599ee66d2af379ae8dfa7317f1b27",
+	"apps/desktop/src-tauri/src/recording.rs": "d883893ef5067f47b8c36d3e35b58adc5e8b8129ce5a8e6cf6681fa935d0e300",
+	"apps/desktop/src/routes/editor/Timeline/ZoomTrack.tsx": "7ae2ada5a181c7488e5c4df2cce00af65069e27101c91dcb51d613a527347f83"
+}

@@ -1,0 +1,51 @@
+{
+	"version": "0.2.0-alpha.53",
+	"sourceCommit": "5a44e8e0d7345bfa36aa1f3a1facd8b38b111db0",
+	"scope": "installed native editor Generate action on an independent trimmed synthetic project",
+	"retainedTimeline": [
+		{
+			"recordingSegment": 0,
+			"timescale": 1.0,
+			"start": 4.0,
+			"end": 8.0,
+			"name": null
+		}
+	],
+	"editedDurationSeconds": 4.0,
+	"retainedClickCount": 0,
+	"generatedZoomSegments": [
+		{
+			"start": 1.7,
+			"end": 4.58,
+			"amount": 2.0,
+			"mode": "auto",
+			"glideDirection": "none",
+			"glideSpeed": 0.5,
+			"instantAnimation": false,
+			"edgeSnapRatio": 0.25
+		},
+		{
+			"start": 9.7,
+			"end": 12.58,
+			"amount": 2.0,
+			"mode": "auto",
+			"glideDirection": "none",
+			"glideSpeed": 0.5,
+			"instantAnimation": false,
+			"edgeSnapRatio": 0.25
+		},
+		{
+			"start": 17.7,
+			"end": 20.58,
+			"amount": 2.0,
+			"mode": "auto",
+			"glideDirection": "none",
+			"glideSpeed": 0.5,
+			"instantAnimation": false,
+			"edgeSnapRatio": 0.25
+		}
+	],
+	"outOfEditedRange": 3,
+	"reproduced": true,
+	"productChanged": false
+}
