@@ -1,0 +1,10 @@
+			createRoot((dispose) => {
+				createEventListenerMap(window, {
+					mousemove: (e) => handleUpdate(e),
+					mouseup: (e) => {
+						handleUpdate(e);
+						finish(e);
+						dispose();
+					},
+				});
+			});

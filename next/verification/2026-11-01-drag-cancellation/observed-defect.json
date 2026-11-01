@@ -1,0 +1,17 @@
+{
+	"sourceSha256": "3881889efe512e70ce5fe08bc6a3d391347bc8b4bd232b245f904166aafe349a",
+	"scope": "original TextTrack listener root with simulated update/finish callbacks; real Solid ownership/event-listener library and Chromium",
+	"cases": [
+		{
+			"kind": "blur",
+			"updatesAfterCancellation": 1,
+			"finishCallsAfterCancellation": 0
+		},
+		{
+			"kind": "owner-disposal",
+			"updatesAfterCancellation": 1,
+			"finishCallsAfterCancellation": 0
+		}
+	],
+	"observed": true
+}
