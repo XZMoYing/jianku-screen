@@ -22,6 +22,7 @@ export default defineConfig({
 			"src/routes/editor/Timeline/segment-drag.test.tsx",
 			"src/routes/editor/text-history.test.tsx",
 			"src/routes/editor/text-drag.test.tsx",
+			"src/routes/editor/auto-zoom-generation.test.ts",
 		],
 		server: {
 			deps: {

@@ -16,7 +16,8 @@ import toast from "solid-toast";
 import { generalSettingsStore } from "~/store";
 import { t as localize } from "~/utils/i18n";
 import { commands } from "~/utils/tauri";
-import { useEditorContext } from "../context";
+import { createAutoZoomGeneration } from "../auto-zoom-generation";
+import { serializeProjectConfiguration, useEditorContext } from "../context";
 import { useTimelineContext, useTrackContext } from "./context";
 import {
 	SegmentContent,
@@ -37,7 +38,7 @@ const MIN_ZOOM_SEGMENT_PIXEL_WIDTH = 40;
 const MIN_NEW_SEGMENT_PIXEL_WIDTH = 80;
 const MIN_NEW_SEGMENT_SECS_WIDTH = 1;
 const NO_AUTO_ZOOM_CLICKS_MESSAGE =
-	"未检测到可缩放的点击操作。可在轨道上拖动以添加缩放片段。";
+	"未检测到可缩放的点击操作。拖动轨道即可添加缩放片段。";
 
 export function ZoomTrack(props: {
 	onDragStateChanged: (v: ZoomSegmentDragState) => void;
@@ -52,6 +53,8 @@ export function ZoomTrack(props: {
 		totalDuration,
 		projectActions,
 		meta,
+		flushProjectConfig,
+		projectRevision,
 	} = useEditorContext();
 
 	const { duration, secsPerPixel } = useTimelineContext();
@@ -84,22 +87,23 @@ export function ZoomTrack(props: {
 		}
 	});
 
-	const handleGenerateZoomSegments = async () => {
-		setIsGeneratingAutoZoom(true);
-		try {
-			const zoomSegments = await commands.generateZoomSegmentsFromClicks();
-			if (zoomSegments.length === 0) {
-			toast.error(localize(NO_AUTO_ZOOM_CLICKS_MESSAGE));
-				return;
-			}
-			setProject("timeline", "zoomSegments", zoomSegments);
-		} catch (error) {
+	const generation = createAutoZoomGeneration({
+		snapshot: () => JSON.stringify(serializeProjectConfiguration(project)),
+		revision: projectRevision,
+		flush: flushProjectConfig,
+		generate: () => commands.generateZoomSegmentsFromClicks(),
+		apply: (segments) => setProject("timeline", "zoomSegments", segments),
+		setPending: setIsGeneratingAutoZoom,
+		onEmpty: () => toast.error(localize(NO_AUTO_ZOOM_CLICKS_MESSAGE)),
+		onStale: () =>
+			toast.error(localize("编辑内容已变化，请重新生成自动缩放。")),
+		onError: (error) => {
 			console.error("Failed to generate zoom segments:", error);
 			toast.error(localize("Failed to generate zoom segments"));
-		} finally {
-			setIsGeneratingAutoZoom(false);
-		}
-	};
+		},
+	});
+	onCleanup(generation.dispose);
+	const handleGenerateZoomSegments = generation.run;
 
 	const newSegmentMinDuration = () =>
 		Math.max(
@@ -606,7 +610,7 @@ export function ZoomTrack(props: {
 										items: [
 											{
 												id: "selectAllZoomSegments",
-								text: localize("全选缩放片段"),
+												text: localize("全选缩放片段"),
 												enabled: allIndices.length > 1,
 												action: () =>
 													setEditorState("timeline", "selection", {
@@ -618,8 +622,10 @@ export function ZoomTrack(props: {
 												id: "deleteZoomSegments",
 												text:
 													targetIndices.length > 1
-	? localize("删除 {count} 个缩放片段", { count: targetIndices.length })
-									: localize("删除缩放片段"),
+														? localize("删除 {count} 个缩放片段", {
+																count: targetIndices.length,
+															})
+														: localize("删除缩放片段"),
 												action: () =>
 													projectActions.deleteZoomSegments(targetIndices),
 											},

@@ -1,0 +1,32 @@
+[
+	{
+		"case": "修剪",
+		"path": "/private/tmp/jianku-autozoom-edited-native/修剪.jks",
+		"expectedZoomRanges": [],
+		"state": "prepared only; not run against a fixed installed version"
+	},
+	{
+		"case": "变速",
+		"path": "/private/tmp/jianku-autozoom-edited-native/变速.jks",
+		"expectedZoomRanges": [[0.7, 3.2]],
+		"state": "prepared only; not run against a fixed installed version"
+	},
+	{
+		"case": "重复",
+		"path": "/private/tmp/jianku-autozoom-edited-native/重复.jks",
+		"expectedZoomRanges": [[1.7, 4.58], [9.7, 12.58]],
+		"state": "prepared only; not run against a fixed installed version"
+	},
+	{
+		"case": "停顿",
+		"path": "/private/tmp/jianku-autozoom-edited-native/停顿.jks",
+		"expectedZoomRanges": [[3.7, 6.58]],
+		"state": "prepared only; not run against a fixed installed version"
+	},
+	{
+		"case": "转场",
+		"path": "/private/tmp/jianku-autozoom-edited-native/转场.jks",
+		"expectedZoomRanges": [[1.7, 4.58], [8.7, 11.58]],
+		"state": "prepared only; not run against a fixed installed version"
+	}
+]

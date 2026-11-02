@@ -6709,6 +6709,131 @@ pub fn generate_zoom_segments_for_project(
     )
 }
 
+pub fn generate_zoom_segments_for_timeline(
+    recording_meta: &RecordingMeta,
+    recordings: &ProjectRecordingsMeta,
+    timeline: &TimelineConfiguration,
+    zoom_amount: f64,
+) -> Result<Vec<ZoomSegment>, String> {
+    if timeline.segments.is_empty() {
+        return Ok(Vec::new());
+    }
+    let duration = timeline.duration();
+    if !duration.is_finite() {
+        return Err("The edited timeline has an invalid duration".to_string());
+    }
+    if duration <= 0.0 {
+        return Ok(Vec::new());
+    }
+    let RecordingMetaInner::Studio(studio) = &recording_meta.inner else {
+        return Ok(Vec::new());
+    };
+    let sources: Vec<_> = match studio.as_ref() {
+        StudioRecordingMeta::SingleSegment { segment } => vec![(segment.cursor.as_ref(), 0.0)],
+        StudioRecordingMeta::MultipleSegments { inner } => inner
+            .segments
+            .iter()
+            .map(|take| {
+                (
+                    take.cursor.as_ref(),
+                    take.latest_start_time().unwrap_or(0.0) * 1000.0,
+                )
+            })
+            .collect(),
+    };
+    let referenced: BTreeSet<_> = timeline
+        .segments
+        .iter()
+        .map(|clip| clip.recording_clip as usize)
+        .collect();
+    let takes: Vec<_> = sources
+        .into_iter()
+        .enumerate()
+        .map(|(index, (path, origin))| {
+            let clicks = match path.filter(|_| referenced.contains(&index)) {
+                Some(path) => {
+                    CursorEvents::load_from_file(&recording_meta.path(path))
+                        .map_err(|error| {
+                            format!("Could not read cursor events for recording {index}: {error}")
+                        })?
+                        .clicks
+                }
+                None => Vec::new(),
+            };
+            Ok((clicks, origin))
+        })
+        .collect::<Result<_, String>>()?;
+    let holds: Vec<_> = timeline
+        .hold_windows()
+        .into_iter()
+        .map(|(start, end)| (start * 1000.0, end * 1000.0))
+        .collect();
+    let mut clicks = Vec::new();
+    let mut output_offset_ms = 0.0;
+    for (index, clip) in timeline.segments.iter().enumerate() {
+        if !clip.timescale.is_finite()
+            || clip.timescale <= 0.0
+            || !clip.start.is_finite()
+            || !clip.end.is_finite()
+            || clip.start < 0.0
+            || clip.end < clip.start
+        {
+            return Err(format!(
+                "Edited clip {index} has an invalid source range or speed"
+            ));
+        }
+        let visible_duration_ms = (clip.duration()
+            - timeline
+                .effective_transition(index + 1)
+                .map_or(0.0, |transition| transition.duration))
+            * 1000.0;
+        let take_index = clip.recording_clip as usize;
+        let (events, origin_ms) = takes
+            .get(take_index)
+            .ok_or_else(|| format!("Edited clip {index} refers to a missing recording"))?;
+        let recording = recordings
+            .segments
+            .get(take_index)
+            .ok_or_else(|| format!("Edited clip {index} has no recording metadata"))?;
+        let recording_duration_ms = recording.duration() * 1000.0;
+        if !origin_ms.is_finite() || !recording_duration_ms.is_finite() {
+            return Err(format!("Recording {take_index} has an invalid time base"));
+        }
+        let source_start_ms = clip.start * 1000.0;
+        let source_end_ms = source_start_ms + visible_duration_ms * clip.timescale;
+        for event in events {
+            let source_ms = event.time_ms - origin_ms;
+            if !source_ms.is_finite()
+                || source_ms < 0.0
+                || source_ms > recording_duration_ms
+                || source_ms < source_start_ms
+                || source_ms >= source_end_ms
+            {
+                continue;
+            }
+            let mut event = event.clone();
+            let mut output_ms = output_offset_ms + (source_ms - source_start_ms) / clip.timescale;
+            for (start, end) in &holds {
+                if output_ms < *start {
+                    break;
+                }
+                output_ms += end - start;
+            }
+            event.time_ms = output_ms;
+            clicks.push(event);
+        }
+        // During overlap the renderer follows the incoming clip's cursor;
+        // an outgoing tail must not contribute clicks for the same output span.
+        output_offset_ms += visible_duration_ms;
+    }
+    Ok(generate_zoom_segments_from_clicks_impl(
+        clicks,
+        Vec::new(),
+        duration,
+        zoom_amount,
+    ))
+}
+
 pub(crate) fn apply_studio_sound_default(app: &AppHandle, config: &mut ProjectConfiguration) {
     let audio_enhancement = app
         .store("store")
@@ -7523,6 +7648,171 @@ mod tests {
                 segments: recording_segments,
             },
         )
+    }
+
+    fn edited_zoom_timeline(segments: serde_json::Value) -> TimelineConfiguration {
+        serde_json::from_value(serde_json::json!({
+            "segments": segments,
+            "zoomSegments": [],
+        }))
+        .unwrap()
+    }
+
+    fn edited_zoom_ranges(
+        meta: &RecordingMeta,
+        recordings: &ProjectRecordingsMeta,
+        timeline: &TimelineConfiguration,
+    ) -> Vec<(f64, f64)> {
+        generate_zoom_segments_for_timeline(meta, recordings, timeline, DEFAULT_AUTO_ZOOM_AMOUNT)
+            .unwrap()
+            .into_iter()
+            .map(|segment| (segment.start, segment.end))
+            .collect()
+    }
+
+    #[test]
+    fn auto_zoom_edited_removes_clicks_in_trimmed_takes_and_regions() {
+        let (_directory, meta, recordings) = auto_zoom_project_fixture(
+            &[8.0, 8.0, 8.0],
+            &[0.5, 0.5, 0.5],
+            &[vec![2500.0], vec![2500.0], vec![2500.0]],
+        );
+        let timeline = edited_zoom_timeline(serde_json::json!([
+            {"recordingSegment": 0, "timescale": 1.0, "start": 4.0, "end": 8.0}
+        ]));
+        assert!(edited_zoom_ranges(&meta, &recordings, &timeline).is_empty());
+    }
+
+    #[test]
+    fn auto_zoom_edited_maps_trim_speed_and_capture_epoch() {
+        let (_directory, meta, recordings) =
+            auto_zoom_project_fixture(&[20.0], &[0.5], &[vec![8500.0]]);
+        let timeline = edited_zoom_timeline(serde_json::json!([
+            {"recordingSegment": 0, "timescale": 2.0, "start": 4.0, "end": 16.0}
+        ]));
+        assert_eq!(
+            edited_zoom_ranges(&meta, &recordings, &timeline),
+            vec![(1.7, 4.5)]
+        );
+    }
+
+    #[test]
+    fn auto_zoom_edited_repeats_events_for_duplicated_clips() {
+        let (_directory, meta, recordings) =
+            auto_zoom_project_fixture(&[8.0], &[0.0], &[vec![2000.0]]);
+        let timeline = edited_zoom_timeline(serde_json::json!([
+            {"recordingSegment": 0, "timescale": 1.0, "start": 0.0, "end": 8.0},
+            {"recordingSegment": 0, "timescale": 1.0, "start": 0.0, "end": 8.0}
+        ]));
+        assert_eq!(
+            edited_zoom_ranges(&meta, &recordings, &timeline),
+            vec![(1.7, 4.5), (9.7, 12.5)]
+        );
+    }
+
+    #[test]
+    fn auto_zoom_edited_reorders_events_before_applying_the_original_merge_rule() {
+        let (_directory, meta, recordings) =
+            auto_zoom_project_fixture(&[8.0, 8.0], &[0.0, 0.0], &[vec![2000.0], vec![6000.0]]);
+        let timeline = edited_zoom_timeline(serde_json::json!([
+            {"recordingSegment": 1, "timescale": 1.0, "start": 0.0, "end": 8.0},
+            {"recordingSegment": 0, "timescale": 1.0, "start": 0.0, "end": 8.0}
+        ]));
+        assert_eq!(
+            edited_zoom_ranges(&meta, &recordings, &timeline),
+            vec![(5.7, 12.5)]
+        );
+    }
+
+    #[test]
+    fn auto_zoom_edited_inserts_fullscreen_text_hold_time() {
+        let (_directory, meta, recordings) =
+            auto_zoom_project_fixture(&[8.0], &[0.0], &[vec![6000.0]]);
+        let mut timeline = edited_zoom_timeline(serde_json::json!([
+            {"recordingSegment": 0, "timescale": 1.0, "start": 0.0, "end": 8.0}
+        ]));
+        timeline.text_segments.push(
+            serde_json::from_value(serde_json::json!({
+                "start": 2.0, "end": 4.0, "layout": "fullscreen"
+            }))
+            .unwrap(),
+        );
+        assert_eq!(
+            edited_zoom_ranges(&meta, &recordings, &timeline),
+            vec![(7.7, 9.2)]
+        );
+    }
+
+    #[test]
+    fn auto_zoom_edited_uses_the_incoming_clip_during_transitions() {
+        let (_directory, meta, recordings) =
+            auto_zoom_project_fixture(&[8.0, 8.0], &[0.0, 0.0], &[vec![7500.0], vec![500.0]]);
+        let mut timeline = edited_zoom_timeline(serde_json::json!([
+            {"recordingSegment": 0, "timescale": 1.0, "start": 0.0, "end": 8.0},
+            {"recordingSegment": 1, "timescale": 1.0, "start": 0.0, "end": 8.0}
+        ]));
+        timeline.transitions.push(cap_project::ClipTransition {
+            segment_index: 1,
+            kind: cap_project::ClipTransitionType::CrossFade,
+            duration: 1.0,
+        });
+        assert_eq!(
+            edited_zoom_ranges(&meta, &recordings, &timeline),
+            vec![(7.2, 10.0)]
+        );
+    }
+
+    #[test]
+    fn auto_zoom_edited_empty_timeline_generates_nothing() {
+        let (_directory, meta, recordings) =
+            auto_zoom_project_fixture(&[8.0], &[0.0], &[vec![2000.0]]);
+        assert!(
+            edited_zoom_ranges(
+                &meta,
+                &recordings,
+                &edited_zoom_timeline(serde_json::json!([]))
+            )
+            .is_empty()
+        );
+    }
+
+    #[test]
+    fn auto_zoom_edited_keeps_unedited_resumed_take_results() {
+        let (_directory, meta, recordings) = auto_zoom_project_fixture(
+            &[8.0, 8.0, 8.0],
+            &[0.5, 50.0, 0.25],
+            &[vec![2500.0, 2580.0], vec![52000.0], vec![2250.0]],
+        );
+        let timeline = edited_zoom_timeline(serde_json::json!([
+            {"recordingSegment": 0, "timescale": 1.0, "start": 0.0, "end": 8.0},
+            {"recordingSegment": 1, "timescale": 1.0, "start": 0.0, "end": 8.0},
+            {"recordingSegment": 2, "timescale": 1.0, "start": 0.0, "end": 8.0}
+        ]));
+        assert_eq!(
+            serde_json::to_value(
+                generate_zoom_segments_for_timeline(&meta, &recordings, &timeline, 1.5).unwrap()
+            )
+            .unwrap(),
+            serde_json::to_value(generate_zoom_segments_for_project(&meta, &recordings, 1.5))
+                .unwrap()
+        );
+    }
+
+    #[test]
+    fn auto_zoom_edited_reports_missing_retained_events_instead_of_partial_results() {
+        let (directory, meta, recordings) =
+            auto_zoom_project_fixture(&[8.0, 8.0], &[0.0, 0.0], &[vec![2000.0], vec![2000.0]]);
+        std::fs::remove_file(directory.path().join("cursor-1.json")).unwrap();
+        let mut timeline = edited_zoom_timeline(serde_json::json!([
+            {"recordingSegment": 0, "timescale": 1.0, "start": 0.0, "end": 8.0}
+        ]));
+        assert_eq!(
+            edited_zoom_ranges(&meta, &recordings, &timeline),
+            vec![(1.7, 4.5)]
+        );
+        timeline.segments.push(timeline.segments[0].clone());
+        timeline.segments[1].recording_clip = 1;
+        assert!(generate_zoom_segments_for_timeline(&meta, &recordings, &timeline, 2.0).is_err());
     }
 
     #[test]

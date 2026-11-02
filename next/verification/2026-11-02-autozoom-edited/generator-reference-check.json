@@ -1,0 +1,6 @@
+{
+	"reference": "../2026-11-01-autozoom-timebase/cap-generator-reference.rs",
+	"sameAsPinnedCapGenerator": true,
+	"sha256": "8d9d3ed96bf3b19f442296f55cfe0151cb79a8999798c7811de1a38d7344186d",
+	"scope": "click interval generator only; editor event mapping is new; not latest upstream verification"
+}

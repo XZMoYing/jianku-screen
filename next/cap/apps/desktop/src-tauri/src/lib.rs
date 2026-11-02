@@ -5180,8 +5180,9 @@ async fn generate_zoom_segments_from_clicks(
     app: AppHandle,
     editor_instance: WindowEditorInstance,
 ) -> Result<Vec<ZoomSegment>, String> {
-    let meta = editor_instance.meta();
-    let recordings = &editor_instance.recordings;
+    let meta = editor_instance.meta().clone();
+    let recordings = editor_instance.recordings.clone();
+    let project_path = editor_instance.project_path.clone();
 
     let zoom_amount = GeneralSettingsStore::get(&app)
         .ok()
@@ -5189,10 +5190,29 @@ async fn generate_zoom_segments_from_clicks(
         .and_then(|settings| settings.default_zoom_amount)
         .unwrap_or(recording::DEFAULT_AUTO_ZOOM_AMOUNT);
 
-    let zoom_segments =
-        recording::generate_zoom_segments_for_project(meta, recordings, zoom_amount);
-
-    Ok(zoom_segments)
+    tokio::task::spawn_blocking(move || {
+        // Preview requests share the in-memory watch and may still be queued;
+        // the caller flushes the atomic saved project before requesting zooms.
+        let saved = std::fs::read_to_string(project_path.join("project-config.json"))
+            .map_err(|error| format!("Could not read the saved project for auto zoom: {error}"))?;
+        let project: ProjectConfiguration = serde_json::from_str(&saved)
+            .map_err(|error| format!("Could not parse the saved project for auto zoom: {error}"))?;
+        match project.timeline {
+            Some(timeline) => recording::generate_zoom_segments_for_timeline(
+                &meta,
+                &recordings,
+                &timeline,
+                zoom_amount,
+            ),
+            None => Ok(recording::generate_zoom_segments_for_project(
+                &meta,
+                &recordings,
+                zoom_amount,
+            )),
+        }
+    })
+    .await
+    .map_err(|error| format!("Auto zoom generation task failed: {error}"))?
 }
 
 #[tauri::command]

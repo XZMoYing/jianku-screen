@@ -1,0 +1,32 @@
+{
+	"baseCommit": "1a5111e",
+	"installedVersion": "0.2.0-alpha.53",
+	"nativeBefore": {
+		"passed": 1,
+		"failed": 7,
+		"scope": "wrapper calling original project generator; actual installed failure separately retained in 2026-11-02-autozoom-edit-diagnosis"
+	},
+	"nativeMappingTests": {
+		"newPassed": 9,
+		"previousProjectMappingPassed": 5,
+		"originalClickRulesPassed": 6
+	},
+	"interfaceTests": {
+		"newPassed": 11,
+		"totalPassed": 153
+	},
+	"typescript": "passed",
+	"frontendBuild": "passed",
+	"i18nTests": "3 passed",
+	"rustFormat": "passed",
+	"capDesktopReleaseCheck": "passed",
+	"generatedBindingsChanged": false,
+	"fixedPackageRuntimeAcceptance": "pending",
+	"strictColorGate": "existing 15 pass / 2 fail; not rerun or waived",
+	"sourceSha256": {
+		"apps/desktop/src-tauri/src/recording.rs": "503cf2b0884c45a1f55e046700c27c621c36f888c649bd745191eea2b7c77f88",
+		"apps/desktop/src-tauri/src/lib.rs": "9b49d8e1e162a5830e1a1498f1e41af05d59962519c9f55f8ecbe62e4b8646ee",
+		"apps/desktop/src/routes/editor/auto-zoom-generation.ts": "1ebdefa6b556e208133157d207c19760679f01099823aa06fd97cd2bc287bd7a",
+		"apps/desktop/src/routes/editor/Timeline/ZoomTrack.tsx": "1eed44146ba6b67bb6a31c0a103b0a53d6b300041d0c2cf782cda700a429810c"
+	}
+}
