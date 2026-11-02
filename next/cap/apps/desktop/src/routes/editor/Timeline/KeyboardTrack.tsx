@@ -1,9 +1,10 @@
-import { createEventListenerMap } from "@solid-primitives/event-listener";
-import { createMemo, createRoot, For } from "solid-js";
+import { createMemo, For } from "solid-js";
 import { t as localize } from "~/utils/i18n";
+import type { KeyboardTrackSegment } from "~/utils/tauri";
 
 import { useEditorContext } from "../context";
 import { useTimelineContext } from "./context";
+import { createTimelineMouseDrag } from "./mouse-drag";
 import {
 	SegmentContent,
 	SegmentHandle,
@@ -38,10 +39,9 @@ export function KeyboardTrack(props: {
 	const minDuration = () =>
 		Math.max(MIN_SEGMENT_SECS, secsPerPixel() * MIN_SEGMENT_PIXELS);
 
+	const allKeyboardSegments = () => project.timeline?.keyboardSegments ?? [];
 	const keyboardSegments = createMemo(() =>
-		(project.timeline?.keyboardSegments ?? []).filter(
-			(s) => s.start < totalDuration(),
-		),
+		allKeyboardSegments().filter((s) => s.start < totalDuration()),
 	);
 	const selectedKeyboardIndices = createMemo(() => {
 		const selection = editorState.timeline.selection;
@@ -50,47 +50,63 @@ export function KeyboardTrack(props: {
 	});
 
 	const neighborBounds = (index: number) => {
-		const segments = keyboardSegments();
+		const segments = keyboardSegments()
+			.slice()
+			.sort((a, b) => a.start - b.start);
+		const position = segments.indexOf(allKeyboardSegments()[index]);
 		return {
-			prevEnd: segments[index - 1]?.end ?? 0,
-			nextStart: segments[index + 1]?.start ?? totalDuration(),
+			prevEnd: segments[position - 1]?.end ?? 0,
+			nextStart: segments[position + 1]?.start ?? totalDuration(),
 		};
 	};
+
+	const startDrag = createTimelineMouseDrag();
 
 	function createMouseDownDrag<T>(
 		segmentIndex: () => number,
 		setup: () => T,
-		update: (e: MouseEvent, value: T, initialMouseX: number) => void,
+		update: (
+			e: MouseEvent,
+			value: T,
+			initialMouseX: number,
+		) => Partial<Pick<KeyboardTrackSegment, "start" | "end">>,
 	) {
 		return (downEvent: MouseEvent) => {
-			if (editorState.timeline.interactMode !== "seek") return;
+			if (
+				downEvent.button !== 0 ||
+				editorState.timeline.interactMode !== "seek"
+			)
+				return;
 			downEvent.stopPropagation();
-			const initial = setup();
-			let moved = false;
-			let initialMouseX: number | null = null;
+			startDrag(() => {
+				const segment = allKeyboardSegments()[segmentIndex()];
+				if (!segment) return null;
+				const id = segment.id;
+				const scale = secsPerPixel();
+				const duration = totalDuration();
+				const initial = setup();
+				let moved = false;
+				let resumeHistory: (() => void) | undefined;
+				props.onDragStateChanged({ type: "movePending" });
 
-			const resumeHistory = projectHistory.pause();
-			props.onDragStateChanged({ type: "movePending" });
-
-			function finish(e: MouseEvent) {
-				resumeHistory();
-				if (!moved) {
-					e.stopPropagation();
-					const index = segmentIndex();
-					const isMultiSelect = e.ctrlKey || e.metaKey;
-
-					if (isMultiSelect) {
-						const currentSelection = editorState.timeline.selection;
-						if (currentSelection?.type === "keyboard") {
-							const base = currentSelection.indices;
-							const exists = base.includes(index);
-							const next = exists
-								? base.filter((i) => i !== index)
+				function finish(event?: MouseEvent) {
+					resumeHistory?.();
+					if (!moved && event) {
+						event.stopPropagation();
+						const index = segmentIndex();
+						const selection = editorState.timeline.selection;
+						if (
+							(event.ctrlKey || event.metaKey) &&
+							selection?.type === "keyboard"
+						) {
+							const base = selection.indices;
+							const indices = base.includes(index)
+								? base.filter((value) => value !== index)
 								: [...base, index];
 							setEditorState(
 								"timeline",
 								"selection",
-								next.length > 0 ? { type: "keyboard", indices: next } : null,
+								indices.length ? { type: "keyboard", indices } : null,
 							);
 						} else {
 							setEditorState("timeline", "selection", {
@@ -98,38 +114,37 @@ export function KeyboardTrack(props: {
 								indices: [index],
 							});
 						}
-					} else {
-						setEditorState("timeline", "selection", {
-							type: "keyboard",
-							indices: [index],
-						});
+						props.handleUpdatePlayhead(event);
 					}
-					props.handleUpdatePlayhead(e);
+					props.onDragStateChanged({ type: "idle" });
 				}
-				props.onDragStateChanged({ type: "idle" });
-			}
 
-			function handleUpdate(event: MouseEvent) {
-				if (Math.abs(event.clientX - downEvent.clientX) > 2) {
+				function handleUpdate(event: MouseEvent) {
 					if (!moved) {
+						if (Math.abs(event.clientX - downEvent.clientX) <= 2) return;
 						moved = true;
-						initialMouseX = event.clientX;
 						props.onDragStateChanged({ type: "moving" });
 					}
+					const changes = update(event, initial, downEvent.clientX);
+					if (
+						(changes.start ?? segment.start) === segment.start &&
+						(changes.end ?? segment.end) === segment.end
+					)
+						return;
+					resumeHistory ??= projectHistory.pause();
+					setProject("timeline", "keyboardSegments", segmentIndex(), changes);
 				}
-				if (initialMouseX === null) return;
-				update(event, initial, initialMouseX);
-			}
 
-			createRoot((dispose) => {
-				createEventListenerMap(window, {
-					mousemove: (e) => handleUpdate(e),
-					mouseup: (e) => {
-						handleUpdate(e);
-						finish(e);
-						dispose();
-					},
-				});
+				return {
+					isValid: () =>
+						editorState.timeline.interactMode === "seek" &&
+						secsPerPixel() === scale &&
+						totalDuration() === duration &&
+						segment.id === id &&
+						keyboardSegments().includes(segment),
+					update: handleUpdate,
+					finish,
+				};
 			});
 		};
 	}
@@ -152,11 +167,12 @@ export function KeyboardTrack(props: {
 					</div>
 				}
 			>
-				{(segment, i) => {
+				{(segment) => {
+					const index = () => allKeyboardSegments().indexOf(segment);
 					const isSelected = createMemo(() => {
 						const indices = selectedKeyboardIndices();
 						if (!indices) return false;
-						return indices.has(i());
+						return indices.has(index());
 					});
 
 					const segmentWidth = () =>
@@ -175,7 +191,7 @@ export function KeyboardTrack(props: {
 					return (
 						<SegmentRoot
 							data-keyboard-segment
-							data-index={i()}
+							data-index={index()}
 							segColor="var(--track-keyboard)"
 							class="group"
 							selected={isSelected()}
@@ -185,21 +201,22 @@ export function KeyboardTrack(props: {
 								end: Math.min(segment.end, totalDuration()),
 							}}
 							onMouseDown={(e) => {
+								if (e.button !== 0) return;
 								e.stopPropagation();
 								if (editorState.timeline.interactMode === "split") {
 									const rect = e.currentTarget.getBoundingClientRect();
 									const fraction = (e.clientX - rect.left) / rect.width;
 									const splitTime = fraction * segmentWidth();
-									projectActions.splitKeyboardSegment(i(), splitTime);
+									projectActions.splitKeyboardSegment(index(), splitTime);
 								}
 							}}
 						>
 							<SegmentHandle
 								position="start"
 								onMouseDown={createMouseDownDrag(
-									i,
+									index,
 									() => {
-										const bounds = neighborBounds(i());
+										const bounds = neighborBounds(index());
 										const start = segment.start;
 										const minValue = bounds.prevEnd;
 										const maxValue = Math.max(
@@ -217,23 +234,17 @@ export function KeyboardTrack(props: {
 											value.minValue,
 											Math.min(value.maxValue, value.start + delta),
 										);
-										setProject(
-											"timeline",
-											"keyboardSegments",
-											i(),
-											"start",
-											next,
-										);
+										return { start: next };
 									},
 								)}
 							/>
 							<SegmentContent
 								class="flex items-center cursor-grab overflow-hidden"
 								onMouseDown={createMouseDownDrag(
-									i,
+									index,
 									() => {
 										const original = { ...segment };
-										const bounds = neighborBounds(i());
+										const bounds = neighborBounds(index());
 										const minDelta = bounds.prevEnd - original.start;
 										const maxDelta = bounds.nextStart - original.end;
 										return { original, minDelta, maxDelta };
@@ -246,11 +257,10 @@ export function KeyboardTrack(props: {
 											upperBound,
 											Math.max(lowerBound, delta),
 										);
-										setProject("timeline", "keyboardSegments", i(), {
-											...value.original,
+										return {
 											start: value.original.start + clampedDelta,
 											end: value.original.end + clampedDelta,
-										});
+										};
 									},
 								)}
 							>
@@ -264,9 +274,9 @@ export function KeyboardTrack(props: {
 							<SegmentHandle
 								position="end"
 								onMouseDown={createMouseDownDrag(
-									i,
+									index,
 									() => {
-										const bounds = neighborBounds(i());
+										const bounds = neighborBounds(index());
 										const end = segment.end;
 										const minValue = segment.start + minDuration();
 										const maxValue = Math.max(minValue, bounds.nextStart);
@@ -278,13 +288,7 @@ export function KeyboardTrack(props: {
 											value.minValue,
 											Math.min(value.maxValue, value.end + delta),
 										);
-										setProject(
-											"timeline",
-											"keyboardSegments",
-											i(),
-											"end",
-											next,
-										);
+										return { end: next };
 									},
 								)}
 							/>

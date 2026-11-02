@@ -1,0 +1,24 @@
+{
+	"baseCommit": "1fe86aa",
+	"oldComponentCasesFailed": 13,
+	"additionalGestureBaseline": {
+		"passed": 16,
+		"failed": 3,
+		"scope": "after identity/lifecycle fix, before full pointer anchor and no-op-history fix"
+	},
+	"newCasesPassed": 19,
+	"totalInterfaceCasesPassed": 172,
+	"typescript": "passed",
+	"frontendBuild": "passed",
+	"formatter": "scoped Biome passed",
+	"installedVersion": "0.2.0-alpha.54",
+	"fixedSourcePackaged": false,
+	"actualBrowserAndInstalledEditorRetest": "pending next stage package",
+	"keyboardPerKeyTrimTiming": "not covered; fixtures use empty keys",
+	"fullVideoFlickerAndOtherTracks": "not resolved by this unit",
+	"sourceSha256": {
+		"apps/desktop/src/routes/editor/Timeline/KeyboardTrack.tsx": "2c50c2d4fc61c6a6f80e0841a51f06e2110ccac2edc860912b20c328e54cb225",
+		"apps/desktop/src/routes/editor/Timeline/keyboard-drag.test.tsx": "87b7629a4d71c29014380e6b200b509b940eb931d8d9b59191b0376c9461c72c",
+		"apps/desktop/vitest.interface.config.ts": "89572f104ebf27306e46675cd2046e8f9a9127f14f533f6ab865b074ced69574"
+	}
+}
