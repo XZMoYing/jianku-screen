@@ -1,0 +1,12 @@
+{
+	"removed": [
+		"/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.52/Jianku Screen Next.app",
+		"/Applications/.jianku-next-update54-bm2i8iit"
+	],
+	"retainedVersions": ["0.2.0-alpha.54", "0.2.0-alpha.53"],
+	"freeBefore": 55816511488,
+	"freeAfter": 56450441216,
+	"deltaBytes": 633929728,
+	"syntheticLargeEventFileRestored": true,
+	"scope": "obsolete app and duplicate staging only; all projects/media/git/native dependencies retained"
+}

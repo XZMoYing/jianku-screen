@@ -1,0 +1,21 @@
+{
+	"version": "0.2.0-alpha.54",
+	"build": "2026.54.0",
+	"productFreeze": "b277a533097ffaac9c2a48ee5f0e91a5721ec343",
+	"sourceFix": "7404530",
+	"runtimeGeneratedCasesPassed": 5,
+	"runtimeSavedReopenedCasesPassed": 5,
+	"runtimeUndoRedoCasesPassed": 4,
+	"runtimeInterruptionAttemptsRetained": 1,
+	"runtimeInterruptionClassification": "test helper CGFloat/Double header lookup; no Undo action executed; corrected and resumed same case",
+	"exportsPassed": 5,
+	"totalExportSeconds": 49,
+	"decodedVideoFrames": 1470,
+	"pendingGenerationColorEditGuardPassed": true,
+	"savedVersusNativeJobPhaseDistinguished": false,
+	"forcedOldPreviewWatchOverwriteRace": "not separately reproduced",
+	"coldFileLaunchU24": "not verified; first generic AX read was before ready",
+	"strictColorGate": "existing 15 pass / 2 fail; not waived",
+	"newUserSingleZoomReport": "not fully resolved",
+	"sourceChecks": "../2026-11-02-autozoom-edited/validation.json"
+}

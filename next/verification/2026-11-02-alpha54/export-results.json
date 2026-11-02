@@ -1,0 +1,147 @@
+[
+	{
+		"case": "修剪",
+		"passed": true,
+		"path": "/private/tmp/jianku-alpha54-20261102/修剪-验收.mp4",
+		"media": {
+			"programs": [],
+			"stream_groups": [],
+			"streams": [
+				{
+					"index": 0,
+					"codec_name": "h264",
+					"width": 1280,
+					"height": 720,
+					"nb_read_frames": "120"
+				},
+				{
+					"index": 1,
+					"codec_name": "aac",
+					"nb_read_frames": "188"
+				}
+			],
+			"format": {
+				"duration": "4.000000",
+				"size": "3951244"
+			}
+		},
+		"exportElapsedSeconds": 3.296,
+		"scope": "export completion and actual full decode; not color/performance acceptance"
+	},
+	{
+		"case": "变速",
+		"passed": true,
+		"path": "/private/tmp/jianku-alpha54-20261102/变速-验收.mp4",
+		"media": {
+			"programs": [],
+			"stream_groups": [],
+			"streams": [
+				{
+					"index": 0,
+					"codec_name": "h264",
+					"width": 1280,
+					"height": 720,
+					"nb_read_frames": "120"
+				},
+				{
+					"index": 1,
+					"codec_name": "aac",
+					"nb_read_frames": "188"
+				}
+			],
+			"format": {
+				"duration": "4.000000",
+				"size": "4170419"
+			}
+		},
+		"exportElapsedSeconds": 2.878,
+		"scope": "export completion and actual full decode; not color/performance acceptance"
+	},
+	{
+		"case": "重复",
+		"passed": true,
+		"path": "/private/tmp/jianku-alpha54-20261102/重复-验收.mp4",
+		"media": {
+			"programs": [],
+			"stream_groups": [],
+			"streams": [
+				{
+					"index": 0,
+					"codec_name": "h264",
+					"width": 1280,
+					"height": 720,
+					"nb_read_frames": "480"
+				},
+				{
+					"index": 1,
+					"codec_name": "aac",
+					"nb_read_frames": "750"
+				}
+			],
+			"format": {
+				"duration": "16.000000",
+				"size": "16383054"
+			}
+		},
+		"exportElapsedSeconds": 5.599,
+		"scope": "export completion and actual full decode; not color/performance acceptance"
+	},
+	{
+		"case": "停顿",
+		"passed": true,
+		"path": "/private/tmp/jianku-alpha54-20261102/停顿-验收.mp4",
+		"media": {
+			"programs": [],
+			"stream_groups": [],
+			"streams": [
+				{
+					"index": 0,
+					"codec_name": "h264",
+					"width": 1280,
+					"height": 720,
+					"nb_read_frames": "300"
+				},
+				{
+					"index": 1,
+					"codec_name": "aac",
+					"nb_read_frames": "469"
+				}
+			],
+			"format": {
+				"duration": "10.000000",
+				"size": "8832411"
+			}
+		},
+		"exportElapsedSeconds": 3.157,
+		"scope": "export completion and actual full decode; not color/performance acceptance"
+	},
+	{
+		"case": "转场",
+		"passed": true,
+		"path": "/private/tmp/jianku-alpha54-20261102/转场-验收.mp4",
+		"media": {
+			"programs": [],
+			"stream_groups": [],
+			"streams": [
+				{
+					"index": 0,
+					"codec_name": "h264",
+					"width": 1280,
+					"height": 720,
+					"nb_read_frames": "450"
+				},
+				{
+					"index": 1,
+					"codec_name": "aac",
+					"nb_read_frames": "704"
+				}
+			],
+			"format": {
+				"duration": "15.000000",
+				"size": "15456792"
+			}
+		},
+		"exportElapsedSeconds": 5.557,
+		"scope": "export completion and actual full decode; not color/performance acceptance"
+	}
+]

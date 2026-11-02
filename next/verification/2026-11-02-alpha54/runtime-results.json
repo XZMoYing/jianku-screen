@@ -1,0 +1,93 @@
+[
+	{
+		"case": "修剪",
+		"phase": "generated",
+		"passed": true,
+		"expected": [],
+		"actual": []
+	},
+	{
+		"case": "修剪",
+		"phase": "save-reopen",
+		"passed": true,
+		"actual": []
+	},
+	{
+		"case": "变速",
+		"phase": "generated",
+		"passed": true,
+		"expected": [[0.7, 3.2]],
+		"actual": [[0.7, 3.2]]
+	},
+	{
+		"case": "变速",
+		"phase": "interrupted",
+		"passed": false,
+		"error": "Owned AX request rejected: ('history', 'undo')"
+	},
+	{
+		"case": "变速",
+		"phase": "undo-redo",
+		"passed": true
+	},
+	{
+		"case": "变速",
+		"phase": "save-reopen",
+		"passed": true,
+		"actual": [[0.7, 3.2]]
+	},
+	{
+		"case": "重复",
+		"phase": "generated",
+		"passed": true,
+		"expected": [[1.7, 4.58], [9.7, 12.58]],
+		"actual": [[1.7, 4.58], [9.7, 12.58]]
+	},
+	{
+		"case": "重复",
+		"phase": "undo-redo",
+		"passed": true
+	},
+	{
+		"case": "重复",
+		"phase": "save-reopen",
+		"passed": true,
+		"actual": [[1.7, 4.58], [9.7, 12.58]]
+	},
+	{
+		"case": "停顿",
+		"phase": "generated",
+		"passed": true,
+		"expected": [[3.7, 6.58]],
+		"actual": [[3.7, 6.58]]
+	},
+	{
+		"case": "停顿",
+		"phase": "undo-redo",
+		"passed": true
+	},
+	{
+		"case": "停顿",
+		"phase": "save-reopen",
+		"passed": true,
+		"actual": [[3.7, 6.58]]
+	},
+	{
+		"case": "转场",
+		"phase": "generated",
+		"passed": true,
+		"expected": [[1.7, 4.58], [8.7, 11.58]],
+		"actual": [[1.7, 4.58], [8.7, 11.58]]
+	},
+	{
+		"case": "转场",
+		"phase": "undo-redo",
+		"passed": true
+	},
+	{
+		"case": "转场",
+		"phase": "save-reopen",
+		"passed": true,
+		"actual": [[1.7, 4.58], [8.7, 11.58]]
+	}
+]

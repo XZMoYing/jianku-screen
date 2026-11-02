@@ -1,0 +1,21 @@
+{
+	"passed": true,
+	"version": "0.2.0-alpha.54",
+	"pendingObservedBeforeEdit": true,
+	"actualStaleResultToast": true,
+	"zoomTrackRemainedEmpty": true,
+	"backgroundEditPersisted": true,
+	"beforeSource": {
+		"type": "color",
+		"value": [239, 235, 225],
+		"alpha": 255
+	},
+	"afterSource": {
+		"type": "color",
+		"value": [214, 202, 177],
+		"alpha": 255
+	},
+	"syntheticMoves": 500000,
+	"temporaryEventBytes": 39500222,
+	"scope": "native pending generation and actual color-button edit; save/native-job phase not distinguished"
+}
