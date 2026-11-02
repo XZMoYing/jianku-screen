@@ -1,0 +1,21 @@
+{
+	"sourceSha256": "56ba95f3f3bc3fbf769f0e5a8160c20d232506bcc64b48e9b4c3d7f17dc708e9",
+	"scope": "original ThreeDTrack listener root/updater with counted update/finish/geometry callbacks; real Solid ownership/event-listener library and Chromium; not the complete component",
+	"cases": [
+		{
+			"kind": "blur",
+			"updatesAfterCancellation": 1,
+			"finishCallsAfterCancellation": 0
+		},
+		{
+			"kind": "owner-disposal",
+			"updatesAfterCancellation": 1,
+			"finishCallsAfterCancellation": 0
+		}
+	],
+	"coalescedMove": {
+		"expectedPointerDistance": 400,
+		"actualAppliedDistance": 0
+	},
+	"observed": true
+}

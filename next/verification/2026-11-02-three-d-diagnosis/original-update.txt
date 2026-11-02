@@ -1,0 +1,15 @@
+function update(event: MouseEvent) {
+								if (Math.abs(event.clientX - downEvent.clientX) > 2) {
+									if (!moved) {
+										moved = true;
+										initialMouseX = event.clientX;
+										props.onDragStateChanged({
+											type: "moving",
+										});
+									}
+								}
+
+								if (initialMouseX === null) return;
+
+								_update(event, initial, initialMouseX);
+							}

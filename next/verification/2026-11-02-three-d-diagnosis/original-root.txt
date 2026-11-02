@@ -1,0 +1,12 @@
+							createRoot((dispose) => {
+								createEventListenerMap(window, {
+									mousemove: (e) => {
+										update(e);
+									},
+									mouseup: (e) => {
+										update(e);
+										finish(e);
+										dispose();
+									},
+								});
+							});
