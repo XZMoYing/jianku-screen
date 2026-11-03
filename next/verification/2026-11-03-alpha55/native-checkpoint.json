@@ -1,0 +1,53 @@
+{
+	"version": "0.2.0-alpha.55",
+	"build": "2026.55.0",
+	"sourceFreeze": "cbe4385fcb2b2a9775191ae6568eb9872a490a73",
+	"installedSixHashesMatchCandidate": true,
+	"rollbackVersion": "0.2.0-alpha.54",
+	"nativeUIAcceptanceComplete": false,
+	"ownedFixture": "拖动与缩放验收（55按键拖动）",
+	"keyboardEnabledThroughUI": true,
+	"preservedSourceIds": ["kb-edit-0", "kb-edit-1", "kb-edit-2"],
+	"observations": [
+		{
+			"attempt": "initial HID input",
+			"result": "no range change; not a passing drag"
+		},
+		{
+			"attempt": "combined source 16 steps 0.9s",
+			"rangeA": [2.0616606982990153, 6.061660698299015],
+			"buttonHeldTrace": true
+		},
+		{
+			"attempt": "second combined source",
+			"rangeA": [2.1233213965980307, 6.12332139659803],
+			"buttonHeldTrace": true
+		},
+		{
+			"attempt": "2.4s plus 0.8s hold",
+			"rangeA": [2.184982094897046, 6.184982094897045],
+			"buttonHeldTrace": true
+		}
+	],
+	"toolbarUndoThreePartialEdits": true,
+	"restoredRanges": [[70, 74], [2, 6], [10, 14]],
+	"isolatedWKInputProbe": {
+		"passed": true,
+		"scope": "visible owned WKWebView with current overlay fixture; not installed55 full editor",
+		"mouseDownButtons": 1,
+		"allDragButtons": 1,
+		"mouseUpButtons": 0,
+		"range": [4, 8],
+		"historyResumes": 1,
+		"earlierInvalidProbeAttempts": "corrected flipped-view coordinates and asynchronous native event delivery; not counted as product regressions"
+	},
+	"unresolved": "Installed editor stops after first movement under verified synthetic input. Exact cancellation/runtime reason unproven; do not mark continuous drag accepted.",
+	"notYetRun": [
+		"keyboard edge trims and split",
+		"keyboard content/timing (fixture uses empty keys)",
+		"native 3D full interaction",
+		"GUI save/reopen after full valid drag",
+		"new full preview/export acceptance"
+	],
+	"pendingSourceNotIn55": ["75df90a ZoomTrack", "8727232 overlay and history"]
+}

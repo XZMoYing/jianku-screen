@@ -35,8 +35,9 @@ guard let bounds = ownWindow(), let ox = bounds["X"], let oy = bounds["Y"], let 
 _ = app.activate(options: [.activateAllWindows])
 RunLoop.current.run(until: Date().addingTimeInterval(0.15))
 guard NSWorkspace.shared.frontmostApplication?.processIdentifier == app.processIdentifier else { exit(2) }
+let eventSource = CGEventSource(stateID: .combinedSessionState)
 func send(_ type: CGEventType, _ x: Double, _ y: Double) {
- if let event = CGEvent(mouseEventSource: CGEventSource(stateID: .hidSystemState), mouseType: type, mouseCursorPosition: CGPoint(x: ox + x, y: oy + y), mouseButton: .left) {
+ if let event = CGEvent(mouseEventSource: eventSource, mouseType: type, mouseCursorPosition: CGPoint(x: ox + x, y: oy + y), mouseButton: .left) {
   event.setIntegerValueField(.mouseEventClickState, value: 1)
   event.post(tap: .cghidEventTap)
  }
@@ -47,6 +48,8 @@ func drag() throws {
  send(.mouseMoved, x1, y1)
  RunLoop.current.run(until: Date().addingTimeInterval(0.1))
  send(.leftMouseDown, x1, y1)
+ RunLoop.current.run(until: Date().addingTimeInterval(0.12))
+ var trace: [[String:Any]] = [["phase":"down", "leftButton":CGEventSource.buttonState(.combinedSessionState, button:.left), "pointerX": CGEvent(source:nil)?.location.x ?? -1, "pointerY": CGEvent(source:nil)?.location.y ?? -1]]
  var lastX = x1
  var lastY = y1
  defer { send(.leftMouseUp, lastX, lastY) }
@@ -57,6 +60,7 @@ func drag() throws {
   lastY = y1 + (y2 - y1) * fraction
   send(.leftMouseDragged, lastX, lastY)
   RunLoop.current.run(until: Date().addingTimeInterval(duration / Double(steps)))
+  if step <= 2 || step == steps { trace.append(["phase":"step-\(step)", "leftButton":CGEventSource.buttonState(.combinedSessionState, button:.left), "pointerX": CGEvent(source:nil)?.location.x ?? -1, "pointerY": CGEvent(source:nil)?.location.y ?? -1]) }
   if step == steps / 2 && mode == "undo" {
    RunLoop.current.run(until: Date().addingTimeInterval(0.08))
    for down in [true, false] {
@@ -79,6 +83,8 @@ func drag() throws {
    }
   }
  }
+ RunLoop.current.run(until: Date().addingTimeInterval(0.8))
+ print(String(data: try JSONSerialization.data(withJSONObject:["trace":trace], options:[.sortedKeys]), encoding:.utf8)!)
 }
 do {
  try drag()
