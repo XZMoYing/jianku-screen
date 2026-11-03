@@ -1,0 +1,6 @@
+{
+	"commit": "7db00cd30ed0a22126862d91869f483dd8d66cdf",
+	"version": "0.2.0-alpha.56",
+	"build": "2026.56.0",
+	"scope": "diagnostic candidate; keyboard native cause still unproven"
+}

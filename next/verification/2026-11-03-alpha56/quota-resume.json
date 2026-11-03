@@ -1,0 +1,15 @@
+{
+	"id": "automation",
+	"thread": "01a0f1dc-4cf3-7382-baad-5ff91e2c889a",
+	"oneTime": true,
+	"rrule": "RRULE:FREQ=DAILY;COUNT=1;BYHOUR=22;BYMINUTE=0;BYSECOND=40",
+	"resetUnix": 1793714380,
+	"resumeUnix": 1793714440,
+	"localTime": "2026-11-03 22:00:40 Asia/Shanghai",
+	"statusAtVerification": "ACTIVE",
+	"goalStillActive": true,
+	"primaryUsedAtCreation": 70,
+	"weeklyUsedAtCreation": 97,
+	"reasonForEarlyScheduling": "weekly quota near limit; does not imply weekly quota resets at this time",
+	"resumeSuccessProven": false
+}
