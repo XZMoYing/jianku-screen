@@ -1512,11 +1512,12 @@ pub async fn save_captions(
         }
     }
 
-    let captions_dir = app_captions_dir(&app, &video_id)?;
+    let storage = app_captions_paths(&app, &video_id)?;
+    let captions_dir = storage.directory();
 
     if !captions_dir.exists() {
         tracing::info!("Creating captions directory: {:?}", captions_dir);
-        std::fs::create_dir_all(&captions_dir).map_err(|e| {
+        std::fs::create_dir_all(captions_dir).map_err(|e| {
             tracing::error!("Failed to create captions directory: {}", e);
             format!("Failed to create captions directory: {e}")
         })?;
@@ -1892,8 +1893,7 @@ pub async fn load_captions(
     tracing::info!("=== LOAD CAPTIONS START ===");
     tracing::info!("Loading captions for video_id: {}", video_id);
 
-    let captions_dir = app_captions_dir(&app, &video_id)?;
-    let captions_path = captions_dir.join("captions.json");
+    let captions_path = app_captions_paths(&app, &video_id)?.json_for_read();
 
     if !captions_path.exists() {
         tracing::info!("No captions file found at: {:?}", captions_path);
@@ -1948,7 +1948,10 @@ pub async fn load_captions(
     }
 }
 
-fn app_captions_dir(app: &AppHandle, video_id: &str) -> Result<PathBuf, String> {
+fn app_captions_paths(
+    app: &AppHandle,
+    video_id: &str,
+) -> Result<cap_project::CaptionStoragePaths, String> {
     tracing::info!("Getting captions directory for video_id: {}", video_id);
 
     let app_dir = app
@@ -1956,11 +1959,9 @@ fn app_captions_dir(app: &AppHandle, video_id: &str) -> Result<PathBuf, String> 
         .app_data_dir()
         .map_err(|_| "Failed to get app data directory".to_string())?;
 
-    let clean_video_id = cap_project::project_name_without_extension(&video_id);
-    let captions_dir = app_dir.join("captions").join(clean_video_id);
-
-    tracing::info!("Captions directory path: {:?}", captions_dir);
-    Ok(captions_dir)
+    let paths = cap_project::caption_storage_paths(&app_dir, video_id);
+    tracing::info!("Captions directory path: {:?}", paths.directory());
+    Ok(paths)
 }
 
 #[derive(Debug, Serialize, Type, tauri_specta::Event, Clone)]
@@ -2725,7 +2726,10 @@ pub async fn export_captions_srt(
     tracing::info!("Converting captions to SRT format");
     let srt_content = captions_to_srt(&captions_with_settings);
 
-    let captions_dir = app_captions_dir(&app, &video_id)?;
+    let storage = app_captions_paths(&app, &video_id)?;
+    let captions_dir = storage.directory();
+    std::fs::create_dir_all(captions_dir)
+        .map_err(|error| format!("Failed to create captions directory: {error}"))?;
     let srt_path = captions_dir.join("captions.srt");
     tracing::info!("Will write SRT file to: {:?}", srt_path);
 

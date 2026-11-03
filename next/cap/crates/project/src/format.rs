@@ -12,8 +12,9 @@ pub fn is_project_path(path: &Path) -> bool {
 }
 
 pub fn project_name_without_extension(name: &str) -> &str {
-    if is_project_path(Path::new(name)) {
-        &name[..name.len() - 4]
+    let trimmed = name.trim_end_matches(std::path::is_separator);
+    if is_project_path(Path::new(trimmed)) {
+        &trimmed[..trimmed.len() - 4]
     } else {
         name
     }
@@ -22,6 +23,19 @@ pub fn project_name_without_extension(name: &str) -> &str {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn strips_package_suffix_after_native_trailing_separators() {
+        for (input, expected) in [
+            ("/tmp/演示.jks/", "/tmp/演示"),
+            ("/tmp/take.CAP//", "/tmp/take"),
+            ("take.JKS///", "take"),
+            ("take.mp4/", "take.mp4/"),
+            ("legacy.jianku/", "legacy.jianku/"),
+        ] {
+            assert_eq!(project_name_without_extension(input), expected);
+        }
+    }
 
     #[test]
     fn reads_legacy_packages_and_new_packages_without_accepting_qt_schema() {

@@ -1,0 +1,24 @@
+{
+	"sourceOnly": true,
+	"installed": 55,
+	"immutableCandidate56IncludesFix": false,
+	"storageBefore": {
+		"failed": 4,
+		"passed": 1
+	},
+	"suffixBeforeFailed": 1,
+	"projectTestsFinal": 166,
+	"newChecks": 7,
+	"cargoFmtAll": true,
+	"cargoCheckRelease": ["cap-project", "cap-desktop"],
+	"nativeUIVerified": false,
+	"strictChroma": {
+		"passed": 15,
+		"failed": 2
+	},
+	"sourceSHA256": {
+		"crates/project/src/caption_storage.rs": "8aee37d60a3d969410f3050a82d19bf7c518d61e33f88cf8beef3dc603985257",
+		"crates/project/src/format.rs": "ab70f32793d14d323f5a7d8d09ca22546c872389ef0467c5b63d973fde785ddc",
+		"apps/desktop/src-tauri/src/captions.rs": "bf26dc677d27c80c67aaa326645a5fa4820a68c8ea761c693035883e97672c4c"
+	}
+}

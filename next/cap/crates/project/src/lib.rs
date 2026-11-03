@@ -1,5 +1,6 @@
 mod animated_gradient;
 mod bookmarks;
+mod caption_storage;
 mod caption_timing;
 mod configuration;
 pub mod cursor;
@@ -10,6 +11,7 @@ mod portable;
 
 pub use animated_gradient::*;
 pub use bookmarks::*;
+pub use caption_storage::*;
 pub use caption_timing::{derive_caption_track_segments, source_caption_id, synchronize_captions};
 pub use configuration::*;
 pub use cursor::*;
