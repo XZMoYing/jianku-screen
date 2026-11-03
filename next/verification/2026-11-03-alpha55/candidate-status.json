@@ -1,0 +1,19 @@
+{
+	"candidateVersion": "0.2.0-alpha.55",
+	"build": "2026.55.0",
+	"productFreeze": "cbe4385fcb2b2a9775191ae6568eb9872a490a73",
+	"candidateSignature": "ad-hoc; strict deep verification passed",
+	"candidateSixBinariesMatchSource": true,
+	"installedVersion": "0.2.0-alpha.54",
+	"installedAppChanged": false,
+	"screenLocked": true,
+	"oldInstalledAppRunning": true,
+	"nativeUIAcceptance": "pending unlock and safe normal exit of confirmed owned editor",
+	"exportCasesPassed": 2,
+	"exportSeconds": 32,
+	"decodedVideoFrames": 960,
+	"frameReview": "3D transform/shadow/blur visible in one synthetic frame; no curve-comfort/colour acceptance",
+	"keyboardFixture": "empty keys; no visible keyboard text at 3s; no keyboard-content-render pass",
+	"strictColorGate": "existing 15 pass / 2 fail not waived",
+	"cleanup": "no old rollback removed; preserve54/53 until55 installed/accepted"
+}

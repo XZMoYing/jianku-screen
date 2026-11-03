@@ -1,0 +1,52 @@
+[
+	{
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.55/按键拖动.jks",
+		"files": [
+			"recording-meta.json",
+			"project-config.json",
+			"content/cursor-2.json",
+			"content/eight-seconds.mp4",
+			"content/cursor-placeholder.png",
+			"content/配乐二.wav",
+			"content/cursor-0.json",
+			"content/resolution-4k.mp4",
+			"content/配乐一.wav",
+			"content/cursor-1.json",
+			"assets/current-desktop-background-975e3324-6d26-489e-97f8-892638b10514.jpg",
+			"assets/current-desktop-background-3062c323-3166-4676-87e7-42125a34cc4e.jpg",
+			"assets/current-desktop-background-7f67f622-4010-4259-8189-9c0b1913ba7e.jpg",
+			"assets/current-desktop-background-1ca6c2bc-d8d2-4ca9-b94e-2ba4beb16c6c.jpg",
+			"assets/current-desktop-background-f9683ea5-5e2e-4553-ad9e-8eeb0d3bd9a3.jpg"
+		],
+		"nativeUI": "pending; Mac locked and installed54 still running"
+	},
+	{
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.55/3D拖动.jks",
+		"files": [
+			"recording-meta.json",
+			"project-config.json",
+			"content/cursor-2.json",
+			"content/eight-seconds.mp4",
+			"content/cursor-placeholder.png",
+			"content/配乐二.wav",
+			"content/cursor-0.json",
+			"content/resolution-4k.mp4",
+			"content/配乐一.wav",
+			"content/cursor-1.json",
+			"assets/current-desktop-background-975e3324-6d26-489e-97f8-892638b10514.jpg",
+			"assets/current-desktop-background-3062c323-3166-4676-87e7-42125a34cc4e.jpg",
+			"assets/current-desktop-background-7f67f622-4010-4259-8189-9c0b1913ba7e.jpg",
+			"assets/current-desktop-background-1ca6c2bc-d8d2-4ca9-b94e-2ba4beb16c6c.jpg",
+			"assets/current-desktop-background-f9683ea5-5e2e-4553-ad9e-8eeb0d3bd9a3.jpg"
+		],
+		"nativeUI": "pending; Mac locked and installed54 still running"
+	},
+	{
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.55/按键拖动-验收.mp4",
+		"sha256": "3208ed420400ff57c4763fd4c125b1bb74f53dbec4b40da54b404b88e173982b"
+	},
+	{
+		"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.55/3D拖动-验收.mp4",
+		"sha256": "aaace4b52c7a4fe416a476ee35bd9cf4110f10ec96183de388b7ef3da6011517"
+	}
+]
