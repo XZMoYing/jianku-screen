@@ -1,0 +1,12 @@
+[
+	{
+		"case": "按键拖动",
+		"path": "/private/tmp/jianku-alpha56-20261103/按键拖动.jks",
+		"state": "prepared; native UI not tested"
+	},
+	{
+		"case": "3D拖动",
+		"path": "/private/tmp/jianku-alpha56-20261103/3D拖动.jks",
+		"state": "prepared; native UI not tested"
+	}
+]

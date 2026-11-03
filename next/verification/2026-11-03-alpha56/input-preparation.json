@@ -1,0 +1,11 @@
+{
+	"fixture": "/private/tmp/jianku-alpha56-20261103/input-comparison55.jks",
+	"sourceConfigurationsCopiedNotLinked": true,
+	"immutableMediaHardLinked": true,
+	"keyboardSourceRanges": [[70, 74], [2, 6], [10, 14]],
+	"oldInputTool": "/private/tmp/jianku-alpha56-20261103/raw-input55",
+	"cleanInputTool": "/private/tmp/jianku-alpha55-20261103/drag-owned",
+	"future56ToolModes": ["normal raw", "normal clean", "undo raw", "blur raw"],
+	"actualComparisonExecuted": false,
+	"reason": "Mac locked / foreground loginwindow; activation refused; no inference of a new product bug"
+}

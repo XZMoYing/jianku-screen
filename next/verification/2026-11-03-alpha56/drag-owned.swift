@@ -5,7 +5,7 @@ import CoreGraphics
 let args = CommandLine.arguments
 let path = "/Applications/Jianku Screen Next.app"
 let matches = NSRunningApplication.runningApplications(withBundleIdentifier: "com.jianku.screen.next").filter { $0.bundleURL?.path == path }
-guard (args.count == 8 || args.count == 9), matches.count == 1, let app = matches.first, AXIsProcessTrusted(),
+guard (8...10).contains(args.count), matches.count == 1, let app = matches.first, AXIsProcessTrusted(),
  let version = NSDictionary(contentsOfFile: path + "/Contents/Info.plist")?["CFBundleShortVersionString"] as? String,
  version == "0.2.0-alpha.56", let windowID = Int(args[1]),
  let x1 = Double(args[2]), let y1 = Double(args[3]), let x2 = Double(args[4]), let y2 = Double(args[5]),
@@ -35,15 +35,20 @@ guard let bounds = ownWindow(), let ox = bounds["X"], let oy = bounds["Y"], let 
 _ = app.activate(options: [.activateAllWindows])
 RunLoop.current.run(until: Date().addingTimeInterval(0.15))
 guard NSWorkspace.shared.frontmostApplication?.processIdentifier == app.processIdentifier else { exit(2) }
+let mode = args.count >= 9 ? args[8] : "normal"
+let inputModel = args.count == 10 ? args[9] : "raw"
+guard ["normal", "undo", "blur"].contains(mode), ["raw", "clean"].contains(inputModel) else { exit(2) }
 let eventSource = CGEventSource(stateID: .combinedSessionState)
 func send(_ type: CGEventType, _ x: Double, _ y: Double) {
  if let event = CGEvent(mouseEventSource: eventSource, mouseType: type, mouseCursorPosition: CGPoint(x: ox + x, y: oy + y), mouseButton: .left) {
-  event.setIntegerValueField(.mouseEventClickState, value: 1)
+  if inputModel == "clean" {
+   event.flags = []
+   event.setIntegerValueField(.mouseEventClickState, value: type == .leftMouseDown || type == .leftMouseUp ? 1 : 0)
+   event.setDoubleValueField(.mouseEventPressure, value: type == .leftMouseDown || type == .leftMouseDragged ? 1 : 0)
+  } else { event.setIntegerValueField(.mouseEventClickState, value: 1) }
   event.post(tap: .cghidEventTap)
  }
 }
-let mode = args.count == 9 ? args[8] : "normal"
-guard ["normal", "undo", "blur"].contains(mode) else { exit(2) }
 func drag() throws {
  send(.mouseMoved, x1, y1)
  RunLoop.current.run(until: Date().addingTimeInterval(0.1))
@@ -89,6 +94,6 @@ func drag() throws {
 do {
  try drag()
  RunLoop.current.run(until: Date().addingTimeInterval(0.1))
- let report: [String: Any] = ["pid": Int(app.processIdentifier), "version": version, "windowID": windowID, "start": [x1, y1], "end": [x2, y2], "steps": steps, "duration": duration, "mode": mode, "scope": "one installed app editor showing the named synthetic project"]
+ let report: [String: Any] = ["pid": Int(app.processIdentifier), "version": version, "windowID": windowID, "start": [x1, y1], "end": [x2, y2], "steps": steps, "duration": duration, "mode": mode, "inputModel": inputModel, "finishedAtUnixMs": Int(Date().timeIntervalSince1970 * 1000), "scope": "one installed app editor showing the named synthetic project"]
  print(String(data: try JSONSerialization.data(withJSONObject: report, options: [.sortedKeys]), encoding: .utf8)!)
 } catch { print(error); exit(2) }

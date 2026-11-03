@@ -1,0 +1,18 @@
+[
+	{
+		"case": "按键拖动",
+		"project": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.56/按键拖动.jks",
+		"export": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.56/按键拖动-验收.mp4",
+		"videoSHA256": "42999710846c01f4c6cb946b2159f5f9b894052455f470cda9210faa9ceeb14a",
+		"nativeUI": "pending; Mac locked",
+		"contentLimit": "keyboard has empty keys; no keyboard-content pass"
+	},
+	{
+		"case": "3D拖动",
+		"project": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.56/3D拖动.jks",
+		"export": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.56/3D拖动-验收.mp4",
+		"videoSHA256": "aaace4b52c7a4fe416a476ee35bd9cf4110f10ec96183de388b7ef3da6011517",
+		"nativeUI": "pending; Mac locked",
+		"contentLimit": "single-frame review only; no comfort/color acceptance"
+	}
+]

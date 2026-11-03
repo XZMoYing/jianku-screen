@@ -38,7 +38,9 @@ guard NSWorkspace.shared.frontmostApplication?.processIdentifier == app.processI
 let eventSource = CGEventSource(stateID: .combinedSessionState)
 func send(_ type: CGEventType, _ x: Double, _ y: Double) {
  if let event = CGEvent(mouseEventSource: eventSource, mouseType: type, mouseCursorPosition: CGPoint(x: ox + x, y: oy + y), mouseButton: .left) {
-  event.setIntegerValueField(.mouseEventClickState, value: 1)
+  event.flags = []
+  event.setIntegerValueField(.mouseEventClickState, value: type == .leftMouseDown || type == .leftMouseUp ? 1 : 0)
+  event.setDoubleValueField(.mouseEventPressure, value: type == .leftMouseDown || type == .leftMouseDragged ? 1 : 0)
   event.post(tap: .cghidEventTap)
  }
 }

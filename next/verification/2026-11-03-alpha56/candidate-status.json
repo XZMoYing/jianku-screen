@@ -1,0 +1,23 @@
+{
+	"version": "0.2.0-alpha.56",
+	"build": "2026.56.0",
+	"productFreeze": "7db00cd",
+	"releaseResult": "completed with exit 0 after resumed build",
+	"sourceArchiveStageSignaturesAndSixHashesMatch": true,
+	"exportCases": 2,
+	"exportSeconds": 32,
+	"decodedFrames": 960,
+	"frameReview": "one 3D synthetic frame shows perspective, shadow and blur; no motion comfort/color pass",
+	"installedVersion": "0.2.0-alpha.55",
+	"lastVerifiedRollback": "0.2.0-alpha.54",
+	"nativeUIAcceptance": false,
+	"screenLockedAtLastCheck": true,
+	"diagnosticFlagEnabled": false,
+	"inputComparison": "new independent fixture and raw/clean tools prepared and compiled; no new actual gesture executed while locked",
+	"keyboardFixtureLimit": "empty keys; does not prove content timing/rendering",
+	"strictChroma": {
+		"passed": 15,
+		"failed": 2
+	},
+	"platforms": "Windows/Linux and physical scenarios remain pending"
+}
