@@ -1,0 +1,49 @@
+{
+	"baseCommit": "b9163b7",
+	"beforeComponentTests": {
+		"failed": 23,
+		"passed": 1,
+		"scope": "real ThreeDTrack with only unrelated count panel and context/i18n fixture adapters"
+	},
+	"afterNewComponentTestsPassed": 31,
+	"totalInterfacePassed": 203,
+	"modelTestsPassed": 97,
+	"chromiumChecksPerMotionPreference": 38,
+	"chromiumPhysicalMouseCasesPassed": 2,
+	"offscreenWKWebViewChecksPassed": 38,
+	"typescript": "passed",
+	"frontend": "passed",
+	"formatter": "scoped Biome passed",
+	"curveAndRendererFiles": [
+		{
+			"path": "apps/desktop/src/routes/editor/three-d.ts",
+			"sha256": "a8d19bd5db35b459d66c6b66687fa17ab992492868fbcb9e38222cdbca0f4be7",
+			"unchanged": true
+		},
+		{
+			"path": "apps/desktop/src/utils/camera3d-spring.ts",
+			"sha256": "a363d56b34641189fd450b1b1f67b35e6b21497e4cde829b3599b60481911604",
+			"unchanged": true
+		},
+		{
+			"path": "crates/rendering/src/camera3d.rs",
+			"sha256": "7cc8e864d5da95ef4c3a3f2544dfa4f9ae9e48100f6c62e08d8fefbd670c4dd8",
+			"unchanged": true
+		}
+	],
+	"installedVersion": "0.2.0-alpha.54",
+	"fixedSourcePackaged": false,
+	"installedEditorVideoAndExportAcceptance": "pending alpha55",
+	"fullFlickerReport": "not resolved by this unit",
+	"strictColorGate": "existing 15 pass / 2 fail not waived",
+	"sourceSha256": {
+		"apps/desktop/src/routes/editor/Timeline/ThreeDTrack.tsx": "4d44e8742a5beb179e709d3e4ce3593eabee723f73ed8634168350b3c9c97091",
+		"apps/desktop/src/routes/editor/Timeline/three-d-drag.test.tsx": "b892697311feebfbca494cde44be0cce7b56ca56a8ce15ed1a8e8a9e841801f3",
+		"apps/desktop/vitest.interface.config.ts": "94ac9d1274e50da07ddf001333ae97ffc105d354599b69afa58eb0e1a94afc0d"
+	},
+	"externalSameObjectRangeBaseline": {
+		"passed": 30,
+		"failed": 1,
+		"scope": "range-change guard added after second-pass reproduction"
+	}
+}

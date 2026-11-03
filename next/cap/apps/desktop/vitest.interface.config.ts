@@ -21,6 +21,7 @@ export default defineConfig({
 			"src/routes/editor/Timeline/hover-preview.test.tsx",
 			"src/routes/editor/Timeline/segment-drag.test.tsx",
 			"src/routes/editor/Timeline/keyboard-drag.test.tsx",
+			"src/routes/editor/Timeline/three-d-drag.test.tsx",
 			"src/routes/editor/text-history.test.tsx",
 			"src/routes/editor/text-drag.test.tsx",
 			"src/routes/editor/auto-zoom-generation.test.ts",
