@@ -1,0 +1,27 @@
+{
+	"date": "2026-11-03",
+	"sourceOnly": true,
+	"tests": {
+		"newDiagnosticWriter": 5,
+		"newEndCauses": 9,
+		"allInterface": 296,
+		"types": true,
+		"frontend": true
+	},
+	"installed": 55,
+	"plannedCandidate": 56,
+	"nativeRootCauseKnown": false,
+	"defaultEnabled": false,
+	"localGate": "AppData/timeline-gesture-diagnostics.enabled",
+	"retainedRecords": 32,
+	"output": "AppData/timeline-gesture-diagnostics-editor-N.json",
+	"sha256": {
+		"apps/desktop/src/routes/editor/Timeline/gesture-diagnostics.ts": "3dc4318972bc13afad7148c923260b1aa3ea0fc1d02c4cf97ef0391c43ef9fd5",
+		"apps/desktop/src/routes/editor/Timeline/mouse-drag.ts": "62205f3c4b3463d3d046f37eab6cb2c145520a26e1c7956c041bd1fac47c960f",
+		"apps/desktop/src/routes/editor/Timeline/KeyboardTrack.tsx": "b9f444237fcba7771a87480631c625d96825a14c1f48c472340579f55f145e7b"
+	},
+	"strictChroma": {
+		"passed": 15,
+		"failed": 2
+	}
+}

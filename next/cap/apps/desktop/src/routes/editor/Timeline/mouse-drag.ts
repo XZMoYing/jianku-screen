@@ -1,8 +1,25 @@
 import { createComputed, createSignal, onCleanup, untrack } from "solid-js";
 
+import {
+	recordTimelineGesture,
+	type TimelineGestureSnapshot,
+} from "./gesture-diagnostics";
+
 export type TimelineMouseDragEndReason = "release" | "cancel" | "history";
 
+type EndCause =
+	| "release"
+	| "escape"
+	| "blur"
+	| "invalid"
+	| "buttons"
+	| "dispose"
+	| "superseded"
+	| "history"
+	| "error";
+
 type MouseDrag = {
+	diagnostics?: { kind: "keyboard"; snapshot(): TimelineGestureSnapshot };
 	isValid(): boolean;
 	update(event: MouseEvent): void;
 	finish(event?: MouseEvent, reason?: TimelineMouseDragEndReason): void;
@@ -11,27 +28,31 @@ type MouseDrag = {
 export function createTimelineMouseDrag() {
 	const [active, setActive] = createSignal<{
 		isValid(): boolean;
-		finish(): void;
+		finish(cause: EndCause): void;
 	} | null>(null);
 	let disposed = false;
 	createComputed(() => {
 		const drag = active();
-		if (drag && !drag.isValid()) untrack(drag.finish);
+		if (drag && !drag.isValid()) untrack(() => drag.finish("invalid"));
 	});
 	onCleanup(() => {
 		disposed = true;
-		active()?.finish();
+		active()?.finish("dispose");
 	});
 
 	return (setup: () => MouseDrag | null) => {
 		if (disposed) return;
-		active()?.finish();
+		active()?.finish("superseded");
 		const drag = setup();
 		if (!drag) return;
 		let ended = false;
+		const startedAt = Date.now();
+		let moves = 0;
+		let buttons: number | null = null;
 		const finish = (
 			event?: MouseEvent,
 			reason: TimelineMouseDragEndReason = "cancel",
+			cause: EndCause = "invalid",
 		) => {
 			if (ended) return;
 			ended = true;
@@ -40,18 +61,41 @@ export function createTimelineMouseDrag() {
 			window.removeEventListener("blur", interrupt);
 			window.removeEventListener("keydown", keydown, true);
 			setActive(null);
+			if (drag.diagnostics) {
+				let snapshot: TimelineGestureSnapshot;
+				try {
+					snapshot = untrack(drag.diagnostics.snapshot);
+				} catch {
+					snapshot = { snapshotUnavailable: true };
+				}
+				void recordTimelineGesture({
+					kind: drag.diagnostics.kind,
+					cause,
+					startedAt,
+					elapsedMs: Date.now() - startedAt,
+					moves,
+					buttons,
+					snapshot,
+				});
+			}
 			drag.finish(event, reason);
 		};
-		const interrupt = () => finish();
+		const interrupt = () => finish(undefined, "cancel", "blur");
 		const move = (event: MouseEvent) => {
+			moves++;
+			buttons = event.buttons;
 			if ((event.buttons & 1) === 0 || !drag.isValid()) {
-				finish();
+				finish(
+					undefined,
+					"cancel",
+					(event.buttons & 1) === 0 ? "buttons" : "invalid",
+				);
 				return;
 			}
 			try {
 				drag.update(event);
 			} catch (error) {
-				finish();
+				finish(undefined, "cancel", "error");
 				throw error;
 			}
 		};
@@ -64,7 +108,7 @@ export function createTimelineMouseDrag() {
 			try {
 				drag.update(event);
 			} finally {
-				finish(event, "release");
+				finish(event, "release", "release");
 			}
 		};
 		const keydown = (event: KeyboardEvent) => {
@@ -72,19 +116,22 @@ export function createTimelineMouseDrag() {
 				(event.ctrlKey || event.metaKey) &&
 				(event.code === "KeyZ" || event.code === "KeyY")
 			) {
-				finish(undefined, "history");
+				finish(undefined, "history", "history");
 				return;
 			}
 			if (event.key !== "Escape") return;
 			event.preventDefault();
 			event.stopImmediatePropagation();
-			finish();
+			finish(undefined, "cancel", "escape");
 		};
 		window.addEventListener("mousemove", move);
 		window.addEventListener("mouseup", release);
 		window.addEventListener("blur", interrupt);
 		window.addEventListener("keydown", keydown, true);
-		setActive({ isValid: drag.isValid, finish: interrupt });
+		setActive({
+			isValid: drag.isValid,
+			finish: (cause) => finish(undefined, "cancel", cause),
+		});
 		return interrupt;
 	};
 }

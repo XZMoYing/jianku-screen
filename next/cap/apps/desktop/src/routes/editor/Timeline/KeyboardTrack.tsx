@@ -136,6 +136,22 @@ export function KeyboardTrack(props: {
 				}
 
 				return {
+					diagnostics: {
+						kind: "keyboard",
+						snapshot: () => ({
+							initialScale: scale,
+							currentScale: secsPerPixel(),
+							initialDuration: duration,
+							currentDuration: totalDuration(),
+							sameId: segment.id === id,
+							sameSourceObject: allKeyboardSegments().includes(segment),
+							visible: keyboardSegments().includes(segment),
+							interactMode: editorState.timeline.interactMode,
+							start: segment.start,
+							end: segment.end,
+							documentFocused: document.hasFocus(),
+						}),
+					},
 					isValid: () =>
 						editorState.timeline.interactMode === "seek" &&
 						secsPerPixel() === scale &&
