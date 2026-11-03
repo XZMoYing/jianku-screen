@@ -1,0 +1,41 @@
+{
+	"date": "2026-11-03",
+	"baselineCommit": "75df90a9fb678bdaeac81f186b467d8d02ad2446",
+	"sourceOnly": true,
+	"installed": 55,
+	"rollback": 54,
+	"installed55IncludesThisFix": false,
+	"before": {
+		"overlayPassed": 4,
+		"overlayFailed": 30,
+		"historyPassed": 3,
+		"historyFailed": 4
+	},
+	"after": {
+		"overlay": 40,
+		"history": 7,
+		"total": 282,
+		"types": true,
+		"frontend": true,
+		"chromiumChecksEach": 70,
+		"realPointersPerMode": 2,
+		"webKit": 70,
+		"threeDChromiumChecksEach": 38,
+		"threeDWK": 38,
+		"zoomChromiumChecksEach": 44,
+		"zoomWK": 44
+	},
+	"sha256": {
+		"apps/desktop/src/routes/editor/Timeline/style-track.tsx": "1e3d6f2018528d1b5c0b25c9ac6c70bf94710936e55c6f4169fa1a6ccb20e0af",
+		"apps/desktop/src/routes/editor/Timeline/mouse-drag.ts": "1adf2ef554dd2d07137a3f08eb0f8133de7656489a6a9d5774d04eaa522e8e75",
+		"apps/desktop/src/routes/editor/project-history.ts": "59270c7e5f23a8186613e4bf45b3b49b646f7aff8096024d17c02a030422f9db",
+		"apps/desktop/src/routes/editor/style.ts": "7b151c9756acd225b46fa4dced86ca7a4d0135c3eea5fe270345dc7dfb6de61a"
+	},
+	"releaseGates": {
+		"strictChromaPassed": 15,
+		"strictChromaFailed": 2,
+		"nativeFullDragAcceptance": false,
+		"hardwareMp4Variance": true,
+		"windowsLinuxComplete": false
+	}
+}

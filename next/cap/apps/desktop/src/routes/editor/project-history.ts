@@ -11,6 +11,7 @@ export function createStoreHistory<T extends Static>(
 ) {
 	const [pauseCount, setPauseCount] = createSignal(0);
 	let derivedWriteDepth = 0;
+	let pauseSnapshot: string | undefined;
 
 	const history = createUndoHistory(() => {
 		if (pauseCount() > 0) return;
@@ -48,31 +49,48 @@ export function createStoreHistory<T extends Static>(
 		e.stopPropagation();
 	});
 
-	return Object.assign(history, {
-		applyDerived(write: () => void) {
-			history.canUndo();
-			history.canRedo();
-			derivedWriteDepth++;
-			try {
-				batch(() => {
-					try {
-						write();
-					} finally {
-						// Evaluate while guarded: deferred history reads would otherwise
-						// turn measured layout into a new edit and discard the redo branch.
-						history.canUndo();
-						history.canRedo();
-					}
-				});
-			} finally {
-				derivedWriteDepth--;
-			}
-		},
-		pause() {
-			setPauseCount(pauseCount() + 1);
+	function applyDerived(write: () => void) {
+		history.canUndo();
+		history.canRedo();
+		derivedWriteDepth++;
+		try {
+			batch(() => {
+				try {
+					write();
+				} finally {
+					// Evaluate while guarded: deferred history reads would otherwise
+					// turn measured layout into a new edit and discard the redo branch.
+					history.canUndo();
+					history.canRedo();
+				}
+			});
+		} finally {
+			derivedWriteDepth--;
+		}
+	}
 
+	return Object.assign(history, {
+		applyDerived,
+		pause() {
+			if (pauseCount() === 0) {
+				history.canUndo();
+				history.canRedo();
+				pauseSnapshot = JSON.stringify(unwrap(state));
+			}
+			setPauseCount(pauseCount() + 1);
+			let resumed = false;
 			return () => {
-				setPauseCount(pauseCount() - 1);
+				if (resumed) return;
+				resumed = true;
+				const remaining = pauseCount() - 1;
+				if (remaining > 0) {
+					setPauseCount(remaining);
+					return;
+				}
+				const unchanged = JSON.stringify(unwrap(state)) === pauseSnapshot;
+				pauseSnapshot = undefined;
+				if (unchanged) applyDerived(() => setPauseCount(0));
+				else setPauseCount(0);
 			};
 		},
 		isPaused: () => pauseCount() > 0,

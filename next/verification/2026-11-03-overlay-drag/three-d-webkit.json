@@ -1,0 +1,157 @@
+{
+	"observations": [
+		{
+			"name": "blur/finish",
+			"passed": true
+		},
+		{
+			"name": "blur/late-events",
+			"passed": true
+		},
+		{
+			"name": "escape/finish",
+			"passed": true
+		},
+		{
+			"name": "escape/late-events",
+			"passed": true
+		},
+		{
+			"name": "unmount/finish",
+			"passed": true
+		},
+		{
+			"name": "unmount/late-events",
+			"passed": true
+		},
+		{
+			"name": "mode/finish",
+			"passed": true
+		},
+		{
+			"name": "mode/late-events",
+			"passed": true
+		},
+		{
+			"name": "replace/finish",
+			"passed": true
+		},
+		{
+			"name": "replace/late-events",
+			"passed": true
+		},
+		{
+			"name": "range/finish",
+			"passed": true
+		},
+		{
+			"name": "range/late-events",
+			"passed": true
+		},
+		{
+			"name": "buttons/finish",
+			"passed": true
+		},
+		{
+			"name": "buttons/late-events",
+			"passed": true
+		},
+		{
+			"name": "scale/finish",
+			"passed": true
+		},
+		{
+			"name": "scale/late-events",
+			"passed": true
+		},
+		{
+			"name": "duration/finish",
+			"passed": true
+		},
+		{
+			"name": "duration/late-events",
+			"passed": true
+		},
+		{
+			"name": "delete/finish",
+			"passed": true
+		},
+		{
+			"name": "delete/late-events",
+			"passed": true
+		},
+		{
+			"name": "creation/blur",
+			"passed": true
+		},
+		{
+			"name": "creation/escape",
+			"passed": true
+		},
+		{
+			"name": "creation/unmount",
+			"passed": true
+		},
+		{
+			"name": "creation/mode",
+			"passed": true
+		},
+		{
+			"name": "creation/buttons",
+			"passed": true
+		},
+		{
+			"name": "creation/scale",
+			"passed": true
+		},
+		{
+			"name": "creation/duration",
+			"passed": true
+		},
+		{
+			"name": "reorder/data",
+			"passed": true
+		},
+		{
+			"name": "reorder/dom",
+			"passed": true
+		},
+		{
+			"name": "reorder/selection",
+			"passed": true
+		},
+		{
+			"name": "trim/start/position",
+			"passed": true
+		},
+		{
+			"name": "trim/start/motion",
+			"passed": true
+		},
+		{
+			"name": "trim/end/position",
+			"passed": true
+		},
+		{
+			"name": "trim/end/motion",
+			"passed": true
+		},
+		{
+			"name": "coalesced-move",
+			"passed": true
+		},
+		{
+			"name": "history/undo",
+			"passed": true
+		},
+		{
+			"name": "history/no-overwrite",
+			"passed": true
+		},
+		{
+			"name": "history/redo",
+			"passed": true
+		}
+	],
+	"passed": true
+}

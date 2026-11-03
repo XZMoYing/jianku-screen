@@ -1,0 +1,618 @@
+[
+	{
+		"reducedMotion": "no-preference",
+		"observations": [
+			{
+				"name": "style/mode/finish",
+				"passed": true
+			},
+			{
+				"name": "style/mode/late-events",
+				"passed": true
+			},
+			{
+				"name": "style/range/finish",
+				"passed": true
+			},
+			{
+				"name": "style/range/late-events",
+				"passed": true
+			},
+			{
+				"name": "style/track/finish",
+				"passed": true
+			},
+			{
+				"name": "style/track/late-events",
+				"passed": true
+			},
+			{
+				"name": "style/lane/finish",
+				"passed": true
+			},
+			{
+				"name": "style/lane/late-events",
+				"passed": true
+			},
+			{
+				"name": "style/buttons/finish",
+				"passed": true
+			},
+			{
+				"name": "style/buttons/late-events",
+				"passed": true
+			},
+			{
+				"name": "style/scale/finish",
+				"passed": true
+			},
+			{
+				"name": "style/scale/late-events",
+				"passed": true
+			},
+			{
+				"name": "style/duration/finish",
+				"passed": true
+			},
+			{
+				"name": "style/duration/late-events",
+				"passed": true
+			},
+			{
+				"name": "style/delete/finish",
+				"passed": true
+			},
+			{
+				"name": "style/delete/late-events",
+				"passed": true
+			},
+			{
+				"name": "style/blur/rollback",
+				"passed": true
+			},
+			{
+				"name": "style/blur/late-events",
+				"passed": true
+			},
+			{
+				"name": "style/escape/rollback",
+				"passed": true
+			},
+			{
+				"name": "style/escape/late-events",
+				"passed": true
+			},
+			{
+				"name": "style/unmount/rollback",
+				"passed": true
+			},
+			{
+				"name": "style/unmount/late-events",
+				"passed": true
+			},
+			{
+				"name": "style/reorder/data",
+				"passed": true
+			},
+			{
+				"name": "style/reorder/dom",
+				"passed": true
+			},
+			{
+				"name": "style/reorder/selection",
+				"passed": true
+			},
+			{
+				"name": "style/trim/start",
+				"passed": true
+			},
+			{
+				"name": "style/trim/end",
+				"passed": true
+			},
+			{
+				"name": "style/secondary-release",
+				"passed": true
+			},
+			{
+				"name": "style/primary-release",
+				"passed": true
+			},
+			{
+				"name": "style/history/undo",
+				"passed": true
+			},
+			{
+				"name": "style/history/late-events",
+				"passed": true
+			},
+			{
+				"name": "style/history/redo",
+				"passed": true
+			},
+			{
+				"name": "style/history/no-op",
+				"passed": true
+			},
+			{
+				"name": "style/history/cancel-metadata",
+				"passed": true
+			},
+			{
+				"name": "style/history/metadata-undo",
+				"passed": true
+			},
+			{
+				"name": "image/mode/finish",
+				"passed": true
+			},
+			{
+				"name": "image/mode/late-events",
+				"passed": true
+			},
+			{
+				"name": "image/range/finish",
+				"passed": true
+			},
+			{
+				"name": "image/range/late-events",
+				"passed": true
+			},
+			{
+				"name": "image/track/finish",
+				"passed": true
+			},
+			{
+				"name": "image/track/late-events",
+				"passed": true
+			},
+			{
+				"name": "image/lane/finish",
+				"passed": true
+			},
+			{
+				"name": "image/lane/late-events",
+				"passed": true
+			},
+			{
+				"name": "image/buttons/finish",
+				"passed": true
+			},
+			{
+				"name": "image/buttons/late-events",
+				"passed": true
+			},
+			{
+				"name": "image/scale/finish",
+				"passed": true
+			},
+			{
+				"name": "image/scale/late-events",
+				"passed": true
+			},
+			{
+				"name": "image/duration/finish",
+				"passed": true
+			},
+			{
+				"name": "image/duration/late-events",
+				"passed": true
+			},
+			{
+				"name": "image/delete/finish",
+				"passed": true
+			},
+			{
+				"name": "image/delete/late-events",
+				"passed": true
+			},
+			{
+				"name": "image/blur/rollback",
+				"passed": true
+			},
+			{
+				"name": "image/blur/late-events",
+				"passed": true
+			},
+			{
+				"name": "image/escape/rollback",
+				"passed": true
+			},
+			{
+				"name": "image/escape/late-events",
+				"passed": true
+			},
+			{
+				"name": "image/unmount/rollback",
+				"passed": true
+			},
+			{
+				"name": "image/unmount/late-events",
+				"passed": true
+			},
+			{
+				"name": "image/reorder/data",
+				"passed": true
+			},
+			{
+				"name": "image/reorder/dom",
+				"passed": true
+			},
+			{
+				"name": "image/reorder/selection",
+				"passed": true
+			},
+			{
+				"name": "image/trim/start",
+				"passed": true
+			},
+			{
+				"name": "image/trim/end",
+				"passed": true
+			},
+			{
+				"name": "image/secondary-release",
+				"passed": true
+			},
+			{
+				"name": "image/primary-release",
+				"passed": true
+			},
+			{
+				"name": "image/history/undo",
+				"passed": true
+			},
+			{
+				"name": "image/history/late-events",
+				"passed": true
+			},
+			{
+				"name": "image/history/redo",
+				"passed": true
+			},
+			{
+				"name": "image/history/no-op",
+				"passed": true
+			},
+			{
+				"name": "image/history/cancel-metadata",
+				"passed": true
+			},
+			{
+				"name": "image/history/metadata-undo",
+				"passed": true
+			}
+		],
+		"passed": true,
+		"pointers": [
+			{
+				"kind": "style",
+				"start": 4,
+				"end": 8,
+				"hiddenStart": 20,
+				"otherStart": 10,
+				"preservedNode": true,
+				"preservedMotion": true,
+				"resumes": 1
+			},
+			{
+				"kind": "image",
+				"start": 4,
+				"end": 8,
+				"hiddenStart": 20,
+				"otherStart": 10,
+				"preservedNode": true,
+				"preservedMotion": true,
+				"resumes": 1
+			}
+		]
+	},
+	{
+		"reducedMotion": "reduce",
+		"observations": [
+			{
+				"name": "style/mode/finish",
+				"passed": true
+			},
+			{
+				"name": "style/mode/late-events",
+				"passed": true
+			},
+			{
+				"name": "style/range/finish",
+				"passed": true
+			},
+			{
+				"name": "style/range/late-events",
+				"passed": true
+			},
+			{
+				"name": "style/track/finish",
+				"passed": true
+			},
+			{
+				"name": "style/track/late-events",
+				"passed": true
+			},
+			{
+				"name": "style/lane/finish",
+				"passed": true
+			},
+			{
+				"name": "style/lane/late-events",
+				"passed": true
+			},
+			{
+				"name": "style/buttons/finish",
+				"passed": true
+			},
+			{
+				"name": "style/buttons/late-events",
+				"passed": true
+			},
+			{
+				"name": "style/scale/finish",
+				"passed": true
+			},
+			{
+				"name": "style/scale/late-events",
+				"passed": true
+			},
+			{
+				"name": "style/duration/finish",
+				"passed": true
+			},
+			{
+				"name": "style/duration/late-events",
+				"passed": true
+			},
+			{
+				"name": "style/delete/finish",
+				"passed": true
+			},
+			{
+				"name": "style/delete/late-events",
+				"passed": true
+			},
+			{
+				"name": "style/blur/rollback",
+				"passed": true
+			},
+			{
+				"name": "style/blur/late-events",
+				"passed": true
+			},
+			{
+				"name": "style/escape/rollback",
+				"passed": true
+			},
+			{
+				"name": "style/escape/late-events",
+				"passed": true
+			},
+			{
+				"name": "style/unmount/rollback",
+				"passed": true
+			},
+			{
+				"name": "style/unmount/late-events",
+				"passed": true
+			},
+			{
+				"name": "style/reorder/data",
+				"passed": true
+			},
+			{
+				"name": "style/reorder/dom",
+				"passed": true
+			},
+			{
+				"name": "style/reorder/selection",
+				"passed": true
+			},
+			{
+				"name": "style/trim/start",
+				"passed": true
+			},
+			{
+				"name": "style/trim/end",
+				"passed": true
+			},
+			{
+				"name": "style/secondary-release",
+				"passed": true
+			},
+			{
+				"name": "style/primary-release",
+				"passed": true
+			},
+			{
+				"name": "style/history/undo",
+				"passed": true
+			},
+			{
+				"name": "style/history/late-events",
+				"passed": true
+			},
+			{
+				"name": "style/history/redo",
+				"passed": true
+			},
+			{
+				"name": "style/history/no-op",
+				"passed": true
+			},
+			{
+				"name": "style/history/cancel-metadata",
+				"passed": true
+			},
+			{
+				"name": "style/history/metadata-undo",
+				"passed": true
+			},
+			{
+				"name": "image/mode/finish",
+				"passed": true
+			},
+			{
+				"name": "image/mode/late-events",
+				"passed": true
+			},
+			{
+				"name": "image/range/finish",
+				"passed": true
+			},
+			{
+				"name": "image/range/late-events",
+				"passed": true
+			},
+			{
+				"name": "image/track/finish",
+				"passed": true
+			},
+			{
+				"name": "image/track/late-events",
+				"passed": true
+			},
+			{
+				"name": "image/lane/finish",
+				"passed": true
+			},
+			{
+				"name": "image/lane/late-events",
+				"passed": true
+			},
+			{
+				"name": "image/buttons/finish",
+				"passed": true
+			},
+			{
+				"name": "image/buttons/late-events",
+				"passed": true
+			},
+			{
+				"name": "image/scale/finish",
+				"passed": true
+			},
+			{
+				"name": "image/scale/late-events",
+				"passed": true
+			},
+			{
+				"name": "image/duration/finish",
+				"passed": true
+			},
+			{
+				"name": "image/duration/late-events",
+				"passed": true
+			},
+			{
+				"name": "image/delete/finish",
+				"passed": true
+			},
+			{
+				"name": "image/delete/late-events",
+				"passed": true
+			},
+			{
+				"name": "image/blur/rollback",
+				"passed": true
+			},
+			{
+				"name": "image/blur/late-events",
+				"passed": true
+			},
+			{
+				"name": "image/escape/rollback",
+				"passed": true
+			},
+			{
+				"name": "image/escape/late-events",
+				"passed": true
+			},
+			{
+				"name": "image/unmount/rollback",
+				"passed": true
+			},
+			{
+				"name": "image/unmount/late-events",
+				"passed": true
+			},
+			{
+				"name": "image/reorder/data",
+				"passed": true
+			},
+			{
+				"name": "image/reorder/dom",
+				"passed": true
+			},
+			{
+				"name": "image/reorder/selection",
+				"passed": true
+			},
+			{
+				"name": "image/trim/start",
+				"passed": true
+			},
+			{
+				"name": "image/trim/end",
+				"passed": true
+			},
+			{
+				"name": "image/secondary-release",
+				"passed": true
+			},
+			{
+				"name": "image/primary-release",
+				"passed": true
+			},
+			{
+				"name": "image/history/undo",
+				"passed": true
+			},
+			{
+				"name": "image/history/late-events",
+				"passed": true
+			},
+			{
+				"name": "image/history/redo",
+				"passed": true
+			},
+			{
+				"name": "image/history/no-op",
+				"passed": true
+			},
+			{
+				"name": "image/history/cancel-metadata",
+				"passed": true
+			},
+			{
+				"name": "image/history/metadata-undo",
+				"passed": true
+			}
+		],
+		"passed": true,
+		"pointers": [
+			{
+				"kind": "style",
+				"start": 4,
+				"end": 8,
+				"hiddenStart": 20,
+				"otherStart": 10,
+				"preservedNode": true,
+				"preservedMotion": true,
+				"resumes": 1
+			},
+			{
+				"kind": "image",
+				"start": 4,
+				"end": 8,
+				"hiddenStart": 20,
+				"otherStart": 10,
+				"preservedNode": true,
+				"preservedMotion": true,
+				"resumes": 1
+			}
+		]
+	}
+]

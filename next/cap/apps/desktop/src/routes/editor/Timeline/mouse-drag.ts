@@ -1,9 +1,11 @@
 import { createComputed, createSignal, onCleanup, untrack } from "solid-js";
 
+export type TimelineMouseDragEndReason = "release" | "cancel" | "history";
+
 type MouseDrag = {
 	isValid(): boolean;
 	update(event: MouseEvent): void;
-	finish(event?: MouseEvent): void;
+	finish(event?: MouseEvent, reason?: TimelineMouseDragEndReason): void;
 };
 
 export function createTimelineMouseDrag() {
@@ -27,7 +29,10 @@ export function createTimelineMouseDrag() {
 		const drag = setup();
 		if (!drag) return;
 		let ended = false;
-		const finish = (event?: MouseEvent) => {
+		const finish = (
+			event?: MouseEvent,
+			reason: TimelineMouseDragEndReason = "cancel",
+		) => {
 			if (ended) return;
 			ended = true;
 			window.removeEventListener("mousemove", move);
@@ -35,7 +40,7 @@ export function createTimelineMouseDrag() {
 			window.removeEventListener("blur", interrupt);
 			window.removeEventListener("keydown", keydown, true);
 			setActive(null);
-			drag.finish(event);
+			drag.finish(event, reason);
 		};
 		const interrupt = () => finish();
 		const move = (event: MouseEvent) => {
@@ -59,7 +64,7 @@ export function createTimelineMouseDrag() {
 			try {
 				drag.update(event);
 			} finally {
-				finish(event);
+				finish(event, "release");
 			}
 		};
 		const keydown = (event: KeyboardEvent) => {
@@ -67,7 +72,7 @@ export function createTimelineMouseDrag() {
 				(event.ctrlKey || event.metaKey) &&
 				(event.code === "KeyZ" || event.code === "KeyY")
 			) {
-				finish();
+				finish(undefined, "history");
 				return;
 			}
 			if (event.key !== "Escape") return;

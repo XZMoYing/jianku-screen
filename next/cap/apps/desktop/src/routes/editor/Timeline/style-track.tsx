@@ -1,8 +1,10 @@
-import { For, onCleanup, Show } from "solid-js";
+import { batch, For, Show } from "solid-js";
 import { t as localize } from "~/utils/i18n";
+import type { ImageSegment, StyleSegment } from "~/utils/tauri";
 import { useEditorContext } from "../context";
 import { editOverlayInterval } from "../style";
 import { useTimelineContext } from "./context";
+import { createTimelineMouseDrag } from "./mouse-drag";
 import {
 	SegmentContent,
 	SegmentHandle,
@@ -35,19 +37,16 @@ export function OverlayTrack(
 		totalDuration,
 	} = useEditorContext();
 	const { secsPerPixel, timelineBounds } = useTimelineContext();
-	const allSegments = () =>
+	const allSegments = (): (StyleSegment | ImageSegment)[] =>
 		(props.type === "style"
 			? project.timeline?.styleSegments
 			: project.timeline?.imageSegments) ?? [];
 	const segments = () =>
-		allSegments()
-			.map((segment, index) => ({ segment, index }))
-			.filter(({ segment }) => segment.track === props.laneIndex);
+		allSegments().filter((segment) => segment.track === props.laneIndex);
 	const selected = (index: number) =>
 		editorState.timeline.selection?.type === props.type &&
 		editorState.timeline.selection.indices.includes(index);
-	let endDrag: (() => void) | undefined;
-	onCleanup(() => endDrag?.());
+	const startGesture = createTimelineMouseDrag();
 
 	const timeAt = (event: MouseEvent) =>
 		Math.max(
@@ -76,10 +75,10 @@ export function OverlayTrack(
 				indices = segments()
 					.filter(
 						(item) =>
-							item.index >= Math.min(anchor, index) &&
-							item.index <= Math.max(anchor, index),
+							allSegments().indexOf(item) >= Math.min(anchor, index) &&
+							allSegments().indexOf(item) <= Math.max(anchor, index),
 					)
-					.map((item) => item.index);
+					.map((item) => allSegments().indexOf(item));
 			}
 		}
 		setEditorState(
@@ -101,80 +100,127 @@ export function OverlayTrack(
 	}
 	function drag(
 		event: MouseEvent,
-		index: number,
+		segment: StyleSegment | ImageSegment,
 		edge: "start" | "move" | "end",
 	) {
 		event.stopPropagation();
 		if (event.button !== 0) return;
+		startGesture(() => null);
+		const index = allSegments().indexOf(segment);
+		if (index < 0) return;
 		if (editorState.timeline.interactMode === "split") {
 			projectActions.splitOverlaySegment(props.type, index, timeAt(event));
 			return;
 		}
+		if (editorState.timeline.interactMode !== "seek") return;
 		event.preventDefault();
 		select(index, event);
 		if (event.metaKey || event.ctrlKey || event.shiftKey) return;
-		endDrag?.();
-		const segment = allSegments()[index];
-		if (!segment) return;
-		const initial = { start: segment.start, end: segment.end };
-		const initialPlaybackTime = editorState.playbackTime;
-		const lane = segments();
-		const position = lane.findIndex((item) => item.index === index);
-		const previousEnd = lane[position - 1]?.segment.end ?? 0;
-		const nextStart = lane[position + 1]?.segment.start ?? totalDuration();
-		const resume = projectHistory.pause();
-		let moved = false;
-		props.onDragStateChanged({ type: "movePending" });
-		const move = (next: MouseEvent) => {
-			if (allSegments()[index] !== segment) return;
-			if (!moved && Math.abs(next.clientX - event.clientX) < 2) return;
-			moved = true;
-			props.onDragStateChanged({ type: "moving" });
-			const interval = editOverlayInterval(
-				initial,
-				(next.clientX - event.clientX) * secsPerPixel(),
-				edge,
-				previousEnd,
-				nextStart,
+		startGesture(() => {
+			const initial = { start: segment.start, end: segment.end };
+			const initialPlaybackTime = editorState.playbackTime;
+			const lane = props.laneIndex;
+			const type = props.type;
+			const scale = secsPerPixel();
+			const span = totalDuration();
+			const neighbours = segments()
+				.filter((item) => item !== segment)
+				.map((item) => ({ item, start: item.start, end: item.end }));
+			const previousEnd = neighbours.reduce(
+				(end, value) =>
+					value.end <= initial.start ? Math.max(end, value.end) : end,
+				0,
 			);
-			if (props.type === "style")
-				setProject("timeline", "styleSegments", index, interval);
-			else setProject("timeline", "imageSegments", index, interval);
-			setEditorState("previewTime", null);
-			setEditorState(
-				"playbackTime",
-				edge === "end" ? interval.end - 0.001 : interval.start,
+			const nextStart = neighbours.reduce(
+				(start, value) =>
+					value.start >= initial.end ? Math.min(start, value.start) : start,
+				span,
 			);
-		};
-		const finish = (next?: MouseEvent, cancelled = false) => {
-			if (!endDrag) return;
-			if (next) move(next);
-			window.removeEventListener("mousemove", move);
-			window.removeEventListener("mouseup", finish);
-			window.removeEventListener("blur", cancel);
-			window.removeEventListener("keydown", keydown, true);
-			endDrag = undefined;
-			if (cancelled && moved && allSegments()[index] === segment) {
-				if (props.type === "style")
-					setProject("timeline", "styleSegments", index, initial);
-				else setProject("timeline", "imageSegments", index, initial);
-				setEditorState("playbackTime", initialPlaybackTime);
-			}
-			resume();
-			props.onDragStateChanged({ type: "idle" });
-		};
-		const cancel = () => finish(undefined, true);
-		const keydown = (next: KeyboardEvent) => {
-			if (next.key !== "Escape") return;
-			next.preventDefault();
-			next.stopImmediatePropagation();
-			cancel();
-		};
-		endDrag = cancel;
-		window.addEventListener("mousemove", move);
-		window.addEventListener("mouseup", finish);
-		window.addEventListener("blur", cancel);
-		window.addEventListener("keydown", keydown, true);
+			let expected = initial;
+			let moved = false;
+			let resume: (() => void) | undefined;
+			const sameContext = () =>
+				props.type === type &&
+				props.laneIndex === lane &&
+				segment.track === lane &&
+				secsPerPixel() === scale &&
+				totalDuration() === span;
+			const sameRange = () =>
+				allSegments().includes(segment) &&
+				segment.start === expected.start &&
+				segment.end === expected.end;
+			const write = (interval: { start: number; end: number }) => {
+				const currentIndex = allSegments().indexOf(segment);
+				if (currentIndex < 0) return;
+				expected = interval;
+				if (type === "style")
+					setProject("timeline", "styleSegments", currentIndex, interval);
+				else setProject("timeline", "imageSegments", currentIndex, interval);
+			};
+			const sameNeighbours = () => {
+				const current = new Set(segments());
+				return (
+					current.size === neighbours.length + 1 &&
+					neighbours.every(
+						(value) =>
+							current.has(value.item) &&
+							value.item.start === value.start &&
+							value.item.end === value.end,
+					)
+				);
+			};
+			props.onDragStateChanged({ type: "movePending" });
+			return {
+				isValid: () =>
+					sameContext() &&
+					sameRange() &&
+					sameNeighbours() &&
+					editorState.timeline.interactMode === "seek",
+				update: (next: MouseEvent) => {
+					if (!moved && Math.abs(next.clientX - event.clientX) < 2) return;
+					moved = true;
+					props.onDragStateChanged({ type: "moving" });
+					const interval = editOverlayInterval(
+						initial,
+						(next.clientX - event.clientX) * scale,
+						edge,
+						previousEnd,
+						nextStart,
+					);
+					if (
+						interval.start !== segment.start ||
+						interval.end !== segment.end
+					) {
+						resume ??= projectHistory.pause();
+						batch(() => {
+							write(interval);
+							setEditorState("previewTime", null);
+							setEditorState(
+								"playbackTime",
+								edge === "end" ? interval.end - 0.001 : interval.start,
+							);
+						});
+					}
+				},
+				finish: (_next, reason) => {
+					if (
+						reason === "cancel" &&
+						resume &&
+						sameContext() &&
+						sameRange() &&
+						sameNeighbours() &&
+						editorState.timeline.interactMode === "seek"
+					) {
+						batch(() => {
+							write(initial);
+							setEditorState("playbackTime", initialPlaybackTime);
+						});
+					}
+					resume?.();
+					props.onDragStateChanged({ type: "idle" });
+				},
+			};
+		});
 	}
 
 	return (
@@ -182,6 +228,7 @@ export function OverlayTrack(
 			onDblClick={(event) => {
 				if (!(event.target as HTMLElement).closest("[data-overlay-segment]")) {
 					event.stopPropagation();
+					startGesture(() => null);
 					add(timeAt(event));
 				}
 			}}
@@ -191,7 +238,10 @@ export function OverlayTrack(
 					type="button"
 					disabled={props.type === "image" && editorState.importingImage}
 					class="cap-empty-lane pointer-events-auto"
-					onMouseDown={(event) => event.stopPropagation()}
+					onMouseDown={(event) => {
+						event.stopPropagation();
+						startGesture(() => null);
+					}}
 					onClick={(event) => {
 						event.stopPropagation();
 						add(editorState.playbackTime);
@@ -222,45 +272,48 @@ export function OverlayTrack(
 				</button>
 			</Show>
 			<For each={segments()}>
-				{({ segment, index }) => (
-					<SegmentRoot
-						segment={segment}
-						data-overlay-segment
-						data-index={index}
-						segColor={`var(--track-${props.type})`}
-						class="group"
-						selected={selected(index)}
-						muted={!segment.enabled}
-						title={`${segment.name} · ${(segment.end - segment.start).toFixed(2)}s`}
-					>
-						<SegmentHandle
-							position="start"
-							onMouseDown={(event) => drag(event, index, "start")}
-						/>
-						<SegmentContent
-							class="cursor-grab overflow-hidden"
-							onMouseDown={(event) => drag(event, index, "move")}
+				{(segment) => {
+					const index = () => allSegments().indexOf(segment);
+					return (
+						<SegmentRoot
+							segment={segment}
+							data-overlay-segment
+							data-index={index()}
+							segColor={`var(--track-${props.type})`}
+							class="group"
+							selected={selected(index())}
+							muted={!segment.enabled}
+							title={`${segment.name} · ${(segment.end - segment.start).toFixed(2)}s`}
 						>
-							<SegmentLabel
-								full={() => (
-									<div class="cap-seg-labels">
-										<span class="cap-seg-label truncate">{segment.name}</span>
-										<span class="cap-seg-sublabel">
-											{`${(segment.end - segment.start).toFixed(1)}s`}
-										</span>
-									</div>
-								)}
-								compact={() => (
-									<span class="cap-seg-label truncate">{segment.name}</span>
-								)}
+							<SegmentHandle
+								position="start"
+								onMouseDown={(event) => drag(event, segment, "start")}
 							/>
-						</SegmentContent>
-						<SegmentHandle
-							position="end"
-							onMouseDown={(event) => drag(event, index, "end")}
-						/>
-					</SegmentRoot>
-				)}
+							<SegmentContent
+								class="cursor-grab overflow-hidden"
+								onMouseDown={(event) => drag(event, segment, "move")}
+							>
+								<SegmentLabel
+									full={() => (
+										<div class="cap-seg-labels">
+											<span class="cap-seg-label truncate">{segment.name}</span>
+											<span class="cap-seg-sublabel">
+												{`${(segment.end - segment.start).toFixed(1)}s`}
+											</span>
+										</div>
+									)}
+									compact={() => (
+										<span class="cap-seg-label truncate">{segment.name}</span>
+									)}
+								/>
+							</SegmentContent>
+							<SegmentHandle
+								position="end"
+								onMouseDown={(event) => drag(event, segment, "end")}
+							/>
+						</SegmentRoot>
+					);
+				}}
 			</For>
 		</TrackRoot>
 	);
