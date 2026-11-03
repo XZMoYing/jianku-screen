@@ -1,0 +1,13 @@
+{
+	"id": "automation",
+	"resetUnix": 1793735088,
+	"resumeUnix": 1793735148,
+	"resumeLocal": "2026-11-04 03:45:48 Asia/Shanghai",
+	"rrule": "RRULE:FREQ=DAILY;COUNT=1;BYHOUR=3;BYMINUTE=45;BYSECOND=48",
+	"targetThreadId": "01a0f1dc-4cf3-7382-baad-5ff91e2c889a",
+	"statusVerified": "ACTIVE",
+	"usedPercentAtClose": 94,
+	"unitCompleteAndBackedUp": "a729dd5",
+	"pauseRequestedByUserThreshold": true,
+	"resumeSuccessProven": false
+}

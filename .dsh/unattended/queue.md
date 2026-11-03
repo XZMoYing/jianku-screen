@@ -1,5 +1,7 @@
 # 2026-10-27：完整中文与跨平台无人值守队列
 
+2026-11-04额度收尾：字幕源码a729dd5已推且166模型/最终两crate check通过，主94%/周15%，当前无活动验证进程，按92%约定收尾暂停。单次automation已核对ACTIVE/本线程/COUNT1，真实5h reset1793735088+60秒＝今天03:45:48 Asia/Shanghai；实际goal以工具状态为准，唤醒须重新核对额度/锁屏/恢复是否成功。
+
 2026-11-04字幕路径源码：已确认并修复.jks/尾斜杠截断和本地字幕落在工程外的问题，新数据入工程，旧外置字幕兼容读取且保留。7新增／166工程全库、fmt、cap-project/cap-desktop release check通过，证据next/verification/2026-11-04-caption-path/。安装55和冻结56均不含新修复，后续原生保存重开/SRT/便携需验；锁屏原生拖动仍待，不能据此猜根因。
 
 2026-11-04候选56离线完成：release51185／prepare95188／export61754均退出0，源/归档/暂存签名版本六hash一致；两份32秒960帧完整导出解码，3D单帧可见透视/阴影/模糊。56已归档但未安装，current55／回滚54，系统再锁屏且激活被拒，解锁问题待答。输入raw/clean与flag工具仅prepared，首步停止根因／原生全验仍未通过。见最新session和56 candidate-status，不重复release/prepare。
