@@ -1,0 +1,42 @@
+{
+  "date": "2026-11-03",
+  "baselineCommit": "e239c45e3aefb4c4810a6a0e8fa3595caa41de93",
+  "sourceOnly": true,
+  "installed": 54,
+  "rollback": 53,
+  "candidate55IncludesZoomFix": false,
+  "baselineInterface": 203,
+  "before": {
+    "passed": 2,
+    "failed": 23
+  },
+  "after": {
+    "new": 32,
+    "totalInterface": 235,
+    "types": true,
+    "frontend": true,
+    "chromiumChecksEach": 44,
+    "chromiumModes": [
+      "no-preference",
+      "reduce"
+    ],
+    "realPointerEach": true,
+    "offscreenWebKitChecks": 44
+  },
+  "sha256": {
+    "apps/desktop/src/routes/editor/Timeline/ZoomTrack.tsx": "afa4f32de38e5a3826189cd0189309ccbdd97e419c8d73f26d2bece61dc810e5",
+    "apps/desktop/src/routes/editor/Timeline/mouse-drag.ts": "893b7af787e575470f15bb6d0442c26412e7e14ea8c2fdb6446a1f927b0cbd7b",
+    "apps/desktop/src/routes/editor/auto-zoom-generation.ts": "1ebdefa6b556e208133157d207c19760679f01099823aa06fd97cd2bc287bd7a"
+  },
+  "renderingChanges": false,
+  "scope": "真实ZoomTrack + Solid history；适配上下文/设置/翻译/命令/native menu/两个无关glyph，非安装版视频验收。",
+  "releaseBlockers": {
+    "strictChroma": {
+      "passed": 15,
+      "failed": 2
+    },
+    "hardwareMp4Variance": true,
+    "devicesDeferred": true,
+    "windowsLinux": false
+  }
+}

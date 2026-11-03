@@ -1,24 +1,22 @@
-import { createEventListenerMap } from "@solid-primitives/event-listener";
 import { Menu } from "@tauri-apps/api/menu";
-import { Array, Option } from "effect";
 import {
 	batch,
 	createEffect,
 	createMemo,
-	createRoot,
 	createSignal,
-	Index,
+	For,
 	onCleanup,
 	Show,
 } from "solid-js";
-import { produce } from "solid-js/store";
+import { produce, unwrap } from "solid-js/store";
 import toast from "solid-toast";
 import { generalSettingsStore } from "~/store";
 import { t as localize } from "~/utils/i18n";
-import { commands } from "~/utils/tauri";
+import { commands, type ZoomSegment } from "~/utils/tauri";
 import { createAutoZoomGeneration } from "../auto-zoom-generation";
 import { serializeProjectConfiguration, useEditorContext } from "../context";
 import { useTimelineContext, useTrackContext } from "./context";
+import { createTimelineMouseDrag } from "./mouse-drag";
 import {
 	SegmentContent,
 	SegmentHandle,
@@ -111,70 +109,170 @@ export function ZoomTrack(props: {
 			MIN_NEW_SEGMENT_SECS_WIDTH,
 		);
 
-	// Returns a start and end time for a new segment that can be inserted at the
-	// current previewTime, if conditions permit
+	const zoomSegments = () => project.timeline?.zoomSegments ?? [];
+	const startGesture = createTimelineMouseDrag();
+	const writeZoom = (
+		item: ZoomSegment,
+		changes: Partial<Pick<ZoomSegment, "start" | "end">>,
+	) => {
+		const index = zoomSegments().indexOf(item);
+		if (index < 0) return;
+		const start = changes.start ?? item.start;
+		const end = changes.end ?? item.end;
+		if (start === item.start && end === item.end) return;
+		const selection = editorState.timeline.selection;
+		const selected =
+			selection?.type === "zoom"
+				? selection.indices.map((value) => zoomSegments()[value])
+				: undefined;
+		batch(() => {
+			setProject(
+				"timeline",
+				"zoomSegments",
+				produce((items) => {
+					const target = items[index];
+					if (!target) return;
+					target.start = start;
+					target.end = end;
+					items.sort((left, right) => left.start - right.start);
+				}),
+			);
+			if (selected && selection?.type === "zoom") {
+				const indices = selected
+					.map((value) => zoomSegments().indexOf(value))
+					.filter((value) => value >= 0);
+				if (
+					indices.length !== selection.indices.length ||
+					indices.some(
+						(value, position) => value !== selection.indices[position],
+					)
+				)
+					setEditorState(
+						"timeline",
+						"selection",
+						indices.length ? { type: "zoom", indices } : null,
+					);
+			}
+		});
+	};
 	const newSegmentDetails = () => {
+		const time = editorState.previewTime;
 		if (
 			creatingSegmentViaDrag() ||
 			editorState.timeline.hoveredTrack !== "zoom" ||
-			editorState.previewTime === null
+			time === null ||
+			time < 0 ||
+			time > totalDuration()
 		)
 			return;
-
-		const { previewTime } = editorState;
-
-		const nextSegment = Array.findFirstWithIndex(
-			project.timeline?.zoomSegments ?? [],
-			(s) => previewTime <= s.start,
-		);
-
-		const prevSegment = Array.findLastIndex(
-			project.timeline?.zoomSegments ?? [],
-			(s) => previewTime >= s.start,
-		).pipe(
-			Option.flatMap((index) =>
-				Option.fromNullable(project.timeline?.zoomSegments?.[index]).pipe(
-					Option.map((segment) => [segment, index] as const),
-				),
-			),
-		);
-
-		// Is mouse hovering over a zoom segment
-		if (
-			Option.isSome(prevSegment) &&
-			previewTime > prevSegment.value[0].start &&
-			previewTime < prevSegment.value[0].end
-		)
-			return;
-
-		const minDuration = newSegmentMinDuration();
-
-		if (Option.isSome(nextSegment)) {
-			if (Option.isSome(prevSegment)) {
-				const availableTime =
-					nextSegment.value[0].start - prevSegment.value[0].end;
-
-				if (availableTime < minDuration) return;
-			}
-
-			if (nextSegment.value[0].start - previewTime < 1)
-				return {
-					index: nextSegment.value[1],
-					start: nextSegment.value[0].start - minDuration,
-					end: nextSegment.value[0].start,
-					max: nextSegment.value[0].start,
-				};
+		let min = 0;
+		let max = totalDuration();
+		for (const item of zoomSegments()) {
+			if (time >= item.start && time < item.end) return;
+			if (item.end <= time) min = Math.max(min, item.end);
+			if (item.start >= time) max = Math.min(max, item.start);
 		}
-
-		return {
-			index: nextSegment.pipe(Option.map(([_, i]) => i)),
-			start: previewTime,
-			end: previewTime + minDuration,
-			max: nextSegment.pipe(
-				Option.map(([s]) => s.start),
-				Option.getOrElse(() => totalDuration()),
-			),
-		};
+		const minDuration = newSegmentMinDuration();
+		if (max - min < minDuration) return;
+		const start = Math.max(min, Math.min(time, max - minDuration));
+		return { start, end: start + minDuration, max };
+	};
+	const handleLaneMouseDown = (event: MouseEvent) => {
+		if (event.button !== 0 || editorState.timeline.interactMode !== "seek")
+			return;
+		event.stopPropagation();
+		const base = newSegmentDetails();
+		startGesture(() => {
+			if (!base) return null;
+			const scale = secsPerPixel();
+			const span = totalDuration();
+			const timelineDuration = duration();
+			const occupied = zoomSegments().map((item) => ({
+				item,
+				start: item.start,
+				end: item.end,
+			}));
+			let created: ZoomSegment | undefined;
+			let expectedEnd = base.end;
+			let resumeHistory: (() => void) | undefined;
+			let moved = false;
+			const createdItem = () =>
+				zoomSegments().find((item) => unwrap(item) === created);
+			const writeEnd = (end: number) => {
+				expectedEnd = end;
+				if (!created) {
+					resumeHistory = projectHistory.pause();
+					created = {
+						start: base.start,
+						end,
+						amount: generalSettings.data?.defaultZoomAmount ?? 1.5,
+						mode: "auto",
+					};
+					const value = created;
+					batch(() => {
+						setProject("timeline", "zoomSegments", (items) => items ?? []);
+						setProject(
+							"timeline",
+							"zoomSegments",
+							produce((items) => {
+								items.push(value);
+								items.sort((left, right) => left.start - right.start);
+							}),
+						);
+						setEditorState("timeline", "selection", {
+							type: "zoom",
+							indices: [
+								zoomSegments().findIndex((item) => unwrap(item) === value),
+							],
+						});
+						setCreatingSegmentViaDrag(true);
+					});
+				} else {
+					const item = createdItem();
+					if (item) writeZoom(item, { end });
+				}
+			};
+			props.onDragStateChanged({ type: "movePending" });
+			return {
+				isValid: () =>
+					editorState.timeline.interactMode === "seek" &&
+					secsPerPixel() === scale &&
+					totalDuration() === span &&
+					duration() === timelineDuration &&
+					zoomSegments().length === occupied.length + (created ? 1 : 0) &&
+					occupied.every(
+						(value) =>
+							zoomSegments().includes(value.item) &&
+							value.item.start === value.start &&
+							value.item.end === value.end,
+					) &&
+					(!created ||
+						(createdItem()?.start === base.start &&
+							createdItem()?.end === expectedEnd)),
+				update: (moveEvent: MouseEvent) => {
+					if (!moved) {
+						if (Math.abs(moveEvent.clientX - event.clientX) <= 2) return;
+						moved = true;
+						props.onDragStateChanged({ type: "moving" });
+					}
+					writeEnd(
+						Math.min(
+							base.max,
+							Math.max(
+								base.end,
+								base.start + (moveEvent.clientX - event.clientX) * scale,
+							),
+						),
+					);
+				},
+				finish: (upEvent?: MouseEvent) => {
+					if (upEvent && !created) writeEnd(base.end);
+					resumeHistory?.();
+					setCreatingSegmentViaDrag(false);
+					props.onDragStateChanged({ type: "idle" });
+				},
+			};
+		});
 	};
 
 	return (
@@ -182,6 +280,7 @@ export function ZoomTrack(props: {
 			onMouseEnter={() => setEditorState("timeline", "hoveredTrack", "zoom")}
 			onMouseLeave={() => setEditorState("timeline", "hoveredTrack", null)}
 			onContextMenu={async (e) => {
+				startGesture(() => null);
 				if (!import.meta.env.DEV) return;
 
 				e.preventDefault();
@@ -197,114 +296,7 @@ export function ZoomTrack(props: {
 				});
 				menu.popup();
 			}}
-			onMouseDown={(e) => {
-				if (e.button !== 0) return;
-
-				const baseSegment = newSegmentDetails();
-				if (!baseSegment) return;
-
-				createRoot((dispose) => {
-					let segmentCreated = false;
-					let createdSegmentIndex = -1;
-					const initialMouseX = e.clientX;
-					const initialEndTime = baseSegment.end;
-
-					const minDuration = newSegmentMinDuration;
-
-					const createSegment = (endTime: number) => {
-						if (segmentCreated) return;
-
-						batch(() => {
-							setProject("timeline", "zoomSegments", (v) => v ?? []);
-							setProject(
-								"timeline",
-								"zoomSegments",
-								produce((zoomSegments) => {
-									zoomSegments ??= [];
-
-									let index = 0;
-
-									for (let i = 0; i < zoomSegments.length; i++) {
-										if (zoomSegments[i].start < baseSegment.start) {
-											index = i + 1;
-										}
-									}
-
-									const minEndTime = baseSegment.start + minDuration();
-
-									zoomSegments.splice(index, 0, {
-										start: baseSegment.start,
-										end: Math.max(minEndTime, endTime),
-										amount: generalSettings.data?.defaultZoomAmount ?? 1.5,
-										mode: "auto",
-									});
-
-									createdSegmentIndex = index;
-								}),
-							);
-							setEditorState("timeline", "selection", {
-								type: "zoom",
-								indices: [createdSegmentIndex],
-							});
-						});
-						segmentCreated = true;
-					};
-
-					const updateSegment = (endTime: number) => {
-						if (!segmentCreated || createdSegmentIndex === -1) return;
-
-						const minEndTime = baseSegment.start + minDuration();
-
-						setProject(
-							"timeline",
-							"zoomSegments",
-							createdSegmentIndex,
-							"end",
-							Math.max(minEndTime, endTime),
-						);
-					};
-
-					const handleMouseMove = (moveEvent: MouseEvent) => {
-						const deltaX = moveEvent.clientX - initialMouseX;
-						const deltaTime =
-							deltaX * secsPerPixel() - (baseSegment.end - baseSegment.start);
-						const newEndTime = initialEndTime + deltaTime;
-
-						// Check boundaries
-						const minEndTime = baseSegment.start + minDuration();
-						const maxEndTime = baseSegment.max;
-
-						const clampedEndTime = Math.min(
-							Math.max(minEndTime, newEndTime),
-							maxEndTime,
-						);
-
-						if (!segmentCreated) {
-							setCreatingSegmentViaDrag(true);
-							// Create the segment on first movement
-							createSegment(clampedEndTime);
-						} else {
-							if (deltaTime < 0) return;
-							updateSegment(clampedEndTime);
-						}
-					};
-
-					const handleMouseUp = () => {
-						setCreatingSegmentViaDrag(false);
-						dispose();
-
-						if (!segmentCreated) {
-							// If no movement, create a default 1-second segment
-							createSegment(initialEndTime);
-						}
-					};
-
-					createEventListenerMap(window, {
-						mousemove: handleMouseMove,
-						mouseup: handleMouseUp,
-					});
-				});
-			}}
+			onMouseDown={handleLaneMouseDown}
 		>
 			<Show
 				when={hasZoomSegments()}
@@ -322,7 +314,10 @@ export function ZoomTrack(props: {
 								class="relative z-10 flex items-center gap-1.5"
 								onMouseEnter={() => setIsHoveringGenerateZoomButton(true)}
 								onMouseLeave={() => setIsHoveringGenerateZoomButton(false)}
-								onMouseDown={(e) => e.stopPropagation()}
+								onMouseDown={(e) => {
+									e.stopPropagation();
+									startGesture(() => null);
+								}}
 							>
 								<span>{localize("Generate zoom segments automatically")}</span>
 								<button
@@ -352,11 +347,11 @@ export function ZoomTrack(props: {
 					</div>
 				}
 			>
-				<Index each={project.timeline?.zoomSegments}>
-					{(segment, i) => {
+				<For each={zoomSegments()}>
+					{(item) => {
+						const segment = () => item;
+						const index = () => zoomSegments().indexOf(item);
 						const { setTrackState } = useTrackContext();
-						let cancelDrag: (() => void) | undefined;
-						onCleanup(() => cancelDrag?.());
 
 						const zoomPercentage = () => {
 							const amount = segment().amount;
@@ -368,59 +363,34 @@ export function ZoomTrack(props: {
 								? localize("自动缩放")
 								: localize("手动缩放");
 
-						const zoomSegments = () => project.timeline?.zoomSegments ?? [];
-
-						// Double-clicking a handle expands the segment as far as it can go
-						// in that direction (up to the neighbouring segment / timeline edge).
 						const fillStart = () => {
-							const segs = zoomSegments();
+							startGesture(() => null);
 							let minValue = 0;
-							for (let j = segs.length - 1; j >= 0; j--) {
-								const s = segs[j];
-								if (s && s.end <= segment().start) {
-									minValue = s.end;
-									break;
-								}
-							}
-							batch(() => {
-								setProject("timeline", "zoomSegments", i, "start", minValue);
-								setProject(
-									"timeline",
-									"zoomSegments",
-									produce((s) => {
-										s.sort((a, b) => a.start - b.start);
-									}),
-								);
-							});
+							for (const other of zoomSegments())
+								if (other !== item && other.end <= item.start)
+									minValue = Math.max(minValue, other.end);
+							writeZoom(item, { start: minValue });
 							setPreviewTime(minValue);
 						};
-
 						const fillEnd = () => {
-							const segs = zoomSegments();
+							startGesture(() => null);
 							let maxValue = totalDuration();
-							for (let j = 0; j < segs.length; j++) {
-								const s = segs[j];
-								if (s && s.start > segment().end) {
-									maxValue = s.start;
-									break;
-								}
-							}
-							batch(() => {
-								setProject("timeline", "zoomSegments", i, "end", maxValue);
-								setProject(
-									"timeline",
-									"zoomSegments",
-									produce((s) => {
-										s.sort((a, b) => a.start - b.start);
-									}),
-								);
-							});
+							for (const other of zoomSegments())
+								if (other !== item && other.start >= item.end)
+									maxValue = Math.min(maxValue, other.start);
+							writeZoom(item, { end: maxValue });
 							setPreviewTime(maxValue);
 						};
 
 						function createMouseDownDrag<T>(
 							setup: () => T,
-							_update: (e: MouseEvent, v: T, initialMouseX: number) => void,
+							_update: (
+								event: MouseEvent,
+								value: T,
+								initialMouseX: number,
+							) => Partial<Pick<ZoomSegment, "start" | "end">> & {
+								previewTime?: number;
+							},
 						) {
 							return (downEvent: MouseEvent) => {
 								if (
@@ -428,124 +398,111 @@ export function ZoomTrack(props: {
 									editorState.timeline.interactMode !== "seek"
 								)
 									return;
-
 								downEvent.stopPropagation();
-								cancelDrag?.();
+								startGesture(() => {
+									const initial = setup();
+									const scale = secsPerPixel();
+									const span = totalDuration();
+									const timelineDuration = duration();
+									let expectedStart = item.start;
+									let expectedEnd = item.end;
+									let moved = false;
+									let resumeHistory: (() => void) | undefined;
+									setTrackState("draggingSegment", true);
+									props.onDragStateChanged({ type: "movePending" });
+									function finish(e?: MouseEvent) {
+										resumeHistory?.();
+										if (!moved && e) {
+											e.stopPropagation();
 
-								const initial = setup();
-								const draggedSegment = segment();
+											const currentSelection = editorState.timeline.selection;
+											const segmentIndex = index();
+											const isMultiSelect = e.ctrlKey || e.metaKey;
+											const isRangeSelect = e.shiftKey;
 
-								let moved = false;
-								let initialMouseX: null | number = null;
+											if (isRangeSelect && currentSelection?.type === "zoom") {
+												const existingIndices = currentSelection.indices;
+												const lastIndex =
+													existingIndices[existingIndices.length - 1];
+												const start = Math.min(lastIndex, segmentIndex);
+												const end = Math.max(lastIndex, segmentIndex);
+												const rangeIndices: number[] = [];
+												for (let idx = start; idx <= end; idx++) {
+													rangeIndices.push(idx);
+												}
 
-								setTrackState("draggingSegment", true);
+												setEditorState("timeline", "selection", {
+													type: "zoom",
+													indices: rangeIndices,
+												});
+											} else if (isMultiSelect) {
+												if (currentSelection?.type === "zoom") {
+													const baseIndices = currentSelection.indices;
+													const exists = baseIndices.includes(segmentIndex);
+													const newIndices = exists
+														? baseIndices.filter((idx) => idx !== segmentIndex)
+														: [...baseIndices, segmentIndex];
 
-								const resumeHistory = projectHistory.pause();
-
-								props.onDragStateChanged({ type: "movePending" });
-
-								function finish(e: MouseEvent) {
-									if (!moved) {
-										e.stopPropagation();
-
-										const currentSelection = editorState.timeline.selection;
-										const segmentIndex = i;
-										const isMultiSelect = e.ctrlKey || e.metaKey;
-										const isRangeSelect = e.shiftKey;
-
-										if (isRangeSelect && currentSelection?.type === "zoom") {
-											// Range selection: select from last selected to current
-											const existingIndices = currentSelection.indices;
-											const lastIndex =
-												existingIndices[existingIndices.length - 1];
-											const start = Math.min(lastIndex, segmentIndex);
-											const end = Math.max(lastIndex, segmentIndex);
-											const rangeIndices: number[] = [];
-											for (let idx = start; idx <= end; idx++) {
-												rangeIndices.push(idx);
-											}
-
-											setEditorState("timeline", "selection", {
-												type: "zoom",
-												indices: rangeIndices,
-											});
-										} else if (isMultiSelect) {
-											// Handle multi-selection with Ctrl/Cmd+click
-											if (currentSelection?.type === "zoom") {
-												const baseIndices = currentSelection.indices;
-												const exists = baseIndices.includes(segmentIndex);
-												const newIndices = exists
-													? baseIndices.filter((idx) => idx !== segmentIndex)
-													: [...baseIndices, segmentIndex];
-
-												if (newIndices.length > 0) {
+													if (newIndices.length > 0) {
+														setEditorState("timeline", "selection", {
+															type: "zoom",
+															indices: newIndices,
+														});
+													} else {
+														setEditorState("timeline", "selection", null);
+													}
+												} else {
 													setEditorState("timeline", "selection", {
 														type: "zoom",
-														indices: newIndices,
+														indices: [segmentIndex],
 													});
-												} else {
-													setEditorState("timeline", "selection", null);
 												}
 											} else {
-												// Start new multi-selection
 												setEditorState("timeline", "selection", {
 													type: "zoom",
 													indices: [segmentIndex],
 												});
 											}
-										} else {
-											// Normal single selection
-											setEditorState("timeline", "selection", {
-												type: "zoom",
-												indices: [segmentIndex],
-											});
+											props.handleUpdatePlayhead(e);
 										}
-										props.handleUpdatePlayhead(e);
-									}
-								}
-
-								function update(event: MouseEvent) {
-									if (Math.abs(event.clientX - downEvent.clientX) > 2) {
-										if (!moved) {
-											moved = true;
-											initialMouseX = event.clientX;
-											props.onDragStateChanged({
-												type: "moving",
-											});
-										}
-									}
-
-									if (initialMouseX === null) return;
-
-									_update(event, initial, initialMouseX);
-								}
-
-								createRoot((dispose) => {
-									cancelDrag = dispose;
-									onCleanup(() => {
-										cancelDrag = undefined;
-										resumeHistory();
 										props.onDragStateChanged({ type: "idle" });
 										setTrackState("draggingSegment", false);
-									});
-									const isCurrentSegment = () =>
-										zoomSegments()[i] === draggedSegment;
-									createEffect(() => {
-										if (!isCurrentSegment()) dispose();
-									});
-									createEventListenerMap(window, {
-										mousemove: (e) => {
-											if (!isCurrentSegment()) return dispose();
-											update(e);
+									}
+									return {
+										isValid: () =>
+											editorState.timeline.interactMode === "seek" &&
+											zoomSegments().includes(item) &&
+											item.start === expectedStart &&
+											item.end === expectedEnd &&
+											secsPerPixel() === scale &&
+											totalDuration() === span &&
+											duration() === timelineDuration,
+										update: (event: MouseEvent) => {
+											if (!moved) {
+												if (Math.abs(event.clientX - downEvent.clientX) <= 2)
+													return;
+												moved = true;
+												props.onDragStateChanged({ type: "moving" });
+											}
+											const { previewTime, ...changes } = _update(
+												event,
+												initial,
+												downEvent.clientX,
+											);
+											if (
+												(changes.start ?? item.start) !== item.start ||
+												(changes.end ?? item.end) !== item.end
+											) {
+												resumeHistory ??= projectHistory.pause();
+												expectedStart = changes.start ?? item.start;
+												expectedEnd = changes.end ?? item.end;
+												writeZoom(item, changes);
+											}
+											if (previewTime !== undefined)
+												setPreviewTime(previewTime);
 										},
-										mouseup: (e) => {
-											if (!isCurrentSegment()) return dispose();
-											update(e);
-											finish(e);
-											dispose();
-										},
-										blur: dispose,
-									});
+										finish,
+									};
 								});
 							};
 						}
@@ -553,7 +510,7 @@ export function ZoomTrack(props: {
 						const isSelected = createMemo(() => {
 							const indices = selectedZoomIndices();
 							if (!indices) return false;
-							return indices.has(i);
+							return indices.has(index());
 						});
 
 						return (
@@ -566,6 +523,7 @@ export function ZoomTrack(props: {
 								onMouseDown={(e) => {
 									e.stopPropagation();
 									if (e.button !== 0) return;
+									startGesture(() => null);
 
 									if (editorState.timeline.interactMode === "split") {
 										const rect = e.currentTarget.getBoundingClientRect();
@@ -574,36 +532,37 @@ export function ZoomTrack(props: {
 										const splitTime =
 											fraction * (segment().end - segment().start);
 
-										projectActions.splitZoomSegment(i, splitTime);
+										projectActions.splitZoomSegment(index(), splitTime);
 									}
 								}}
 								onContextMenu={async (e: MouseEvent) => {
 									e.preventDefault();
 									e.stopPropagation();
 									// Native menus can consume mouseup before deleting the dragged segment.
-									cancelDrag?.();
+									startGesture(() => null);
 
 									// Right-clicking an unselected segment selects it first,
 									// so the menu always acts on what's highlighted.
 									const selection = editorState.timeline.selection;
 									const targetIndices =
-										selection?.type === "zoom" && selection.indices.includes(i)
+										selection?.type === "zoom" &&
+										selection.indices.includes(index())
 											? [...selection.indices]
-											: [i];
+											: [index()];
 									if (
 										targetIndices.length === 1 &&
-										!selectedZoomIndices()?.has(i)
+										!selectedZoomIndices()?.has(index())
 									)
 										setEditorState("timeline", "selection", {
 											type: "zoom",
-											indices: [i],
+											indices: [index()],
 										});
 
-									// `Array` here is effect's module, so derive the index
-									// list from the segments themselves.
-									const allIndices = (project.timeline?.zoomSegments ?? []).map(
-										(_, idx) => idx,
-									);
+									const targets = targetIndices
+										.map((value) => zoomSegments()[value])
+										.filter(
+											(value): value is ZoomSegment => value !== undefined,
+										);
 
 									const menu = await Menu.new({
 										id: "zoom-segment-options",
@@ -611,11 +570,11 @@ export function ZoomTrack(props: {
 											{
 												id: "selectAllZoomSegments",
 												text: localize("全选缩放片段"),
-												enabled: allIndices.length > 1,
+												enabled: zoomSegments().length > 1,
 												action: () =>
 													setEditorState("timeline", "selection", {
 														type: "zoom",
-														indices: allIndices,
+														indices: zoomSegments().map((_, value) => value),
 													}),
 											},
 											{
@@ -627,7 +586,11 @@ export function ZoomTrack(props: {
 															})
 														: localize("删除缩放片段"),
 												action: () =>
-													projectActions.deleteZoomSegments(targetIndices),
+													projectActions.deleteZoomSegments(
+														targets
+															.map((value) => zoomSegments().indexOf(value))
+															.filter((value) => value >= 0),
+													),
 											},
 										],
 									});
@@ -652,11 +615,11 @@ export function ZoomTrack(props: {
 
 											const maxValue = segment().end - minDuration;
 
-											for (let i = zoomSegments().length - 1; i >= 0; i--) {
-												const segment = zoomSegments()[i];
-												if (!segment) continue;
-												if (segment.end <= start) {
-													minValue = segment.end;
+											for (let j = zoomSegments().length - 1; j >= 0; j--) {
+												const other = zoomSegments()[j];
+												if (!other) continue;
+												if (other.end <= start) {
+													minValue = other.end;
 													break;
 												}
 											}
@@ -672,22 +635,7 @@ export function ZoomTrack(props: {
 												Math.max(value.minValue, newStart),
 											);
 
-											setProject(
-												"timeline",
-												"zoomSegments",
-												i,
-												"start",
-												nextStart,
-											);
-
-											setProject(
-												"timeline",
-												"zoomSegments",
-												produce((s) => {
-													s.sort((a, b) => a.start - b.start);
-												}),
-											);
-											setPreviewTime(nextStart);
+											return { start: nextStart, previewTime: nextStart };
 										},
 									)}
 								/>
@@ -697,8 +645,8 @@ export function ZoomTrack(props: {
 										() => {
 											const original = { ...segment() };
 
-											const prevSegment = zoomSegments()[i - 1];
-											const nextSegment = zoomSegments()[i + 1];
+											const prevSegment = zoomSegments()[index() - 1];
+											const nextSegment = zoomSegments()[index() + 1];
 
 											const minStart = prevSegment?.end ?? 0;
 											const maxEnd = nextSegment?.start ?? duration();
@@ -723,10 +671,10 @@ export function ZoomTrack(props: {
 											else if (newEnd > value.maxEnd)
 												delta = value.maxEnd - value.original.end;
 
-											setProject("timeline", "zoomSegments", i, {
+											return {
 												start: value.original.start + delta,
 												end: value.original.end + delta,
-											});
+											};
 										},
 									)}
 								>
@@ -784,11 +732,11 @@ export function ZoomTrack(props: {
 
 											let maxValue = duration();
 
-											for (let i = 0; i < zoomSegments().length; i++) {
-												const segment = zoomSegments()[i];
-												if (!segment) continue;
-												if (segment.start > end) {
-													maxValue = segment.start;
+											for (let j = 0; j < zoomSegments().length; j++) {
+												const other = zoomSegments()[j];
+												if (!other) continue;
+												if (other !== item && other.start >= end) {
+													maxValue = other.start;
 													break;
 												}
 											}
@@ -804,23 +752,14 @@ export function ZoomTrack(props: {
 												Math.max(value.minValue, newEnd),
 											);
 
-											setProject("timeline", "zoomSegments", i, "end", nextEnd);
-
-											setProject(
-												"timeline",
-												"zoomSegments",
-												produce((s) => {
-													s.sort((a, b) => a.start - b.start);
-												}),
-											);
-											setPreviewTime(nextEnd);
+											return { end: nextEnd, previewTime: nextEnd };
 										},
 									)}
 								/>
 							</SegmentRoot>
 						);
 					}}
-				</Index>
+				</For>
 			</Show>
 			<Show
 				when={
