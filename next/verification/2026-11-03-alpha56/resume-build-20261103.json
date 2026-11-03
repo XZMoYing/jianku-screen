@@ -1,0 +1,18 @@
+{
+	"productFreeze": "7db00cd",
+	"oldHandle": "20216 missing",
+	"oldProcessLive": false,
+	"oldBundle": "alpha55",
+	"oldReleaseComplete": false,
+	"reason": "No release/cargo/rustc/caffeinate process or completion marker; not restarted solely because of an observation timeout",
+	"goalAtResume": "active (user_goal event)",
+	"newLog": "/private/tmp/jianku-alpha56-20261103/release-resumed.log",
+	"newHandle": 51185,
+	"automationId": "automation",
+	"automationConsumedAndDeleted": true,
+	"goalConfirmed": "active",
+	"recoveryMethod": "user_goal active event observed; no resume click executed",
+	"primaryUsedAtWake": 1,
+	"weeklyUsedAtWake": 99,
+	"ordinaryUsageAllowed": true
+}

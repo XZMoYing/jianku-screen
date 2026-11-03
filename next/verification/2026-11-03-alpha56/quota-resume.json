@@ -11,5 +11,11 @@
 	"primaryUsedAtCreation": 70,
 	"weeklyUsedAtCreation": 97,
 	"reasonForEarlyScheduling": "weekly quota near limit; does not imply weekly quota resets at this time",
-	"resumeSuccessProven": false
+	"resumeSuccessProven": false,
+	"consumed": true,
+	"deletedAfterWake": true,
+	"goalConfirmedActiveAfterWake": true,
+	"recoveryMethod": "user_goal active event observed, then verified by get_goal; no agent resume click",
+	"primaryUsedAfterReset": 1,
+	"weeklyUsedAfterReset": 99
 }
