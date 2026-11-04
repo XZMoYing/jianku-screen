@@ -78,6 +78,7 @@ import { type SceneSegmentDragState, SceneTrack } from "./SceneTrack";
 import { type TextSegmentDragState, TextTrack } from "./TextTrack";
 import { type ThreeDSegmentDragState, ThreeDTrack } from "./ThreeDTrack";
 import { TrackIcon, TrackManager } from "./TrackManager";
+import { createTimelineScale } from "./timeline-scale";
 import { type ZoomSegmentDragState, ZoomTrack } from "./ZoomTrack";
 
 // The timeline renders inside the editor's timeline card, which supplies the
@@ -223,7 +224,9 @@ export function Timeline(props: {
 	const [timelineRef, setTimelineRef] = createSignal<HTMLDivElement>();
 	const timelineBounds = createElementBounds(timelineRef);
 
-	const secsPerPixel = () => transform().zoom / (timelineBounds.width ?? 1);
+	const secsPerPixel = createTimelineScale(
+		() => transform().zoom / (timelineBounds.width ?? 1),
+	);
 	const playbackFollow = new PlaybackFollow();
 	const playbackDuration = createMemo(totalDuration);
 	let followRafId: number | null = null;

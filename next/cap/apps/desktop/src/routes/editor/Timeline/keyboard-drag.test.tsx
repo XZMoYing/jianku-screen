@@ -321,3 +321,24 @@ it("does not add a history entry when the drag is clamped without changing the s
 	});
 	expect(context.projectHistory.canUndo()).toBe(false);
 });
+
+it.each([Number.NaN, Number.POSITIVE_INFINITY, 0])(
+	"continues through an unusable layout scale %s",
+	(invalid) => {
+		const f = mount();
+		begin(f.content);
+		context.setScale(invalid);
+		expect(context.resume).not.toHaveBeenCalled();
+		context.setScale(0.01);
+		mouse(window, "mousemove", 400);
+		mouse(window, "mouseup", 500, 0);
+		expect(context.project.timeline.keyboardSegments[0]).toMatchObject({
+			start: 5,
+			end: 9,
+		});
+		expect(document.querySelector('[data-keyboard-segment][title="A"]')).toBe(
+			f.root,
+		);
+		expect(context.resume).toHaveBeenCalledTimes(1);
+	},
+);

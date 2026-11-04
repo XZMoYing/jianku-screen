@@ -1,0 +1,47 @@
+{
+	"schema": 1,
+	"records": [
+		{
+			"kind": "keyboard",
+			"cause": "invalid",
+			"startedAt": 1793789764647,
+			"elapsedMs": 127,
+			"moves": 1,
+			"buttons": 1,
+			"snapshot": {
+				"initialScale": 0.012332139659803044,
+				"currentScale": null,
+				"initialDuration": 16,
+				"currentDuration": 16,
+				"sameId": true,
+				"sameSourceObject": true,
+				"visible": true,
+				"interactMode": "seek",
+				"start": 2.0616606982990153,
+				"end": 6.061660698299015,
+				"documentFocused": true
+			}
+		},
+		{
+			"kind": "keyboard",
+			"cause": "invalid",
+			"startedAt": 1793789999920,
+			"elapsedMs": 134,
+			"moves": 1,
+			"buttons": 1,
+			"snapshot": {
+				"initialScale": 0.012332139659803044,
+				"currentScale": null,
+				"initialDuration": 16,
+				"currentDuration": 16,
+				"sameId": true,
+				"sameSourceObject": true,
+				"visible": true,
+				"interactMode": "seek",
+				"start": 2.0616606982990153,
+				"end": 6.061660698299015,
+				"documentFocused": true
+			}
+		}
+	]
+}

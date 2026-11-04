@@ -7,6 +7,7 @@ import { type Accessor, createMemo } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { useEditorContext } from "../context";
+import { createTimelineScale } from "./timeline-scale";
 
 export const MAX_TIMELINE_MARKINGS = 20;
 const TIMELINE_MARKING_RESOLUTIONS = [0.5, 1, 2.5, 5, 10, 30];
@@ -46,6 +47,7 @@ export const [TimelineContextProvider, useTimelineContext] =
 			timelineBounds: Readonly<NullableBounds>;
 		}) => {
 			const { editorState: state } = useEditorContext();
+			const secsPerPixel = createTimelineScale(() => props.secsPerPixel);
 
 			const markingResolution = createMemo(
 				() =>
@@ -69,7 +71,7 @@ export const [TimelineContextProvider, useTimelineContext] =
 
 			return {
 				duration: () => props.duration,
-				secsPerPixel: () => props.secsPerPixel,
+				secsPerPixel,
 				timelineBounds: props.timelineBounds,
 				markingResolution,
 				visibleTimeRange,
@@ -88,8 +90,9 @@ export const [TrackContextProvider, useTrackContext] = createContextProvider(
 		});
 		const bounds = createElementBounds(() => props.ref());
 
-		const secsPerPixel = () =>
-			state.timeline.transform.zoom / (bounds.width ?? 1);
+		const secsPerPixel = createTimelineScale(
+			() => state.timeline.transform.zoom / (bounds.width ?? 1),
+		);
 
 		return {
 			secsPerPixel,

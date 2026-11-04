@@ -506,3 +506,24 @@ it("keeps menu deletion on its original objects after sorting", async () => {
 	mouse(window, "mouseup", 600, 0);
 	expect(JSON.stringify(context.project)).toBe(before);
 });
+
+it.each([Number.NaN, Number.POSITIVE_INFINITY, 0])(
+	"retains a zoom drag through unusable layout scale %s",
+	(invalid) => {
+		mount();
+		const node = roots()[0];
+		begin(content());
+		context.setScale(invalid);
+		expect(context.counts().resumes).toBe(0);
+		context.setScale(0.01);
+		mouse(window, "mousemove", 400);
+		mouse(window, "mouseup", 500, 0);
+		expect(context.project.timeline.zoomSegments[0]).toMatchObject({
+			start: 5,
+			end: 9,
+			amount: 2,
+		});
+		expect(roots()[0]).toBe(node);
+		expect(context.counts().resumes).toBe(1);
+	},
+);

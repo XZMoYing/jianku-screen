@@ -1,0 +1,29 @@
+{
+	"sourceOnlyFix": true,
+	"installed": 56,
+	"plannedCandidate": 57,
+	"nativeBefore": {
+		"rawInput": "invalid after first move",
+		"cleanInput": "invalid after first move",
+		"lastButtons": 1,
+		"sameItem": true,
+		"sameDuration": true,
+		"focused": true,
+		"currentScale": "non-finite JSON encoded null"
+	},
+	"regression": {
+		"keyboardAndZoomBeforeFailures": 6,
+		"initial3DFixtureFieldError": true,
+		"newPassingChecks": 9,
+		"allInterfacePassed": 305,
+		"types": true,
+		"frontend": true
+	},
+	"diagnosticFlagRemoved": true,
+	"native57FixVerified": false,
+	"curvesAndRenderingChanged": false,
+	"strictChroma": {
+		"passed": 15,
+		"failed": 2
+	}
+}

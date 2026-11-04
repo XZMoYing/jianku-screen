@@ -500,3 +500,29 @@ it("fills and undoes shot boundaries while retaining normalized keyframes", () =
 	expect(context.project.timeline.camera3dSegments[0].start).toBe(0);
 	expect(context.project.timeline.camera3dSegments[0].end).toBe(6);
 });
+
+it.each([Number.NaN, Number.POSITIVE_INFINITY, 0])(
+	"retains 3D drag and motion through unusable layout scale %s",
+	(invalid) => {
+		mount();
+		const node = roots()[0];
+		const item = context.project.timeline.camera3dSegments[0];
+		const motion = () =>
+			JSON.stringify({
+				properties: item.properties,
+				tracks: item.tracks,
+				blur: item.blur,
+			});
+		const before = motion();
+		begin(content());
+		context.setScale(invalid);
+		expect(context.resume).not.toHaveBeenCalled();
+		context.setScale(0.01);
+		mouse(window, "mousemove", 400);
+		mouse(window, "mouseup", 500, 0);
+		expect(item).toMatchObject({ start: 5, end: 9 });
+		expect(motion()).toBe(before);
+		expect(roots()[0]).toBe(node);
+		expect(context.resume).toHaveBeenCalledTimes(1);
+	},
+);

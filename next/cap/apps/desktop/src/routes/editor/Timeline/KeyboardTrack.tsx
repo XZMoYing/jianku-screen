@@ -34,7 +34,7 @@ export function KeyboardTrack(props: {
 		projectHistory,
 		projectActions,
 	} = useEditorContext();
-	const { secsPerPixel } = useTimelineContext();
+	const { secsPerPixel, timelineBounds } = useTimelineContext();
 
 	const minDuration = () =>
 		Math.max(MIN_SEGMENT_SECS, secsPerPixel() * MIN_SEGMENT_PIXELS);
@@ -140,6 +140,8 @@ export function KeyboardTrack(props: {
 						kind: "keyboard",
 						snapshot: () => ({
 							initialScale: scale,
+							viewportWidth: String(timelineBounds.width),
+							viewportZoom: String(editorState.timeline.transform.zoom),
 							currentScale: secsPerPixel(),
 							initialDuration: duration,
 							currentDuration: totalDuration(),
