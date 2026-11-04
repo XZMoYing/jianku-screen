@@ -2,13 +2,15 @@
 	"id": "automation",
 	"targetThreadId": "01a0f1dc-4cf3-7382-baad-5ff91e2c889a",
 	"oneTime": true,
-	"resetUnix": 1793807486,
-	"resumeUnix": 1793807546,
-	"localTime": "2026-11-04 23:52:26 Asia/Shanghai",
+	"resetUnix": 1793807485,
+	"resumeUnix": 1793807545,
+	"localTime": "2026-11-04 23:52:25 Asia/Shanghai",
 	"primaryUsedAtCreation": 89,
 	"weeklyUsedAtCreation": 30,
 	"statusAtVerification": "ACTIVE",
-	"rrule": "RRULE:FREQ=DAILY;COUNT=1;BYHOUR=23;BYMINUTE=52;BYSECOND=26",
+	"rrule": "RRULE:FREQ=DAILY;COUNT=1;BYHOUR=23;BYMINUTE=52;BYSECOND=25",
 	"consumed": false,
-	"resumeSuccessProven": false
+	"resumeSuccessProven": false,
+	"primaryUsedAtClosure": 92,
+	"weeklyUsedAtClosure": 30
 }
