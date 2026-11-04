@@ -8,7 +8,7 @@
 	"exportSeconds": 32,
 	"decodedFrames": 960,
 	"frameReview": "one 3D synthetic frame shows perspective, shadow and blur; no motion comfort/color pass",
-	"installedVersion": "0.2.0-alpha.55",
+	"installedVersion": "0.2.0-alpha.56",
 	"lastVerifiedRollback": "0.2.0-alpha.54",
 	"nativeUIAcceptance": false,
 	"screenLockedAtLastCheck": true,
@@ -19,5 +19,9 @@
 		"passed": 15,
 		"failed": 2
 	},
-	"platforms": "Windows/Linux and physical scenarios remain pending"
+	"platforms": "Windows/Linux and physical scenarios remain pending",
+	"installedAndHashVerified": true,
+	"nativeDiagnosisCaptured": true,
+	"nativeUIResult": "raw and clean inputs cancel on first move when scale becomes non-finite; snapshot identity/buttons/duration/focus remain valid",
+	"nextFixCandidate": "0.2.0-alpha.57"
 }

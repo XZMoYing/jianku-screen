@@ -1,0 +1,6 @@
+{
+	"commit": "32b5c471b24f17acfed2f08b910d3671fa5bc379",
+	"version": "0.2.0-alpha.57",
+	"build": "2026.57.0",
+	"scope": "timeline scale invalidation fix plus caption storage fix; native acceptance pending"
+}
