@@ -1,0 +1,19 @@
+{
+	"observedAt": "2026-11-04T12:24:06.806748+00:00",
+	"readOnly": true,
+	"note": "After the saved acceptance and capture Undo assertions completed, a later read found first 3D start at 2.012332... rather than 2. Source of this later change is unknown; preserve the open editor and do not undo or count this read as another pass. Investigate user interaction versus a later queued write before assigning cause.",
+	"projects": [
+		{
+			"case": "按键拖动",
+			"ranges": [[70.0, 74.0], [2.0, 6.998903312444047], [10.0, 14.0]],
+			"configMtimeUnix": 1793794245.494768,
+			"sha256": "09fc8a9f7fb9d20c345e98b5adbe00163e4b0e422c575ea3ae4d2de10d6c3022"
+		},
+		{
+			"case": "3D拖动",
+			"ranges": [[2.012332139659803, 6.998903312444047], [10.0, 14.0]],
+			"configMtimeUnix": 1793794533.3771055,
+			"sha256": "20b3f320d628bfa6eedeb57aadff7bab242c15041e8f73aec29b7f13e102f16e"
+		}
+	]
+}

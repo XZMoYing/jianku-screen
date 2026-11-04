@@ -1,0 +1,212 @@
+[
+	{
+		"model": "raw",
+		"phase": "move",
+		"passed": true,
+		"range": [2.9989033124440465, 6.998903312444047],
+		"diagnostic": {
+			"kind": "keyboard",
+			"cause": "release",
+			"startedAt": 1793792241831,
+			"elapsedMs": 1974,
+			"moves": 16,
+			"buttons": 1,
+			"snapshot": {
+				"initialScale": 0.012332139659803044,
+				"viewportWidth": "1117",
+				"viewportZoom": "13.775",
+				"currentScale": 0.012332139659803044,
+				"initialDuration": 16,
+				"currentDuration": 16,
+				"sameId": true,
+				"sameSourceObject": true,
+				"visible": true,
+				"interactMode": "seek",
+				"start": 2.9989033124440465,
+				"end": 6.998903312444047,
+				"documentFocused": true
+			}
+		},
+		"otherSourceItemsPreserved": true
+	},
+	{
+		"model": "raw",
+		"phase": "undo",
+		"passed": true,
+		"restoredRanges": [[70.0, 74.0], [2.0, 6.0], [10.0, 14.0]]
+	},
+	{
+		"model": "clean",
+		"phase": "move",
+		"passed": true,
+		"range": [2.9989033124440465, 6.998903312444047],
+		"diagnostic": {
+			"kind": "keyboard",
+			"cause": "release",
+			"startedAt": 1793792675874,
+			"elapsedMs": 1975,
+			"moves": 16,
+			"buttons": 1,
+			"snapshot": {
+				"initialScale": 0.012332139659803044,
+				"viewportWidth": "1117",
+				"viewportZoom": "13.775",
+				"currentScale": 0.012332139659803044,
+				"initialDuration": 16,
+				"currentDuration": 16,
+				"sameId": true,
+				"sameSourceObject": true,
+				"visible": true,
+				"interactMode": "seek",
+				"start": 2.9989033124440465,
+				"end": 6.998903312444047,
+				"documentFocused": true
+			}
+		},
+		"otherSourceItemsPreserved": true
+	},
+	{
+		"model": "clean",
+		"phase": "undo",
+		"passed": true,
+		"restoredRanges": [[70.0, 74.0], [2.0, 6.0], [10.0, 14.0]]
+	},
+	{
+		"model": "raw",
+		"phase": "history",
+		"passed": true,
+		"range": [2, 6],
+		"diagnostic": {
+			"kind": "keyboard",
+			"cause": "history",
+			"startedAt": 1793793104220,
+			"elapsedMs": 741,
+			"moves": 8,
+			"buttons": 1,
+			"snapshot": {
+				"initialScale": 0.012332139659803044,
+				"viewportWidth": "1117",
+				"viewportZoom": "13.775",
+				"currentScale": 0.012332139659803044,
+				"initialDuration": 16,
+				"currentDuration": 16,
+				"sameId": true,
+				"sameSourceObject": true,
+				"visible": true,
+				"interactMode": "seek",
+				"start": 2.505617726051925,
+				"end": 6.505617726051925,
+				"documentFocused": true
+			}
+		},
+		"otherSourceItemsPreserved": true
+	},
+	{
+		"model": "raw",
+		"phase": "history-restored",
+		"passed": true,
+		"tailEventsIgnored": true
+	},
+	{
+		"model": "raw",
+		"phase": "blur",
+		"passed": true,
+		"range": [2.505617726051925, 6.505617726051925],
+		"diagnostic": {
+			"kind": "keyboard",
+			"cause": "blur",
+			"startedAt": 1793793112562,
+			"elapsedMs": 1354,
+			"moves": 8,
+			"buttons": 1,
+			"snapshot": {
+				"initialScale": 0.012332139659803044,
+				"viewportWidth": "1117",
+				"viewportZoom": "13.775",
+				"currentScale": 0.012332139659803044,
+				"initialDuration": 16,
+				"currentDuration": 16,
+				"sameId": true,
+				"sameSourceObject": true,
+				"visible": true,
+				"interactMode": "seek",
+				"start": 2.505617726051925,
+				"end": 6.505617726051925,
+				"documentFocused": false
+			}
+		},
+		"otherSourceItemsPreserved": true
+	},
+	{
+		"model": "raw",
+		"phase": "blur-restored",
+		"passed": true,
+		"tailEventsIgnored": true
+	},
+	{
+		"model": "raw",
+		"phase": "start",
+		"passed": true,
+		"range": [2.9989033124440465, 6],
+		"diagnostic": {
+			"kind": "keyboard",
+			"cause": "release",
+			"startedAt": 1793794153712,
+			"elapsedMs": 2003,
+			"moves": 16,
+			"buttons": 1,
+			"snapshot": {
+				"initialScale": 0.012332139659803044,
+				"viewportWidth": "1117",
+				"viewportZoom": "13.775",
+				"currentScale": 0.012332139659803044,
+				"initialDuration": 16,
+				"currentDuration": 16,
+				"sameId": true,
+				"sameSourceObject": true,
+				"visible": true,
+				"interactMode": "seek",
+				"start": 2.9989033124440465,
+				"end": 6,
+				"documentFocused": true
+			}
+		},
+		"otherSourceItemsPreserved": true
+	},
+	{
+		"model": "raw",
+		"phase": "undo",
+		"passed": true,
+		"restoredRanges": [[70.0, 74.0], [2.0, 6.0], [10.0, 14.0]]
+	},
+	{
+		"model": "raw",
+		"phase": "end",
+		"passed": true,
+		"range": [2, 6.998903312444047],
+		"diagnostic": {
+			"kind": "keyboard",
+			"cause": "release",
+			"startedAt": 1793794172566,
+			"elapsedMs": 1973,
+			"moves": 16,
+			"buttons": 1,
+			"snapshot": {
+				"initialScale": 0.012332139659803044,
+				"viewportWidth": "1117",
+				"viewportZoom": "13.775",
+				"currentScale": 0.012332139659803044,
+				"initialDuration": 16,
+				"currentDuration": 16,
+				"sameId": true,
+				"sameSourceObject": true,
+				"visible": true,
+				"interactMode": "seek",
+				"start": 2,
+				"end": 6.998903312444047,
+				"documentFocused": true
+			}
+		},
+		"otherSourceItemsPreserved": true
+	}
+]

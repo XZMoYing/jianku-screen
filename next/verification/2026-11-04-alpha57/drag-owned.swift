@@ -32,9 +32,15 @@ func ownWindow() -> [String: Double]? {
 }
 guard let bounds = ownWindow(), let ox = bounds["X"], let oy = bounds["Y"], let width = bounds["Width"], let height = bounds["Height"],
  min(x1, x2) >= 0, min(y1, y2) >= 0, max(x1, x2) < width, max(y1, y2) < height else { exit(2) }
-_ = app.activate(options: [.activateAllWindows])
+_ = app.activate(options: [])
+_ = AXUIElementPerformAction(editors[0], kAXRaiseAction as CFString)
+_ = AXUIElementSetAttributeValue(editors[0], kAXMainAttribute as CFString, kCFBooleanTrue)
 RunLoop.current.run(until: Date().addingTimeInterval(0.15))
-guard NSWorkspace.shared.frontmostApplication?.processIdentifier == app.processIdentifier else { exit(2) }
+func editorFocused() -> Bool {
+ guard let focused = read(application, kAXFocusedWindowAttribute) else { return false }
+ return CFEqual(focused, editors[0])
+}
+guard NSWorkspace.shared.frontmostApplication?.processIdentifier == app.processIdentifier, editorFocused() else { exit(2) }
 let mode = args.count >= 9 ? args[8] : "normal"
 let inputModel = args.count == 10 ? args[9] : "raw"
 guard ["normal", "undo", "blur"].contains(mode), ["raw", "clean"].contains(inputModel) else { exit(2) }
@@ -42,9 +48,8 @@ let eventSource = CGEventSource(stateID: .combinedSessionState)
 func send(_ type: CGEventType, _ x: Double, _ y: Double) {
  if let event = CGEvent(mouseEventSource: eventSource, mouseType: type, mouseCursorPosition: CGPoint(x: ox + x, y: oy + y), mouseButton: .left) {
   if inputModel == "clean" {
-   event.flags = []
-   event.setIntegerValueField(.mouseEventClickState, value: type == .leftMouseDown || type == .leftMouseUp ? 1 : 0)
-   event.setDoubleValueField(.mouseEventPressure, value: type == .leftMouseDown || type == .leftMouseDragged ? 1 : 0)
+   event.flags.subtract([.maskCommand, .maskShift, .maskControl, .maskAlternate, .maskAlphaShift, .maskSecondaryFn])
+   if type == .leftMouseDown || type == .leftMouseUp { event.setIntegerValueField(.mouseEventClickState, value: 1) }
   } else { event.setIntegerValueField(.mouseEventClickState, value: 1) }
   event.post(tap: .cghidEventTap)
  }
@@ -54,18 +59,23 @@ func drag() throws {
  RunLoop.current.run(until: Date().addingTimeInterval(0.1))
  send(.leftMouseDown, x1, y1)
  RunLoop.current.run(until: Date().addingTimeInterval(0.12))
+ guard CGEventSource.buttonState(.combinedSessionState, button:.left) else { send(.leftMouseUp, x1, y1); throw NSError(domain:"Owned mouse-down was not held", code:2) }
  var trace: [[String:Any]] = [["phase":"down", "leftButton":CGEventSource.buttonState(.combinedSessionState, button:.left), "pointerX": CGEvent(source:nil)?.location.x ?? -1, "pointerY": CGEvent(source:nil)?.location.y ?? -1]]
  var lastX = x1
  var lastY = y1
  defer { send(.leftMouseUp, lastX, lastY) }
  for step in 1...steps {
-  guard ownWindow() == bounds, NSWorkspace.shared.frontmostApplication?.processIdentifier == app.processIdentifier else { throw NSError(domain: "Own window changed", code: 2) }
+  guard ownWindow() == bounds, NSWorkspace.shared.frontmostApplication?.processIdentifier == app.processIdentifier, editorFocused() else { throw NSError(domain: "Own window changed", code: 2) }
   let fraction = Double(step) / Double(steps)
   lastX = x1 + (x2 - x1) * fraction
   lastY = y1 + (y2 - y1) * fraction
   send(.leftMouseDragged, lastX, lastY)
   RunLoop.current.run(until: Date().addingTimeInterval(duration / Double(steps)))
   if step <= 2 || step == steps { trace.append(["phase":"step-\(step)", "leftButton":CGEventSource.buttonState(.combinedSessionState, button:.left), "pointerX": CGEvent(source:nil)?.location.x ?? -1, "pointerY": CGEvent(source:nil)?.location.y ?? -1]) }
+  if mode == "normal" && !CGEventSource.buttonState(.combinedSessionState, button:.left) {
+   print(String(data: try JSONSerialization.data(withJSONObject:["invalidInputTrace":trace], options:[.sortedKeys]), encoding:.utf8)!)
+   throw NSError(domain:"Mouse button was released before the owned drag completed", code:2)
+  }
   if step == steps / 2 && mode == "undo" {
    RunLoop.current.run(until: Date().addingTimeInterval(0.08))
    for down in [true, false] {
@@ -80,7 +90,7 @@ func drag() throws {
    RunLoop.current.run(until: Date().addingTimeInterval(0.2))
    guard (read(editors[0], kAXMinimizedAttribute) as? Bool) == true else { throw NSError(domain: "Minimize readback failed", code: 2) }
    guard AXUIElementSetAttributeValue(editors[0], kAXMinimizedAttribute as CFString, kCFBooleanFalse) == .success else { throw NSError(domain: "Cannot restore own editor", code: 2) }
-   _ = app.activate(options: [.activateAllWindows])
+   _ = app.activate(options: [])
    _ = AXUIElementPerformAction(editors[0], kAXRaiseAction as CFString)
    let restoreDeadline = Date().addingTimeInterval(3)
    while (ownWindow() != bounds || NSWorkspace.shared.frontmostApplication?.processIdentifier != app.processIdentifier) && Date() < restoreDeadline {

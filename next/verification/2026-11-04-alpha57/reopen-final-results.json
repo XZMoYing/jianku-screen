@@ -1,0 +1,30 @@
+[
+	{
+		"case": "按键拖动",
+		"repetition": 1,
+		"passed": true,
+		"fullConfigPreservedAfterNativeReopen": true,
+		"diagnosticFlagAbsent": true
+	},
+	{
+		"case": "按键拖动",
+		"repetition": 2,
+		"passed": true,
+		"fullConfigPreservedAfterNativeReopen": true,
+		"diagnosticFlagAbsent": true
+	},
+	{
+		"case": "3D拖动",
+		"repetition": 1,
+		"passed": true,
+		"fullConfigPreservedAfterNativeReopen": true,
+		"diagnosticFlagAbsent": true
+	},
+	{
+		"case": "3D拖动",
+		"repetition": 2,
+		"passed": true,
+		"fullConfigPreservedAfterNativeReopen": true,
+		"diagnosticFlagAbsent": true
+	}
+]

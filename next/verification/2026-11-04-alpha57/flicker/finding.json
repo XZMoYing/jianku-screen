@@ -1,0 +1,40 @@
+{
+	"status": "reproduced; not fixed",
+	"sourceCommit": "32b5c47",
+	"installedVersion": "0.2.0-alpha.57",
+	"decodedCapturedFrames": 510,
+	"loadingPlaceholderFrameRuns": [
+		{
+			"startIndex": 90,
+			"endIndex": 93,
+			"startTime": 1.6,
+			"endTime": 1.65,
+			"frames": 4
+		},
+		{
+			"startIndex": 124,
+			"endIndex": 126,
+			"startTime": 2.166667,
+			"endTime": 2.2,
+			"frames": 3
+		},
+		{
+			"startIndex": 133,
+			"endIndex": 137,
+			"startTime": 2.316667,
+			"endTime": 2.383333,
+			"frames": 5
+		},
+		{
+			"startIndex": 140,
+			"endIndex": 144,
+			"startTime": 2.433333,
+			"endTime": 2.5,
+			"frames": 5
+		}
+	],
+	"finding": "Whole editor returns to EditorSkeleton during the first drag updates, not only blank preview pixels. The initiating async dependency has not yet been identified.",
+	"geometryAcceptanceDoesNotCoverFlicker": true,
+	"capturedVideoScope": "Only verified owned-window crop retained; initial full-display recording removed after crop verification.",
+	"fullGoalCompleted": false
+}

@@ -1,0 +1,14 @@
+{
+	"windowID": 19466,
+	"bounds": {
+		"Height": 800,
+		"Width": 1275,
+		"X": 202,
+		"Y": 102
+	},
+	"recording": "/private/tmp/jianku-alpha57-20261104/flicker/three-d-body-owned-window.mp4",
+	"rangeMutationObserved": true,
+	"undoRestoredFullConfig": true,
+	"visualStatus": "pending frame-by-frame review",
+	"captureScope": "System video capture ignored -l; immediately cropped to the verified owned editor bounds and removed the original full-display recording. Only cropped evidence is retained."
+}

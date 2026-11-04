@@ -1,0 +1,41 @@
+[
+	{
+		"id": "kb-edit-0",
+		"start": 70.0,
+		"end": 74.0,
+		"displayText": "隐藏按键",
+		"keys": [],
+		"fadeDurationOverride": null,
+		"positionOverride": null,
+		"colorOverride": null,
+		"backgroundColorOverride": null,
+		"fontSizeOverride": null,
+		"uppercaseOverride": null
+	},
+	{
+		"id": "kb-edit-1",
+		"start": 2.0,
+		"end": 6.0,
+		"displayText": "按键A",
+		"keys": [],
+		"fadeDurationOverride": null,
+		"positionOverride": null,
+		"colorOverride": null,
+		"backgroundColorOverride": null,
+		"fontSizeOverride": null,
+		"uppercaseOverride": null
+	},
+	{
+		"id": "kb-edit-2",
+		"start": 10.0,
+		"end": 14.0,
+		"displayText": "按键B",
+		"keys": [],
+		"fadeDurationOverride": null,
+		"positionOverride": null,
+		"colorOverride": null,
+		"backgroundColorOverride": null,
+		"fontSizeOverride": null,
+		"uppercaseOverride": null
+	}
+]

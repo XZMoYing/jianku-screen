@@ -1,0 +1,29 @@
+[
+	{
+		"case": "move",
+		"passed": true,
+		"actualRange": [2.9989033124440465, 6.998903312444047],
+		"otherShotPreserved": true,
+		"normalizedMotionAndBlurPreserved": true,
+		"undoRestored": true,
+		"motionSHA256": "a035475d88326a93ff7701c34467cb0928fa916342f48c1155ff46833db22f7b"
+	},
+	{
+		"case": "start",
+		"passed": true,
+		"actualRange": [2.9989033124440465, 6.0],
+		"otherShotPreserved": true,
+		"normalizedMotionAndBlurPreserved": true,
+		"undoRestored": true,
+		"motionSHA256": "a035475d88326a93ff7701c34467cb0928fa916342f48c1155ff46833db22f7b"
+	},
+	{
+		"case": "end",
+		"passed": true,
+		"actualRange": [2.0, 6.998903312444047],
+		"otherShotPreserved": true,
+		"normalizedMotionAndBlurPreserved": true,
+		"undoRestored": true,
+		"motionSHA256": "a035475d88326a93ff7701c34467cb0928fa916342f48c1155ff46833db22f7b"
+	}
+]
