@@ -2778,31 +2778,41 @@ export const [EditorContextProvider, useBaseEditorContext] =
 						resumeHistory();
 					}
 				},
-				selectTrack() {
+				selectTrack(type?: TimelineTrackType, lane?: number) {
 					const selection = editorState.timeline.selection;
-					if (!selection || selection.type === "transition") return false;
+					type ??=
+						selection?.type === "transition" ? undefined : selection?.type;
+					if (!type) return false;
 
 					const timeline = project.timeline;
-					const segmentCount = {
-						style: timeline?.styleSegments?.length ?? 0,
-						image: timeline?.imageSegments?.length ?? 0,
-						clip: timeline?.segments.length ?? 0,
-						zoom: timeline?.zoomSegments?.length ?? 0,
-						scene: timeline?.sceneSegments?.length ?? 0,
-						mask: timeline?.maskSegments?.length ?? 0,
-						caption: timeline?.captionSegments?.length ?? 0,
-						keyboard: timeline?.keyboardSegments?.length ?? 0,
-						text: timeline?.textSegments?.length ?? 0,
-						audio: timeline?.audioSegments?.length ?? 0,
-						"3d": timeline?.camera3dSegments?.length ?? 0,
-					}[selection.type];
-					if (!segmentCount) return false;
+					const segments = {
+						style: timeline?.styleSegments,
+						image: timeline?.imageSegments,
+						clip: timeline?.segments,
+						zoom: timeline?.zoomSegments,
+						scene: timeline?.sceneSegments,
+						mask: timeline?.maskSegments,
+						caption: timeline?.captionSegments,
+						keyboard: timeline?.keyboardSegments,
+						text: timeline?.textSegments,
+						audio: timeline?.audioSegments,
+						"3d": timeline?.camera3dSegments,
+					}[type];
+					const indices = segments?.flatMap((segment, index) =>
+						lane === undefined ||
+						("track" in segment ? (segment.track ?? 0) : 0) === lane
+							? [index]
+							: [],
+					);
+					if (!indices?.length) return false;
 
-					setEditorState("timeline", "selection", {
-						type: selection.type,
-						indices: Array.from({ length: segmentCount }, (_, i) => i),
+					batch(() => {
+						setEditorState("timeline", "audioPicker", null);
+						setEditorState("timeline", "audioReplace", null);
+						setEditorState("timeline", "selection", { type, indices });
 					});
 				},
+
 				deselect() {
 					if (
 						!editorState.timeline.selection &&

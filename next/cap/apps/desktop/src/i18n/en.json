@@ -1716,5 +1716,11 @@
 	"等待按键…": "Press a shortcut…",
 	"未设置": "Unassigned",
 	"清除快捷键": "Clear shortcut",
-	"恢复预设键位": "Restore preset shortcut"
+	"恢复预设键位": "Restore preset shortcut",
+	"时间线菜单": "Timeline menu",
+	"时间尺": "Timeline ruler",
+	"将播放头移到此处": "Move playhead here",
+	"选中此轨道的全部片段": "Select all clips on this track",
+	"选中使用此素材的片段": "Select clips using this source",
+	"工程名称": "Project name"
 }

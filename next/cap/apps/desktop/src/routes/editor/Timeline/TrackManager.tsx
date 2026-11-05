@@ -156,11 +156,12 @@ function TrackTile(props: {
 
 export function TrackManager(props: {
 	options: TrackManagerOption[];
+	open: boolean;
+	onOpenChange(open: boolean): void;
 	onToggle(type: TimelineTrackType, next: boolean): void;
 	onAdd(type: TimelineTrackType): void;
 }) {
 	const selectable = () => props.options.filter((option) => !option.locked);
-	const [open, setOpen] = createSignal(false);
 	const [hovered, setHovered] = createSignal<TimelineTrackType | null>(null);
 	const hint = () => {
 		const type = hovered();
@@ -176,9 +177,9 @@ export function TrackManager(props: {
 			placement="right-end"
 			gutter={0}
 			overflowPadding={12}
-			open={open()}
+			open={props.open}
 			onOpenChange={(next) => {
-				setOpen(next);
+				props.onOpenChange(next);
 				if (!next) setHovered(null);
 			}}
 		>
@@ -218,7 +219,7 @@ export function TrackManager(props: {
 										} else {
 											props.onToggle(current.type, !current.active);
 										}
-										setOpen(false);
+										props.onOpenChange(false);
 									}}
 								/>
 							)}

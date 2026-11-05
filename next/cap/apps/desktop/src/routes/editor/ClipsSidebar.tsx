@@ -22,6 +22,10 @@ import { MotionGroup } from "~/components/InterfaceMotion";
 import { t as localize } from "~/utils/i18n";
 import { commands } from "~/utils/tauri";
 import { type EditorTimelineSegment, useEditorContext } from "./context";
+import {
+	createEditorContextMenu,
+	isContextMenuKey,
+} from "./editor-context-menu";
 import { getExistingRecordingPickerOptions } from "./existing-recording-picker";
 import { routeEditorPlaybackIntent } from "./playback-intent-routing";
 import { createTimelineMouseDrag } from "./Timeline/mouse-drag";
@@ -222,6 +226,7 @@ export function ClipsSidebar(props: { class?: string; active?: boolean }) {
 	const backToEditor = () => setDialog((d) => ({ ...d, open: false }));
 
 	const [tab, setTab] = createSignal("sources");
+	const sourceMenu = createEditorContextMenu();
 	const [selectedSource, setSelectedSource] = createSignal<number>();
 	let sourceList: HTMLDivElement | undefined;
 	const [importing, setImporting] = createSignal(false);
@@ -354,6 +359,31 @@ export function ClipsSidebar(props: { class?: string; active?: boolean }) {
 		}
 		toast.error(localize("素材时长不可用，无法添加"));
 	};
+	const showSourceMenu = (event: MouseEvent | KeyboardEvent, index: number) => {
+		const uses = () =>
+			segments().flatMap((clip, clipIndex) =>
+				(clip.recordingSegment ?? 0) === index ? [clipIndex] : [],
+			);
+		sourceMenu.show(event, sourceLabel(index), [
+			{
+				label: localize("添加到时间线末尾"),
+				shortcut: keymap.label("append"),
+				disabled: !canAppendSource(index),
+				run: () => appendSource(index),
+			},
+			{
+				label: localize("选中使用此素材的片段"),
+				disabled: uses().length === 0,
+				run: () => {
+					const indices = uses();
+					if (!indices.length) return;
+					setEditorState("timeline", "selection", { type: "clip", indices });
+					setTab("clips");
+				},
+			},
+		]);
+	};
+
 	useEditorShortcuts(keymap, {
 		append: () => {
 			const index = selectedSource();
@@ -555,6 +585,7 @@ export function ClipsSidebar(props: { class?: string; active?: boolean }) {
 							{(source, index) => (
 								<div
 									data-source-asset={index()}
+									onContextMenu={(event) => showSourceMenu(event, index())}
 									class={cx(
 										"flex min-w-0 items-center gap-2 rounded-xl border p-2 transition-colors",
 										selectedSource() === index()
@@ -565,6 +596,10 @@ export function ClipsSidebar(props: { class?: string; active?: boolean }) {
 									<button
 										type="button"
 										aria-pressed={selectedSource() === index()}
+										onKeyDown={(event) => {
+											if (isContextMenuKey(event))
+												showSourceMenu(event, index());
+										}}
 										onClick={(event) => {
 											setSelectedSource(index());
 											event.currentTarget.focus();
@@ -610,6 +645,7 @@ export function ClipsSidebar(props: { class?: string; active?: boolean }) {
 					</Show>
 				</KTabs.Content>
 
+				<sourceMenu.Content />
 				<KTabs.Content
 					value="clips"
 					class="overflow-y-auto flex-1 -mx-1 px-1 min-h-0 custom-scroll"

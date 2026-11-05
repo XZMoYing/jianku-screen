@@ -18,6 +18,8 @@ import {
 } from "~/utils/editor-keymap";
 import { t as localize } from "~/utils/i18n";
 import type { Hotkey } from "~/utils/tauri";
+import IconLucideRotateCcw from "~icons/lucide/rotate-ccw";
+import IconLucideX from "~icons/lucide/x";
 import { Section, SectionCard } from "./Setting";
 
 const presets: { id: EditorKeyPreset; name: string }[] = [
@@ -207,21 +209,31 @@ export function EditorShortcutSettings(props: { globalBindings: Hotkey[] }) {
 												<Show when={keys()[command].length > 0}>
 													<button
 														type="button"
-														class={buttonClass}
+														class={cx(
+															buttonClass,
+															"grid size-7 place-items-center p-0",
+														)}
+														title={localize("清除快捷键")}
+														aria-label={localize("清除快捷键")}
 														disabled={saving()}
 														onClick={() => edit(command, null)}
 													>
-														{localize("清除快捷键")}
+														<IconLucideX class="size-3.5" />
 													</button>
 												</Show>
 												<Show when={override() !== undefined}>
 													<button
 														type="button"
-														class={buttonClass}
+														class={cx(
+															buttonClass,
+															"grid size-7 place-items-center p-0",
+														)}
+														title={localize("恢复预设键位")}
+														aria-label={localize("恢复预设键位")}
 														disabled={saving()}
 														onClick={() => edit(command, undefined)}
 													>
-														{localize("恢复预设键位")}
+														<IconLucideRotateCcw class="size-3.5" />
 													</button>
 												</Show>
 											</div>

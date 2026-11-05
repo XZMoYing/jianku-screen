@@ -3,8 +3,6 @@ import {
 	createEventListener,
 	createEventListenerMap,
 } from "@solid-primitives/event-listener";
-import { LogicalPosition } from "@tauri-apps/api/dpi";
-import { Menu, MenuItem } from "@tauri-apps/api/menu";
 import { platform } from "@tauri-apps/plugin-os";
 import { cx } from "cva";
 import {
@@ -46,6 +44,10 @@ import {
 } from "../captions";
 import { clipDuration, clipTimelineOffsets } from "../clip-transitions";
 import { FPS, type TimelineTrackType, useEditorContext } from "../context";
+import {
+	createEditorContextMenu,
+	isContextMenuKey,
+} from "../editor-context-menu";
 import { defaultMaskSegment, type MaskSegment } from "../masks";
 import { autoTextColorAt, defaultTextSegment, type TextSegment } from "../text";
 import { effectiveToOutput, holdWindows } from "../timeline-holds";
@@ -224,6 +226,19 @@ export function Timeline(props: {
 
 	const [timelineContainerRef, setTimelineContainerRef] =
 		createSignal<HTMLDivElement>();
+	const blankMenu = createEditorContextMenu();
+	const [trackPickerOpen, setTrackPickerOpen] = createSignal(false);
+
+	createEventListener(
+		timelineContainerRef,
+		"mousedown",
+		(event) => {
+			if (event.button !== 0 || (event.ctrlKey && platform() === "macos"))
+				event.stopPropagation();
+		},
+		{ capture: true },
+	);
+
 	const [timelineScrollRef, setTimelineScrollRef] =
 		createSignal<HTMLDivElement>();
 	const [timelineRef, setTimelineRef] = createSignal<HTMLDivElement>();
@@ -839,26 +854,6 @@ export function Timeline(props: {
 		resumeHistory();
 	}
 
-	async function handleOpenTrackMenu(
-		e: MouseEvent,
-		type: "text" | "mask" | "audio" | "style" | "image",
-		laneIndex: number,
-	) {
-		e.preventDefault();
-		e.stopPropagation();
-
-		const menu = await Menu.new({
-			items: [
-				await MenuItem.new({
-					text: `Delete ${type} track`,
-					action: () => handleDeleteTrackLane(type, laneIndex),
-				}),
-			],
-		});
-
-		menu.popup(new LogicalPosition(e.clientX, e.clientY));
-	}
-
 	onMount(() => {
 		if (!project.timeline) {
 			const resume = projectHistory.pause();
@@ -1025,6 +1020,43 @@ export function Timeline(props: {
 		// of the timeline origin so hitting exactly 0:00 isn't a battle
 		const snappedTime = rawTime / secsPerPixel() <= START_SNAP_PX ? 0 : rawTime;
 		return Math.min(Math.max(0, snappedTime), totalDuration());
+	}
+
+	function showBlankMenu(event: MouseEvent | KeyboardEvent) {
+		if (props.inactive || timelinePointerDown) return;
+		const time =
+			"clientX" in event &&
+			(event.button !== 0 || event.clientX || event.clientY)
+				? timelineTimeFromClientX(event.clientX)
+				: editorState.playbackTime;
+		blankMenu.show(event, localize("时间线菜单"), [
+			{
+				label: localize("将播放头移到此处"),
+				disabled: time === null || time === editorState.playbackTime,
+				run: () => {
+					if (time === null) return;
+					setEditorState("previewTime", null);
+					void seekPlayheadTo(time);
+				},
+			},
+			{
+				label: localize("Add track"),
+				run: () => queueMicrotask(() => setTrackPickerOpen(true)),
+			},
+			{
+				label: localize("显示整个时间线"),
+				shortcut: keymap.label("fit"),
+				run: timelineCommands.fit,
+			},
+			{
+				label: localize("取消选择"),
+				shortcut: keymap.label("deselect"),
+				disabled:
+					!editorState.timeline.selection &&
+					editorState.timeline.audioPicker === null,
+				run: timelineCommands.deselect,
+			},
+		]);
 	}
 
 	async function seekPlayheadTo(newTime: number) {
@@ -1238,7 +1270,18 @@ export function Timeline(props: {
 				ref={setTimelineContainerRef}
 				class="relative overflow-hidden flex flex-col gap-1 h-full"
 				style={{ "--track-height": TRACK_HEIGHT }}
+				onContextMenu={(event) => {
+					if (
+						event.target instanceof Element &&
+						event.target.closest(
+							"[data-timeline-segment], button, input, [role='menu'], [role='dialog']",
+						)
+					)
+						return;
+					showBlankMenu(event);
+				}}
 				onMouseDown={(e) => {
+					if (e.button !== 0) return;
 					createRoot((dispose) => {
 						createEventListener(e.currentTarget, "mouseup", () => {
 							handleUpdatePlayhead(e);
@@ -1294,6 +1337,8 @@ export function Timeline(props: {
 					>
 						<TrackManager
 							options={trackOptions()}
+							open={trackPickerOpen()}
+							onOpenChange={setTrackPickerOpen}
 							onToggle={handleToggleTrack}
 							onAdd={handleAddTrack}
 						/>
@@ -1304,6 +1349,11 @@ export function Timeline(props: {
 					<div
 						class="absolute inset-y-0 right-0 z-40"
 						style={{ left: `${TRACK_GUTTER - RULER_SCRUB_OVERHANG_PX}px` }}
+						tabIndex={0}
+						aria-label={localize("时间尺")}
+						onKeyDown={(event) => {
+							if (isContextMenuKey(event)) showBlankMenu(event);
+						}}
 						onMouseDown={beginRulerScrub}
 					/>
 				</div>
@@ -1370,6 +1420,7 @@ export function Timeline(props: {
 						</div>
 					)}
 				</Show>
+				<blankMenu.Content />
 				<div class="overflow-hidden relative flex-1 min-h-0">
 					<div
 						ref={setTimelineScrollRef}
@@ -1433,9 +1484,6 @@ export function Timeline(props: {
 										type="style"
 										laneIndex={laneIndex}
 										onDelete={() => handleDeleteTrackLane("style", laneIndex)}
-										onContextMenu={(event) =>
-											handleOpenTrackMenu(event, "style", laneIndex)
-										}
 									>
 										<StyleTrack
 											laneIndex={laneIndex}
@@ -1464,9 +1512,6 @@ export function Timeline(props: {
 										type={row.kind}
 										laneIndex={row.track}
 										onDelete={() => handleDeleteTrackLane(row.kind, row.track)}
-										onContextMenu={(event) =>
-											handleOpenTrackMenu(event, row.kind, row.track)
-										}
 									>
 										<Switch>
 											<Match when={row.kind === "image"}>
@@ -1508,9 +1553,6 @@ export function Timeline(props: {
 										type="audio"
 										laneIndex={laneIndex}
 										onDelete={() => handleDeleteTrackLane("audio", laneIndex)}
-										onContextMenu={(e) =>
-											handleOpenTrackMenu(e, "audio", laneIndex)
-										}
 									>
 										<AudioTrack
 											laneIndex={laneIndex}
@@ -1532,7 +1574,6 @@ export function Timeline(props: {
 										? () => handleClearTrackSegments("zoom")
 										: undefined
 								}
-								deleteLabel="Clear all"
 								deleteTitle="Delete all zoom segments"
 							>
 								<ZoomTrack
@@ -1552,7 +1593,6 @@ export function Timeline(props: {
 											? () => handleClearTrackSegments("3d")
 											: undefined
 									}
-									deleteLabel="Clear all"
 									deleteTitle="Delete all 3D shots"
 								>
 									<ThreeDTrack
@@ -1573,7 +1613,6 @@ export function Timeline(props: {
 											? () => handleClearTrackSegments("scene")
 											: undefined
 									}
-									deleteLabel="Clear all"
 									deleteTitle="Delete all scene segments"
 								>
 									<SceneTrack
@@ -1599,12 +1638,11 @@ function TrackRow(props: {
 	laneIndex?: number;
 	children: JSX.Element;
 	onDelete?: () => void;
-	deleteLabel?: string;
 	deleteTitle?: string;
-	onContextMenu?: (e: MouseEvent) => void;
 }) {
-	const { project, setProject, editorState, setEditorState } =
+	const { project, setProject, editorState, setEditorState, timelineCommands } =
 		useEditorContext();
+	const menu = createEditorContextMenu();
 	const [dragging, setDragging] = createSignal(false);
 	let suppressClick = false;
 	let finishDrag: (() => void) | undefined;
@@ -1734,6 +1772,30 @@ function TrackRow(props: {
 				);
 			}
 		});
+	};
+
+	const showTrackMenu = (event: MouseEvent | KeyboardEvent) => {
+		const remove = props.onDelete;
+		menu.show(event, props.label ?? props.type, [
+			{
+				label: localize("选中此轨道的全部片段"),
+				disabled: !trackSegments().some(
+					(segment) =>
+						props.laneIndex === undefined ||
+						getSegmentTrack(segment) === props.laneIndex,
+				),
+				run: () => timelineCommands.selectTrack(props.type, props.laneIndex),
+			},
+			...(remove
+				? [
+						{
+							label: localize(props.deleteTitle ?? "删除轨道"),
+							danger: true,
+							run: remove,
+						},
+					]
+				: []),
+		]);
 	};
 
 	const canReorder = () =>
@@ -1936,11 +1998,11 @@ function TrackRow(props: {
 			classList={{ "opacity-35": dragging() }}
 			data-track-type={props.type}
 			data-track-lane={props.laneIndex}
-			onContextMenu={props.onContextMenu}
 		>
 			<div
 				class="group/icon relative shrink-0"
 				style={{ width: `${TRACK_ICON_WIDTH}px` }}
+				onContextMenu={showTrackMenu}
 			>
 				<button
 					type="button"
@@ -1955,7 +2017,10 @@ function TrackRow(props: {
 							: undefined
 					}
 					onMouseDown={startReorder}
-					onKeyDown={reorderWithKeyboard}
+					onKeyDown={(event) => {
+						if (isContextMenuKey(event)) showTrackMenu(event);
+						else reorderWithKeyboard(event);
+					}}
 					aria-label={localize("选择轨道：{track}", {
 						track: props.label ?? props.type,
 					})}
@@ -2006,6 +2071,7 @@ function TrackRow(props: {
 			<div class="flex-1 relative overflow-hidden min-w-0 rounded-r-lg">
 				{props.children}
 			</div>
+			<menu.Content />
 		</div>
 	);
 }

@@ -106,6 +106,7 @@ export function SegmentRoot(
 			<SegmentContextProvider width={width} segment={() => local.segment}>
 				<div
 					{...rest}
+					data-timeline-segment=""
 					class={cx(
 						"absolute overflow-visible inset-y-0",
 						editorState.timeline.interactMode === "split" &&

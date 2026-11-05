@@ -326,7 +326,11 @@ function NameEditor(props: {
 	const flushPrettyName = createRecordingTitleSave({
 		initialName: props.name,
 		getDraft: prettyName,
-		resetDraft: setPrettyName,
+		resetDraft: (name) => {
+			if (prettyNameRef && prettyNameRef.value !== name)
+				prettyNameRef.value = name;
+			setPrettyName(name);
+		},
 		save: async (trimmed) => {
 			try {
 				await commands.setPrettyName(trimmed);
@@ -364,14 +368,17 @@ function NameEditor(props: {
 		<Tooltip content={props.name} childClass="min-w-0">
 			<div class="flex relative flex-row items-center min-w-0 text-[13px] font-medium tracking-[-0.01em] text-ed-text-1">
 				<input
-					ref={prettyNameRef}
+					ref={(input) => {
+						prettyNameRef = input;
+						input.value = prettyName();
+					}}
+					aria-label={localize("工程名称")}
 					class={cx(
 						"absolute inset-0 px-px m-0 opacity-0 overflow-hidden focus:opacity-100 bg-transparent border-b border-transparent focus:border-ed-line-strong focus:outline-hidden peer whitespace-pre select-text",
 						truncated() && "truncate",
 						(prettyName().length < 5 || prettyName().length > 100) &&
 							"focus:border-red-500",
 					)}
-					value={prettyName()}
 					readOnly={props.readOnly}
 					onInput={(e) => setPrettyName(e.currentTarget.value)}
 					onBlur={() => {

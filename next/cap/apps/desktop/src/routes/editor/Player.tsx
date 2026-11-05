@@ -567,6 +567,7 @@ export function PlayerContent(props: {
 				<div class="flex flex-row flex-1 gap-0.5 justify-end items-center min-w-fit">
 					<EditorButton<typeof KToggleButton>
 						tooltipText={localize("分割工具")}
+						aria-label={localize("分割工具")}
 						kbd={keymap.kbd("bladeTool")}
 						pressed={editorState.timeline.interactMode === "split"}
 						onChange={(v: boolean) =>
@@ -580,6 +581,7 @@ export function PlayerContent(props: {
 					<div class="flex flex-row gap-0.5 items-center" title={zoomHint()}>
 						<EditorButton
 							tooltipText={localize("缩小时间线")}
+							aria-label={localize("缩小时间线")}
 							kbd={keymap.kbd("zoomOut")}
 							onClick={() => timelineCommands.zoomBy(1.1)}
 							leftIcon={<IconCapZoomOut />}
@@ -613,12 +615,14 @@ export function PlayerContent(props: {
 						/>
 						<EditorButton
 							tooltipText={localize("放大时间线")}
+							aria-label={localize("放大时间线")}
 							kbd={keymap.kbd("zoomIn")}
 							onClick={() => timelineCommands.zoomBy(1 / 1.1)}
 							leftIcon={<IconCapZoomIn />}
 						/>
 						<EditorButton
 							tooltipText={localize("显示整个时间线")}
+							aria-label={localize("显示整个时间线")}
 							kbd={keymap.kbd("fit")}
 							onClick={timelineCommands.fit}
 							leftIcon={<IconLucideMaximize2 />}
