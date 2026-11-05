@@ -1,0 +1,57 @@
+{
+  "source": {
+    "commit": "1a81b360899d494a1fe68f3eeac28afa964d0a52",
+    "version": "0.2.0-alpha.73",
+    "build": "2026.73.0"
+  },
+  "releaseSession": 16361,
+  "installSession": 13088,
+  "off": {
+    "start": 6.0625,
+    "end": 7.0625,
+    "track": 0,
+    "enabled": true,
+    "name": "吸附样式",
+    "overrides": {}
+  },
+  "altBypass": {
+    "start": 6.0625,
+    "end": 7.0625,
+    "track": 0,
+    "enabled": true,
+    "name": "吸附样式",
+    "overrides": {}
+  },
+  "otherTrack": {
+    "start": 6.1,
+    "end": 7.1,
+    "track": 0,
+    "enabled": true,
+    "name": "吸附样式",
+    "overrides": {}
+  },
+  "clipEdge": {
+    "start": 6.5,
+    "end": 7.5,
+    "track": 0,
+    "enabled": true,
+    "name": "吸附样式",
+    "overrides": {}
+  },
+  "reopened": {
+    "appIsForeground": true,
+    "bounds": {
+      "Height": 954,
+      "Width": 1680,
+      "X": 0,
+      "Y": 25
+    },
+    "editorSelection": "unique own CG editor title and matching AX window geometry",
+    "focusedWindowTitle": "简库镜传 · 视频编辑",
+    "ownedEditorWindowCount": 1,
+    "path": "/Applications/Jianku Screen Next.app",
+    "pid": 47390,
+    "trusted": true,
+    "windowID": 22413
+  }
+}
