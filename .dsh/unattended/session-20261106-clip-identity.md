@@ -27,3 +27,9 @@ worker真实ClipsSidebar组件5项交互通过（同源ID/最终松手位置/各
 最终补充：blast复核发现CLI 1处/可选GPUI12处构造，Terra已补None并格式化5文件；CLI check87681正常0，独立GPUI offline check退出101是缺本地next/zed-cap/crates/gpui/Cargo.toml，不下载／不启用，不能标绿。Schema未改，不重复绑定生成。
 
 主代理补历史after-restore回调，前／状态／后恢复一起batch。context保存当前clip IDs，恢复后仍存在的ID重映射选择；别类选择仍按旧规则清除。18模型＋13历史/真实组件均通过；最终类型10424／rootfmt50710／前端14567都终态0。当前无编译／测试／导出句柄；下一源码提交/冻结64，完整App实际验收仍待。相关最终日志已入clip-identity证据，保留初期及最终范围。不把原overlay绝对时序行为说成完整关联移动。
+
+64构建检查点：源ca9f7e5已提交；唯一canonical release57249日志/private/tmp/jianku-alpha64-20261106/release.log运行。之后不改CAP冻结输入，不重复编译／绑定生成。新平台配置合并入口已用（Mac仍5sidecars）。source/rollback manifest与验证工具next/verification/2026-11-06-alpha64均prepared，63归档验签／6hash已核实，64尚未prepare/安装。私有demo.jks已从63自有样本APFS克隆：三片段步骤甲0..4、步骤乙重复0..4且hideCursor、步骤丙4..8/volume1.1，均无id测试legacy，overlay空以聚焦身份；未在63打开。只在64包prepare后复制到版本归档verification，不能提前建Builds/0.2.0-alpha.64目录。
+
+续构建前已实查release57249对应node PID33125/33141仍live，CLI/前端阶段已过，进入桌面原生编译；不是观察超时就重启。64的AX/拖动(含Escape)/单窗口采集工具均已编译，root工具源已prepared，drag55462终态0。当前共同源不得变，先完成此包；实际GUI只在确认63仍为自有示例且无未知录制后保存/正常退出再安装。Native截图/录像必须只包含目标自有窗口，不能复用曾忽略-l的系统整屏命令。
+
+阶段额度最新周已用46%，无5h窗口，两券未用，不暂停、不设定时。源ca9f7e5已推，待64构建/归档/安装/原生身份与Undo验收；下一轮继续唯一57249。完整目标active，U29/U30及所有原门槛仍未完成。
