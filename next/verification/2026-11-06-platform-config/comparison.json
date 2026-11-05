@@ -1,0 +1,26 @@
+{
+	"baselineCommit": "dbaf9eb",
+	"macOverrideIdenticalToInstalledAlpha63": true,
+	"platformBundles": {
+		"darwin": "app",
+		"win32": "nsis",
+		"linux": "deb"
+	},
+	"externalBinaries": {
+		"darwin": [
+			"binaries/cap-muxer",
+			"binaries/cap-exporter",
+			"binaries/cap-cli",
+			"binaries/jianku-device-capture",
+			"binaries/jianku-android-capture"
+		],
+		"win32": [
+			"binaries/cap-muxer",
+			"binaries/cap-exporter",
+			"binaries/cap-cli"
+		],
+		"linux": ["binaries/cap-muxer", "binaries/cap-exporter", "binaries/cap-cli"]
+	},
+	"windowsLinuxMissingMacMobileResourceRemoved": true,
+	"limits": "Configuration and command selection verified on Mac; no Windows/Linux native build or runtime claim"
+}

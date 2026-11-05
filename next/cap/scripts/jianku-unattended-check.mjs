@@ -2,11 +2,13 @@ import { spawn } from "node:child_process";
 import { homedir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { jiankuBuildConfiguration } from "./jianku-config.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const environment = {
 	...process.env,
 	CARGO_BUILD_JOBS: process.env.CARGO_BUILD_JOBS ?? "2",
+	TAURI_CONFIG: JSON.stringify(jiankuBuildConfiguration().config),
 	PATH: [
 		path.join(homedir(), ".cargo/bin"),
 		path.join(homedir(), ".npm-global/bin"),
@@ -25,6 +27,7 @@ if (process.platform === "darwin") {
 }
 
 const checks = [
+	["node", ["--test", "scripts/jianku-config.test.mjs"]],
 	["cargo", ["fmt", "--all", "--", "--check"]],
 	["cargo", ["check", "--locked", "--release", "-p", "cap-desktop"]],
 	[

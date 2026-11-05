@@ -4,13 +4,13 @@ import {
 	existsSync,
 	mkdirSync,
 	readdirSync,
-	readFileSync,
 	unlinkSync,
 	writeFileSync,
 } from "node:fs";
 import { homedir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { jiankuBuildConfiguration } from "./jianku-config.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const desktop = path.join(root, "apps/desktop");
@@ -239,13 +239,29 @@ function signMacBundle() {
 function main() {
 	const command = process.argv[2];
 	if (
-		!["setup", "frontend", "check", "build", "release", "sign"].includes(
-			command,
-		)
+		![
+			"setup",
+			"frontend",
+			"check",
+			"build",
+			"release",
+			"sign",
+			"config",
+		].includes(command)
 	) {
 		throw new Error(
-			"用法：node scripts/jianku.mjs setup|frontend|check|build|release|sign",
+			"用法：node scripts/jianku.mjs setup|frontend|check|build|release|sign|config [darwin|win32|linux]",
 		);
+	}
+	if (command === "config") {
+		console.log(
+			JSON.stringify(
+				jiankuBuildConfiguration(process.argv[3] ?? process.platform),
+				null,
+				2,
+			),
+		);
+		return;
 	}
 	prepareEnvironment();
 	if (command === "sign") {
@@ -258,11 +274,9 @@ function main() {
 		run("bun", ["run", "build"], desktop);
 	} else {
 		checkNativeTools();
+		const { config, bundle } = jiankuBuildConfiguration();
 		if (command === "check") {
-			environment.TAURI_CONFIG = readFileSync(
-				path.join(desktop, "src-tauri/tauri.jianku.conf.json"),
-				"utf8",
-			);
+			environment.TAURI_CONFIG = JSON.stringify(config);
 			run("cargo", ["fmt", "--all", "--check"]);
 			run("cargo", ["check", "--locked", "-p", "cap-desktop"]);
 		} else {
@@ -275,13 +289,9 @@ function main() {
 					"build",
 					...(profile === "debug" ? ["--debug"] : []),
 					"--bundles",
-					process.platform === "darwin"
-						? "app"
-						: process.platform === "win32"
-							? "nsis"
-							: "deb",
+					bundle,
 					"--config",
-					"src-tauri/tauri.jianku.conf.json",
+					JSON.stringify(config),
 				],
 				desktop,
 			);

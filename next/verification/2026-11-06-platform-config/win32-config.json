@@ -1,0 +1,59 @@
+{
+	"platform": "win32",
+	"bundle": "nsis",
+	"config": {
+		"$schema": "https://schema.tauri.app/config/2",
+		"productName": "Jianku Screen Next",
+		"mainBinaryName": "Jianku Screen Next",
+		"identifier": "com.jianku.screen.next",
+		"version": "0.2.0-alpha.63",
+		"build": {
+			"beforeBuildCommand": "bun run build"
+		},
+		"plugins": {
+			"updater": {
+				"active": false,
+				"endpoints": [],
+				"pubkey": ""
+			},
+			"deep-link": {
+				"desktop": {
+					"schemes": ["jianku-screen-next"]
+				}
+			}
+		},
+		"bundle": {
+			"createUpdaterArtifacts": false,
+			"fileAssociations": [
+				{
+					"ext": ["jks"],
+					"name": "简库录制工程",
+					"role": "Editor"
+				}
+			],
+			"icon": [
+				"icons/jianku/128x128.png",
+				"icons/jianku/icon.icns",
+				"icons/jianku/icon.ico"
+			],
+			"resources": {
+				"../../../LICENSE": "licenses/Cap-LICENSE.txt",
+				"../../../JIANKU-NOTICE.md": "licenses/JIANKU-NOTICE.md",
+				"../../../licenses/material-color-utilities-LICENSE.txt": "licenses/material-color-utilities-LICENSE.txt",
+				"../../../licenses/dogsc-LICENSE.txt": "licenses/dogsc-LICENSE.txt",
+				"../../../licenses/scrcpy-LICENSE.txt": "licenses/scrcpy-LICENSE.txt",
+				"../../../licenses/SDL-LICENSE.txt": "licenses/SDL-LICENSE.txt"
+			},
+			"macOS": {
+				"bundleName": "简库镜传 Next",
+				"bundleVersion": "2026.63.0",
+				"entitlements": "Entitlements.plist"
+			},
+			"externalBin": [
+				"binaries/cap-muxer",
+				"binaries/cap-exporter",
+				"binaries/cap-cli"
+			]
+		}
+	}
+}

@@ -38,25 +38,18 @@
 			"../../../JIANKU-NOTICE.md": "licenses/JIANKU-NOTICE.md",
 			"../../../licenses/material-color-utilities-LICENSE.txt": "licenses/material-color-utilities-LICENSE.txt",
 			"../../../licenses/dogsc-LICENSE.txt": "licenses/dogsc-LICENSE.txt",
-			"../../../target/native-deps/jianku-scrcpy/scrcpy-server-v4.1": "mobile/scrcpy-server",
 			"../../../licenses/scrcpy-LICENSE.txt": "licenses/scrcpy-LICENSE.txt",
 			"../../../licenses/SDL-LICENSE.txt": "licenses/SDL-LICENSE.txt"
 		},
 		"macOS": {
 			"bundleName": "简库镜传 Next",
 			"bundleVersion": "2026.63.0",
-			"entitlements": "Entitlements.plist",
-			"frameworks": [
-				"../../../target/native-deps/Spacedrive.framework",
-				"../../../target/native-deps/jianku-scrcpy/libSDL3.0.dylib"
-			]
+			"entitlements": "Entitlements.plist"
 		},
 		"externalBin": [
 			"binaries/cap-muxer",
 			"binaries/cap-exporter",
-			"binaries/cap-cli",
-			"binaries/jianku-device-capture",
-			"binaries/jianku-android-capture"
+			"binaries/cap-cli"
 		]
 	}
 }

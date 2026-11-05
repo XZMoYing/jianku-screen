@@ -1,0 +1,7 @@
+# 平台打包清单拆分
+
+U12a源码：共用配置保留三项通用辅助程序与许可／工程关联／图标，Mac额外的iOS和安卓采集程序、scrcpy server、框架单独放在tauri.jianku.macos.json。jianku.mjs的check／build／release使用同一配置生成函数；无人值守检查入口也传入该函数的TAURI_CONFIG。config命令仅显示目标平台清单，不能跨平台编译。
+
+实际运行三个平台的config命令。Mac覆盖对象与已安装alpha.63对应dbaf9eb的旧完整配置逐项相等；Windows/Linux仅请求当前入口会生成的三个程序，不要求Mac移动组件。3项相关配置检查通过，Node语法和6文件Biome通过。由Terra用实际Mac覆盖配置作为TAURI_CONFIG运行cap-desktop release check，通过（句柄78613终态0，约1m02s）；未重复全量构建和渲染测试。
+
+当前实际应用仍是已验证alpha.63，本单元只改变构建入口；没有假称生成Windows/Linux安装包或在目标系统运行。现有许可、背景／音乐资源合并规则保留，Mac版本号和bundleVersion继续在共用配置维护。CI目前原有生产配置与本入口不同，平台编译／原生功能／移动组件移植与发布审计仍待；原严格色度15过2失败、硬件成片等门槛保留。

@@ -1,0 +1,20 @@
+{
+	"bundle": {
+		"resources": {
+			"../../../target/native-deps/jianku-scrcpy/scrcpy-server-v4.1": "mobile/scrcpy-server"
+		},
+		"macOS": {
+			"frameworks": [
+				"../../../target/native-deps/Spacedrive.framework",
+				"../../../target/native-deps/jianku-scrcpy/libSDL3.0.dylib"
+			]
+		},
+		"externalBin": [
+			"binaries/cap-muxer",
+			"binaries/cap-exporter",
+			"binaries/cap-cli",
+			"binaries/jianku-device-capture",
+			"binaries/jianku-android-capture"
+		]
+	}
+}
