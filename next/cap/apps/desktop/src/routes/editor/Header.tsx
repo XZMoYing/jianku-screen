@@ -24,7 +24,6 @@ import type { TitleSaveRegistration } from "./editor-title-save-bridge";
 import OrganizationDropdown from "./OrganizationDropdown";
 import PresetsDropdown from "./PresetsDropdown";
 import { ProjectMenu } from "./ProjectMenu";
-import { bindRecordingTitleInput } from "./recording-title-input";
 import { createRecordingTitleSave } from "./recording-title-save";
 import ShareButton from "./ShareButton";
 import { EditorButton } from "./ui";
@@ -320,7 +319,7 @@ function NameEditor(props: {
 }) {
 	const { refetchMeta } = useEditorContext();
 
-	let titleInput: ReturnType<typeof bindRecordingTitleInput> | undefined;
+	let prettyNameRef: HTMLInputElement | undefined;
 	let prettyNameMeasureRef: HTMLSpanElement | undefined;
 	const [truncated, setTruncated] = createSignal(false);
 	const [prettyName, setPrettyName] = createSignal(props.name);
@@ -328,7 +327,8 @@ function NameEditor(props: {
 		initialName: props.name,
 		getDraft: prettyName,
 		resetDraft: (name) => {
-			titleInput?.reset(name);
+			if (prettyNameRef && prettyNameRef.value !== name)
+				prettyNameRef.value = name;
 			setPrettyName(name);
 		},
 		save: async (trimmed) => {
@@ -350,10 +350,7 @@ function NameEditor(props: {
 		flush: flushPrettyName,
 		setReadOnly: props.setReadOnly,
 	});
-	onCleanup(() => {
-		titleInput?.dispose();
-		props.registerTitleSave(undefined);
-	});
+	onCleanup(() => props.registerTitleSave(undefined));
 
 	createEffect(
 		on(prettyName, () => {
@@ -372,12 +369,8 @@ function NameEditor(props: {
 			<div class="flex relative flex-row items-center min-w-0 text-[13px] font-medium tracking-[-0.01em] text-ed-text-1">
 				<input
 					ref={(input) => {
+						prettyNameRef = input;
 						input.value = prettyName();
-						titleInput = bindRecordingTitleInput(
-							input,
-							setPrettyName,
-							ostype() === "macos",
-						);
 					}}
 					aria-label={localize("工程名称")}
 					class={cx(
@@ -387,6 +380,7 @@ function NameEditor(props: {
 							"focus:border-red-500",
 					)}
 					readOnly={props.readOnly}
+					onInput={(e) => setPrettyName(e.currentTarget.value)}
 					onBlur={() => {
 						void flushPrettyName().catch(() => {});
 					}}
@@ -396,7 +390,7 @@ function NameEditor(props: {
 							e.keyCode !== 229 &&
 							(e.key === "Enter" || e.key === "Escape")
 						) {
-							e.currentTarget.blur();
+							prettyNameRef?.blur();
 						}
 					}}
 				/>

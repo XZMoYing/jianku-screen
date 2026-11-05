@@ -29,7 +29,6 @@ export default defineConfig({
 			"src/routes/editor/Timeline/gesture-diagnostics.test.ts",
 			"src/routes/editor/Timeline/mouse-drag-diagnostics.test.ts",
 			"src/routes/editor/text-history.test.tsx",
-			"src/routes/editor/recording-title-input.test.ts",
 			"src/routes/editor/project-history-pause.test.ts",
 			"src/routes/editor/editor-fallback-diagnostics.test.ts",
 			"src/routes/editor/bookmark-refresh.test.tsx",
