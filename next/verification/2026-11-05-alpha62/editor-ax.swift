@@ -127,6 +127,20 @@ if let app=apps.first {
     for type in [CGEventType.leftMouseDown,.leftMouseUp] {if let event=CGEvent(mouseEventSource:nil,mouseType:type,mouseCursorPosition:point,mouseButton:.left){event.setIntegerValueField(.mouseEventClickState,value:1);event.post(tap:.cghidEventTap)};Thread.sleep(forTimeInterval:0.08)}
    }
    result["clickedWindow"]=windowID
+  case "capture-window":
+   guard args.count==3,args[2].hasPrefix("/private/tmp/jianku-alpha62-20261105/"),!FileManager.default.fileExists(atPath:args[2]),let windowID=ownedEditors[0][kCGWindowNumber as String] as? UInt32,let captured=CGWindowListCreateImage(.null,.optionIncludingWindow,windowID,[.boundsIgnoreFraming,.nominalResolution]),let png=NSBitmapImageRep(cgImage:captured).representation(using:.png,properties:[:]) else {exit(2)}
+   try png.write(to:URL(fileURLWithPath:args[2]))
+   result["captureScope"]="one verified owned editor window"
+   result["capturePath"]=args[2]
+  case "scroll-window":
+   guard args.count==6,let windowID=Int(args[2]),windowID==ownedEditors[0][kCGWindowNumber as String] as? Int,let x=Double(args[3]),let y=Double(args[4]),let dy=Int32(args[5]),abs(dy)<=1500,let rect=ownedEditors[0][kCGWindowBounds as String] as? [String:Double],let ox=rect["X"],let oy=rect["Y"],let width=rect["Width"],let height=rect["Height"],x>=0,y>=0,x<width,y<height else {exit(2)}
+   app.activate(options:[])
+   RunLoop.current.run(until:Date(timeIntervalSinceNow:0.15))
+   guard NSWorkspace.shared.frontmostApplication?.processIdentifier==app.processIdentifier else {exit(2)}
+   let point=CGPoint(x:ox+x,y:oy+y)
+   CGEvent(mouseEventSource:nil,mouseType:.mouseMoved,mouseCursorPosition:point,mouseButton:.left)?.post(tap:.cghidEventTap)
+   if let event=CGEvent(scrollWheelEvent2Source:nil,units:.pixel,wheelCount:1,wheel1:dy,wheel2:0,wheel3:0){event.location=point;event.post(tap:.cghidEventTap)}
+   result["scrolledOwnedWindow"]=windowID
   case "focus-element":
    guard args.count==4,let index=Int(args[2]),nodes.indices.contains(index),items[index]["AXRole"] as? String == args[3] else {fatalError("Invalid owned focus target")}
    result["focusStatus"]=AXUIElementSetAttributeValue(nodes[index],kAXFocusedAttribute as CFString,kCFBooleanTrue).rawValue

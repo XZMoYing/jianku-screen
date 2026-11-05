@@ -1,0 +1,51 @@
+{
+	"sourceCommit": "a704084",
+	"installedVersion": "0.2.0-alpha.62",
+	"actualUI": {
+		"fixture": "archived own 12-second dashboard; not user recording",
+		"changedJoinSeconds": 1.1,
+		"afterCutAndReturnSeconds": 1.1,
+		"savedAndReopenedJoinSeconds": 0.75,
+		"reopenedJoinMode": "平滑衔接",
+		"independentBoundarySliders": "visually disabled for valid neighboring joins",
+		"controlsVerifiedBy": "fresh AX state plus physical clicks; AX value setter alone did not change the controlled slider"
+	},
+	"windowSizing": {
+		"initialFileOpenBounds": {
+			"Height": 800,
+			"Width": 1275,
+			"X": 202,
+			"Y": 102
+		},
+		"manualOrdinaryMaximizeBounds": {
+			"Height": 954,
+			"Width": 1680,
+			"X": 0,
+			"Y": 25
+		},
+		"reopenedBounds": {
+			"Height": 953,
+			"Width": 1680,
+			"X": 0,
+			"Y": 25
+		},
+		"defaultAcrossEntryPaths": "not passed: initial file open was 1275x800; needs follow-up, later reopened maximized"
+	},
+	"nativePlayback": {
+		"captureLog": "full-playback-from-zero.log.gz",
+		"durationSeconds": 16,
+		"framesCaptured": 683,
+		"writerDropped": 0,
+		"maximumCaptureGapMs": 46.2516249390319,
+		"scope": "one verified owned editor window only",
+		"observation": "physical return-to-start showed 0:00.00; playback advanced through the two neighboring joins and reached the end; actual join frame strip reviewed",
+		"limit": "capture throughput is not a preview frame-rate benchmark or universal subjective comfort acceptance"
+	},
+	"releaseGates": {
+		"strictChromaPassed": 15,
+		"strictChromaFailed": 2,
+		"hardwareOutput": "still blocking",
+		"fullLocalization": "in progress",
+		"windowsLinux": "not validated here"
+	}
+}

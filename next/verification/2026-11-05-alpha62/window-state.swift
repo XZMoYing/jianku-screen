@@ -2,7 +2,7 @@ import AppKit
 import ApplicationServices
 import CoreGraphics
 let path="/Applications/Jianku Screen Next.app"
-guard Bundle(path:path)?.infoDictionary?["CFBundleShortVersionString"] as? String=="0.2.0-alpha.61",AXIsProcessTrusted() else {exit(2)}
+guard Bundle(path:path)?.infoDictionary?["CFBundleShortVersionString"] as? String=="0.2.0-alpha.62",AXIsProcessTrusted() else {exit(2)}
 let apps=NSRunningApplication.runningApplications(withBundleIdentifier:"com.jianku.screen.next").filter{$0.bundleURL?.path==path}
 guard apps.count==1,let app=apps.first else {exit(2)}
 let root=AXUIElementCreateApplication(app.processIdentifier)
