@@ -1,0 +1,167 @@
+{
+	"schemaVersion": 1,
+	"kind": "implementation-requirements",
+	"updatedAt": "2026-11-05",
+	"runtimeFeatureImplemented": false,
+	"designOwnership": "Own visual language, light/dark wallpaper-derived palette and motion; reference editing workflows and commands, not copied commercial UI/code",
+	"phaseOrder": [
+		"current_workspace_and_camera_flow",
+		"editor_workflows",
+		"independent_cursor_track"
+	],
+	"editor_workflows": {
+		"status": "planned",
+		"scope": [
+			"feature_categories",
+			"asset_browser",
+			"contextual_properties",
+			"preview",
+			"timeline",
+			"all_context_menus",
+			"keyboard_presets"
+		],
+		"keyboard": {
+			"defaultPreset": "Final Cut Pro",
+			"presetsSelectable": true,
+			"customBindings": true,
+			"labelsReflectActualBindings": true,
+			"textInputAndModalScopesProtected": true,
+			"recordingAndPresentationHotkeysCheckedForConflicts": true
+		},
+		"timeline": {
+			"mainTrackMagnetism": {
+				"userSelectable": true,
+				"semantics": "Closing and opening gaps, insertion, reorder, deletion and linked items follow one consistent edit model"
+			},
+			"snapping": {
+				"userSelectable": true,
+				"distinctFromMagnetism": true,
+				"targets": ["playhead", "clip_edges", "markers", "other_tracks"],
+				"feedback": "Single stable guide and predictable threshold, with temporary bypass"
+			},
+			"linkedTracks": "Source-associated overlays follow relevant edits unless deliberately detached; one undo group per user gesture",
+			"selection": "Stable object identity across reorder, split and undo; visible range, zoom and scroll preserved"
+		},
+		"contextMenus": {
+			"coverage": [
+				"media_bin",
+				"preview_canvas",
+				"video_clip",
+				"clip_boundary_transition",
+				"track_header",
+				"timeline_blank",
+				"text",
+				"image",
+				"audio",
+				"mask",
+				"style",
+				"zoom",
+				"camera_3d",
+				"caption",
+				"keyboard_events",
+				"future_cursor_clip"
+			],
+			"sharedCommandIds": true,
+			"rules": [
+				"show applicable operations",
+				"same command and keyboard binding across toolbar/menu",
+				"explain unavailable operations",
+				"opening menu preserves intended selection",
+				"right click must not move or split content"
+			]
+		}
+	},
+	"independent_cursor_track": {
+		"status": "planned_after_editor_workflows",
+		"dependsOn": ["editor_workflows"],
+		"editing": [
+			"independent_visible_timeline_track",
+			"split",
+			"trim",
+			"move",
+			"duplicate",
+			"delete",
+			"per_segment_visibility",
+			"per_segment_parameter_overrides",
+			"undo_redo",
+			"save_reopen",
+			"preview_export_parity"
+		],
+		"sourceModel": {
+			"nonDestructive": true,
+			"stableSegmentIdentity": true,
+			"bindToVideoInstanceNotOnlySourceFile": true,
+			"accountFor": [
+				"source_start_offsets",
+				"video_cuts",
+				"duplicated_sources",
+				"speed",
+				"holds",
+				"transitions",
+				"crop_and_display_transform"
+			],
+			"requiresSeparatelyCapturedCursorData": true
+		},
+		"misalignment": {
+			"visibleBadge": true,
+			"textAndIconNotColorAlone": true,
+			"displayTemporalOffset": true,
+			"separateMissingSourceAndSpatialMismatch": true,
+			"neverSilentlyConcealDesync": true
+		},
+		"contextMenu": {
+			"autoAlignToTimeline": true,
+			"alignToCorrespondingVideoInstance": true,
+			"preserveAppearanceOverrides": true,
+			"visibilityToggle": true,
+			"alignmentIsSingleUndoableEdit": true
+		},
+		"transitions": {
+			"allChangedRenderedParametersCovered": true,
+			"shape": {
+				"policy": "fast hotspot-aligned complementary crossfade; no drifting or slow morph through unrelated geometry",
+				"arrowIBeamHandAndCapturedShapes": true,
+				"timing": "shorter than page and numeric-property transitions; final duration tuned in actual use"
+			},
+			"visibility": {
+				"policy": "brief continuous reveal/hide with existing visual language; no abrupt pop"
+			},
+			"numeric": {
+				"examples": [
+					"cursor_size",
+					"rotation",
+					"smoothing",
+					"motion_blur",
+					"click_scale",
+					"shadow",
+					"opacity",
+					"color"
+				],
+				"policy": "continuous rendered output and velocity where relevant, not resetting the solver at clip boundaries"
+			},
+			"discrete": {
+				"examples": [
+					"cursor_family",
+					"raw_vs_smoothed",
+					"svg_vs_captured",
+					"click_effect_enabled",
+					"idle_hide_enabled"
+				],
+				"policy": "blend rendered states rather than interpolate incompatible enums"
+			},
+			"hotspot": "Pointer contact point stays anchored during size, style, shadow and image changes",
+			"seek": "Deterministic evaluation from timeline time, independent of play/seek history",
+			"desyncedSource": "Badge remains visible; visual blending does not pretend alignment was corrected"
+		}
+	},
+	"verificationPhilosophy": "Necessary functional checks plus real interaction and visual review; do not substitute extensive defensive tests for product quality",
+	"existingGatesRemain": [
+		"complete_localization",
+		"release_audit",
+		"strict_chroma_failures",
+		"hardware_output",
+		"windows",
+		"linux",
+		"deferred_physical_acceptance"
+	]
+}
