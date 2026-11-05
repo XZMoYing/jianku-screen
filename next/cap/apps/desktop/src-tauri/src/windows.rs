@@ -2361,6 +2361,8 @@ impl ShowCapWindow {
 
                 fit_content_window_bounds(&window, &_id, true).await;
 
+                window.maximize()?;
+
                 // Show immediately: the native background color is already
                 // themed, so the window can appear before the webview loads and
                 // the editor skeleton takes over. When window transparency is
