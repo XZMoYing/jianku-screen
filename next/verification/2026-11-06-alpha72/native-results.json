@@ -1,0 +1,81 @@
+{
+  "version": "0.2.0-alpha.72",
+  "sourceCommit": "c3535194dc38a52ccf265864e528079450d03444",
+  "releaseSession": 13634,
+  "installSession": 80982,
+  "title": {
+    "opened": {
+      "value": "拖动与缩放验收（72工程名撤销）",
+      "focused": false
+    },
+    "title-pending": {
+      "value": "拖动与缩放验收（72工b程名撤销）",
+      "focused": true
+    },
+    "title-committed": {
+      "value": "拖动与缩放验收（72工b程名撤销）",
+      "focused": true
+    },
+    "title-undone": {
+      "value": "拖动与缩放验收（72工程名撤销）",
+      "focused": true
+    },
+    "title-redone": {
+      "value": "拖动与缩放验收（72工b程名撤销）",
+      "focused": true
+    },
+    "title-saved": {
+      "value": "拖动与缩放验收（72工b程名撤销）",
+      "focused": false
+    },
+    "reopened-editor": {
+      "value": "拖动与缩放验收（72工程名撤销）",
+      "focused": false
+    },
+    "escape-test-pending": {
+      "value": "拖动与缩放验收（72工b程名撤销）",
+      "focused": true
+    },
+    "escape-test-cancelled": {
+      "value": "拖动与缩放验收（72工程名撤销）",
+      "focused": true
+    },
+    "escape-test-finished": {
+      "value": "拖动与缩放验收（72工程名撤销）",
+      "focused": false
+    }
+  },
+  "diskAfterFirstReturn": "拖动与缩放验收（72工程名撤销）",
+  "diskAfterSecondReturn": "拖动与缩放验收（72工b程名撤销）",
+  "diskAfterRestoring": "拖动与缩放验收（72工程名撤销）",
+  "transitionsBeforeProjectUndo": [
+    {
+      "segmentIndex": 1,
+      "type": "fade-through-black",
+      "duration": 0.5
+    }
+  ],
+  "transitionsAfterProjectUndo": [
+    {
+      "segmentIndex": 1,
+      "type": "cross-fade",
+      "duration": 0.5
+    }
+  ],
+  "savedFixtureReopened": {
+    "appIsForeground": true,
+    "bounds": {
+      "Height": 954,
+      "Width": 1680,
+      "X": 0,
+      "Y": 25
+    },
+    "editorSelection": "unique own CG editor title and matching AX window geometry",
+    "focusedWindowTitle": "简库镜传 · 视频编辑",
+    "ownedEditorWindowCount": 1,
+    "path": "/Applications/Jianku Screen Next.app",
+    "pid": 37021,
+    "trusted": true,
+    "windowID": 22396
+  }
+}
