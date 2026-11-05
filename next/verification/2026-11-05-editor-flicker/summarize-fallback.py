@@ -1,8 +1,11 @@
 import json
+import sys
 from pathlib import Path
 
 area = Path('/private/tmp/jianku-editor-flicker-20261105')
-metadata = json.loads((area / 'alpha58-capture-result.json').read_text())
+version = sys.argv[1]
+assert version in ['58', '59']
+metadata = json.loads((area / f'alpha{version}-capture-result.json').read_text())
 started = metadata['capturer']['firstSampleAtUnix']
 ended = started + metadata['capturer']['durationRequested']
 folder = Path.home() / 'Library/Application Support/com.jianku.screen.next'
@@ -18,5 +21,5 @@ for path in folder.glob('editor-fallback-diagnostics-editor-*.json'):
             rows.append({'windowLog': path.name, 'secondsFromFirstVideoSample': row['at'] / 1000 - started, **row})
 rows.sort(key=lambda row: row['at'])
 report = {'installedCandidate': metadata['version'], 'scope': 'actual opted-in fallback connection events during the owned capture; missing rows do not prove absence of flicker', 'events': rows}
-(area / 'alpha58-fallback-summary.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
+(area / f'alpha{version}-fallback-summary.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
 print(json.dumps(report, ensure_ascii=False, indent=2))

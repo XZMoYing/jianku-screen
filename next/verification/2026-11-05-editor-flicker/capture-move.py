@@ -9,8 +9,8 @@ from pathlib import Path
 area = Path('/private/tmp/jianku-editor-flicker-20261105')
 old = Path('/private/tmp/jianku-alpha57-20261104')
 version = sys.argv[1]
-assert version in ['57', '58']
-helpers = old if version == '57' else Path('/private/tmp/jianku-alpha58-20261105')
+assert version in ['57', '58', '59']
+helpers = old if version == '57' else Path(f'/private/tmp/jianku-alpha{version}-20261105')
 app = Path('/Applications/Jianku Screen Next.app')
 assert plistlib.loads((app / 'Contents/Info.plist').read_bytes())['CFBundleShortVersionString'] == '0.2.0-alpha.' + version
 project = old / '3D拖动.jks'

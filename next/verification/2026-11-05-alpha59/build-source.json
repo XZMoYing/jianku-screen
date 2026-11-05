@@ -1,0 +1,6 @@
+{
+	"commit": "08c5c3e010df0ba67d2c217fa3cbb2dea7e875d7",
+	"version": "0.2.0-alpha.59",
+	"build": "2026.59.0",
+	"scope": "Bookmark mapping dependencies and non-suspending local refresh; native continuous-frame validation pending"
+}

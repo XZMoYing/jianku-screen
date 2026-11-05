@@ -5,7 +5,7 @@ from pathlib import Path
 
 area = Path('/private/tmp/jianku-editor-flicker-20261105')
 version = sys.argv[1]
-assert version in ['57', '58']
+assert version in ['57', '58', '59']
 source = area / f'alpha{version}-move.mov'
 metadata = json.loads((area / f'alpha{version}-capture-result.json').read_text())
 rect = metadata['previewRectInWindowPoints']
