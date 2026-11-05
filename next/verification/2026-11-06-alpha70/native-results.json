@@ -1,0 +1,41 @@
+{
+  "version": "0.2.0-alpha.70",
+  "sourceCommit": "02a5a04c9664ede1f329b40443e4e1f68f8aced7",
+  "releaseSession": 31236,
+  "installSession": 89105,
+  "emptySeamMenu": [
+    "交叉淡化",
+    "黑场淡化"
+  ],
+  "trimHandleMenu": [
+    "交叉淡化",
+    "黑场淡化"
+  ],
+  "savedTransitions": [
+    {
+      "segmentIndex": 1,
+      "type": "cross-fade",
+      "duration": 0.5
+    }
+  ],
+  "clipCount": 7,
+  "textCount": 3,
+  "zoomCount": 1,
+  "savedFixtureReopened": {
+    "appIsForeground": true,
+    "bounds": {
+      "Height": 954,
+      "Width": 1680,
+      "X": 0,
+      "Y": 25
+    },
+    "editorSelection": "unique own CG editor title and matching AX window geometry",
+    "focusedWindowTitle": "简库镜传 · 视频编辑",
+    "ownedEditorWindowCount": 1,
+    "path": "/Applications/Jianku Screen Next.app",
+    "pid": 17371,
+    "trusted": true,
+    "windowID": 22327
+  },
+  "reopenedTransitionLabel": "交叉淡化 · 0.50s"
+}
