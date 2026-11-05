@@ -1,0 +1,14 @@
+{
+	"version": "0.2.0-alpha.60",
+	"observedWindowSize": {
+		"width": 1275,
+		"height": 800
+	},
+	"visibleWorkArea": {
+		"width": 1680,
+		"height": 954
+	},
+	"fullscreen": false,
+	"maximizationAcceptance": false,
+	"note": "Builder maximized(true) did not survive hidden-window initial content fitting; explicit maximize after fitting remains required."
+}

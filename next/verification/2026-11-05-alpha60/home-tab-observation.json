@@ -1,0 +1,5 @@
+{
+	"nativeActions": ["光标", "画面", "光标", "画面"],
+	"lastPage": "画面",
+	"scope": "normal UI interaction and final visible state only, not quantitative frame pacing"
+}
