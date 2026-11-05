@@ -2339,7 +2339,6 @@ impl ShowCapWindow {
                 let builder = self
                     .window_builder_with_id(app, "/editor", &_id, _id.label())
                     .maximizable(true)
-                    .maximized(true)
                     .focused(true);
                 #[cfg(debug_assertions)]
                 let builder = if crate::stop_editor_benchmark::enabled() {
@@ -2359,8 +2358,9 @@ impl ShowCapWindow {
                 }
                 lock_window_text_scale(&window);
 
+                // Tao queues macOS zoom as a toggle; also maximizing in the builder can
+                // enqueue a second toggle before the first one updates the native state.
                 fit_content_window_bounds(&window, &_id, true).await;
-
                 window.maximize()?;
 
                 // Show immediately: the native background color is already
