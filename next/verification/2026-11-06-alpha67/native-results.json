@@ -1,0 +1,588 @@
+{
+  "version": "0.2.0-alpha.67",
+  "sourceCommit": "27f9c8d0ed18e9cc28d6706abb7f8d297257ee39",
+  "releaseSession": 5379,
+  "prepareSession": 76657,
+  "installSession": 76674,
+  "passed": [
+    "Default Final Cut Pro selection in real settings",
+    "Cmd+B split into a new stable clip identity",
+    "Cmd+Z and Shift+Cmd+Z persisted undo and redo",
+    "B and A changed the blade state",
+    "Cmd+= zoomed in and Shift+Z fit the timeline",
+    "Right-click menu displayed the current cut shortcut",
+    "E appended the selected source as a separate 12-second instance",
+    "Legacy persisted after settings reopen; C worked in the existing editor",
+    "Duplicate B conflicted with the blade command; Shift+B applied to the existing editor",
+    "Per-command reset restored the default preset binding",
+    "Seven-clip project saved and reopened",
+    "Title input did not execute project undo"
+  ],
+  "pending": [
+    "Native title text undo did not revert the typed character, although project timeline was unaffected",
+    "Global collision behavior was code checked, with editor-to-editor collision separately exercised in App",
+    "Full context-menu coverage, snapping, magnetism and cursor track remain open"
+  ],
+  "observations": {
+    "initial-editor": {
+      "window": {
+        "appIsForeground": true,
+        "bounds": {
+          "Height": 954,
+          "Width": 1680,
+          "X": 0,
+          "Y": 25
+        },
+        "editorSelection": "unique own CG editor title and matching AX window geometry",
+        "focusedWindowTitle": "简库镜传 · 视频编辑",
+        "ownedEditorWindowCount": 1,
+        "path": "/Applications/Jianku Screen Next.app",
+        "pid": 83329,
+        "trusted": true,
+        "windowID": 22263
+      },
+      "selectedControls": [
+        {
+          "AXRole": "AXTextField",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "拖动与缩放验收（67快捷键）",
+          "AXFocused": "0"
+        },
+        {
+          "AXRole": "AXCheckBox",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "0",
+          "AXFocused": "0"
+        },
+        {
+          "AXRole": "AXSlider",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "0",
+          "AXFocused": "0"
+        }
+      ]
+    },
+    "reopened-editor": {
+      "window": {
+        "appIsForeground": true,
+        "bounds": {
+          "Height": 954,
+          "Width": 1680,
+          "X": 0,
+          "Y": 25
+        },
+        "editorSelection": "unique own CG editor title and matching AX window geometry",
+        "focusedWindowTitle": "简库镜传 · 视频编辑",
+        "ownedEditorWindowCount": 1,
+        "path": "/Applications/Jianku Screen Next.app",
+        "pid": 83329,
+        "trusted": true,
+        "windowID": 22278
+      },
+      "selectedControls": [
+        {
+          "AXRole": "AXTextField",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "拖动与缩放验收（67快捷键）",
+          "AXFocused": "0"
+        },
+        {
+          "AXRole": "AXCheckBox",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "0",
+          "AXFocused": "0"
+        }
+      ]
+    },
+    "blade-state": {
+      "window": {
+        "appIsForeground": true,
+        "bounds": {
+          "Height": 954,
+          "Width": 1680,
+          "X": 0,
+          "Y": 25
+        },
+        "editorSelection": "unique own CG editor title and matching AX window geometry",
+        "focusedWindowTitle": "简库镜传 · 视频编辑",
+        "ownedEditorWindowCount": 1,
+        "path": "/Applications/Jianku Screen Next.app",
+        "pid": 83329,
+        "trusted": true,
+        "windowID": 22263
+      },
+      "selectedControls": [
+        {
+          "AXRole": "AXTextField",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "拖动与缩放验收（67快捷键）",
+          "AXFocused": "0"
+        },
+        {
+          "AXRole": "AXCheckBox",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "1",
+          "AXFocused": "0"
+        },
+        {
+          "AXRole": "AXSlider",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "0",
+          "AXFocused": "0"
+        }
+      ]
+    },
+    "zoom-state": {
+      "window": {
+        "appIsForeground": true,
+        "bounds": {
+          "Height": 954,
+          "Width": 1680,
+          "X": 0,
+          "Y": 25
+        },
+        "editorSelection": "unique own CG editor title and matching AX window geometry",
+        "focusedWindowTitle": "简库镜传 · 视频编辑",
+        "ownedEditorWindowCount": 1,
+        "path": "/Applications/Jianku Screen Next.app",
+        "pid": 83329,
+        "trusted": true,
+        "windowID": 22263
+      },
+      "selectedControls": [
+        {
+          "AXRole": "AXTextField",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "拖动与缩放验收（67快捷键）",
+          "AXFocused": "0"
+        },
+        {
+          "AXRole": "AXCheckBox",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "0",
+          "AXFocused": "0"
+        },
+        {
+          "AXRole": "AXSlider",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "0.09090909",
+          "AXFocused": "0"
+        }
+      ]
+    },
+    "fit-state": {
+      "window": {
+        "appIsForeground": true,
+        "bounds": {
+          "Height": 954,
+          "Width": 1680,
+          "X": 0,
+          "Y": 25
+        },
+        "editorSelection": "unique own CG editor title and matching AX window geometry",
+        "focusedWindowTitle": "简库镜传 · 视频编辑",
+        "ownedEditorWindowCount": 1,
+        "path": "/Applications/Jianku Screen Next.app",
+        "pid": 83329,
+        "trusted": true,
+        "windowID": 22263
+      },
+      "selectedControls": [
+        {
+          "AXRole": "AXTextField",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "拖动与缩放验收（67快捷键）",
+          "AXFocused": "0"
+        },
+        {
+          "AXRole": "AXCheckBox",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "0",
+          "AXFocused": "0"
+        },
+        {
+          "AXRole": "AXSlider",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "0",
+          "AXFocused": "0"
+        }
+      ]
+    },
+    "clip-menu-enabled": {
+      "window": {
+        "appIsForeground": true,
+        "bounds": {
+          "Height": 954,
+          "Width": 1680,
+          "X": 0,
+          "Y": 25
+        },
+        "editorSelection": "unique own CG editor title and matching AX window geometry",
+        "focusedWindowTitle": "简库镜传 · 视频编辑",
+        "ownedEditorWindowCount": 1,
+        "path": "/Applications/Jianku Screen Next.app",
+        "pid": 83329,
+        "trusted": true,
+        "windowID": 22263
+      },
+      "selectedControls": [
+        {
+          "AXRole": "AXTextField",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "拖动与缩放验收（67快捷键）",
+          "AXFocused": "0"
+        },
+        {
+          "AXRole": "AXCheckBox",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "0",
+          "AXFocused": "0"
+        },
+        {
+          "AXRole": "AXSlider",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "0",
+          "AXFocused": "0"
+        },
+        {
+          "AXRole": "AXButton",
+          "AXDescription": "",
+          "AXTitle": "在播放头处分割 ⌘B",
+          "AXValue": "",
+          "AXFocused": "0"
+        }
+      ]
+    },
+    "source-selected": {
+      "window": {
+        "appIsForeground": true,
+        "bounds": {
+          "Height": 954,
+          "Width": 1680,
+          "X": 0,
+          "Y": 25
+        },
+        "editorSelection": "unique own CG editor title and matching AX window geometry",
+        "focusedWindowTitle": "简库镜传 · 视频编辑",
+        "ownedEditorWindowCount": 1,
+        "path": "/Applications/Jianku Screen Next.app",
+        "pid": 83329,
+        "trusted": true,
+        "windowID": 22263
+      },
+      "selectedControls": [
+        {
+          "AXRole": "AXTextField",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "拖动与缩放验收（67快捷键）",
+          "AXFocused": "0"
+        },
+        {
+          "AXRole": "AXCheckBox",
+          "AXDescription": "",
+          "AXTitle": "1 素材 1 0:12",
+          "AXValue": "1",
+          "AXFocused": "1"
+        },
+        {
+          "AXRole": "AXCheckBox",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "0",
+          "AXFocused": "0"
+        },
+        {
+          "AXRole": "AXSlider",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "0",
+          "AXFocused": "0"
+        }
+      ]
+    },
+    "settings-initial": {
+      "window": {
+        "appIsForeground": true,
+        "bounds": {
+          "Height": 775,
+          "Width": 782,
+          "X": 449,
+          "Y": 115
+        },
+        "editorSelection": "unique own CG editor title and matching AX window geometry",
+        "focusedWindowTitle": "简库镜传 · 设置",
+        "ownedEditorWindowCount": 1,
+        "path": "/Applications/Jianku Screen Next.app",
+        "pid": 83329,
+        "trusted": true,
+        "windowID": 22269
+      },
+      "selectedControls": [
+        {
+          "AXRole": "AXCheckBox",
+          "AXDescription": "",
+          "AXTitle": "Final Cut Pro",
+          "AXValue": "1",
+          "AXFocused": "0"
+        },
+        {
+          "AXRole": "AXCheckBox",
+          "AXDescription": "",
+          "AXTitle": "原有键位",
+          "AXValue": "0",
+          "AXFocused": "0"
+        }
+      ]
+    },
+    "settings-legacy-reopened": {
+      "window": {
+        "appIsForeground": true,
+        "bounds": {
+          "Height": 775,
+          "Width": 782,
+          "X": 449,
+          "Y": 115
+        },
+        "editorSelection": "unique own CG editor title and matching AX window geometry",
+        "focusedWindowTitle": "简库镜传 · 设置",
+        "ownedEditorWindowCount": 1,
+        "path": "/Applications/Jianku Screen Next.app",
+        "pid": 83329,
+        "trusted": true,
+        "windowID": 22271
+      },
+      "selectedControls": [
+        {
+          "AXRole": "AXCheckBox",
+          "AXDescription": "",
+          "AXTitle": "Final Cut Pro",
+          "AXValue": "0",
+          "AXFocused": "0"
+        },
+        {
+          "AXRole": "AXCheckBox",
+          "AXDescription": "",
+          "AXTitle": "原有键位",
+          "AXValue": "1",
+          "AXFocused": "0"
+        }
+      ]
+    },
+    "settings-conflict": {
+      "window": {
+        "appIsForeground": true,
+        "bounds": {
+          "Height": 775,
+          "Width": 782,
+          "X": 449,
+          "Y": 115
+        },
+        "editorSelection": "unique own CG editor title and matching AX window geometry",
+        "focusedWindowTitle": "简库镜传 · 设置",
+        "ownedEditorWindowCount": 1,
+        "path": "/Applications/Jianku Screen Next.app",
+        "pid": 83329,
+        "trusted": true,
+        "windowID": 22274
+      },
+      "selectedControls": [
+        {
+          "AXRole": "AXCheckBox",
+          "AXDescription": "",
+          "AXTitle": "Final Cut Pro",
+          "AXValue": "1",
+          "AXFocused": "0"
+        },
+        {
+          "AXRole": "AXCheckBox",
+          "AXDescription": "",
+          "AXTitle": "原有键位",
+          "AXValue": "0",
+          "AXFocused": "0"
+        },
+        {
+          "AXRole": "AXStaticText",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "已用于「分割工具」",
+          "AXFocused": "0"
+        }
+      ]
+    },
+    "settings-custom-reopened": {
+      "window": {
+        "appIsForeground": true,
+        "bounds": {
+          "Height": 775,
+          "Width": 782,
+          "X": 449,
+          "Y": 115
+        },
+        "editorSelection": "unique own CG editor title and matching AX window geometry",
+        "focusedWindowTitle": "简库镜传 · 设置",
+        "ownedEditorWindowCount": 1,
+        "path": "/Applications/Jianku Screen Next.app",
+        "pid": 83329,
+        "trusted": true,
+        "windowID": 22276
+      },
+      "selectedControls": [
+        {
+          "AXRole": "AXCheckBox",
+          "AXDescription": "",
+          "AXTitle": "Final Cut Pro",
+          "AXValue": "1",
+          "AXFocused": "0"
+        },
+        {
+          "AXRole": "AXCheckBox",
+          "AXDescription": "",
+          "AXTitle": "原有键位",
+          "AXValue": "0",
+          "AXFocused": "0"
+        },
+        {
+          "AXRole": "AXButton",
+          "AXDescription": "",
+          "AXTitle": "恢复预设键位",
+          "AXValue": "",
+          "AXFocused": "0"
+        }
+      ]
+    },
+    "settings-restored": {
+      "window": {
+        "appIsForeground": true,
+        "bounds": {
+          "Height": 775,
+          "Width": 782,
+          "X": 449,
+          "Y": 115
+        },
+        "editorSelection": "unique own CG editor title and matching AX window geometry",
+        "focusedWindowTitle": "简库镜传 · 设置",
+        "ownedEditorWindowCount": 1,
+        "path": "/Applications/Jianku Screen Next.app",
+        "pid": 83329,
+        "trusted": true,
+        "windowID": 22276
+      },
+      "selectedControls": [
+        {
+          "AXRole": "AXCheckBox",
+          "AXDescription": "",
+          "AXTitle": "Final Cut Pro",
+          "AXValue": "1",
+          "AXFocused": "0"
+        },
+        {
+          "AXRole": "AXCheckBox",
+          "AXDescription": "",
+          "AXTitle": "原有键位",
+          "AXValue": "0",
+          "AXFocused": "0"
+        }
+      ]
+    },
+    "input-hid-typed": {
+      "window": {
+        "appIsForeground": true,
+        "bounds": {
+          "Height": 954,
+          "Width": 1680,
+          "X": 0,
+          "Y": 25
+        },
+        "editorSelection": "unique own CG editor title and matching AX window geometry",
+        "focusedWindowTitle": "简库镜传 · 视频编辑",
+        "ownedEditorWindowCount": 1,
+        "path": "/Applications/Jianku Screen Next.app",
+        "pid": 83329,
+        "trusted": true,
+        "windowID": 22263
+      },
+      "selectedControls": [
+        {
+          "AXRole": "AXTextField",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "拖动与缩放验收（67快捷bb键）",
+          "AXFocused": "1"
+        },
+        {
+          "AXRole": "AXCheckBox",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "0",
+          "AXFocused": "0"
+        },
+        {
+          "AXRole": "AXSlider",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "0",
+          "AXFocused": "0"
+        }
+      ]
+    },
+    "input-hid-undone": {
+      "window": {
+        "appIsForeground": true,
+        "bounds": {
+          "Height": 954,
+          "Width": 1680,
+          "X": 0,
+          "Y": 25
+        },
+        "editorSelection": "unique own CG editor title and matching AX window geometry",
+        "focusedWindowTitle": "简库镜传 · 视频编辑",
+        "ownedEditorWindowCount": 1,
+        "path": "/Applications/Jianku Screen Next.app",
+        "pid": 83329,
+        "trusted": true,
+        "windowID": 22263
+      },
+      "selectedControls": [
+        {
+          "AXRole": "AXTextField",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "拖动与缩放验收（67快捷bb键）",
+          "AXFocused": "1"
+        },
+        {
+          "AXRole": "AXCheckBox",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "0",
+          "AXFocused": "0"
+        },
+        {
+          "AXRole": "AXSlider",
+          "AXDescription": "",
+          "AXTitle": "",
+          "AXValue": "0",
+          "AXFocused": "0"
+        }
+      ]
+    }
+  }
+}
