@@ -1,0 +1,17 @@
+{
+	"installedVersion": "0.2.0-alpha.65",
+	"buildCommit": "284afd1",
+	"nativeCases": {
+		"dockedThreePanes": true,
+		"sourceAndClipCounts": [1, 4, 5],
+		"appendPreservedOriginalFour": true,
+		"independentAppendedId": "clip-1e662434-77ba-4c9c-ac3b-7613ef1db927",
+		"speedAndCursorControlsPersist": true,
+		"sharedTimelineMenuShowsSameValues": true,
+		"toolbarUndoRedoPreservesClipSelection": true,
+		"savedAndReopenedFiveIdentitiesAndAttributes": true
+	},
+	"visualFinding": "Global Picture tab remains highlighted while clip properties are displayed. Correction staged for alpha.66.",
+	"capture": "Owned editor only, 8 seconds, 324 frames. Sampled storyboard inspected.",
+	"limits": "Narrow drawer branch source-level only because native min width 1275 on this display. No fps or general effect acceptance."
+}

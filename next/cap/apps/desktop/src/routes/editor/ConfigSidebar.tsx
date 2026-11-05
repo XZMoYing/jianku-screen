@@ -372,7 +372,13 @@ function ConfigSidebarContent() {
 			}
 			class="jk-inspector flex overflow-hidden z-10 flex-col flex-1 min-h-0 min-w-0 rounded-xl shrink-0 bg-ed-card shadow-ed-card"
 		>
-			<KTabs.List class="jk-inspector-tabs flex sticky top-0 z-60 flex-row justify-around items-center px-2.5 h-[46px] border-b border-ed-line shrink-0 bg-ed-card">
+			<KTabs.List
+				class="jk-inspector-tabs sticky top-0 z-60 flex-row justify-around items-center px-2.5 h-[46px] border-b border-ed-line shrink-0 bg-ed-card"
+				classList={{
+					flex: sidebarSelection()?.type !== "clip",
+					hidden: sidebarSelection()?.type === "clip",
+				}}
+			>
 				<MotionGroup
 					class="jk-inspector-tab-motion"
 					label={localize("编辑设置")}
