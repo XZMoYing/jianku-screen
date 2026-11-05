@@ -1,0 +1,191 @@
+{
+  "version": "0.2.0-alpha.69",
+  "sourceCommit": "9c399f9b888ddfe94fb4068a60ae064b210861c8",
+  "releaseSession": 56931,
+  "installSession": 97392,
+  "overlayMultiSelectionMenu": [
+    {
+      "AXRole": "AXMenu",
+      "AXTitle": "",
+      "AXDescription": "文本",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "编辑此片段属性",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "定位到片段开头",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "选中此轨道的全部片段",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "删除 2 个片段 ⌫",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    }
+  ],
+  "emptyTransitionKeyboardMenu": [
+    {
+      "AXRole": "AXMenu",
+      "AXTitle": "",
+      "AXDescription": "片段转场",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "交叉淡化",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "黑场淡化",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    }
+  ],
+  "existingTransitionMouseMenu": [
+    {
+      "AXRole": "AXMenu",
+      "AXTitle": "",
+      "AXDescription": "片段转场",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "编辑片段转场",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "交叉淡化",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "黑场淡化",
+      "AXDescription": "",
+      "AXEnabled": "0"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "移除转场",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    }
+  ],
+  "emptyTransitionMouseHitGap": {
+    "center": [
+      {
+        "AXRole": "AXMenu",
+        "AXTitle": "",
+        "AXDescription": "时间线菜单",
+        "AXEnabled": "1"
+      },
+      {
+        "AXRole": "AXMenuItem",
+        "AXTitle": "将播放头移到此处",
+        "AXDescription": "",
+        "AXEnabled": "1"
+      },
+      {
+        "AXRole": "AXMenuItem",
+        "AXTitle": "添加轨道",
+        "AXDescription": "",
+        "AXEnabled": "1"
+      },
+      {
+        "AXRole": "AXMenuItem",
+        "AXTitle": "显示整个时间线 ⇧Z",
+        "AXDescription": "",
+        "AXEnabled": "1"
+      },
+      {
+        "AXRole": "AXMenuItem",
+        "AXTitle": "取消选择 Esc",
+        "AXDescription": "",
+        "AXEnabled": "1"
+      }
+    ],
+    "trimHandle": []
+  },
+  "previewMenu": [
+    {
+      "AXRole": "AXMenu",
+      "AXTitle": "",
+      "AXDescription": "预览菜单",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "性能模式",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    }
+  ],
+  "previewCheckedMenu": [
+    {
+      "AXRole": "AXMenu",
+      "AXTitle": "",
+      "AXDescription": "预览菜单",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "✓ 性能模式",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    }
+  ],
+  "zoomMenu": [
+    {
+      "AXRole": "AXMenu",
+      "AXTitle": "",
+      "AXDescription": "缩放",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "编辑此片段属性",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "定位到片段开头",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "选中此轨道的全部片段",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "删除此片段 ⌫",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    }
+  ],
+  "isolatedTextSurvivedBatchDelete": true,
+  "undoRestoredBothTextSegments": true,
+  "textPropertiesShown": true,
+  "transitionDurationAfterTypeChange": 0.5,
+  "transitionDurationControlOpened": true,
+  "transitionRemovedAndRestored": true
+}
