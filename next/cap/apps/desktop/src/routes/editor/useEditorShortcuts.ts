@@ -1,53 +1,53 @@
 import { createEventListener } from "@solid-primitives/event-listener";
+import { createContext } from "solid-js";
+import type { EditorCommand } from "~/utils/editor-keymap";
+import type { createEditorKeymap } from "./createEditorKeymap";
 
-export type ShortcutBinding = {
-	combo: string; // e.g. "Mod+=", "Mod+-", "Space", "S", "C"
-	handler: (e: KeyboardEvent) => void | Promise<void>;
-	preventDefault?: boolean; // default: true
-	when?: () => boolean; // optional enablement gate
-};
-
-const isMod = (e: KeyboardEvent) => e.metaKey || e.ctrlKey; // treat Cmd/Ctrl as Mod
-
-function normalizeCombo(e: KeyboardEvent): string {
-	const parts: string[] = [];
-	if (isMod(e)) parts.push("Mod");
-
-	let key: string;
-	switch (e.code) {
-		case "Equal":
-			key = "=";
-			break;
-		case "Minus":
-			key = "-";
-			break;
-		default:
-			key = e.code.startsWith("Key") ? e.code.slice(3) : e.code;
+export function editorShortcutBlocked(event: KeyboardEvent) {
+	if (
+		event.defaultPrevented ||
+		event.repeat ||
+		event.isComposing ||
+		event.key === "Process" ||
+		event.keyCode === 229
+	)
+		return true;
+	const scopedControl =
+		'input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="textbox"], [role="combobox"], [role="slider"], [role="listbox"], [role="menu"], [role="dialog"]';
+	for (const target of [event.target, document.activeElement]) {
+		if (!(target instanceof Element)) continue;
+		if (target.closest(scopedControl)) return true;
+		if (
+			event.code === "Space" &&
+			target.closest(
+				'button, a[href], [role="button"], [role="tab"], [role="switch"], [role="checkbox"]',
+			)
+		)
+			return true;
 	}
-
-	parts.push(key);
-	return parts.join("+");
+	return !!document.querySelector(
+		'[role="menu"][data-expanded], [role="listbox"][data-expanded], [role="dialog"][data-expanded]',
+	);
 }
 
+export const EditorKeymapContext =
+	createContext<ReturnType<typeof createEditorKeymap>>();
+
 export function useEditorShortcuts(
-	getScopeActive: () => boolean,
-	bindings: ShortcutBinding[],
+	keymap: ReturnType<typeof createEditorKeymap>,
+	handlers: Partial<
+		Record<EditorCommand, () => boolean | void | Promise<void>>
+	>,
 ) {
-	const map = new Map<string, ShortcutBinding>(
-		bindings.map((b) => [b.combo, b]),
-	);
-
-	createEventListener(document, "keydown", async (e: KeyboardEvent) => {
-		// Basic guards
-		if (!getScopeActive()) return;
-		if (e.repeat) return;
-
-		const binding = map.get(normalizeCombo(e));
-		if (!binding) return;
-		if (binding.when && !binding.when()) return;
-
-		if (binding.preventDefault !== false) e.preventDefault();
-
-		await binding.handler(e);
+	const commands = Object.entries(handlers) as [
+		EditorCommand,
+		() => boolean | void | Promise<void>,
+	][];
+	createEventListener(window, "keydown", (event: KeyboardEvent) => {
+		for (const [command, execute] of commands) {
+			if (!keymap.matches(command, event)) continue;
+			if (execute() !== false) event.preventDefault();
+			break;
+		}
 	});
 }

@@ -6,6 +6,7 @@ import {
 	type ColorSchemeSettings,
 	colorSchemeDefaults,
 } from "~/utils/color-scheme";
+import { type EditorKeymap, editorKeymapDefaults } from "~/utils/editor-keymap";
 import {
 	type GeneralSettingsStore,
 	RECORDING_START_SAFETY_DEFAULTS,
@@ -129,6 +130,10 @@ export const authStore = declareStore<AuthStore>("auth");
 export const automationsStore = declareStore<AutomationsStore>("automations");
 export const userProfileStore = declareStore<UserProfileStore>("user_profile");
 export const hotkeysStore = declareStore<HotkeysStore>("hotkeys");
+export const editorKeymapStore = declareStore<EditorKeymap>(
+	"editor_keymap",
+	editorKeymapDefaults,
+);
 export const generalSettingsStore =
 	declareStore<GeneralSettingsStore>("general_settings");
 export const colorSchemeStore = declareStore<ColorSchemeSettings>(

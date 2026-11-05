@@ -3,12 +3,25 @@ import { createEventListener } from "@solid-primitives/event-listener";
 import { createUndoHistory } from "@solid-primitives/history";
 import { batch, createSignal } from "solid-js";
 import { type createStore, reconcile, unwrap } from "solid-js/store";
+import { editorShortcutBlocked } from "./useEditorShortcuts";
+
+export function defaultHistoryShortcut(event: KeyboardEvent) {
+	if (
+		editorShortcutBlocked(event) ||
+		!(event.ctrlKey || event.metaKey) ||
+		event.altKey
+	)
+		return undefined;
+	if (event.code === "KeyZ") return event.shiftKey ? "redo" : "undo";
+	if (event.code === "KeyY" && !event.shiftKey) return "redo";
+}
 
 export function createStoreHistory<T extends Static>(
 	state: T,
 	setState: ReturnType<typeof createStore<T>>[1],
 	onRestore?: () => void,
 	onRestored?: () => void,
+	historyShortcut = defaultHistoryShortcut,
 ) {
 	const [pauseCount, setPauseCount] = createSignal(0);
 	let derivedWriteDepth = 0;
@@ -31,26 +44,12 @@ export function createStoreHistory<T extends Static>(
 		};
 	});
 
-	createEventListener(window, "keydown", (e) => {
-		switch (e.code) {
-			case "KeyZ": {
-				if (!(e.ctrlKey || e.metaKey)) return;
-				if (e.shiftKey) history.redo();
-				else history.undo();
-				break;
-			}
-			case "KeyY": {
-				if (!(e.ctrlKey || e.metaKey)) return;
-				history.redo();
-				break;
-			}
-			default: {
-				return;
-			}
-		}
-
-		e.preventDefault();
-		e.stopPropagation();
+	createEventListener(window, "keydown", (event) => {
+		const command = historyShortcut(event);
+		if (!command) return;
+		if (command === "undo" && history.canUndo()) history.undo();
+		if (command === "redo" && history.canRedo()) history.redo();
+		event.preventDefault();
 	});
 
 	function applyDerived(write: () => void) {

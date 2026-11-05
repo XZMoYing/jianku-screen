@@ -94,6 +94,7 @@ import {
 	transitionsAfterClipSplit,
 } from "./clip-transitions";
 import { normalizeColorCorrection } from "./colorCorrection";
+import { createEditorKeymap } from "./createEditorKeymap";
 import { registerEditorResource } from "./editor-fallback-diagnostics";
 import { defaultImageSegment, type ImageSegment, pickImage } from "./images";
 import {
@@ -1957,7 +1958,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				position: number;
 			};
 
-			const zoomOutLimit = () => Math.min(totalDuration(), 60 * 10);
+			const zoomOutLimit = () => Math.max(totalDuration(), MAX_ZOOM_IN);
 
 			function updateZoom(
 				state: State,
@@ -2037,7 +2038,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 						| { type: "3d"; indices: number[] },
 					transform: {
 						// visible seconds
-						zoom: zoomOutLimit(),
+						zoom: Math.min(zoomOutLimit(), 60 * 10),
 						updateZoom(z: number, origin: number) {
 							const { zoom, position } = updateZoom(
 								{
@@ -2663,6 +2664,175 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				}),
 			);
 
+			const keymap = createEditorKeymap(() => {
+				const state = dialog();
+				return (
+					!isModalDialog(state) &&
+					!(state.open && "type" in state && state.type === "export")
+				);
+			});
+			const historyShortcut = (event: KeyboardEvent) => {
+				if (keymap.matches("undo", event)) return "undo";
+				if (keymap.matches("redo", event)) return "redo";
+			};
+
+			const projectHistory = createStoreHistory(
+				project,
+				setProject,
+				() => {
+					const selection = editorState.timeline.selection;
+					clipSelectionBeforeRestore =
+						selection?.type === "clip"
+							? selection.indices.flatMap((index) => {
+									const id = project.timeline?.segments[index]?.id;
+									return id ? [id] : [];
+								})
+							: [];
+					exitStyleScope();
+					setEditorState("timeline", "selection", null);
+				},
+				() => {
+					const indices = clipIndicesForIds(
+						project.timeline?.segments ?? [],
+						clipSelectionBeforeRestore,
+					);
+					clipSelectionBeforeRestore = [];
+					if (indices.length)
+						setEditorState("timeline", "selection", {
+							type: "clip",
+							indices,
+						});
+				},
+				historyShortcut,
+			);
+
+			const timelineCommands = {
+				splitAtPlayhead(index?: number) {
+					const time = editorState.previewTime ?? editorState.playbackTime;
+					if (index !== undefined) {
+						projectActions.splitClipSegment(time, index);
+						return;
+					}
+					const selection = editorState.timeline.selection;
+					if (selection?.type === "style" || selection?.type === "image") {
+						const type = selection.type;
+						const resumeHistory = projectHistory.pause();
+						for (const index of [...selection.indices].sort((a, b) => b - a))
+							projectActions.splitOverlaySegment(type, index, time);
+						resumeHistory();
+					} else if (selection?.type === "3d") {
+						// Only a selected shot the playhead is actually inside can be cut;
+						// anything else falls through to cutting the clip underneath.
+						const segments = project.timeline?.camera3dSegments ?? [];
+						const index = [...selection.indices]
+							.sort((a, b) => b - a)
+							.find((idx) => {
+								const segment = segments[idx];
+								return !!segment && time > segment.start && time < segment.end;
+							});
+						const segment = index === undefined ? undefined : segments[index];
+						if (index !== undefined && segment)
+							projectActions.splitCamera3DSegment(index, time - segment.start);
+						else projectActions.splitClipSegment(time);
+					} else projectActions.splitClipSegment(time);
+				},
+				deleteSelection(clipIndex?: number) {
+					if (clipIndex !== undefined) {
+						projectActions.deleteClipSegment(clipIndex);
+						return;
+					}
+					const selection = editorState.timeline.selection;
+					if (!selection) return false;
+					const resumeHistory = projectHistory.pause();
+					try {
+						if (selection.type === "style" || selection.type === "image") {
+							projectActions.deleteOverlaySegments(
+								selection.type,
+								selection.indices,
+							);
+						} else if (selection.type === "zoom") {
+							projectActions.deleteZoomSegments(selection.indices);
+						} else if (selection.type === "caption") {
+							projectActions.deleteCaptionSegments(selection.indices);
+						} else if (selection.type === "keyboard") {
+							projectActions.deleteKeyboardSegments(selection.indices);
+						} else if (selection.type === "mask") {
+							projectActions.deleteMaskSegments(selection.indices);
+						} else if (selection.type === "text") {
+							projectActions.deleteTextSegments(selection.indices);
+						} else if (selection.type === "audio") {
+							projectActions.deleteAudioSegments(selection.indices);
+						} else if (selection.type === "3d") {
+							projectActions.deleteCamera3DSegments(selection.indices);
+						} else if (selection.type === "transition") {
+							projectActions.deleteClipTransition(selection.index);
+						} else if (selection.type === "clip") {
+							if (project.timeline?.segments.length === 1) return false;
+							for (const index of [...selection.indices].sort((a, b) => b - a))
+								projectActions.deleteClipSegment(index);
+						} else if (selection.type === "scene") {
+							for (const index of [...selection.indices].sort((a, b) => b - a))
+								projectActions.deleteSceneSegment(index);
+						}
+					} finally {
+						resumeHistory();
+					}
+				},
+				selectTrack() {
+					const selection = editorState.timeline.selection;
+					if (!selection || selection.type === "transition") return false;
+
+					const timeline = project.timeline;
+					const segmentCount = {
+						style: timeline?.styleSegments?.length ?? 0,
+						image: timeline?.imageSegments?.length ?? 0,
+						clip: timeline?.segments.length ?? 0,
+						zoom: timeline?.zoomSegments?.length ?? 0,
+						scene: timeline?.sceneSegments?.length ?? 0,
+						mask: timeline?.maskSegments?.length ?? 0,
+						caption: timeline?.captionSegments?.length ?? 0,
+						keyboard: timeline?.keyboardSegments?.length ?? 0,
+						text: timeline?.textSegments?.length ?? 0,
+						audio: timeline?.audioSegments?.length ?? 0,
+						"3d": timeline?.camera3dSegments?.length ?? 0,
+					}[selection.type];
+					if (!segmentCount) return false;
+
+					setEditorState("timeline", "selection", {
+						type: selection.type,
+						indices: Array.from({ length: segmentCount }, (_, i) => i),
+					});
+				},
+				deselect() {
+					if (
+						!editorState.timeline.selection &&
+						editorState.timeline.audioPicker === null
+					)
+						return false;
+					batch(() => {
+						setEditorState("timeline", "selection", null);
+						setEditorState("timeline", "audioPicker", null);
+					});
+				},
+				setTool(mode: "seek" | "split") {
+					setEditorState("timeline", "interactMode", mode);
+				},
+				zoomBy(factor: number) {
+					const transform = editorState.timeline.transform;
+					transform.updateZoom(
+						transform.zoom * factor,
+						editorState.playbackTime,
+					);
+				},
+				fit() {
+					batch(() => {
+						const transform = editorState.timeline.transform;
+						transform.updateZoom(zoomOutLimit(), 0);
+						transform.setPosition(0);
+					});
+				},
+			};
+
 			return {
 				...editorInstanceContext,
 				recordingBookmarks,
@@ -2692,34 +2862,9 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				toggleStyleGroup,
 				exitStyleScope,
 				previewStyle,
-				projectHistory: createStoreHistory(
-					project,
-					setProject,
-					() => {
-						const selection = editorState.timeline.selection;
-						clipSelectionBeforeRestore =
-							selection?.type === "clip"
-								? selection.indices.flatMap((index) => {
-										const id = project.timeline?.segments[index]?.id;
-										return id ? [id] : [];
-									})
-								: [];
-						exitStyleScope();
-						setEditorState("timeline", "selection", null);
-					},
-					() => {
-						const indices = clipIndicesForIds(
-							project.timeline?.segments ?? [],
-							clipSelectionBeforeRestore,
-						);
-						clipSelectionBeforeRestore = [];
-						if (indices.length)
-							setEditorState("timeline", "selection", {
-								type: "clip",
-								indices,
-							});
-					},
-				),
+				projectHistory,
+				keymap,
+				timelineCommands,
 				editorState,
 				setEditorState,
 				snapGuides,

@@ -59,6 +59,7 @@ export function Header(props: {
 		flushProjectConfig,
 		project,
 		projectHistory,
+		keymap,
 		dialog,
 		setDialog,
 		meta,
@@ -174,6 +175,7 @@ export function Header(props: {
 						!projectHistory.canUndo() && !editorState.timeline.selection
 					}
 					tooltipText={localize("Undo")}
+					kbd={keymap.kbd("undo")}
 					leftIcon={<IconCapUndo />}
 				/>
 				<EditorButton
@@ -185,6 +187,7 @@ export function Header(props: {
 						!projectHistory.canRedo() && !editorState.timeline.selection
 					}
 					tooltipText={localize("Redo")}
+					kbd={keymap.kbd("redo")}
 					leftIcon={<IconCapRedo />}
 				/>
 				<div class="mx-1.5 w-px h-4 shrink-0 bg-ed-line-strong" />

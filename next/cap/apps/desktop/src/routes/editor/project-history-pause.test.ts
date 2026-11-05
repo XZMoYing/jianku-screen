@@ -125,3 +125,33 @@ it("runs the post-restore callback against restored identities for undo and redo
 		]);
 	});
 });
+
+it("leaves text and composition undo to the focused control", () => {
+	const { state, setState, history } = mount();
+	const resume = history.pause();
+	setState("name", "Edited");
+	resume();
+	const input = document.createElement("input");
+	document.body.append(input);
+	const undo = (isComposing = false) =>
+		new KeyboardEvent("keydown", {
+			code: "KeyZ",
+			key: "z",
+			metaKey: true,
+			cancelable: true,
+			bubbles: true,
+			isComposing,
+		});
+	try {
+		input.focus();
+		expect(input.dispatchEvent(undo())).toBe(true);
+		expect(state.name).toBe("Edited");
+		input.blur();
+		expect(document.body.dispatchEvent(undo(true))).toBe(true);
+		expect(state.name).toBe("Edited");
+		expect(document.body.dispatchEvent(undo())).toBe(false);
+		expect(state.name).toBe("Original");
+	} finally {
+		input.remove();
+	}
+});

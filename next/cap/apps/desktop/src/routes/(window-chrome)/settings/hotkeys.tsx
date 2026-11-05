@@ -12,7 +12,13 @@ import {
 } from "solid-js";
 import { createStore } from "solid-js/store";
 import toast from "solid-toast";
-import { hotkeysStore } from "~/store";
+import { editorKeymapStore, hotkeysStore } from "~/store";
+import {
+	editorBindingOwner,
+	editorCommandLabels,
+	editorKeymapDefaults,
+	sameStroke,
+} from "~/utils/editor-keymap";
 import { t as localize } from "~/utils/i18n";
 
 import {
@@ -21,6 +27,7 @@ import {
 	type HotkeyAction,
 	type HotkeysStore,
 } from "~/utils/tauri";
+import { EditorShortcutSettings } from "./EditorShortcutSettings";
 import { Section, SectionCard, SettingsPageContent } from "./Setting";
 
 const ACTION_TEXT = {
@@ -63,6 +70,7 @@ function Inner(props: { initialStore: HotkeysStore | null }) {
 	}>();
 
 	const [saving, setSaving] = createSignal(false);
+	const mac = ostype() === "macos";
 	const commitBinding = async (
 		action: HotkeyAction,
 		binding: Hotkey | null,
@@ -71,6 +79,20 @@ function Inner(props: { initialStore: HotkeysStore | null }) {
 		const previous = listening()?.prev;
 		setSaving(true);
 		try {
+			if (binding && (!previous || !sameStroke(binding, previous))) {
+				const settings =
+					(await editorKeymapStore.get()) ?? editorKeymapDefaults;
+				const owner = editorBindingOwner(settings, mac, binding);
+				if (owner) {
+					setHotkeys(action, previous);
+					toast.error(
+						localize("已用于编辑器的「{command}」", {
+							command: localize(editorCommandLabels[owner]),
+						}),
+					);
+					return;
+				}
+			}
 			await commands.setHotkey(action, binding);
 			setHotkeys(action, binding ?? undefined);
 		} catch (error) {
@@ -101,6 +123,12 @@ function Inner(props: { initialStore: HotkeysStore | null }) {
 		}
 	});
 
+	const committedBindings = () => {
+		const values = { ...hotkeys };
+		const pending = listening();
+		if (pending) values[pending.action] = pending.prev;
+		return Object.values(values).filter((key): key is Hotkey => !!key);
+	};
 	const actions = () =>
 		[
 			"screenshotDisplay",
@@ -121,6 +149,7 @@ function Inner(props: { initialStore: HotkeysStore | null }) {
 	return (
 		<div class="cap-settings-page flex flex-col h-full custom-scroll">
 			<SettingsPageContent>
+				<EditorShortcutSettings globalBindings={committedBindings()} />
 				<Section
 					title={localize("Shortcuts")}
 					description={localize(

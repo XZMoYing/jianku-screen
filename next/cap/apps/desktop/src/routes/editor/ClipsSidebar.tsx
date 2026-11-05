@@ -25,6 +25,7 @@ import { type EditorTimelineSegment, useEditorContext } from "./context";
 import { getExistingRecordingPickerOptions } from "./existing-recording-picker";
 import { routeEditorPlaybackIntent } from "./playback-intent-routing";
 import { createTimelineMouseDrag } from "./Timeline/mouse-drag";
+import { useEditorShortcuts } from "./useEditorShortcuts";
 
 const formatClipDuration = (seconds: number) => {
 	if (!Number.isFinite(seconds) || seconds <= 0) return "0:00";
@@ -215,11 +216,14 @@ export function ClipsSidebar(props: { class?: string; active?: boolean }) {
 		setEditorState,
 		setDialog,
 		requestHandoffPlayback,
+		keymap,
 	} = useEditorContext();
 
 	const backToEditor = () => setDialog((d) => ({ ...d, open: false }));
 
 	const [tab, setTab] = createSignal("sources");
+	const [selectedSource, setSelectedSource] = createSignal<number>();
+	let sourceList: HTMLDivElement | undefined;
 	const [importing, setImporting] = createSignal(false);
 	const [openingRecorder, setOpeningRecorder] = createSignal(false);
 
@@ -333,13 +337,39 @@ export function ClipsSidebar(props: { class?: string; active?: boolean }) {
 				indices: [index],
 			});
 	};
+	const canAppendSource = (index: number) => {
+		const duration = sources()[index]?.display.duration ?? 0;
+		return (
+			!importing() &&
+			!openingRecorder() &&
+			Number.isFinite(duration) &&
+			duration > 0
+		);
+	};
 	const appendSource = (index: number) => {
+		if (!canAppendSource(index)) return false;
 		if (projectActions.appendClipFromSource(index)) {
 			setTab("clips");
 			return;
 		}
 		toast.error(localize("素材时长不可用，无法添加"));
 	};
+	useEditorShortcuts(keymap, {
+		append: () => {
+			const index = selectedSource();
+			if (
+				props.active === false ||
+				tab() !== "sources" ||
+				index === undefined ||
+				!sourceList?.contains(document.activeElement) ||
+				document.activeElement
+					?.closest("[data-source-asset]")
+					?.getAttribute("data-source-asset") !== String(index)
+			)
+				return false;
+			return appendSource(index);
+		},
+	});
 
 	const [editingClipId, setEditingClipId] = createSignal<string | null>(null);
 	const editingIndex = createMemo(() => {
@@ -509,6 +539,7 @@ export function ClipsSidebar(props: { class?: string; active?: boolean }) {
 				</KTabs.List>
 
 				<KTabs.Content
+					ref={sourceList}
 					value="sources"
 					class="custom-scroll flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto"
 				>
@@ -522,36 +553,53 @@ export function ClipsSidebar(props: { class?: string; active?: boolean }) {
 					>
 						<For each={sources()}>
 							{(source, index) => (
-								<div class="flex min-w-0 items-center gap-2 rounded-xl border border-ed-line bg-ed-card-2 p-2">
-									<div class="relative aspect-video w-16 shrink-0 overflow-hidden rounded-md">
-										<ClipThumbnail
-											projectPath={editorInstance.path}
-											recordingSegment={index()}
-											start={0}
-											index={index()}
-										/>
-									</div>
-									<div class="min-w-0 flex-1">
-										<div class="truncate text-xs font-medium">
-											{sourceLabel(index())}
+								<div
+									data-source-asset={index()}
+									class={cx(
+										"flex min-w-0 items-center gap-2 rounded-xl border p-2 transition-colors",
+										selectedSource() === index()
+											? "border-ed-accent bg-ed-ctl"
+											: "border-ed-line bg-ed-card-2",
+									)}
+								>
+									<button
+										type="button"
+										aria-pressed={selectedSource() === index()}
+										onClick={(event) => {
+											setSelectedSource(index());
+											event.currentTarget.focus();
+										}}
+										class="flex min-w-0 flex-1 items-center gap-2 rounded-md text-left focus-visible:outline-ed-accent"
+									>
+										<div class="relative aspect-video w-16 shrink-0 overflow-hidden rounded-md">
+											<ClipThumbnail
+												projectPath={editorInstance.path}
+												recordingSegment={index()}
+												start={0}
+												index={index()}
+											/>
 										</div>
-										<div class="text-[11px] tabular-nums text-ed-text-3">
-											{formatClipDuration(source.display.duration)}
+										<div class="min-w-0 flex-1">
+											<div class="truncate text-xs font-medium">
+												{sourceLabel(index())}
+											</div>
+											<div class="text-[11px] tabular-nums text-ed-text-3">
+												{formatClipDuration(source.display.duration)}
+											</div>
 										</div>
-									</div>
+									</button>
 									<button
 										type="button"
 										class="flex size-8 shrink-0 items-center justify-center rounded-full bg-ed-ctl text-ed-accent hover:bg-ed-ctl-hover disabled:opacity-50"
 										aria-label={localize("将素材 {number} 添加到末尾", {
 											number: index() + 1,
 										})}
-										title={localize("添加到时间线末尾")}
-										disabled={
-											importing() ||
-											openingRecorder() ||
-											!Number.isFinite(source.display.duration) ||
-											source.display.duration <= 0
+										title={
+											selectedSource() === index() && keymap.label("append")
+												? `${localize("添加到时间线末尾")} · ${keymap.label("append")}`
+												: localize("添加到时间线末尾")
 										}
+										disabled={!canAppendSource(index())}
 										onClick={() => appendSource(index())}
 									>
 										<IconCapCirclePlus class="size-4" />

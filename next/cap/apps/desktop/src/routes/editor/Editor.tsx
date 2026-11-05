@@ -74,6 +74,7 @@ import { usePreparingEditor } from "./preparing-editor-context";
 import { createPreviewFullscreen } from "./preview-fullscreen";
 import { Timeline } from "./Timeline";
 import { Dialog, DialogContent, EditorButton, Input, Subfield } from "./ui";
+import { EditorKeymapContext } from "./useEditorShortcuts";
 
 // Deferred surfaces: these are not visible at first paint (export mode,
 // transcript panel, clips sidebar), so their code is split out of the editor
@@ -359,6 +360,7 @@ function Inner(props: {
 		exportState,
 		requestHandoffPlayback,
 		handoffPlaybackPending,
+		keymap,
 	} = useEditorContext();
 
 	const [projectBusy, setProjectBusy] = createSignal(false);
@@ -937,7 +939,7 @@ function Inner(props: {
 		window.addEventListener("mouseup", handleUp);
 	};
 
-	return (
+	const layout = () => (
 		<Show
 			when={!fullscreenMode()}
 			fallback={
@@ -1153,6 +1155,11 @@ function Inner(props: {
 				</div>
 			</div>
 		</Show>
+	);
+	return (
+		<EditorKeymapContext.Provider value={keymap}>
+			{layout()}
+		</EditorKeymapContext.Provider>
 	);
 }
 

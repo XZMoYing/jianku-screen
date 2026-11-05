@@ -443,7 +443,8 @@ function ClipSettingsControl(props: {
 	onOpenChange: (open: boolean) => void;
 	triggerClass?: string;
 }) {
-	const { project, projectActions, editorState } = useEditorContext();
+	const { project, projectActions, editorState, keymap, timelineCommands } =
+		useEditorContext();
 	const [renaming, setRenaming] = createSignal(false);
 	const [draftName, setDraftName] = createSignal("");
 
@@ -540,11 +541,11 @@ function ClipSettingsControl(props: {
 						<ClipMenuRow
 							icon={<IconLucideScissors />}
 							label={localize("Split at playhead")}
-							kbd="C"
+							kbd={keymap.label("split")}
 							hint={localize("将播放头移到此片段内")}
 							disabled={!canSplitAtPlayhead()}
 							onClick={() => {
-								projectActions.splitClipSegment(playheadTime(), props.index);
+								timelineCommands.splitAtPlayhead(props.index);
 								close();
 							}}
 						/>
@@ -611,12 +612,17 @@ function ClipSettingsControl(props: {
 					<ClipMenuRow
 						icon={<IconLucideTrash2 />}
 						label={localize("Delete clip")}
-						kbd="⌫"
+						kbd={
+							editorState.timeline.selection?.type === "clip" &&
+							editorState.timeline.selection.indices.length > 1
+								? undefined
+								: keymap.label("delete")
+						}
 						hint={localize("无法删除唯一的片段")}
 						disabled={!canDelete()}
 						danger
 						onClick={() => {
-							projectActions.deleteClipSegment(props.index);
+							timelineCommands.deleteSelection(props.index);
 							close();
 						}}
 					/>
@@ -1055,7 +1061,6 @@ export function ClipTrack(
 								onContextMenu={(e) => {
 									e.preventDefault();
 									e.stopPropagation();
-									if (split()) return;
 									const index = i();
 									const selection = editorState.timeline.selection;
 									if (

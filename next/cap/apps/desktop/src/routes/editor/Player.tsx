@@ -84,6 +84,8 @@ export function PlayerContent(props: {
 		playbackIntent,
 		requestHandoffPlayback,
 		handoffPlaybackPending,
+		keymap,
+		timelineCommands,
 	} = useEditorContext();
 
 	let panelRef: HTMLDivElement | undefined;
@@ -327,62 +329,30 @@ export function PlayerContent(props: {
 		);
 	}
 
-	// Register keyboard shortcuts in one place
-	useEditorShortcuts(() => {
-		const el = document.activeElement;
-		if (!el) return true;
-		const tagName = el.tagName.toLowerCase();
-		const isContentEditable = el.getAttribute("contenteditable") === "true";
-		return !(
-			tagName === "input" ||
-			tagName === "textarea" ||
-			isContentEditable
-		);
-	}, [
-		{
-			combo: "S",
-			when: () => !props.fullscreen,
-			handler: () =>
-				setEditorState(
-					"timeline",
-					"interactMode",
-					editorState.timeline.interactMode === "split" ? "seek" : "split",
-				),
+	useEditorShortcuts(keymap, {
+		selectTool: () =>
+			props.fullscreen ? false : timelineCommands.setTool("seek"),
+		bladeTool: () => {
+			if (props.fullscreen) return false;
+			timelineCommands.setTool(
+				keymap.legacy() && editorState.timeline.interactMode === "split"
+					? "seek"
+					: "split",
+			);
 		},
-		{
-			combo: "Mod+=",
-			when: () => !props.fullscreen,
-			handler: () =>
-				editorState.timeline.transform.updateZoom(
-					editorState.timeline.transform.zoom / 1.1,
-					editorState.playbackTime,
-				),
+		zoomIn: () => (props.fullscreen ? false : timelineCommands.zoomBy(1 / 1.1)),
+		zoomOut: () => (props.fullscreen ? false : timelineCommands.zoomBy(1.1)),
+		fit: () => (props.fullscreen ? false : timelineCommands.fit()),
+		playPause: async () => {
+			const prevTime = editorState.previewTime;
+			if (!playbackIntent()) {
+				if (prevTime !== null) setEditorState("playbackTime", prevTime);
+				if (!handoffPlaybackPending())
+					await commands.seekTo(Math.floor(editorState.playbackTime * FPS));
+			}
+			await handlePlayPauseClick();
 		},
-		{
-			combo: "Mod+-",
-			when: () => !props.fullscreen,
-			handler: () =>
-				editorState.timeline.transform.updateZoom(
-					editorState.timeline.transform.zoom * 1.1,
-					editorState.playbackTime,
-				),
-		},
-		{
-			combo: "Space",
-			handler: async () => {
-				const prevTime = editorState.previewTime;
-
-				if (!playbackIntent()) {
-					if (prevTime !== null) setEditorState("playbackTime", prevTime);
-
-					if (!handoffPlaybackPending())
-						await commands.seekTo(Math.floor(editorState.playbackTime * FPS));
-				}
-
-				await handlePlayPauseClick();
-			},
-		},
-	]);
+	});
 
 	return (
 		<div
@@ -556,7 +526,10 @@ export function PlayerContent(props: {
 					>
 						<IconCapPrev class="size-3.5" />
 					</button>
-					<Tooltip kbd={["Space"]} content={localize("Play/Pause video")}>
+					<Tooltip
+						kbd={keymap.kbd("playPause")}
+						content={localize("Play/Pause video")}
+					>
 						<button
 							type="button"
 							onClick={handlePlayPauseClick}
@@ -593,11 +566,11 @@ export function PlayerContent(props: {
 				</div>
 				<div class="flex flex-row flex-1 gap-0.5 justify-end items-center min-w-fit">
 					<EditorButton<typeof KToggleButton>
-						tooltipText={localize("Toggle Split")}
-						kbd={["S"]}
+						tooltipText={localize("分割工具")}
+						kbd={keymap.kbd("bladeTool")}
 						pressed={editorState.timeline.interactMode === "split"}
 						onChange={(v: boolean) =>
-							setEditorState("timeline", "interactMode", v ? "split" : "seek")
+							timelineCommands.setTool(v ? "split" : "seek")
 						}
 						as={KToggleButton}
 						variant="danger"
@@ -606,14 +579,9 @@ export function PlayerContent(props: {
 					<div class="mx-1.5 w-px h-4 shrink-0 bg-ed-line-strong" />
 					<div class="flex flex-row gap-0.5 items-center" title={zoomHint()}>
 						<EditorButton
-							tooltipText={localize("Zoom out")}
-							kbd={["meta", "-"]}
-							onClick={() => {
-								editorState.timeline.transform.updateZoom(
-									editorState.timeline.transform.zoom * 1.1,
-									editorState.playbackTime,
-								);
-							}}
+							tooltipText={localize("缩小时间线")}
+							kbd={keymap.kbd("zoomOut")}
+							onClick={() => timelineCommands.zoomBy(1.1)}
 							leftIcon={<IconCapZoomOut />}
 						/>
 						<Slider
@@ -644,15 +612,16 @@ export function PlayerContent(props: {
 							}
 						/>
 						<EditorButton
-							tooltipText={localize("Zoom in")}
-							kbd={["meta", "+"]}
-							onClick={() => {
-								editorState.timeline.transform.updateZoom(
-									editorState.timeline.transform.zoom / 1.1,
-									editorState.playbackTime,
-								);
-							}}
+							tooltipText={localize("放大时间线")}
+							kbd={keymap.kbd("zoomIn")}
+							onClick={() => timelineCommands.zoomBy(1 / 1.1)}
 							leftIcon={<IconCapZoomIn />}
+						/>
+						<EditorButton
+							tooltipText={localize("显示整个时间线")}
+							kbd={keymap.kbd("fit")}
+							onClick={timelineCommands.fit}
+							leftIcon={<IconLucideMaximize2 />}
 						/>
 					</div>
 				</div>

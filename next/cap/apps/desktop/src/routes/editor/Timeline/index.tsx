@@ -191,6 +191,8 @@ function deleteTrackLane<T extends { track?: number }>(
 		});
 }
 
+import { useEditorShortcuts } from "../useEditorShortcuts";
+
 export function Timeline(props: {
 	inactive?: boolean;
 	onViewportOverflowChange?: (value: {
@@ -213,6 +215,8 @@ export function Timeline(props: {
 		canvasControls,
 		playbackIntent,
 		requestHandoffPlayback,
+		keymap,
+		timelineCommands,
 	} = useEditorContext();
 
 	const duration = () => editorInstance.recordingDuration;
@@ -1162,118 +1166,11 @@ export function Timeline(props: {
 		});
 	}
 
-	createEventListener(window, "keydown", (e) => {
-		if (props.inactive || e.defaultPrevented) return;
-		const hasNoModifiers = !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey;
-
-		if (
-			document.activeElement instanceof HTMLInputElement ||
-			document.activeElement instanceof HTMLTextAreaElement
-		) {
-			return;
-		}
-
-		if (e.code === "Backspace" || (e.code === "Delete" && hasNoModifiers)) {
-			const selection = editorState.timeline.selection;
-			if (!selection) return;
-
-			if (selection.type === "style" || selection.type === "image") {
-				projectActions.deleteOverlaySegments(selection.type, selection.indices);
-			} else if (selection.type === "zoom") {
-				projectActions.deleteZoomSegments(selection.indices);
-			} else if (selection.type === "caption") {
-				projectActions.deleteCaptionSegments(selection.indices);
-			} else if (selection.type === "keyboard") {
-				projectActions.deleteKeyboardSegments(selection.indices);
-			} else if (selection.type === "mask") {
-				projectActions.deleteMaskSegments(selection.indices);
-			} else if (selection.type === "text") {
-				projectActions.deleteTextSegments(selection.indices);
-			} else if (selection.type === "audio") {
-				projectActions.deleteAudioSegments(selection.indices);
-			} else if (selection.type === "3d") {
-				projectActions.deleteCamera3DSegments(selection.indices);
-			} else if (selection.type === "transition") {
-				projectActions.deleteClipTransition(selection.index);
-			} else if (selection.type === "clip") {
-				// Delete all selected clips in reverse order
-				[...selection.indices]
-					.sort((a, b) => b - a)
-					.forEach((idx) => {
-						projectActions.deleteClipSegment(idx);
-					});
-			} else if (selection.type === "scene") {
-				// Delete all selected scenes in reverse order
-				[...selection.indices]
-					.sort((a, b) => b - a)
-					.forEach((idx) => {
-						projectActions.deleteSceneSegment(idx);
-					});
-			}
-		} else if (e.code === "KeyC" && hasNoModifiers) {
-			// Allow cutting while playing: use playbackTime when previewTime is null
-			const time = editorState.previewTime ?? editorState.playbackTime;
-			if (time === null || time === undefined) return;
-
-			const selection = editorState.timeline.selection;
-			if (selection?.type === "style" || selection?.type === "image") {
-				const type = selection.type;
-				const resumeHistory = projectHistory.pause();
-				for (const index of [...selection.indices].sort((a, b) => b - a))
-					projectActions.splitOverlaySegment(type, index, time);
-				resumeHistory();
-			} else if (selection?.type === "3d") {
-				// Only a selected shot the playhead is actually inside can be cut;
-				// anything else falls through to cutting the clip underneath.
-				const segments = project.timeline?.camera3dSegments ?? [];
-				const index = [...selection.indices]
-					.sort((a, b) => b - a)
-					.find((idx) => {
-						const segment = segments[idx];
-						return !!segment && time > segment.start && time < segment.end;
-					});
-				const segment = index === undefined ? undefined : segments[index];
-				if (index !== undefined && segment)
-					projectActions.splitCamera3DSegment(index, time - segment.start);
-				else projectActions.splitClipSegment(time);
-			} else projectActions.splitClipSegment(time);
-		} else if (e.code === "Escape" && hasNoModifiers) {
-			// Deselect all selected segments
-			setEditorState("timeline", "selection", null);
-			setEditorState("timeline", "audioPicker", null);
-		} else if (
-			e.code === "KeyA" &&
-			(e.metaKey || e.ctrlKey) &&
-			!e.shiftKey &&
-			!e.altKey
-		) {
-			// Cmd/Ctrl+A expands the current selection to every segment on the
-			// same track.
-			const selection = editorState.timeline.selection;
-			if (!selection || selection.type === "transition") return;
-
-			const timeline = project.timeline;
-			const segmentCount = {
-				style: timeline?.styleSegments?.length ?? 0,
-				image: timeline?.imageSegments?.length ?? 0,
-				clip: timeline?.segments.length ?? 0,
-				zoom: timeline?.zoomSegments?.length ?? 0,
-				scene: timeline?.sceneSegments?.length ?? 0,
-				mask: timeline?.maskSegments?.length ?? 0,
-				caption: timeline?.captionSegments?.length ?? 0,
-				keyboard: timeline?.keyboardSegments?.length ?? 0,
-				text: timeline?.textSegments?.length ?? 0,
-				audio: timeline?.audioSegments?.length ?? 0,
-				"3d": timeline?.camera3dSegments?.length ?? 0,
-			}[selection.type];
-			if (!segmentCount) return;
-
-			e.preventDefault();
-			setEditorState("timeline", "selection", {
-				type: selection.type,
-				indices: Array.from({ length: segmentCount }, (_, i) => i),
-			});
-		}
+	useEditorShortcuts(keymap, {
+		split: () => (props.inactive ? false : timelineCommands.splitAtPlayhead()),
+		delete: () => (props.inactive ? false : timelineCommands.deleteSelection()),
+		selectAll: () => (props.inactive ? false : timelineCommands.selectTrack()),
+		deselect: () => (props.inactive ? false : timelineCommands.deselect()),
 	});
 
 	const generateCaptionsFromTrack = async () => {

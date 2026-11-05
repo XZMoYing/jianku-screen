@@ -1,5 +1,13 @@
-import { createComputed, createSignal, onCleanup, untrack } from "solid-js";
+import {
+	createComputed,
+	createSignal,
+	onCleanup,
+	untrack,
+	useContext,
+} from "solid-js";
 
+import { defaultHistoryShortcut } from "../project-history";
+import { EditorKeymapContext } from "../useEditorShortcuts";
 import {
 	recordTimelineGesture,
 	type TimelineGestureSnapshot,
@@ -26,6 +34,7 @@ type MouseDrag = {
 };
 
 export function createTimelineMouseDrag() {
+	const keymap = useContext(EditorKeymapContext);
 	const [active, setActive] = createSignal<{
 		isValid(): boolean;
 		finish(cause: EndCause): void;
@@ -113,8 +122,9 @@ export function createTimelineMouseDrag() {
 		};
 		const keydown = (event: KeyboardEvent) => {
 			if (
-				(event.ctrlKey || event.metaKey) &&
-				(event.code === "KeyZ" || event.code === "KeyY")
+				keymap
+					? keymap.matches("undo", event) || keymap.matches("redo", event)
+					: defaultHistoryShortcut(event)
 			) {
 				finish(undefined, "history", "history");
 				return;
