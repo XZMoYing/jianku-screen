@@ -1,0 +1,18 @@
+{
+	"appIsForeground": true,
+	"bounds": {
+		"Height": 954,
+		"Width": 1680,
+		"X": 0,
+		"Y": 25
+	},
+	"editorSelection": "unique own CG editor title and matching AX window geometry",
+	"focusedWindowTitle": "简库镜传 · 视频编辑",
+	"normalQuitRequested": true,
+	"ownedEditorWindowCount": 1,
+	"path": "/Applications/Jianku Screen Next.app",
+	"pid": 42435,
+	"testModalLeaseAccepted": false,
+	"trusted": true,
+	"windowID": 22188
+}

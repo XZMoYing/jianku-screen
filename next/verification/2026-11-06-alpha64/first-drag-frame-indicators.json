@@ -1,0 +1,9 @@
+{
+	"decodedFrames": 499,
+	"timestampMode": "passthrough, microsecond encoder timebase; no CFR duplication or raw muxer warning",
+	"scope": "preview chart region in one owned editor, every encoded captured frame",
+	"minimumLumaStdDev": 24.824077640448685,
+	"maximumMeanAbsoluteDifferenceToFirstFrame": 0.1203125,
+	"nearFlatFramesAtStdDevBelowOne": 0,
+	"limit": "A texture/blank-preview indicator for this drag only, not full UI or preview frame-rate acceptance"
+}

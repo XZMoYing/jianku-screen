@@ -1,0 +1,19 @@
+{
+	"removed": [
+		{
+			"removedDuplicate": "/Applications/.jianku-next-update62-5f6kwy1a/previous.app",
+			"retainedArchive": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.61/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.61",
+			"logicalBytesRemoved": 316155915,
+			"strictSignaturesAndSixHashes": "matched"
+		},
+		{
+			"removedDuplicate": "/Applications/.jianku-next-update63-kvma3yc2/previous.app",
+			"retainedArchive": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.62/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.62",
+			"logicalBytesRemoved": 316173419,
+			"strictSignaturesAndSixHashes": "matched"
+		}
+	],
+	"kept": "installed64, current update64 previous63, every version archive and all project media"
+}

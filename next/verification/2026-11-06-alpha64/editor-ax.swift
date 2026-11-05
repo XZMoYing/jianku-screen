@@ -173,6 +173,17 @@ if let app=apps.first {
    guard NSWorkspace.shared.frontmostApplication?.processIdentifier == app.processIdentifier else {fatalError("Target application is not foreground")}
    for down in [true,false] {if let event=CGEvent(keyboardEventSource:nil,virtualKey:key,keyDown:down){event.flags=flags;event.post(tap:.cghidEventTap)};Thread.sleep(forTimeInterval:0.03)}
    result["keySent"]=args[2]
+  case "editor-shortcut":
+   guard args.count==3,let window=selectedEditor.first,!items.contains(where:{["AXTextField","AXTextArea"].contains($0["AXRole"] as? String ?? "") && $0["AXFocused"] as? String == "1"}) else {exit(2)}
+   let keys:[String:(CGKeyCode,CGEventFlags)] = ["undo":(6,[.maskCommand]),"redo":(6,[.maskCommand,.maskShift]),"cut":(8,[]),"delete":(51,[])]
+   guard let (key,flags)=keys[args[2]] else {exit(2)}
+   app.activate(options:[])
+   _ = AXUIElementPerformAction(window,kAXRaiseAction as CFString)
+   _ = AXUIElementSetAttributeValue(window,kAXMainAttribute as CFString,kCFBooleanTrue)
+   RunLoop.current.run(until:Date(timeIntervalSinceNow:0.15))
+   guard NSWorkspace.shared.frontmostApplication?.processIdentifier==app.processIdentifier,let focused=read(root,kAXFocusedWindowAttribute),CFEqual(focused,window) else {exit(2)}
+   for down in [true,false] {if let event=CGEvent(keyboardEventSource:nil,virtualKey:key,keyDown:down){event.flags=flags;event.postToPid(app.processIdentifier)};Thread.sleep(forTimeInterval:0.04)}
+   result["sentOwnedEditorShortcut"]=args[2]
   case "save":
    app.activate(options:[])
    for down in [true,false] {if let event=CGEvent(keyboardEventSource:nil,virtualKey:1,keyDown:down){event.flags=[.maskCommand];event.postToPid(app.processIdentifier)}}

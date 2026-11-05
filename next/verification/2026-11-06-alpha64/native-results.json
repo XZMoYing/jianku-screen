@@ -1,0 +1,62 @@
+{
+	"sourceCommit": "ca9f7e5",
+	"installedVersion": "0.2.0-alpha.64",
+	"build": "2026.64.0",
+	"package": "strict signatures and six executable hashes matched source/archive/installed",
+	"ownedFixture": "archived repeated-footage .jks; two original instances share recordingSegment and source range",
+	"nativeCases": {
+		"reorderRetainsIdentityAndSettings": true,
+		"undoRetainsCorrectSelectedInstance": "verified by deleting selected instance after undo, then undoing deletion",
+		"redoRetainsCorrectSelectedInstance": "verified by deleting selected instance after redo, then undoing deletion",
+		"escapeCancelLeavesFullProjectUnchanged": true,
+		"splitRetainsLeftAndCreatesUniqueRight": true,
+		"splitUndoRedoRetainsGeneratedIdentity": true,
+		"saveReopenAndFurtherReorderPreserveAllIds": true
+	},
+	"finalSegments": [
+		{
+			"id": "legacy-clip-1",
+			"name": "步骤乙（重复素材）",
+			"start": 0.0,
+			"end": 4.0,
+			"timescale": 1.0
+		},
+		{
+			"id": "legacy-clip-0",
+			"name": "步骤甲",
+			"start": 0.0,
+			"end": 2.0000615972158062,
+			"timescale": 1.0
+		},
+		{
+			"id": "clip-d3d0cefd-8ece-45e1-ad09-59fc0748fb0b",
+			"name": "步骤甲",
+			"start": 2.0000615972158062,
+			"end": 4.0,
+			"timescale": 1.0
+		},
+		{
+			"id": "legacy-clip-2",
+			"name": "步骤丙",
+			"start": 4.0,
+			"end": 8.0,
+			"timescale": 1.0
+		}
+	],
+	"videoIndicators": {
+		"decodedFrames": 499,
+		"timestampMode": "passthrough, microsecond encoder timebase; no CFR duplication or raw muxer warning",
+		"scope": "preview chart region in one owned editor, every encoded captured frame",
+		"minimumLumaStdDev": 24.824077640448685,
+		"maximumMeanAbsoluteDifferenceToFirstFrame": 0.1203125,
+		"nearFlatFramesAtStdDevBelowOne": 0,
+		"limit": "A texture/blank-preview indicator for this drag only, not full UI or preview frame-rate acceptance"
+	},
+	"scopeLimits": [
+		"native normal drag, Escape, history selection and persistence in own sample; other tracks/drag combinations remain pending",
+		"all linked overlays following video, magnetism/snapping, complete context menus/FCP not implemented by this unit",
+		"strict chroma 15 pass / 2 fail and hardware output gates unchanged",
+		"Windows/Linux runtime and postponed devices not validated"
+	],
+	"observedUXTodo": "Clips sidebar badge counts one recorded source while showing four edited instances; descriptions still include Clip 1. Fix with material/instance UI and localization."
+}
