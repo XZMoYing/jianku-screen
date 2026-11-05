@@ -29,6 +29,7 @@ export default defineConfig({
 			"src/routes/editor/text-history.test.tsx",
 			"src/routes/editor/project-history-pause.test.ts",
 			"src/routes/editor/editor-fallback-diagnostics.test.ts",
+			"src/routes/editor/bookmark-refresh.test.tsx",
 			"src/routes/editor/text-drag.test.tsx",
 			"src/routes/editor/auto-zoom-generation.test.ts",
 		],

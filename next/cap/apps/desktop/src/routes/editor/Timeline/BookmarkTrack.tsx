@@ -59,7 +59,9 @@ export function BookmarkTrack(props: { gutter: number }) {
 										}}
 										title={label()}
 										aria-label={label()}
-										disabled={recordingBookmarks.busy()}
+										disabled={
+											recordingBookmarks.busy() || recordingBookmarks.loading()
+										}
 										onMouseDown={(event) => event.stopPropagation()}
 										onMouseMove={(event) => event.stopPropagation()}
 										onKeyDown={(event) => {
@@ -92,7 +94,10 @@ export function BookmarkTrack(props: { gutter: number }) {
 													<button
 														type="button"
 														class="block w-full truncate rounded-xl px-3 py-2 text-left text-sm hover:bg-ed-ctl-hover"
-														disabled={recordingBookmarks.busy()}
+														disabled={
+															recordingBookmarks.busy() ||
+															recordingBookmarks.loading()
+														}
 														onClick={() => void jump(item)}
 													>
 														{title(item)}

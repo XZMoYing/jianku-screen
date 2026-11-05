@@ -1619,5 +1619,6 @@
 	"Pin main window": "主窗口置顶",
 	"Unpin main window": "取消主窗口置顶",
 	"Could not change the main window pin: {error}": "无法更改主窗口置顶状态：{error}",
-	"编辑内容已变化，请重新生成自动缩放。": "编辑内容已变化，请重新生成自动缩放。"
+	"编辑内容已变化，请重新生成自动缩放。": "编辑内容已变化，请重新生成自动缩放。",
+	"Reading bookmarks…": "正在读取书签…"
 }

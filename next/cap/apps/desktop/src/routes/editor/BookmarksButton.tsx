@@ -62,19 +62,24 @@ export function BookmarksButton(props: { disabled?: boolean }) {
 								<button
 									type="button"
 									class="flex items-center justify-center gap-2 rounded-full bg-ed-accent/15 px-3 py-2 text-ed-text-1"
-									disabled={busy()}
+									disabled={busy() || loading()}
 									onClick={() => void undoDelete()}
 								>
 									<IconUndo class="size-4" />
 									{localize("撤销上次删除")}
 								</button>
 							</Show>
+							<Show when={loading()}>
+								<p role="status" class="text-ed-text-2">
+									{localize("正在读取书签…")}
+								</p>
+							</Show>
 							<Show when={error()}>
 								<p role="alert">{localize(String(error()))}</p>
 								<button
 									type="button"
 									class="rounded-full bg-ed-ctl px-3 py-2"
-									disabled={busy()}
+									disabled={busy() || loading()}
 									onClick={() => void recordingBookmarks.refresh()}
 								>
 									{localize("重新读取")}
@@ -96,7 +101,7 @@ export function BookmarksButton(props: { disabled?: boolean }) {
 												class="min-w-0 flex-1 rounded-lg bg-transparent px-2 py-1 text-ed-text-1"
 												aria-label={localize("书签名称")}
 												maxLength={120}
-												disabled={busy()}
+												disabled={busy() || loading()}
 												value={item.bookmark.label}
 												placeholder={localize("书签 {number}", {
 													number: index() + 1,
@@ -118,7 +123,7 @@ export function BookmarksButton(props: { disabled?: boolean }) {
 												class="p-2"
 												onPointerDown={(event) => event.preventDefault()}
 												aria-label={localize("删除书签")}
-												disabled={busy()}
+												disabled={busy() || loading()}
 												onClick={() => void save(item.bookmark, null)}
 											>
 												<IconTrash class="size-4" />
@@ -131,7 +136,7 @@ export function BookmarksButton(props: { disabled?: boolean }) {
 														type="button"
 														onPointerDown={(event) => event.preventDefault()}
 														class="rounded-full bg-ed-ctl-hover px-3 py-1 text-sm tabular-nums"
-														disabled={busy()}
+														disabled={busy() || loading()}
 														onClick={() => void jump(time)}
 													>
 														{bookmarkTimestamp(time)}

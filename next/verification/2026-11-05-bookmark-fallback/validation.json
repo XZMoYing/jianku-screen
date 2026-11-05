@@ -1,0 +1,23 @@
+{
+	"before": {
+		"passed": 7,
+		"failed": 4,
+		"scope": "actual BookmarkTrack with actual bookmark session under Solid Suspense"
+	},
+	"after": {
+		"passed": 11,
+		"failed": 0
+	},
+	"fullInterface": 323,
+	"existingBookmarkMarkersAndI18nModels": 11,
+	"typecheck": "passed",
+	"frontend": "passed",
+	"installedVersion": "0.2.0-alpha.58",
+	"nativeFixedVersionValidation": "pending alpha59",
+	"strictChromaGate": {
+		"passed": 15,
+		"failed": 2,
+		"stillBlocking": true
+	},
+	"curvesOrRenderingQualityChanged": false
+}
