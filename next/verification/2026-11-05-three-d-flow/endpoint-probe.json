@@ -1,0 +1,35 @@
+{
+	"kind": "authored auto-scene endpoint probe, not rendered video",
+	"boundaries": [
+		{
+			"time": 4,
+			"transitions": [0, 0],
+			"delta": {
+				"tiltX": -1.1999999999999993,
+				"tiltY": 44.04,
+				"roll": -1,
+				"rotateX": -40,
+				"rotateY": 18,
+				"fov": 15,
+				"zoom": -0.30000000000000004,
+				"panX": 0.295,
+				"panY": 0.20500000000000002
+			}
+		},
+		{
+			"time": 8,
+			"transitions": [0, 0],
+			"delta": {
+				"tiltX": -34.19,
+				"tiltY": -15.28,
+				"roll": 0,
+				"rotateX": 26,
+				"rotateY": -9,
+				"fov": -15,
+				"zoom": 0.21499999999999997,
+				"panX": 0.217,
+				"panY": 0.476
+			}
+		}
+	]
+}
