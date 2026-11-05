@@ -670,7 +670,12 @@ export function ClipTrack(
 		event: MouseEvent | KeyboardEvent,
 		index: number,
 	) {
-		if (transitionDrag() || event.defaultPrevented) return;
+		if (
+			transitionDrag() ||
+			event.defaultPrevented ||
+			("buttons" in event && (event.buttons & 1) !== 0)
+		)
+			return;
 		const previous = segments()[index - 1];
 		const next = segments()[index];
 		if (!previous || !next) return;
@@ -869,9 +874,26 @@ export function ClipTrack(
 		props.handleUpdatePlayhead(event);
 	}
 
+	function showTransitionAtSeam(event: MouseEvent) {
+		if (!(event.currentTarget instanceof HTMLElement)) return;
+		const bounds = event.currentTarget.getBoundingClientRect();
+		const scale = secsPerPixel();
+		const time =
+			editorState.timeline.transform.position +
+			(event.clientX - bounds.left) * scale;
+		const holds = heldWindows();
+		const boundary = segmentOffsets().findIndex(
+			(offset, index) =>
+				index > 0 &&
+				Math.abs(effectiveToOutput(holds, offset) - time) <= 2 * scale,
+		);
+		if (boundary > 0) showTransitionMenu(event, boundary);
+	}
+
 	return (
 		<TrackRoot
 			ref={props.ref}
+			onContextMenu={showTransitionAtSeam}
 			onMouseEnter={() => setEditorState("timeline", "hoveredTrack", "clip")}
 			onMouseLeave={() => {
 				setEditorState("timeline", "hoveredTrack", null);
@@ -1469,6 +1491,9 @@ export function ClipTrack(
 								<SegmentHandle
 									position="start"
 									data-clip-handle
+									onContextMenu={(event) => {
+										if (i() > 0) showTransitionMenu(event, i());
+									}}
 									onMouseDown={(downEvent) => {
 										if (split()) return;
 										const seg = segment();
@@ -1590,6 +1615,10 @@ export function ClipTrack(
 								<SegmentHandle
 									position="end"
 									data-clip-handle
+									onContextMenu={(event) => {
+										if (i() + 1 < segments().length)
+											showTransitionMenu(event, i() + 1);
+									}}
 									onMouseDown={(downEvent) => {
 										const seg = segment();
 										const end = seg.end;
