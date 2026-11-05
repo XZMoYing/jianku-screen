@@ -1,0 +1,6 @@
+{
+	"commit": "db7dec8661726af8fe92121eda600829dbbecaf5",
+	"version": "0.2.0-alpha.58",
+	"build": "2026.58.0",
+	"scope": "Default-off editor fallback tracing; not a flicker fix or visual acceptance"
+}
