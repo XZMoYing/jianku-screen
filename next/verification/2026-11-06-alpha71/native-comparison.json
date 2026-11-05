@@ -1,0 +1,63 @@
+{
+  "alpha71": {
+    "initial": {
+      "title": "拖动与缩放验收（71工程名撤销）",
+      "focused": false
+    },
+    "pending": {
+      "title": "拖动与缩放验收（71工b程名撤销）",
+      "focused": true
+    },
+    "committed": {
+      "title": "拖动与缩放验收（71工b程名撤销）",
+      "focused": true
+    },
+    "undo": {
+      "title": "拖动与缩放验收（71工程名撤销）",
+      "focused": true
+    },
+    "redo": {
+      "title": "拖动与缩放验收（71工b程名撤销）",
+      "focused": true
+    }
+  },
+  "alpha70": {
+    "initial": {
+      "title": "拖动与缩放验收（70文字对照）",
+      "focused": false
+    },
+    "pending": {
+      "title": "拖动与缩放验收（70文b字对照）",
+      "focused": true
+    },
+    "committed": {
+      "title": "拖动与缩放验收（70文b字对照）",
+      "focused": false
+    },
+    "undo": {
+      "title": "拖动与缩放验收（70文字对照）",
+      "focused": true
+    },
+    "redo": {
+      "title": "拖动与缩放验收（70文b字对照）",
+      "focused": true
+    }
+  },
+  "alpha71TimelineAfterTextHistory": [
+    {
+      "segmentIndex": 1,
+      "type": "fade-through-black",
+      "duration": 0.5
+    }
+  ],
+  "alpha71TimelineAfterProjectUndo": [
+    {
+      "segmentIndex": 1,
+      "type": "cross-fade",
+      "duration": 0.5
+    }
+  ],
+  "isolatedTitleRestored": "拖动与缩放验收（71工程名撤销）",
+  "releaseSession": 55803,
+  "installSession": 61359
+}

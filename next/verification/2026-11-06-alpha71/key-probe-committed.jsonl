@@ -1,0 +1,15 @@
+{"type":"keyup","key":"b","code":"KeyB","meta":false,"ctrl":false,"shift":false,"composing":false,"value":"Original"}
+{"type":"compositionstart","value":"Original"}
+{"type":"beforeinput","composing":true,"input":"insertCompositionText","value":"Original"}
+{"type":"input","composing":true,"input":"insertCompositionText","value":"Originalb"}
+{"type":"keydown","key":"b","code":"KeyB","meta":false,"ctrl":false,"shift":false,"composing":true,"value":"Originalb"}
+{"type":"keyup","key":"Enter","code":"Enter","meta":false,"ctrl":false,"shift":false,"composing":true,"value":"Originalb"}
+{"type":"beforeinput","composing":true,"input":"deleteCompositionText","value":"Originalb"}
+{"type":"input","composing":true,"input":"deleteCompositionText","value":"Original"}
+{"type":"beforeinput","composing":true,"input":"insertFromComposition","value":"Original"}
+{"type":"input","composing":true,"input":"insertFromComposition","value":"Originalb"}
+{"type":"compositionend","value":"Originalb"}
+{"type":"keydown","key":"Enter","code":"Enter","meta":false,"ctrl":false,"shift":false,"composing":false,"value":"Originalb"}
+{"type":"keydown","key":"z","code":"KeyZ","meta":true,"ctrl":false,"shift":false,"composing":false,"value":"Originalb"}
+{"type":"beforeinput","composing":false,"input":"historyUndo","value":"Originalb"}
+{"type":"input","composing":false,"input":"historyUndo","value":"Original"}
