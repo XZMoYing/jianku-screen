@@ -1,0 +1,314 @@
+{
+	"installedVersion": "0.2.0-alpha.66",
+	"sourceCommit": "b426ef7",
+	"windowId": 22248,
+	"pid": 70079,
+	"sourceCount": 1,
+	"timelineClipCount": 5,
+	"nativeInspector": {
+		"clipHeaderVisible": true,
+		"globalTabsHiddenWhileEditingClip": true,
+		"returnRestoresPreviouslySelectedAudioTab": true,
+		"savedClipAttributesReadBack": true
+	},
+	"visibleStates": {
+		"global-before": [
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "来源素材 1",
+				"AXDescription": "",
+				"AXValue": "1",
+				"position": {
+					"x": 27,
+					"y": 202
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "时间线片段 5",
+				"AXDescription": "",
+				"AXValue": "0",
+				"position": {
+					"x": 152,
+					"y": 202
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "",
+				"AXDescription": "背景",
+				"AXValue": "1",
+				"position": {
+					"x": 1276,
+					"y": 90
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "",
+				"AXDescription": "摄像头",
+				"AXValue": "0",
+				"position": {
+					"x": 1346,
+					"y": 90
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "",
+				"AXDescription": "音频",
+				"AXValue": "0",
+				"position": {
+					"x": 1392,
+					"y": 90
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "",
+				"AXDescription": "光标",
+				"AXValue": "0",
+				"position": {
+					"x": 1438,
+					"y": 90
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "",
+				"AXDescription": "按键",
+				"AXValue": "0",
+				"position": {
+					"x": 1484,
+					"y": 90
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "",
+				"AXDescription": "字幕",
+				"AXValue": "0",
+				"position": {
+					"x": 1530,
+					"y": 90
+				}
+			}
+		],
+		"dedicated-properties": [
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "来源素材 1",
+				"AXDescription": "",
+				"AXValue": "0",
+				"position": {
+					"x": 27,
+					"y": 202
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "时间线片段 5",
+				"AXDescription": "",
+				"AXValue": "1",
+				"position": {
+					"x": 152,
+					"y": 202
+				}
+			},
+			{
+				"AXRole": "AXStaticText",
+				"AXTitle": "",
+				"AXDescription": "",
+				"AXValue": "片段属性",
+				"position": {
+					"x": 1197,
+					"y": 111
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "0.25x",
+				"AXDescription": "",
+				"AXValue": "0",
+				"position": {
+					"x": 1199,
+					"y": 263
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "0.5x",
+				"AXDescription": "",
+				"AXValue": "0",
+				"position": {
+					"x": 1263,
+					"y": 263
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "1x",
+				"AXDescription": "",
+				"AXValue": "0",
+				"position": {
+					"x": 1327,
+					"y": 263
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "1.5x",
+				"AXDescription": "",
+				"AXValue": "0",
+				"position": {
+					"x": 1391,
+					"y": 263
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "2x",
+				"AXDescription": "",
+				"AXValue": "1",
+				"position": {
+					"x": 1454,
+					"y": 263
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "4x",
+				"AXDescription": "",
+				"AXValue": "0",
+				"position": {
+					"x": 1518,
+					"y": 263
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "8x",
+				"AXDescription": "",
+				"AXValue": "0",
+				"position": {
+					"x": 1582,
+					"y": 263
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "静音",
+				"AXDescription": "",
+				"AXValue": "1",
+				"position": {
+					"x": 1199,
+					"y": 363
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "保持音高",
+				"AXDescription": "",
+				"AXValue": "0",
+				"position": {
+					"x": 1348,
+					"y": 363
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "随速度变化",
+				"AXDescription": "",
+				"AXValue": "0",
+				"position": {
+					"x": 1497,
+					"y": 363
+				}
+			}
+		],
+		"restored-global-audio": [
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "来源素材 1",
+				"AXDescription": "",
+				"AXValue": "0",
+				"position": {
+					"x": 27,
+					"y": 202
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "时间线片段 5",
+				"AXDescription": "",
+				"AXValue": "1",
+				"position": {
+					"x": 152,
+					"y": 202
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "",
+				"AXDescription": "背景",
+				"AXValue": "0",
+				"position": {
+					"x": 1276,
+					"y": 90
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "",
+				"AXDescription": "摄像头",
+				"AXValue": "0",
+				"position": {
+					"x": 1322,
+					"y": 90
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "",
+				"AXDescription": "音频",
+				"AXValue": "1",
+				"position": {
+					"x": 1368,
+					"y": 90
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "",
+				"AXDescription": "光标",
+				"AXValue": "0",
+				"position": {
+					"x": 1438,
+					"y": 90
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "",
+				"AXDescription": "按键",
+				"AXValue": "0",
+				"position": {
+					"x": 1484,
+					"y": 90
+				}
+			},
+			{
+				"AXRole": "AXRadioButton",
+				"AXTitle": "",
+				"AXDescription": "字幕",
+				"AXValue": "0",
+				"position": {
+					"x": 1530,
+					"y": 90
+				}
+			}
+		]
+	},
+	"lowerWidthDrawer": "source-level only on current display",
+	"otherGates": "strict chroma 15 pass / 2 fail, hardware output, Windows/Linux and deferred devices pending"
+}
