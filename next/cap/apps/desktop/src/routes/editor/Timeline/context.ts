@@ -6,7 +6,7 @@ import { createContextProvider } from "@solid-primitives/context";
 import { type Accessor, createMemo } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { useEditorContext } from "../context";
+import { type TimelineTrackType, useEditorContext } from "../context";
 import { createTimelineScale } from "./timeline-scale";
 
 export const MAX_TIMELINE_MARKINGS = 20;
@@ -14,12 +14,24 @@ const TIMELINE_MARKING_RESOLUTIONS = [0.5, 1, 2.5, 5, 10, 30];
 
 const SEGMENT_RENDER_PADDING = 2;
 
+export type SegmentMenuTarget = {
+	type: Exclude<TimelineTrackType, "clip">;
+	index: number;
+	cancelGesture?: () => void;
+};
+
+type ShowSegmentMenu = (
+	event: MouseEvent | KeyboardEvent,
+	target: SegmentMenuTarget,
+) => void;
+
 type TimelineContextValue = {
 	duration: Accessor<number>;
 	secsPerPixel: Accessor<number>;
 	timelineBounds: Readonly<NullableBounds>;
 	markingResolution: Accessor<number>;
 	visibleTimeRange: Accessor<{ start: number; end: number }>;
+	showSegmentMenu?: ShowSegmentMenu;
 	isSegmentVisible(segmentStart: number, segmentEnd: number): boolean;
 };
 
@@ -45,6 +57,7 @@ export const [TimelineContextProvider, useTimelineContext] =
 			duration: number;
 			secsPerPixel: number;
 			timelineBounds: Readonly<NullableBounds>;
+			showSegmentMenu?: ShowSegmentMenu;
 		}) => {
 			const { editorState: state } = useEditorContext();
 			const secsPerPixel = createTimelineScale(() => props.secsPerPixel);
@@ -76,6 +89,7 @@ export const [TimelineContextProvider, useTimelineContext] =
 				markingResolution,
 				visibleTimeRange,
 				isSegmentVisible,
+				showSegmentMenu: props.showSegmentMenu,
 			};
 		},
 		null as unknown as TimelineContextValue,

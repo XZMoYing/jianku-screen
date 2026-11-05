@@ -12,6 +12,8 @@ import {
 	splitProps,
 } from "solid-js";
 import { useEditorContext } from "../context";
+import { isContextMenuKey } from "../editor-context-menu";
+import type { SegmentMenuTarget } from "./context";
 import {
 	SegmentContextProvider,
 	TrackContextProvider,
@@ -73,6 +75,7 @@ export function SegmentRoot(
 		selected?: boolean;
 		muted?: boolean;
 		ghost?: boolean;
+		menuTarget?: SegmentMenuTarget;
 		onMouseDown?: (
 			e: MouseEvent & { currentTarget: HTMLDivElement; target: Element },
 		) => void;
@@ -85,6 +88,9 @@ export function SegmentRoot(
 		"selected",
 		"muted",
 		"ghost",
+		"menuTarget",
+		"onContextMenu",
+		"onKeyDown",
 		"onMouseDown",
 		"class",
 		"style",
@@ -92,7 +98,7 @@ export function SegmentRoot(
 		"children",
 	]);
 	const { editorState } = useEditorContext();
-	const { isSegmentVisible } = useTimelineContext();
+	const { isSegmentVisible, showSegmentMenu } = useTimelineContext();
 	const translateX = useSegmentTranslateX(() => local.segment);
 	const width = useSegmentWidth(() => local.segment);
 	const visible = createMemo(
@@ -107,6 +113,31 @@ export function SegmentRoot(
 				<div
 					{...rest}
 					data-timeline-segment=""
+					tabIndex={
+						showSegmentMenu && local.menuTarget && local.selected
+							? 0
+							: rest.tabIndex
+					}
+					onContextMenu={
+						showSegmentMenu && local.menuTarget
+							? (event) => {
+									if (local.menuTarget)
+										showSegmentMenu(event, local.menuTarget);
+								}
+							: local.onContextMenu
+					}
+					onKeyDown={
+						showSegmentMenu && local.menuTarget
+							? (event) => {
+									if (
+										event.currentTarget === event.target &&
+										local.menuTarget &&
+										isContextMenuKey(event)
+									)
+										showSegmentMenu(event, local.menuTarget);
+								}
+							: local.onKeyDown
+					}
 					class={cx(
 						"absolute overflow-visible inset-y-0",
 						editorState.timeline.interactMode === "split" &&

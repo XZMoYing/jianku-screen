@@ -399,6 +399,7 @@ export function TextTrack(props: {
 
 					return (
 						<SegmentRoot
+							menuTarget={{ type: "text", index: index() }}
 							data-text-segment
 							data-index={index()}
 							segColor="var(--track-text)"

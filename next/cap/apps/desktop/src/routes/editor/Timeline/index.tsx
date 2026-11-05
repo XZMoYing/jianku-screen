@@ -71,13 +71,18 @@ import { type AudioSegmentDragState, AudioTrack } from "./AudioTrack";
 import { BookmarkTrack } from "./BookmarkTrack";
 import { type CaptionSegmentDragState, CaptionsTrack } from "./CaptionsTrack";
 import { ClipTrack } from "./ClipTrack";
-import { TimelineContextProvider, useTimelineContext } from "./context";
+import {
+	type SegmentMenuTarget,
+	TimelineContextProvider,
+	useTimelineContext,
+} from "./context";
 import { createTimelineHoverPreview } from "./hover-preview";
 import { type KeyboardSegmentDragState, KeyboardTrack } from "./KeyboardTrack";
 import { type MaskSegmentDragState, MaskTrack } from "./MaskTrack";
 import { Minimap } from "./Minimap";
 import { PlaybackFollow } from "./playback-follow";
 import { type SceneSegmentDragState, SceneTrack } from "./SceneTrack";
+import { createTimelineSegmentMenu } from "./segment-menu";
 import { type TextSegmentDragState, TextTrack } from "./TextTrack";
 import { type ThreeDSegmentDragState, ThreeDTrack } from "./ThreeDTrack";
 import { TrackIcon, TrackManager } from "./TrackManager";
@@ -227,6 +232,9 @@ export function Timeline(props: {
 	const [timelineContainerRef, setTimelineContainerRef] =
 		createSignal<HTMLDivElement>();
 	const blankMenu = createEditorContextMenu();
+	const segmentMenu = createTimelineSegmentMenu(
+		(time) => void seekPlayheadTo(time),
+	);
 	const [trackPickerOpen, setTrackPickerOpen] = createSignal(false);
 
 	createEventListener(
@@ -1059,6 +1067,18 @@ export function Timeline(props: {
 		]);
 	}
 
+	function showSegmentMenu(
+		event: MouseEvent | KeyboardEvent,
+		target: SegmentMenuTarget,
+	) {
+		if (props.inactive || (timelinePointerDown && !target.cancelGesture))
+			return;
+		const track = trackDefinitions.find(
+			(definition) => definition.type === target.type,
+		);
+		segmentMenu.show(event, target, localize(track?.label ?? target.type));
+	}
+
 	async function seekPlayheadTo(newTime: number) {
 		const pending = requestHandoffPlayback(playbackIntent(), newTime);
 		if (pending) {
@@ -1265,6 +1285,7 @@ export function Timeline(props: {
 			duration={duration()}
 			secsPerPixel={secsPerPixel()}
 			timelineBounds={timelineBounds}
+			showSegmentMenu={showSegmentMenu}
 		>
 			<div
 				ref={setTimelineContainerRef}
@@ -1421,6 +1442,7 @@ export function Timeline(props: {
 					)}
 				</Show>
 				<blankMenu.Content />
+				<segmentMenu.Content />
 				<div class="overflow-hidden relative flex-1 min-h-0">
 					<div
 						ref={setTimelineScrollRef}

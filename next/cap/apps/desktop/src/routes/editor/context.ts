@@ -2706,7 +2706,32 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				historyShortcut,
 			);
 
+			const trackSegments = (type: TimelineTrackType) => {
+				const timeline = project.timeline;
+				return {
+					style: timeline?.styleSegments,
+					image: timeline?.imageSegments,
+					clip: timeline?.segments,
+					zoom: timeline?.zoomSegments,
+					scene: timeline?.sceneSegments,
+					mask: timeline?.maskSegments,
+					caption: timeline?.captionSegments,
+					keyboard: timeline?.keyboardSegments,
+					text: timeline?.textSegments,
+					audio: timeline?.audioSegments,
+					"3d": timeline?.camera3dSegments,
+				}[type];
+			};
+			const selectSegments = (type: TimelineTrackType, indices: number[]) =>
+				batch(() => {
+					setEditorState("timeline", "audioPicker", null);
+					setEditorState("timeline", "audioReplace", null);
+					setEditorState("timeline", "selection", { type, indices });
+				});
+
 			const timelineCommands = {
+				trackSegments,
+				selectSegments,
 				splitAtPlayhead(index?: number) {
 					const time = editorState.previewTime ?? editorState.playbackTime;
 					if (index !== undefined) {
@@ -2784,20 +2809,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 						selection?.type === "transition" ? undefined : selection?.type;
 					if (!type) return false;
 
-					const timeline = project.timeline;
-					const segments = {
-						style: timeline?.styleSegments,
-						image: timeline?.imageSegments,
-						clip: timeline?.segments,
-						zoom: timeline?.zoomSegments,
-						scene: timeline?.sceneSegments,
-						mask: timeline?.maskSegments,
-						caption: timeline?.captionSegments,
-						keyboard: timeline?.keyboardSegments,
-						text: timeline?.textSegments,
-						audio: timeline?.audioSegments,
-						"3d": timeline?.camera3dSegments,
-					}[type];
+					const segments = trackSegments(type);
 					const indices = segments?.flatMap((segment, index) =>
 						lane === undefined ||
 						("track" in segment ? (segment.track ?? 0) : 0) === lane
@@ -2806,11 +2818,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					);
 					if (!indices?.length) return false;
 
-					batch(() => {
-						setEditorState("timeline", "audioPicker", null);
-						setEditorState("timeline", "audioReplace", null);
-						setEditorState("timeline", "selection", { type, indices });
-					});
+					selectSegments(type, indices);
 				},
 
 				deselect() {

@@ -1722,5 +1722,11 @@
 	"将播放头移到此处": "Move playhead here",
 	"选中此轨道的全部片段": "Select all clips on this track",
 	"选中使用此素材的片段": "Select clips using this source",
-	"工程名称": "Project name"
+	"工程名称": "Project name",
+	"编辑此片段属性": "Edit this segment’s properties",
+	"定位到片段开头": "Go to segment start",
+	"删除 {count} 个片段": "Delete {count} segments",
+	"预览菜单": "Preview menu",
+	"预览画面": "Preview canvas",
+	"删除此片段": "Delete this segment"
 }

@@ -515,6 +515,11 @@ export function ZoomTrack(props: {
 
 						return (
 							<SegmentRoot
+								menuTarget={{
+									type: "zoom",
+									index: index(),
+									cancelGesture: () => startGesture(() => null),
+								}}
 								segColor="var(--track-zoom)"
 								class="group"
 								selected={isSelected()}
@@ -534,67 +539,6 @@ export function ZoomTrack(props: {
 
 										projectActions.splitZoomSegment(index(), splitTime);
 									}
-								}}
-								onContextMenu={async (e: MouseEvent) => {
-									e.preventDefault();
-									e.stopPropagation();
-									// Native menus can consume mouseup before deleting the dragged segment.
-									startGesture(() => null);
-
-									// Right-clicking an unselected segment selects it first,
-									// so the menu always acts on what's highlighted.
-									const selection = editorState.timeline.selection;
-									const targetIndices =
-										selection?.type === "zoom" &&
-										selection.indices.includes(index())
-											? [...selection.indices]
-											: [index()];
-									if (
-										targetIndices.length === 1 &&
-										!selectedZoomIndices()?.has(index())
-									)
-										setEditorState("timeline", "selection", {
-											type: "zoom",
-											indices: [index()],
-										});
-
-									const targets = targetIndices
-										.map((value) => zoomSegments()[value])
-										.filter(
-											(value): value is ZoomSegment => value !== undefined,
-										);
-
-									const menu = await Menu.new({
-										id: "zoom-segment-options",
-										items: [
-											{
-												id: "selectAllZoomSegments",
-												text: localize("全选缩放片段"),
-												enabled: zoomSegments().length > 1,
-												action: () =>
-													setEditorState("timeline", "selection", {
-														type: "zoom",
-														indices: zoomSegments().map((_, value) => value),
-													}),
-											},
-											{
-												id: "deleteZoomSegments",
-												text:
-													targetIndices.length > 1
-														? localize("删除 {count} 个缩放片段", {
-																count: targetIndices.length,
-															})
-														: localize("删除缩放片段"),
-												action: () =>
-													projectActions.deleteZoomSegments(
-														targets
-															.map((value) => zoomSegments().indexOf(value))
-															.filter((value) => value >= 0),
-													),
-											},
-										],
-									});
-									menu.popup();
 								}}
 							>
 								<SegmentHandle

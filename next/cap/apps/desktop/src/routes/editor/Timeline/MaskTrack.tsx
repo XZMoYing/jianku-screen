@@ -402,6 +402,7 @@ export function MaskTrack(props: {
 
 					return (
 						<SegmentRoot
+							menuTarget={{ type: "mask", index: index() }}
 							data-mask-segment
 							data-index={index()}
 							segColor="var(--track-mask)"

@@ -208,6 +208,7 @@ export function KeyboardTrack(props: {
 
 					return (
 						<SegmentRoot
+							menuTarget={{ type: "keyboard", index: index() }}
 							data-keyboard-segment
 							data-index={index()}
 							segColor="var(--track-keyboard)"

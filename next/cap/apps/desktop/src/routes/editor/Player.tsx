@@ -3,7 +3,6 @@ import { ToggleButton as KToggleButton } from "@kobalte/core/toggle-button";
 import { createElementBounds } from "@solid-primitives/bounds";
 import { createEventListener } from "@solid-primitives/event-listener";
 import { debounce } from "@solid-primitives/scheduled";
-import { Menu } from "@tauri-apps/api/menu";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { type as ostype } from "@tauri-apps/plugin-os";
 import { cx } from "cva";
@@ -33,6 +32,10 @@ import { CaptionsRegenerateBadge } from "./CaptionsRegenerateBadge";
 import { createCaptionTrackSegments } from "./captions";
 import { newClipInstance } from "./clip-identity";
 import { FPS, useEditorContext } from "./context";
+import {
+	createEditorContextMenu,
+	isContextMenuKey,
+} from "./editor-context-menu";
 import { FrameButton } from "./FrameButton";
 import { ImageOverlay } from "./image-overlay";
 import { MaskOverlay } from "./MaskOverlay";
@@ -671,20 +674,14 @@ function PreviewCanvas(props: {
 		),
 	);
 
-	const handleContextMenu = async (e: MouseEvent) => {
-		e.preventDefault();
-		const menu = await Menu.new({
-			items: [
-				{
-					id: "performance-mode",
-					text: performanceMode()
-						? localize("✓ 性能模式")
-						: localize("性能模式"),
-					action: () => setPerformanceMode(!performanceMode()),
-				},
-			],
-		});
-		menu.popup();
+	const previewMenu = createEditorContextMenu();
+	const handleContextMenu = (event: MouseEvent | KeyboardEvent) => {
+		previewMenu.show(event, localize("预览菜单"), [
+			{
+				label: localize(performanceMode() ? "✓ 性能模式" : "性能模式"),
+				run: () => setPerformanceMode(!performanceMode()),
+			},
+		]);
 	};
 
 	let initializedCanvas: HTMLCanvasElement | undefined;
@@ -811,8 +808,15 @@ function PreviewCanvas(props: {
 			ref={setCanvasContainerRef}
 			class="relative flex-1 justify-center items-center min-h-0 bg-ed-card"
 			style={{ contain: "layout style" }}
+			tabIndex={0}
+			aria-label={localize("预览画面")}
 			onContextMenu={handleContextMenu}
+			onKeyDown={(event) => {
+				if (event.currentTarget === event.target && isContextMenuKey(event))
+					handleContextMenu(event);
+			}}
 		>
+			<previewMenu.Content />
 			<CaptionsRegenerateBadge class="absolute top-3 right-3 z-20" />
 			<Show when={preparing?.model.rendered() && !preparing?.ordinaryReady()}>
 				<div class="absolute inset-0 flex items-center justify-center p-4 z-10 pointer-events-none">

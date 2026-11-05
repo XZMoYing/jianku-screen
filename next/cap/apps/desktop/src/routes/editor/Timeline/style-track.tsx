@@ -276,6 +276,7 @@ export function OverlayTrack(
 					const index = () => allSegments().indexOf(segment);
 					return (
 						<SegmentRoot
+							menuTarget={{ type: props.type, index: index() }}
 							segment={segment}
 							data-overlay-segment
 							data-index={index()}

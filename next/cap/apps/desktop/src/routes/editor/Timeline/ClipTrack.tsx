@@ -34,6 +34,7 @@ import {
 	clipMergeBlockerHint,
 } from "../clip-merge";
 import {
+	type ClipTransitionKind,
 	clampTransitionDuration,
 	clipDuration,
 	clipTimelineDuration,
@@ -45,6 +46,10 @@ import {
 	maxTransitionDuration,
 } from "../clip-transitions";
 import { useEditorContext } from "../context";
+import {
+	createEditorContextMenu,
+	isContextMenuKey,
+} from "../editor-context-menu";
 import { TextInput } from "../TextInput";
 import { effectiveToOutput, holdWindows } from "../timeline-holds";
 import { useSegmentContext, useTimelineContext } from "./context";
@@ -655,6 +660,75 @@ export function ClipTrack(
 
 	const segments = (): Array<TimelineSegment> =>
 		project.timeline?.segments ?? [{ start: 0, end: duration(), timescale: 1 }];
+	const transitionMenu = createEditorContextMenu();
+
+	function editTransition(index: number) {
+		setEditorState("timeline", "selection", { type: "transition", index });
+	}
+
+	function showTransitionMenu(
+		event: MouseEvent | KeyboardEvent,
+		index: number,
+	) {
+		if (transitionDrag() || event.defaultPrevented) return;
+		const previous = segments()[index - 1];
+		const next = segments()[index];
+		if (!previous || !next) return;
+		const current = transitionAt(index);
+		const currentIndex = () => {
+			const clips = segments();
+			const target = clips.indexOf(next);
+			return target > 0 && clips[target - 1] === previous ? target : -1;
+		};
+		const types = [
+			["cross-fade", "交叉淡化"],
+			["fade-through-black", "黑场淡化"],
+		] as const satisfies ReadonlyArray<readonly [ClipTransitionKind, string]>;
+		transitionMenu.show(event, localize("Clip transition"), [
+			...(current
+				? [
+						{
+							label: localize("Edit clip transition"),
+							run: () => {
+								const target = currentIndex();
+								if (target > 0 && transitionAt(target))
+									queueMicrotask(() => editTransition(target));
+							},
+						},
+					]
+				: []),
+			...types.map(([type, label]) => ({
+				label: localize(label),
+				disabled:
+					current?.type === type ||
+					maxTransitionDuration(previous, next) < MIN_CLIP_TRANSITION_DURATION,
+				run: () => {
+					const target = currentIndex();
+					if (target < 0) return;
+					projectActions.setClipTransition(target, {
+						type,
+						duration:
+							transitionAt(target)?.duration ??
+							DEFAULT_CLIP_TRANSITION_DURATION,
+					});
+				},
+			})),
+			...(current
+				? [
+						{
+							label: localize("Remove transition"),
+							danger: true,
+							run: () => {
+								const target = currentIndex();
+								if (target > 0 && transitionAt(target))
+									projectActions.deleteClipTransition(target);
+							},
+						},
+					]
+				: []),
+		]);
+	}
+
 	const [transitionDrag, setTransitionDrag] = createSignal<{
 		index: number;
 		duration: number;
@@ -1257,16 +1331,18 @@ export function ClipTrack(
 										aria-label={localize("Add transition before clip {count}", {
 											count: i() + 1,
 										})}
+										onContextMenu={(event) => showTransitionMenu(event, i())}
+										onKeyDown={(event) => {
+											if (isContextMenuKey(event))
+												showTransitionMenu(event, i());
+										}}
 										onClick={(event) => {
 											event.stopPropagation();
 											projectActions.setClipTransition(i(), {
 												type: "cross-fade",
 												duration: DEFAULT_CLIP_TRANSITION_DURATION,
 											});
-											setEditorState("timeline", "selection", {
-												type: "transition",
-												index: i(),
-											});
+											editTransition(i());
 										}}
 									>
 										+
@@ -1306,6 +1382,13 @@ export function ClipTrack(
 												}}
 												title={`${transition().type === "cross-fade" ? localize("交叉淡化") : localize("黑场淡化")} · ${transition().duration.toFixed(2)}s`}
 												onMouseDown={(event) => event.stopPropagation()}
+												onContextMenu={(event) =>
+													showTransitionMenu(event, i())
+												}
+												onKeyDown={(event) => {
+													if (isContextMenuKey(event))
+														showTransitionMenu(event, i());
+												}}
 											>
 												<span class="sr-only">
 													{localize("Edit clip transition")}
@@ -1327,8 +1410,8 @@ export function ClipTrack(
 													<div class="grid grid-cols-2 gap-1 rounded-lg bg-gray-2 p-1">
 														{(
 															[
-																["cross-fade", "Crossfade"],
-																["fade-through-black", "Fade"],
+																["cross-fade", "交叉淡化"],
+																["fade-through-black", "黑场淡化"],
 															] as const
 														).map(([type, label]) => (
 															<button
@@ -1347,7 +1430,7 @@ export function ClipTrack(
 																	})
 																}
 															>
-																{label}
+																{localize(label)}
 															</button>
 														))}
 													</div>
@@ -1641,6 +1724,7 @@ export function ClipTrack(
 					);
 				}}
 			</Index>
+			<transitionMenu.Content />
 		</TrackRoot>
 	);
 }

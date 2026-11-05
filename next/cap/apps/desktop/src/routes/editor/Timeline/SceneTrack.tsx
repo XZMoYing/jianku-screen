@@ -415,6 +415,7 @@ export function SceneTrack(props: {
 
 					return (
 						<SegmentRoot
+							menuTarget={{ type: "scene", index: i() }}
 							segColor="var(--track-scene)"
 							class="group"
 							selected={isSelected()}

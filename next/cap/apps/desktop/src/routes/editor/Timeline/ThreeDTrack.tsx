@@ -520,6 +520,7 @@ export function ThreeDTrack(props: {
 
 					return (
 						<SegmentRoot
+							menuTarget={{ type: "3d", index: index() }}
 							segColor="var(--track-3d)"
 							class="group"
 							selected={isSelected()}

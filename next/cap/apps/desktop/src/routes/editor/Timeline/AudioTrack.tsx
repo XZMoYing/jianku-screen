@@ -491,6 +491,7 @@ export function AudioTrack(props: {
 
 					return (
 						<SegmentRoot
+							menuTarget={{ type: "audio", index: index() }}
 							data-audio-segment
 							data-index={index()}
 							forceVisible={isDragging()}

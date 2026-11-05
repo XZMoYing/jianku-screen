@@ -186,6 +186,7 @@ export function CaptionsTrack(props: {
 
 					return (
 						<SegmentRoot
+							menuTarget={{ type: "caption", index: i() }}
 							data-caption-segment
 							data-index={i()}
 							segColor="var(--track-caption)"

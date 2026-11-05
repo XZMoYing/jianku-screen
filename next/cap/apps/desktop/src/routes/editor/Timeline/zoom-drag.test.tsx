@@ -1,4 +1,3 @@
-import { Menu } from "@tauri-apps/api/menu";
 import { batch, createSignal, Show } from "solid-js";
 import { createStore, produce, unwrap } from "solid-js/store";
 import { render } from "solid-js/web";
@@ -6,6 +5,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import type { ZoomSegment } from "~/utils/tauri";
 import { createStoreHistory } from "../project-history";
 import { TimelineContextProvider } from "./context";
+import { createTimelineSegmentMenu } from "./segment-menu";
 import { ZoomTrack } from "./ZoomTrack";
 
 vi.mock("../context", () => ({
@@ -23,6 +23,21 @@ vi.mock("~/utils/tauri", () => ({
 }));
 vi.mock("@tauri-apps/api/menu", () => ({
 	Menu: { new: vi.fn(async () => ({ popup: vi.fn() })) },
+}));
+
+const { showMenu } = vi.hoisted(() => ({
+	showMenu:
+		vi.fn<
+			(
+				event: MouseEvent | KeyboardEvent,
+				title: string,
+				entries: { danger?: boolean; run: () => void }[],
+			) => void
+		>(),
+}));
+vi.mock("../editor-context-menu", async (importOriginal) => ({
+	...(await importOriginal<typeof import("../editor-context-menu")>()),
+	createEditorContextMenu: () => ({ show: showMenu }),
 }));
 
 function segment(start: number, end = start + 4): ZoomSegment {
@@ -55,7 +70,16 @@ function fixture(segments: ZoomSegment[]) {
 	let resumes = 0;
 	const [total, setTotal] = createSignal(60);
 	const [scale, setScale] = createSignal(0.01);
+	const deleteZoomSegments = vi.fn();
 	return {
+		keymap: { label: () => "Delete" },
+		timelineCommands: {
+			trackSegments: () => project.timeline.zoomSegments,
+			selectSegments: (type: "zoom", indices: number[]) =>
+				setEditorState("timeline", "selection", { type, indices }),
+			deleteSelection: () =>
+				deleteZoomSegments(editorState.timeline.selection?.indices),
+		},
 		project,
 		setProject,
 		editorState,
@@ -78,7 +102,7 @@ function fixture(segments: ZoomSegment[]) {
 		meta: () => ({ hasRecordedCursorData: false }),
 		flushProjectConfig: async () => {},
 		projectRevision: () => 0,
-		projectActions: { splitZoomSegment: vi.fn(), deleteZoomSegments: vi.fn() },
+		projectActions: { splitZoomSegment: vi.fn(), deleteZoomSegments },
 	};
 }
 let context: ReturnType<typeof fixture>;
@@ -108,10 +132,12 @@ function mount(segments = [segment(2), segment(10)]) {
 	const onDragStateChanged = vi.fn();
 	dispose = render(() => {
 		context = fixture(segments);
+		const menu = createTimelineSegmentMenu(() => {});
 		return (
 			<TimelineContextProvider
 				duration={context.totalDuration()}
 				secsPerPixel={context.scale()}
+				showSegmentMenu={(event, target) => menu.show(event, target, "Zoom")}
 				timelineBounds={{
 					left: 0,
 					top: 0,
@@ -476,20 +502,8 @@ it("keeps menu deletion on its original objects after sorting", async () => {
 	roots()[0].dispatchEvent(new MouseEvent("contextmenu", { bubbles: true }));
 	await Promise.resolve();
 	expect(context.counts().resumes).toBe(1);
-	const menu = vi.mocked(Menu.new).mock.calls.at(-1)?.[0];
-	const item = menu?.items?.find(
-		(value) =>
-			typeof value === "object" &&
-			"id" in value &&
-			value.id === "deleteZoomSegments",
-	);
-	if (
-		!item ||
-		typeof item !== "object" ||
-		!("action" in item) ||
-		typeof item.action !== "function"
-	)
-		throw new Error("Missing deletion action");
+	const item = showMenu.mock.calls.at(-1)?.[2].find((entry) => entry.danger);
+	if (!item) throw new Error("Missing deletion action");
 	context.setProject(
 		"timeline",
 		"zoomSegments",
@@ -499,7 +513,7 @@ it("keeps menu deletion on its original objects after sorting", async () => {
 			items.sort((left, right) => left.start - right.start);
 		}),
 	);
-	item.action("deleteZoomSegments");
+	item.run();
 	expect(context.projectActions.deleteZoomSegments).toHaveBeenCalledWith([1]);
 	const before = JSON.stringify(context.project);
 	mouse(window, "mousemove", 600);
