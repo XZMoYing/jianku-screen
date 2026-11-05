@@ -1,10 +1,15 @@
 import { createElementBounds } from "@solid-primitives/bounds";
 import { makePersisted } from "@solid-primitives/storage";
+import { useQueryClient } from "@tanstack/solid-query";
 import { type as ostype } from "@tauri-apps/plugin-os";
-import { createSignal, For, Show } from "solid-js";
+import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import CaptionControlsMacOS from "~/components/titlebar/controls/CaptionControlsMacOS";
 import CaptionControlsWindows11 from "~/components/titlebar/controls/CaptionControlsWindows11";
 import { t as localize } from "~/utils/i18n";
+import {
+	type EditorFallbackBoundary,
+	observeEditorFallback,
+} from "./editor-fallback-diagnostics";
 import { DEFAULT_TIMELINE_HEIGHT, editorVerticalLayout } from "./editor-layout";
 import { usePreparingEditorModel } from "./preparing-editor-context";
 import {
@@ -194,8 +199,20 @@ function PreparingSidebar() {
 	);
 }
 
-export function EditorSkeleton() {
+export function EditorSkeleton(
+	props: { boundary?: EditorFallbackBoundary } = {},
+) {
 	const model = usePreparingEditorModel();
+	const queryClient = useQueryClient();
+	let element!: HTMLDivElement;
+	onMount(() => {
+		const stop = observeEditorFallback(
+			element,
+			props.boundary ?? "unspecified",
+			() => queryClient.getQueryCache().getAll(),
+		);
+		onCleanup(stop);
+	});
 	const [layoutRef, setLayoutRef] = createSignal<HTMLDivElement>();
 	const bounds = createElementBounds(layoutRef);
 	const [savedHeight] = makePersisted(createSignal<number | null>(null), {
@@ -208,6 +225,7 @@ export function EditorSkeleton() {
 		);
 	return (
 		<div
+			ref={element}
 			class="flex flex-col flex-1 min-h-0"
 			aria-busy="true"
 			aria-label={localize("Recording editor")}

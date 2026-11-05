@@ -88,6 +88,7 @@ import {
 	transitionsAfterClipSplit,
 } from "./clip-transitions";
 import { normalizeColorCorrection } from "./colorCorrection";
+import { registerEditorResource } from "./editor-fallback-diagnostics";
 import { defaultImageSegment, type ImageSegment, pickImage } from "./images";
 import {
 	generateForStableKeyboardTimeline,
@@ -2815,6 +2816,7 @@ const createEditorInstanceContext = () => {
 		},
 	);
 
+	registerEditorResource("editor-instance", () => editorInstance.state);
 	const metaQuery = createQuery(() => ({
 		queryKey: ["editor", "meta"],
 		queryFn: editorInstance.latest

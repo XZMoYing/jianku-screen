@@ -1,0 +1,16 @@
+{
+	"version": "0.2.0-alpha.57",
+	"bounds": {
+		"Height": 800,
+		"Width": 1275,
+		"X": 202,
+		"Y": 102
+	},
+	"previewRectInWindowPoints": [142, 123, 490, 275],
+	"dragStartedAtUnix": 1793877536.167097,
+	"dragEndedAtUnix": 1793877538.743366,
+	"rangeChanged": [3.0112354521038496, 7.997806624888094],
+	"undoRestoredFullConfig": true,
+	"recording": "/private/tmp/jianku-editor-flicker-20261105/alpha57-move.mov",
+	"visualResult": "pending frame review"
+}

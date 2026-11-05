@@ -9,8 +9,12 @@
 	"weeklyUsedAtCreation": 30,
 	"statusAtVerification": "ACTIVE",
 	"rrule": "RRULE:FREQ=DAILY;COUNT=1;BYHOUR=23;BYMINUTE=52;BYSECOND=25",
-	"consumed": false,
-	"resumeSuccessProven": false,
+	"consumed": true,
+	"resumeSuccessProven": true,
 	"primaryUsedAtClosure": 92,
-	"weeklyUsedAtClosure": 30
+	"weeklyUsedAtClosure": 30,
+	"deletedAfterWake": true,
+	"automaticWakeResumedGoal": false,
+	"goalConfirmedActiveAfterUserUnlock": true,
+	"recoveryMethod": "Unique existing goal resume AX action after user confirmed unlock, followed by active event and get_goal confirmation"
 }

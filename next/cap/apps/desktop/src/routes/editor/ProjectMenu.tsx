@@ -8,6 +8,7 @@ import { t as localize } from "~/utils/i18n";
 import { projectCopyName } from "~/utils/project-files";
 import { commands } from "~/utils/tauri";
 import { isModalDialog, useEditorContext } from "./context";
+import { registerEditorResource } from "./editor-fallback-diagnostics";
 import { savePortableCopy } from "./project-copy";
 import { EditorButton, MenuItem, MenuItemList, PopperContent } from "./ui";
 
@@ -31,6 +32,7 @@ export function ProjectMenu(props: {
 			return [];
 		}),
 	);
+	registerEditorResource("recent-projects", () => recent.state);
 	const unavailable = () =>
 		props.disabled ||
 		busy() ||

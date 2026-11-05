@@ -88,7 +88,7 @@ export default function () {
 				)}
 			>
 				<PreparingEditorProvider>
-					<Suspense fallback={<EditorSkeleton />}>
+					<Suspense fallback={<EditorSkeleton boundary="route-suspense" />}>
 						<Editor titleSave={titleSave} onProjectPath={setProjectPath} />
 					</Suspense>
 				</PreparingEditorProvider>

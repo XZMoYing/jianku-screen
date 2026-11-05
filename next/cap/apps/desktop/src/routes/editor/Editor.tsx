@@ -56,6 +56,7 @@ import {
 	useEditorInstanceContext,
 } from "./context";
 import { EditorErrorScreen } from "./EditorErrorScreen";
+import { registerEditorResource } from "./editor-fallback-diagnostics";
 import {
 	DEFAULT_TIMELINE_HEIGHT,
 	editorInspectorWidth,
@@ -170,6 +171,7 @@ export function Editor(props: {
 		props.onProjectPath(path);
 		return path;
 	});
+	registerEditorResource("project-path", () => projectPath.state);
 
 	const rawMetaQuery = createQuery(() => ({
 		queryKey: ["editor", "raw-meta", projectPath()],
@@ -241,7 +243,7 @@ export function Editor(props: {
 	};
 
 	return (
-		<Switch fallback={<EditorSkeleton />}>
+		<Switch fallback={<EditorSkeleton boundary="project-metadata" />}>
 			<Match when={rawMetaQuery.isError ? projectPath() : null}>
 				{(path) => (
 					<EditorErrorScreen
@@ -318,7 +320,7 @@ function EditorContent(props: {
 	};
 
 	return (
-		<Switch fallback={<EditorSkeleton />}>
+		<Switch fallback={<EditorSkeleton boundary="instance-data" />}>
 			<Match when={errorInfo()}>
 				{(info) => (
 					<EditorErrorScreen
@@ -931,7 +933,7 @@ function Inner(props: {
 		<Show
 			when={!fullscreenMode()}
 			fallback={
-				<Suspense fallback={<EditorSkeleton />}>
+				<Suspense fallback={<EditorSkeleton boundary="export-suspense" />}>
 					<ExportPage />
 				</Suspense>
 			}
