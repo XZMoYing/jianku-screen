@@ -9,5 +9,8 @@
 	"rrule": "RRULE:FREQ=DAILY;COUNT=1;BYHOUR=0;BYMINUTE=4;BYSECOND=23",
 	"primaryUsedAtCreation": 88,
 	"weeklyUsedAtCreation": 46,
-	"resumeSuccessProven": false
+	"resumeSuccessProven": false,
+	"primaryUsedAtClosure": 95,
+	"weeklyUsedAtClosure": 47,
+	"finalResumeScheduleVerified": true
 }
