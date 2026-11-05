@@ -22,7 +22,7 @@ import { BackgroundSettings } from "./BackgroundSettings";
 import { CameraSettings } from "./CameraSettings";
 import { CursorSettings } from "./CursorSettings";
 import { Disclosure } from "./Disclosure";
-import { MotionGroup, MotionSwitch } from "./InterfaceMotion";
+import { MotionGroup, MotionPanel, MotionSwitch } from "./InterfaceMotion";
 import { LayoutSettings } from "./LayoutSettings";
 import { Toggle } from "./Toggle";
 
@@ -203,7 +203,7 @@ export default function CaptureAppearance(props: {
 							>
 								{(panel) => (
 									<>
-										<Show when={panel() === "background"}>
+										<MotionPanel visible={panel() === "background"}>
 											<BackgroundSettings
 												background={value().config.background}
 												desktopSelected={value().desktopWallpaper}
@@ -276,7 +276,7 @@ export default function CaptureAppearance(props: {
 														.catch((e: unknown) => toast.error(String(e)));
 												}}
 											/>
-										</Show>
+										</MotionPanel>
 										<Show when={panel() === "cursor"}>
 											<CursorSettings
 												cursor={value().config.cursor}

@@ -2339,6 +2339,7 @@ impl ShowCapWindow {
                 let builder = self
                     .window_builder_with_id(app, "/editor", &_id, _id.label())
                     .maximizable(true)
+                    .maximized(true)
                     .focused(true);
                 #[cfg(debug_assertions)]
                 let builder = if crate::stop_editor_benchmark::enabled() {

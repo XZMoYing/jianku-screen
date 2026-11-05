@@ -16,6 +16,7 @@ export default defineConfig({
 			"src/components/interface-controls.test.tsx",
 			"src/components/device-choice-controls.test.tsx",
 			"src/components/workspace-motion.test.tsx",
+			"src/components/workspace-layout.test.tsx",
 			"src/components/mobile-resource-view.test.tsx",
 			"src/routes/editor/canvas-drag.test.tsx",
 			"src/routes/editor/Timeline/hover-preview.test.tsx",

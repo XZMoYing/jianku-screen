@@ -474,6 +474,7 @@ function ConfigSidebarContent() {
 						<KTabs value={displayed()}>
 							<StyleSegmentConfig />
 							<BackgroundConfig
+								active={displayed() === TAB_IDS.background}
 								scrollRef={scrollRef}
 								brandColorSwatches={brandColorSwatches()}
 							/>
@@ -1343,6 +1344,7 @@ function ConfigSidebarContent() {
 }
 
 function BackgroundConfig(props: {
+	active: boolean;
 	scrollRef: HTMLDivElement;
 	brandColorSwatches: OrganizationBrandColorSwatch[];
 }) {
@@ -1357,6 +1359,10 @@ function BackgroundConfig(props: {
 	return (
 		<KTabs.Content
 			value={TAB_IDS.background}
+			forceMount
+			hidden={!props.active}
+			inert={!props.active}
+			style={{ display: props.active ? undefined : "none" }}
 			class="flex flex-col gap-3.5 pt-3.5 px-4 pb-4"
 		>
 			<StyleGroupToggle group="background" />

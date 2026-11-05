@@ -46,6 +46,7 @@ import Mode from "~/components/Mode";
 import { MotionText } from "~/components/MotionText";
 import { RecoveryToast } from "~/components/RecoveryToast";
 import WindowCaptureOptions from "~/components/WindowCaptureOptions";
+import WorkspaceLayout from "~/components/WorkspaceLayout";
 import { EditorButton, Input } from "~/routes/editor/ui";
 import Presentation from "~/routes/presentation";
 import { generalSettingsStore, recordingSettingsStore } from "~/store";
@@ -3167,13 +3168,11 @@ function Page() {
 					</details>
 				</nav>
 			</header>
-			<div class="jk-workspace-body">
-				<div
-					class="jk-workspace-main"
-					data-menu-open={!!activeMenu()}
-					data-mode={workspaceMode()}
-					data-source={recordSource()}
-				>
+			<WorkspaceLayout
+				mode={workspaceMode()}
+				source={recordSource()}
+				menuOpen={!!activeMenu()}
+				preview={
 					<CaptureStage
 						style={captureStyle()}
 						cameraEnabled={
@@ -3182,436 +3181,416 @@ function Page() {
 							workspaceMode() === "recording"
 						}
 					/>
-					<div class="jk-workspace-controls">
-						<MotionSwitch
-							value={workspaceMode()}
-							kind="subpage"
-							order={["recording", "presentation"]}
-							class="jk-workspace-switch"
-							focusFallback={() => workspaceModeButtons[workspaceMode()]}
-						>
-							{(displayedMode) => (
-								<>
-									<MotionPanel visible={displayedMode() === "presentation"}>
-										<Presentation
-											blocked={
-												isRecording() ||
-												mobileActive() ||
-												!!editorRecordingFlow() ||
-												styleBusy()
-											}
-											captureStyle={captureStyle()}
-											onStatus={setPresentationStatus}
-											onBusy={setPresentationBusy}
-										/>
-									</MotionPanel>
-									<MotionPanel
-										class="workspace-recording"
-										testId="recording-panel"
-										visible={displayedMode() === "recording"}
+				}
+				inspector={
+					<CaptureAppearance
+						blocked={isRecording() || mobileActive() || presentationBusy()}
+						onStyle={setCaptureStyle}
+						onBusy={setStyleBusy}
+					/>
+				}
+			>
+				<MotionSwitch
+					value={workspaceMode()}
+					kind="subpage"
+					order={["recording", "presentation"]}
+					class="jk-workspace-switch"
+					focusFallback={() => workspaceModeButtons[workspaceMode()]}
+				>
+					{(displayedMode) => (
+						<>
+							<MotionPanel visible={displayedMode() === "presentation"}>
+								<Presentation
+									blocked={
+										isRecording() ||
+										mobileActive() ||
+										!!editorRecordingFlow() ||
+										styleBusy()
+									}
+									captureStyle={captureStyle()}
+									onStatus={setPresentationStatus}
+									onBusy={setPresentationBusy}
+								/>
+							</MotionPanel>
+							<MotionPanel
+								class="workspace-recording"
+								testId="recording-panel"
+								visible={displayedMode() === "recording"}
+							>
+								<MotionGroup
+									class="workspace-sources"
+									label={localize("录制来源")}
+								>
+									<button
+										type="button"
+										class={recordSource() === "desktop" ? "is-selected" : ""}
+										aria-pressed={recordSource() === "desktop"}
+										ref={(element) => {
+											recordSourceButtons.desktop = element;
+										}}
+										disabled={mobileActive()}
+										onClick={() => setRecordSource("desktop")}
 									>
-										<MotionGroup
-											class="workspace-sources"
-											label={localize("录制来源")}
+										{localize("电脑屏幕")}
+									</button>
+									<button
+										type="button"
+										class={recordSource() === "mobile" ? "is-selected" : ""}
+										aria-pressed={recordSource() === "mobile"}
+										ref={(element) => {
+											recordSourceButtons.mobile = element;
+										}}
+										disabled={isRecording() || !!editorRecordingFlow()}
+										onClick={() => {
+											closeAllMenuPanels();
+											setRecordSource("mobile");
+										}}
+									>
+										{localize("手机与平板")}
+									</button>
+								</MotionGroup>
+								<MotionPresence
+									class="workspace-recording-heading"
+									visible={recordSource() === "desktop" && !activeMenu()}
+								>
+									<Mode
+										locked={isRecording() || !!editorRecordingFlow()}
+										onInfoClick={() => {
+											closeAllMenuPanels();
+											setModeInfoMenuOpen(true);
+										}}
+									/>
+									<Show when={editorRecordingFlow()}>
+										<button
+											type="button"
+											class="studio-secondary"
+											onClick={() => void cancelEditorRecordingFlow()}
 										>
-											<button
-												type="button"
-												class={
-													recordSource() === "desktop" ? "is-selected" : ""
-												}
-												aria-pressed={recordSource() === "desktop"}
-												ref={(element) => {
-													recordSourceButtons.desktop = element;
-												}}
-												disabled={mobileActive()}
-												onClick={() => setRecordSource("desktop")}
+											{localize("返回编辑器")}
+										</button>
+									</Show>
+								</MotionPresence>
+								<MotionSwitch
+									value={recordSource()}
+									kind="subpage"
+									order={["desktop", "mobile"]}
+									class="jk-source-switch"
+									focusFallback={() => recordSourceButtons[recordSource()]}
+								>
+									{(displayedSource) => (
+										<>
+											<MotionPanel
+												class="flex flex-1 min-h-0 flex-col"
+												visible={displayedSource() === "desktop"}
+												testId="desktop-recorder"
 											>
-												{localize("电脑屏幕")}
-											</button>
-											<button
-												type="button"
-												class={recordSource() === "mobile" ? "is-selected" : ""}
-												aria-pressed={recordSource() === "mobile"}
-												ref={(element) => {
-													recordSourceButtons.mobile = element;
-												}}
-												disabled={isRecording() || !!editorRecordingFlow()}
-												onClick={() => {
-													closeAllMenuPanels();
-													setRecordSource("mobile");
-												}}
-											>
-												{localize("手机与平板")}
-											</button>
-										</MotionGroup>
-										<MotionPresence
-											class="workspace-recording-heading"
-											visible={recordSource() === "desktop" && !activeMenu()}
-										>
-											<Mode
-												locked={isRecording() || !!editorRecordingFlow()}
-												onInfoClick={() => {
-													closeAllMenuPanels();
-													setModeInfoMenuOpen(true);
-												}}
-											/>
-											<Show when={editorRecordingFlow()}>
-												<button
-													type="button"
-													class="studio-secondary"
-													onClick={() => void cancelEditorRecordingFlow()}
+												<Show
+													when={
+														!isActivelyRecording() &&
+														recordingErrors().length > 0
+													}
 												>
-													{localize("返回编辑器")}
-												</button>
-											</Show>
-										</MotionPresence>
-										<MotionSwitch
-											value={recordSource()}
-											kind="subpage"
-											order={["desktop", "mobile"]}
-											class="jk-source-switch"
-											focusFallback={() => recordSourceButtons[recordSource()]}
-										>
-											{(displayedSource) => (
-												<>
-													<MotionPanel
-														class="flex flex-1 min-h-0 flex-col"
-														visible={displayedSource() === "desktop"}
-														testId="desktop-recorder"
+													<div
+														role="alert"
+														tabIndex={0}
+														class="max-h-20 shrink-0 space-y-1 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-red-3 p-2 text-sm text-red-11"
 													>
+														<For each={recordingErrors()}>
+															{(error) => <p>{error}</p>}
+														</For>
+													</div>
+												</Show>
+												<div class="workspace-recording-body">
+													<Show
+														when={
+															rawOptions.mode !== "screenshot" &&
+															(activeMenu() === "window" ||
+																rawOptions.captureTarget.variant === "window")
+														}
+													>
+														<WindowCaptureOptions
+															disabled={isRecording() || styleBusy()}
+														/>
+													</Show>
+													<Show when={signIn.isPending}>
+														<div class="flex absolute inset-0 justify-center items-center bg-gray-1 animate-in fade-in">
+															<div class="flex flex-col gap-4 justify-center items-center">
+																<span>{localize("Signing In...")}</span>
+
+																<Button
+																	onClick={() => {
+																		signIn.variables?.abort();
+																		signIn.reset();
+																	}}
+																	variant="gray"
+																	class="w-full"
+																>
+																	{localize("Cancel Sign In")}
+																</Button>
+															</div>
+														</div>
+													</Show>
+													<Show when={!signIn.isPending}>
+														<MotionSwitch
+															value={activeMenu()}
+															kind="subpage"
+															order={[
+																null,
+																"display",
+																"window",
+																"recording",
+																"screenshot",
+																"modeInfo",
+																"camera",
+																"microphone",
+															]}
+															class="flex flex-col flex-1 min-h-0"
+														>
+															{(menu) => (
+																<Show
+																	when={menu()}
+																	keyed
+																	fallback={
+																		<>
+																			<TargetSelectionHome />
+																			<p class="workspace-recording-note">
+																				{localize(
+																					"屏幕与窗口支持独立选择；录制结束后可在编辑器调整画面、镜头与光标。",
+																				)}
+																			</p>
+																		</>
+																	}
+																>
+																	{(variant) =>
+																		variant === "display" ? (
+																			<TargetMenuPanel
+																				variant="display"
+																				targets={displayTargetsData()}
+																				isLoading={displayMenuLoading()}
+																				errorMessage={displayErrorMessage()}
+																				onSelect={selectDisplayTarget}
+																				disabled={isRecording() || styleBusy()}
+																				onBack={() => {
+																					setDisplayMenuOpen(false);
+																					displayTriggerRef?.focus();
+																				}}
+																			/>
+																		) : variant === "window" ? (
+																			<TargetMenuPanel
+																				variant="window"
+																				targets={windowTargetsData()}
+																				isLoading={windowMenuLoading()}
+																				errorMessage={windowErrorMessage()}
+																				onSelect={selectWindowTarget}
+																				disabled={isRecording() || styleBusy()}
+																				onBack={() => {
+																					setWindowMenuOpen(false);
+																					windowTriggerRef?.focus();
+																				}}
+																			/>
+																		) : variant === "recording" ? (
+																			<TargetMenuPanel
+																				variant="recording"
+																				targets={recordingsData()}
+																				isLoading={recordings.isPending}
+																				errorMessage={
+																					recordings.error
+																						? "Failed to load recordings"
+																						: undefined
+																				}
+																				onSelect={openRecording}
+																				disabled={isRecording() || styleBusy()}
+																				onBack={() => {
+																					setRecordingsMenuOpen(false);
+																				}}
+																				onViewAll={async () => {
+																					await commands.showWindow({
+																						Settings: {
+																							page: "recordings",
+																						},
+																					});
+																					hideCurrentWindow();
+																				}}
+																				uploadProgress={uploadProgress}
+																				reuploadingPaths={reuploadingPaths()}
+																				onReupload={handleReupload}
+																				onRefetch={refreshRecordings}
+																			/>
+																		) : variant === "screenshot" ? (
+																			<TargetMenuPanel
+																				variant="screenshot"
+																				targets={screenshotsData()}
+																				isLoading={screenshots.isPending}
+																				errorMessage={
+																					screenshots.error
+																						? "Failed to load screenshots"
+																						: undefined
+																				}
+																				onSelect={openScreenshot}
+																				disabled={isRecording() || styleBusy()}
+																				onBack={() => {
+																					setScreenshotsMenuOpen(false);
+																				}}
+																				onViewAll={async () => {
+																					await commands.showWindow({
+																						Settings: {
+																							page: "screenshots",
+																						},
+																					});
+																					hideCurrentWindow();
+																				}}
+																			/>
+																		) : variant === "camera" ? (
+																			<TargetMenuPanel
+																				variant="camera"
+																				targets={devices.cameras}
+																				selectedTarget={
+																					options.camera() ?? null
+																				}
+																				isLoading={devices.isPending}
+																				onSelect={(c) => {
+																					if (!c) {
+																						setOptions("cameraLabel", null);
+																						setCamera.mutate({
+																							model: null,
+																						});
+																					} else if (c.model_id) {
+																						setOptions(
+																							"cameraLabel",
+																							c.display_name,
+																						);
+																						setCamera.mutate({
+																							model: {
+																								ModelID: c.model_id,
+																							},
+																						});
+																					} else {
+																						setOptions(
+																							"cameraLabel",
+																							c.display_name,
+																						);
+																						setCamera.mutate({
+																							model: {
+																								DeviceID: c.device_id,
+																							},
+																						});
+																					}
+																					setCameraMenuOpen(false);
+																					setCameraInitialSettings(null);
+																				}}
+																				disabled={isRecording() || styleBusy()}
+																				onBack={() => {
+																					setCameraMenuOpen(false);
+																					setCameraInitialSettings(null);
+																				}}
+																				permissions={currentPermissions()}
+																				deviceSettings={
+																					deviceSettings() ?? undefined
+																				}
+																				onCameraSettingsChange={(
+																					camera,
+																					settings,
+																				) => {
+																					void setCameraDeviceSettings(
+																						camera,
+																						settings,
+																					);
+																				}}
+																				compatibilityStudioMode={compatibilityStudioMode()}
+																				initialSettingsTarget={cameraInitialSettings()}
+																			/>
+																		) : variant === "microphone" ? (
+																			<TargetMenuPanel
+																				variant="microphone"
+																				targets={devices.microphones}
+																				selectedTarget={
+																					options.micName() ?? null
+																				}
+																				isLoading={devices.isPending}
+																				onSelect={(v) => {
+																					setMicInput.mutate(v?.name ?? null);
+																					setMicrophoneMenuOpen(false);
+																					setMicrophoneInitialSettings(null);
+																				}}
+																				disabled={isRecording() || styleBusy()}
+																				onBack={() => {
+																					setMicrophoneMenuOpen(false);
+																					setMicrophoneInitialSettings(null);
+																				}}
+																				permissions={currentPermissions()}
+																				deviceSettings={
+																					deviceSettings() ?? undefined
+																				}
+																				onMicrophoneSettingsChange={(
+																					key,
+																					settings,
+																				) => {
+																					void setMicrophoneDeviceSettings(
+																						key,
+																						settings,
+																					);
+																				}}
+																				compatibilityStudioMode={compatibilityStudioMode()}
+																				initialSettingsTarget={microphoneInitialSettings()}
+																			/>
+																		) : (
+																			<ModeInfoPanel
+																				onBack={() => {
+																					setModeInfoMenuOpen(false);
+																				}}
+																			/>
+																		)
+																	}
+																</Show>
+															)}
+														</MotionSwitch>
+													</Show>
+												</div>
+											</MotionPanel>
+											<MotionPanel visible={displayedSource() === "mobile"}>
+												<Suspense
+													fallback={
 														<Show
 															when={
-																!isActivelyRecording() &&
-																recordingErrors().length > 0
+																displayedMode() === "recording" &&
+																displayedSource() === "mobile"
 															}
 														>
-															<div
-																role="alert"
-																tabIndex={0}
-																class="max-h-20 shrink-0 space-y-1 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-red-3 p-2 text-sm text-red-11"
-															>
-																<For each={recordingErrors()}>
-																	{(error) => <p>{error}</p>}
-																</For>
+															<div class="studio-empty" role="status">
+																{localize("正在查找移动设备…")}
 															</div>
 														</Show>
-														<div class="workspace-recording-body">
-															<Show
-																when={
-																	rawOptions.mode !== "screenshot" &&
-																	(activeMenu() === "window" ||
-																		rawOptions.captureTarget.variant ===
-																			"window")
-																}
-															>
-																<WindowCaptureOptions
-																	disabled={isRecording() || styleBusy()}
-																/>
-															</Show>
-															<Show when={signIn.isPending}>
-																<div class="flex absolute inset-0 justify-center items-center bg-gray-1 animate-in fade-in">
-																	<div class="flex flex-col gap-4 justify-center items-center">
-																		<span>{localize("Signing In...")}</span>
-
-																		<Button
-																			onClick={() => {
-																				signIn.variables?.abort();
-																				signIn.reset();
-																			}}
-																			variant="gray"
-																			class="w-full"
-																		>
-																			{localize("Cancel Sign In")}
-																		</Button>
-																	</div>
-																</div>
-															</Show>
-															<Show when={!signIn.isPending}>
-																<MotionSwitch
-																	value={activeMenu()}
-																	kind="subpage"
-																	order={[
-																		null,
-																		"display",
-																		"window",
-																		"recording",
-																		"screenshot",
-																		"modeInfo",
-																		"camera",
-																		"microphone",
-																	]}
-																	class="flex flex-col flex-1 min-h-0"
-																>
-																	{(menu) => (
-																		<Show
-																			when={menu()}
-																			keyed
-																			fallback={
-																				<>
-																					<TargetSelectionHome />
-																					<p class="workspace-recording-note">
-																						{localize(
-																							"屏幕与窗口支持独立选择；录制结束后可在编辑器调整画面、镜头与光标。",
-																						)}
-																					</p>
-																				</>
-																			}
-																		>
-																			{(variant) =>
-																				variant === "display" ? (
-																					<TargetMenuPanel
-																						variant="display"
-																						targets={displayTargetsData()}
-																						isLoading={displayMenuLoading()}
-																						errorMessage={displayErrorMessage()}
-																						onSelect={selectDisplayTarget}
-																						disabled={
-																							isRecording() || styleBusy()
-																						}
-																						onBack={() => {
-																							setDisplayMenuOpen(false);
-																							displayTriggerRef?.focus();
-																						}}
-																					/>
-																				) : variant === "window" ? (
-																					<TargetMenuPanel
-																						variant="window"
-																						targets={windowTargetsData()}
-																						isLoading={windowMenuLoading()}
-																						errorMessage={windowErrorMessage()}
-																						onSelect={selectWindowTarget}
-																						disabled={
-																							isRecording() || styleBusy()
-																						}
-																						onBack={() => {
-																							setWindowMenuOpen(false);
-																							windowTriggerRef?.focus();
-																						}}
-																					/>
-																				) : variant === "recording" ? (
-																					<TargetMenuPanel
-																						variant="recording"
-																						targets={recordingsData()}
-																						isLoading={recordings.isPending}
-																						errorMessage={
-																							recordings.error
-																								? "Failed to load recordings"
-																								: undefined
-																						}
-																						onSelect={openRecording}
-																						disabled={
-																							isRecording() || styleBusy()
-																						}
-																						onBack={() => {
-																							setRecordingsMenuOpen(false);
-																						}}
-																						onViewAll={async () => {
-																							await commands.showWindow({
-																								Settings: {
-																									page: "recordings",
-																								},
-																							});
-																							hideCurrentWindow();
-																						}}
-																						uploadProgress={uploadProgress}
-																						reuploadingPaths={reuploadingPaths()}
-																						onReupload={handleReupload}
-																						onRefetch={refreshRecordings}
-																					/>
-																				) : variant === "screenshot" ? (
-																					<TargetMenuPanel
-																						variant="screenshot"
-																						targets={screenshotsData()}
-																						isLoading={screenshots.isPending}
-																						errorMessage={
-																							screenshots.error
-																								? "Failed to load screenshots"
-																								: undefined
-																						}
-																						onSelect={openScreenshot}
-																						disabled={
-																							isRecording() || styleBusy()
-																						}
-																						onBack={() => {
-																							setScreenshotsMenuOpen(false);
-																						}}
-																						onViewAll={async () => {
-																							await commands.showWindow({
-																								Settings: {
-																									page: "screenshots",
-																								},
-																							});
-																							hideCurrentWindow();
-																						}}
-																					/>
-																				) : variant === "camera" ? (
-																					<TargetMenuPanel
-																						variant="camera"
-																						targets={devices.cameras}
-																						selectedTarget={
-																							options.camera() ?? null
-																						}
-																						isLoading={devices.isPending}
-																						onSelect={(c) => {
-																							if (!c) {
-																								setOptions("cameraLabel", null);
-																								setCamera.mutate({
-																									model: null,
-																								});
-																							} else if (c.model_id) {
-																								setOptions(
-																									"cameraLabel",
-																									c.display_name,
-																								);
-																								setCamera.mutate({
-																									model: {
-																										ModelID: c.model_id,
-																									},
-																								});
-																							} else {
-																								setOptions(
-																									"cameraLabel",
-																									c.display_name,
-																								);
-																								setCamera.mutate({
-																									model: {
-																										DeviceID: c.device_id,
-																									},
-																								});
-																							}
-																							setCameraMenuOpen(false);
-																							setCameraInitialSettings(null);
-																						}}
-																						disabled={
-																							isRecording() || styleBusy()
-																						}
-																						onBack={() => {
-																							setCameraMenuOpen(false);
-																							setCameraInitialSettings(null);
-																						}}
-																						permissions={currentPermissions()}
-																						deviceSettings={
-																							deviceSettings() ?? undefined
-																						}
-																						onCameraSettingsChange={(
-																							camera,
-																							settings,
-																						) => {
-																							void setCameraDeviceSettings(
-																								camera,
-																								settings,
-																							);
-																						}}
-																						compatibilityStudioMode={compatibilityStudioMode()}
-																						initialSettingsTarget={cameraInitialSettings()}
-																					/>
-																				) : variant === "microphone" ? (
-																					<TargetMenuPanel
-																						variant="microphone"
-																						targets={devices.microphones}
-																						selectedTarget={
-																							options.micName() ?? null
-																						}
-																						isLoading={devices.isPending}
-																						onSelect={(v) => {
-																							setMicInput.mutate(
-																								v?.name ?? null,
-																							);
-																							setMicrophoneMenuOpen(false);
-																							setMicrophoneInitialSettings(
-																								null,
-																							);
-																						}}
-																						disabled={
-																							isRecording() || styleBusy()
-																						}
-																						onBack={() => {
-																							setMicrophoneMenuOpen(false);
-																							setMicrophoneInitialSettings(
-																								null,
-																							);
-																						}}
-																						permissions={currentPermissions()}
-																						deviceSettings={
-																							deviceSettings() ?? undefined
-																						}
-																						onMicrophoneSettingsChange={(
-																							key,
-																							settings,
-																						) => {
-																							void setMicrophoneDeviceSettings(
-																								key,
-																								settings,
-																							);
-																						}}
-																						compatibilityStudioMode={compatibilityStudioMode()}
-																						initialSettingsTarget={microphoneInitialSettings()}
-																					/>
-																				) : (
-																					<ModeInfoPanel
-																						onBack={() => {
-																							setModeInfoMenuOpen(false);
-																						}}
-																					/>
-																				)
-																			}
-																		</Show>
-																	)}
-																</MotionSwitch>
-															</Show>
-														</div>
-													</MotionPanel>
-													<MotionPanel visible={displayedSource() === "mobile"}>
-														<Suspense
-															fallback={
-																<Show
-																	when={
-																		displayedMode() === "recording" &&
-																		displayedSource() === "mobile"
-																	}
-																>
-																	<div class="studio-empty" role="status">
-																		{localize("正在查找移动设备…")}
-																	</div>
-																</Show>
+													}
+												>
+													<MobileRecorder
+														visible={
+															displayedMode() === "recording" &&
+															displayedSource() === "mobile"
+														}
+														blocked={
+															isRecording() ||
+															styleBusy() ||
+															!!editorRecordingFlow() ||
+															!!presentationStatus()?.active
+														}
+														onActive={(active) => {
+															setMobileActive(active);
+															if (active) {
+																setRecordSource("mobile");
+																setWorkspaceMode("recording");
 															}
-														>
-															<MobileRecorder
-																visible={
-																	displayedMode() === "recording" &&
-																	displayedSource() === "mobile"
-																}
-																blocked={
-																	isRecording() ||
-																	styleBusy() ||
-																	!!editorRecordingFlow() ||
-																	!!presentationStatus()?.active
-																}
-																onActive={(active) => {
-																	setMobileActive(active);
-																	if (active) {
-																		setRecordSource("mobile");
-																		setWorkspaceMode("recording");
-																	}
-																}}
-															/>
-														</Suspense>
-													</MotionPanel>
-												</>
-											)}
-										</MotionSwitch>
-									</MotionPanel>
-								</>
-							)}
-						</MotionSwitch>
-					</div>
-				</div>
-				<CaptureAppearance
-					blocked={isRecording() || mobileActive() || presentationBusy()}
-					onStyle={setCaptureStyle}
-					onBusy={setStyleBusy}
-				/>
-			</div>
+														}}
+													/>
+												</Suspense>
+											</MotionPanel>
+										</>
+									)}
+								</MotionSwitch>
+							</MotionPanel>
+						</>
+					)}
+				</MotionSwitch>
+			</WorkspaceLayout>
 			<Show when={isActivelyRecording()}>
 				<div class="absolute inset-0 z-10 flex flex-col justify-end bg-gray-1/80 px-6 pb-8 backdrop-blur-xs">
 					<div class="pointer-events-auto">

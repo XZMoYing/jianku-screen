@@ -26,6 +26,18 @@ const arrivalFrames = (kind: "page" | "subpage", direction: number) =>
 				: `translateX(${direction * 26 * (1 - progress)}px) scale(${0.985 + 0.015 * progress})`,
 	}));
 const enterFrames = arrivalFrames("page", 1);
+const pageArrivals = {
+	page: enterFrames,
+	forward: arrivalFrames("subpage", 1),
+	backward: arrivalFrames("subpage", -1),
+};
+const sectionFrames = springFrames(0.62, 0.82, 0.85).map(
+	({ offset, progress }) => ({
+		offset,
+		opacity: Math.min(1, Math.max(0, progress)),
+		transform: `translateY(${40 * (1 - progress)}px) scale(${0.96 + 0.04 * progress})`,
+	}),
+);
 const reducedMotion = () =>
 	document.visibilityState !== "visible" ||
 	window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -191,43 +203,66 @@ export function MotionSwitch<T>(props: {
 				}
 				if (generation !== revision) return;
 				setDisplayed(() => value);
+				if (!reducedMotion())
+					await new Promise<void>((resolve) =>
+						requestAnimationFrame(() => resolve()),
+					);
+				if (generation !== revision) return;
+				const sections: Array<{ element: HTMLElement; delay: number }> = [];
+				if (kind === "page" && !reducedMotion()) {
+					const bounds = root.getBoundingClientRect();
+					const candidates = Array.from(
+						root.querySelectorAll<HTMLElement>(
+							"[data-motion-section], [role=tabpanel]:not([hidden]) > div, .jk-motion-content > .jk-layout-settings, .jk-motion-content > .jk-cursor-settings, .jk-motion-content > .jk-background-settings",
+						),
+					);
+					const selected = new Set(candidates);
+					for (const element of candidates) {
+						let ancestor = element.parentElement;
+						let nested = false;
+						while (ancestor && ancestor !== root) {
+							if (selected.has(ancestor)) {
+								nested = true;
+								break;
+							}
+							ancestor = ancestor.parentElement;
+						}
+						if (nested) continue;
+						const rect = element.getBoundingClientRect();
+						if (!rect.height) continue;
+						sections.push({
+							element,
+							delay:
+								(Math.min(900, Math.max(0, rect.top - bounds.top)) / 900) * 300,
+						});
+					}
+				}
 				cancel();
 				root.inert = false;
 				setInteractive(true);
 				if (reducedMotion()) return;
 				animations.push(
-					root.animate(arrivalFrames(kind, direction), {
-						duration: 700,
-						easing: "linear",
-					}),
+					root.animate(
+						kind === "page"
+							? pageArrivals.page
+							: direction > 0
+								? pageArrivals.forward
+								: pageArrivals.backward,
+						{
+							duration: 700,
+							easing: "linear",
+						},
+					),
 				);
 				if (kind === "page") {
-					const bounds = root.getBoundingClientRect();
-					const sections = root.querySelectorAll<HTMLElement>(
-						"[data-motion-section], [role=tabpanel]:not([hidden]) > div, .jk-motion-content > .jk-layout-settings, .jk-motion-content > .jk-cursor-settings, .jk-motion-content > .jk-background-settings",
-					);
-					for (const section of sections) {
-						if (
-							!section.offsetHeight ||
-							section.parentElement?.closest("[data-motion-section]")
-						)
-							continue;
-						const delay =
-							(Math.min(
-								900,
-								Math.max(0, section.getBoundingClientRect().top - bounds.top),
-							) /
-								900) *
-							300;
+					for (const { element, delay } of sections) {
 						animations.push(
-							section.animate(
-								springFrames(0.62, 0.82, 0.85).map(({ offset, progress }) => ({
-									offset,
-									opacity: Math.min(1, Math.max(0, progress)),
-									transform: `translateY(${40 * (1 - progress)}px) scale(${0.96 + 0.04 * progress})`,
-								})),
-								{ duration: 850, delay, easing: "linear", fill: "backwards" },
-							),
+							element.animate(sectionFrames, {
+								duration: 850,
+								delay,
+								easing: "linear",
+								fill: "backwards",
+							}),
 						);
 					}
 				}
