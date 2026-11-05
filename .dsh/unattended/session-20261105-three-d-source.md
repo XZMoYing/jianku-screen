@@ -9,3 +9,5 @@ U27a实际代码已进入CAP，旧/private/tmp/staged只是过时草稿，不再
 实际CLI源码构建91804正常0，目标target/release/cap；导出59861三份自有12秒仪表板（直接/0.45/0.75）各360帧完整解码，主代理看6格×3行取帧比较，0.75更从容作为默认，整体舒适度仍需实际全速体验。证据next/verification/2026-11-05-three-d-flow/；新源电影工程在/private/tmp/jianku-3d-flow-20261105/demo.jks及三个变体，原生/媒体无活动句柄。
 
 下一冻结新包并实际UI／播放／保存重开，不重复23分钟绑定生成或重跑不相关大测试。当前61未包含本修复，后续版本另档；完整U27/U29/U30及原发布门槛不关闭。U30严格在U29之后，全部需求已在代码侧JSON和队列保存。
+
+62冻结a704084已备份，唯一release57642启动，日志/private/tmp/jianku-alpha62-20261105/release.log；工具next/verification/2026-11-05-alpha62只prepared。当前61/归档61回滚六程序验签通过，无安装动作。先续当前构建，不再生成绑定或改冻结CAP源码。
