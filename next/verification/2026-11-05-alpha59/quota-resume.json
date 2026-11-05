@@ -1,0 +1,13 @@
+{
+	"id": "automation",
+	"thread": "01a0f1dc-4cf3-7382-baad-5ff91e2c889a",
+	"oneTime": true,
+	"resetUnix": 1793894603,
+	"resumeUnix": 1793894663,
+	"localTime": "2026-11-06 00:04:23 Asia/Shanghai",
+	"statusAtVerification": "ACTIVE",
+	"rrule": "RRULE:FREQ=DAILY;COUNT=1;BYHOUR=0;BYMINUTE=4;BYSECOND=23",
+	"primaryUsedAtCreation": 88,
+	"weeklyUsedAtCreation": 46,
+	"resumeSuccessProven": false
+}

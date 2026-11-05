@@ -1,0 +1,18 @@
+{
+	"path": "/private/tmp/jianku-alpha59-20261105/bookmarks.jks",
+	"ownedSyntheticClone": true,
+	"copyMethod": "APFS clone via cp -cR",
+	"configSHA256": "20b3f320d628bfa6eedeb57aadff7bab242c15041e8f73aec29b7f13e102f16e",
+	"bookmarks": [
+		{
+			"id": "native59-bookmark-one",
+			"label": "操作重点",
+			"recordingSegment": 0,
+			"time": 2
+		}
+	],
+	"expectedPositions": [1.5, 9.5],
+	"state": "prepared only; native validation pending",
+	"sourceSyncOffsetSeconds": 0.5,
+	"expectationCorrection": "First expected 2/10 omitted the recorded display start offset; corrected to the existing native latest_start_time mapping, without changing product timing."
+}

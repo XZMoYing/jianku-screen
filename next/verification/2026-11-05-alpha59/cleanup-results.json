@@ -1,0 +1,38 @@
+{
+	"retainedAppArchives": [54, 57, 58, 59],
+	"scope": "verified duplicate previous.app slots and obsolete app bundles only; project media, verification evidence, dependencies and Git retained",
+	"removed": [
+		{
+			"path": "/Applications/.jianku-next-update55-ivi5dcrz/previous.app",
+			"logicalAllocatedBytes": 316833792
+		},
+		{
+			"path": "/Applications/.jianku-next-update56-5xeu5bq2/previous.app",
+			"logicalAllocatedBytes": 316833792
+		},
+		{
+			"path": "/Applications/.jianku-next-update57-7rs2tztp/previous.app",
+			"logicalAllocatedBytes": 316817408
+		},
+		{
+			"path": "/Applications/.jianku-next-update58-h2w52tpq/previous.app",
+			"logicalAllocatedBytes": 316833792
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.53/Jianku Screen Next.app",
+			"logicalAllocatedBytes": 316801024
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.55/Jianku Screen Next.app",
+			"logicalAllocatedBytes": 316833792
+		},
+		{
+			"path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.56/Jianku Screen Next.app",
+			"logicalAllocatedBytes": 316817408
+		}
+	],
+	"skipped": [],
+	"sumRemovedAllocatedBytes": 2217771008,
+	"observedVolumeFreeChangeBytes": 2218823680,
+	"volumeChangeMayIncludeOtherSystemActivity": true
+}

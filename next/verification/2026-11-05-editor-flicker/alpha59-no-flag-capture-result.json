@@ -1,0 +1,29 @@
+{
+	"version": "0.2.0-alpha.59",
+	"bounds": {
+		"Height": 800,
+		"Width": 1275,
+		"X": 202,
+		"Y": 102
+	},
+	"previewRectInWindowPoints": [142, 123, 490, 275],
+	"dragStartedAtUnix": 1793882823.815087,
+	"dragEndedAtUnix": 1793882826.324898,
+	"rangeChanged": [3.024832139659803, 8.011403312444047],
+	"undoRestoredFullConfig": true,
+	"recording": "/private/tmp/jianku-editor-flicker-20261105/alpha59-no-flag-move.mov",
+	"capturer": {
+		"captureStartedAtUnix": 1793882823.012469,
+		"droppedByWriter": 0,
+		"durationRequested": 7,
+		"firstSampleAtUnix": 1793882823.054625,
+		"frames": 379,
+		"height": 800,
+		"maximumSampleGapMs": 43.79179165698588,
+		"samples": 379,
+		"scope": "CGWindowListCreateImage optionIncludingWindow for one verified owned editor; no display capture",
+		"width": 1276,
+		"windowID": 21396
+	},
+	"visualResult": "pending frame review"
+}

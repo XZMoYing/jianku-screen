@@ -1,0 +1,5 @@
+{
+	"installedCandidate": "0.2.0-alpha.59",
+	"scope": "actual opted-in fallback connection events during the owned capture; missing rows do not prove absence of flicker",
+	"events": []
+}

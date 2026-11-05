@@ -9,6 +9,7 @@ from pathlib import Path
 area = Path('/private/tmp/jianku-editor-flicker-20261105')
 old = Path('/private/tmp/jianku-alpha57-20261104')
 version = sys.argv[1]
+suffix = '-no-flag' if len(sys.argv) > 2 and sys.argv[2] == 'no-flag' else ''
 assert version in ['57', '58', '59']
 helpers = old if version == '57' else Path(f'/private/tmp/jianku-alpha{version}-20261105')
 app = Path('/Applications/Jianku Screen Next.app')
@@ -43,9 +44,9 @@ preview = collections.Counter((node['position']['x'] - bounds['X'], node['positi
 rects = [rect for rect, count in preview.items() if count >= 4]
 assert rects, preview
 preview_rect = max(rects, key=lambda rect: rect[2] * rect[3])
-output = area / f'alpha{version}-move.mov'
+output = area / f'alpha{version}{suffix}-move.mov'
 assert not output.exists()
-with (area / f'alpha{version}-capture.log').open('x') as capture_log:
+with (area / f'alpha{version}{suffix}-capture.log').open('x') as capture_log:
     capture = subprocess.Popen([str(area / 'record-owned-window-cg'), str(state['windowID']), '7', str(output)], stdout=subprocess.PIPE, stderr=capture_log, text=True)
     line = capture.stdout.readline()
     assert line.startswith('OWNED_WINDOW_CAPTURE_READY'), line
@@ -53,7 +54,7 @@ with (area / f'alpha{version}-capture.log').open('x') as capture_log:
     time.sleep(0.5)
     assert ready()['windowID'] == state['windowID']
     started = time.time()
-    with (area / f'alpha{version}-drag.log').open('x') as drag_log:
+    with (area / f'alpha{version}{suffix}-drag.log').open('x') as drag_log:
         result = subprocess.run([str(helpers / 'drag-owned'), str(state['windowID']), str(x), str(y), str(x + 81), str(y), '16', '0.9', 'normal', 'raw'], stdout=drag_log, stderr=subprocess.STDOUT, timeout=25)
     ended = time.time()
     capture_report = capture.stdout.read()
@@ -72,5 +73,5 @@ time.sleep(0.4)
 restored = json.loads((project / 'project-config.json').read_text())
 assert restored == before
 row = {'version': '0.2.0-alpha.' + version, 'bounds': bounds, 'previewRectInWindowPoints': preview_rect, 'dragStartedAtUnix': started, 'dragEndedAtUnix': ended, 'rangeChanged': [a['start'], a['end']], 'undoRestoredFullConfig': True, 'recording': str(output), 'capturer': json.loads(capture_report), 'visualResult': 'pending frame review'}
-(area / f'alpha{version}-capture-result.json').write_text(json.dumps(row, ensure_ascii=False, indent=2) + '\n')
+(area / f'alpha{version}{suffix}-capture-result.json').write_text(json.dumps(row, ensure_ascii=False, indent=2) + '\n')
 print(json.dumps(row, ensure_ascii=False))

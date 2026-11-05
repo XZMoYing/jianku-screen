@@ -1,0 +1,69 @@
+{
+	"passed": true,
+	"firstPlaybackSamples": [
+		{
+			"time": 0.11,
+			"playing": true,
+			"windowID": 21310
+		},
+		{
+			"time": 0.47,
+			"playing": true,
+			"windowID": 21310
+		},
+		{
+			"time": 1.21,
+			"playing": true,
+			"windowID": 21310
+		},
+		{
+			"time": 1.55,
+			"playing": true,
+			"windowID": 21310
+		},
+		{
+			"time": 2.29,
+			"playing": true,
+			"windowID": 21310
+		},
+		{
+			"time": 3.04,
+			"playing": true,
+			"windowID": 21310
+		},
+		{
+			"time": 3.38,
+			"playing": true,
+			"windowID": 21310
+		},
+		{
+			"time": 4.14,
+			"playing": true,
+			"windowID": 21310
+		}
+	],
+	"replayAfterPauseAndResetSamples": [
+		{
+			"time": 0.1,
+			"playing": true,
+			"windowID": 21310
+		},
+		{
+			"time": 0.54,
+			"playing": true,
+			"windowID": 21310
+		},
+		{
+			"time": 1.26,
+			"playing": true,
+			"windowID": 21310
+		},
+		{
+			"time": 2.0,
+			"playing": true,
+			"windowID": 21310
+		}
+	],
+	"projectConfigPreserved": true,
+	"scope": "native time advance, pause and restart; not frame-pacing or full flicker acceptance"
+}

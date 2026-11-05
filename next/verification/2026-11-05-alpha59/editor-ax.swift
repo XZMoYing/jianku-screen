@@ -53,7 +53,14 @@ if let app=apps.first {
  result["editorSelection"]="unique own CG editor title and matching AX window geometry"
  for window in selectedEditor {walk(window,0)}
  if args.count>1 {
-  guard items.contains(where:{ ($0["AXValue"] as? String)?.contains("拖动与缩放验收")==true }) else {exit(2)}
+  let ownTitleVisible=items.contains(where:{ ($0["AXValue"] as? String)?.contains("拖动与缩放验收")==true })
+  var validBookmarkModalLease=false
+  if let encoded=ProcessInfo.processInfo.environment["JIANKU_TEST_EDITOR_LEASE"],let data=encoded.data(using:.utf8),let lease=try? JSONSerialization.jsonObject(with:data) as? [String:Any],let created=lease["createdAt"] as? Double {
+   let age=Date().timeIntervalSince1970-created
+   validBookmarkModalLease=age>=0 && age<60 && lease["pid"] as? Int == Int(app.processIdentifier) && lease["windowID"] as? Int == ownedEditors[0][kCGWindowNumber as String] as? Int && lease["bounds"] as? [String:Double] == ownedEditors[0][kCGWindowBounds as String] as? [String:Double] && lease["projectTitle"] as? String == "拖动与缩放验收（59书签）" && items.contains(where:{$0["AXRole"] as? String == "AXHeading" && $0["AXTitle"] as? String == "录制书签"})
+  }
+  guard ownTitleVisible || validBookmarkModalLease else {exit(2)}
+  result["testModalLeaseAccepted"]=validBookmarkModalLease
   switch args[1] {
   case "generate-edit":
    guard args.count==4,items.contains(where:{$0["AXRole"] as? String == "AXTextField" && $0["AXValue"] as? String == args[3]}) else {exit(2)}

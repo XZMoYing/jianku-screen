@@ -1,0 +1,10 @@
+{
+	"passed": true,
+	"duplicateSourceMarkerPositions": [1.5, 9.5],
+	"nativeJumpsVerified": [1.5, 9.5],
+	"sourceSyncOffsetSeconds": 0.5,
+	"renamePersistedAndBothMarkersUpdated": true,
+	"globalFallbackEntriesDuringActions": 0,
+	"startedAtUnix": 1793882487.029481,
+	"scope": "owned native bookmark load, duplicate mapping, jump and explicit refresh after rename; no physical capture acceptance"
+}

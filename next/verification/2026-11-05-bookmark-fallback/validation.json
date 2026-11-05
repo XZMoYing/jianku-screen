@@ -12,12 +12,13 @@
 	"existingBookmarkMarkersAndI18nModels": 11,
 	"typecheck": "passed",
 	"frontend": "passed",
-	"installedVersion": "0.2.0-alpha.58",
-	"nativeFixedVersionValidation": "pending alpha59",
+	"nativeFixedVersionValidation": "passed for the recorded bookmark-triggered root fallback; broader gates remain",
 	"strictChromaGate": {
 		"passed": 15,
 		"failed": 2,
 		"stillBlocking": true
 	},
-	"curvesOrRenderingQualityChanged": false
+	"curvesOrRenderingQualityChanged": false,
+	"atSourceCheckInstalledVersion": "0.2.0-alpha.58",
+	"currentInstalledVersion": "0.2.0-alpha.59"
 }

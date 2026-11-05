@@ -5,9 +5,10 @@ from pathlib import Path
 
 area = Path('/private/tmp/jianku-editor-flicker-20261105')
 version = sys.argv[1]
+suffix = '-no-flag' if len(sys.argv) > 2 and sys.argv[2] == 'no-flag' else ''
 assert version in ['57', '58', '59']
-source = area / f'alpha{version}-move.mov'
-metadata = json.loads((area / f'alpha{version}-capture-result.json').read_text())
+source = area / f'alpha{version}{suffix}-move.mov'
+metadata = json.loads((area / f'alpha{version}{suffix}-capture-result.json').read_text())
 rect = metadata['previewRectInWindowPoints']
 video = json.loads(subprocess.check_output(['/Users/moyingxz/homebrew/bin/ffprobe', '-v', 'error', '-show_entries', 'stream=width,height', '-of', 'json', str(source)], text=True))['streams'][0]
 scale_x = video['width'] / metadata['bounds']['Width']
@@ -40,11 +41,11 @@ for row in blank:
     else:
         runs.append({'startIndex': row['index'], 'endIndex': row['index'], 'startTime': row['time'], 'endTime': row['time'], 'frames': 1})
 report = {'version': version, 'loadingPlaceholderCandidates': runs, 'frames': len(rows), 'scope': 'all decoded frames in captured preview rectangle; metrics identify candidates, not a no-flicker acceptance', 'topChanges': sorted(rows, key=lambda row: row['meanDifference'], reverse=True)[:12], 'samples': rows}
-(area / f'alpha{version}-frame-analysis.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
+(area / f'alpha{version}{suffix}-frame-analysis.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
 print(json.dumps({key: value for key, value in report.items() if key != 'samples'}, ensure_ascii=False, indent=2))
 indices = sorted(set(max(0, row['index'] + offset) for row in report['topChanges'][:4] for offset in [-1, 0, 1]))
 expression = '+'.join(f'eq(n,{index})' for index in indices)
-output = area / f'alpha{version}-candidate-frames.png'
+output = area / f'alpha{version}{suffix}-candidate-frames.png'
 assert not output.exists()
 subprocess.run([ffmpeg, '-v', 'error', '-i', str(source), '-vf', f'{crop},select={expression.replace(chr(44), chr(92) + chr(44))},scale=320:180,tile=4x3', '-frames:v', '1', str(output)], check=True)
-(area / f'alpha{version}-candidate-indices.json').write_text(json.dumps(indices) + '\n')
+(area / f'alpha{version}{suffix}-candidate-indices.json').write_text(json.dumps(indices) + '\n')

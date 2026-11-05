@@ -1,0 +1,37 @@
+{
+	"version": "0.2.0-alpha.59",
+	"sourceCommit": "08c5c3e",
+	"strictSignaturesAndSixBinaryFingerprints": "source/archive/installed matched",
+	"before58": {
+		"captureFrames": 329,
+		"loadingPlaceholderRuns": 4,
+		"globalFallbackEntries": 16
+	},
+	"after59OptIn": {
+		"captureFrames": 380,
+		"loadingPlaceholderRuns": 0,
+		"globalFallbackEntries": 0,
+		"maximumSampleGapMs": 45.44
+	},
+	"after59WithoutDiagnostic": {
+		"captureFrames": 379,
+		"loadingPlaceholderRuns": 0,
+		"maximumSampleGapMs": 43.792
+	},
+	"native": {
+		"rangeAndUndoPreserved": true,
+		"pauseResetReplayAdvanced": true,
+		"bookmarkJumpAndRenamePersisted": true,
+		"bookmarkReopenedWithoutDiagnostic": true,
+		"decodedExportFrames": 960
+	},
+	"diagnosticFlagRemoved": true,
+	"openedArchivedSyntheticExample": true,
+	"visualScope": "same owned 16-step 3D drag in two 7-second samples; does not prove arbitrary shorter or other interaction defects absent",
+	"strictChromaGate": {
+		"passed": 15,
+		"failed": 2,
+		"stillBlocking": true
+	},
+	"fullGoalCompleted": false
+}
