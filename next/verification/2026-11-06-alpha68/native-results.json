@@ -1,0 +1,147 @@
+{
+  "version": "0.2.0-alpha.68",
+  "sourceCommit": "4852364fc916f7ac68a337b58c142dad361f28e8",
+  "releaseSession": 69505,
+  "installSession": 49882,
+  "blankMenu": [
+    {
+      "AXRole": "AXMenu",
+      "AXTitle": "",
+      "AXDescription": "时间线菜单",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "将播放头移到此处",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "添加轨道",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "显示整个时间线 ⇧Z",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "取消选择 Esc",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    }
+  ],
+  "videoHeaderMenu": [
+    {
+      "AXRole": "AXMenu",
+      "AXTitle": "",
+      "AXDescription": "视频",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "选中此轨道的全部片段",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    }
+  ],
+  "videoHeaderKeyboardMenu": [
+    {
+      "AXRole": "AXMenu",
+      "AXTitle": "",
+      "AXDescription": "视频",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "选中此轨道的全部片段",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    }
+  ],
+  "sourceMenu": [
+    {
+      "AXRole": "AXMenu",
+      "AXTitle": "",
+      "AXDescription": "素材 1",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "添加到时间线末尾 E",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "选中使用此素材的片段",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    }
+  ],
+  "textHeaderMenu": [
+    {
+      "AXRole": "AXMenu",
+      "AXTitle": "",
+      "AXDescription": "文本 1",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "选中此轨道的全部片段",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    },
+    {
+      "AXRole": "AXMenuItem",
+      "AXTitle": "删除轨道",
+      "AXDescription": "",
+      "AXEnabled": "1"
+    }
+  ],
+  "playheadWindowX": {
+    "beforeRightClick": 187,
+    "menuOpen": 187,
+    "afterExplicitSeek": 565
+  },
+  "clipSelectionPreservedOnOpen": true,
+  "videoHeaderSelectionCount": 7,
+  "addTrackPickerOpened": true,
+  "sourceSelectionCount": 7,
+  "clipCountBeforeAndAfterSourceAppend": [
+    7,
+    8
+  ],
+  "textSegmentCountsAddDeleteUndoRedo": [
+    1,
+    0,
+    1,
+    0
+  ],
+  "savedFixtureReopened": {
+    "appIsForeground": true,
+    "bounds": {
+      "Height": 954,
+      "Width": 1680,
+      "X": 0,
+      "Y": 25
+    },
+    "editorSelection": "unique own CG editor title and matching AX window geometry",
+    "focusedWindowTitle": "简库镜传 · 视频编辑",
+    "ownedEditorWindowCount": 1,
+    "path": "/Applications/Jianku Screen Next.app",
+    "pid": 95566,
+    "trusted": true,
+    "windowID": 22297
+  },
+  "nativeTitleUndo": {
+    "passed": false,
+    "afterTyping": "拖动与缩放验收（68右b键与轨道）",
+    "afterCommandZ": "拖动与缩放验收（68右b键与轨道）",
+    "restoredTitle": "拖动与缩放验收（68右键与轨道）"
+  }
+}
