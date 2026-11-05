@@ -5,6 +5,7 @@ import { useEditorContext } from "../context";
 import { editOverlayInterval } from "../style";
 import { useTimelineContext } from "./context";
 import { createTimelineMouseDrag } from "./mouse-drag";
+import { nearestTimelineSnap, SPLIT_SNAP_PX } from "./split-snapping";
 import {
 	SegmentContent,
 	SegmentHandle,
@@ -36,7 +37,7 @@ export function OverlayTrack(
 		projectHistory,
 		totalDuration,
 	} = useEditorContext();
-	const { secsPerPixel, timelineBounds } = useTimelineContext();
+	const { secsPerPixel, timelineBounds, snapping } = useTimelineContext();
 	const allSegments = (): (StyleSegment | ImageSegment)[] =>
 		(props.type === "style"
 			? project.timeline?.styleSegments
@@ -114,11 +115,16 @@ export function OverlayTrack(
 		}
 		if (editorState.timeline.interactMode !== "seek") return;
 		event.preventDefault();
+		const snapPlayhead = editorState.playbackTime;
 		select(index, event);
 		if (event.metaKey || event.ctrlKey || event.shiftKey) return;
 		startGesture(() => {
 			const initial = { start: segment.start, end: segment.end };
 			const initialPlaybackTime = editorState.playbackTime;
+			const targets = snapping
+				? [snapPlayhead, ...snapping.targets(segment)]
+				: [];
+			const edges = edge === "move" ? (["start", "end"] as const) : [edge];
 			const lane = props.laneIndex;
 			const type = props.type;
 			const scale = secsPerPixel();
@@ -180,13 +186,21 @@ export function OverlayTrack(
 					if (!moved && Math.abs(next.clientX - event.clientX) < 2) return;
 					moved = true;
 					props.onDragStateChanged({ type: "moving" });
-					const interval = editOverlayInterval(
-						initial,
-						(next.clientX - event.clientX) * scale,
-						edge,
-						previousEnd,
-						nextStart,
-					);
+					const delta = (next.clientX - event.clientX) * scale;
+					const edit = (value: number) =>
+						editOverlayInterval(initial, value, edge, previousEnd, nextStart);
+					const snap =
+						snapping?.enabled() && !next.altKey
+							? nearestTimelineSnap(
+									edges.map((side) => initial[side] + delta),
+									targets,
+									SPLIT_SNAP_PX * scale,
+									(shift, side, target) =>
+										Math.abs(edit(delta + shift)[edges[side]] - target) < 1e-7,
+								)
+							: null;
+					snapping?.setGuide(snap?.time ?? null);
+					const interval = edit(delta + (snap?.delta ?? 0));
 					if (
 						interval.start !== segment.start ||
 						interval.end !== segment.end
@@ -203,6 +217,7 @@ export function OverlayTrack(
 					}
 				},
 				finish: (_next, reason) => {
+					snapping?.setGuide(null);
 					if (
 						reason === "cancel" &&
 						resume &&

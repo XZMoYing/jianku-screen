@@ -3,6 +3,7 @@ import {
 	createEventListener,
 	createEventListenerMap,
 } from "@solid-primitives/event-listener";
+import { makePersisted } from "@solid-primitives/storage";
 import { platform } from "@tauri-apps/plugin-os";
 import { cx } from "cva";
 import {
@@ -24,6 +25,7 @@ import {
 import { produce } from "solid-js/store";
 import toast from "solid-toast";
 import { t as localize } from "~/utils/i18n";
+import IconLucideMagnet from "~icons/lucide/magnet";
 import IconLucidePalette from "~icons/lucide/palette";
 import { newClipInstance } from "../clip-identity";
 import { stylesRevealCamera } from "../style";
@@ -83,6 +85,7 @@ import { Minimap } from "./Minimap";
 import { PlaybackFollow } from "./playback-follow";
 import { type SceneSegmentDragState, SceneTrack } from "./SceneTrack";
 import { createTimelineSegmentMenu } from "./segment-menu";
+import { overlayBoundaryTargets } from "./split-snapping";
 import { type TextSegmentDragState, TextTrack } from "./TextTrack";
 import { type ThreeDSegmentDragState, ThreeDTrack } from "./ThreeDTrack";
 import { TrackIcon, TrackManager } from "./TrackManager";
@@ -224,6 +227,7 @@ export function Timeline(props: {
 		requestHandoffPlayback,
 		keymap,
 		timelineCommands,
+		recordingBookmarks,
 	} = useEditorContext();
 
 	const duration = () => editorInstance.recordingDuration;
@@ -236,6 +240,40 @@ export function Timeline(props: {
 		(time) => void seekPlayheadTo(time),
 	);
 	const [trackPickerOpen, setTrackPickerOpen] = createSignal(false);
+	const [snappingEnabled, setSnappingEnabled] = makePersisted(
+		createSignal(true),
+		{
+			name: "editorTimelineSnappingEnabled",
+		},
+	);
+	const [snapGuide, setSnapGuide] = createSignal<number | null>(null);
+	const toggleSnapping = () => {
+		setSnappingEnabled((enabled) => !enabled);
+		if (!snappingEnabled()) {
+			setSnapGuide(null);
+			setEditorState("timeline", "splitPreview", null);
+		}
+	};
+	const snapping = {
+		enabled: snappingEnabled,
+		targets: (exclude?: object) => {
+			const timeline = project.timeline;
+			const clips = timeline?.segments ?? [];
+			const offsets = clipTimelineOffsets(clips, timeline?.transitions ?? []);
+			const holds = holdWindows(timeline?.textSegments);
+			return [
+				...clips.flatMap((clip, index) => [
+					effectiveToOutput(holds, offsets[index]),
+					effectiveToOutput(holds, offsets[index] + clipDuration(clip)),
+				]),
+				...(recordingBookmarks.items() ?? []).flatMap(
+					(bookmark) => bookmark.positions,
+				),
+				...overlayBoundaryTargets(timeline, exclude),
+			];
+		},
+		setGuide: setSnapGuide,
+	};
 
 	createEventListener(
 		timelineContainerRef,
@@ -1219,6 +1257,7 @@ export function Timeline(props: {
 	}
 
 	useEditorShortcuts(keymap, {
+		snap: () => (props.inactive ? false : toggleSnapping()),
 		split: () => (props.inactive ? false : timelineCommands.splitAtPlayhead()),
 		delete: () => (props.inactive ? false : timelineCommands.deleteSelection()),
 		selectAll: () => (props.inactive ? false : timelineCommands.selectTrack()),
@@ -1286,6 +1325,7 @@ export function Timeline(props: {
 			secsPerPixel={secsPerPixel()}
 			timelineBounds={timelineBounds}
 			showSegmentMenu={showSegmentMenu}
+			snapping={snapping}
 		>
 			<div
 				ref={setTimelineContainerRef}
@@ -1364,6 +1404,28 @@ export function Timeline(props: {
 							onAdd={handleAddTrack}
 						/>
 					</div>
+					<button
+						type="button"
+						class={cx(
+							"absolute right-1 top-0.5 z-50 grid size-6 place-items-center rounded-md bg-ed-card focus-visible:outline-ed-accent",
+							snappingEnabled() ? "text-ed-accent" : "text-ed-text-3",
+						)}
+						aria-label={localize("时间线吸附")}
+						aria-pressed={snappingEnabled()}
+						disabled={props.inactive}
+						title={[
+							localize("时间线吸附"),
+							keymap.label("snap"),
+							localize("按住 Alt 临时绕过"),
+						]
+							.filter(Boolean)
+							.join(" · ")}
+						onMouseDown={(event) => event.stopPropagation()}
+						onClick={toggleSnapping}
+					>
+						<IconLucideMagnet class="size-4" />
+					</button>
+
 					{/* Scrub surface for the ruler. It overhangs the timeline origin so
 					    the snap-to-zero zone places the playhead instead of hitting the
 					    "Add track" trigger beneath, without swallowing that trigger. */}
@@ -1420,6 +1482,18 @@ export function Timeline(props: {
 				>
 					<div class="size-3 rounded-full bg-ed-playhead ring-2 ring-ed-card -mt-1.5 -ml-[5.5px]" />
 				</div>
+				<Show when={snapGuide() !== null}>
+					<div
+						aria-hidden="true"
+						data-timeline-snap-guide=""
+						class="absolute bottom-0 z-30 w-px pointer-events-none bg-ed-accent"
+						style={{
+							left: `${TRACK_GUTTER}px`,
+							top: `${PLAYHEAD_TOP_OFFSET}px`,
+							transform: `translateX(${((snapGuide() ?? 0) - transform().position) / secsPerPixel()}px)`,
+						}}
+					/>
+				</Show>
 				<Show when={split() ? editorState.timeline.splitPreview : null}>
 					{(preview) => (
 						<div

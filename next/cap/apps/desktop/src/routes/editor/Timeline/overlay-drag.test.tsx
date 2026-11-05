@@ -165,7 +165,14 @@ function begin() {
 	mouse(content(), "mousedown", 200);
 	mouse(window, "mousemove", 300);
 }
-function mount(kind: Kind) {
+function mount(
+	kind: Kind,
+	snapping?: {
+		enabled: () => boolean;
+		targets: () => number[];
+		setGuide: (time: number | null) => void;
+	},
+) {
 	const [shown, setShown] = createSignal(true);
 	const [lane, setLane] = createSignal(0);
 	const onDragStateChanged = vi.fn();
@@ -175,6 +182,7 @@ function mount(kind: Kind) {
 			<TimelineContextProvider
 				duration={context.totalDuration()}
 				secsPerPixel={context.scale()}
+				snapping={snapping}
 				timelineBounds={{
 					left: 0,
 					top: 0,
@@ -206,6 +214,24 @@ function mount(kind: Kind) {
 }
 for (const kind of ["style", "image"] as const)
 	describe(kind, () => {
+		it("snaps to a nearby edge, allows Alt to bypass it, and clears the guide", () => {
+			const setGuide = vi.fn();
+			mount(kind, { enabled: () => true, targets: () => [3.04], setGuide });
+			const item = context.items()[1];
+			begin();
+			expect(item.start).toBeCloseTo(3.04);
+			expect(item.end - item.start).toBeCloseTo(4);
+			expect(setGuide).toHaveBeenLastCalledWith(3.04);
+			window.dispatchEvent(
+				new MouseEvent("mousemove", { clientX: 300, buttons: 1, altKey: true }),
+			);
+			expect(item.start).toBeCloseTo(3);
+			expect(setGuide).toHaveBeenLastCalledWith(null);
+			mouse(window, "mouseup", 300, 0);
+			expect(item.start).toBeCloseTo(3.04);
+			expect(setGuide).toHaveBeenLastCalledWith(null);
+		});
+
 		it("keeps the source item, DOM and selection after an external array reorder", () => {
 			mount(kind);
 			const node = roots()[0];

@@ -655,7 +655,8 @@ export function ClipTrack(
 		systemAudioWaveforms,
 	} = useEditorContext();
 
-	const { secsPerPixel, duration, isSegmentVisible } = useTimelineContext();
+	const { secsPerPixel, duration, isSegmentVisible, snapping } =
+		useTimelineContext();
 	const setPreviewTime = useSetPreviewTime();
 
 	const segments = (): Array<TimelineSegment> =>
@@ -996,14 +997,16 @@ export function ClipTrack(
 						const rect = e.currentTarget.getBoundingClientRect();
 						const seg = relativeSegment();
 						const raw = seg.start + (e.clientX - rect.left) * secsPerPixel();
-						if (e.altKey) return { time: raw, snapped: null };
+						if (e.altKey || snapping?.enabled() === false)
+							return { time: raw, snapped: null };
 						return snapSplitTime(
 							raw,
 							seg.start,
 							seg.end,
 							SPLIT_SNAP_PX * secsPerPixel(),
-							project.timeline,
+							snapping ? undefined : project.timeline,
 							editorState.playbackTime,
+							snapping?.targets(),
 						);
 					};
 

@@ -27,6 +27,46 @@ const BOUNDARY_TRACKS = [
 	"audioSegments",
 ] as const;
 
+export function overlayBoundaryTargets(
+	timeline: TimelineConfiguration | null | undefined,
+	exclude?: object,
+) {
+	const targets: number[] = [];
+	if (timeline) {
+		for (const key of BOUNDARY_TRACKS) {
+			for (const segment of timeline[key] ?? []) {
+				if (segment !== exclude) targets.push(segment.start, segment.end);
+			}
+		}
+	}
+	return targets;
+}
+
+export function nearestTimelineSnap(
+	edges: readonly number[],
+	targets: readonly number[],
+	radius: number,
+	allowed: (delta: number, edge: number, target: number) => boolean,
+) {
+	let best: { time: number; delta: number } | null = null;
+	for (const target of targets) {
+		if (!Number.isFinite(target)) continue;
+		for (let edge = 0; edge < edges.length; edge++) {
+			const delta = target - edges[edge];
+			const distance = Math.abs(delta);
+			if (!Number.isFinite(distance) || distance > radius) continue;
+			if (
+				best &&
+				(distance > Math.abs(best.delta) ||
+					(distance === Math.abs(best.delta) && target >= best.time))
+			)
+				continue;
+			if (allowed(delta, edge, target)) best = { time: target, delta };
+		}
+	}
+	return best;
+}
+
 export function snapSplitTime(
 	raw: number,
 	clipStart: number,
@@ -34,35 +74,17 @@ export function snapSplitTime(
 	radius: number,
 	timeline: TimelineConfiguration | null | undefined,
 	playhead: number,
+	additionalTargets: readonly number[] = [],
 ): SplitSnapResult {
-	const min = clipStart + SPLIT_EDGE_EPSILON;
-	const max = clipEnd - SPLIT_EDGE_EPSILON;
-	let best: number | null = null;
-	let bestDist = Number.POSITIVE_INFINITY;
-
-	const consider = (t: number) => {
-		if (t < min || t > max) return;
-		const dist = Math.abs(t - raw);
-		if (dist > radius) return;
-		if (dist < bestDist || (dist === bestDist && best !== null && t < best)) {
-			bestDist = dist;
-			best = t;
-		}
-	};
-
-	consider(playhead);
-	if (timeline) {
-		for (const key of BOUNDARY_TRACKS) {
-			const segments = timeline[key];
-			if (!segments) continue;
-			for (const segment of segments) {
-				consider(segment.start);
-				consider(segment.end);
-			}
-		}
-	}
-
+	const best = nearestTimelineSnap(
+		[raw],
+		[playhead, ...overlayBoundaryTargets(timeline), ...additionalTargets],
+		radius,
+		(_delta, _edge, time) =>
+			time >= clipStart + SPLIT_EDGE_EPSILON &&
+			time <= clipEnd - SPLIT_EDGE_EPSILON,
+	);
 	return best === null
 		? { time: raw, snapped: null }
-		: { time: best, snapped: { time: best } };
+		: { time: best.time, snapped: { time: best.time } };
 }

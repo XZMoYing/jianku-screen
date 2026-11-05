@@ -1728,5 +1728,7 @@
 	"删除 {count} 个片段": "Delete {count} segments",
 	"预览菜单": "Preview menu",
 	"预览画面": "Preview canvas",
-	"删除此片段": "Delete this segment"
+	"删除此片段": "Delete this segment",
+	"时间线吸附": "Timeline snapping",
+	"按住 Alt 临时绕过": "Hold Alt to temporarily bypass"
 }

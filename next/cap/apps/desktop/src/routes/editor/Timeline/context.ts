@@ -25,6 +25,12 @@ type ShowSegmentMenu = (
 	target: SegmentMenuTarget,
 ) => void;
 
+type TimelineSnapping = {
+	enabled: Accessor<boolean>;
+	targets(exclude?: object): number[];
+	setGuide(time: number | null): void;
+};
+
 type TimelineContextValue = {
 	duration: Accessor<number>;
 	secsPerPixel: Accessor<number>;
@@ -32,6 +38,7 @@ type TimelineContextValue = {
 	markingResolution: Accessor<number>;
 	visibleTimeRange: Accessor<{ start: number; end: number }>;
 	showSegmentMenu?: ShowSegmentMenu;
+	snapping?: TimelineSnapping;
 	isSegmentVisible(segmentStart: number, segmentEnd: number): boolean;
 };
 
@@ -58,6 +65,7 @@ export const [TimelineContextProvider, useTimelineContext] =
 			secsPerPixel: number;
 			timelineBounds: Readonly<NullableBounds>;
 			showSegmentMenu?: ShowSegmentMenu;
+			snapping?: TimelineSnapping;
 		}) => {
 			const { editorState: state } = useEditorContext();
 			const secsPerPixel = createTimelineScale(() => props.secsPerPixel);
@@ -90,6 +98,7 @@ export const [TimelineContextProvider, useTimelineContext] =
 				visibleTimeRange,
 				isSegmentVisible,
 				showSegmentMenu: props.showSegmentMenu,
+				snapping: props.snapping,
 			};
 		},
 		null as unknown as TimelineContextValue,

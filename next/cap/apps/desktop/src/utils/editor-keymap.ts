@@ -12,6 +12,7 @@ export const editorCommandLabels = {
 	zoomIn: "放大时间线",
 	zoomOut: "缩小时间线",
 	fit: "显示整个时间线",
+	snap: "时间线吸附",
 	undo: "撤销",
 	redo: "重做",
 } as const;
@@ -85,6 +86,7 @@ export function editorBindings(settings: EditorKeymap, mac: boolean) {
 		],
 		zoomOut: [keyStroke("Minus", mod), keyStroke("NumpadSubtract", mod)],
 		fit: legacy ? [] : [keyStroke("KeyZ", { shift: true })],
+		snap: legacy ? [] : [keyStroke("KeyN")],
 		undo: [keyStroke("KeyZ", mod)],
 		redo: [
 			keyStroke("KeyZ", { ...mod, shift: true }),
