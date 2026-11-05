@@ -31,6 +31,7 @@ import {
 import { CaptionOverlay } from "./CaptionOverlay";
 import { CaptionsRegenerateBadge } from "./CaptionsRegenerateBadge";
 import { createCaptionTrackSegments } from "./captions";
+import { newClipInstance } from "./clip-identity";
 import { FPS, useEditorContext } from "./context";
 import { FrameButton } from "./FrameButton";
 import { ImageOverlay } from "./image-overlay";
@@ -176,11 +177,11 @@ export function PlayerContent(props: {
 					updatedProject.timeline = {
 						...(updatedProject.timeline ?? {
 							segments: [
-								{
+								newClipInstance({
 									start: 0,
 									end: editorInstance.recordingDuration,
 									timescale: 1,
-								},
+								}),
 							],
 							zoomSegments: [],
 							sceneSegments: [],

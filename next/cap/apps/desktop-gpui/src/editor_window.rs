@@ -424,6 +424,7 @@ pub fn preflight(path: &std::path::Path) -> Result<ProjectSummary, String> {
                 .iter()
                 .enumerate()
                 .map(|(index, segment)| cap_project::TimelineSegment {
+                    id: None,
                     recording_clip: index as u32,
                     timescale: 1.0,
                     start: 0.0,
@@ -11965,6 +11966,7 @@ mod tests {
         let mut project = ProjectConfiguration {
             timeline: Some(TimelineConfiguration {
                 segments: vec![cap_project::TimelineSegment {
+                    id: None,
                     recording_clip: 0,
                     start: 0.0,
                     end: 10.0,
@@ -12020,6 +12022,7 @@ mod tests {
             timeline: Some(TimelineConfiguration {
                 segments: vec![
                     cap_project::TimelineSegment {
+                        id: None,
                         recording_clip: 0,
                         start: 0.5,
                         end: 4.5,
@@ -12030,6 +12033,7 @@ mod tests {
                         volume: None,
                     },
                     cap_project::TimelineSegment {
+                        id: None,
                         recording_clip: 0,
                         start: 0.5,
                         end: 4.5,

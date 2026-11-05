@@ -1478,7 +1478,7 @@ letterSpacing?: number; lineHeight?: number; opacity?: number; shadow?: number; 
  */
 layoutTransition?: number }
 export type TimelineConfiguration = { segments: TimelineSegment[]; transitions: ClipTransition[]; zoomSegments: ZoomSegment[]; sceneSegments?: SceneSegment[]; maskSegments?: MaskSegment[]; textSegments?: TextSegment[]; captionSegments?: CaptionTrackSegment[]; keyboardSegments?: KeyboardTrackSegment[]; audioSegments?: AudioTrackSegment[]; styleSegments: StyleSegment[]; imageSegments: ImageSegment[]; camera3dSegments?: Camera3DSegment[] }
-export type TimelineSegment = { recordingSegment?: number; timescale: number; start: number; end: number; name?: string | null; speedAudioMode?: ClipSpeedAudioMode | null; volume?: number | null; hideCursor?: boolean | null }
+export type TimelineSegment = { id?: string | null; recordingSegment?: number; timescale: number; start: number; end: number; name?: string | null; speedAudioMode?: ClipSpeedAudioMode | null; volume?: number | null; hideCursor?: boolean | null }
 export type TranscriptionEngine = "Whisper" | "Parakeet"
 export type Trigger = "screenshotTaken" | "studioRecordingFinished" | "instantRecordingFinished" | "recordingStarted" | "uploadCompleted" | "videoImported" | "recordingDeleted"
 export type UpdateChannel = "stable" | "nightly"

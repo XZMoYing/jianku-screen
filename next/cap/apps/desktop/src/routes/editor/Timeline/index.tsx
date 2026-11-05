@@ -27,6 +27,7 @@ import { produce } from "solid-js/store";
 import toast from "solid-toast";
 import { t as localize } from "~/utils/i18n";
 import IconLucidePalette from "~icons/lucide/palette";
+import { newClipInstance } from "../clip-identity";
 import { stylesRevealCamera } from "../style";
 import { ImageTrack } from "./image-track";
 import { type OverlayDragState, StyleTrack } from "./style-track";
@@ -757,7 +758,9 @@ export function Timeline(props: {
 							};
 						}
 						project.timeline ??= {
-							segments: [{ start: 0, end: duration(), timescale: 1 }],
+							segments: [
+								newClipInstance({ start: 0, end: duration(), timescale: 1 }),
+							],
 							zoomSegments: [],
 							sceneSegments: [],
 							maskSegments: [],
@@ -784,7 +787,9 @@ export function Timeline(props: {
 							};
 						}
 						project.timeline ??= {
-							segments: [{ start: 0, end: duration(), timescale: 1 }],
+							segments: [
+								newClipInstance({ start: 0, end: duration(), timescale: 1 }),
+							],
 							zoomSegments: [],
 							sceneSegments: [],
 							maskSegments: [],
@@ -855,11 +860,11 @@ export function Timeline(props: {
 			const resume = projectHistory.pause();
 			setProject("timeline", {
 				segments: [
-					{
+					newClipInstance({
 						timescale: 1,
 						start: 0,
 						end: duration(),
-					},
+					}),
 				],
 				zoomSegments: [],
 				sceneSegments: [],
@@ -903,11 +908,11 @@ export function Timeline(props: {
 			produce((project) => {
 				project.timeline ??= {
 					segments: [
-						{
+						newClipInstance({
 							start: 0,
 							end: duration(),
 							timescale: 1,
-						},
+						}),
 					],
 					zoomSegments: [],
 					sceneSegments: [],

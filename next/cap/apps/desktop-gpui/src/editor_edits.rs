@@ -1830,6 +1830,7 @@ pub fn ensure_timeline(project: &mut ProjectConfiguration, clip_display_duration
             .iter()
             .enumerate()
             .map(|(index, duration)| TimelineSegment {
+                id: None,
                 recording_clip: index as u32,
                 timescale: 1.0,
                 start: 0.0,

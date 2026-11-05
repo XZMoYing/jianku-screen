@@ -19,6 +19,7 @@ export default defineConfig({
 			"src/components/workspace-layout.test.tsx",
 			"src/components/mobile-resource-view.test.tsx",
 			"src/routes/editor/canvas-drag.test.tsx",
+			"src/routes/editor/ClipsSidebar.identity.test.tsx",
 			"src/routes/editor/Timeline/hover-preview.test.tsx",
 			"src/routes/editor/Timeline/segment-drag.test.tsx",
 			"src/routes/editor/Timeline/keyboard-drag.test.tsx",

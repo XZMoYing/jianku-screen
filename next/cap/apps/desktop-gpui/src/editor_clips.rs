@@ -1961,6 +1961,7 @@ impl PreparedMp4Import {
         }
         let timeline = config.timeline.as_mut().ok_or("Missing project timeline")?;
         timeline.segments.push(TimelineSegment {
+            id: None,
             recording_clip: index,
             timescale: 1.0,
             start: 0.0,
@@ -2441,6 +2442,7 @@ fn full_timeline_for_segments(
             let duration =
                 get_video_duration_secs(&project_path.join(segment.display.path.as_str()))?;
             Ok(TimelineSegment {
+                id: None,
                 recording_clip: index as u32,
                 timescale: 1.0,
                 start: 0.0,
@@ -3038,6 +3040,7 @@ fn full_timeline_for_source_segments(
         .map(|(index, segment)| {
             let duration = get_source_video_duration_secs(source_meta, &segment.display)?;
             Ok(TimelineSegment {
+                id: None,
                 recording_clip: index as u32,
                 timescale: 1.0,
                 start: 0.0,
@@ -3125,6 +3128,7 @@ fn source_timeline_segments_for_import(
         }
 
         imported_segments.push(TimelineSegment {
+            id: None,
             recording_clip: source_index,
             timescale: if segment.timescale.is_finite() && segment.timescale > 0.0 {
                 segment.timescale
@@ -3361,6 +3365,7 @@ pub(crate) fn append_cap_project_to_editor(
             };
 
             timeline.segments.push(TimelineSegment {
+                id: None,
                 recording_clip: *target_index,
                 timescale: source_segment.timescale,
                 start: source_segment.start,
@@ -3802,6 +3807,7 @@ mod tests {
 
     fn segment(recording_clip: u32, start: f64, end: f64) -> TimelineSegment {
         TimelineSegment {
+            id: None,
             recording_clip,
             timescale: 1.0,
             start,

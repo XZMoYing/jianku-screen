@@ -257,6 +257,7 @@ pub fn synthesize_default_timeline(
         .filter_map(|(i, segment)| {
             let duration = segment.duration();
             (duration > 0.0).then_some(TimelineSegment {
+                id: None,
                 recording_clip: i as u32,
                 start: 0.0,
                 end: duration,

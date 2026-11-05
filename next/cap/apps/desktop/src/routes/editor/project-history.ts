@@ -8,6 +8,7 @@ export function createStoreHistory<T extends Static>(
 	state: T,
 	setState: ReturnType<typeof createStore<T>>[1],
 	onRestore?: () => void,
+	onRestored?: () => void,
 ) {
 	const [pauseCount, setPauseCount] = createSignal(0);
 	let derivedWriteDepth = 0;
@@ -22,8 +23,11 @@ export function createStoreHistory<T extends Static>(
 		const copy = structuredClone(unwrap(state));
 
 		return () => {
-			onRestore?.();
-			setState(reconcile(copy));
+			batch(() => {
+				onRestore?.();
+				setState(reconcile(copy));
+				onRestored?.();
+			});
 		};
 	});
 

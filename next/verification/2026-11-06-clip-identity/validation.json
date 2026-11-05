@@ -1,0 +1,28 @@
+{
+	"nativeChecked": [
+		"cap-project",
+		"cap-editor",
+		"cap-export",
+		"cap-rendering",
+		"cap-recording",
+		"cap-desktop",
+		"cap"
+	],
+	"nativeIdentityRoundTrip": 1,
+	"bindings": "generated via canonical Rust test, one optional property",
+	"models": 18,
+	"actualSidebarComponentCases": 5,
+	"typecheck": "passed",
+	"frontend": "passed",
+	"installedVersion": "alpha.63",
+	"nextPackage": "alpha.64 pending release/native UI acceptance",
+	"allLinkedTracksFollowVideo": "not implemented here",
+	"historyAndSidebarCases": 13,
+	"optionalGpui": {
+		"enabledInProduct": false,
+		"verified": false,
+		"checkExitCode": 101,
+		"blocker": "missing local next/zed-cap/crates/gpui/Cargo.toml; no dependency download"
+	},
+	"historySelection": "matching clip identities remapped after restore; before/state/after changes batched"
+}

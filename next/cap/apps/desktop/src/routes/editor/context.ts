@@ -68,12 +68,18 @@ import {
 } from "./audio";
 import { deriveCaptionTrackSegments, mapEditedTimeToSource } from "./captions";
 import {
+	clipIndicesForIds,
+	newClipInstance,
+	normalizeClipIdentities,
+} from "./clip-identity";
+import {
 	type ClipMergeDirection,
 	clipMergeBlocker,
 	clipMergeKeptIndex,
 	mergedClipSegment,
 	transitionsAfterClipMerge,
 } from "./clip-merge";
+import { reorderClipInstance } from "./clip-reorder";
 import {
 	type ClipTransition,
 	type ClipTransitionInput,
@@ -301,6 +307,7 @@ export function normalizeProject(
 	const timeline = config.timeline
 		? {
 				...config.timeline,
+				segments: normalizeClipIdentities(config.timeline.segments),
 				styleSegments: normalizeTrackSegments(
 					config.timeline.styleSegments ?? [],
 				),
@@ -375,6 +382,7 @@ export function serializeProjectConfiguration(
 	const timeline = project.timeline
 		? {
 				...project.timeline,
+				segments: normalizeClipIdentities(project.timeline.segments),
 				transitions: project.timeline.transitions ?? [],
 				styleSegments: project.timeline.styleSegments ?? [],
 				imageSegments: project.timeline.imageSegments ?? [],
@@ -412,6 +420,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 			const [project, setProject] = createStore<EditorProjectConfiguration>(
 				normalizeProject(props.editorInstance.savedProjectConfig),
 			);
+			let clipSelectionBeforeRestore: string[] = [];
 
 			const setClipTransition = (
 				segmentIndex: number,
@@ -667,6 +676,41 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					setClipTransition(segmentIndex, null);
 					setEditorState("timeline", "selection", null);
 				},
+				moveClipSegment: (clipId: string, insertionIndex: number) => {
+					const selection = editorState.timeline.selection;
+					const selectedIds =
+						selection?.type === "clip"
+							? selection.indices.flatMap((index) => {
+									const id = project.timeline?.segments[index]?.id;
+									return id ? [id] : [];
+								})
+							: [];
+					let moved = false;
+					batch(() => {
+						setProject(
+							produce((project) => {
+								if (project.timeline)
+									moved =
+										reorderClipInstance(
+											project.timeline,
+											clipId,
+											insertionIndex,
+										) !== null;
+							}),
+						);
+						if (!moved) return;
+						const ids = selectedIds.includes(clipId) ? selectedIds : [clipId];
+						const indices = clipIndicesForIds(
+							project.timeline?.segments ?? [],
+							ids,
+						);
+						setEditorState(
+							"timeline",
+							"selection",
+							indices.length ? { type: "clip", indices } : null,
+						);
+					});
+				},
 				splitClipSegment: (time: number, requestedSegmentIndex?: number) => {
 					let didSplit = false;
 					setProject(
@@ -721,11 +765,15 @@ export const [EditorContextProvider, useBaseEditorContext] =
 								return;
 							const splitPositionInRecording = localTime * segment.timescale;
 
-							segments.splice(currentSegmentIndex + 1, 0, {
-								...segment,
-								start: segment.start + splitPositionInRecording,
-								end: segment.end,
-							});
+							segments.splice(
+								currentSegmentIndex + 1,
+								0,
+								newClipInstance({
+									...segment,
+									start: segment.start + splitPositionInRecording,
+									end: segment.end,
+								}),
+							);
 							segments[currentSegmentIndex].end =
 								segment.start + splitPositionInRecording;
 							timeline.transitions = transitionsAfterClipSplit(
@@ -2591,10 +2639,34 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				toggleStyleGroup,
 				exitStyleScope,
 				previewStyle,
-				projectHistory: createStoreHistory(project, setProject, () => {
-					exitStyleScope();
-					setEditorState("timeline", "selection", null);
-				}),
+				projectHistory: createStoreHistory(
+					project,
+					setProject,
+					() => {
+						const selection = editorState.timeline.selection;
+						clipSelectionBeforeRestore =
+							selection?.type === "clip"
+								? selection.indices.flatMap((index) => {
+										const id = project.timeline?.segments[index]?.id;
+										return id ? [id] : [];
+									})
+								: [];
+						exitStyleScope();
+						setEditorState("timeline", "selection", null);
+					},
+					() => {
+						const indices = clipIndicesForIds(
+							project.timeline?.segments ?? [],
+							clipSelectionBeforeRestore,
+						);
+						clipSelectionBeforeRestore = [];
+						if (indices.length)
+							setEditorState("timeline", "selection", {
+								type: "clip",
+								indices,
+							});
+					},
+				),
 				editorState,
 				setEditorState,
 				snapGuides,

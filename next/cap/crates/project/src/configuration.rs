@@ -976,6 +976,8 @@ pub struct HotkeysConfiguration {
 #[derive(Type, Serialize, Deserialize, Clone, Debug, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct TimelineSegment {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
     #[serde(default, rename = "recordingSegment")]
     pub recording_clip: u32,
     pub timescale: f64,
@@ -3219,6 +3221,7 @@ mod tests {
         TimelineConfiguration {
             segments: vec![
                 TimelineSegment {
+                    id: None,
                     recording_clip: 0,
                     timescale: 1.0,
                     start: 0.0,
@@ -3229,6 +3232,7 @@ mod tests {
                     hide_cursor: None,
                 },
                 TimelineSegment {
+                    id: None,
                     recording_clip: 1,
                     timescale: 1.0,
                     start: 10.0,
@@ -4100,8 +4104,28 @@ mod tests {
         );
     }
 
+    #[test]
+    fn clip_instance_identity_survives_save_and_legacy_clips_remain_readable() {
+        let clip: TimelineSegment = serde_json::from_value(serde_json::json!({
+            "id": "clip-instance-a", "recordingSegment": 0,
+            "start": 0.0, "end": 4.0, "timescale": 1.0
+        }))
+        .unwrap();
+        let saved = serde_json::to_value(&clip).unwrap();
+        assert_eq!(saved["id"], "clip-instance-a");
+        let reopened: TimelineSegment = serde_json::from_value(saved).unwrap();
+        assert_eq!(reopened.id.as_deref(), Some("clip-instance-a"));
+        let legacy: TimelineSegment = serde_json::from_value(serde_json::json!({
+            "start": 0.0, "end": 4.0, "timescale": 1.0
+        }))
+        .unwrap();
+        assert!(legacy.id.is_none());
+        assert!(serde_json::to_value(legacy).unwrap().get("id").is_none());
+    }
+
     fn clip(start: f64, end: f64, hide_cursor: bool) -> TimelineSegment {
         TimelineSegment {
+            id: None,
             recording_clip: 0,
             timescale: 1.0,
             start,

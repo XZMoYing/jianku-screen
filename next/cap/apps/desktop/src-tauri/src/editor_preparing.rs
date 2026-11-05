@@ -1410,6 +1410,7 @@ mod presentation_guard_tests {
     #[test]
     fn stopped_layout_rejects_multiple_or_missing_segments_and_recorded_notches() {
         let segment = cap_project::TimelineSegment {
+            id: None,
             recording_clip: 0,
             start: 0.0,
             end: 6.0,

@@ -61,6 +61,7 @@ export function mergedClipSegment<T extends TimelineSegment>(
 		null;
 	return {
 		...settingsFrom,
+		...(left.id ? { id: left.id } : {}),
 		recordingSegment: left.recordingSegment,
 		timescale: left.timescale,
 		start: left.start,

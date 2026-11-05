@@ -2065,6 +2065,7 @@ pub fn apply_caption_result(
     if project.timeline.is_none() {
         project.timeline = Some(TimelineConfiguration {
             segments: vec![TimelineSegment {
+                id: None,
                 recording_clip: 0,
                 timescale: 1.0,
                 start: 0.0,

@@ -2805,6 +2805,7 @@ async fn stop_recording(
         .enumerate()
         .filter_map(|(i, segment)| {
             (segment.duration > 0.0).then_some(TimelineSegment {
+                id: None,
                 recording_clip: i as u32,
                 start: 0.0,
                 end: segment.duration,

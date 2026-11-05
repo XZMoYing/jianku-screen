@@ -6905,6 +6905,7 @@ fn project_config_from_recording(
         .iter()
         .enumerate()
         .map(|(i, segment)| TimelineSegment {
+            id: None,
             recording_clip: i as u32,
             start: 0.0,
             end: segment.duration(),
@@ -10789,6 +10790,7 @@ mod preparing_presentation_parity_tests {
 
     fn one_segment(end: f64) -> Vec<TimelineSegment> {
         vec![TimelineSegment {
+            id: None,
             recording_clip: 0,
             start: 0.0,
             end,

@@ -897,6 +897,7 @@ mod fixture {
         let project_config = ProjectConfiguration {
             timeline: Some(TimelineConfiguration {
                 segments: vec![TimelineSegment {
+                    id: None,
                     recording_clip: 0,
                     start: 0.0,
                     end: display_duration,

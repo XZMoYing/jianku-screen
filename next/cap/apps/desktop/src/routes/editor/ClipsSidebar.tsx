@@ -9,30 +9,20 @@ import { cx } from "cva";
 import {
 	createEffect,
 	createMemo,
-	createRoot,
 	createSignal,
 	For,
 	onCleanup,
 	onMount,
 	Show,
 } from "solid-js";
-import { produce } from "solid-js/store";
 import { Portal } from "solid-js/web";
 import toast from "solid-toast";
 import { t as localize } from "~/utils/i18n";
 import { commands } from "~/utils/tauri";
-import {
-	clipTimelineOffsets,
-	getClipTransition,
-	rippleTimelineTrack,
-	transitionsAfterClipMove,
-} from "./clip-transitions";
 import { type EditorTimelineSegment, useEditorContext } from "./context";
 import { getExistingRecordingPickerOptions } from "./existing-recording-picker";
-import { rippleKeyboardTrack } from "./keyboard-timing";
 import { routeEditorPlaybackIntent } from "./playback-intent-routing";
-import { scaleKeyframeTimes } from "./three-d";
-import { effectiveToOutput, holdWindows } from "./timeline-holds";
+import { createTimelineMouseDrag } from "./Timeline/mouse-drag";
 
 const formatClipDuration = (seconds: number) => {
 	if (!Number.isFinite(seconds) || seconds <= 0) return "0:00";
@@ -217,7 +207,6 @@ export function ClipsSidebar(props: { class?: string }) {
 	const {
 		project,
 		flushProjectConfig,
-		setProject,
 		projectActions,
 		editorInstance,
 		editorState,
@@ -370,107 +359,39 @@ export function ClipsSidebar(props: { class?: string }) {
 		return formattedDuration;
 	};
 
-	const [editingIndex, setEditingIndex] = createSignal<number | null>(null);
+	const [editingClipId, setEditingClipId] = createSignal<string | null>(null);
+	const editingIndex = createMemo(() => {
+		const index = segments().findIndex(
+			(segment) => segment.id === editingClipId(),
+		);
+		return index < 0 ? null : index;
+	});
 	const [draftName, setDraftName] = createSignal("");
 	const startRename = (index: number, currentName: string) => {
 		setDraftName(currentName);
-		setEditingIndex(index);
+		setEditingClipId(segments()[index]?.id ?? null);
 	};
 	const commitRename = (index: number) => {
 		if (editingIndex() !== index) return;
 		const value = draftName().trim();
-		setProject(
-			"timeline",
-			"segments",
-			index,
-			"name",
-			value.length ? value : null,
-		);
-		setEditingIndex(null);
+		projectActions.setClipSegmentName(index, value.length ? value : null);
+		setEditingClipId(null);
 	};
-	const cancelRename = () => setEditingIndex(null);
+	const cancelRename = () => setEditingClipId(null);
 
-	const [draggingIndex, setDraggingIndex] = createSignal<number | null>(null);
+	const [draggingClipId, setDraggingClipId] = createSignal<string | null>(null);
+	const draggingIndex = createMemo(() => {
+		const index = segments().findIndex(
+			(segment) => segment.id === draggingClipId(),
+		);
+		return index < 0 ? null : index;
+	});
 	const [dropIndex, setDropIndex] = createSignal<number | null>(null);
 	const [pointerPos, setPointerPos] = createSignal<{
 		x: number;
 		y: number;
 	} | null>(null);
 	let listRef: HTMLDivElement | undefined;
-
-	const moveClip = (from: number, insertionIndex: number) => {
-		let to = insertionIndex;
-		if (from < insertionIndex) to -= 1;
-		if (from === to) return;
-		setProject(
-			produce((project) => {
-				const timeline = project.timeline;
-				if (!timeline) return;
-				const proposedSegments = [...timeline.segments];
-				const [proposedMoved] = proposedSegments.splice(from, 1);
-				proposedSegments.splice(to, 0, proposedMoved);
-				const { kept, dropped } = transitionsAfterClipMove(
-					timeline.segments.length,
-					timeline.transitions ?? [],
-					from,
-					to,
-				);
-				dropped.sort((a, b) => b.segmentIndex - a.segmentIndex);
-
-				for (const transition of dropped) {
-					const effective = getClipTransition(
-						timeline.segments,
-						timeline.transitions,
-						transition.segmentIndex,
-					);
-					if (!effective) continue;
-					const boundary = effectiveToOutput(
-						holdWindows(timeline.textSegments),
-						clipTimelineOffsets(timeline.segments, timeline.transitions)[
-							transition.segmentIndex
-						] + effective.duration,
-					);
-					timeline.transitions = timeline.transitions.filter(
-						(candidate) => candidate.segmentIndex !== transition.segmentIndex,
-					);
-					const camera3dSegments = timeline.camera3dSegments ?? [];
-					const previousCamera3dDurations = camera3dSegments.map(
-						(segment) => segment.end - segment.start,
-					);
-					for (const track of [
-						timeline.styleSegments,
-						timeline.imageSegments,
-						timeline.zoomSegments,
-						timeline.sceneSegments ?? [],
-						timeline.maskSegments,
-						timeline.textSegments,
-						timeline.captionSegments ?? [],
-						timeline.audioSegments ?? [],
-						camera3dSegments,
-					]) {
-						rippleTimelineTrack(track, boundary, effective.duration);
-					}
-					rippleKeyboardTrack(
-						timeline.keyboardSegments ?? [],
-						boundary,
-						effective.duration,
-					);
-					for (let index = 0; index < camera3dSegments.length; index++) {
-						const segment = camera3dSegments[index];
-						const previousDuration = previousCamera3dDurations[index];
-						const nextDuration = segment.end - segment.start;
-						if (previousDuration <= 0 || previousDuration === nextDuration)
-							continue;
-						scaleKeyframeTimes(segment.tracks, nextDuration / previousDuration);
-					}
-				}
-
-				timeline.segments = proposedSegments;
-				timeline.transitions = kept;
-			}),
-		);
-		setEditorState("timeline", "selection", null);
-	};
 
 	const computeDropIndex = (clientY: number) => {
 		if (!listRef) return segments().length;
@@ -485,58 +406,55 @@ export function ClipsSidebar(props: { class?: string }) {
 		return insertion;
 	};
 
-	const commitDrop = () => {
-		const from = draggingIndex();
-		const insertion = dropIndex();
-		setDraggingIndex(null);
+	const startGesture = createTimelineMouseDrag();
+	const clearClipDrag = () => {
+		setDraggingClipId(null);
 		setDropIndex(null);
 		setPointerPos(null);
-		if (from === null || insertion === null) return;
-		moveClip(from, insertion);
 	};
-
 	const startClipDrag = (index: number, downEvent: MouseEvent) => {
 		if (downEvent.button !== 0) return;
 		const target = downEvent.target as HTMLElement;
 		if (target.closest("[data-clip-delete], [data-clip-edit], [data-no-drag]"))
 			return;
+		const id = segments()[index]?.id;
+		if (!id) return;
 		downEvent.preventDefault();
-
 		const startX = downEvent.clientX;
 		const startY = downEvent.clientY;
 		let active = false;
-
-		createRoot((dispose) => {
-			const onMove = (event: MouseEvent) => {
+		startGesture(() => ({
+			isValid: () => segments().some((segment) => segment.id === id),
+			update(event) {
 				if (!active) {
 					if (Math.hypot(event.clientX - startX, event.clientY - startY) < 5)
 						return;
 					active = true;
-					setDraggingIndex(index);
+					setDraggingClipId(id);
 				}
 				setPointerPos({ x: event.clientX, y: event.clientY });
 				setDropIndex(computeDropIndex(event.clientY));
-			};
-
-			const onUp = () => {
-				if (active) {
-					commitDrop();
-				} else {
-					setDraggingIndex(null);
-					setDropIndex(null);
-					setPointerPos(null);
-				}
-				dispose();
-			};
-
-			onCleanup(() => {
-				window.removeEventListener("mousemove", onMove);
-				window.removeEventListener("mouseup", onUp);
-			});
-
-			window.addEventListener("mousemove", onMove);
-			window.addEventListener("mouseup", onUp);
-		});
+			},
+			finish(event, reason) {
+				const bounds = listRef?.parentElement?.getBoundingClientRect();
+				const releasedInside =
+					event &&
+					bounds &&
+					event.clientX >= bounds.left &&
+					event.clientX <= bounds.right &&
+					event.clientY >= bounds.top &&
+					event.clientY <= bounds.bottom;
+				const insertion = event ? computeDropIndex(event.clientY) : null;
+				clearClipDrag();
+				if (
+					reason === "release" &&
+					active &&
+					releasedInside &&
+					insertion !== null
+				)
+					projectActions.moveClipSegment(id, insertion);
+			},
+		}));
 	};
 
 	const deleteClip = (index: number) => {
@@ -635,6 +553,7 @@ export function ClipsSidebar(props: { class?: string }) {
 											</Show>
 											<div
 												data-clip-card
+												data-clip-id={segment.id}
 												onMouseDown={(e) => startClipDrag(index(), e)}
 												class={cx(
 													"group flex items-center gap-3 rounded-lg border p-2 transition-all cursor-grab active:cursor-grabbing bg-gray-2 dark:bg-gray-3 border-gray-4 hover:border-gray-7",

@@ -270,6 +270,7 @@ async fn load_recording(
                     Err(_) => 5.0,
                 };
                 vec![TimelineSegment {
+                    id: None,
                     recording_clip: 0,
                     start: 0.0,
                     end: duration,
@@ -294,6 +295,7 @@ async fn load_recording(
                         return None;
                     }
                     Some(TimelineSegment {
+                        id: None,
                         recording_clip: i as u32,
                         start: 0.0,
                         end: duration,

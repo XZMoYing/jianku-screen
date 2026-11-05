@@ -360,6 +360,7 @@ impl EditorInstance {
                     let display_path = recording_meta.path(&segment.display.path);
                     match display_video_duration(&display_path) {
                         Some(duration) if duration > 0.0 => vec![TimelineSegment {
+                            id: None,
                             recording_clip: 0,
                             start: 0.0,
                             end: duration,
@@ -395,6 +396,7 @@ impl EditorInstance {
                             return None;
                         }
                         Some(TimelineSegment {
+                            id: None,
                             recording_clip: i as u32,
                             start: 0.0,
                             end: duration,

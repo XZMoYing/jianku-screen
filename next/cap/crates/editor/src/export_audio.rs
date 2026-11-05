@@ -1070,6 +1070,7 @@ mod tests {
 
     fn segment(index: u32, start: f64, end: f64) -> TimelineSegment {
         TimelineSegment {
+            id: None,
             recording_clip: index,
             start,
             end,

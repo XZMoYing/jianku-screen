@@ -2583,6 +2583,7 @@ mod tests {
             timeline: Some(TimelineConfiguration {
                 segments: vec![
                     TimelineSegment {
+                        id: None,
                         recording_clip: 0,
                         timescale: 1.0,
                         start: 0.0,
@@ -2593,6 +2594,7 @@ mod tests {
                         volume: None,
                     },
                     TimelineSegment {
+                        id: None,
                         recording_clip: 0,
                         timescale: 4.0,
                         start: 1.0,
@@ -2603,6 +2605,7 @@ mod tests {
                         volume: None,
                     },
                     TimelineSegment {
+                        id: None,
                         recording_clip: 0,
                         timescale: 1.0,
                         start: 2.0,
@@ -2613,6 +2616,7 @@ mod tests {
                         volume: None,
                     },
                     TimelineSegment {
+                        id: None,
                         recording_clip: 1,
                         timescale: 1.0,
                         start: 0.0,
@@ -2623,6 +2627,7 @@ mod tests {
                         volume: None,
                     },
                     TimelineSegment {
+                        id: None,
                         recording_clip: 1,
                         timescale: 2.0,
                         start: 1.0,
@@ -2633,6 +2638,7 @@ mod tests {
                         volume: None,
                     },
                     TimelineSegment {
+                        id: None,
                         recording_clip: 1,
                         timescale: 1.0,
                         start: 2.0,
@@ -3091,6 +3097,7 @@ mod tests {
 
     fn segment(recording_clip: u32, start: f64, end: f64, timescale: f64) -> TimelineSegment {
         TimelineSegment {
+            id: None,
             recording_clip,
             timescale,
             start,

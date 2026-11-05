@@ -30,6 +30,7 @@ import {
 	createCaptionExportCues,
 	formatCaptionCues,
 } from "./captions-export";
+import { newClipInstance } from "./clip-identity";
 import {
 	clipCutPreservesTransitionGeometry,
 	rangeIntersectsClipTransition,
@@ -212,7 +213,9 @@ export function TranscriptPanel() {
 				};
 				p.captions.sourceTimed = true;
 				p.timeline ??= {
-					segments: [{ start: 0, end: total || end, timescale: 1 }],
+					segments: [
+						newClipInstance({ start: 0, end: total || end, timescale: 1 }),
+					],
 					zoomSegments: [],
 					sceneSegments: [],
 					maskSegments: [],
@@ -255,7 +258,11 @@ export function TranscriptPanel() {
 			if (!path) return;
 
 			await writeTextFile(path, formatCaptionCues(cues, format));
-			toast.success(localize("Captions saved as {format}", { format: format.toUpperCase() }));
+			toast.success(
+				localize("Captions saved as {format}", {
+					format: format.toUpperCase(),
+				}),
+			);
 		} catch (error) {
 			console.error("Failed to save captions:", error);
 			toast.error(localize("Failed to save captions"));
@@ -403,9 +410,7 @@ export function TranscriptPanel() {
 					),
 			)
 		) {
-			toast.error(
-				localize("请先移除附近的转场，再删除这段转录文本。"),
-			);
+			toast.error(localize("请先移除附近的转场，再删除这段转录文本。"));
 			return;
 		}
 

@@ -93,3 +93,35 @@ it("treats duplicate resume as a no-op and still records later edits", () => {
 	f.history.undo();
 	expect(f.state.start).toBe(2);
 });
+
+it("runs the post-restore callback against restored identities for undo and redo", () => {
+	createRoot((end) => {
+		dispose = end;
+		const [state, setState] = createStore({
+			clips: [{ id: "a" }, { id: "b" }],
+		});
+		const observed: string[] = [];
+		const ids = () => state.clips.map((clip) => clip.id).join(",");
+		const history = createStoreHistory(
+			state,
+			setState,
+			() => {
+				observed.push(`before:${ids()}`);
+			},
+			() => {
+				observed.push(`after:${ids()}`);
+			},
+		);
+		const resume = history.pause();
+		setState("clips", [{ id: "b" }, { id: "a" }]);
+		resume();
+		history.undo();
+		history.redo();
+		expect(observed).toEqual([
+			"before:b,a",
+			"after:a,b",
+			"before:a,b",
+			"after:b,a",
+		]);
+	});
+});

@@ -1,4 +1,5 @@
 import type { KeyboardTrackSegment } from "~/utils/tauri";
+import { newClipInstance } from "./clip-identity";
 import {
 	type ClipTransition,
 	clipDuration,
@@ -272,6 +273,7 @@ function rippleDeleteCamera3DTrack(
 
 export function cutClipSegmentsForRange(
 	segments: Array<{
+		id?: string | null;
 		timescale: number;
 		start: number;
 		end: number;
@@ -317,7 +319,10 @@ export function cutClipSegmentsForRange(
 			newSegs.push({ ...seg, end: beforeEnd });
 		}
 		if (seg.end > afterStart + 0.001) {
-			newSegs.push({ ...seg, start: afterStart });
+			const remaining = { ...seg, start: afterStart };
+			newSegs.push(
+				newSegs.length > 0 && seg.id ? newClipInstance(remaining) : remaining,
+			);
 		}
 
 		if (segments.length === 1 && newSegs.length === 0) return transitions;
@@ -352,7 +357,12 @@ export function cutClipSegmentsForRange(
 
 export function rippleDeleteAllTracks(
 	timeline: {
-		segments: Array<{ timescale: number; start: number; end: number }>;
+		segments: Array<{
+			id?: string | null;
+			timescale: number;
+			start: number;
+			end: number;
+		}>;
 		transitions?: ClipTransition[] | null;
 		styleSegments?: Array<{ start: number; end: number }> | null;
 		imageSegments?: Array<{ start: number; end: number }> | null;

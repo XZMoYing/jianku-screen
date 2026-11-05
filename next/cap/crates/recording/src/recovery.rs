@@ -2324,6 +2324,7 @@ impl RecoveryManager {
                 }
 
                 Some(TimelineSegment {
+                    id: None,
                     recording_clip: i as u32,
                     start: 0.0,
                     end: duration,

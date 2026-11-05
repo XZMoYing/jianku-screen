@@ -1323,6 +1323,7 @@ mod tests {
         let config = project.timeline.as_mut().unwrap();
         config.segments = vec![
             TimelineSegment {
+                id: None,
                 recording_clip: 0,
                 timescale: 2.0,
                 start: 10.0,
@@ -1333,6 +1334,7 @@ mod tests {
                 volume: None,
             },
             TimelineSegment {
+                id: None,
                 recording_clip: 0,
                 timescale: 1.0,
                 start: 30.0,
@@ -2101,6 +2103,7 @@ mod tests {
         // recording 11s must aim the zoom; a click at recording 1s must not.
         let timeline_config = TimelineConfiguration {
             segments: vec![TimelineSegment {
+                id: None,
                 recording_clip: 0,
                 timescale: 1.0,
                 start: 10.0,
@@ -2162,6 +2165,7 @@ mod tests {
         let timeline = TimelineConfiguration {
             segments: vec![
                 TimelineSegment {
+                    id: None,
                     recording_clip: 0,
                     timescale: 1.0,
                     start: 0.0,
@@ -2172,6 +2176,7 @@ mod tests {
                     volume: None,
                 },
                 TimelineSegment {
+                    id: None,
                     recording_clip: 0,
                     timescale: 1.0,
                     start: 10.0,

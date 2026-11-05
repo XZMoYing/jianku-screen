@@ -318,6 +318,7 @@ fn full_timeline_for_segments(
         .map(|(index, segment)| {
             let duration = get_video_duration_secs(&segment.display.path.to_path(project_path))?;
             Ok(TimelineSegment {
+                id: None,
                 recording_clip: index as u32,
                 timescale: 1.0,
                 start: 0.0,
@@ -354,6 +355,7 @@ fn full_timeline_for_source_segments(
         .map(|(index, segment)| {
             let duration = get_source_video_duration_secs(source_meta, &segment.display)?;
             Ok(TimelineSegment {
+                id: None,
                 recording_clip: index as u32,
                 timescale: 1.0,
                 start: 0.0,
@@ -916,6 +918,7 @@ fn source_timeline_segments_for_import(
         }
 
         imported_segments.push(TimelineSegment {
+            id: None,
             recording_clip: source_index,
             timescale: if segment.timescale.is_finite() && segment.timescale > 0.0 {
                 segment.timescale
@@ -1731,6 +1734,7 @@ async fn append_mp4_to_editor_project(
     ensure_project_timeline(&mut config, &target_project_path, &existing_segments)?
         .segments
         .push(TimelineSegment {
+            id: None,
             recording_clip: new_index,
             timescale: 1.0,
             start: 0.0,
@@ -1864,6 +1868,7 @@ async fn append_cap_project_to_editor_project(
             };
 
             timeline.segments.push(TimelineSegment {
+                id: None,
                 recording_clip: *target_index,
                 timescale: source_segment.timescale,
                 start: source_segment.start,
