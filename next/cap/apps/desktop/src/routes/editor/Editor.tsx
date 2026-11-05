@@ -869,8 +869,19 @@ function Inner(props: {
 		createSignal<HTMLDivElement>();
 
 	const splitBounds = createElementBounds(splitContainerRef);
-	const inspectorWidth = () =>
-		editorInspectorWidth(splitBounds.width ?? 1024, preferredInspectorWidth());
+	const materialsDocked = () => (splitBounds.width ?? 1024) >= 1024;
+	const materialsWidth = () =>
+		Math.min(280, Math.max(224, (splitBounds.width ?? 1024) - 32));
+	const inspectorAvailableWidth = () =>
+		(splitBounds.width ?? 1024) -
+		(isClipsMode() && materialsDocked() ? materialsWidth() + 8 : 0);
+	const clampInspectorWidth = (preferred: number) =>
+		editorInspectorWidth(
+			inspectorAvailableWidth(),
+			preferred,
+			isClipsMode() && materialsDocked() ? 400 : undefined,
+		);
+	const inspectorWidth = () => clampInspectorWidth(preferredInspectorWidth());
 	let endInspectorResize: (() => void) | undefined;
 	onCleanup(() => endInspectorResize?.());
 	const handleInspectorResizeStart = (event: PointerEvent) => {
@@ -881,10 +892,7 @@ function Inner(props: {
 		const width = inspectorWidth();
 		const handleMove = (move: PointerEvent) =>
 			setPreferredInspectorWidth(
-				editorInspectorWidth(
-					splitBounds.width ?? 1024,
-					width + start - move.clientX,
-				),
+				clampInspectorWidth(width + start - move.clientX),
 			);
 		const finish = () => {
 			window.removeEventListener("pointermove", handleMove);
@@ -1005,11 +1013,31 @@ function Inner(props: {
 					>
 						<div
 							ref={setSplitContainerRef}
-							class="jk-editor-stage flex overflow-hidden flex-row flex-1 min-h-0 px-2"
+							class="jk-editor-stage relative flex overflow-hidden flex-row flex-1 min-h-0 px-2"
 							style={{
 								"min-height": `${layoutLimits().minPlayerHeight}px`,
 							}}
 						>
+							<Show when={clipsSidebarMounted()}>
+								<div
+									class="jk-preview-chrome min-h-0 shrink-0"
+									classList={{
+										flex: isClipsMode(),
+										hidden: !isClipsMode(),
+										"mr-2": materialsDocked(),
+										"absolute inset-y-2.5 left-2.5 z-70 shadow-ed-pop rounded-3xl":
+											!materialsDocked(),
+									}}
+									style={{ width: `${materialsWidth()}px` }}
+									inert={!isClipsMode() || previewFullscreen()}
+								>
+									<Suspense>
+										<ClipsSidebar
+											active={isClipsMode() && !previewFullscreen()}
+										/>
+									</Suspense>
+								</div>
+							</Show>
 							<div
 								class="jk-editor-card jk-preview-card flex overflow-hidden flex-col rounded-xl bg-ed-card shadow-ed-card"
 								style={{
@@ -1055,23 +1083,7 @@ function Inner(props: {
 									inert={previewFullscreen()}
 									style={{ width: `${inspectorWidth()}px` }}
 								>
-									<div
-										class="overflow-hidden min-h-0"
-										classList={{
-											flex: !isClipsMode(),
-											"flex-1": !isClipsMode(),
-											hidden: isClipsMode(),
-										}}
-									>
-										<ConfigSidebar />
-									</div>
-									<Show when={clipsSidebarMounted()}>
-										<Suspense>
-											<ClipsSidebar
-												class={isClipsMode() ? undefined : "hidden"}
-											/>
-										</Suspense>
-									</Show>
+									<ConfigSidebar />
 								</div>
 							</Show>
 							<Show when={isTranscriptMode()}>

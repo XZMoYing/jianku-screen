@@ -64,6 +64,7 @@ import {
 	MAX_VOLUME_DB,
 	MIN_VOLUME_DB,
 } from "./audio";
+import { ClipInspector } from "./ClipInspector";
 import { ColorCorrectionSection } from "./ColorCorrectionSection";
 import { recordedCursorFamily } from "./CursorStylePicker";
 import { syncCaptionWordsWithText } from "./captions";
@@ -316,13 +317,15 @@ function ConfigSidebarContent() {
 			| "captions",
 	});
 
-	// Clip selection is a timeline-only affordance (highlight, Delete key,
-	// multi-select); it must not swap the sidebar away from the current tab.
 	const sidebarSelection = () => {
 		const selection = editorState.timeline.selection;
-		return selection && selection.type !== "clip" && selection.type !== "style"
-			? selection
-			: null;
+		if (!selection || selection.type === "style") return null;
+		if (
+			selection.type === "clip" &&
+			!selection.indices.some((index) => project.timeline?.segments[index]?.id)
+		)
+			return null;
+		return selection;
 	};
 
 	createEffect(() => {
@@ -348,9 +351,12 @@ function ConfigSidebarContent() {
 	let previousSelection = "";
 	createEffect(() => {
 		const selection = sidebarSelection();
-		const key = selection
-			? `${selection.type}:${"indices" in selection ? selection.indices.join(",") : selection.index}`
-			: "";
+		const key =
+			selection?.type === "clip"
+				? `clip:${selection.indices.map((index) => project.timeline?.segments[index]?.id).join(",")}`
+				: selection
+					? `${selection.type}:${"indices" in selection ? selection.indices.join(",") : selection.index}`
+					: "";
 		if (key !== previousSelection) {
 			previousSelection = key;
 			selectionScrollRef?.scrollTo({ top: 0 });
@@ -706,6 +712,14 @@ function ConfigSidebarContent() {
 				>
 					{(selection) => (
 						<Suspense>
+							<Show
+								when={(() => {
+									const selected = selection();
+									return selected.type === "clip" ? selected.indices : null;
+								})()}
+							>
+								{(indices) => <ClipInspector indices={indices()} />}
+							</Show>
 							<Show when={selection().type === "image"}>
 								<For
 									each={

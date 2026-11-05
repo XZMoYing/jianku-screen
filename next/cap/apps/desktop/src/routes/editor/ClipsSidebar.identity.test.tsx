@@ -31,6 +31,13 @@ beforeEach(() => {
 	])
 		vi.stubGlobal(name, () => null);
 	vi.stubGlobal(
+		"ResizeObserver",
+		class {
+			observe() {}
+			disconnect() {}
+		},
+	);
+	vi.stubGlobal(
 		"IntersectionObserver",
 		class {
 			observe() {}
@@ -53,10 +60,18 @@ function mount() {
 	state.context = {
 		project,
 		projectActions: { moveClipSegment },
-		editorInstance: { path: "test", recordings: { segments: [{}] } },
+		editorInstance: {
+			path: "test",
+			recordings: { segments: [{ display: { duration: 15 } }] },
+		},
 		editorState: {},
 	};
 	dispose = render(() => <ClipsSidebar />, document.body);
+	const clipsTab = [
+		...document.querySelectorAll<HTMLButtonElement>('[role="tab"]'),
+	].find((tab) => tab.textContent?.includes("时间线片段"));
+	if (!clipsTab) throw new Error("Missing timeline clips tab");
+	clipsTab.click();
 	const cards = () => [
 		...document.querySelectorAll<HTMLElement>("[data-clip-card]"),
 	];

@@ -167,9 +167,8 @@ export function Header(props: {
 			>
 				<EditorButton
 					onClick={() => {
-						clearTimelineSelection();
-						if (!projectHistory.canUndo()) return;
-						projectHistory.undo();
+						if (projectHistory.canUndo()) projectHistory.undo();
+						else clearTimelineSelection();
 					}}
 					disabled={
 						!projectHistory.canUndo() && !editorState.timeline.selection
@@ -179,9 +178,8 @@ export function Header(props: {
 				/>
 				<EditorButton
 					onClick={() => {
-						clearTimelineSelection();
-						if (!projectHistory.canRedo()) return;
-						projectHistory.redo();
+						if (projectHistory.canRedo()) projectHistory.redo();
+						else clearTimelineSelection();
 					}}
 					disabled={
 						!projectHistory.canRedo() && !editorState.timeline.selection
@@ -199,12 +197,12 @@ export function Header(props: {
 				<PresetsDropdown />
 				<BookmarksButton disabled={props.disabled} />
 				<EditorButton
-					title={localize("Clips")}
-					aria-label={localize("Clips")}
+					title={localize("素材与片段")}
+					aria-label={localize("素材与片段")}
+					aria-expanded={isClipsOpen()}
 					class={cx(isClipsOpen() && "bg-ed-ctl-hover text-ed-text-1")}
 					leftIcon={<IconCapClapperboard />}
 					onClick={() => {
-						clearTimelineSelection();
 						if (isClipsOpen()) {
 							setDialog((d) => ({ ...d, open: false }));
 						} else {
@@ -212,7 +210,7 @@ export function Header(props: {
 						}
 					}}
 				>
-					<span class="max-[1200px]:hidden">{localize("片段")}</span>
+					<span class="max-[1200px]:hidden">{localize("素材")}</span>
 				</EditorButton>
 				<Show when={hasTranscript()}>
 					<EditorButton

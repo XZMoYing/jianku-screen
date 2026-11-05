@@ -676,6 +676,59 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					setClipTransition(segmentIndex, null);
 					setEditorState("timeline", "selection", null);
 				},
+				appendClipFromSource: (recordingSegment: number) => {
+					const sources = props.editorInstance.recordings.segments;
+					const duration = sources[recordingSegment]?.display.duration;
+					if (
+						duration === undefined ||
+						!Number.isFinite(duration) ||
+						duration <= 0
+					)
+						return false;
+					if (
+						!project.timeline &&
+						sources.some(
+							({ display }) =>
+								!Number.isFinite(display.duration) || display.duration <= 0,
+						)
+					)
+						return false;
+					const clip = newClipInstance({
+						recordingSegment,
+						start: 0,
+						end: duration,
+						timescale: 1,
+					});
+					batch(() => {
+						setProject(
+							produce((project) => {
+								project.timeline ??= {
+									segments: sources.map(({ display }, index) =>
+										newClipInstance({
+											recordingSegment: index,
+											start: 0,
+											end: display.duration,
+											timescale: 1,
+										}),
+									),
+									transitions: [],
+									zoomSegments: [],
+									styleSegments: [],
+									imageSegments: [],
+									maskSegments: [],
+									textSegments: [],
+									camera3dSegments: [],
+								};
+								project.timeline.segments.push(clip);
+							}),
+						);
+						setEditorState("timeline", "selection", {
+							type: "clip",
+							indices: [(project.timeline?.segments.length ?? 1) - 1],
+						});
+					});
+					return true;
+				},
 				moveClipSegment: (clipId: string, insertionIndex: number) => {
 					const selection = editorState.timeline.selection;
 					const selectedIds =

@@ -11,10 +11,14 @@ export function editorVerticalLayout(available: number, preferred: number) {
 	};
 }
 
-export function editorInspectorWidth(available: number, preferred: number) {
+export function editorInspectorWidth(
+	available: number,
+	preferred: number,
+	minimumPreviewWidth = 280,
+) {
 	const width = Math.max(0, available - 32);
 	const minimum = Math.min(292, width * 0.52);
-	const maximum = Math.max(minimum, Math.min(560, width - 280));
+	const maximum = Math.max(minimum, Math.min(560, width - minimumPreviewWidth));
 	return Math.round(
 		Math.min(
 			maximum,

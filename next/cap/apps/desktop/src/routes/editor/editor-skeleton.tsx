@@ -68,7 +68,7 @@ function PreparingHeader(props: { model: PreparingEditorModel }) {
 					{localize("Presets")}
 				</button>
 				<button type="button" disabled class={DISABLED_CONTROL}>
-					{localize("Clips")}
+					{localize("素材")}
 				</button>
 				<button
 					type="button"

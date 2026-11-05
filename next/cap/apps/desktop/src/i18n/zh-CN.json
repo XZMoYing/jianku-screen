@@ -1634,5 +1634,9 @@
 	"End · Same as start": "结束 · 与开始相同",
 	"Shot count: {number}": "镜头数：{number}",
 	"Separate entry transition": "独立进入过渡",
-	"Separate exit transition": "独立退出过渡"
+	"Separate exit transition": "独立退出过渡",
+	"No clip on that side": "此侧没有片段",
+	"Different recording": "来自不同素材",
+	"Footage was cut between them": "两个片段之间的源画面已被剪除",
+	"Match the clip speeds first": "请先统一片段速度"
 }

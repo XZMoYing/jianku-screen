@@ -26,6 +26,7 @@ import IconLucideMousePointerBan from "~icons/lucide/mouse-pointer-ban";
 import IconLucideScissors from "~icons/lucide/scissors";
 import IconLucideTrash2 from "~icons/lucide/trash-2";
 import IconLucideVolumeX from "~icons/lucide/volume-x";
+import { ClipProperties } from "../ClipProperties";
 import { clipAudioMuted, clipVolume } from "../clip-audio";
 import {
 	type ClipMergeDirection,
@@ -34,6 +35,7 @@ import {
 } from "../clip-merge";
 import {
 	clampTransitionDuration,
+	clipDuration,
 	clipTimelineDuration,
 	clipTimelineOffsets,
 	clipTransitionMap,
@@ -45,7 +47,6 @@ import {
 import { useEditorContext } from "../context";
 import { TextInput } from "../TextInput";
 import { effectiveToOutput, holdWindows } from "../timeline-holds";
-import { Slider } from "../ui";
 import { useSegmentContext, useTimelineContext } from "./context";
 import { getSectionMarker } from "./sectionMarker";
 import { SPLIT_SNAP_PX, snapSplitTime } from "./split-snapping";
@@ -381,101 +382,12 @@ function WaveformCanvas(props: {
 	);
 }
 
-const CLIP_SPEEDS = [0.25, 0.5, 1, 1.5, 2, 4, 8] as const;
+const formatEditedClipDuration = (segment: TimelineSegment) =>
+	localize("{seconds} 秒", {
+		seconds: Number(clipDuration(segment).toFixed(2)),
+	});
 
 type ClipMenuAnchor = { x: number; y: number };
-
-function ClipMenuSection(props: { name: string; children: JSX.Element }) {
-	return (
-		<div class="flex flex-col gap-1">
-			<span class="px-2 text-[10px] font-medium uppercase tracking-[0.08em] text-ed-text-3">
-				{props.name}
-			</span>
-			{props.children}
-		</div>
-	);
-}
-
-function ClipMenuChips<T extends string | number>(props: {
-	options: ReadonlyArray<readonly [T, string]>;
-	value: T;
-	onChange: (value: T) => void;
-	label: string;
-}) {
-	return (
-		<div
-			role="radiogroup"
-			aria-label={props.label}
-			class="flex items-center gap-0.5 rounded-lg bg-ed-ctl p-0.5"
-		>
-			<For each={props.options}>
-				{([value, label]) => (
-					<button
-						type="button"
-						role="radio"
-						aria-checked={props.value === value}
-						class={cx(
-							"flex-1 rounded-md px-1.5 py-1 text-[11.5px] whitespace-nowrap tabular-nums transition-colors outline-hidden focus-visible:ring-1 focus-visible:ring-ed-accent",
-							props.value === value
-								? "bg-ed-ctl-active text-ed-text-1"
-								: "text-ed-text-2 hover:text-ed-text-1",
-						)}
-						onClick={() => props.onChange(value)}
-					>
-						{label}
-					</button>
-				)}
-			</For>
-		</div>
-	);
-}
-
-function ClipMenuToggleRow(props: {
-	icon: JSX.Element;
-	label: string;
-	description: string;
-	checked: boolean;
-	onChange: (checked: boolean) => void;
-}) {
-	return (
-		<button
-			type="button"
-			role="switch"
-			aria-checked={props.checked}
-			class="flex h-10 w-full items-center gap-2.5 rounded-lg px-2 text-left transition-colors outline-hidden hover:bg-ed-ctl-hover focus-visible:bg-ed-ctl-hover"
-			onClick={() => props.onChange(!props.checked)}
-		>
-			<span
-				class={cx(
-					"flex size-4 shrink-0 items-center justify-center [&_svg]:size-3.5",
-					props.checked ? "text-ed-accent" : "text-ed-text-2",
-				)}
-			>
-				{props.icon}
-			</span>
-			<span class="flex min-w-0 flex-1 flex-col leading-tight">
-				<span class="truncate text-[12.5px] text-ed-text-1">{props.label}</span>
-				<span class="truncate text-[10.5px] text-ed-text-3">
-					{props.description}
-				</span>
-			</span>
-			<span
-				aria-hidden
-				class={cx(
-					"cap-toggle relative h-5 w-9 shrink-0 rounded-full p-0.5 transition-colors",
-					props.checked ? "bg-ed-accent" : "bg-ed-ctl-active",
-				)}
-			>
-				<span
-					class={cx(
-						"cap-toggle-thumb block size-4 rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.22)] transition-transform",
-						props.checked && "translate-x-full",
-					)}
-				/>
-			</span>
-		</button>
-	);
-}
 
 function ClipMenuRow(props: {
 	icon: JSX.Element;
@@ -551,7 +463,7 @@ function ClipSettingsControl(props: {
 		clipMergeBlocker(segments(), props.index, direction);
 	const mergeHint = (direction: ClipMergeDirection) => {
 		const blocker = mergeBlocker(direction);
-		return blocker ? clipMergeBlockerHint(blocker) : undefined;
+		return blocker ? localize(clipMergeBlockerHint(blocker)) : undefined;
 	};
 	const canDelete = () => segments().length > 1;
 
@@ -612,7 +524,7 @@ function ClipSettingsControl(props: {
 							{props.label}
 						</span>
 						<span class="shrink-0 text-[11px] tabular-nums text-ed-text-3">
-							{formatTime(props.segment.end - props.segment.start)}
+							{formatEditedClipDuration(props.segment)}
 							<Show when={!normalSpeed()}>
 								{" · "}
 								{props.segment.timescale}x
@@ -620,81 +532,7 @@ function ClipSettingsControl(props: {
 						</span>
 					</div>
 
-					<ClipMenuSection name="Speed">
-						<ClipMenuChips
-							label={localize("Clip speed")}
-							options={CLIP_SPEEDS.map((mult) => [mult, `${mult}x`] as const)}
-							value={props.segment.timescale}
-							onChange={(mult) =>
-								projectActions.setClipSegmentTimescale(props.index, mult)
-							}
-						/>
-					</ClipMenuSection>
-
-					<ClipMenuSection name={localize("Audio")}>
-						<div class="flex h-7 items-center gap-2 px-2 text-[11.5px]">
-							<span class="w-12 shrink-0 text-ed-text-2">
-								{localize("Volume")}
-							</span>
-							<Slider
-								class="min-w-0 flex-1"
-								aria-label={localize("Clip volume")}
-								value={[Math.round(clipVolume(props.segment) * 100)]}
-								minValue={0}
-								maxValue={200}
-								step={1}
-								disabled={muted()}
-								onChange={([value]) =>
-									projectActions.setClipSegmentVolume(props.index, value / 100)
-								}
-								formatTooltip={(value) => `${value}%`}
-							/>
-							<span class="w-9 shrink-0 text-right tabular-nums text-ed-text-2">
-								{Math.round(clipVolume(props.segment) * 100)}%
-							</span>
-						</div>
-						<Show
-							when={!normalSpeed()}
-							fallback={
-								<ClipMenuToggleRow
-									icon={<IconLucideVolumeX />}
-									label={localize("Mute clip")}
-									description={localize("Silence this clip's audio")}
-									checked={muted()}
-									onChange={(checked) =>
-										projectActions.setClipSegmentMuted(props.index, checked)
-									}
-								/>
-							}
-						>
-							<ClipMenuChips
-								label={localize("Audio at this speed")}
-								options={
-									[
-										["mute", "Mute"],
-										["maintainPitch", "Keep pitch"],
-										["matchSpeed", "Match speed"],
-									] as const
-								}
-								value={props.segment.speedAudioMode ?? "mute"}
-								onChange={(mode) =>
-									projectActions.setClipSegmentSpeedAudioMode(props.index, mode)
-								}
-							/>
-						</Show>
-					</ClipMenuSection>
-
-					<ClipMenuSection name="Cursor">
-						<ClipMenuToggleRow
-							icon={<IconLucideMousePointerBan />}
-							label={localize("Hide cursor")}
-							description={localize("Fades out while this clip plays")}
-							checked={cursorHidden()}
-							onChange={(checked) =>
-								projectActions.setClipSegmentHideCursor(props.index, checked)
-							}
-						/>
-					</ClipMenuSection>
+					<ClipProperties index={props.index} segment={props.segment} />
 
 					<div class="h-px bg-ed-line" />
 
@@ -703,7 +541,7 @@ function ClipSettingsControl(props: {
 							icon={<IconLucideScissors />}
 							label={localize("Split at playhead")}
 							kbd="C"
-							hint="Move the playhead into this clip"
+							hint={localize("将播放头移到此片段内")}
 							disabled={!canSplitAtPlayhead()}
 							onClick={() => {
 								projectActions.splitClipSegment(playheadTime(), props.index);
@@ -774,7 +612,7 @@ function ClipSettingsControl(props: {
 						icon={<IconLucideTrash2 />}
 						label={localize("Delete clip")}
 						kbd="⌫"
-						hint="Can't delete the only clip"
+						hint={localize("无法删除唯一的片段")}
 						disabled={!canDelete()}
 						danger
 						onClick={() => {
@@ -913,9 +751,6 @@ export function ClipTrack(
 		}
 	}
 
-	const hasMultipleRecordingSegments = () =>
-		editorInstance.recordings.segments.length > 1;
-
 	const split = () => editorState.timeline.interactMode === "split";
 
 	createEffect(() => {
@@ -976,10 +811,8 @@ export function ClipTrack(
 					};
 
 					const defaultClipName = () =>
-						hasMultipleRecordingSegments()
-							? localize("片段 {number}", {
-									number: (segment().recordingSegment ?? 0) + 1,
-								})
+						segments().length > 1
+							? localize("片段 {number}", { number: i() + 1 })
 							: localize("Clip");
 					const clipName = () => segment().name?.trim() || defaultClipName();
 
@@ -999,13 +832,15 @@ export function ClipTrack(
 
 					const clipTitle = () => {
 						const seg = segment();
-						const parts = [clipName(), formatTime(seg.end - seg.start)];
+						const parts = [clipName(), formatEditedClipDuration(seg)];
 						if (seg.timescale !== 1) parts.push(`${seg.timescale}x`);
 						if (clipAudioMuted(seg) || clipVolume(seg) === 0)
 							parts.push(localize("静音"));
 						else if (clipVolume(seg) !== 1)
-							parts.push(`${Math.round(clipVolume(seg) * 100)}% volume`);
-						if (seg.hideCursor) parts.push("Cursor hidden");
+							parts.push(
+								`${localize("Volume")} ${Math.round(clipVolume(seg) * 100)}%`,
+							);
+						if (seg.hideCursor) parts.push(localize("Hide cursor"));
 						return parts.join(" · ");
 					};
 
@@ -1648,7 +1483,7 @@ export function ClipTrack(
 											<div class="cap-seg-labels">
 												<span class="cap-seg-label truncate">{clipName()}</span>
 												<span class="cap-seg-sublabel">
-													{formatTime(segment().end - segment().start)}
+													{formatEditedClipDuration(segment())}
 												</span>
 												{speedControl("shrink-0")}
 											</div>
@@ -1657,7 +1492,7 @@ export function ClipTrack(
 											<div class="cap-seg-labels">
 												{speedControl("shrink-0")}
 												<span class="cap-seg-sublabel truncate">
-													{formatTime(segment().end - segment().start)}
+													{formatEditedClipDuration(segment())}
 												</span>
 											</div>
 										)}

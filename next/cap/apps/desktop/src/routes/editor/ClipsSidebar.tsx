@@ -1,4 +1,5 @@
 import { Button } from "@cap/ui-solid";
+import { Tabs as KTabs } from "@kobalte/core/tabs";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { LogicalPosition } from "@tauri-apps/api/dpi";
 import { Menu, MenuItem } from "@tauri-apps/api/menu";
@@ -17,6 +18,7 @@ import {
 } from "solid-js";
 import { Portal } from "solid-js/web";
 import toast from "solid-toast";
+import { MotionGroup } from "~/components/InterfaceMotion";
 import { t as localize } from "~/utils/i18n";
 import { commands } from "~/utils/tauri";
 import { type EditorTimelineSegment, useEditorContext } from "./context";
@@ -203,7 +205,7 @@ function ClipThumbnail(props: {
 	);
 }
 
-export function ClipsSidebar(props: { class?: string }) {
+export function ClipsSidebar(props: { class?: string; active?: boolean }) {
 	const {
 		project,
 		flushProjectConfig,
@@ -217,6 +219,7 @@ export function ClipsSidebar(props: { class?: string }) {
 
 	const backToEditor = () => setDialog((d) => ({ ...d, open: false }));
 
+	const [tab, setTab] = createSignal("sources");
 	const [importing, setImporting] = createSignal(false);
 	const [openingRecorder, setOpeningRecorder] = createSignal(false);
 
@@ -241,7 +244,7 @@ export function ClipsSidebar(props: { class?: string }) {
 			await commands.openEditorRecordingMain(editorInstance.path);
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error);
-			toast.error(`Could not open the recorder: ${message}`);
+			toast.error(localize("无法打开录制窗口。{message}", { message }));
 		} finally {
 			setOpeningRecorder(false);
 		}
@@ -268,7 +271,9 @@ export function ClipsSidebar(props: { class?: string }) {
 			window.location.reload();
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error);
-			toast.error(`Failed to import clip: ${message}`, { id: toastId });
+			toast.error(localize("导入片段失败。{message}", { message }), {
+				id: toastId,
+			});
 			setImporting(false);
 		}
 	};
@@ -309,54 +314,31 @@ export function ClipsSidebar(props: { class?: string }) {
 	const segments = createMemo<EditorTimelineSegment[]>(
 		() => project.timeline?.segments ?? [],
 	);
-	const recordedClipCount = () => editorInstance.recordings.segments.length;
-
-	const clipLabel = (index: number) => `Clip ${index + 1}`;
-
-	const segmentClipIndex = (segment: EditorTimelineSegment, index: number) =>
-		segment.recordingSegment ??
-		Math.min(index, Math.max(recordedClipCount() - 1, 0));
-
-	const segmentSplitNumber = (
-		segment: EditorTimelineSegment,
-		index: number,
-	) => {
-		const clipIndex = segmentClipIndex(segment, index);
-		let count = 0;
-		for (let i = 0; i <= index; i++) {
-			const current = segments()[i];
-			if (current && segmentClipIndex(current, i) === clipIndex) count++;
-		}
-		return count;
-	};
-
-	const segmentLabel = (segment: EditorTimelineSegment, index: number) => {
-		const splitNumber = segmentSplitNumber(segment, index);
-		return splitNumber === 1
-			? clipLabel(segmentClipIndex(segment, index))
-			: `Split ${splitNumber - 1}`;
-	};
-
-	const displayName = (segment: EditorTimelineSegment, index: number) => {
-		const name = segment.name?.trim();
-		return name ? name : segmentLabel(segment, index);
-	};
+	const sources = () => editorInstance.recordings.segments;
+	const sourceLabel = (index: number) =>
+		localize("素材 {number}", { number: index + 1 });
+	const clipLabel = (index: number) =>
+		localize("片段 {number}", { number: index + 1 });
+	const displayName = (segment: EditorTimelineSegment, index: number) =>
+		segment.name?.trim() || clipLabel(index);
 	const displayNameAt = (index: number) => {
 		const segment = segments()[index];
 		return segment ? displayName(segment, index) : clipLabel(index);
 	};
-
-	const segmentDescription = (
-		segment: EditorTimelineSegment,
-		index: number,
-		duration: number,
-	) => {
-		const formattedDuration = formatClipDuration(duration);
-		const splitNumber = segmentSplitNumber(segment, index);
-		if (splitNumber > 1) {
-			return `${clipLabel(segmentClipIndex(segment, index))} · ${formattedDuration}`;
+	const selectClip = (id: string) => {
+		const index = segments().findIndex((segment) => segment.id === id);
+		if (index >= 0)
+			setEditorState("timeline", "selection", {
+				type: "clip",
+				indices: [index],
+			});
+	};
+	const appendSource = (index: number) => {
+		if (projectActions.appendClipFromSource(index)) {
+			setTab("clips");
+			return;
 		}
-		return formattedDuration;
+		toast.error(localize("素材时长不可用，无法添加"));
 	};
 
 	const [editingClipId, setEditingClipId] = createSignal<string | null>(null);
@@ -424,7 +406,10 @@ export function ClipsSidebar(props: { class?: string }) {
 		const startY = downEvent.clientY;
 		let active = false;
 		startGesture(() => ({
-			isValid: () => segments().some((segment) => segment.id === id),
+			isValid: () =>
+				props.active !== false &&
+				tab() === "clips" &&
+				segments().some((segment) => segment.id === id),
 			update(event) {
 				if (!active) {
 					if (Math.hypot(event.clientX - startX, event.clientY - startY) < 5)
@@ -446,13 +431,10 @@ export function ClipsSidebar(props: { class?: string }) {
 					event.clientY <= bounds.bottom;
 				const insertion = event ? computeDropIndex(event.clientY) : null;
 				clearClipDrag();
-				if (
-					reason === "release" &&
-					active &&
-					releasedInside &&
-					insertion !== null
-				)
+				if (reason !== "release" || !releasedInside) return;
+				if (active && insertion !== null)
 					projectActions.moveClipSegment(id, insertion);
+				else if (!active) selectClip(id);
 			},
 		}));
 	};
@@ -465,7 +447,7 @@ export function ClipsSidebar(props: { class?: string }) {
 	return (
 		<div
 			class={cx(
-				"flex overflow-hidden flex-col flex-1 min-h-0 rounded-xl bg-ed-card shadow-ed-card",
+				"jk-editor-card flex overflow-hidden flex-col flex-1 min-w-0 min-h-0 rounded-xl bg-ed-card shadow-ed-card",
 				props.class,
 			)}
 		>
@@ -475,19 +457,23 @@ export function ClipsSidebar(props: { class?: string }) {
 				class="flex flex-none gap-2 items-center px-4 w-full h-[46px] text-[13px] font-medium border-b transition-colors text-ed-text-1 border-ed-line hover:bg-ed-ctl"
 			>
 				<IconCapMoveLeft class="size-4 text-ed-text-2" />
-				{localize("Back to editor")}
+				{localize("收起素材区")}
 			</button>
 
-			<div class="flex flex-col flex-1 gap-3 p-3 min-h-0">
-				<div class="flex flex-none gap-2">
+			<KTabs
+				value={tab()}
+				onChange={setTab}
+				class="flex flex-col flex-1 gap-3 p-3 min-h-0"
+			>
+				<div class="flex flex-none flex-wrap gap-2">
 					<Button
 						variant="blue"
-						class="flex flex-1 gap-2 justify-center items-center h-10"
+						class="flex flex-1 min-w-0 gap-2 justify-center items-center h-10"
 						disabled={openingRecorder() || importing()}
 						onClick={() => void recordNewClip()}
 					>
 						<IconLucideVideo class="size-4" />
-						{localize("Record a new clip")}
+						<span class="truncate">{localize("Record a new clip")}</span>
 					</Button>
 					<Button
 						variant="gray"
@@ -500,18 +486,86 @@ export function ClipsSidebar(props: { class?: string }) {
 					</Button>
 				</div>
 
-				<div class="flex flex-none gap-2 items-center">
-					<span class="text-sm font-medium text-gray-12">
-						{localize("Clips")}
-					</span>
-					<Show when={recordedClipCount() > 0}>
-						<span class="rounded-md bg-gray-3 px-1.5 py-0.5 text-[10px] font-medium tabular-nums text-gray-11">
-							{recordedClipCount()}
-						</span>
-					</Show>
-				</div>
+				<KTabs.List class="shrink-0">
+					<MotionGroup
+						class="flex gap-1 rounded-xl bg-ed-ctl p-1"
+						label={localize("素材与片段")}
+					>
+						<KTabs.Trigger
+							value="sources"
+							class="min-w-0 flex-1 rounded-lg px-2 py-1.5 text-xs text-ed-text-2"
+						>
+							{localize("来源素材")}{" "}
+							<span class="tabular-nums">{sources().length}</span>
+						</KTabs.Trigger>
+						<KTabs.Trigger
+							value="clips"
+							class="min-w-0 flex-1 rounded-lg px-2 py-1.5 text-xs text-ed-text-2"
+						>
+							{localize("时间线片段")}{" "}
+							<span class="tabular-nums">{segments().length}</span>
+						</KTabs.Trigger>
+					</MotionGroup>
+				</KTabs.List>
 
-				<div class="overflow-y-auto flex-1 -mx-1 px-1 min-h-0 custom-scroll">
+				<KTabs.Content
+					value="sources"
+					class="custom-scroll flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto"
+				>
+					<Show
+						when={sources().length}
+						fallback={
+							<p class="px-2 py-6 text-center text-xs text-ed-text-3">
+								{localize("暂无来源素材")}
+							</p>
+						}
+					>
+						<For each={sources()}>
+							{(source, index) => (
+								<div class="flex min-w-0 items-center gap-2 rounded-xl border border-ed-line bg-ed-card-2 p-2">
+									<div class="relative aspect-video w-16 shrink-0 overflow-hidden rounded-md">
+										<ClipThumbnail
+											projectPath={editorInstance.path}
+											recordingSegment={index()}
+											start={0}
+											index={index()}
+										/>
+									</div>
+									<div class="min-w-0 flex-1">
+										<div class="truncate text-xs font-medium">
+											{sourceLabel(index())}
+										</div>
+										<div class="text-[11px] tabular-nums text-ed-text-3">
+											{formatClipDuration(source.display.duration)}
+										</div>
+									</div>
+									<button
+										type="button"
+										class="flex size-8 shrink-0 items-center justify-center rounded-full bg-ed-ctl text-ed-accent hover:bg-ed-ctl-hover disabled:opacity-50"
+										aria-label={localize("将素材 {number} 添加到末尾", {
+											number: index() + 1,
+										})}
+										title={localize("添加到时间线末尾")}
+										disabled={
+											importing() ||
+											openingRecorder() ||
+											!Number.isFinite(source.display.duration) ||
+											source.display.duration <= 0
+										}
+										onClick={() => appendSource(index())}
+									>
+										<IconCapCirclePlus class="size-4" />
+									</button>
+								</div>
+							)}
+						</For>
+					</Show>
+				</KTabs.Content>
+
+				<KTabs.Content
+					value="clips"
+					class="overflow-y-auto flex-1 -mx-1 px-1 min-h-0 custom-scroll"
+				>
 					<Show
 						when={segments().length > 0}
 						fallback={
@@ -523,9 +577,7 @@ export function ClipsSidebar(props: { class?: string }) {
 									{localize("No clips yet")}
 								</p>
 								<p class="max-w-[200px] text-xs text-gray-10">
-									{localize(
-										"Record or import a clip and it will show up here.",
-									)}
+									{localize("可从来源素材添加片段，也可以录制或导入视频。")}
 								</p>
 							</div>
 						}
@@ -536,6 +588,13 @@ export function ClipsSidebar(props: { class?: string }) {
 									const duration = () =>
 										(segment.end - segment.start) / segment.timescale;
 									const isDragging = () => draggingIndex() === index();
+									const isSelected = () => {
+										const selection = editorState.timeline?.selection;
+										return (
+											selection?.type === "clip" &&
+											selection.indices.includes(index())
+										);
+									};
 									const showTopBar = () =>
 										draggingIndex() !== null && dropIndex() === index();
 									const showBottomBar = () =>
@@ -546,21 +605,24 @@ export function ClipsSidebar(props: { class?: string }) {
 									return (
 										<div class="relative">
 											<Show when={showTopBar()}>
-												<div class="absolute right-0 -top-1 left-0 z-10 h-0.5 rounded-full bg-blue-9" />
+												<div class="absolute right-0 -top-1 left-0 z-10 h-0.5 rounded-full bg-ed-accent" />
 											</Show>
 											<Show when={showBottomBar()}>
-												<div class="absolute right-0 -bottom-1 left-0 z-10 h-0.5 rounded-full bg-blue-9" />
+												<div class="absolute right-0 -bottom-1 left-0 z-10 h-0.5 rounded-full bg-ed-accent" />
 											</Show>
 											<div
 												data-clip-card
 												data-clip-id={segment.id}
 												onMouseDown={(e) => startClipDrag(index(), e)}
 												class={cx(
-													"group flex items-center gap-3 rounded-lg border p-2 transition-all cursor-grab active:cursor-grabbing bg-gray-2 dark:bg-gray-3 border-gray-4 hover:border-gray-7",
+													"group flex items-center gap-2 rounded-xl border p-2 transition-colors cursor-grab active:cursor-grabbing hover:bg-ed-ctl",
+													isSelected()
+														? "border-ed-accent bg-ed-ctl"
+														: "border-ed-line bg-ed-card-2",
 													isDragging() && "opacity-40",
 												)}
 											>
-												<div class="overflow-hidden relative w-24 rounded-md aspect-video shrink-0 bg-gray-4">
+												<div class="overflow-hidden relative w-14 rounded-md aspect-video shrink-0 bg-ed-ctl">
 													<ClipThumbnail
 														projectPath={editorInstance.path}
 														recordingSegment={segment.recordingSegment ?? 0}
@@ -572,14 +634,20 @@ export function ClipsSidebar(props: { class?: string }) {
 													<Show
 														when={editingIndex() === index()}
 														fallback={
-															<span
+															<button
+																type="button"
+																aria-pressed={isSelected()}
+																onClick={(event) => {
+																	if (event.detail === 0 && segment.id)
+																		selectClip(segment.id);
+																}}
 																onDblClick={() =>
 																	startRename(index(), segment.name ?? "")
 																}
-																class="text-sm font-medium truncate text-gray-12"
+																class="text-left text-xs font-medium truncate text-ed-text-1"
 															>
 																{displayName(segment, index())}
-															</span>
+															</button>
 														}
 													>
 														<input
@@ -591,7 +659,7 @@ export function ClipsSidebar(props: { class?: string }) {
 																});
 															}}
 															value={draftName()}
-															placeholder={segmentLabel(segment, index())}
+															placeholder={clipLabel(index())}
 															onInput={(e) =>
 																setDraftName(e.currentTarget.value)
 															}
@@ -610,8 +678,9 @@ export function ClipsSidebar(props: { class?: string }) {
 															class="px-1.5 py-0.5 w-full text-sm rounded border outline-none bg-gray-1 dark:bg-gray-4 border-gray-6 text-gray-12 focus:border-blue-9"
 														/>
 													</Show>
-													<span class="text-xs tabular-nums text-gray-10">
-														{segmentDescription(segment, index(), duration())}
+													<span class="text-[11px] tabular-nums text-ed-text-3">
+														{sourceLabel(segment.recordingSegment ?? 0)} ·{" "}
+														{formatClipDuration(duration())}
 													</span>
 												</div>
 												<div class="flex flex-none gap-0.5 items-center">
@@ -622,7 +691,7 @@ export function ClipsSidebar(props: { class?: string }) {
 															startRename(index(), segment.name ?? "")
 														}
 														aria-label={localize("Rename clip")}
-														class="flex flex-none justify-center items-center rounded-md opacity-0 transition-colors size-7 text-gray-10 hover:bg-gray-5 hover:text-gray-12 group-hover:opacity-100"
+														class="flex flex-none justify-center items-center rounded-md opacity-0 transition-colors size-6 text-gray-10 hover:bg-gray-5 hover:text-gray-12 group-hover:opacity-100 focus-visible:opacity-100"
 													>
 														<IconCapPencil class="size-3.5" />
 													</button>
@@ -632,7 +701,7 @@ export function ClipsSidebar(props: { class?: string }) {
 															data-clip-delete
 															onClick={() => deleteClip(index())}
 															aria-label={localize("Remove clip")}
-															class="flex flex-none justify-center items-center rounded-md opacity-0 transition-colors size-7 text-gray-10 hover:bg-red-3 hover:text-red-11 group-hover:opacity-100"
+															class="flex flex-none justify-center items-center rounded-md opacity-0 transition-colors size-6 text-gray-10 hover:bg-red-3 hover:text-red-11 group-hover:opacity-100 focus-visible:opacity-100"
 														>
 															<IconCapTrash class="size-3.5" />
 														</button>
@@ -645,8 +714,8 @@ export function ClipsSidebar(props: { class?: string }) {
 							</For>
 						</div>
 					</Show>
-				</div>
-			</div>
+				</KTabs.Content>
+			</KTabs>
 
 			<Show when={draggingIndex() !== null && pointerPos()}>
 				{(pos) => (
