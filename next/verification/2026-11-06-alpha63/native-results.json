@@ -1,0 +1,85 @@
+{
+	"sourceCommit": "eed7e9c",
+	"installedVersion": "0.2.0-alpha.63",
+	"build": "2026.63.0",
+	"package": "strict deep signatures and six executable hashes matched for source/archive/installed",
+	"previousVersionInitialBounds": {
+		"Height": 800,
+		"Width": 1275,
+		"X": 202,
+		"Y": 102
+	},
+	"coldFileOpen": {
+		"fullscreen": false,
+		"minimized": false,
+		"ownedSyntheticEditor": true,
+		"position": {
+			"x": 0,
+			"y": 25
+		},
+		"size": {
+			"height": 954,
+			"width": 1680
+		},
+		"title": "简库镜传 · 视频编辑"
+	},
+	"newEditorWhileAppAlreadyRunning": {
+		"fullscreen": false,
+		"minimized": false,
+		"ownedSyntheticEditor": true,
+		"position": {
+			"x": 0,
+			"y": 25
+		},
+		"size": {
+			"height": 954,
+			"width": 1680
+		},
+		"title": "简库镜传 · 视频编辑"
+	},
+	"manualOrdinaryRestore": {
+		"fullscreen": false,
+		"minimized": false,
+		"ownedSyntheticEditor": true,
+		"position": {
+			"x": 202,
+			"y": 102
+		},
+		"size": {
+			"height": 800,
+			"width": 1275
+		},
+		"title": "简库镜传 · 视频编辑"
+	},
+	"minimized": {
+		"fullscreen": false,
+		"minimized": true,
+		"ownedSyntheticEditor": true,
+		"position": {
+			"x": 202,
+			"y": 102
+		},
+		"size": {
+			"height": 800,
+			"width": 1275
+		},
+		"title": "简库镜传 · 视频编辑"
+	},
+	"openAlreadyExistingEditorRestoresChosenSize": {
+		"fullscreen": false,
+		"minimized": false,
+		"ownedSyntheticEditor": true,
+		"position": {
+			"x": 202,
+			"y": 102
+		},
+		"size": {
+			"height": 800,
+			"width": 1275
+		},
+		"title": "简库镜传 · 视频编辑"
+	},
+	"ownership": "own archived synthetic .jks only; unknown user editors preserved",
+	"startupFocus": "first early AX snapshot briefly saw main window focus; later settled to editor automatically without a focus command, hot-new-editor settled editor",
+	"limits": "This is macOS window lifecycle acceptance, not Windows/Linux or entire editor workflow acceptance. Existing strict chroma 15 pass / 2 fail and hardware output gates remain."
+}

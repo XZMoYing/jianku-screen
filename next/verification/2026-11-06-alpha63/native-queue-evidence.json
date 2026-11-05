@@ -1,0 +1,10 @@
+{
+	"runtimeDependency": "vendored Tao 0.34.3 selected by Cargo.toml patch.crates-io",
+	"callPath": "window.rs::set_maximized checks is_zoomed before queuing; util/async.rs::set_maximized_async executes native zoom without rechecking native state",
+	"relevance": "Builder and post-fit maximize could both see the same old false state and enqueue two zoom toggles",
+	"sourceHashes": {
+		"next/cap/vendor/tao/src/platform_impl/macos/window.rs": "620547be0684994a47d3cc2f7b0dbf2966d93c9c5753f6a88074b7a7a4b78d11",
+		"next/cap/vendor/tao/src/platform_impl/macos/util/async.rs": "6d661261df23d1611cf15ce7bfd590d8a25574a764ed8b940bed7f4e55b1e0c6"
+	},
+	"note": "Initially inspected registry 0.37.1 analogue; then verified the actual patched 0.34.3 code and corrected version references. Actual code has the same relevant scheduling behavior."
+}

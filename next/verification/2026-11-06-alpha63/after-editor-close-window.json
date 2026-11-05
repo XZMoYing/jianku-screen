@@ -1,0 +1,14 @@
+{
+	"pid": 15721,
+	"screens": [{ "visibleHeight": 954, "visibleWidth": 1680 }],
+	"windows": [
+		{
+			"fullscreen": false,
+			"minimized": false,
+			"ownedSyntheticEditor": false,
+			"position": { "x": 250, "y": 98 },
+			"size": { "height": 800, "width": 1120 },
+			"title": "简库镜传 Next"
+		}
+	]
+}

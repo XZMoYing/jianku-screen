@@ -1,0 +1,22 @@
+{
+	"pid": 15721,
+	"screens": [{ "visibleHeight": 954, "visibleWidth": 1680 }],
+	"windows": [
+		{
+			"fullscreen": false,
+			"minimized": false,
+			"ownedSyntheticEditor": true,
+			"position": { "x": 202, "y": 102 },
+			"size": { "height": 800, "width": 1275 },
+			"title": "简库镜传 · 视频编辑"
+		},
+		{
+			"fullscreen": false,
+			"minimized": false,
+			"ownedSyntheticEditor": false,
+			"position": { "x": 250, "y": 98 },
+			"size": { "height": 800, "width": 1120 },
+			"title": "简库镜传 Next"
+		}
+	]
+}

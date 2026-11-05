@@ -1,0 +1,26 @@
+{
+	"removed": [
+		{
+			"removedDuplicate": "/Applications/.jianku-next-update59-gp20_a2g/previous.app",
+			"retainedArchive": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.58/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.58",
+			"logicalBytesRemoved": 316155963,
+			"strictSignaturesAndSixExecutableHashes": "matched"
+		},
+		{
+			"removedDuplicate": "/Applications/.jianku-next-update60-zesinh2v/previous.app",
+			"retainedArchive": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.59/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.59",
+			"logicalBytesRemoved": 316172507,
+			"strictSignaturesAndSixExecutableHashes": "matched"
+		},
+		{
+			"removedDuplicate": "/Applications/.jianku-next-update61-8b8sk9db/previous.app",
+			"retainedArchive": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.60/Jianku Screen Next.app",
+			"version": "0.2.0-alpha.60",
+			"logicalBytesRemoved": 316155899,
+			"strictSignaturesAndSixExecutableHashes": "matched"
+		}
+	],
+	"retained": "all versioned archives; installed alpha62; latest update62 previous alpha61; no project media or build dependency cache removed"
+}
