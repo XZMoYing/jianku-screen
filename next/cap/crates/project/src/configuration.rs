@@ -1678,9 +1678,15 @@ pub struct Camera3DSegment {
     /// Seconds to ease back to the flat frame before the segment end.
     #[serde(default = "default_camera3d_transition")]
     pub transition_out: f64,
+    #[serde(default = "Camera3DSegment::default_join_duration")]
+    pub join_duration: Option<f64>,
 }
 
 impl Camera3DSegment {
+    fn default_join_duration() -> Option<f64> {
+        Some(0.75)
+    }
+
     fn default_enabled() -> bool {
         true
     }
@@ -4042,6 +4048,7 @@ mod tests {
             },
             transition_in: 0.3,
             transition_out: 0.3,
+            join_duration: None,
         }];
 
         let json = serde_json::to_value(&timeline).unwrap();

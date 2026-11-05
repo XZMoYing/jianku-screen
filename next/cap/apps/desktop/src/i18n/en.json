@@ -1659,5 +1659,17 @@
 	"编辑内容已变化，请重新生成自动缩放。": "The project changed. Generate auto zoom again.",
 	"正在读取书签…": "Reading bookmarks…",
 	"调整首页预览与控制区高度": "Resize home preview and controls",
-	"调整首页画面设置宽度": "Resize home appearance settings"
+	"调整首页画面设置宽度": "Resize home appearance settings",
+	"与前一镜头衔接": "Join from previous shot",
+	"镜头衔接方式": "Shot transition",
+	"平滑衔接": "Smooth join",
+	"直接切换": "Direct cut",
+	"衔接时长": "Join duration",
+	"相邻处平滑接上姿态；独立镜头保留进入、退出效果。": "Adjacent shots join smoothly. Separate shots keep their entry and exit effects.",
+	"当前没有相邻的前一镜头，接上后生效。": "No previous shot is adjacent yet. The join applies when the shots touch.",
+	"录制时长不足，无法添加这么多镜头": "This recording is too short for that many shots",
+	"结束 · 与开始相同": "End · Same as start",
+	"镜头数：{number}": "Shot count: {number}",
+	"独立进入过渡": "Separate entry transition",
+	"独立退出过渡": "Separate exit transition"
 }

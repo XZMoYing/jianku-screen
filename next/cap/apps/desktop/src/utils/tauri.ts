@@ -968,7 +968,7 @@ transitionIn?: number;
 /**
  * Seconds to ease back to the flat frame before the segment end.
  */
-transitionOut?: number }
+transitionOut?: number; joinDuration?: number | null }
 /**
  * Per-property keyframe tracks. A property with an empty track holds the
  * segment's base value; each track holds independently before its first and

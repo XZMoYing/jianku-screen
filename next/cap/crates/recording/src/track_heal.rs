@@ -1148,6 +1148,7 @@ mod tests {
                 },
                 transition_in: 0.5,
                 transition_out: 0.8,
+                join_duration: None,
             }],
         };
         let config = ProjectConfiguration {

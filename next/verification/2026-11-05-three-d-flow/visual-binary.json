@@ -1,0 +1,11 @@
+{
+	"tool": "target/release/cap",
+	"sha256": "a0277804d14286ca573541b1192b925a964ccbd5ad25a6461678b13da1cfb8fb",
+	"sourceStatus": "current uncommitted 3D source subsequently frozen in this commit; version/config metadata later bumps only",
+	"sourceFiles": {
+		"crates/rendering/src/camera3d.rs": "8c86cfbfffe736d77ff14d6d84af4a9e2fb89c4c6858d8a35c18af9b75d39fa8",
+		"crates/project/src/configuration.rs": "ebdbb8ee9731bf2fbb6919e1d6b418bab6420bce004a8ccc325ee7f4b34fceb4",
+		"crates/recording/src/track_heal.rs": "0949522d2b4d9eee62da204043e5fda3adface3d274a3f52386b005439a6124b"
+	},
+	"scope": "actual CLI rendering with the new join implementation; installed app remains alpha61"
+}

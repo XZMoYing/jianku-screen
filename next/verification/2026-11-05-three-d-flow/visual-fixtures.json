@@ -1,0 +1,20 @@
+[
+	{
+		"case": "smooth-450",
+		"path": "/private/tmp/jianku-3d-flow-20261105/smooth-450.jks",
+		"joinDuration": 0.45,
+		"state": "prepared; no visual result yet"
+	},
+	{
+		"case": "smooth-750",
+		"path": "/private/tmp/jianku-3d-flow-20261105/smooth-750.jks",
+		"joinDuration": 0.75,
+		"state": "prepared; no visual result yet"
+	},
+	{
+		"case": "direct-cut",
+		"path": "/private/tmp/jianku-3d-flow-20261105/direct-cut.jks",
+		"joinDuration": null,
+		"state": "prepared; no visual result yet"
+	}
+]

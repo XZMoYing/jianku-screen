@@ -17,6 +17,8 @@ import {
 	type ValidComponent,
 } from "solid-js";
 import { produce } from "solid-js/store";
+import { ChoiceSelect } from "~/components/ChoiceSelect";
+import { MotionPresence } from "~/components/InterfaceMotion";
 import { Toggle } from "~/components/Toggle";
 import { t as localize } from "~/utils/i18n";
 import IconLucideArrowLeftRight from "~icons/lucide/arrow-left-right";
@@ -48,6 +50,7 @@ import {
 	camera3DShotLabel,
 	camera3dBlurLimit,
 	cssPreviewTransform,
+	DEFAULT_CAMERA3D_JOIN_DURATION,
 	flipCamera3DSegment,
 	getEndPose,
 	getMotionEasing,
@@ -136,8 +139,8 @@ export function ShotCountPills(props: {
 						data-selected={props.current === count}
 						title={
 							count > props.max
-								? "This recording is too short for that many shots"
-								: `${count} ${count === 1 ? "shot" : "shots"}`
+								? localize("录制时长不足，无法添加这么多镜头")
+								: localize("镜头数：{number}", { number: count })
 						}
 						onMouseEnter={() => {
 							if (count <= props.max) props.onHover(count);
@@ -504,6 +507,27 @@ export function Camera3DShotPanel(props: {
 		);
 	};
 
+	const rememberedJoinDuration = new WeakMap<Camera3DSegment, number>();
+	const joinDurationValue = () =>
+		props.segment.joinDuration ??
+		rememberedJoinDuration.get(props.segment) ??
+		DEFAULT_CAMERA3D_JOIN_DURATION;
+	const hasPreviousJoin = () =>
+		props.segment.joinDuration !== null &&
+		(project.timeline?.camera3dSegments ?? []).some(
+			(segment) =>
+				segment !== props.segment &&
+				segment.enabled &&
+				segment.end === props.segment.start,
+		);
+	const hasNextJoin = () =>
+		(project.timeline?.camera3dSegments ?? []).some(
+			(segment) =>
+				segment !== props.segment &&
+				segment.enabled &&
+				segment.start === props.segment.end &&
+				segment.joinDuration !== null,
+		);
 	const startPose = () => getStartPose(props.segment);
 	const endPose = () => getEndPose(props.segment);
 	const isStill = () => camera3DPosesEqual(startPose(), endPose());
@@ -673,9 +697,9 @@ export function Camera3DShotPanel(props: {
 			: null;
 
 	const poseCaption = (end: boolean) => {
-		if (end && isStill()) return "End · same as start";
+		if (end && isStill()) return localize("结束 · 与开始相同");
 		const time = end ? props.segment.end : props.segment.start;
-		return `${end ? "End" : "Start"} · ${formatShotTime(time)}`;
+		return `${localize(end ? "结束" : "开始")} · ${formatShotTime(time)}`;
 	};
 
 	const poseTile = (end: boolean) => (
@@ -1016,13 +1040,69 @@ export function Camera3DShotPanel(props: {
 						</KSelect>
 					</div>
 				</Field>
+				<Field inline name={localize("与前一镜头衔接")}>
+					<ChoiceSelect
+						aria-label={localize("镜头衔接方式")}
+						value={props.segment.joinDuration === null ? "cut" : "smooth"}
+						options={[
+							{ value: "smooth", label: localize("平滑衔接") },
+							{ value: "cut", label: localize("直接切换") },
+						]}
+						onChange={(value) => {
+							if (value !== "smooth" && value !== "cut") return;
+							if (props.segment.joinDuration !== null)
+								rememberedJoinDuration.set(
+									props.segment,
+									props.segment.joinDuration,
+								);
+							updateSegment((segment) => {
+								segment.joinDuration =
+									value === "cut" ? null : joinDurationValue();
+							});
+						}}
+					/>
+				</Field>
+				<MotionPresence
+					visible={props.segment.joinDuration !== null}
+					class="flex-col gap-3"
+				>
+					<Field
+						inline
+						name={localize("衔接时长")}
+						value={localize("{seconds} 秒", {
+							seconds: joinDurationValue().toFixed(2),
+						})}
+					>
+						<Slider
+							value={[joinDurationValue()]}
+							minValue={0.1}
+							maxValue={2}
+							step={0.05}
+							onChange={([value]) =>
+								updateSegment((segment) => {
+									segment.joinDuration = value;
+								})
+							}
+						/>
+					</Field>
+					<p class="text-xs text-ed-text-3">
+						{localize(
+							hasPreviousJoin()
+								? "相邻处平滑接上姿态；独立镜头保留进入、退出效果。"
+								: "当前没有相邻的前一镜头，接上后生效。",
+						)}
+					</p>
+				</MotionPresence>
 				<Field
 					inline
-					name="Ease in"
-					value={`${props.segment.transitionIn.toFixed(2)}s`}
+					name={localize("独立进入过渡")}
+					value={localize("{seconds} 秒", {
+						seconds: props.segment.transitionIn.toFixed(2),
+					})}
 				>
 					<Slider
 						value={[props.segment.transitionIn]}
+						disabled={hasPreviousJoin()}
 						onChange={(v) =>
 							updateSegment((segment) => {
 								segment.transitionIn = v[0];
@@ -1035,11 +1115,14 @@ export function Camera3DShotPanel(props: {
 				</Field>
 				<Field
 					inline
-					name="Ease out"
-					value={`${props.segment.transitionOut.toFixed(2)}s`}
+					name={localize("独立退出过渡")}
+					value={localize("{seconds} 秒", {
+						seconds: props.segment.transitionOut.toFixed(2),
+					})}
 				>
 					<Slider
 						value={[props.segment.transitionOut]}
+						disabled={hasNextJoin()}
 						onChange={(v) =>
 							updateSegment((segment) => {
 								segment.transitionOut = v[0];

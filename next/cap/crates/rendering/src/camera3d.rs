@@ -68,37 +68,237 @@ pub fn interpolate_camera3d(
         .filter(|s| s.enabled)
         .find(|s| frame_time >= s.start && frame_time <= s.end)?;
 
+    if let Some((previous, next, progress)) = camera3d_join_at(frame_time, segments) {
+        let previous_frame = sample_camera3d_segment(frame_time, previous, segments, aspect);
+        let next_frame = sample_camera3d_segment(frame_time, next, segments, aspect);
+        return Some(blend_camera3d_frames(
+            previous_frame,
+            next_frame,
+            progress,
+            aspect,
+        ));
+    }
+    Some(sample_camera3d_segment(
+        frame_time, segment, segments, aspect,
+    ))
+}
+
+fn sample_camera3d_segment(
+    frame_time: f64,
+    segment: &Camera3DSegment,
+    segments: &[Camera3DSegment],
+    aspect: f64,
+) -> Camera3DFrame {
     let rel = frame_time - segment.start;
+    let duration = segment.end - segment.start;
+    let sample = |base: f64, keys: &[Camera3DKeyframe], time: f64| {
+        sample_join_track(base, keys, time, duration)
+    };
     let tracks = &segment.tracks;
     let base = &segment.properties;
     let blur_base = &segment.blur;
 
     let pose = Camera3DProperties {
-        tilt_x: sample_track(base.tilt_x, &tracks.tilt_x, rel),
-        tilt_y: sample_track(base.tilt_y, &tracks.tilt_y, rel),
-        roll: sample_track(base.roll, &tracks.roll, rel),
-        rotate_x: sample_track(base.rotate_x, &tracks.rotate_x, rel),
-        rotate_y: sample_track(base.rotate_y, &tracks.rotate_y, rel),
-        fov: sample_track(base.fov, &tracks.fov, rel),
-        zoom: sample_track(base.zoom, &tracks.zoom, rel),
-        pan_x: sample_track(base.pan_x, &tracks.pan_x, rel),
-        pan_y: sample_track(base.pan_y, &tracks.pan_y, rel),
+        tilt_x: sample(base.tilt_x, &tracks.tilt_x, rel),
+        tilt_y: sample(base.tilt_y, &tracks.tilt_y, rel),
+        roll: sample(base.roll, &tracks.roll, rel),
+        rotate_x: sample(base.rotate_x, &tracks.rotate_x, rel),
+        rotate_y: sample(base.rotate_y, &tracks.rotate_y, rel),
+        fov: sample(base.fov, &tracks.fov, rel),
+        zoom: sample(base.zoom, &tracks.zoom, rel),
+        pan_x: sample(base.pan_x, &tracks.pan_x, rel),
+        pan_y: sample(base.pan_y, &tracks.pan_y, rel),
     };
 
     let blur = Camera3DBlurFrame {
         mode: blur_base.mode,
-        strength: sample_track(blur_base.strength, &tracks.blur_strength, rel),
-        falloff: sample_track(blur_base.falloff, &tracks.blur_falloff, rel),
-        focus_x: sample_track(blur_base.focus_x, &tracks.blur_focus_x, rel),
-        focus_y: sample_track(blur_base.focus_y, &tracks.blur_focus_y, rel),
-        focus_size: sample_track(blur_base.focus_size, &tracks.blur_focus_size, rel),
-        angle: sample_track(blur_base.angle, &tracks.blur_angle, rel).to_radians(),
-        dir_position: sample_track(blur_base.dir_position, &tracks.blur_dir_position, rel),
+        strength: sample(blur_base.strength, &tracks.blur_strength, rel),
+        falloff: sample(blur_base.falloff, &tracks.blur_falloff, rel),
+        focus_x: sample(blur_base.focus_x, &tracks.blur_focus_x, rel),
+        focus_y: sample(blur_base.focus_y, &tracks.blur_focus_y, rel),
+        focus_size: sample(blur_base.focus_size, &tracks.blur_focus_size, rel),
+        angle: sample(blur_base.angle, &tracks.blur_angle, rel).to_radians(),
+        dir_position: sample(blur_base.dir_position, &tracks.blur_dir_position, rel),
         bokeh: blur_base.bokeh,
     };
 
-    let activity = boundary_activity(segment, frame_time);
-    Some(effective_frame(&pose, &blur, activity, aspect))
+    let joins_previous = segments
+        .iter()
+        .any(|previous| camera3d_join_half(previous, segment, segments).is_some());
+    let joins_next = segments
+        .iter()
+        .any(|next| camera3d_join_half(segment, next, segments).is_some());
+    let activity = boundary_activity_with_durations(
+        segment,
+        frame_time,
+        if joins_previous {
+            0.0
+        } else {
+            segment.transition_in
+        },
+        if joins_next {
+            0.0
+        } else {
+            segment.transition_out
+        },
+    );
+    effective_frame(&pose, &blur, activity, aspect)
+}
+
+fn sample_join_track(base: f64, keys: &[Camera3DKeyframe], time: f64, duration: f64) -> f64 {
+    if time >= 0.0 && time <= duration {
+        return sample_track(base, keys, time);
+    }
+    // Extend the endpoint tangent through the join instead of stopping one camera at the cut.
+    let step = 0.001_f64.min(duration * 0.01);
+    if time < 0.0 {
+        let at = sample_track(base, keys, 0.0);
+        at + time * (sample_track(base, keys, step) - at) / step
+    } else {
+        let at = sample_track(base, keys, duration);
+        at + (time - duration) * (at - sample_track(base, keys, duration - step)) / step
+    }
+}
+
+fn camera3d_join_half(
+    previous: &Camera3DSegment,
+    next: &Camera3DSegment,
+    segments: &[Camera3DSegment],
+) -> Option<f64> {
+    let duration = next.join_duration?;
+    if !duration.is_finite()
+        || duration <= 0.0
+        || !previous.enabled
+        || !next.enabled
+        || previous.end != next.start
+        || previous.start >= previous.end
+        || next.start >= next.end
+    {
+        return None;
+    }
+    if segments.iter().any(|other| {
+        other.enabled
+            && !std::ptr::eq(other, previous)
+            && !std::ptr::eq(other, next)
+            && ((other.start < previous.end && other.end > previous.start)
+                || (other.start < next.end && other.end > next.start))
+    }) {
+        return None;
+    }
+    let half = (duration * 0.5)
+        .min((previous.end - previous.start) * 0.5)
+        .min((next.end - next.start) * 0.5);
+    (half > 1e-6).then_some(half)
+}
+
+fn camera3d_join_at(
+    time: f64,
+    segments: &[Camera3DSegment],
+) -> Option<(&Camera3DSegment, &Camera3DSegment, f64)> {
+    for next in segments {
+        let Some(duration) = next.join_duration else {
+            continue;
+        };
+        if !next.enabled
+            || !duration.is_finite()
+            || duration <= 0.0
+            || (time - next.start).abs() > duration * 0.5
+        {
+            continue;
+        }
+        for previous in segments {
+            if let Some(half) = camera3d_join_half(previous, next, segments)
+                && time >= next.start - half
+                && time <= next.start + half
+            {
+                let progress = crate::camera3d_spring::progress(
+                    &cap_project::Camera3DMotionSpring::default(),
+                    (time - next.start + half) / (2.0 * half),
+                );
+                return Some((previous, next, progress.clamp(0.0, 1.0)));
+            }
+        }
+    }
+    None
+}
+
+fn blend_camera3d_frames(
+    a: Camera3DFrame,
+    b: Camera3DFrame,
+    progress: f64,
+    aspect: f64,
+) -> Camera3DFrame {
+    if progress <= 0.0 {
+        return a;
+    }
+    if progress >= 1.0 {
+        return b;
+    }
+    let mix = |a: f64, b: f64| a + (b - a) * progress;
+    let angle = |a: f64, b: f64| a + ((b - a + 180.0).rem_euclid(360.0) - 180.0) * progress;
+    let flat = Camera3DProperties::default();
+    let flat = Camera3DProperties {
+        zoom: plane_half_extents(aspect).1 / (flat.fov.to_radians() / 2.0).tan(),
+        ..flat
+    };
+    let left = a.pose.as_ref().unwrap_or(&flat);
+    let right = b.pose.as_ref().unwrap_or(&flat);
+    let pose = Camera3DProperties {
+        tilt_x: angle(left.tilt_x, right.tilt_x),
+        tilt_y: angle(left.tilt_y, right.tilt_y),
+        roll: angle(left.roll, right.roll),
+        rotate_x: angle(left.rotate_x, right.rotate_x),
+        rotate_y: angle(left.rotate_y, right.rotate_y),
+        fov: mix(left.fov, right.fov),
+        zoom: mix(left.zoom, right.zoom),
+        pan_x: mix(left.pan_x, right.pan_x),
+        pan_y: mix(left.pan_y, right.pan_y),
+    };
+    let blur = match (a.blur, b.blur) {
+        (None, None) => None,
+        (Some(left), Some(right)) if left.mode == right.mode && left.bokeh == right.bokeh => {
+            Some(Camera3DBlurFrame {
+                strength: mix(left.strength, right.strength),
+                falloff: mix(left.falloff, right.falloff),
+                focus_x: mix(left.focus_x, right.focus_x),
+                focus_y: mix(left.focus_y, right.focus_y),
+                focus_size: mix(left.focus_size, right.focus_size),
+                angle: left.angle
+                    + ((right.angle - left.angle + std::f64::consts::PI)
+                        .rem_euclid(std::f64::consts::TAU)
+                        - std::f64::consts::PI)
+                        * progress,
+                dir_position: mix(left.dir_position, right.dir_position),
+                ..left
+            })
+        }
+        (Some(mut blur), None) => {
+            blur.strength *= 1.0 - progress;
+            Some(blur)
+        }
+        (None, Some(mut blur)) => {
+            blur.strength *= progress;
+            Some(blur)
+        }
+        (Some(mut left), Some(mut right)) => {
+            if progress < 0.5 {
+                left.strength *= (1.0 - 2.0 * progress).powi(2);
+                Some(left)
+            } else {
+                right.strength *= (2.0 * progress - 1.0).powi(2);
+                Some(right)
+            }
+        }
+    }
+    .filter(|blur| blur.strength >= 0.5);
+    Camera3DFrame {
+        pose: (a.pose.is_some() || b.pose.is_some()).then_some(pose),
+        blur,
+        activity: mix(
+            if a.pose.is_some() { a.activity } else { 0.0 },
+            if b.pose.is_some() { b.activity } else { 0.0 },
+        ),
+    }
 }
 
 fn effective_frame(
@@ -161,11 +361,16 @@ fn pose_from_activity(
 }
 
 /// 0 at the segment edges, ramping to 1 over `transition_in`/`transition_out`.
-fn boundary_activity(segment: &Camera3DSegment, frame_time: f64) -> f64 {
+fn boundary_activity_with_durations(
+    segment: &Camera3DSegment,
+    frame_time: f64,
+    transition_in: f64,
+    transition_out: f64,
+) -> f64 {
     let len = (segment.end - segment.start).max(0.0);
     let half = len / 2.0;
-    let t_in = segment.transition_in.clamp(0.0, half);
-    let t_out = segment.transition_out.clamp(0.0, half);
+    let t_in = transition_in.clamp(0.0, half);
+    let t_out = transition_out.clamp(0.0, half);
 
     let a_in = if t_in > 0.0 {
         ((frame_time - segment.start) / t_in).clamp(0.0, 1.0)
@@ -517,10 +722,10 @@ fn camera3d_motion_history<'a>(
     }
     let mut current = segment;
     while since < current.start {
-        let Some(previous) = segments
-            .iter()
-            .find(|previous| continuous_camera3d_cut(previous, current))
-        else {
+        let Some(previous) = segments.iter().find(|previous| {
+            camera3d_join_half(previous, current, segments).is_some()
+                || continuous_camera3d_cut(previous, current)
+        }) else {
             break;
         };
         history.push(previous);
@@ -533,10 +738,11 @@ fn camera3d_motion_frame(
     time: f64,
     segment: &Camera3DSegment,
     history: &[&Camera3DSegment],
+    segments: &[Camera3DSegment],
     aspect: f64,
 ) -> Option<(f64, Camera3DFrame)> {
     let time = time.max(history.last().map_or(segment.start, |s| s.start));
-    let selected = if time < segment.start {
+    let _selected = if time < segment.start {
         history
             .iter()
             .copied()
@@ -544,7 +750,7 @@ fn camera3d_motion_frame(
     } else {
         segment
     };
-    interpolate_camera3d(time, std::slice::from_ref(selected), aspect).map(|frame| (time, frame))
+    interpolate_camera3d(time, segments, aspect).map(|frame| (time, frame))
 }
 
 pub fn has_camera3d_shutter_tail(
@@ -562,7 +768,7 @@ pub fn has_camera3d_shutter_tail(
         .is_some_and(|segment| {
             let previous_time = time - amount.min(1.0) / f64::from(crate::MOTION_BLUR_BASELINE_FPS);
             let history = camera3d_motion_history(segment, segments, previous_time);
-            camera3d_motion_frame(previous_time, segment, &history, aspect)
+            camera3d_motion_frame(previous_time, segment, &history, segments, aspect)
                 .is_some_and(|(_, frame)| frame.pose.is_some())
         })
 }
@@ -603,9 +809,7 @@ pub fn interpolate_camera3d_motion(
     let exposure = amount.min(1.0) / f64::from(crate::MOTION_BLUR_BASELINE_FPS);
     let history = camera3d_motion_history(segment, segments, time - exposure);
     let sample = |time: f64| {
-        // Only proven continuations share exposure history; authored pose,
-        // speed or phase changes keep their hard boundary.
-        let (time, frame) = camera3d_motion_frame(time, segment, &history, aspect)?;
+        let (time, frame) = camera3d_motion_frame(time, segment, &history, segments, aspect)?;
         let pose = frame.pose.unwrap_or_else(|| {
             let pose = Camera3DProperties::default();
             Camera3DProperties {
@@ -1056,6 +1260,7 @@ mod tests {
             tracks: Camera3DTracks::default(),
             transition_in: 0.5,
             transition_out: 0.5,
+            join_duration: None,
         }
     }
 
@@ -1476,5 +1681,87 @@ mod tests {
             interpolate_camera3d_motion(time, &[whole], (1920, 1080), 1.0, zoom).unwrap();
         let actual = interpolate_camera3d_motion(time, &pieces, (1920, 1080), 1.0, zoom).unwrap();
         assert_eq!(actual.samples, expected.samples);
+    }
+    fn joining_shots() -> Vec<Camera3DSegment> {
+        let mut left = segment();
+        left.transition_in = 0.0;
+        left.transition_out = 0.0;
+        left.properties.tilt_y = -25.0;
+        let mut right = left.clone();
+        right.start = left.end;
+        right.end = right.start + 4.0;
+        right.properties.tilt_y = 25.0;
+        right.join_duration = Some(0.45);
+        vec![left, right]
+    }
+
+    #[test]
+    fn smooth_join_keeps_pose_and_velocity_continuous_at_the_cut() {
+        let shots = joining_shots();
+        let angle = |time| {
+            interpolate_camera3d(time, &shots, ASPECT)
+                .unwrap()
+                .pose
+                .unwrap()
+                .tilt_y
+        };
+        let step = 0.00001;
+        let time = shots[1].start;
+        assert!((angle(time + step) - angle(time - step)).abs() < 0.01);
+        let before = (angle(time) - angle(time - step)) / step;
+        let after = (angle(time + step) - angle(time)) / step;
+        assert!(
+            (before - after).abs() < 0.1,
+            "join velocity: {before} / {after}"
+        );
+        for edge in [time - 0.225, time + 0.225] {
+            let before = (angle(edge) - angle(edge - step)) / step;
+            let after = (angle(edge + step) - angle(edge)) / step;
+            assert!(
+                (before - after).abs() < 0.1,
+                "edge velocity: {before} / {after}"
+            );
+        }
+        assert_close(
+            angle(time - 0.225),
+            -25.0,
+            1e-8,
+            "join begins on previous pose",
+        );
+        assert_close(angle(time + 0.225), 25.0, 1e-8, "join ends on next pose");
+    }
+
+    #[test]
+    fn explicit_cut_and_a_gap_keep_their_authored_boundaries() {
+        let mut shots = joining_shots();
+        shots[1].join_duration = None;
+        let before = interpolate_camera3d(8.0 - 1e-5, &shots, ASPECT)
+            .unwrap()
+            .pose
+            .unwrap();
+        let after = interpolate_camera3d(8.0 + 1e-5, &shots, ASPECT)
+            .unwrap()
+            .pose
+            .unwrap();
+        assert!((after.tilt_y - before.tilt_y).abs() > 49.0);
+        shots[1].join_duration = Some(0.45);
+        shots[1].start += 0.5;
+        assert!(camera3d_join_at(8.0, &shots).is_none());
+        assert!(interpolate_camera3d(8.25, &shots, ASPECT).is_none());
+    }
+
+    #[test]
+    fn join_motion_blur_samples_the_continuous_path_across_the_cut() {
+        let shots = joining_shots();
+        let time = shots[1].start + 0.002;
+        let motion =
+            interpolate_camera3d_motion(time, &shots, (1920, 1080), 1.0, |_| None).unwrap();
+        let history = camera3d_motion_history(&shots[1], &shots, time - 1.0 / 60.0);
+        assert_eq!(history.len(), 1);
+        assert_ne!(
+            motion.samples.first().unwrap().inverse_rows,
+            motion.samples.last().unwrap().inverse_rows
+        );
+        assert!(has_camera3d_shutter_tail(time, &shots, ASPECT, 1.0));
     }
 }

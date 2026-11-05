@@ -83,6 +83,7 @@ export type Camera3DSegment = {
 	tracks: Camera3DTracks;
 	transitionIn: number;
 	transitionOut: number;
+	joinDuration: number | null;
 };
 
 /**
@@ -90,6 +91,7 @@ export type Camera3DSegment = {
  * renderer defaults to the same 0 (crates/rendering/src/camera3d.rs).
  */
 export const DEFAULT_CAMERA3D_TRANSITION = 0;
+export const DEFAULT_CAMERA3D_JOIN_DURATION = 0.75;
 
 /**
  * Handles the renderer falls back to when a keyframe carries none: cubic
@@ -641,8 +643,6 @@ export const applyMotionTemplate = (
 ) => {
 	setMotion(segment, template.from, template.to);
 	segment.blur = { ...template.blur };
-	// A template owns the whole move, so the segment cuts in and out of it.
-	// Segments authored before the 0 default can still carry a ramp.
 	segment.transitionIn = 0;
 	segment.transitionOut = 0;
 };
@@ -1047,6 +1047,7 @@ export const applySceneToRange = (
 			tracks: defaultCamera3DTracks(),
 			transitionIn: 0,
 			transitionOut: 0,
+			joinDuration: DEFAULT_CAMERA3D_JOIN_DURATION,
 		};
 		setMotion(segment, shot.from, shot.to);
 		return segment;
@@ -1204,6 +1205,14 @@ export const normalizeCamera3DSegments = (
 				tracks: normalizeCamera3DTracks(segment.tracks),
 				transitionIn: segment.transitionIn ?? DEFAULT_CAMERA3D_TRANSITION,
 				transitionOut: segment.transitionOut ?? DEFAULT_CAMERA3D_TRANSITION,
+				joinDuration:
+					segment.joinDuration === undefined
+						? DEFAULT_CAMERA3D_JOIN_DURATION
+						: typeof segment.joinDuration === "number" &&
+								Number.isFinite(segment.joinDuration) &&
+								segment.joinDuration > 0
+							? segment.joinDuration
+							: null,
 			};
 			fitCamera3DMotionToSegment(normalized);
 			return normalized;
@@ -1227,6 +1236,7 @@ export const defaultCamera3DSegment = (
 		tracks: defaultCamera3DTracks(),
 		transitionIn: DEFAULT_CAMERA3D_TRANSITION,
 		transitionOut: DEFAULT_CAMERA3D_TRANSITION,
+		joinDuration: DEFAULT_CAMERA3D_JOIN_DURATION,
 	};
 };
 
@@ -1403,6 +1413,7 @@ export const splitCamera3DMotion = (
 				sliceCamera3DTrack(segment.tracks[key], start, end),
 			]),
 		) as Camera3DTracks,
+		joinDuration: start === 0 ? segment.joinDuration : null,
 		transitionIn: start === 0 ? segment.transitionIn : 0,
 		transitionOut:
 			end === segment.end - segment.start ? segment.transitionOut : 0,

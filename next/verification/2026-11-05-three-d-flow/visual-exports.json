@@ -1,0 +1,83 @@
+[
+	{
+		"case": "smooth-450",
+		"path": "/private/tmp/jianku-3d-flow-20261105/smooth-450.jks",
+		"joinDuration": 0.45,
+		"state": "exported and decoded; visual review pending",
+		"media": {
+			"programs": [],
+			"stream_groups": [],
+			"streams": [
+				{
+					"codec_name": "h264",
+					"width": 1280,
+					"height": 800,
+					"nb_read_frames": "360"
+				},
+				{
+					"codec_name": "aac",
+					"nb_read_frames": "563"
+				}
+			],
+			"format": {
+				"duration": "12.000000"
+			}
+		},
+		"output": "/private/tmp/jianku-3d-flow-20261105/smooth-450.mp4",
+		"elapsedSeconds": 4.553
+	},
+	{
+		"case": "smooth-750",
+		"path": "/private/tmp/jianku-3d-flow-20261105/smooth-750.jks",
+		"joinDuration": 0.75,
+		"state": "exported and decoded; visual review pending",
+		"media": {
+			"programs": [],
+			"stream_groups": [],
+			"streams": [
+				{
+					"codec_name": "h264",
+					"width": 1280,
+					"height": 800,
+					"nb_read_frames": "360"
+				},
+				{
+					"codec_name": "aac",
+					"nb_read_frames": "563"
+				}
+			],
+			"format": {
+				"duration": "12.000000"
+			}
+		},
+		"output": "/private/tmp/jianku-3d-flow-20261105/smooth-750.mp4",
+		"elapsedSeconds": 4.185
+	},
+	{
+		"case": "direct-cut",
+		"path": "/private/tmp/jianku-3d-flow-20261105/direct-cut.jks",
+		"joinDuration": null,
+		"state": "exported and decoded; visual review pending",
+		"media": {
+			"programs": [],
+			"stream_groups": [],
+			"streams": [
+				{
+					"codec_name": "h264",
+					"width": 1280,
+					"height": 800,
+					"nb_read_frames": "360"
+				},
+				{
+					"codec_name": "aac",
+					"nb_read_frames": "563"
+				}
+			],
+			"format": {
+				"duration": "12.000000"
+			}
+		},
+		"output": "/private/tmp/jianku-3d-flow-20261105/direct-cut.mp4",
+		"elapsedSeconds": 4.226
+	}
+]
