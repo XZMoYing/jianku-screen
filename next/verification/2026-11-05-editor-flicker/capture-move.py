@@ -56,7 +56,8 @@ with (area / f'alpha{version}-capture.log').open('x') as capture_log:
     with (area / f'alpha{version}-drag.log').open('x') as drag_log:
         result = subprocess.run([str(helpers / 'drag-owned'), str(state['windowID']), str(x), str(y), str(x + 81), str(y), '16', '0.9', 'normal', 'raw'], stdout=drag_log, stderr=subprocess.STDOUT, timeout=25)
     ended = time.time()
-    capture_log.write(capture.stdout.read())
+    capture_report = capture.stdout.read()
+    capture_log.write(capture_report)
     assert capture.wait(timeout=20) == 0
 assert result.returncode == 0
 assert control('save')['saveKeySent']
@@ -70,6 +71,6 @@ assert control('save')['saveKeySent']
 time.sleep(0.4)
 restored = json.loads((project / 'project-config.json').read_text())
 assert restored == before
-row = {'version': '0.2.0-alpha.' + version, 'bounds': bounds, 'previewRectInWindowPoints': preview_rect, 'dragStartedAtUnix': started, 'dragEndedAtUnix': ended, 'rangeChanged': [a['start'], a['end']], 'undoRestoredFullConfig': True, 'recording': str(output), 'visualResult': 'pending frame review'}
+row = {'version': '0.2.0-alpha.' + version, 'bounds': bounds, 'previewRectInWindowPoints': preview_rect, 'dragStartedAtUnix': started, 'dragEndedAtUnix': ended, 'rangeChanged': [a['start'], a['end']], 'undoRestoredFullConfig': True, 'recording': str(output), 'capturer': json.loads(capture_report), 'visualResult': 'pending frame review'}
 (area / f'alpha{version}-capture-result.json').write_text(json.dumps(row, ensure_ascii=False, indent=2) + '\n')
 print(json.dumps(row, ensure_ascii=False))

@@ -1,0 +1,16 @@
+{
+	"appHidden": false,
+	"editors": [
+		{
+			"editor": true,
+			"minimized": false,
+			"ownedDemo": true
+		}
+	],
+	"normalQuitRequested": true,
+	"pid": 8937,
+	"saveSignalSent": true,
+	"normalExitObserved": true,
+	"onScreenGuardRefusedBeforeMutation": true,
+	"saveSignalIsNotAnAcknowledgement": true
+}

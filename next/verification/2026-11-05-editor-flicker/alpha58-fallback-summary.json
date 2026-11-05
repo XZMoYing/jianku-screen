@@ -1,0 +1,1526 @@
+{
+	"installedCandidate": "0.2.0-alpha.58",
+	"scope": "actual opted-in fallback connection events during the owned capture; missing rows do not prove absence of flicker",
+	"events": [
+		{
+			"windowLog": "editor-fallback-diagnostics-editor-0.json",
+			"secondsFromFirstVideoSample": 1.6326549053192139,
+			"at": 1793879117610,
+			"boundary": "route-suspense",
+			"connected": true,
+			"resources": [
+				{
+					"name": "project-path",
+					"state": "ready"
+				},
+				{
+					"name": "editor-instance",
+					"state": "ready"
+				},
+				{
+					"name": "recent-projects",
+					"state": "ready"
+				}
+			],
+			"queries": [
+				{
+					"name": "store/general_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/raw-meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/presets",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "customDomain",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/auth",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/recording_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "animated-gradient-catalog",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/animated_gradients",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "desktop-background",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "local-background-materials",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "bundled-wallpapers",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				}
+			]
+		},
+		{
+			"windowLog": "editor-fallback-diagnostics-editor-0.json",
+			"secondsFromFirstVideoSample": 1.7006549835205078,
+			"at": 1793879117678,
+			"boundary": "route-suspense",
+			"connected": true,
+			"resources": [
+				{
+					"name": "project-path",
+					"state": "ready"
+				},
+				{
+					"name": "editor-instance",
+					"state": "ready"
+				},
+				{
+					"name": "recent-projects",
+					"state": "ready"
+				}
+			],
+			"queries": [
+				{
+					"name": "store/general_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/raw-meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/presets",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "customDomain",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/auth",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/recording_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "animated-gradient-catalog",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/animated_gradients",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "desktop-background",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "local-background-materials",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "bundled-wallpapers",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				}
+			]
+		},
+		{
+			"windowLog": "editor-fallback-diagnostics-editor-0.json",
+			"secondsFromFirstVideoSample": 1.7576549053192139,
+			"at": 1793879117735,
+			"boundary": "route-suspense",
+			"connected": true,
+			"resources": [
+				{
+					"name": "project-path",
+					"state": "ready"
+				},
+				{
+					"name": "editor-instance",
+					"state": "ready"
+				},
+				{
+					"name": "recent-projects",
+					"state": "ready"
+				}
+			],
+			"queries": [
+				{
+					"name": "store/general_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/raw-meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/presets",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "customDomain",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/auth",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/recording_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "animated-gradient-catalog",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/animated_gradients",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "desktop-background",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "local-background-materials",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "bundled-wallpapers",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				}
+			]
+		},
+		{
+			"windowLog": "editor-fallback-diagnostics-editor-0.json",
+			"secondsFromFirstVideoSample": 1.817655086517334,
+			"at": 1793879117795,
+			"boundary": "route-suspense",
+			"connected": true,
+			"resources": [
+				{
+					"name": "project-path",
+					"state": "ready"
+				},
+				{
+					"name": "editor-instance",
+					"state": "ready"
+				},
+				{
+					"name": "recent-projects",
+					"state": "ready"
+				}
+			],
+			"queries": [
+				{
+					"name": "store/general_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/raw-meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/presets",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "customDomain",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/auth",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/recording_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "animated-gradient-catalog",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/animated_gradients",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "desktop-background",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "local-background-materials",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "bundled-wallpapers",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				}
+			]
+		},
+		{
+			"windowLog": "editor-fallback-diagnostics-editor-0.json",
+			"secondsFromFirstVideoSample": 1.881654977798462,
+			"at": 1793879117859,
+			"boundary": "route-suspense",
+			"connected": true,
+			"resources": [
+				{
+					"name": "project-path",
+					"state": "ready"
+				},
+				{
+					"name": "editor-instance",
+					"state": "ready"
+				},
+				{
+					"name": "recent-projects",
+					"state": "ready"
+				}
+			],
+			"queries": [
+				{
+					"name": "store/general_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/raw-meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/presets",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "customDomain",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/auth",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/recording_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "animated-gradient-catalog",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/animated_gradients",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "desktop-background",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "local-background-materials",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "bundled-wallpapers",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				}
+			]
+		},
+		{
+			"windowLog": "editor-fallback-diagnostics-editor-0.json",
+			"secondsFromFirstVideoSample": 1.9596550464630127,
+			"at": 1793879117937,
+			"boundary": "route-suspense",
+			"connected": true,
+			"resources": [
+				{
+					"name": "project-path",
+					"state": "ready"
+				},
+				{
+					"name": "editor-instance",
+					"state": "ready"
+				},
+				{
+					"name": "recent-projects",
+					"state": "ready"
+				}
+			],
+			"queries": [
+				{
+					"name": "store/general_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/raw-meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/presets",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "customDomain",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/auth",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/recording_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "animated-gradient-catalog",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/animated_gradients",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "desktop-background",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "local-background-materials",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "bundled-wallpapers",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				}
+			]
+		},
+		{
+			"windowLog": "editor-fallback-diagnostics-editor-0.json",
+			"secondsFromFirstVideoSample": 2.0286550521850586,
+			"at": 1793879118006,
+			"boundary": "route-suspense",
+			"connected": true,
+			"resources": [
+				{
+					"name": "project-path",
+					"state": "ready"
+				},
+				{
+					"name": "editor-instance",
+					"state": "ready"
+				},
+				{
+					"name": "recent-projects",
+					"state": "ready"
+				}
+			],
+			"queries": [
+				{
+					"name": "store/general_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/raw-meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/presets",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "customDomain",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/auth",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/recording_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "animated-gradient-catalog",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/animated_gradients",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "desktop-background",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "local-background-materials",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "bundled-wallpapers",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				}
+			]
+		},
+		{
+			"windowLog": "editor-fallback-diagnostics-editor-0.json",
+			"secondsFromFirstVideoSample": 2.0936551094055176,
+			"at": 1793879118071,
+			"boundary": "route-suspense",
+			"connected": true,
+			"resources": [
+				{
+					"name": "project-path",
+					"state": "ready"
+				},
+				{
+					"name": "editor-instance",
+					"state": "ready"
+				},
+				{
+					"name": "recent-projects",
+					"state": "ready"
+				}
+			],
+			"queries": [
+				{
+					"name": "store/general_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/raw-meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/presets",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "customDomain",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/auth",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/recording_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "animated-gradient-catalog",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/animated_gradients",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "desktop-background",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "local-background-materials",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "bundled-wallpapers",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				}
+			]
+		},
+		{
+			"windowLog": "editor-fallback-diagnostics-editor-0.json",
+			"secondsFromFirstVideoSample": 2.1496551036834717,
+			"at": 1793879118127,
+			"boundary": "route-suspense",
+			"connected": true,
+			"resources": [
+				{
+					"name": "project-path",
+					"state": "ready"
+				},
+				{
+					"name": "editor-instance",
+					"state": "ready"
+				},
+				{
+					"name": "recent-projects",
+					"state": "ready"
+				}
+			],
+			"queries": [
+				{
+					"name": "store/general_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/raw-meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/presets",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "customDomain",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/auth",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/recording_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "animated-gradient-catalog",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/animated_gradients",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "desktop-background",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "local-background-materials",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "bundled-wallpapers",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				}
+			]
+		},
+		{
+			"windowLog": "editor-fallback-diagnostics-editor-0.json",
+			"secondsFromFirstVideoSample": 2.2166550159454346,
+			"at": 1793879118194,
+			"boundary": "route-suspense",
+			"connected": true,
+			"resources": [
+				{
+					"name": "project-path",
+					"state": "ready"
+				},
+				{
+					"name": "editor-instance",
+					"state": "ready"
+				},
+				{
+					"name": "recent-projects",
+					"state": "ready"
+				}
+			],
+			"queries": [
+				{
+					"name": "store/general_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/raw-meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/presets",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "customDomain",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/auth",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/recording_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "animated-gradient-catalog",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/animated_gradients",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "desktop-background",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "local-background-materials",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "bundled-wallpapers",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				}
+			]
+		},
+		{
+			"windowLog": "editor-fallback-diagnostics-editor-0.json",
+			"secondsFromFirstVideoSample": 2.2776551246643066,
+			"at": 1793879118255,
+			"boundary": "route-suspense",
+			"connected": true,
+			"resources": [
+				{
+					"name": "project-path",
+					"state": "ready"
+				},
+				{
+					"name": "editor-instance",
+					"state": "ready"
+				},
+				{
+					"name": "recent-projects",
+					"state": "ready"
+				}
+			],
+			"queries": [
+				{
+					"name": "store/general_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/raw-meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/presets",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "customDomain",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/auth",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/recording_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "animated-gradient-catalog",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/animated_gradients",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "desktop-background",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "local-background-materials",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "bundled-wallpapers",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				}
+			]
+		},
+		{
+			"windowLog": "editor-fallback-diagnostics-editor-0.json",
+			"secondsFromFirstVideoSample": 2.3336551189422607,
+			"at": 1793879118311,
+			"boundary": "route-suspense",
+			"connected": true,
+			"resources": [
+				{
+					"name": "project-path",
+					"state": "ready"
+				},
+				{
+					"name": "editor-instance",
+					"state": "ready"
+				},
+				{
+					"name": "recent-projects",
+					"state": "ready"
+				}
+			],
+			"queries": [
+				{
+					"name": "store/general_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/raw-meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/presets",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "customDomain",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/auth",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/recording_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "animated-gradient-catalog",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/animated_gradients",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "desktop-background",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "local-background-materials",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "bundled-wallpapers",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				}
+			]
+		},
+		{
+			"windowLog": "editor-fallback-diagnostics-editor-0.json",
+			"secondsFromFirstVideoSample": 2.4026551246643066,
+			"at": 1793879118380,
+			"boundary": "route-suspense",
+			"connected": true,
+			"resources": [
+				{
+					"name": "project-path",
+					"state": "ready"
+				},
+				{
+					"name": "editor-instance",
+					"state": "ready"
+				},
+				{
+					"name": "recent-projects",
+					"state": "ready"
+				}
+			],
+			"queries": [
+				{
+					"name": "store/general_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/raw-meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/presets",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "customDomain",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/auth",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/recording_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "animated-gradient-catalog",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/animated_gradients",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "desktop-background",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "local-background-materials",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "bundled-wallpapers",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				}
+			]
+		},
+		{
+			"windowLog": "editor-fallback-diagnostics-editor-0.json",
+			"secondsFromFirstVideoSample": 2.4676549434661865,
+			"at": 1793879118445,
+			"boundary": "route-suspense",
+			"connected": true,
+			"resources": [
+				{
+					"name": "project-path",
+					"state": "ready"
+				},
+				{
+					"name": "editor-instance",
+					"state": "ready"
+				},
+				{
+					"name": "recent-projects",
+					"state": "ready"
+				}
+			],
+			"queries": [
+				{
+					"name": "store/general_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/raw-meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/presets",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "customDomain",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/auth",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/recording_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "animated-gradient-catalog",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/animated_gradients",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "desktop-background",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "local-background-materials",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "bundled-wallpapers",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				}
+			]
+		},
+		{
+			"windowLog": "editor-fallback-diagnostics-editor-0.json",
+			"secondsFromFirstVideoSample": 2.5346550941467285,
+			"at": 1793879118512,
+			"boundary": "route-suspense",
+			"connected": true,
+			"resources": [
+				{
+					"name": "project-path",
+					"state": "ready"
+				},
+				{
+					"name": "editor-instance",
+					"state": "ready"
+				},
+				{
+					"name": "recent-projects",
+					"state": "ready"
+				}
+			],
+			"queries": [
+				{
+					"name": "store/general_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/raw-meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/presets",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "customDomain",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/auth",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/recording_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "animated-gradient-catalog",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/animated_gradients",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "desktop-background",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "local-background-materials",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "bundled-wallpapers",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				}
+			]
+		},
+		{
+			"windowLog": "editor-fallback-diagnostics-editor-0.json",
+			"secondsFromFirstVideoSample": 2.5986549854278564,
+			"at": 1793879118576,
+			"boundary": "route-suspense",
+			"connected": true,
+			"resources": [
+				{
+					"name": "project-path",
+					"state": "ready"
+				},
+				{
+					"name": "editor-instance",
+					"state": "ready"
+				},
+				{
+					"name": "recent-projects",
+					"state": "ready"
+				}
+			],
+			"queries": [
+				{
+					"name": "store/general_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/raw-meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "editor/meta",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/presets",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "customDomain",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/auth",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/recording_settings",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "animated-gradient-catalog",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "store/animated_gradients",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "desktop-background",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "local-background-materials",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				},
+				{
+					"name": "bundled-wallpapers",
+					"status": "success",
+					"fetchStatus": "idle",
+					"hasData": true
+				}
+			]
+		}
+	]
+}

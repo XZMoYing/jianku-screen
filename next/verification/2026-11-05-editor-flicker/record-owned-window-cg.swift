@@ -70,7 +70,9 @@ final class WindowRecorder: NSObject {
   let height = Int(ceil(pointsHigh / 2)) * 2
   let recorder = try WindowRecorder(output: URL(fileURLWithPath: args[3]), width: width, height: height)
   print("OWNED_WINDOW_CAPTURE_READY \(windowID) \(width)x\(height)"); fflush(stdout)
+  let startedUnix = Date().timeIntervalSince1970
   let started = ProcessInfo.processInfo.systemUptime
+  var firstSampleUnix: Double?
   var previous: Double?
   var maxGap = 0.0
   var samples = 0
@@ -81,6 +83,7 @@ final class WindowRecorder: NSObject {
     let now = ProcessInfo.processInfo.systemUptime
     if let previous { maxGap = max(maxGap, now - previous) }
     previous = now
+    if firstSampleUnix == nil { firstSampleUnix = startedUnix + now - started }
     samples += 1
     recorder.append(image, at: CMTime(seconds: now - started, preferredTimescale: 1_000_000))
     return true
@@ -91,7 +94,7 @@ final class WindowRecorder: NSObject {
   recorder.input.markAsFinished()
   await recorder.writer.finishWriting()
   guard recorder.writer.status == .completed, !recorder.appendFailed, recorder.frames > 0 else { throw recorder.writer.error ?? NSError(domain: "Owned capture did not finish", code: 2) }
-  let report: [String: Any] = ["scope": "CGWindowListCreateImage optionIncludingWindow for one verified owned editor; no display capture", "windowID": windowID, "width": width, "height": height, "frames": recorder.frames, "samples": samples, "maximumSampleGapMs": maxGap * 1000, "droppedByWriter": recorder.dropped, "durationRequested": duration]
+  let report: [String: Any] = ["scope": "CGWindowListCreateImage optionIncludingWindow for one verified owned editor; no display capture", "windowID": windowID, "width": width, "height": height, "frames": recorder.frames, "samples": samples, "captureStartedAtUnix": startedUnix, "firstSampleAtUnix": firstSampleUnix ?? startedUnix, "maximumSampleGapMs": maxGap * 1000, "droppedByWriter": recorder.dropped, "durationRequested": duration]
   print(String(data: try JSONSerialization.data(withJSONObject: report, options: [.sortedKeys]), encoding: .utf8)!)
  }
 }
