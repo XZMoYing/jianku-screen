@@ -1,0 +1,11 @@
+{
+	"exit": 1,
+	"lastStages": {
+		"studio": "collecting",
+		"instant": "collecting"
+	},
+	"verdict": "inconclusive",
+	"studioFailureCategory": "screen_capture_permission",
+	"instantFailureCategory": "screen_capture_permission",
+	"numericMeasurement": false
+}

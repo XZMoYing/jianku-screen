@@ -45,6 +45,14 @@ fn safe_measurement(measurement: &Value) -> Value {
     Value::Object(result)
 }
 
+pub(super) fn safe_failure_code(error: &str) -> &'static str {
+    if error.starts_with("screen recording permission unavailable") {
+        "screen_capture_permission"
+    } else {
+        "unclassified"
+    }
+}
+
 pub(super) fn safe_sync_report(report: &Value) -> Option<Value> {
     let verdict = report.get("verdict")?.as_str()?;
     if !matches!(verdict, "pass" | "warn" | "fail" | "inconclusive") {
@@ -77,6 +85,8 @@ pub(super) fn safe_sync_report(report: &Value) -> Option<Value> {
         "instant": instant,
         "studio_error": report["studio_error"].is_string().then_some("Studio sync test failed"),
         "instant_error": report["instant_error"].is_string().then_some("Instant sync test failed"),
+        "studio_error_code": report["studio_error"].as_str().map(safe_failure_code),
+        "instant_error_code": report["instant_error"].as_str().map(safe_failure_code),
         "thresholds": numeric_fields(&report["thresholds"], &[
             "pass_offset_ms", "pass_total_drift_ms", "warn_offset_ms",
             "warn_total_drift_ms", "max_raw_export_delta_ms",
@@ -98,6 +108,7 @@ mod tests {
             "mode": "both",
             "summary": "/Volumes/private-sentinel/failure",
             "studio_error": "Failed to load private-sentinel",
+            "instant_error": "screen recording permission unavailable: private-sentinel",
             "recording": {
                 "median_offset_ms": 37.2,
                 "total_drift_ms": -1.5,
@@ -119,6 +130,8 @@ mod tests {
         assert_eq!(result["recording"]["median_offset_ms"], 37.2);
         assert_eq!(result["diagnostics"]["audio_output_latency_ms"], 18.0);
         assert_eq!(result["studio_error"], "Studio sync test failed");
+        assert_eq!(result["studio_error_code"], "unclassified");
+        assert_eq!(result["instant_error_code"], "screen_capture_permission");
         assert_eq!(
             result["summary"],
             "Measured offset +37.2 ms and drift -1.5 ms"

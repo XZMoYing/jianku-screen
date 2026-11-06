@@ -83,7 +83,9 @@ enum SyncTestMessage {
     Report {
         report: serde_json::Value,
     },
-    Error {},
+    Error {
+        error: String,
+    },
 }
 
 fn parse_sync_test_line(line: &str) -> Option<SyncTestMessage> {
@@ -193,7 +195,9 @@ async fn run_sync_test(
         .take()
         .ok_or_else(|| "Sync test stdout was not captured".to_string())?;
     let mut report = None;
-    let mut reported_error = false;
+    let mut reported_error = None;
+    let mut studio_stage = None;
+    let mut instant_stage = None;
     let mut stdout_lines = tokio::io::BufReader::new(stdout).lines();
 
     while let Some(line) = stdout_lines
@@ -214,6 +218,11 @@ async fn run_sync_test(
                         | "done"
                 ) =>
             {
+                match mode.as_deref() {
+                    Some("studio") => studio_stage = Some(stage.clone()),
+                    Some("instant") => instant_stage = Some(stage.clone()),
+                    _ => {}
+                }
                 DiagnosticProgress {
                     phase: "sync-test".to_string(),
                     stage: Some(stage),
@@ -223,9 +232,19 @@ async fn run_sync_test(
                 .ok();
             }
             Some(SyncTestMessage::Report { report: value }) => {
-                report = sync_report::safe_sync_report(&value);
+                if let Some(mut safe_report) = sync_report::safe_sync_report(&value) {
+                    if value["studio_error"].is_string() {
+                        safe_report["studio_failure_stage"] = serde_json::json!(studio_stage);
+                    }
+                    if value["instant_error"].is_string() {
+                        safe_report["instant_failure_stage"] = serde_json::json!(instant_stage);
+                    }
+                    report = Some(safe_report);
+                }
             }
-            Some(SyncTestMessage::Error {}) => reported_error = true,
+            Some(SyncTestMessage::Error { error }) => {
+                reported_error = Some(sync_report::safe_failure_code(&error));
+            }
             _ => {}
         }
     }
@@ -239,8 +258,11 @@ async fn run_sync_test(
         return Ok(report);
     }
 
-    if reported_error {
-        return Err(format!("Sync test reported an error ({status})"));
+    if let Some(code) = reported_error {
+        let stage = studio_stage
+            .or(instant_stage)
+            .unwrap_or_else(|| "startup".to_string());
+        return Err(format!("Sync test failed at {stage}: {code} ({status})"));
     }
 
     Err(format!(
@@ -584,7 +606,9 @@ mod tests {
 
         assert_eq!(
             parse_sync_test_line(r#"{"type":"Error","error":"no display"}"#),
-            Some(SyncTestMessage::Error {})
+            Some(SyncTestMessage::Error {
+                error: "no display".to_string()
+            })
         );
     }
 
