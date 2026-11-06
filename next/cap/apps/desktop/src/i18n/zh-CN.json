@@ -349,6 +349,7 @@
 	"Are you sure you want to delete this preset?": "确定删除此预设？",
 	"Current frame": "当前帧",
 	"Loading frame…": "正在加载画面…",
+	"Move the playhead onto a video clip to crop it.": "请将播放头移到视频片段上，再裁切画面。",
 	"Rendering preview…": "正在渲染预览…",
 	"Snap to ratios": "吸附到比例",
 	"Center": "居中",

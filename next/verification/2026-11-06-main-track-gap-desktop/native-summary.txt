@@ -1,0 +1,2 @@
+test export::tests::desktop_export_preview_and_crop_handle_main_track_gaps ... ok
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 553 filtered out; finished in 0.37s

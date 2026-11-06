@@ -6188,6 +6188,13 @@ async fn get_display_frame_for_cropping(
     editor_instance: WindowEditorInstance,
     fps: u32,
 ) -> Result<Vec<u8>, String> {
+    display_frame_for_cropping(&editor_instance, fps).await
+}
+
+async fn display_frame_for_cropping(
+    editor_instance: &cap_editor::EditorInstance,
+    fps: u32,
+) -> Result<Vec<u8>, String> {
     use cap_project::ClipOffsets;
     use cap_rendering::{PixelFormat, cpu_yuv};
     use image::{ImageEncoder, codecs::jpeg::JpegEncoder};
@@ -6202,9 +6209,13 @@ async fn get_display_frame_for_cropping(
     let project = editor_instance.project_config.1.borrow().clone();
     let lookup_started_at = Instant::now();
 
-    let (segment_time, segment) = project
-        .get_segment_time(time_secs)
-        .ok_or_else(|| "No segment found for current time".to_string())?;
+    let source = project
+        .get_frame_mapping(time_secs)
+        .ok_or_else(|| "No segment found for current time".to_string())?
+        .primary_source()
+        .ok_or_else(|| "crop-main-track-gap".to_string())?;
+    let segment_time = source.source_time;
+    let segment = source.segment;
 
     let segment_medias = editor_instance
         .segment_medias

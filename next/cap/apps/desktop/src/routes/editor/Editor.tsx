@@ -1357,6 +1357,7 @@ function Dialogs() {
 								);
 
 								let cancelled = false;
+								let sourceUnavailable = false;
 
 								// The crop must operate on the raw display recording (no
 								// padding/background/zoom baked in), decoded at the current
@@ -1375,6 +1376,16 @@ function Dialogs() {
 									})
 									.catch((error: unknown) => {
 										if (cancelled) return;
+										if (error === "crop-main-track-gap") {
+											sourceUnavailable = true;
+											toast.error(
+												localize(
+													"Move the playhead onto a video clip to crop it.",
+												),
+											);
+											setDialog((d) => ({ ...d, open: false }));
+											return;
+										}
 										console.warn("Display frame fetch failed:", error);
 										setFrameError(true);
 									});
@@ -1535,7 +1546,7 @@ function Dialogs() {
 									trailingConfig.clear();
 									const url = frameUrl();
 									if (url) URL.revokeObjectURL(url);
-									queueConfig(null);
+									if (!sourceUnavailable) queueConfig(null);
 								});
 
 								const initialBounds = {

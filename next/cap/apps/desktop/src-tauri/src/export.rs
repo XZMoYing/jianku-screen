@@ -1876,6 +1876,37 @@ pub struct ExportPreviewResult {
     pub total_frames: u32,
 }
 
+async fn export_preview_for_gap(
+    constants: &RenderVideoConstants,
+    project: &cap_project::ProjectConfiguration,
+    frame_time: f64,
+    settings: &ExportPreviewSettings,
+) -> Result<Option<ExportPreviewResult>, String> {
+    cap_export::preview::render_preview_if_main_track_gap(
+        constants,
+        project,
+        frame_time,
+        cap_export::preview::ExportPreviewSettings {
+            fps: settings.fps,
+            resolution_base: settings.resolution_base,
+            compression_bpp: settings.compression_bpp,
+            cursor_only: settings.cursor_only,
+        },
+    )
+    .await
+    .map(|preview| {
+        preview.map(|preview| ExportPreviewResult {
+            jpeg_base64: preview.jpeg_base64,
+            estimated_size_mb: preview.estimated_size_mb,
+            actual_width: preview.actual_width,
+            actual_height: preview.actual_height,
+            frame_render_time_ms: preview.frame_render_time_ms,
+            total_frames: preview.total_frames,
+        })
+    })
+    .map_err(|error| format!("Failed to render frame: {error}"))
+}
+
 fn estimate_cursor_only_size_mb(total_pixels: f64, total_frames: f64) -> f64 {
     let bytes_per_frame = total_pixels * 0.4;
     (bytes_per_frame * total_frames) / (1024.0 * 1024.0)
@@ -1973,6 +2004,12 @@ async fn generate_export_preview_inner(
         .await
         .map_err(|e| format!("Failed to create render constants: {e}"))?,
     );
+
+    if let Some(preview) =
+        export_preview_for_gap(&render_constants, &project_config, frame_time, &settings).await?
+    {
+        return Ok(preview);
+    }
 
     let force_ffmpeg = should_force_ffmpeg_preview();
     info!(
@@ -2196,6 +2233,107 @@ async fn generate_export_preview_inner(
 mod tests {
     use super::*;
     use tempfile::tempdir;
+
+    #[test]
+    fn desktop_export_preview_and_crop_handle_main_track_gaps() {
+        const STACK_SIZE: usize = 16 * 1024 * 1024;
+        std::thread::Builder::new()
+            .stack_size(STACK_SIZE)
+            .spawn(|| {
+                tokio::runtime::Builder::new_multi_thread()
+                    .worker_threads(2)
+                    .thread_stack_size(STACK_SIZE)
+                    .enable_all()
+                    .build()
+                    .unwrap()
+                    .block_on(verify_desktop_main_track_gap_preview());
+            })
+            .unwrap()
+            .join()
+            .unwrap();
+    }
+
+    async fn verify_desktop_main_track_gap_preview() {
+        use base64::{Engine, engine::general_purpose::STANDARD};
+
+        ffmpeg::init().unwrap();
+        let dir = tempdir().unwrap();
+        let path = dir.path().to_path_buf();
+        std::fs::write(
+            path.join("display.mp4"),
+            include_bytes!("../test-data/clip-thumbnail-gop.mp4"),
+        )
+        .unwrap();
+        image::RgbaImage::from_pixel(32, 32, image::Rgba([255, 225, 0, 255]))
+            .save(path.join("overlay.png"))
+            .unwrap();
+        let mut meta: RecordingMeta = serde_json::from_value(serde_json::json!({
+            "pretty_name": "Main track gap preview",
+            "segments": [{"display": {"path": "display.mp4", "fps": 10, "start_time": 0.0}}],
+            "cursors": {}, "status": {"status": "Complete"}
+        }))
+        .unwrap();
+        meta.project_path = path.clone();
+        meta.save_for_project().unwrap();
+        let project: cap_project::ProjectConfiguration =
+            serde_json::from_value(serde_json::json!({
+                "background": {"source": {"type": "color", "value": [12, 45, 150]}},
+                "timeline": {
+                    "segments": [{"id": "clip", "start": 0.0, "end": 1.5, "timescale": 1.0}],
+                    "mainTrackGaps": {"beforeClip": {"clip": 0.5}, "trailing": 0.5},
+                    "zoomSegments": [],
+                    "imageSegments": [{"path": "overlay.png", "start": 0.0, "end": 0.5}]
+                }
+            }))
+            .unwrap();
+        project.write(&path).unwrap();
+
+        let settings = || ExportPreviewSettings {
+            fps: 24,
+            resolution_base: XY::new(160, 90),
+            compression_bpp: 0.3,
+            cursor_only: false,
+        };
+        let independent = generate_export_preview(path.clone(), 0.25, settings())
+            .await
+            .unwrap();
+        let editor = cap_editor::EditorInstance::new_with_audio_output(
+            path,
+            |_| {},
+            Box::new(|_, _| {}),
+            None,
+            Arc::new(cap_editor::AudioOutput::new_headless(Box::new(|_, _| {}))),
+        )
+        .await
+        .unwrap();
+        let fast = generate_export_preview_fast_inner(&editor, 0.25, settings())
+            .await
+            .unwrap();
+        assert_eq!(independent.jpeg_base64, fast.jpeg_base64);
+        assert_eq!(fast.total_frames, 60);
+        let jpeg = STANDARD.decode(fast.jpeg_base64).unwrap();
+        let pixels = image::load_from_memory(&jpeg).unwrap().to_rgb8();
+        let [r, g, b] = pixels.get_pixel(pixels.width() / 2, pixels.height() / 2).0;
+        assert!(r > 240 && g > 200 && b < 30, "Overlay pixel {r}, {g}, {b}");
+        let [r, g, b] = pixels.get_pixel(2, 2).0;
+        assert!(
+            r < 30 && g < 70 && b > 120,
+            "Background pixel {r}, {g}, {b}"
+        );
+        assert!(!editor.export_preview_active.load(Ordering::Acquire));
+
+        editor.state.lock().await.playhead_position = 6;
+        let no_source = crate::display_frame_for_cropping(&editor, 24)
+            .await
+            .unwrap_err();
+        assert_eq!(no_source, "crop-main-track-gap");
+        editor.state.lock().await.playhead_position = 24;
+        let source = crate::display_frame_for_cropping(&editor, 24)
+            .await
+            .unwrap();
+        assert!(image::load_from_memory(&source).is_ok());
+        editor.dispose().await;
+    }
 
     #[test]
     fn native_save_failure_uses_the_rendered_project_output() {
@@ -2473,7 +2611,7 @@ pub async fn generate_export_preview_fast(
     settings: ExportPreviewSettings,
 ) -> Result<ExportPreviewResult, String> {
     match AssertUnwindSafe(generate_export_preview_fast_inner(
-        editor, frame_time, settings,
+        &editor, frame_time, settings,
     ))
     .catch_unwind()
     .await
@@ -2529,7 +2667,7 @@ fn export_preview_media<T>(medias: &[T], recording_clip: u32) -> Result<&T, Stri
 
 #[instrument(skip_all)]
 async fn generate_export_preview_fast_inner(
-    editor: WindowEditorInstance,
+    editor: &cap_editor::EditorInstance,
     frame_time: f64,
     settings: ExportPreviewSettings,
 ) -> Result<ExportPreviewResult, String> {
@@ -2560,6 +2698,17 @@ async fn generate_export_preview_fast_inner(
     })
     .await
     .map_err(|error| format!("Failed to synchronize export preview timing: {error}"))?;
+    if let Some(preview) = export_preview_for_gap(
+        &editor.render_constants,
+        &project_config,
+        frame_time,
+        &settings,
+    )
+    .await?
+    {
+        return Ok(preview);
+    }
+
     let transition_mapping = project_config.timeline.as_ref().and_then(|timeline| {
         if timeline.transitions.is_empty() {
             return None;

@@ -108,6 +108,38 @@ struct PreviewSegment<'a> {
     cursor: &'a CursorEvents,
 }
 
+pub async fn render_preview_if_main_track_gap(
+    render_constants: &RenderVideoConstants,
+    project_config: &ProjectConfiguration,
+    frame_time: f64,
+    settings: ExportPreviewSettings,
+) -> Result<Option<ExportPreviewResult>, ExportError> {
+    let Some(timeline) = &project_config.timeline else {
+        return Ok(None);
+    };
+    if !timeline.has_main_track_gaps()
+        || !matches!(
+            timeline.get_frame_mapping(frame_time),
+            Some(TimelineFrameMapping::Gap { .. })
+        )
+    {
+        return Ok(None);
+    }
+
+    render_preview_frame(
+        PreviewSource {
+            project_config,
+            render_constants,
+            segments: Vec::new(),
+            total_duration: timeline.duration(),
+        },
+        frame_time,
+        settings,
+    )
+    .await
+    .map(Some)
+}
+
 async fn render_preview_with_base(
     exporter_base: ExporterBase,
     frame_time: f64,
