@@ -563,6 +563,7 @@ function TextSegmentOverlay(props: {
 	let endEditing: (() => void) | null = null;
 	const startEditing = () => {
 		if (editing()) return;
+		const previousVisibility = project.hiddenTextSegments?.slice();
 		const resumeHistory = projectHistory.pause();
 		setEditing(true);
 		setProject("hiddenTextSegments", [props.index]);
@@ -573,7 +574,7 @@ function TextSegmentOverlay(props: {
 		endEditing = () => {
 			endEditing = null;
 			setEditing(false);
-			setProject("hiddenTextSegments", []);
+			setProject("hiddenTextSegments", previousVisibility);
 			const empty = segment().content.trim() === "";
 			const index =
 				project.timeline?.textSegments?.indexOf(props.segment) ?? -1;

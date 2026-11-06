@@ -3000,6 +3000,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 						});
 				},
 				historyShortcut,
+				({ hiddenTextSegments: _, ...snapshot }) => snapshot,
 			);
 
 			const trackSegments = (type: TimelineTrackType) => {

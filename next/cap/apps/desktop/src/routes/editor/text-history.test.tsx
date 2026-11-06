@@ -12,21 +12,34 @@ vi.mock("./CanvasElementsOverlay", () => ({
 }));
 vi.mock("~/utils/i18n", () => ({ t: (value: string) => value }));
 
-function fixture(onRestore?: () => void) {
-	const [project, setProject] = createStore({
+function fixture(onRestore?: () => void, initiallyEmpty = false) {
+	const initialProject = {
 		timeline: {
-			textSegments: [defaultTextSegment(2, 6)],
+			textSegments: initiallyEmpty ? [] : [defaultTextSegment(2, 6)],
 			maskSegments: [],
 			imageSegments: [],
 			audioSegments: [{ start: 2, end: 6 }],
 		},
-	});
+	};
+	const [project, setProject] = createStore<
+		typeof initialProject & { hiddenTextSegments?: number[] }
+	>(initialProject);
 	const [editorState, setEditorState] = createStore({
 		previewTime: null as number | null,
 		playbackTime: 0,
-		timeline: { selection: null, pendingTextEdit: null },
+		timeline: {
+			selection: null as { type: "text"; indices: number[] } | null,
+			pendingTextEdit: null as number | null,
+		},
 	});
-	const projectHistory = createStoreHistory(project, setProject, onRestore);
+	const projectHistory = createStoreHistory(
+		project,
+		setProject,
+		onRestore,
+		undefined,
+		undefined,
+		({ hiddenTextSegments: _, ...snapshot }) => snapshot,
+	);
 	return {
 		project,
 		setProject,
@@ -64,10 +77,10 @@ afterEach(() => {
 	vi.restoreAllMocks();
 	vi.useRealTimers();
 });
-function mount(onRestore?: () => void) {
+function mount(onRestore?: () => void, initiallyEmpty = false) {
 	let setShown: ((value: boolean) => boolean) | undefined;
 	dispose = render(() => {
-		context = fixture(onRestore);
+		context = fixture(onRestore, initiallyEmpty);
 		const [shown, updateShown] = createSignal(true);
 		setShown = updateShown;
 		return (
@@ -78,6 +91,48 @@ function mount(onRestore?: () => void) {
 	}, document.body);
 	return { setShown: (value: boolean) => setShown?.(value) };
 }
+
+function createTextAndOpenInlineEditor() {
+	mount(undefined, true);
+	batch(() => {
+		context.setProject("timeline", "textSegments", [defaultTextSegment(2, 6)]);
+		context.setEditorState("previewTime", 3);
+		context.setEditorState("timeline", "selection", {
+			type: "text",
+			indices: [0],
+		});
+		context.setEditorState("timeline", "pendingTextEdit", 0);
+	});
+	const input = document.querySelector("textarea");
+	if (!input) throw new Error("Missing inline editor for new text");
+	return input;
+}
+
+it("undoes new text in one step after leaving its inline editor without typing", () => {
+	const input = createTextAndOpenInlineEditor();
+	measuredWidth = 92;
+	vi.advanceTimersByTime(20);
+	input.dispatchEvent(new FocusEvent("blur", { bubbles: true }));
+	context.projectHistory.undo();
+	expect(context.project.timeline.textSegments).toHaveLength(0);
+	context.projectHistory.redo();
+	expect(context.project.timeline.textSegments).toHaveLength(1);
+});
+
+it("keeps a typed inline edit separate from creating the text", () => {
+	const input = createTextAndOpenInlineEditor();
+	input.value = "Edited text";
+	input.dispatchEvent(new Event("input", { bubbles: true }));
+	vi.advanceTimersByTime(20);
+	input.dispatchEvent(new FocusEvent("blur", { bubbles: true }));
+	expect(context.project.timeline.textSegments[0].content).toBe("Edited text");
+	context.projectHistory.undo();
+	expect(context.project.timeline.textSegments[0].content).toBe(
+		defaultTextSegment(2, 6).content,
+	);
+	context.projectHistory.undo();
+	expect(context.project.timeline.textSegments).toHaveLength(0);
+});
 it("fits measured text without adding an undo step just by visiting its time", () => {
 	mount();
 	expect(context.projectHistory.canUndo()).toBe(false);

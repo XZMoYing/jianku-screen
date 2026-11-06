@@ -22,10 +22,13 @@ export function createStoreHistory<T extends Static>(
 	onRestore?: () => void,
 	onRestored?: () => void,
 	historyShortcut = defaultHistoryShortcut,
+	historyState: (value: T) => T = (value) => value,
 ) {
 	const [pauseCount, setPauseCount] = createSignal(0);
 	let derivedWriteDepth = 0;
 	let pauseSnapshot: string | undefined;
+	const snapshot = () => historyState(unwrap(state));
+	const serializedSnapshot = () => JSON.stringify(snapshot());
 
 	const history = createUndoHistory(() => {
 		if (pauseCount() > 0) return;
@@ -33,7 +36,7 @@ export function createStoreHistory<T extends Static>(
 		trackStore(state);
 		if (derivedWriteDepth > 0) return;
 
-		const copy = structuredClone(unwrap(state));
+		const copy = structuredClone(snapshot());
 
 		return () => {
 			batch(() => {
@@ -55,6 +58,8 @@ export function createStoreHistory<T extends Static>(
 	function applyDerived(write: () => void) {
 		history.canUndo();
 		history.canRedo();
+		const advancePauseSnapshot =
+			pauseSnapshot !== undefined && pauseSnapshot === serializedSnapshot();
 		derivedWriteDepth++;
 		try {
 			batch(() => {
@@ -69,6 +74,8 @@ export function createStoreHistory<T extends Static>(
 			});
 		} finally {
 			derivedWriteDepth--;
+			if (advancePauseSnapshot && pauseSnapshot !== undefined)
+				pauseSnapshot = serializedSnapshot();
 		}
 	}
 
@@ -78,7 +85,7 @@ export function createStoreHistory<T extends Static>(
 			if (pauseCount() === 0) {
 				history.canUndo();
 				history.canRedo();
-				pauseSnapshot = JSON.stringify(unwrap(state));
+				pauseSnapshot = serializedSnapshot();
 			}
 			setPauseCount(pauseCount() + 1);
 			let resumed = false;
@@ -90,7 +97,7 @@ export function createStoreHistory<T extends Static>(
 					setPauseCount(remaining);
 					return;
 				}
-				const unchanged = JSON.stringify(unwrap(state)) === pauseSnapshot;
+				const unchanged = serializedSnapshot() === pauseSnapshot;
 				pauseSnapshot = undefined;
 				if (unchanged) applyDerived(() => setPauseCount(0));
 				else setPauseCount(0);
