@@ -1,6 +1,9 @@
+import type { OverlayAttachment } from "~/utils/tauri";
+
 export type AudioTrackSegment = {
 	start: number;
 	end: number;
+	attachment?: OverlayAttachment | null;
 	track: number;
 	path: string;
 	name: string | null;

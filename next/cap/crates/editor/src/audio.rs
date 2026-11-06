@@ -3633,6 +3633,7 @@ mod tests {
         fade_out: f64,
     ) -> cap_project::AudioTrackSegment {
         cap_project::AudioTrackSegment {
+            attachment: None,
             start,
             end,
             track: 0,

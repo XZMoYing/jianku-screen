@@ -3961,6 +3961,7 @@ mod tests {
         ]);
         config.transitions = vec![transition(1, 1.0)];
         config.zoom_segments = vec![cap_project::ZoomSegment {
+            attachment: None,
             start: 15.0,
             end: 18.0,
             amount: 1.5,

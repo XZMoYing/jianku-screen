@@ -373,6 +373,7 @@ mod tests {
 
     fn camera_scene(transition: f64) -> SceneSegment {
         SceneSegment {
+            attachment: None,
             start: 2.0,
             end: 5.0,
             mode: SceneMode::CameraOnly,

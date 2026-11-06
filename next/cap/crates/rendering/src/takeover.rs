@@ -155,6 +155,7 @@ mod tests {
 
     fn segment(layout: TextLayout, start: f64, end: f64) -> TextSegment {
         TextSegment {
+            attachment: None,
             start,
             end,
             track: 0,

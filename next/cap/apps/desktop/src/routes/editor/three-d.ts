@@ -2,6 +2,7 @@ import { camera3DSpringProgress } from "~/utils/camera3d-spring";
 import type {
 	Camera3DBlurMode,
 	Camera3DMotionSpring,
+	OverlayAttachment,
 	Camera3DBlur as RawCamera3DBlur,
 	Camera3DKeyframe as RawCamera3DKeyframe,
 	Camera3DProperties as RawCamera3DProperties,
@@ -77,6 +78,7 @@ export type Camera3DTracks = Record<Camera3DTrackKey, Camera3DKeyframe[]>;
 export type Camera3DSegment = {
 	start: number;
 	end: number;
+	attachment?: OverlayAttachment | null;
 	enabled: boolean;
 	properties: Camera3DProperties;
 	blur: Camera3DBlur;
@@ -1200,6 +1202,7 @@ export const normalizeCamera3DSegments = (
 				start: segment.start,
 				end: segment.end,
 				enabled: segment.enabled ?? true,
+				...(segment.attachment ? { attachment: segment.attachment } : {}),
 				properties: normalizeCamera3DProperties(segment.properties),
 				blur: normalizeCamera3DBlur(segment.blur),
 				tracks: normalizeCamera3DTracks(segment.tracks),

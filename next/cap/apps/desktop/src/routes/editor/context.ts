@@ -118,6 +118,7 @@ import {
 	trimPositionedMainTrackClip,
 } from "./main-track-edit";
 import type { MaskSegment } from "./masks";
+import { moveClipsWithOverlayAttachments } from "./overlay-attachment";
 import { usePreparingEditor } from "./preparing-editor-context";
 import { createPreparingPlaybackHandoff } from "./preparing-playback-handoff";
 import {
@@ -724,7 +725,11 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					let moved = false;
 					setProject(
 						produce((project) => {
-							if (project.timeline) moved = update(project.timeline);
+							const timeline = project.timeline;
+							if (timeline)
+								moved = moveClipsWithOverlayAttachments(timeline, () =>
+									update(timeline),
+								);
 						}),
 					);
 					if (!moved) return false;

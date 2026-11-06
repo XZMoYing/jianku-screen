@@ -1,0 +1,9 @@
+test overlay_attachment::tests::overlay_attachments_round_trip_without_inventing_legacy_links ... ok
+test result: ok. 170 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s
+    Finished `release` profile [optimized + debuginfo] target(s) in 1m 08s
+test typescript_bindings_tests::export_typescript_bindings ... ok
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 569 filtered out; finished in 0.01s
+ Test Files  5 passed (5)
+      Tests  125 passed (125)
+Checked 9 files in 66ms. No fixes applied.
+binary file matches (found "\0" byte around offset 1191)

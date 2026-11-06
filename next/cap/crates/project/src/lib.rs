@@ -7,6 +7,7 @@ pub mod cursor;
 mod format;
 pub mod keyboard;
 mod meta;
+mod overlay_attachment;
 mod portable;
 
 pub use animated_gradient::*;
@@ -18,6 +19,7 @@ pub use cursor::*;
 pub use format::*;
 pub use keyboard::*;
 pub use meta::*;
+pub use overlay_attachment::*;
 pub use portable::*;
 
 use serde::{Deserialize, Serialize};

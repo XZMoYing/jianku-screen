@@ -429,6 +429,7 @@ mod tests {
 
     fn segment(animation_in: TextAnimation, animation_out: TextAnimation) -> TextSegment {
         TextSegment {
+            attachment: None,
             start: 0.0,
             end: 10.0,
             track: 0,

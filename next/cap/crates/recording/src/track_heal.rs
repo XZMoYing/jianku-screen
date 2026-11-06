@@ -1057,6 +1057,7 @@ mod tests {
             }],
             transitions: Vec::new(),
             zoom_segments: vec![ZoomSegment {
+                attachment: None,
                 start: 100.0,
                 end: 150.0,
                 amount: 2.0,
@@ -1126,6 +1127,7 @@ mod tests {
             keyboard_segments: vec![],
             audio_segments: vec![],
             camera3d_segments: vec![Camera3DSegment {
+                attachment: None,
                 start: 100.0,
                 end: 150.0,
                 enabled: true,
@@ -1212,6 +1214,7 @@ mod tests {
             ],
             transitions: Vec::new(),
             zoom_segments: vec![ZoomSegment {
+                attachment: None,
                 start: 10.0,
                 end: 20.0,
                 amount: 2.0,

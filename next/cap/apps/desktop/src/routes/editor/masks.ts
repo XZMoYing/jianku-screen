@@ -1,4 +1,4 @@
-import type { XY } from "~/utils/tauri";
+import type { OverlayAttachment, XY } from "~/utils/tauri";
 import maskEffectContract from "../../../../../crates/project/mask-effects.json";
 
 export type MaskKind = "sensitive" | "highlight";
@@ -32,6 +32,7 @@ export type MaskKeyframes = {
 export type MaskSegment = {
 	start: number;
 	end: number;
+	attachment?: OverlayAttachment | null;
 	track: number;
 	enabled: boolean;
 	maskType: MaskKind;

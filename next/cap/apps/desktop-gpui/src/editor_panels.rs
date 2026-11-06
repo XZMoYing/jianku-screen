@@ -1830,6 +1830,7 @@ pub fn apply_camera3d_shots_to_range(
         .enumerate()
         .map(|(index, shot)| {
             let mut segment = Camera3DSegment {
+                attachment: None,
                 start: boundaries[index],
                 end: boundaries[index + 1],
                 enabled: true,
@@ -7940,6 +7941,7 @@ mod tests {
 
     fn camera3d(start: f64, end: f64) -> Camera3DSegment {
         Camera3DSegment {
+            attachment: None,
             start,
             end,
             enabled: true,
@@ -8043,6 +8045,7 @@ mod tests {
 
     fn mask(pixelation: f64) -> MaskSegment {
         MaskSegment {
+            attachment: None,
             start: 0.,
             end: 1.,
             track: 0,

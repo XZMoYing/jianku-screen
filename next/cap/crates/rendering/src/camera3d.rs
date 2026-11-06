@@ -1247,6 +1247,7 @@ mod tests {
 
     fn segment() -> Camera3DSegment {
         Camera3DSegment {
+            attachment: None,
             start: 2.0,
             end: 8.0,
             enabled: true,

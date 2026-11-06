@@ -1533,6 +1533,7 @@ pub fn insert_zoom_segment(
     timeline.zoom_segments.insert(
         index,
         ZoomSegment {
+            attachment: None,
             start,
             end,
             amount,
@@ -1589,6 +1590,7 @@ pub fn place_segment_at_time<T: TrackSegmentOps>(
 
 pub fn default_text_segment(start: f64, end: f64, track: u32) -> TextSegment {
     TextSegment {
+        attachment: None,
         start,
         end,
         track,
@@ -1626,6 +1628,7 @@ pub fn default_text_segment(start: f64, end: f64, track: u32) -> TextSegment {
 pub fn default_mask_segment(start: f64, end: f64, track: u32) -> MaskSegment {
     let contract = mask_effect_contract();
     MaskSegment {
+        attachment: None,
         start,
         end,
         track,
@@ -1651,6 +1654,7 @@ pub fn default_audio_segment(
     duration: Option<f64>,
 ) -> AudioTrackSegment {
     AudioTrackSegment {
+        attachment: None,
         start,
         end,
         track,
@@ -1716,6 +1720,7 @@ pub fn insert_audio_segment(
 
 pub fn default_camera3d_segment(start: f64, end: f64) -> Camera3DSegment {
     Camera3DSegment {
+        attachment: None,
         start,
         end,
         enabled: true,
@@ -1739,6 +1744,7 @@ pub fn default_camera3d_segment(start: f64, end: f64) -> Camera3DSegment {
 
 pub fn default_scene_segment(start: f64, end: f64) -> SceneSegment {
     SceneSegment {
+        attachment: None,
         start,
         end,
         mode: SceneMode::CameraOnly,
@@ -2072,6 +2078,7 @@ pub fn generate_zoom_segments_from_clicks(
     merged
         .into_iter()
         .map(|(start, end)| ZoomSegment {
+            attachment: None,
             start: start.round() / MS_PER_SECOND,
             end: end.round() / MS_PER_SECOND,
             amount: zoom_amount,
@@ -3991,6 +3998,7 @@ mod tests {
             duration: 1.0,
         }];
         timeline.zoom_segments = vec![cap_project::ZoomSegment {
+            attachment: None,
             start: 12.0,
             end: 14.0,
             amount: 1.5,

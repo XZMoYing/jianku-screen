@@ -184,6 +184,7 @@ mod tests {
 
     fn sample_segment() -> MaskSegment {
         MaskSegment {
+            attachment: None,
             start: 0.0,
             end: 10.0,
             track: 0,

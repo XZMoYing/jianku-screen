@@ -6614,6 +6614,7 @@ fn generate_zoom_segments_from_clicks_impl(
     merged
         .into_iter()
         .map(|(start, end)| ZoomSegment {
+            attachment: None,
             start: start.round() / MS_PER_SECOND,
             end: end.round() / MS_PER_SECOND,
             amount: zoom_amount,

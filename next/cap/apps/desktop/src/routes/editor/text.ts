@@ -1,5 +1,5 @@
 import type { CanvasControls } from "~/utils/socket";
-import type { XY } from "~/utils/tauri";
+import type { OverlayAttachment, XY } from "~/utils/tauri";
 
 // Font sizes are authored in pixels against a 1080p-tall reference frame;
 // the renderer scales them by outputHeight / 1080 (crates/rendering/text.rs).
@@ -32,6 +32,7 @@ export type TextLayout = "overlay" | "fullscreen" | "splitLeft" | "splitRight";
 export type TextSegment = {
 	start: number;
 	end: number;
+	attachment?: OverlayAttachment | null;
 	track: number;
 	enabled: boolean;
 	content: string;

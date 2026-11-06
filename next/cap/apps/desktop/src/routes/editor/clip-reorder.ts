@@ -6,6 +6,7 @@ import {
 } from "./clip-transitions";
 import type { EditorProjectConfiguration } from "./context";
 import { rippleKeyboardTrack } from "./keyboard-timing";
+import type { AttachmentSpan } from "./overlay-attachment";
 import { scaleKeyframeTimes } from "./three-d";
 import { effectiveToOutput, holdWindows } from "./timeline-holds";
 
@@ -57,7 +58,7 @@ export function reorderClipInstance(
 		const previousDurations = camera3d.map(
 			(segment) => segment.end - segment.start,
 		);
-		for (const track of [
+		const rippleTracks: AttachmentSpan[][] = [
 			timeline.styleSegments,
 			timeline.imageSegments,
 			timeline.zoomSegments,
@@ -67,8 +68,13 @@ export function reorderClipInstance(
 			timeline.captionSegments ?? [],
 			timeline.audioSegments ?? [],
 			camera3d,
-		])
-			rippleTimelineTrack(track, boundary, effective.duration);
+		];
+		for (const track of rippleTracks)
+			rippleTimelineTrack(
+				track.filter((row) => !row.attachment),
+				boundary,
+				effective.duration,
+			);
 		rippleKeyboardTrack(
 			timeline.keyboardSegments ?? [],
 			boundary,

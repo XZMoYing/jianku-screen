@@ -6595,6 +6595,7 @@ mod style_image_tests {
             ..Default::default()
         });
         timeline.scene_segments.push(cap_project::SceneSegment {
+            attachment: None,
             start: 0.7,
             end: 1.4,
             mode: SceneMode::CameraOnly,
@@ -9513,6 +9514,7 @@ mod project_uniforms_tests {
         ] {
             let mut split = project.clone();
             split.timeline.as_mut().unwrap().scene_segments = vec![cap_project::SceneSegment {
+                attachment: None,
                 start: 2.0,
                 end: 4.0,
                 mode,

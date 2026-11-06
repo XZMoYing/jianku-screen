@@ -818,7 +818,7 @@ export type AudioMeta = { path: string; start_time?: number | null; device_id?: 
  * segments. `path` is resolved relative to the project directory so projects
  * stay portable when moved.
  */
-export type AudioTrackSegment = { start: number; end: number; track?: number; path: string; name?: string | null; enabled?: boolean;
+export type AudioTrackSegment = { start: number; end: number; attachment?: OverlayAttachment | null; track?: number; path: string; name?: string | null; enabled?: boolean;
 /**
  * Offset into the source audio file (seconds) at which playback begins.
  */
@@ -956,7 +956,7 @@ rotateY?: number; fov?: number;
  * Camera distance in world units.
  */
 zoom?: number; panX?: number; panY?: number }
-export type Camera3DSegment = { start: number; end: number; enabled?: boolean;
+export type Camera3DSegment = { start: number; end: number; attachment?: OverlayAttachment | null; enabled?: boolean;
 /**
  * Base pose; per-property tracks override individual values.
  */
@@ -1015,6 +1015,7 @@ export type CliInstallStatus = { installDir: string; shimPath: string; targetPat
  */
 pathConfigured: boolean }
 export type ClickSpringConfig = { tension: number; mass: number; friction: number }
+export type ClipAttachmentTiming = "preserveDuration" | "followClipSpeed"
 export type ClipConfiguration = { index: number; offsets: ClipOffsets;
 /**
  * Whether `offsets` were computed automatically (recording start-time
@@ -1231,7 +1232,7 @@ export type Hotkey = { code: string; meta: boolean; ctrl: boolean; alt: boolean;
 export type HotkeyAction = "startStudioRecording" | "startInstantRecording" | "stopRecording" | "restartRecording" | "togglePauseRecording" | "addRecordingBookmark" | "togglePresentationCurtain" | "cycleRecordingMode" | "openRecordingPicker" | "openRecordingPickerDisplay" | "openRecordingPickerWindow" | "openRecordingPickerArea" | "screenshotDisplay" | "screenshotWindow" | "screenshotArea" | "other"
 export type HotkeysConfiguration = { show: boolean }
 export type HotkeysStore = { hotkeys: { [key in HotkeyAction]: Hotkey } }
-export type ImageSegment = { start: number; end: number; track: number; enabled: boolean; path: string; name: string; center: XY<number>; size: XY<number>; opacity: number; rotation: number; rounding: number; flipX: boolean; flipY: boolean; lockAspect: boolean }
+export type ImageSegment = { start: number; end: number; attachment?: OverlayAttachment | null; track: number; enabled: boolean; path: string; name: string; center: XY<number>; size: XY<number>; opacity: number; rotation: number; rounding: number; flipX: boolean; flipY: boolean; lockAspect: boolean }
 export type ImportStage = "Probing" | "Converting" | "Finalizing" | "Complete" | "Failed"
 export type ImportedAudioTrack = {
 /**
@@ -1257,7 +1258,7 @@ export type MainWindowRecordingStartBehaviour = "close" | "minimise"
 export type MaskKeyframes = { position?: MaskVectorKeyframe[]; size?: MaskVectorKeyframe[]; intensity?: MaskScalarKeyframe[] }
 export type MaskKind = "sensitive" | "highlight"
 export type MaskScalarKeyframe = { time: number; value: number }
-export type MaskSegment = { start: number; end: number; track?: number; enabled?: boolean; maskType: MaskKind; center: XY<number>; size: XY<number>; feather?: number; opacity?: number; pixelation?: number; darkness?: number; fadeDuration?: number; keyframes?: MaskKeyframes }
+export type MaskSegment = { start: number; end: number; attachment?: OverlayAttachment | null; track?: number; enabled?: boolean; maskType: MaskKind; center: XY<number>; size: XY<number>; feather?: number; opacity?: number; pixelation?: number; darkness?: number; fadeDuration?: number; keyframes?: MaskKeyframes }
 export type MaskType = "blur" | "pixelate"
 export type MaskVectorKeyframe = { time: number; x: number; y: number }
 export type MatchMode = "all" | "any"
@@ -1299,6 +1300,7 @@ export type OSPermissionsCheck = { screenRecording: OSPermissionStatus; micropho
 export type OnEscapePress = null
 export type Organization = { id: string; name: string; ownerId: string; role?: string; canEditBrand?: boolean; iconUrl?: string | null; brandColors?: OrganizationBrandColors }
 export type OrganizationBrandColors = { primary: string | null; secondary: string | null; accent: string | null; background: string | null }
+export type OverlayAttachment = { kind: "timeline"; id: string } | { kind: "clip"; id: string; clipId: string; sourceTime: number; timing?: ClipAttachmentTiming }
 export type OverlayTrack = { kind: OverlayTrackKind; track: number }
 export type OverlayTrackKind = "mask" | "image" | "text"
 export type Phase = "awaitingShortcut" | "starting" | "recording" | "pausing" | "paused" | "resuming" | "resumeFailed" | "restarting" | "stopping" | "restoring"
@@ -1376,7 +1378,7 @@ export type SceneMode = "default" | "cameraOnly" | "hideCamera" | "splitScreen" 
  * of full-bleed halves. Shares [`SplitLayout`] for per-pane pan/zoom.
  */
 "floating"
-export type SceneSegment = { start: number; end: number; mode?: SceneMode; splitLayout?: SplitLayout | null; transitionIn?: number; transitionOut?: number }
+export type SceneSegment = { start: number; end: number; attachment?: OverlayAttachment | null; mode?: SceneMode; splitLayout?: SplitLayout | null; transitionIn?: number; transitionOut?: number }
 export type ScreenCaptureTarget = { variant: "window"; id: WindowId } | { variant: "display"; id: DisplayId } | { variant: "area"; screen: DisplayId; bounds: LogicalBounds } | { variant: "cameraOnly" }
 export type ScreenMovementSpring = { stiffness: number; damping: number; mass: number }
 export type ScreenshotMetaWithMetadata = ((StudioRecordingMeta | InstantRecordingMeta) & { platform?: Platform | null; pretty_name: string; sharing?: SharingMeta | null; upload?: UploadMeta | null }) & { sort_time_millis: number }
@@ -1408,7 +1410,7 @@ export type StudioRecordingMeta = { segment: SingleSegment } | { inner: Multiple
 export type StudioRecordingQuality = "compatibility" | "balanced" | "ultra"
 export type StudioRecordingStatus = { status: "InProgress" } | { status: "NeedsRemux" } | { status: "Failed"; error: string } | { status: "Complete" }
 export type StyleOverrides = { background?: BackgroundConfiguration | null; camera?: Camera | null; cursor?: CursorConfiguration | null; cameraOnlyPadding?: number | null }
-export type StyleSegment = { start: number; end: number; track: number; enabled: boolean; name: string; overrides: StyleOverrides }
+export type StyleSegment = { start: number; end: number; attachment?: OverlayAttachment | null; track: number; enabled: boolean; name: string; overrides: StyleOverrides }
 export type SystemDiagnostics = { macosVersion: MacOSVersionInfo | null; availableEncoders: string[]; screenCaptureSupported: boolean; metalSupported: boolean; gpuName: string | null }
 export type TargetUnderCursor = { display_id: DisplayId | null; window: WindowUnderCursor | null }
 export type TextAlign = "left" | "center" | "right"
@@ -1450,7 +1452,7 @@ export type TextLayout =
  * Text in the right half, display card contained in the left half.
  */
 "splitRight"
-export type TextSegment = { start: number; end: number; track?: number; enabled?: boolean; content?: string; center?: XY<number>; size?: XY<number>; fontFamily?: string; fontSize?: number; fontWeight?: number; italic?: boolean; color?: string; backgroundColor?: string | null; backgroundStyle?: TextBackgroundStyle; uppercase?: boolean;
+export type TextSegment = { start: number; end: number; attachment?: OverlayAttachment | null; track?: number; enabled?: boolean; content?: string; center?: XY<number>; size?: XY<number>; fontFamily?: string; fontSize?: number; fontWeight?: number; italic?: boolean; color?: string; backgroundColor?: string | null; backgroundStyle?: TextBackgroundStyle; uppercase?: boolean;
 /**
  * Outline px at the 1080p reference height, like `font_size`; 0 disables.
  */
@@ -1503,7 +1505,7 @@ export type WindowPosition = { x: number; y: number; displayId?: DisplayId | nul
 export type WindowUnderCursor = { id: WindowId; app_name: string; bounds: LogicalBounds }
 export type XY<T> = { x: T; y: T }
 export type ZoomMode = "auto" | { manual: { x: number; y: number } }
-export type ZoomSegment = { start: number; end: number; amount: number; mode: ZoomMode; glideDirection?: GlideDirection; glideSpeed?: number; instantAnimation?: boolean; edgeSnapRatio?: number }
+export type ZoomSegment = { start: number; end: number; attachment?: OverlayAttachment | null; amount: number; mode: ZoomMode; glideDirection?: GlideDirection; glideSpeed?: number; instantAnimation?: boolean; edgeSnapRatio?: number }
 
 /** tauri-specta globals **/
 

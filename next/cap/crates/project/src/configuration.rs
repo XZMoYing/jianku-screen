@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use specta::Type;
 
-use crate::DisplayNotch;
+use crate::{DisplayNotch, OverlayAttachment};
 
 #[derive(Type, Serialize, Deserialize, Clone, Debug, Default, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -1044,6 +1044,8 @@ pub enum GlideDirection {
 pub struct ZoomSegment {
     pub start: f64,
     pub end: f64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub attachment: Option<OverlayAttachment>,
     pub amount: f64,
     pub mode: ZoomMode,
     #[serde(default)]
@@ -1129,6 +1131,8 @@ pub struct MaskKeyframes {
 pub struct MaskSegment {
     pub start: f64,
     pub end: f64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub attachment: Option<OverlayAttachment>,
     #[serde(default)]
     pub track: u32,
     #[serde(default = "MaskSegment::default_enabled")]
@@ -1231,6 +1235,8 @@ pub enum TextLayout {
 pub struct TextSegment {
     pub start: f64,
     pub end: f64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub attachment: Option<OverlayAttachment>,
     #[serde(default)]
     pub track: u32,
     #[serde(default = "TextSegment::default_enabled")]
@@ -1397,6 +1403,8 @@ fn default_scene_transition() -> f64 {
 pub struct SceneSegment {
     pub start: f64,
     pub end: f64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub attachment: Option<OverlayAttachment>,
     #[serde(default)]
     pub mode: SceneMode,
     #[serde(default)]
@@ -1665,6 +1673,8 @@ impl Default for Camera3DMotionSpring {
 pub struct Camera3DSegment {
     pub start: f64,
     pub end: f64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub attachment: Option<OverlayAttachment>,
     #[serde(default = "Camera3DSegment::default_enabled")]
     pub enabled: bool,
     /// Base pose; per-property tracks override individual values.
@@ -1705,6 +1715,8 @@ impl Camera3DSegment {
 pub struct AudioTrackSegment {
     pub start: f64,
     pub end: f64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub attachment: Option<OverlayAttachment>,
     #[serde(default)]
     pub track: u32,
     pub path: String,
@@ -1751,6 +1763,8 @@ pub struct StyleOverrides {
 pub struct StyleSegment {
     pub start: f64,
     pub end: f64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub attachment: Option<OverlayAttachment>,
     pub track: u32,
     pub enabled: bool,
     pub name: String,
@@ -1760,6 +1774,7 @@ pub struct StyleSegment {
 impl Default for StyleSegment {
     fn default() -> Self {
         Self {
+            attachment: None,
             start: 0.0,
             end: 0.0,
             track: 0,
@@ -1781,6 +1796,8 @@ impl StyleSegment {
 pub struct ImageSegment {
     pub start: f64,
     pub end: f64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub attachment: Option<OverlayAttachment>,
     pub track: u32,
     pub enabled: bool,
     pub path: String,
@@ -1798,6 +1815,7 @@ pub struct ImageSegment {
 impl Default for ImageSegment {
     fn default() -> Self {
         Self {
+            attachment: None,
             start: 0.0,
             end: 0.0,
             track: 0,
@@ -3911,6 +3929,7 @@ mod tests {
 
     fn fullscreen_text(start: f64, end: f64) -> TextSegment {
         TextSegment {
+            attachment: None,
             start,
             end,
             track: 0,
@@ -4166,6 +4185,7 @@ mod tests {
     fn camera3d_segments_serialize_with_stable_field_names() {
         let mut timeline = timeline_with_transitions(Vec::new());
         timeline.camera3d_segments = vec![Camera3DSegment {
+            attachment: None,
             start: 1.0,
             end: 3.0,
             enabled: true,
@@ -4552,6 +4572,7 @@ mod tests {
                 scene_segments: Vec::new(),
                 mask_segments: Vec::new(),
                 text_segments: vec![TextSegment {
+                    attachment: None,
                     start: 0.0,
                     end: 1.0,
                     track: 0,
@@ -4662,6 +4683,7 @@ mod tests {
                 scene_segments: Vec::new(),
                 mask_segments: Vec::new(),
                 text_segments: vec![TextSegment {
+                    attachment: None,
                     start: 0.0,
                     end: 1.0,
                     track: 0,

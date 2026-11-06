@@ -1,6 +1,12 @@
 import { expect, it } from "vitest";
 import { reorderClipInstance } from "./clip-reorder";
 import type { ClipTransition } from "./clip-transitions";
+import {
+	attachOverlayToClip,
+	keepOverlayAtTimelineTime,
+	moveClipsWithOverlayAttachments,
+	overlayAttachmentLayout,
+} from "./overlay-attachment";
 
 function timeline() {
 	return {
@@ -62,5 +68,56 @@ it("keeps transitions only between their original adjacent pair", () => {
 	reorderClipInstance(project, "c", 0);
 	expect(project.transitions).toEqual([
 		{ segmentIndex: 2, type: "cross-fade", duration: 0.5 },
+	]);
+});
+
+it("reorders linked overlays while keeping an explicit timeline position through a dropped transition", () => {
+	const base = timeline();
+	base.transitions = [{ segmentIndex: 1, type: "cross-fade", duration: 0.5 }];
+	const image = (name: string, start: number) => ({
+		start,
+		end: start + 0.5,
+		track: 0,
+		enabled: true,
+		path: "image.png",
+		name,
+		center: { x: 0.5, y: 0.5 },
+		size: { x: 0.25, y: 0.25 },
+		opacity: 1,
+		rotation: 0,
+		rounding: 0,
+		flipX: false,
+		flipY: false,
+		lockAspect: true,
+	});
+	const linked = image("linked", 5);
+	const fixed = image("fixed", 5.5);
+	const project = {
+		...base,
+		imageSegments: [
+			{
+				...linked,
+				attachment: attachOverlayToClip(
+					linked,
+					overlayAttachmentLayout(base),
+					"b",
+				),
+			},
+			{ ...fixed, attachment: keepOverlayAtTimelineTime(fixed) },
+			image("legacy", 6),
+		],
+	};
+	expect(
+		moveClipsWithOverlayAttachments(
+			project,
+			() => reorderClipInstance(project, "b", 3) !== null,
+		),
+	).toBe(true);
+	expect(
+		project.imageSegments.map(({ name, start, end }) => [name, start, end]),
+	).toEqual([
+		["fixed", 5.5, 6],
+		["legacy", 6.5, 7],
+		["linked", 9.5, 10],
 	]);
 });
