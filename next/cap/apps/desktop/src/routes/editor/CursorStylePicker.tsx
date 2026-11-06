@@ -10,7 +10,6 @@ import macArrow from "../../../../../crates/cursor-info/assets/mac/arrow.svg?raw
 import tahoeArrow from "../../../../../crates/cursor-info/assets/mac/tahoe/default.svg?raw";
 import windowsArrow from "../../../../../crates/cursor-info/assets/windows/arrow.svg?raw";
 import { RgbInput } from "./color-utils";
-import type { TransformedMeta } from "./context";
 import {
 	type CursorFamily,
 	type CursorStyle,
@@ -35,29 +34,6 @@ export const DEFAULT_CURSOR_RIPPLE: CursorRippleConfig = {
 	size: 1,
 	duration: 0.6,
 };
-
-export function cursorFamilyFromShape(
-	shape: string | null | undefined,
-): CursorFamily | undefined {
-	if (!shape) return undefined;
-	const [namespace, name] = shape.split("|");
-	if (namespace === "Windows") return "windows";
-	if (namespace === "MacOS")
-		return name?.startsWith("Tahoe") ? "tahoe" : "macos";
-	return undefined;
-}
-
-export function recordedCursorFamily(
-	meta: TransformedMeta,
-): CursorFamily | undefined {
-	if (meta.type !== "multiple") return undefined;
-	for (const cursor of Object.values(meta.cursors)) {
-		if (typeof cursor === "string") continue;
-		const family = cursorFamilyFromShape(cursor.shape);
-		if (family) return family;
-	}
-	return undefined;
-}
 
 export function isExplicitCursorFamily(type: CursorType): type is CursorFamily {
 	return type === "macos" || type === "tahoe" || type === "windows";

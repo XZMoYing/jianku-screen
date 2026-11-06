@@ -1,0 +1,36 @@
+{
+	"version": "0.2.0-alpha.85",
+	"build": "2026.85.0",
+	"platform": "macOS",
+	"interrupted": {
+		"interruptedMetadataRestoredExactly": true,
+		"interruptedJournalCleared": true,
+		"interruptedTimelineClipCount": 2
+	},
+	"read-only": {
+		"readOnlyFailureReachedNativeAppend": true,
+		"originalDocumentsAndMediaPreserved": true,
+		"noPendingJournal": true
+	},
+	"mp4-retry": {
+		"mp4RetrySucceeded": true,
+		"mp4AppendedSeconds": 2.5,
+		"originalClipsPreserved": true,
+		"sourceCount": 2
+	},
+	"project-append": {
+		"projectAppendSucceeded": true,
+		"importedSourceRange": [1.25, 4.75],
+		"sourceFilesPreserved": true,
+		"sourceCount": 3,
+		"clipCount": 4
+	},
+	"save-reopen": {
+		"editedPropertyPersisted": true,
+		"reopenedSources": 3,
+		"reopenedTimelineClips": 4,
+		"timelinePreserved": true,
+		"cursorPickerErrorObservedOnAlpha85": true,
+		"verifiedNormalQuitAndNewProcess": true
+	}
+}

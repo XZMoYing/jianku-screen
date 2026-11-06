@@ -67,10 +67,10 @@ import {
 } from "./audio";
 import { ClipInspector } from "./ClipInspector";
 import { ColorCorrectionSection } from "./ColorCorrectionSection";
-import { recordedCursorFamily } from "./CursorStylePicker";
 import { syncCaptionWordsWithText } from "./captions";
 import { type ClipTransition, clipSourceTimeAt } from "./clip-transitions";
 import { EditorStyleContext, useEditorContext } from "./context";
+import { recordedCursorFamily } from "./cursor-style";
 import { ImageSegmentConfig } from "./image-segment-config";
 import { KeyboardTab } from "./KeyboardTab";
 import {
