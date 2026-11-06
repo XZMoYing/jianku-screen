@@ -9,7 +9,10 @@ import { createEffect, onCleanup, Show } from "solid-js";
 import CaptionControlsWindows11 from "~/components/titlebar/controls/CaptionControlsWindows11";
 import { createTauriEventListener } from "~/utils/createEventListener";
 import { t as localize } from "~/utils/i18n";
-import { isRecordingStorageError } from "~/utils/recording";
+import {
+	isProjectConfigurationReadError,
+	isRecordingStorageError,
+} from "~/utils/recording";
 import { commands } from "~/utils/tauri";
 import IconAlertTriangle from "~icons/lucide/alert-triangle";
 import IconFolder from "~icons/lucide/folder";
@@ -26,9 +29,11 @@ export function EditorErrorScreen(props: {
 	error: string;
 	projectPath: string;
 }) {
+	const configReadFailed = () => isProjectConfigurationReadError(props.error);
 	const storageShortage = () => isRecordingStorageError(props.error);
 	const needsRecovery = () =>
 		!!props.projectPath &&
+		!configReadFailed() &&
 		(storageShortage() || isRecoveryNeededError(props.error));
 	const isMac = () => ostype() === "macos";
 
@@ -208,13 +213,17 @@ export function EditorErrorScreen(props: {
 									: localize("无法打开录制文件")}
 						</h2>
 						<p class="text-sm text-gray-11">
-							{needsRecovery()
+							{configReadFailed()
 								? localize(
-										"Follow the steps below to try recovering the recording.",
+										"The project settings could not be read. The original settings file has been kept. Restore it from a working copy, then reload the editor.",
 									)
-								: localize(
-										"Check that the project and its original media are still in their original location, then reload the editor.",
-									)}
+								: needsRecovery()
+									? localize(
+											"Follow the steps below to try recovering the recording.",
+										)
+									: localize(
+											"Check that the project and its original media are still in their original location, then reload the editor.",
+										)}
 						</p>
 						<details class="w-full text-sm text-gray-11 text-left">
 							<summary class="cursor-pointer">

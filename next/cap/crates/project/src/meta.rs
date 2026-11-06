@@ -248,8 +248,8 @@ impl RecordingMeta {
         Ok(())
     }
 
-    pub fn project_config(&self) -> ProjectConfiguration {
-        let mut config = ProjectConfiguration::load(&self.project_path).unwrap_or_default();
+    pub fn project_config(&self) -> std::io::Result<ProjectConfiguration> {
+        let mut config = ProjectConfiguration::load_or_default(&self.project_path)?;
 
         let captions_path = self.project_path.join("captions.json");
         debug!("Checking for captions at: {:?}", captions_path);
@@ -303,7 +303,7 @@ impl RecordingMeta {
             }
         }
 
-        config
+        Ok(config)
     }
 
     pub fn output_path(&self) -> PathBuf {
@@ -812,6 +812,38 @@ mod metadata_save_tests {
     }
 
     #[test]
+    fn missing_project_config_is_optional_but_malformed_config_is_preserved() {
+        let directory = tempfile::tempdir().unwrap();
+        let meta = recording(directory.path());
+        let path = directory.path().join("project-config.json");
+
+        assert!(meta.project_config().unwrap().timeline.is_none());
+        assert!(!path.exists());
+
+        for invalid in [b"{".as_slice(), br#"{"timeline":{"segments":[],"zoomSegments":[],"maskSegments":[{"maskType":"unknown"}]}}"#] {
+            std::fs::write(&path, invalid).unwrap();
+            assert_eq!(
+                meta.project_config().unwrap_err().kind(),
+                std::io::ErrorKind::InvalidData
+            );
+            assert_eq!(std::fs::read(&path).unwrap(), invalid);
+        }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn dangling_project_config_is_not_treated_as_missing() {
+        let directory = tempfile::tempdir().unwrap();
+        let meta = recording(directory.path());
+        let path = directory.path().join("project-config.json");
+        let target = directory.path().join("unavailable.json");
+        std::os::unix::fs::symlink(&target, &path).unwrap();
+
+        assert!(meta.project_config().is_err());
+        assert_eq!(std::fs::read_link(&path).unwrap(), target);
+    }
+
+    #[test]
     fn saved_caption_master_takes_precedence_over_legacy_sidecar() {
         let directory = tempfile::tempdir().unwrap();
         let meta = recording(directory.path());
@@ -837,14 +869,14 @@ mod metadata_save_tests {
         )
         .unwrap();
         assert_eq!(
-            meta.project_config().captions.unwrap().segments[0].text,
+            meta.project_config().unwrap().captions.unwrap().segments[0].text,
             "edited"
         );
         ProjectConfiguration::default()
             .write(directory.path())
             .unwrap();
         assert_eq!(
-            meta.project_config().captions.unwrap().segments[0].text,
+            meta.project_config().unwrap().captions.unwrap().segments[0].text,
             "stale"
         );
     }

@@ -261,12 +261,13 @@ impl Renderer {
                     &render_constants.queue,
                     render_constants.is_software_adapter,
                 );
-                let project = render_constants.recording_meta.project_config();
-                layers.preload_cursor_assets(
-                    &render_constants,
-                    project.cursor.use_svg,
-                    project.cursor.cursor_type(),
-                );
+                if let Ok(project) = render_constants.recording_meta.project_config() {
+                    layers.preload_cursor_assets(
+                        &render_constants,
+                        project.cursor.use_svg,
+                        project.cursor.cursor_type(),
+                    );
+                }
                 layers
             }
         };

@@ -619,7 +619,7 @@ async fn load_fixture(recording_path: &Path) -> Result<FixtureContext> {
     };
 
     let studio_meta = studio_meta.as_ref().clone();
-    let project = recording_meta.project_config();
+    let project = recording_meta.project_config()?;
     let recordings = Arc::new(
         ProjectRecordingsMeta::new(&recording_meta.project_path, &studio_meta)
             .map_err(anyhow::Error::msg)?,

@@ -116,7 +116,9 @@ async fn load_recording(
         return Err("Not a studio recording".to_string());
     };
     let meta = meta.clone();
-    let mut project = recording_meta.project_config();
+    let mut project = recording_meta
+        .project_config()
+        .map_err(|error| format!("Could not read project-config.json: {error}"))?;
 
     if project.timeline.is_none() {
         let timeline_segments = match meta.as_ref() {
@@ -127,6 +129,7 @@ async fn load_recording(
                     Err(_) => 5.0,
                 };
                 vec![TimelineSegment {
+                    id: None,
                     recording_clip: 0,
                     start: 0.0,
                     end: duration,
@@ -148,6 +151,7 @@ async fn load_recording(
                         Err(_) => 5.0,
                     };
                     (duration > 0.0).then_some(TimelineSegment {
+                        id: None,
                         recording_clip: i as u32,
                         start: 0.0,
                         end: duration,

@@ -3072,6 +3072,24 @@ impl ProjectConfiguration {
         Ok(())
     }
 
+    pub fn load_or_default(project_path: impl AsRef<Path>) -> std::io::Result<Self> {
+        let project_path = project_path.as_ref();
+        match Self::load(project_path) {
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                match std::fs::symlink_metadata(project_path.join("project-config.json")) {
+                    Ok(_) => Err(error),
+                    Err(metadata_error)
+                        if metadata_error.kind() == std::io::ErrorKind::NotFound =>
+                    {
+                        Ok(Self::default())
+                    }
+                    Err(metadata_error) => Err(metadata_error),
+                }
+            }
+            result => result,
+        }
+    }
+
     pub fn load(project_path: impl AsRef<Path>) -> Result<Self, std::io::Error> {
         let project_path = project_path.as_ref();
         let config_path = project_path.join("project-config.json");

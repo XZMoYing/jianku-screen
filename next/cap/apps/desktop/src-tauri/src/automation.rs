@@ -528,9 +528,9 @@ impl AutomationHost for DesktopAutomationHost {
 
         info!(preset = name, project = %project_path.display(), "Automation: applying preset");
 
-        let existing_timeline = cap_project::ProjectConfiguration::load(project_path)
-            .ok()
-            .and_then(|c| c.timeline);
+        let existing_timeline = cap_project::ProjectConfiguration::load_or_default(project_path)
+            .map_err(|error| format!("Could not read project-config.json: {error}"))?
+            .timeline;
 
         let mut config = preset.config;
         if config.timeline.is_none() {

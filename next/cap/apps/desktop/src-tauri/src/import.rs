@@ -872,7 +872,8 @@ fn source_timeline_segments_for_import(
     source_meta: &RecordingMeta,
     source_segments: &[MultipleSegment],
 ) -> Result<Vec<TimelineSegment>, String> {
-    let source_config = ProjectConfiguration::load(&source_meta.project_path).unwrap_or_default();
+    let source_config = ProjectConfiguration::load_or_default(&source_meta.project_path)
+        .map_err(|error| format!("Could not read the source project-config.json: {error}"))?;
     let Some(timeline) = source_config.timeline else {
         return full_timeline_for_source_segments(source_meta, source_segments);
     };
@@ -1632,7 +1633,8 @@ async fn append_mp4_to_editor_project(
 
     let mut target_meta = RecordingMeta::load_for_project(&target_project_path)
         .map_err(|e| format!("Failed to load target project metadata: {e}"))?;
-    let mut config = ProjectConfiguration::load(&target_project_path).unwrap_or_default();
+    let mut config = ProjectConfiguration::load_or_default(&target_project_path)
+        .map_err(|error| format!("Could not read the destination project-config.json: {error}"))?;
     let existing_segments = {
         let inner = ensure_multiple_segments(&mut target_meta)?;
         inner.status = Some(StudioRecordingStatus::Complete);
@@ -1806,7 +1808,8 @@ async fn append_cap_project_to_editor_project(
 
     let mut target_meta = RecordingMeta::load_for_project(&target_project_path)
         .map_err(|e| format!("Failed to load target project metadata: {e}"))?;
-    let mut config = ProjectConfiguration::load(&target_project_path).unwrap_or_default();
+    let mut config = ProjectConfiguration::load_or_default(&target_project_path)
+        .map_err(|error| format!("Could not read the destination project-config.json: {error}"))?;
     let existing_segments = {
         let inner = ensure_multiple_segments(&mut target_meta)?;
         inner.status = Some(StudioRecordingStatus::Complete);

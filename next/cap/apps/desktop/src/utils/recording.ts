@@ -17,6 +17,14 @@ export function displayRecordingName(name: string): string {
 	return name.replace(/^Cap(?=\s|$)/, localize("Cap"));
 }
 
+export function isProjectConfigurationReadError(error: unknown): boolean {
+	const message = error instanceof Error ? error.message : error;
+	return (
+		typeof message === "string" &&
+		message.startsWith("Could not read project-config.json:")
+	);
+}
+
 export function isRecordingStorageError(error: unknown): boolean {
 	const message = error instanceof Error ? error.message : error;
 	return (

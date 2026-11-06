@@ -336,7 +336,10 @@ impl Export {
         }
 
         if settings.cursor_only() {
-            builder = builder.with_config(make_cursor_only_project(meta.project_config()));
+            let project = meta
+                .project_config()
+                .map_err(|error| format!("Could not read project-config.json: {error}"))?;
+            builder = builder.with_config(make_cursor_only_project(project));
         }
 
         let exporter_base = builder

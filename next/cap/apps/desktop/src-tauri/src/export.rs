@@ -1060,8 +1060,10 @@ async fn do_export(
 
     if settings.cursor_only() {
         let meta = RecordingMeta::load_for_project(project_path).map_err(|e| e.to_string())?;
-        exporter_builder =
-            exporter_builder.with_config(export_project_config(meta.project_config(), true));
+        let project = meta
+            .project_config()
+            .map_err(|error| format!("Could not read project-config.json: {error}"))?;
+        exporter_builder = exporter_builder.with_config(export_project_config(project, true));
     }
 
     let exporter_base = exporter_builder.build().await.map_err(|e| e.to_string())?;
@@ -1977,8 +1979,10 @@ async fn generate_export_preview_inner(
         return Err("Cannot preview non-studio recordings".to_string());
     };
 
-    let mut project_config =
-        export_project_config(recording_meta.project_config(), settings.cursor_only);
+    let project = recording_meta
+        .project_config()
+        .map_err(|error| format!("Could not read project-config.json: {error}"))?;
+    let mut project_config = export_project_config(project, settings.cursor_only);
 
     let recordings = Arc::new(
         ProjectRecordingsMeta::new(&recording_meta.project_path, studio_meta)

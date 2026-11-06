@@ -1478,6 +1478,7 @@
 	"内框不透明度": "内框不透明度",
 	"Unable to open project": "无法打开工程",
 	"Check that the project still exists and contains its original media.": "请检查工程是否仍然存在，并包含录制原文件。",
+	"The project settings could not be read. The original settings file has been kept. Restore it from a working copy, then reload the editor.": "无法读取工程设置，原设置文件已保留。请从可用的副本恢复设置，再重新加载编辑器。",
 	"Check that the project and its original media are still in their original location, then reload the editor.": "请确认工程和原始素材仍在原来的位置。文件还原后，点击“重新加载”。",
 	"Error details": "错误详情",
 	"The action could not be completed. Please try again.": "操作未完成，请重试。",

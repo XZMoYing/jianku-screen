@@ -34,6 +34,7 @@ import { t as localize } from "~/utils/i18n";
 import { createCustomDomainQuery } from "~/utils/queries";
 import {
 	displayRecordingName,
+	isProjectConfigurationReadError,
 	isRecordingStorageError,
 } from "~/utils/recording";
 import {
@@ -3396,6 +3397,7 @@ const createEditorInstanceContext = () => {
 					lastError = e;
 					const errorMessage = e instanceof Error ? e.message : String(e);
 					if (
+						isProjectConfigurationReadError(e) ||
 						isRecordingStorageError(e) ||
 						/may need to be recovered/i.test(errorMessage) ||
 						attempt === 4

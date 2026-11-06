@@ -51,8 +51,10 @@ pub async fn render_preview(
     if settings.cursor_only {
         let meta = RecordingMeta::load_for_project(&project_path)
             .map_err(|e| ExportError::Other(format!("Failed to load recording meta: {e}")))?;
-        exporter_builder =
-            exporter_builder.with_config(make_cursor_only_project(meta.project_config()));
+        let project = meta.project_config().map_err(|error| {
+            ExportError::Other(format!("Could not read project-config.json: {error}"))
+        })?;
+        exporter_builder = exporter_builder.with_config(make_cursor_only_project(project));
     }
 
     let exporter_base = exporter_builder

@@ -73,7 +73,8 @@ impl Probe {
         }
         let project = RecordingMeta::load_for_project(&path)
             .map_err(|error| error.to_string())?
-            .project_config();
+            .project_config()
+            .map_err(|error| error.to_string())?;
         let duration = project
             .timeline
             .as_ref()

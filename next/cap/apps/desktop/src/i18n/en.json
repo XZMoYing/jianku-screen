@@ -1620,6 +1620,7 @@
 	"内框不透明度": "Inset opacity",
 	"Unable to open project": "Unable to open project",
 	"Check that the project still exists and contains its original media.": "Check that the project still exists and contains its original media.",
+	"The project settings could not be read. The original settings file has been kept. Restore it from a working copy, then reload the editor.": "The project settings could not be read. The original settings file has been kept. Restore it from a working copy, then reload the editor.",
 	"Check that the project and its original media are still in their original location, then reload the editor.": "Check that the project and its original media are still in their original location, then reload the editor.",
 	"Error details": "Error details",
 	"The action could not be completed. Please try again.": "The action could not be completed. Please try again.",

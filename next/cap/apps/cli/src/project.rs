@@ -70,7 +70,9 @@ pub fn inspect(project_path: PathBuf, format: OutputFormat) -> Result<(), String
     let meta = RecordingMeta::load_for_project(&project_path)
         .map_err(|e| format!("Failed to load recording meta: {e}"))?;
     let output_path = meta.output_path();
-    let config = meta.project_config();
+    let config = meta
+        .project_config()
+        .map_err(|error| format!("Could not read project-config.json: {error}"))?;
 
     match format {
         OutputFormat::Text => {

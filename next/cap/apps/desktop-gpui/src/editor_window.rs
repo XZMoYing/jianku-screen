@@ -407,11 +407,9 @@ pub fn preflight(path: &std::path::Path) -> Result<ProjectSummary, String> {
     .map_err(|error| format!("Failed to read this recording's media: {error}"))?;
     let recordings = Arc::new(recordings);
 
-    // `RecordingMeta::project_config()` loads `project-config.json` (falling
-    // back to the default) and overlays `captions.json` -- the same read
-    // `EditorInstance::new` starts from, so the timeline shown here is the one
-    // that will be rendered.
-    let mut config = meta.project_config();
+    let mut config = meta
+            .project_config()
+            .map_err(|error| format!("Could not read project-config.json: {error}"))?;
     // With no persisted timeline `EditorInstance::new` synthesises one from
     // the per-segment display durations (`editor_instance.rs:210-230`) and
     // writes it back. Synthesise the same shape here so the strip is not empty

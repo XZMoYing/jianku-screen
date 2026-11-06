@@ -284,10 +284,11 @@ impl ScreenshotEditorInstances {
 
         let (recording_meta, loaded_config) = if let Some(cap_dir) = &cap_dir {
             let meta = RecordingMeta::load_for_project(cap_dir).ok();
-            let config = ProjectConfiguration::load(cap_dir).ok();
+            let config = ProjectConfiguration::load_or_default(cap_dir)
+                .map_err(|error| format!("Could not read project-config.json: {error}"))?;
             (meta, config)
         } else {
-            (None, None)
+            (None, ProjectConfiguration::default())
         };
 
         if !start_preview {
@@ -297,7 +298,7 @@ impl ScreenshotEditorInstances {
                 .unwrap_or_else(|| "Screenshot".to_string());
             let (config_tx, _) = watch::channel(ScreenshotConfigUpdate {
                 revision: 0,
-                config: loaded_config.unwrap_or_default(),
+                config: loaded_config,
             });
 
             return Ok(Arc::new(ScreenshotEditorInstance {
@@ -437,7 +438,7 @@ impl ScreenshotEditorInstances {
 
         let (config_tx, mut config_rx) = watch::channel(ScreenshotConfigUpdate {
             revision: 0,
-            config: loaded_config.unwrap_or_default(),
+            config: loaded_config,
         });
 
         let render_shutdown_token = ws_shutdown_token.clone();

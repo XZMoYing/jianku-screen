@@ -2344,13 +2344,7 @@ impl RecoveryManager {
             ));
         }
 
-        let mut config = match ProjectConfiguration::load(&recording.project_path) {
-            Ok(config) => config,
-            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
-                ProjectConfiguration::default()
-            }
-            Err(error) => return Err(error.into()),
-        };
+        let mut config = ProjectConfiguration::load_or_default(&recording.project_path)?;
 
         config.timeline = Some(TimelineConfiguration {
             main_track_gaps: Default::default(),

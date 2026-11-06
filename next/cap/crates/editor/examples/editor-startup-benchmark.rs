@@ -55,7 +55,9 @@ async fn profile_startup_stages(
     };
     push_stage(&mut stages, "load recording metadata", &mut stage_start);
 
-    let project = recording_meta.project_config();
+    let project = recording_meta
+        .project_config()
+        .map_err(|error| format!("Could not read project-config.json: {error}"))?;
     push_stage(&mut stages, "load project config", &mut stage_start);
 
     let recordings = Arc::new(ProjectRecordingsMeta::new(

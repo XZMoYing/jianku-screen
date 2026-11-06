@@ -259,7 +259,9 @@ async fn load_recording(
     };
     let meta = meta.clone();
 
-    let mut project = recording_meta.project_config();
+    let mut project = recording_meta
+        .project_config()
+        .map_err(|error| format!("Could not read project-config.json: {error}"))?;
 
     if project.timeline.is_none() {
         let timeline_segments = match meta.as_ref() {

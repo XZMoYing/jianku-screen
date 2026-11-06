@@ -351,7 +351,9 @@ impl EditorInstance {
             );
         }
 
-        let mut project = recording_meta.project_config();
+        let mut project = recording_meta
+            .project_config()
+            .map_err(|error| format!("Could not read project-config.json: {error}"))?;
 
         if project.timeline.is_none() {
             warn!("Project config has no timeline, creating one from recording segments");
@@ -1880,6 +1882,33 @@ fn get_calibration_offset(
 mod tests {
     use super::*;
     use cap_project::{AudioGapSummary, CursorClickEvent, CursorConfiguration, CursorMoveEvent};
+
+    #[tokio::test]
+    async fn opening_editor_preserves_an_unreadable_project_config() {
+        let directory = tempfile::tempdir().unwrap();
+        std::fs::write(
+            directory.path().join("recording-meta.json"),
+            br#"{"pretty_name":"Test","segments":[{"display":{"path":"content/display.mp4","fps":30,"start_time":0.0}}],"cursors":{},"status":{"status":"Complete"}}"#,
+        )
+        .unwrap();
+        let path = directory.path().join("project-config.json");
+        let invalid = br#"{"timeline":{"segments":[],"zoomSegments":[],"keyboardSegments":"bad"}}"#;
+        std::fs::write(&path, invalid).unwrap();
+
+        let result = EditorInstance::new(
+            directory.path().to_path_buf(),
+            |_| panic!("Failed editor should not emit state"),
+            Box::new(|_, _| panic!("Failed editor should not render frames")),
+            None,
+        )
+        .await;
+
+        assert!(matches!(
+            result,
+            Err(error) if error.starts_with("Could not read project-config.json:")
+        ));
+        assert_eq!(std::fs::read(&path).unwrap(), invalid);
+    }
 
     fn event_state() -> Arc<Mutex<EditorState>> {
         Arc::new(Mutex::new(EditorState {
