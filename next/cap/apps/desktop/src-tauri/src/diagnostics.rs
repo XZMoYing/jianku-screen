@@ -1,3 +1,5 @@
+mod sync_report;
+
 use crate::{ArcLock, general_settings::GeneralSettingsStore, permissions};
 use serde::{Deserialize, Serialize};
 use specta::Type;
@@ -9,12 +11,11 @@ use tauri::{AppHandle, Manager};
 use tauri_plugin_opener::OpenerExt;
 use tauri_specta::Event;
 use tokio::io::AsyncBufReadExt;
-use tracing::{error, info, warn};
+use tracing::{error, warn};
 
 /// Reports are written next to the logs so support can ask for them by name.
 const REPORTS_DIR_NAME: &str = "diagnostics";
 const REPORTS_TO_KEEP: usize = 5;
-const SYNC_TEST_STDERR_TAIL_LIMIT: usize = 40;
 /// The full report always lands on disk; only the copy handed back to the
 /// webview is trimmed, so a pathological run can't wedge the settings window.
 const MAX_INLINE_REPORT_BYTES: usize = 2 * 1024 * 1024;
@@ -81,9 +82,7 @@ enum SyncTestMessage {
     Report {
         report: serde_json::Value,
     },
-    Error {
-        error: String,
-    },
+    Error {},
 }
 
 fn parse_sync_test_line(line: &str) -> Option<SyncTestMessage> {
@@ -160,32 +159,6 @@ fn sync_test_args(options: &DiagnosticOptions, mode: &str) -> Vec<String> {
     args
 }
 
-async fn collect_sync_test_stderr_tail(stderr: tokio::process::ChildStderr) -> Vec<String> {
-    let mut lines = tokio::io::BufReader::new(stderr).lines();
-    let mut tail = Vec::new();
-
-    loop {
-        match lines.next_line().await {
-            Ok(Some(line)) => {
-                if cfg!(debug_assertions) {
-                    info!(line = %line, "Sync test stderr");
-                }
-                tail.push(line);
-                if tail.len() > SYNC_TEST_STDERR_TAIL_LIMIT {
-                    tail.remove(0);
-                }
-            }
-            Ok(None) => break,
-            Err(e) => {
-                tail.push(format!("failed reading stderr: {e}"));
-                break;
-            }
-        }
-    }
-
-    tail
-}
-
 /// Drives `cap selftest av-sync` in the exporter sidecar. The verdict lives in
 /// the `Report` message, never in the exit code: the CLI exits non-zero for
 /// fail/inconclusive runs that still produced a full report.
@@ -197,13 +170,13 @@ async fn run_sync_test(
     // The sync test lives in the `cap` CLI, shipped as the `cap-exporter`
     // sidecar; a dev build without the sidecar has no way to run it.
     let bin_path = crate::export::resolve_exporter_binary()
-        .map_err(|e| format!("Sync test helper unavailable: {e}"))?;
+        .map_err(|_| "Sync test helper unavailable".to_string())?;
 
     let mut command = tokio::process::Command::new(&bin_path);
     command
         .args(sync_test_args(options, mode))
         .stdout(std::process::Stdio::piped())
-        .stderr(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::null())
         // Every early return below (a stdout read error, most of all) would
         // otherwise orphan a process that owns the screen with a fullscreen
         // flashing window and is midway through a recording.
@@ -212,66 +185,69 @@ async fn run_sync_test(
 
     let mut child = command
         .spawn()
-        .map_err(|e| format!("Failed to start sync test '{}': {e}", bin_path.display()))?;
+        .map_err(|e| format!("Failed to start sync test: {:?}", e.kind()))?;
 
     let stdout = child
         .stdout
         .take()
         .ok_or_else(|| "Sync test stdout was not captured".to_string())?;
-    let stderr = child
-        .stderr
-        .take()
-        .ok_or_else(|| "Sync test stderr was not captured".to_string())?;
-    let stderr_task = tokio::spawn(collect_sync_test_stderr_tail(stderr));
-
     let mut report = None;
-    let mut reported_error = None;
+    let mut reported_error = false;
     let mut stdout_lines = tokio::io::BufReader::new(stdout).lines();
 
     while let Some(line) = stdout_lines
         .next_line()
         .await
-        .map_err(|e| format!("Failed reading sync test stdout: {e}"))?
+        .map_err(|e| format!("Failed reading sync test stdout: {:?}", e.kind()))?
     {
         match parse_sync_test_line(&line) {
-            Some(SyncTestMessage::Stage { stage, mode }) => {
+            Some(SyncTestMessage::Stage { stage, mode })
+                if matches!(
+                    stage.as_str(),
+                    "collecting"
+                        | "recording"
+                        | "pattern-run"
+                        | "remuxing"
+                        | "analyzing"
+                        | "exporting"
+                        | "done"
+                ) =>
+            {
                 DiagnosticProgress {
                     phase: "sync-test".to_string(),
                     stage: Some(stage),
-                    mode,
+                    mode: mode.filter(|mode| matches!(mode.as_str(), "studio" | "instant")),
                 }
                 .emit(app)
                 .ok();
             }
-            Some(SyncTestMessage::Report { report: value }) => report = Some(value),
-            Some(SyncTestMessage::Error { error }) => reported_error = Some(error),
-            None => {}
+            Some(SyncTestMessage::Report { report: value }) => {
+                report = sync_report::safe_sync_report(&value);
+            }
+            Some(SyncTestMessage::Error {}) => reported_error = true,
+            _ => {}
         }
     }
 
     let status = child
         .wait()
         .await
-        .map_err(|e| format!("Failed waiting for sync test: {e}"))?;
-    let stderr_tail = stderr_task.await.unwrap_or_default();
+        .map_err(|e| format!("Failed waiting for sync test: {:?}", e.kind()))?;
 
     if let Some(report) = report {
         return Ok(report);
     }
 
-    if let Some(error) = reported_error {
-        return Err(error);
+    if reported_error {
+        return Err(format!("Sync test reported an error ({status})"));
     }
 
-    let tail = stderr_tail.join("\n");
     Err(format!(
-        "Sync test exited with status {status} without producing a report.\n{tail}"
+        "Sync test exited with {status} without producing a valid report"
     ))
 }
 
 fn settings_snapshot(settings: &GeneralSettingsStore) -> serde_json::Value {
-    use cap_recording::diagnostics::redact_home_paths;
-
     serde_json::json!({
         "maxFps": settings.max_fps,
         "instantModeMaxResolution": settings.instant_mode_max_resolution,
@@ -280,20 +256,45 @@ fn settings_snapshot(settings: &GeneralSettingsStore) -> serde_json::Value {
         "outOfProcessMuxer": settings.out_of_process_muxer,
         "crashRecoveryRecording": settings.crash_recovery_recording,
         "enableNativeCameraPreview": settings.enable_native_camera_preview,
-        "recordingsPath": settings
-            .recordings_path
-            .as_deref()
-            .map(redact_home_paths),
-        "previousRecordingsPaths": settings
-            .previous_recordings_paths
-            .iter()
-            .map(|p| redact_home_paths(p))
-            .collect::<Vec<_>>(),
+        "customRecordingsDirectory": settings.recordings_path.is_some(),
+        "previousRecordingsDirectoryCount": settings.previous_recordings_paths.len(),
         "updateChannel": settings.update_channel,
         "enableTelemetry": settings.enable_telemetry,
         "editorPreviewQuality": settings.editor_preview_quality,
         "captureKeyboardEvents": settings.capture_keyboard_events,
     })
+}
+
+fn minimize_local_report(report: &mut cap_recording::diagnostics::DiagnosticReport) {
+    for (index, display) in report.displays.iter_mut().enumerate() {
+        display.id = format!("display-{}", index + 1);
+        display.name = format!("Display {}", index + 1);
+    }
+    for (index, camera) in report.cameras.iter_mut().enumerate() {
+        camera.device_id = format!("camera-{}", index + 1);
+        camera.display_name = format!("Camera {}", index + 1);
+        camera.model_id = None;
+    }
+    for (index, microphone) in report.microphones.iter_mut().enumerate() {
+        microphone.name = format!("Microphone {}", index + 1);
+    }
+    for (index, output) in report.audio_outputs.iter_mut().enumerate() {
+        output.name = format!("Audio output {}", index + 1);
+    }
+    if let Some(storage) = report.storage.as_mut() {
+        storage.recordings_path = "[omitted]".to_string();
+    }
+    for recording in &mut report.recent_recordings {
+        if recording.error.is_some() {
+            recording.error = Some("Recording metadata or capture error".to_string());
+        }
+        for segment in &mut recording.segments {
+            segment.display_device_id = None;
+            segment.camera_device_id = None;
+            segment.mic_device_id = None;
+            segment.system_audio_device_id = None;
+        }
+    }
 }
 
 fn permissions_snapshot() -> serde_json::Value {
@@ -456,7 +457,7 @@ pub async fn run_diagnostic(
     // `collect_report` probes displays and disk mounts; both can block for tens
     // of seconds, so it never runs on the async runtime's cooperative threads.
     let report = tokio::task::spawn_blocking(move || {
-        cap_recording::diagnostics::collect_report(
+        let mut report = cap_recording::diagnostics::collect_report(
             cap_recording::diagnostics::DiagnosticReportArgs {
                 flavor: "tauri",
                 app_version: &app_version,
@@ -468,7 +469,9 @@ pub async fn run_diagnostic(
                 sync_test,
                 sync_test_error: sync_test_error_for_report,
             },
-        )
+        );
+        minimize_local_report(&mut report);
+        report
     })
     .await
     .map_err(|e| format!("Failed to collect diagnostic report: {e}"))?;
@@ -572,9 +575,7 @@ mod tests {
 
         assert_eq!(
             parse_sync_test_line(r#"{"type":"Error","error":"no display"}"#),
-            Some(SyncTestMessage::Error {
-                error: "no display".to_string()
-            })
+            Some(SyncTestMessage::Error {})
         );
     }
 
@@ -732,6 +733,8 @@ mod tests {
     fn local_diagnostic_settings_omit_server_and_instance_identity() {
         let settings = GeneralSettingsStore {
             server_url: "https://user:secret@example.invalid/?token=sentinel".into(),
+            recordings_path: Some("/Volumes/private-sentinel/recordings".into()),
+            previous_recordings_paths: vec![r"D:\private-sentinel".into()],
             ..Default::default()
         };
         let snapshot = settings_snapshot(&settings);
@@ -739,6 +742,8 @@ mod tests {
         assert!(snapshot.get("serverUrl").is_none());
         assert!(snapshot.get("instanceId").is_none());
         assert!(snapshot.get("maxFps").is_some());
+        assert_eq!(snapshot["customRecordingsDirectory"], true);
+        assert_eq!(snapshot["previousRecordingsDirectoryCount"], 1);
         assert!(!snapshot.to_string().contains("sentinel"));
     }
 
