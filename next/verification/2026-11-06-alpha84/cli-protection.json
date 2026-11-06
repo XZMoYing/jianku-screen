@@ -1,0 +1,9 @@
+{
+	"exits": {
+		"inspect": 1,
+		"cursorOnlyExport": 1,
+		"cursorOnlyPreview": 1
+	},
+	"noCursorExportFile": true,
+	"invalidConfigSha256": "41046a21a5a8f7c1dcd7b4def4be98238ce552637b7875b7e6a50b15dcaaba34"
+}
