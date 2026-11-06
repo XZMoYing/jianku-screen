@@ -1,0 +1,56 @@
+{
+  "native": {
+    "baseGeometry": [
+      5.992248062015504,
+      6.622739018087855
+    ],
+    "sourceOffset": 0.40358495795990024,
+    "trim": {
+      "start": 1.25,
+      "end": 2.2205950291046843
+    },
+    "splitPhase": 1.7508446009768708,
+    "cancelled": true,
+    "undos": 3,
+    "redos": 3,
+    "reopened": true,
+    "trimmedGeometry": [
+      6.1937984496124034,
+      6.700258397932816
+    ],
+    "movedGeometry": [
+      6.17312661498708,
+      6.850129198966409
+    ]
+  },
+  "export": {
+    "frames": {
+      "baseline": 189,
+      "trimmed": 189,
+      "split": 189
+    },
+    "unchangedLeftSample": true,
+    "movedRightSampleChanged": true,
+    "differentAfterSplit": []
+  },
+  "preview": [
+    {
+      "case": "edited-slice",
+      "requestedTime": 6.5,
+      "displayedTime": 6.5,
+      "attempts": [
+        [
+          1386.25,
+          6.5
+        ]
+      ],
+      "captureScope": "one verified owned editor window",
+      "image": "window-preview-edited-slice.png"
+    }
+  ],
+  "source": {
+    "commit": "cfc45a43c31a63019592ef330586968bfff82282",
+    "version": "0.2.0-alpha.82",
+    "build": "2026.82.0"
+  }
+}
