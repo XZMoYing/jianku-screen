@@ -1958,6 +1958,7 @@ pub struct TimelineSource<'a> {
 pub struct TimelineSourceRange<'a> {
     pub output: Range<f64>,
     pub source_at_start: Option<TimelineSource<'a>>,
+    pub source_frozen: bool,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -2301,15 +2302,18 @@ impl TimelineConfiguration {
             }
             let end = end.min(range.end);
             let source_at_start = mapping.primary_source();
+            let source_frozen = matches!(mapping, TimelineFrameMapping::Hold { .. });
             let segment_index = source_at_start.map(|source| source.segment_index);
             if let Some(previous) = ranges.last_mut()
                 && previous.source_at_start.map(|source| source.segment_index) == segment_index
+                && previous.source_frozen == source_frozen
             {
                 previous.output.end = end;
             } else {
                 ranges.push(TimelineSourceRange {
                     output: time..end,
                     source_at_start,
+                    source_frozen,
                 });
             }
             time = end;
@@ -4133,11 +4137,15 @@ mod tests {
         timeline.text_segments = vec![fullscreen_text(1.0, 2.0)];
 
         let ranges = timeline.primary_source_ranges(0.5..5.5).unwrap();
-        assert_eq!(ranges.len(), 2);
-        assert_eq!(ranges[0].output, 0.5..4.0);
+        assert_eq!(ranges.len(), 4);
+        assert_eq!(ranges[0].output, 0.5..1.0);
         assert_eq!(ranges[0].source_at_start.unwrap().source_time, 0.5);
-        assert_eq!(ranges[1].output, 4.0..5.5);
-        assert_eq!(ranges[1].source_at_start.unwrap().source_time, 10.0);
+        assert_eq!(ranges[1].output, 1.0..2.0);
+        assert!(ranges[1].source_frozen);
+        assert_eq!(ranges[1].source_at_start.unwrap().source_time, 1.0);
+        assert_eq!(ranges[2].output, 2.0..4.0);
+        assert_eq!(ranges[3].output, 4.0..5.5);
+        assert_eq!(ranges[3].source_at_start.unwrap().source_time, 10.0);
 
         timeline
             .main_track_gaps

@@ -6837,23 +6837,33 @@ pub fn generate_zoom_segments_for_timeline(
 }
 
 fn attach_generated_zooms(timeline: &TimelineConfiguration, zooms: &mut [ZoomSegment]) {
-    let holds = timeline.hold_windows();
     for zoom in zooms {
         let Some(ranges) = timeline.primary_source_ranges(zoom.start..zoom.end) else {
             continue;
         };
-        let mut slices: Vec<_> = ranges
+        if ranges.iter().any(|range| {
+            range
+                .source_at_start
+                .is_some_and(|source| source.segment.id.is_none())
+        }) {
+            continue;
+        }
+        let first_source = ranges.first().and_then(|range| range.source_at_start);
+        let single_source = first_source.is_some_and(|first| {
+            ranges.iter().all(|range| {
+                range
+                    .source_at_start
+                    .is_some_and(|source| source.segment_index == first.segment_index)
+            })
+        });
+        let slices: Vec<_> = ranges
             .into_iter()
             .map(|range| ZoomSourceSlice {
                 phase_start: range.output.start - zoom.start,
                 phase_end: range.output.end - zoom.start,
                 source_end: range.source_at_start.and_then(|source| {
-                    if source.segment.id.is_none()
-                        || holds.iter().any(|(start, end)| {
-                            *start < range.output.end && *end > range.output.start
-                        })
-                    {
-                        return None;
+                    if range.source_frozen {
+                        return Some(source.source_time);
                     }
                     let end = source.source_time
                         + (range.output.end - range.output.start) * source.segment.timescale;
@@ -6869,8 +6879,8 @@ fn attach_generated_zooms(timeline: &TimelineConfiguration, zooms: &mut [ZoomSeg
                 }),
             })
             .collect();
-        if slices.len() == 1 {
-            zoom.attachment = slices.pop().and_then(|slice| slice.attachment);
+        if single_source {
+            zoom.attachment = slices.into_iter().next().and_then(|slice| slice.attachment);
         } else if slices.iter().any(|slice| slice.attachment.is_some()) {
             zoom.source_slices = slices;
         }
@@ -7746,9 +7756,13 @@ mod tests {
             .main_track_gaps
             .before_clip
             .insert("right".into(), 0.25);
+        split.text_segments = serde_json::from_value(serde_json::json!([
+            {"start":4.375,"end":4.625,"layout":"fullscreen","content":"Hold"}
+        ]))
+        .unwrap();
         let mut across = [ZoomSegment {
             start: 3.5,
-            end: 4.5,
+            end: 4.75,
             attachment: None,
             ..zooms[0].clone()
         }];
@@ -7767,22 +7781,29 @@ mod tests {
         let [zoom] = timeline.zoom_segments.as_slice() else {
             panic!("expected one animation");
         };
-        assert_eq!((zoom.start, zoom.end), (3.5, 4.5));
-        let [left, gap, right] = zoom.source_slices.as_slice() else {
-            panic!("expected two clip slices and the intervening gap");
+        assert_eq!((zoom.start, zoom.end), (3.5, 4.75));
+        let [left, gap, right, hold, resumed] = zoom.source_slices.as_slice() else {
+            panic!("expected three linear slices, a gap and a frozen source slice");
         };
         assert_eq!((left.phase_start, left.phase_end), (0.0, 0.5));
         assert_eq!((gap.phase_start, gap.phase_end), (0.5, 0.75));
-        assert_eq!((right.phase_start, right.phase_end), (0.75, 1.0));
+        assert_eq!((right.phase_start, right.phase_end), (0.75, 0.875));
+        assert_eq!((hold.phase_start, hold.phase_end), (0.875, 1.125));
+        assert_eq!((resumed.phase_start, resumed.phase_end), (1.125, 1.25));
         assert_eq!(left.source_end, Some(4.0));
         assert_eq!(gap.source_end, None);
-        assert_eq!(right.source_end, Some(4.25));
+        assert_eq!(right.source_end, Some(4.125));
+        assert_eq!(hold.source_end, Some(4.125));
+        assert_eq!(resumed.source_end, Some(4.25));
         assert!(
             matches!(&left.attachment, Some(OverlayAttachment::Clip { clip_id, source_time: 3.5, .. }) if clip_id == "left")
         );
         assert!(gap.attachment.is_none());
         assert!(
             matches!(&right.attachment, Some(OverlayAttachment::Clip { clip_id, source_time: 4.0, .. }) if clip_id == "right")
+        );
+        assert!(
+            matches!(&hold.attachment, Some(OverlayAttachment::Clip { clip_id, source_time: 4.125, .. }) if clip_id == "right")
         );
     }
 

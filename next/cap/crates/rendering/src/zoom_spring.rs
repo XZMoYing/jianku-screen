@@ -459,66 +459,53 @@ fn build_time_map(timeline: Option<&TimelineConfiguration>) -> Vec<TimeMapSegmen
         return map;
     }
 
-    // Fullscreen text segments pause the recording clock: re-express the map
-    // in held-output time, splitting entries at each hold and inserting a
-    // timescale-0 (frozen) span so cursor-driven zoom aiming stays aligned
-    // with what the display actually shows.
-    let mut out = Vec::with_capacity(map.len() + holds.len());
-    let mut hold_idx = 0usize;
     let mut shift = 0.0;
+    let held_clock: Vec<_> = holds
+        .into_iter()
+        .map(|(start, end)| {
+            let hold = (start - shift, start, end, shift);
+            shift += end - start;
+            hold
+        })
+        .collect();
+    let mut out = Vec::with_capacity(map.len() + held_clock.len());
+    // Each overlapping clip crosses the same output hold independently.
     for segment in map {
-        let mut piece_start_out = segment.timeline_start + shift;
-        let mut piece_start_rec = segment.recording_start;
-        let mut remaining = segment.timeline_end - segment.timeline_start;
-        while hold_idx < holds.len() {
-            let (hold_start, hold_end) = holds[hold_idx];
-            if hold_start >= piece_start_out + remaining {
+        let source_at =
+            |time| segment.recording_start + (time - segment.timeline_start) * segment.timescale;
+        let mut effective_start = segment.timeline_start;
+        let first_hold = held_clock.partition_point(|(position, ..)| *position < effective_start);
+        let mut shift = held_clock
+            .get(first_hold)
+            .map_or(shift, |&(_, _, _, before)| before);
+        for &(effective_hold, hold_start, hold_end, _) in &held_clock[first_hold..] {
+            if effective_hold >= segment.timeline_end {
                 break;
             }
-            if timeline.has_main_track_gaps() && hold_start < piece_start_out {
-                let hold_len = hold_end - hold_start;
-                piece_start_out += hold_len;
-                shift += hold_len;
-                hold_idx += 1;
-                continue;
-            }
-            if hold_start > piece_start_out {
-                let len = hold_start - piece_start_out;
+            if effective_hold > effective_start {
                 out.push(TimeMapSegment {
-                    segment_index: segment.segment_index,
-                    timeline_start: piece_start_out,
+                    timeline_start: effective_start + shift,
                     timeline_end: hold_start,
-                    recording_start: piece_start_rec,
-                    timescale: segment.timescale,
-                    recording_clip: segment.recording_clip,
+                    recording_start: source_at(effective_start),
+                    ..segment
                 });
-                piece_start_rec += len * segment.timescale;
-                remaining -= len;
-                piece_start_out = hold_start;
             }
-            let hold_len = hold_end - hold_start;
             out.push(TimeMapSegment {
-                segment_index: segment.segment_index,
-                timeline_start: piece_start_out,
-                timeline_end: piece_start_out + hold_len,
-                recording_start: piece_start_rec,
+                timeline_start: hold_start,
+                timeline_end: hold_end,
+                recording_start: source_at(effective_hold),
                 timescale: 0.0,
-                recording_clip: segment.recording_clip,
+                ..segment
             });
-            piece_start_out += hold_len;
-            shift += hold_len;
-            hold_idx += 1;
+            effective_start = effective_hold;
+            shift += hold_end - hold_start;
         }
-        if remaining > 0.0 {
-            out.push(TimeMapSegment {
-                segment_index: segment.segment_index,
-                timeline_start: piece_start_out,
-                timeline_end: piece_start_out + remaining,
-                recording_start: piece_start_rec,
-                timescale: segment.timescale,
-                recording_clip: segment.recording_clip,
-            });
-        }
+        out.push(TimeMapSegment {
+            timeline_start: effective_start + shift,
+            timeline_end: segment.timeline_end + shift,
+            recording_start: source_at(effective_start),
+            ..segment
+        });
     }
     out
 }
@@ -641,6 +628,17 @@ fn project_zoom_phases(
     let mut previous_end = 0.0;
     let mut changed = false;
     for slice in &segment.source_slices {
+        let phase_duration = slice.phase_end - slice.phase_start;
+        if !phase_duration.is_finite()
+            || phase_duration <= 0.0
+            || (slice.phase_start - previous_end).abs() > 1e-6
+        {
+            return None;
+        }
+        previous_end = slice.phase_end;
+        if slice.attachment.is_none() && slice.source_end.is_none() {
+            continue;
+        }
         let Some(OverlayAttachment::Clip {
             clip_id,
             source_time,
@@ -650,50 +648,92 @@ fn project_zoom_phases(
             return None;
         };
         let source_end = slice.source_end?;
-        let phase_duration = slice.phase_end - slice.phase_start;
         let original_rate = (source_end - source_time) / phase_duration;
-        if !original_rate.is_finite()
-            || original_rate <= 0.0
-            || phase_duration <= 0.0
-            || (slice.phase_start - previous_end).abs() > 1e-6
-        {
+        if !original_rate.is_finite() || original_rate < 0.0 {
             return None;
         }
-        previous_end = slice.phase_end;
-        let current = time_map
+        let (segment_index, clip) = timeline
+            .segments
             .iter()
-            .find(|entry| timeline.segments[entry.segment_index].id.as_ref() == Some(clip_id))?;
+            .enumerate()
+            .find(|(_, clip)| clip.id.as_ref() == Some(clip_id))?;
+        let original_start = phase_origin + slice.phase_start;
         original_map.push(TimeMapSegment {
-            timeline_start: phase_origin + slice.phase_start,
+            segment_index,
+            timeline_start: original_start,
             timeline_end: phase_origin + slice.phase_end,
             recording_start: *source_time,
             timescale: original_rate,
-            ..*current
+            recording_clip: clip.recording_clip,
         });
-        let retained_start = source_time.max(current.recording_start);
-        let retained_end = source_end.min(timeline.segments[current.segment_index].end);
-        if retained_start >= retained_end {
-            changed = true;
-            continue;
+        let mut covered_phase = 0.0;
+        for current in time_map
+            .iter()
+            .filter(|entry| entry.segment_index == segment_index)
+        {
+            let span = if current.timescale == 0.0 {
+                let frozen_source = current.recording_start;
+                if original_rate == 0.0 && (*source_time - frozen_source).abs() <= 1e-6 {
+                    Some(PhaseSpan {
+                        segment_index,
+                        start: current.timeline_start,
+                        end: current.timeline_end,
+                        original_start,
+                        rate: phase_duration / (current.timeline_end - current.timeline_start),
+                    })
+                } else if original_rate > 0.0
+                    && frozen_source >= *source_time
+                    && frozen_source < source_end
+                    && !segment.source_slices.iter().any(|other| {
+                        matches!(&other.attachment, Some(OverlayAttachment::Clip {
+                            clip_id: other_id, source_time: frozen_at, ..
+                        }) if other_id == clip_id
+                            && other.source_end == Some(*frozen_at)
+                            && (*frozen_at - frozen_source).abs() <= 1e-6)
+                    })
+                {
+                    Some(PhaseSpan {
+                        segment_index,
+                        start: current.timeline_start,
+                        end: current.timeline_end,
+                        original_start: original_start
+                            + (frozen_source - source_time) / original_rate,
+                        rate: 0.0,
+                    })
+                } else {
+                    None
+                }
+            } else if original_rate > 0.0 {
+                let current_source_end = current.recording_start
+                    + (current.timeline_end - current.timeline_start) * current.timescale;
+                let retained_start = source_time.max(current.recording_start);
+                let retained_end = source_end.min(clip.end).min(current_source_end);
+                (retained_start < retained_end).then(|| PhaseSpan {
+                    segment_index,
+                    start: current.timeline_start
+                        + (retained_start - current.recording_start) / current.timescale,
+                    end: current.timeline_start
+                        + (retained_end - current.recording_start) / current.timescale,
+                    original_start: original_start + (retained_start - source_time) / original_rate,
+                    rate: current.timescale / original_rate,
+                })
+            } else {
+                None
+            };
+            let Some(span) = span else { continue };
+            let duration = span.end - span.start;
+            covered_phase += duration * span.rate;
+            changed |= (span.start - segment.start - (span.original_start - phase_origin)).abs()
+                > 1e-6
+                || (duration * (1.0 - span.rate)).abs() > 1e-6;
+            spans.push(span);
         }
-        let start =
-            current.timeline_start + (retained_start - current.recording_start) / current.timescale;
-        let end =
-            current.timeline_start + (retained_end - current.recording_start) / current.timescale;
-        changed |= (start - segment.start - slice.phase_start).abs() > 1e-6
-            || (end - segment.start - slice.phase_end).abs() > 1e-6
-            || (original_rate - current.timescale).abs() > 1e-6;
-        spans.push(PhaseSpan {
-            segment_index: current.segment_index,
-            start,
-            end,
-            original_start: phase_origin
-                + slice.phase_start
-                + (retained_start - source_time) / original_rate,
-            rate: current.timescale / original_rate,
-        });
+        changed |= (covered_phase - phase_duration).abs() > 1e-6;
     }
-    if !changed || (previous_end - (segment.end - segment.start)).abs() > 1e-6 {
+    if !changed
+        || original_map.is_empty()
+        || (previous_end - (segment.end - segment.start)).abs() > 1e-6
+    {
         return None;
     }
     spans.sort_by(|a, b| a.start.total_cmp(&b.start));
@@ -771,16 +811,15 @@ impl ZoomTransformTimeline {
             },
             phase_tracks: Vec::new(),
         };
-        let linear_timeline = timeline.filter(|timeline| {
+        let phase_timeline = timeline.filter(|_| {
             zoom_segments
                 .iter()
                 .any(|segment| !segment.source_slices.is_empty())
-                && timeline.hold_windows().is_empty()
                 && crops.styles.is_empty()
         });
         for (index, segment) in zoom_segments.iter().enumerate() {
             let phase_origin = (STEP_MS + (segment.start * 1000.0).rem_euclid(STEP_MS)) / 1000.0;
-            let projected = linear_timeline.and_then(|timeline| {
+            let projected = phase_timeline.and_then(|timeline| {
                 project_zoom_phases(segment, timeline, &plan.time_map, phase_origin)
             });
             if let Some((spans, original_map)) = projected
@@ -1481,6 +1520,131 @@ mod tests {
             assert!((actual.bounds.top_left.x - expected.bounds.top_left.x).abs() < 1e-5);
             assert!((actual.bounds.bottom_right.y - expected.bounds.bottom_right.y).abs() < 1e-5);
         }
+    }
+
+    #[test]
+    fn an_inserted_hold_freezes_phase_without_consuming_the_original_gap() {
+        let mut project = project_with_sliced_zoom(4.0);
+        let timeline = project.timeline.as_mut().unwrap();
+        timeline
+            .main_track_gaps
+            .before_clip
+            .insert("right".into(), 0.5);
+        let zoom = &mut timeline.zoom_segments[0];
+        zoom.end = 5.5;
+        zoom.source_slices[1].phase_start += 0.5;
+        zoom.source_slices[1].phase_end += 0.5;
+        zoom.source_slices.insert(
+            1,
+            serde_json::from_value(serde_json::json!({
+                "phaseStart": 1.0, "phaseEnd": 1.5
+            }))
+            .unwrap(),
+        );
+
+        let cursor = CursorEvents {
+            moves: vec![move_event(3100.0, 0.2, 0.3), move_event(4200.0, 0.8, 0.7)],
+            ..Default::default()
+        };
+        let size = XY::new(1000, 1000);
+        let mut reference = ZoomTransformTimeline::from_project(&project, &cursor, 9.0, size);
+        assert!(reference.phase_tracks.is_empty());
+        reference.precompute();
+
+        let timeline = project.timeline.as_mut().unwrap();
+        timeline
+            .main_track_gaps
+            .before_clip
+            .insert("right".into(), 2.0);
+        timeline.text_segments = serde_json::from_value(serde_json::json!([
+            {"start":6.25,"end":7.25,"layout":"fullscreen","content":"Hold"}
+        ]))
+        .unwrap();
+        let mut edited = ZoomTransformTimeline::from_project(&project, &cursor, 12.0, size);
+        assert_eq!(edited.phase_tracks.len(), 1);
+        edited.ensure_precomputed_until(7.5);
+        for (output, original) in [(6.1, 4.6), (6.25, 4.75), (7.0, 4.75), (7.5, 5.0)] {
+            let actual = edited.sample(output);
+            let expected = reference.sample(original);
+            assert!((actual.t - expected.t).abs() < 1e-5);
+            assert!((actual.bounds.top_left.x - expected.bounds.top_left.x).abs() < 1e-5);
+            assert!((actual.bounds.bottom_right.y - expected.bounds.bottom_right.y).abs() < 1e-5);
+        }
+    }
+
+    #[test]
+    fn an_original_hold_reuses_its_saved_phase_when_retimed() {
+        let mut project = project_with_sliced_zoom(4.0);
+        let timeline = project.timeline.as_mut().unwrap();
+        timeline.text_segments = serde_json::from_value(serde_json::json!([
+            {"start":4.25,"end":4.75,"layout":"fullscreen","content":"Hold"}
+        ]))
+        .unwrap();
+        let zoom = &mut timeline.zoom_segments[0];
+        zoom.end = 5.5;
+        zoom.source_slices[1].phase_end = 1.25;
+        zoom.source_slices[1].source_end = Some(4.25);
+        zoom.source_slices.extend(
+            serde_json::from_value::<Vec<_>>(serde_json::json!([
+                {"phaseStart":1.25,"phaseEnd":1.75,"sourceEnd":4.25,
+                 "attachment":{"kind":"clip","id":"hold","clipId":"right","sourceTime":4.25}},
+                {"phaseStart":1.75,"phaseEnd":2.5,"sourceEnd":5.0,
+                 "attachment":{"kind":"clip","id":"after","clipId":"right","sourceTime":4.25}}
+            ]))
+            .unwrap(),
+        );
+
+        let cursor = CursorEvents {
+            moves: vec![move_event(3100.0, 0.2, 0.3), move_event(4200.0, 0.8, 0.7)],
+            ..Default::default()
+        };
+        let size = XY::new(1000, 1000);
+        let mut reference = ZoomTransformTimeline::from_project(&project, &cursor, 9.0, size);
+        assert!(reference.phase_tracks.is_empty());
+        reference.precompute();
+
+        project.timeline.as_mut().unwrap().text_segments[0].end = 5.25;
+        let mut edited = ZoomTransformTimeline::from_project(&project, &cursor, 10.0, size);
+        assert_eq!(edited.phase_tracks.len(), 1);
+        edited.ensure_precomputed_until(5.5);
+        for (output, original) in [(4.25, 4.25), (4.75, 4.5), (5.25, 4.75), (5.5, 5.0)] {
+            let actual = edited.sample(output);
+            let expected = reference.sample(original);
+            assert!((actual.t - expected.t).abs() < 1e-5);
+            assert!((actual.bounds.top_left.x - expected.bounds.top_left.x).abs() < 1e-5);
+        }
+    }
+
+    #[test]
+    fn a_hold_in_a_transition_preserves_the_clock_on_both_layers() {
+        let mut project = project_with_sliced_zoom(6.0);
+        let timeline = project.timeline.as_mut().unwrap();
+        timeline.transitions = vec![ClipTransition {
+            segment_index: 1,
+            kind: ClipTransitionType::CrossFade,
+            duration: 0.5,
+        }];
+        timeline.text_segments = serde_json::from_value(serde_json::json!([
+            {"start":3.75,"end":4.25,"layout":"fullscreen","content":"Hold"}
+        ]))
+        .unwrap();
+        let map = build_time_map(Some(timeline));
+        assert_eq!(
+            map_timeline_to_recording_secs(&map, 4.0, Some(0), true),
+            3.75
+        );
+        assert_eq!(
+            map_timeline_to_recording_secs(&map, 4.0, Some(0), false),
+            6.25
+        );
+        assert_eq!(
+            map_timeline_to_recording_secs(&map, 4.375, Some(0), true),
+            3.875
+        );
+        assert_eq!(
+            map_timeline_to_recording_secs(&map, 4.375, Some(0), false),
+            6.375
+        );
     }
 
     fn project_with_crop_styles(

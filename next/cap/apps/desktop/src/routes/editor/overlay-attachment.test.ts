@@ -219,6 +219,45 @@ describe("overlay attachment", () => {
 		).toBeNull();
 	});
 
+	it("rebinds a frozen zoom slice to the retained part containing its source frame", () => {
+		const clips = sameSourceTwice();
+		const layout = overlayAttachmentLayout(clips);
+		const zoom = {
+			start: 2.75,
+			end: 4,
+			sourceSlices: [
+				{
+					phaseStart: 0,
+					phaseEnd: 0.25,
+					sourceEnd: 6.75,
+					attachment: attachOverlayToClip(
+						{ start: 2.75, end: 3 },
+						layout,
+						"a",
+						"followClipSpeed",
+					),
+				},
+			],
+		};
+		const timeline = { ...clips, zoomSegments: [zoom] };
+		editClipsWithOverlayAttachments(timeline, (replacements) => {
+			timeline.segments.splice(
+				0,
+				1,
+				{ ...clip("a"), end: 6.5 },
+				{ ...clip("a-right"), start: 6.5 },
+			);
+			replacements.set("a", ["a-right"]);
+			return true;
+		});
+		expect(zoom.sourceSlices[0]).toMatchObject({
+			phaseStart: 0,
+			phaseEnd: 0.25,
+			sourceEnd: 6.75,
+			attachment: { clipId: "a-right", sourceTime: 6.75 },
+		});
+	});
+
 	it("keeps fixed content and the missing source reference through ripple deletion", () => {
 		const clips = sameSourceTwice();
 		const layout = overlayAttachmentLayout(clips);

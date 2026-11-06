@@ -295,6 +295,10 @@ function rebindZoomSourceSlice(
 	const attachment = slice.attachment;
 	if (attachment?.kind !== "clip" || !replacements.has(attachment.clipId))
 		return [slice];
+	if (slice.sourceEnd === attachment.sourceTime) {
+		const next = resolveReplacement(attachment, after, replacements);
+		return next === attachment ? [slice] : [{ ...slice, attachment: next }];
+	}
 	const sourceEnd = originalZoomSourceEnd(slice, attachment, row.start, before);
 	if (sourceEnd === null) return [slice];
 	const sourceRate =
