@@ -6836,20 +6836,7 @@ pub fn generate_zoom_segments_for_timeline(
 
 fn attach_generated_zooms(timeline: &TimelineConfiguration, zooms: &mut [ZoomSegment]) {
     for zoom in zooms {
-        let Some(start) = timeline
-            .get_frame_mapping(zoom.start)
-            .and_then(|mapping| mapping.primary_source())
-        else {
-            continue;
-        };
-        let end_time = (zoom.end - 1e-7).max(zoom.start);
-        let Some(end) = timeline
-            .get_frame_mapping(end_time)
-            .and_then(|mapping| mapping.primary_source())
-        else {
-            continue;
-        };
-        if start.segment_index == end.segment_index
+        if let Some(start) = timeline.primary_source_for_range(zoom.start..zoom.end)
             && let Some(clip_id) = &start.segment.id
         {
             zoom.attachment = Some(OverlayAttachment::Clip {
