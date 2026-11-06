@@ -1,0 +1,10 @@
+{
+	"version": "0.2.0-alpha.85",
+	"build": "2026.85.0",
+	"pendingRejected": {
+		"inspect": 1,
+		"portableCopy": 1
+	},
+	"pendingBytesPreserved": true,
+	"noPortableCopyCreated": true
+}
