@@ -1,0 +1,302 @@
+{
+  "geometry": {
+    "exports": {
+      "reference-alpha80": {
+        "width": 640,
+        "height": 360,
+        "duration": "8.000000",
+        "nb_frames": "192"
+      },
+      "reference-alpha81": {
+        "width": 640,
+        "height": 360,
+        "duration": "8.000000",
+        "nb_frames": "192"
+      },
+      "edited-alpha81": {
+        "width": 640,
+        "height": 360,
+        "duration": "8.375000",
+        "nb_frames": "201"
+      },
+      "fixed-alpha81": {
+        "width": 640,
+        "height": 360,
+        "duration": "8.375000",
+        "nb_frames": "201"
+      }
+    },
+    "frames": [
+      {
+        "case": "unchanged-reference",
+        "referenceFrame": 108,
+        "outputFrame": 108,
+        "meanChannelDelta": 0,
+        "exactChannelShare": 1.0
+      },
+      {
+        "case": "relocated-crop",
+        "referenceFrame": 108,
+        "outputFrame": 147,
+        "meanChannelDelta": 0,
+        "exactChannelShare": 1.0
+      },
+      {
+        "case": "before-overlap",
+        "referenceFrame": 112,
+        "outputFrame": 149,
+        "meanChannelDelta": 0.001712962962962963,
+        "exactChannelShare": 0.9982942708333333
+      },
+      {
+        "case": "explicit-zoom",
+        "referenceFrame": 152,
+        "outputFrame": 152,
+        "meanChannelDelta": 0,
+        "exactChannelShare": 1.0
+      },
+      {
+        "case": "after-overlap",
+        "referenceFrame": 122,
+        "outputFrame": 154,
+        "meanChannelDelta": 0,
+        "exactChannelShare": 1.0
+      },
+      {
+        "case": "after-hold",
+        "referenceFrame": 130,
+        "outputFrame": 170,
+        "meanChannelDelta": 0,
+        "exactChannelShare": 1.0
+      }
+    ]
+  },
+  "defaultMotionBlur": {
+    "exports": {
+      "reference-alpha80": {
+        "width": 640,
+        "height": 360,
+        "duration": "8.000000",
+        "nb_frames": "192"
+      },
+      "reference-alpha81": {
+        "width": 640,
+        "height": 360,
+        "duration": "8.000000",
+        "nb_frames": "192"
+      },
+      "edited-alpha81": {
+        "width": 640,
+        "height": 360,
+        "duration": "8.375000",
+        "nb_frames": "201"
+      },
+      "fixed-alpha81": {
+        "width": 640,
+        "height": 360,
+        "duration": "8.375000",
+        "nb_frames": "201"
+      }
+    },
+    "frames": [
+      {
+        "case": "unchanged-reference",
+        "referenceFrame": 108,
+        "outputFrame": 108,
+        "meanChannelDelta": 0,
+        "exactChannelShare": 1.0
+      },
+      {
+        "case": "relocated-crop",
+        "referenceFrame": 108,
+        "outputFrame": 147,
+        "meanChannelDelta": 12.762162905092593,
+        "exactChannelShare": 0.4759201388888889
+      },
+      {
+        "case": "before-overlap",
+        "referenceFrame": 112,
+        "outputFrame": 149,
+        "meanChannelDelta": 5.877377025462963,
+        "exactChannelShare": 0.7166232638888889
+      },
+      {
+        "case": "explicit-zoom",
+        "referenceFrame": 152,
+        "outputFrame": 152,
+        "meanChannelDelta": 0,
+        "exactChannelShare": 1.0
+      },
+      {
+        "case": "after-overlap",
+        "referenceFrame": 122,
+        "outputFrame": 154,
+        "meanChannelDelta": 0,
+        "exactChannelShare": 1.0
+      },
+      {
+        "case": "after-hold",
+        "referenceFrame": 130,
+        "outputFrame": 170,
+        "meanChannelDelta": 0,
+        "exactChannelShare": 1.0
+      }
+    ]
+  },
+  "exportPreview": [
+    {
+      "case": "gap",
+      "frame": 120,
+      "meanChannelDelta": 0.6666666666666666,
+      "estimated_size_mb": 0.6479072653064577,
+      "actual_width": 640,
+      "actual_height": 360,
+      "frame_render_time_ms": 93.300917,
+      "total_frames": 201
+    },
+    {
+      "case": "crop",
+      "frame": 147,
+      "meanChannelDelta": 1.8234722222222222,
+      "estimated_size_mb": 0.6479072653064577,
+      "actual_width": 640,
+      "actual_height": 360,
+      "frame_render_time_ms": 87.96875,
+      "total_frames": 201
+    },
+    {
+      "case": "override",
+      "frame": 152,
+      "meanChannelDelta": 1.2268315972222221,
+      "estimated_size_mb": 0.6479072653064577,
+      "actual_width": 640,
+      "actual_height": 360,
+      "frame_render_time_ms": 109.76029199999999,
+      "total_frames": 201
+    },
+    {
+      "case": "resume",
+      "frame": 154,
+      "meanChannelDelta": 1.7353052662037036,
+      "estimated_size_mb": 0.6479072653064577,
+      "actual_width": 640,
+      "actual_height": 360,
+      "frame_render_time_ms": 86.55529200000001,
+      "total_frames": 201
+    },
+    {
+      "case": "title-hold",
+      "frame": 162,
+      "meanChannelDelta": 0.7060706018518519,
+      "estimated_size_mb": 0.6479072653064577,
+      "actual_width": 640,
+      "actual_height": 360,
+      "frame_render_time_ms": 127.88454099999998,
+      "total_frames": 201
+    },
+    {
+      "case": "after-hold",
+      "frame": 170,
+      "meanChannelDelta": 1.724486400462963,
+      "estimated_size_mb": 0.6479072653064577,
+      "actual_width": 640,
+      "actual_height": 360,
+      "frame_render_time_ms": 99.850292,
+      "total_frames": 201
+    }
+  ],
+  "editorPreview": [
+    {
+      "case": "gap",
+      "requestedTime": 5.0,
+      "displayedTime": 4.983333333333333,
+      "attempts": [
+        [
+          1037.0,
+          4.983333333333333
+        ]
+      ],
+      "captureScope": "one verified owned editor window",
+      "image": "window-preview-gap.png"
+    },
+    {
+      "case": "relocated",
+      "requestedTime": 6.125,
+      "displayedTime": 6.116666666666666,
+      "attempts": [
+        [
+          1241.1875,
+          6.116666666666666
+        ]
+      ],
+      "captureScope": "one verified owned editor window",
+      "image": "window-preview-relocated.png"
+    },
+    {
+      "case": "override",
+      "requestedTime": 6.333,
+      "displayedTime": 6.316666666666666,
+      "attempts": [
+        [
+          1278.9395,
+          6.316666666666666
+        ]
+      ],
+      "captureScope": "one verified owned editor window",
+      "image": "window-preview-override.png"
+    },
+    {
+      "case": "resume",
+      "requestedTime": 6.417,
+      "displayedTime": 6.4,
+      "attempts": [
+        [
+          1294.1855,
+          6.4
+        ]
+      ],
+      "captureScope": "one verified owned editor window",
+      "image": "window-preview-resume.png"
+    },
+    {
+      "case": "title-hold",
+      "requestedTime": 6.75,
+      "displayedTime": 6.733333333333333,
+      "attempts": [
+        [
+          1354.625,
+          6.733333333333333
+        ]
+      ],
+      "captureScope": "one verified owned editor window",
+      "image": "window-preview-title-hold.png"
+    },
+    {
+      "case": "after-hold",
+      "requestedTime": 7.083,
+      "displayedTime": 7.066666666666666,
+      "attempts": [
+        [
+          1415.0645,
+          7.066666666666666
+        ]
+      ],
+      "captureScope": "one verified owned editor window",
+      "image": "window-preview-after-hold.png"
+    }
+  ],
+  "installedExport": {
+    "frameCount": 201,
+    "identicalDecodedFrames": 201
+  },
+  "reopen": {
+    "phaseAndLayoutMatch": true,
+    "uniqueOwnedEditor": true,
+    "version": "0.2.0-alpha.81"
+  },
+  "source": {
+    "commit": "011d88637ceff7cc4e2c14ab49e50c188780dfb8",
+    "version": "0.2.0-alpha.81",
+    "build": "2026.81.0"
+  }
+}
