@@ -18,7 +18,12 @@ export type SegmentMenuTarget = {
 	type: Exclude<TimelineTrackType, "clip">;
 	index: number;
 	cancelGesture?: () => void;
-	projectedZoom?: { start: number | null; label: string };
+	projectedZoom?: {
+		start: number | null;
+		label: string;
+		canSplitAt?: (time: number) => boolean;
+		splitAt?: (time: number) => void;
+	};
 };
 
 type ShowSegmentMenu = (

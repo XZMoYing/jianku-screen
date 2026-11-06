@@ -615,6 +615,7 @@ struct StepTargets {
 #[derive(Clone, Copy)]
 struct PhaseSpan {
     segment_index: usize,
+    slice_index: usize,
     start: f64,
     end: f64,
     original_start: f64,
@@ -660,8 +661,11 @@ pub struct ZoomTrackProjection {
 #[serde(rename_all = "camelCase")]
 pub struct ZoomTrackSpan {
     pub segment_index: u32,
+    pub slice_index: u32,
     pub start: f64,
     pub end: f64,
+    pub phase_start: f64,
+    pub phase_end: f64,
 }
 
 struct ProjectedPhases {
@@ -739,7 +743,7 @@ fn project_zoom_phases(
     let mut previous_end = 0.0;
     let mut changed = false;
     let mut has_missing_source = false;
-    for slice in &segment.source_slices {
+    for (slice_index, slice) in segment.source_slices.iter().enumerate() {
         let phase_duration = slice.phase_end - slice.phase_start;
         if !phase_duration.is_finite()
             || phase_duration <= 0.0
@@ -799,6 +803,7 @@ fn project_zoom_phases(
                 if original_rate == 0.0 && (*source_time - frozen_source).abs() <= 1e-6 {
                     Some(PhaseSpan {
                         segment_index,
+                        slice_index,
                         start: current.timeline_start,
                         end: current.timeline_end,
                         original_start,
@@ -817,6 +822,7 @@ fn project_zoom_phases(
                 {
                     Some(PhaseSpan {
                         segment_index,
+                        slice_index,
                         start: current.timeline_start,
                         end: current.timeline_end,
                         original_start: original_start
@@ -833,6 +839,7 @@ fn project_zoom_phases(
                 let retained_end = source_end.min(clip.end).min(current_source_end);
                 (retained_start < retained_end).then(|| PhaseSpan {
                     segment_index,
+                    slice_index,
                     start: current.timeline_start
                         + (retained_start - current.recording_start) / current.timescale,
                     end: current.timeline_start
@@ -922,8 +929,11 @@ pub fn zoom_track_projection(timeline: &TimelineConfiguration) -> Vec<ZoomTrackP
                 .into_iter()
                 .map(|span| ZoomTrackSpan {
                     segment_index: span.segment_index as u32,
+                    slice_index: span.slice_index as u32,
                     start: span.start,
                     end: span.end,
+                    phase_start: span.original_start - group.phase_origin,
+                    phase_end: span.original_time(span.end) - group.phase_origin,
                 })
                 .collect(),
             has_conflict: group.has_conflict,
@@ -1348,7 +1358,17 @@ impl ZoomTransformTimeline {
                 let phase = span.original_time(time);
                 let mut sample = track.original.sample_state(phase)?;
                 let previous = track.original.sample_state(phase - step * span.rate)?;
-                sample.snapped |= time - step < span.start;
+                let previous_output = time - step;
+                if previous_output < span.start {
+                    let expected_phase = phase - step * span.rate;
+                    sample.snapped |= !track.spans.iter().any(|earlier| {
+                        earlier.segment_index == span.segment_index
+                            && previous_output >= earlier.start
+                            && previous_output < earlier.end
+                            && (earlier.original_time(previous_output) - expected_phase).abs()
+                                <= 1e-7
+                    });
+                }
                 return Some((sample, previous));
             }
         }
@@ -2029,6 +2049,7 @@ mod tests {
     fn overlapping_projected_groups_keep_the_first_claim_only_for_the_same_clip_instance() {
         let first = PhaseSpan {
             segment_index: 0,
+            slice_index: 0,
             start: 4.0,
             end: 5.0,
             original_start: 0.0,
@@ -2055,6 +2076,62 @@ mod tests {
             (other.start, other.end, other.original_start),
             (4.5, 6.0, 1.0)
         );
+    }
+
+    #[test]
+    fn splitting_a_visible_zoom_slice_keeps_the_original_trajectory_and_blur_window() {
+        let mut project = project_with_sliced_zoom(4.0);
+        let timeline = project.timeline.as_mut().unwrap();
+        timeline.segments[1].timescale = 2.0;
+        timeline
+            .main_track_gaps
+            .before_clip
+            .insert("right".into(), 2.0);
+        let cursor = CursorEvents {
+            moves: vec![move_event(3100.0, 0.2, 0.3), move_event(4200.0, 0.8, 0.7)],
+            ..Default::default()
+        };
+        let size = XY::new(1000, 1000);
+        let mut before = ZoomTransformTimeline::from_project(&project, &cursor, 8.0, size);
+        before.precompute();
+        let timeline = project.timeline.as_mut().unwrap();
+        let slices = &mut timeline.zoom_segments[0].source_slices;
+        let mut right = slices[1].clone();
+        slices[1].phase_end = 1.5;
+        slices[1].source_end = Some(4.5);
+        right.phase_start = 1.5;
+        let Some(OverlayAttachment::Clip {
+            id, source_time, ..
+        }) = &mut right.attachment
+        else {
+            panic!("expected a source anchor")
+        };
+        *id = "right-half".into();
+        *source_time = 4.5;
+        slices.push(right);
+        let projected = zoom_track_projection(timeline);
+        let spans = &projected[0].spans;
+        assert_eq!(
+            (spans[1].slice_index, spans[1].start, spans[1].end),
+            (1, 6.0, 6.25)
+        );
+        assert_eq!(
+            (spans[2].slice_index, spans[2].start, spans[2].end),
+            (2, 6.25, 6.5)
+        );
+        let mut after = ZoomTransformTimeline::from_project(&project, &cursor, 8.0, size);
+        after.precompute();
+        for time in [6.125, 6.24, 6.25, 6.26, 6.375] {
+            let a = before.sample(time);
+            let b = after.sample(time);
+            assert!((a.t - b.t).abs() < 1e-6);
+            assert!((a.bounds.top_left.x - b.bounds.top_left.x).abs() < 1e-6);
+        }
+        assert_eq!(
+            before.snapped_within(6.23, 6.27),
+            after.snapped_within(6.23, 6.27)
+        );
+        assert!(!after.snapped_within(6.23, 6.27));
     }
 
     #[test]

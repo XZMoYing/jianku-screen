@@ -47,6 +47,7 @@ export function createTimelineSegmentMenu(moveTo: (time: number) => void) {
 		const clip = association
 			? timelineCommands.overlayAssociationTarget()
 			: null;
+		const playhead = editorState.playbackTime;
 		menu.show(event, name, [
 			{
 				label: projectedZoom
@@ -74,7 +75,18 @@ export function createTimelineSegmentMenu(moveTo: (time: number) => void) {
 				run: () => timelineCommands.selectTrack(type, lane),
 			},
 			...(projectedZoom
-				? [{ label: projectedZoom.label, disabled: true, run: () => {} }]
+				? [
+						{ label: projectedZoom.label, disabled: true, run: () => {} },
+						...(projectedZoom.splitAt
+							? [
+									{
+										label: localize("Split zoom slice at playhead"),
+										disabled: !projectedZoom.canSplitAt?.(playhead),
+										run: () => projectedZoom.splitAt?.(playhead),
+									},
+								]
+							: []),
+					]
 				: []),
 			...(association
 				? [

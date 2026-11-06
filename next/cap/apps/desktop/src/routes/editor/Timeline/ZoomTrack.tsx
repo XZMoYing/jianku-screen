@@ -18,11 +18,13 @@ import {
 	commands,
 	type ZoomSegment,
 	type ZoomTrackProjection,
+	type ZoomTrackSpan,
 } from "~/utils/tauri";
 import IconLucideLink2 from "~icons/lucide/link-2";
 import IconLucideTriangleAlert from "~icons/lucide/triangle-alert";
 import { createAutoZoomGeneration } from "../auto-zoom-generation";
 import { serializeProjectConfiguration, useEditorContext } from "../context";
+import { splitZoomSourceSlice, zoomSliceCut } from "../zoom-slice-edit";
 import { useTimelineContext, useTrackContext } from "./context";
 import {
 	createTimelineMouseDrag,
@@ -216,6 +218,24 @@ export function ZoomTrack(props: {
 	const projectedSpans = createMemo(() =>
 		zoomSegments().flatMap((row) => projectedZoom(row)?.spans ?? []),
 	);
+	const cutAt = (row: ZoomSegment, span: ZoomTrackSpan, time: number) =>
+		projection()?.input === projectionInput() &&
+		projectedZoom(row)?.spans.includes(span) &&
+		row.sourceSlices
+			? zoomSliceCut(row.sourceSlices, span, time)
+			: null;
+	const splitAt = (row: ZoomSegment, span: ZoomTrackSpan, time: number) => {
+		const cut = cutAt(row, span, time);
+		const index = zoomSegments().indexOf(row);
+		if (!cut || index < 0 || !row.sourceSlices) return;
+		setProject(
+			"timeline",
+			"zoomSegments",
+			index,
+			"sourceSlices",
+			splitZoomSourceSlice(row.sourceSlices, cut),
+		);
+	};
 	const startGesture = createTimelineMouseDrag();
 	const clearGeneratedSources = (item: ZoomSegment) => {
 		const index = zoomSegments().indexOf(item);
@@ -784,6 +804,9 @@ export function ZoomTrack(props: {
 														),
 														end,
 														segmentIndex: -1,
+														sliceIndex: -1,
+														phaseStart: 0,
+														phaseEnd: 0,
 													},
 												]
 											: [];
@@ -834,18 +857,32 @@ export function ZoomTrack(props: {
 													) : (
 														<IconLucideLink2 class="size-3.5 shrink-0 cap-seg-label" />
 													);
+												const sliceActions = () => {
+													const visible = span();
+													return {
+														start:
+															visible.segmentIndex >= 0 ? visible.start : null,
+														label: status(),
+														...(cutAt(
+															item,
+															visible,
+															(visible.start + visible.end) / 2,
+														)
+															? {
+																	canSplitAt: (time: number) =>
+																		cutAt(item, visible, time) !== null,
+																	splitAt: (time: number) =>
+																		splitAt(item, visible, time),
+																}
+															: {}),
+													};
+												};
 												return (
 													<SegmentRoot
 														menuTarget={{
 															type: "zoom",
 															index: index(),
-															projectedZoom: {
-																start:
-																	span().segmentIndex >= 0
-																		? span().start
-																		: null,
-																label: status(),
-															},
+															projectedZoom: sliceActions(),
 														}}
 														segColor="var(--track-zoom)"
 														class="cursor-pointer"
@@ -878,6 +915,21 @@ export function ZoomTrack(props: {
 															if (event.button !== 0) return;
 															startGesture(() => null);
 															selectGroup();
+															if (
+																editorState.timeline.interactMode === "split"
+															) {
+																const rect =
+																	event.currentTarget.getBoundingClientRect();
+																if (rect.width > 0) {
+																	const visible = span();
+																	const time =
+																		visible.start +
+																		((event.clientX - rect.left) / rect.width) *
+																			(visible.end - visible.start);
+																	splitAt(item, visible, time);
+																}
+																return;
+															}
 															if (span().segmentIndex >= 0)
 																props.handleUpdatePlayhead(event);
 														}}

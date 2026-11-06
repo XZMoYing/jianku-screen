@@ -265,73 +265,129 @@ it("exposes linking, unlinking and the source state on the timeline segment", ()
 	}
 });
 
-it("draws effective slices and targets their actual time without editing the source group", async () => {
-	const sourceSlices: ZoomSegment["sourceSlices"] = [
-		{
-			phaseStart: 0,
-			phaseEnd: 1,
-			sourceEnd: 4,
-			attachment: { kind: "clip", id: "left", clipId: "a", sourceTime: 3 },
-		},
-		{
-			phaseStart: 1,
-			phaseEnd: 2,
-			sourceEnd: 5,
-			attachment: { kind: "clip", id: "right", clipId: "b", sourceTime: 4 },
-		},
-	];
-	vi.mocked(commands.projectZoomTrack).mockResolvedValueOnce([
-		{
-			groupIndex: 1,
-			hasConflict: true,
-			hasMissingSource: false,
-			spans: [
-				{ start: 6, end: 6.25, segmentIndex: 1 },
-				{ start: 6.5, end: 6.75, segmentIndex: 1 },
+it.each(["menu", "blade"] as const)(
+	"draws effective slices and splits at their actual time with the %s",
+	async (action) => {
+		const sourceSlices: ZoomSegment["sourceSlices"] = [
+			{
+				phaseStart: 0,
+				phaseEnd: 1,
+				sourceEnd: 4,
+				attachment: { kind: "clip", id: "left", clipId: "a", sourceTime: 3 },
+			},
+			{
+				phaseStart: 1,
+				phaseEnd: 2,
+				sourceEnd: 5,
+				attachment: { kind: "clip", id: "right", clipId: "b", sourceTime: 4 },
+			},
+		];
+		vi.mocked(commands.projectZoomTrack).mockResolvedValueOnce([
+			{
+				groupIndex: 1,
+				hasConflict: true,
+				hasMissingSource: false,
+				spans: [
+					{
+						start: 6,
+						end: 6.25,
+						segmentIndex: 1,
+						sliceIndex: 1,
+						phaseStart: 1,
+						phaseEnd: 1.25,
+					},
+					{
+						start: 6.5,
+						end: 6.75,
+						segmentIndex: 1,
+						sliceIndex: 1,
+						phaseStart: 1.5,
+						phaseEnd: 1.75,
+					},
+				],
+			},
+			{ groupIndex: 2, hasConflict: false, hasMissingSource: true, spans: [] },
+		]);
+		const mounted = mount(
+			[
+				segment(10),
+				{ ...segment(3, 5), sourceSlices },
+				{ ...segment(7, 9), sourceSlices },
 			],
-		},
-		{ groupIndex: 2, hasConflict: false, hasMissingSource: true, spans: [] },
-	]);
-	const mounted = mount(
-		[
-			segment(10),
-			{ ...segment(3, 5), sourceSlices },
-			{ ...segment(7, 9), sourceSlices },
-		],
-		true,
-	);
-	const slices = () => [
-		...document.querySelectorAll<HTMLElement>('[data-zoom-projection="slice"]'),
-	];
-	await vi.waitFor(() => expect(slices()).toHaveLength(2));
-	expect(roots()).toHaveLength(1);
-	const position = (node: HTMLElement) =>
-		Number.parseFloat(node.style.getPropertyValue("--segment-x"));
-	expect(position(slices()[0])).toBeCloseTo(position(roots()[0]) * 0.6);
-	expect(position(slices()[1])).toBeCloseTo(position(roots()[0]) * 0.65);
-	expect(slices()[1].title).toContain("Some zoom slices are covered");
-	expect(
-		document
-			.querySelector('[data-zoom-projection="inactive"]')
-			?.getAttribute("title"),
-	).toContain("Some zoom sources are missing");
+			true,
+		);
+		const slices = () => [
+			...document.querySelectorAll<HTMLElement>(
+				'[data-zoom-projection="slice"]',
+			),
+		];
+		await vi.waitFor(() => expect(slices()).toHaveLength(2));
+		expect(roots()).toHaveLength(1);
+		const position = (node: HTMLElement) =>
+			Number.parseFloat(node.style.getPropertyValue("--segment-x"));
+		expect(position(slices()[0])).toBeCloseTo(position(roots()[0]) * 0.6);
+		expect(position(slices()[1])).toBeCloseTo(position(roots()[0]) * 0.65);
+		expect(slices()[1].title).toContain("Some zoom slices are covered");
+		expect(
+			document
+				.querySelector('[data-zoom-projection="inactive"]')
+				?.getAttribute("title"),
+		).toContain("Some zoom sources are missing");
 
-	mouse(slices()[1], "mousedown", 660);
-	expect(context.editorState.timeline.selection).toEqual({
-		type: "zoom",
-		indices: [1],
-	});
-	mouse(slices()[1], "contextmenu", 660, 0, 2);
-	const menu = showMenu.mock.lastCall?.[2];
-	menu?.find((entry) => entry.label === "Go to zoom slice start")?.run();
-	expect(mounted.moveTo).toHaveBeenCalledWith(6.5);
-	expect(context.project.timeline.zoomSegments[1]).toMatchObject({
-		start: 3,
-		end: 5,
-		sourceSlices,
-	});
-	expect(context.projectHistory.canUndo()).toBe(false);
-});
+		mouse(slices()[1], "mousedown", 660);
+		expect(context.editorState.timeline.selection).toEqual({
+			type: "zoom",
+			indices: [1],
+		});
+		mouse(slices()[1], "contextmenu", 660, 0, 2);
+		const menu = showMenu.mock.lastCall?.[2];
+		menu?.find((entry) => entry.label === "Go to zoom slice start")?.run();
+		expect(mounted.moveTo).toHaveBeenCalledWith(6.5);
+		expect(context.project.timeline.zoomSegments[1]).toMatchObject({
+			start: 3,
+			end: 5,
+			sourceSlices,
+		});
+		expect(context.projectHistory.canUndo()).toBe(false);
+		if (action === "menu") {
+			context.setEditorState("playbackTime", 6.625);
+			mouse(slices()[1], "contextmenu", 660, 0, 2);
+			showMenu.mock.lastCall?.[2]
+				.find((entry) => entry.label === "Split zoom slice at playhead")
+				?.run();
+		} else {
+			context.setEditorState("timeline", "interactMode", "split");
+			vi.spyOn(slices()[1], "getBoundingClientRect").mockReturnValue(
+				new DOMRect(650, 0, 50, 32),
+			);
+			mouse(slices()[1], "mousedown", 675);
+		}
+		expect(context.project.timeline.zoomSegments[1].sourceSlices).toMatchObject(
+			[
+				sourceSlices[0],
+				{
+					phaseStart: 1,
+					phaseEnd: 1.625,
+					sourceEnd: 4.625,
+					attachment: { sourceTime: 4 },
+				},
+				{
+					phaseStart: 1.625,
+					phaseEnd: 2,
+					sourceEnd: 5,
+					attachment: { sourceTime: 4.625 },
+				},
+			],
+		);
+		context.projectHistory.undo();
+		expect(context.project.timeline.zoomSegments[1]).toMatchObject({
+			start: 3,
+			end: 5,
+			sourceSlices,
+		});
+		expect(context.projectHistory.canUndo()).toBe(false);
+	},
+);
 
 it.each([
 	"blur",

@@ -159,7 +159,8 @@ export function SegmentRoot(
 					class={cx(
 						"absolute overflow-visible inset-y-0",
 						editorState.timeline.interactMode === "split" &&
-							!local.menuTarget?.projectedZoom &&
+							(!local.menuTarget?.projectedZoom ||
+								!!local.menuTarget.projectedZoom.splitAt) &&
 							"timeline-scissors-cursor",
 						local.class,
 					)}
