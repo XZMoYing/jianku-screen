@@ -18,6 +18,7 @@ import {
 	commands,
 	type ZoomSegment,
 	type ZoomSliceTrim,
+	type ZoomSourceSlice,
 	type ZoomTrackProjection,
 	type ZoomTrackSpan,
 } from "~/utils/tauri";
@@ -26,6 +27,7 @@ import IconLucideTriangleAlert from "~icons/lucide/triangle-alert";
 import { createAutoZoomGeneration } from "../auto-zoom-generation";
 import { serializeProjectConfiguration, useEditorContext } from "../context";
 import {
+	prepareZoomSliceMove,
 	splitZoomSourceSlice,
 	trimZoomSourceSlice,
 	zoomSliceCut,
@@ -175,7 +177,7 @@ export function ZoomTrack(props: {
 		byIndex: Map<number, ZoomTrackProjection>;
 		byRow: Map<ZoomSegment, ZoomTrackProjection>;
 	}>();
-	const [trimPreview, setTrimPreview] = createSignal<{
+	const [slicePreview, setSlicePreview] = createSignal<{
 		row: ZoomSegment;
 		span: ZoomTrackSpan;
 		range: { start: number; end: number };
@@ -184,7 +186,7 @@ export function ZoomTrack(props: {
 		const input = projectionInput();
 		if (!input) {
 			setProjection(undefined);
-			setTrimPreview(undefined);
+			setSlicePreview(undefined);
 			return;
 		}
 		const rows = untrack(() => [...zoomSegments()]);
@@ -208,13 +210,13 @@ export function ZoomTrack(props: {
 								}),
 							),
 						});
-						setTrimPreview(undefined);
+						setSlicePreview(undefined);
 					});
 			},
 			(error) => {
 				if (current) {
 					setProjection(undefined);
-					setTrimPreview(undefined);
+					setSlicePreview(undefined);
 					console.error("Failed to project zoom track:", error);
 				}
 			},
@@ -255,6 +257,119 @@ export function ZoomTrack(props: {
 		);
 	};
 	const startGesture = createTimelineMouseDrag();
+	const beginProjectedMove = (
+		row: ZoomSegment,
+		span: ZoomTrackSpan,
+		downEvent: MouseEvent,
+		setDragging: (dragging: boolean) => void,
+	) => {
+		if (!cutAt(row, span, (span.start + span.end) / 2) || !row.sourceSlices)
+			return false;
+		const original = structuredClone(unwrap(row.sourceSlices));
+		const prepared = prepareZoomSliceMove(original, span);
+		if (!prepared) return false;
+		let prevEnd = span.moveStart;
+		let nextStart = Math.min(span.moveEnd, totalDuration());
+		for (const item of zoomSegments()) {
+			const projected = projectedZoom(item);
+			const occupied = projected
+				? projected.spans.filter(
+						(other) => other.segmentIndex === span.segmentIndex,
+					)
+				: [item];
+			for (const other of occupied) {
+				if (other === span) continue;
+				if (other.end <= span.start) prevEnd = Math.max(prevEnd, other.end);
+				if (other.start >= span.end)
+					nextStart = Math.min(nextStart, other.start);
+			}
+		}
+		startGesture(() => {
+			const scale = secsPerPixel();
+			const drag = createTimelineRangeDrag(
+				snapping,
+				span,
+				"move",
+				{ prevEnd, nextStart },
+				0,
+				editorState.playbackTime,
+			);
+			let resumeHistory: (() => void) | undefined;
+			let expectedInput = projectionInput();
+			const originalData = JSON.stringify(original);
+			let expectedData = originalData;
+			const ownsMove = () =>
+				zoomSegments().includes(row) &&
+				JSON.stringify(row.sourceSlices) === expectedData;
+			const writeSlices = (slices: ZoomSourceSlice[]) => {
+				const index = zoomSegments().indexOf(row);
+				if (index < 0) return;
+				setProject("timeline", "zoomSegments", index, "sourceSlices", slices);
+				expectedInput = projectionInput();
+				expectedData = JSON.stringify(row.sourceSlices);
+			};
+			setDragging(true);
+			props.onDragStateChanged({ type: "movePending" });
+			return {
+				isValid: () =>
+					editorState.timeline.interactMode === "seek" &&
+					ownsMove() &&
+					expectedInput === projectionInput() &&
+					secsPerPixel() === scale,
+				update: (event) => {
+					const dx = event.clientX - downEvent.clientX;
+					if (!resumeHistory && Math.abs(dx) <= 2) return;
+					const range = drag.edit(dx * scale, scale, event.altKey);
+					const delta = range.start - drag.original.start;
+					if (Math.abs(delta) <= 1e-7 && !resumeHistory) return;
+					const offset = prepared.offset + delta * span.sourceRate;
+					const slices =
+						Math.abs(delta) <= 1e-7
+							? original
+							: prepared.slices.map((slice, index) =>
+									index === prepared.index
+										? {
+												...slice,
+												sourceOffset:
+													Math.abs(offset) <= 1e-7 ? undefined : offset,
+											}
+										: slice,
+								);
+					if (JSON.stringify(slices) === expectedData) return;
+					if (!resumeHistory) {
+						resumeHistory = projectHistory.pause();
+						props.onDragStateChanged({ type: "moving" });
+					}
+					batch(() => {
+						setSlicePreview({ row, span, range });
+						writeSlices(slices);
+					});
+				},
+				finish: (event, reason, cause) => {
+					drag.clear();
+					batch(() => {
+						if (
+							reason === "cancel" &&
+							cause !== "superseded" &&
+							ownsMove() &&
+							expectedData !== originalData
+						) {
+							setSlicePreview({ row, span, range: drag.original });
+							writeSlices(original);
+						}
+						if (!ownsMove() || projection()?.input === projectionInput())
+							setSlicePreview(undefined);
+						setDragging(false);
+						props.onDragStateChanged({ type: "idle" });
+					});
+					resumeHistory?.();
+					if (!resumeHistory && event && reason === "release")
+						props.handleUpdatePlayhead(event);
+				},
+			};
+		});
+		return true;
+	};
 	const beginProjectedTrim = (
 		row: ZoomSegment,
 		span: ZoomTrackSpan,
@@ -326,7 +441,7 @@ export function ZoomTrack(props: {
 							props.onDragStateChanged({ type: "moving" });
 						}
 						batch(() => {
-							setTrimPreview({ row, span, range });
+							setSlicePreview({ row, span, range });
 							writeTrim(trim);
 						});
 					}
@@ -338,7 +453,7 @@ export function ZoomTrack(props: {
 					batch(() => {
 						if (reason === "cancel" && cause !== "superseded" && ownsTrim()) {
 							if (!sameTrim(expectedTrim, initial.trim)) {
-								setTrimPreview({ row, span, range: drag.original });
+								setSlicePreview({ row, span, range: drag.original });
 								writeTrim(initial.trim);
 							}
 							if (
@@ -348,7 +463,7 @@ export function ZoomTrack(props: {
 								setEditorState("previewTime", beforePreview);
 						}
 						if (!ownsTrim() || projection()?.input === projectionInput())
-							setTrimPreview(undefined);
+							setSlicePreview(undefined);
 						setDragging(false);
 						props.onDragStateChanged({ type: "idle" });
 					});
@@ -929,6 +1044,9 @@ export function ZoomTrack(props: {
 														phaseEnd: 0,
 														availableStart: 0,
 														availableEnd: 0,
+														moveStart: 0,
+														moveEnd: 0,
+														sourceRate: 0,
 													},
 												]
 											: [];
@@ -945,6 +1063,9 @@ export function ZoomTrack(props: {
 											{(span) => {
 												const clipName = () =>
 													project.timeline?.segments[span().segmentIndex]?.name;
+												const hasOffset = () =>
+													!!item.sourceSlices?.[span().sliceIndex]
+														?.sourceOffset;
 												const sharesTransition = () =>
 													span().segmentIndex >= 0 &&
 													projectedSpans().some(
@@ -968,12 +1089,16 @@ export function ZoomTrack(props: {
 														group().hasConflict
 															? localize("Some zoom slices are covered")
 															: "",
+														hasOffset()
+															? localize("Zoom slice has a timing offset")
+															: "",
 													]
 														.filter(Boolean)
 														.join(" · ");
 												const marker = () =>
 													group().hasMissingSource ||
 													group().hasConflict ||
+													hasOffset() ||
 													span().segmentIndex < 0 ? (
 														<IconLucideTriangleAlert class="size-3.5 shrink-0 text-amber-10" />
 													) : (
@@ -981,15 +1106,34 @@ export function ZoomTrack(props: {
 													);
 												const sliceActions = () => {
 													const visible = span();
+													const midpoint = (visible.start + visible.end) / 2;
+													const editable =
+														cutAt(item, visible, midpoint) !== null;
 													return {
 														start:
 															visible.segmentIndex >= 0 ? visible.start : null,
 														label: status(),
-														...(cutAt(
-															item,
-															visible,
-															(visible.start + visible.end) / 2,
-														)
+														...(hasOffset() && editable
+															? {
+																	resetOffset: () => {
+																		const index = zoomSegments().indexOf(item);
+																		if (
+																			index >= 0 &&
+																			cutAt(item, visible, midpoint)
+																		)
+																			setProject(
+																				"timeline",
+																				"zoomSegments",
+																				index,
+																				"sourceSlices",
+																				visible.sliceIndex,
+																				"sourceOffset",
+																				undefined,
+																			);
+																	},
+																}
+															: {}),
+														...(editable
 															? {
 																	canSplitAt: (time: number) =>
 																		cutAt(item, visible, time) !== null,
@@ -999,8 +1143,8 @@ export function ZoomTrack(props: {
 															: {}),
 													};
 												};
-												const activeTrim = () => {
-													const preview = trimPreview();
+												const activeSliceEdit = () => {
+													const preview = slicePreview();
 													const visible = span();
 													return preview?.row === item &&
 														preview.span.sliceIndex === visible.sliceIndex &&
@@ -1014,7 +1158,7 @@ export function ZoomTrack(props: {
 													const visible = span();
 													return (
 														editorState.timeline.interactMode === "seek" &&
-														(activeTrim() ||
+														(activeSliceEdit() ||
 															cutAt(
 																item,
 																visible,
@@ -1035,9 +1179,14 @@ export function ZoomTrack(props: {
 															type: "zoom",
 															index: index(),
 															projectedZoom: sliceActions(),
+															cancelGesture: () => startGesture(() => null),
 														}}
 														segColor="var(--track-zoom)"
-														class="group cursor-pointer"
+														class={
+															span().sourceRate > 0
+																? "group cursor-grab"
+																: "group cursor-pointer"
+														}
 														style={
 															sharesTransition()
 																? {
@@ -1061,7 +1210,7 @@ export function ZoomTrack(props: {
 															span().segmentIndex >= 0 ? "slice" : "inactive"
 														}
 														data-zoom-group-index={index()}
-														segment={activeTrim() ?? span()}
+														segment={activeSliceEdit() ?? span()}
 														onMouseDown={(event) => {
 															event.stopPropagation();
 															if (event.button !== 0) return;
@@ -1082,7 +1231,16 @@ export function ZoomTrack(props: {
 																}
 																return;
 															}
-															if (span().segmentIndex >= 0)
+															if (
+																span().segmentIndex >= 0 &&
+																!beginProjectedMove(
+																	item,
+																	span(),
+																	event,
+																	(dragging) =>
+																		setTrackState("draggingSegment", dragging),
+																)
+															)
 																props.handleUpdatePlayhead(event);
 														}}
 														onKeyDown={(event) => {

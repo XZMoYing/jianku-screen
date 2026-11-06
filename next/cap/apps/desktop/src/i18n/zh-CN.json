@@ -1651,6 +1651,8 @@
 	"Delete zoom group": "删除缩放组",
 	"Go to zoom slice start": "定位到缩放切片开头",
 	"Split zoom slice at playhead": "在播放头处分割缩放切片",
+	"Zoom slice has a timing offset": "缩放切片已手动偏移",
+	"Reset zoom slice alignment": "恢复缩放切片与素材对齐",
 	"Fixed timeline position": "位置固定在时间线上",
 	"Follows {name}": "跟随 {name}",
 	"Associated clip is missing": "关联的视频片段已移除",

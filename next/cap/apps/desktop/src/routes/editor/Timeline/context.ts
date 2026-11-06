@@ -23,6 +23,7 @@ export type SegmentMenuTarget = {
 		label: string;
 		canSplitAt?: (time: number) => boolean;
 		splitAt?: (time: number) => void;
+		resetOffset?: () => void;
 	};
 };
 

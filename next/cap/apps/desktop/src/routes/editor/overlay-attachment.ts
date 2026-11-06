@@ -316,14 +316,17 @@ function rebindZoomSourceSlice(
 	const attachment = slice.attachment;
 	if (attachment?.kind !== "clip" || !replacements.has(attachment.clipId))
 		return [slice];
+	const offset = slice.sourceOffset ?? 0;
 	if (slice.sourceEnd === attachment.sourceTime) {
 		const next = resolveReplacement(
-			attachment,
+			{ ...attachment, sourceTime: attachment.sourceTime + offset },
 			after,
 			replacements,
 			slice.recordingSegment,
 		);
-		return next === attachment ? [slice] : [{ ...slice, attachment: next }];
+		return next.clipId === attachment.clipId
+			? [slice]
+			: [{ ...slice, attachment: { ...attachment, clipId: next.clipId } }];
 	}
 	const sourceEnd = originalZoomSourceEnd(slice, attachment, row.start, before);
 	if (sourceEnd === null) return [slice];
@@ -338,7 +341,10 @@ function rebindZoomSourceSlice(
 				placement.recordingSegment !== slice.recordingSegment)
 		)
 			continue;
-		for (const time of [placement.sourceStart, placement.sourceEnd]) {
+		for (const time of [
+			placement.sourceStart - offset,
+			placement.sourceEnd - offset,
+		]) {
 			if (time > attachment.sourceTime && time < sourceEnd) cuts.add(time);
 		}
 	}
@@ -347,7 +353,7 @@ function rebindZoomSourceSlice(
 		slice.phaseStart + (time - attachment.sourceTime) / sourceRate;
 	return bounds.slice(0, -1).map((sourceTime, index) => {
 		const next = resolveReplacement(
-			{ ...attachment, sourceTime },
+			{ ...attachment, sourceTime: sourceTime + offset },
 			after,
 			replacements,
 			slice.recordingSegment,
@@ -364,6 +370,7 @@ function rebindZoomSourceSlice(
 			attachment: {
 				...next,
 				id: index > 0 ? `overlay-${crypto.randomUUID()}` : next.id,
+				sourceTime,
 			},
 		};
 	});
@@ -512,7 +519,13 @@ function projectGeneratedZoomTranslation(
 	after: AttachmentLayout,
 ) {
 	const slices = row.sourceSlices;
-	if (row.attachment || !slices || slices.length < 2) return null;
+	if (
+		row.attachment ||
+		!slices ||
+		slices.length < 2 ||
+		slices.some((slice) => !!slice.sourceOffset)
+	)
+		return null;
 
 	const tolerance = ZOOM_PHASE_TOLERANCE;
 	let phase = 0;

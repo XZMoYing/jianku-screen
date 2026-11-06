@@ -1510,9 +1510,9 @@ export type XY<T> = { x: T; y: T }
 export type ZoomMode = "auto" | { manual: { x: number; y: number } }
 export type ZoomSegment = { start: number; end: number; attachment?: OverlayAttachment | null; sourceSlices?: ZoomSourceSlice[]; amount: number; mode: ZoomMode; glideDirection?: GlideDirection; glideSpeed?: number; instantAnimation?: boolean; edgeSnapRatio?: number }
 export type ZoomSliceTrim = { start: number; end: number }
-export type ZoomSourceSlice = { phaseStart: number; phaseEnd: number; recordingSegment?: number | null; sourceEnd?: number | null; trim?: ZoomSliceTrim | null; attachment?: OverlayAttachment | null }
+export type ZoomSourceSlice = { phaseStart: number; phaseEnd: number; recordingSegment?: number | null; sourceEnd?: number | null; trim?: ZoomSliceTrim | null; sourceOffset?: number | null; attachment?: OverlayAttachment | null }
 export type ZoomTrackProjection = { groupIndex: number; spans: ZoomTrackSpan[]; hasConflict: boolean; hasMissingSource: boolean }
-export type ZoomTrackSpan = { segmentIndex: number; sliceIndex: number; start: number; end: number; phaseStart: number; phaseEnd: number; availableStart: number; availableEnd: number }
+export type ZoomTrackSpan = { segmentIndex: number; sliceIndex: number; start: number; end: number; phaseStart: number; phaseEnd: number; availableStart: number; availableEnd: number; moveStart: number; moveEnd: number; sourceRate: number }
 
 /** tauri-specta globals **/
 

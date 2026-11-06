@@ -6862,6 +6862,7 @@ fn attach_generated_zooms(timeline: &TimelineConfiguration, zooms: &mut [ZoomSeg
                 phase_start: range.output.start - zoom.start,
                 phase_end: range.output.end - zoom.start,
                 trim: None,
+                source_offset: None,
                 recording_segment: range
                     .source_at_start
                     .map(|source| source.segment.recording_clip),

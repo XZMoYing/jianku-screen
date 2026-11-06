@@ -294,6 +294,9 @@ it.each(["menu", "blade"] as const)(
 						segmentIndex: 1,
 						availableStart: 6,
 						availableEnd: 6.25,
+						moveStart: 6,
+						moveEnd: 7,
+						sourceRate: 1,
 						sliceIndex: 1,
 						phaseStart: 1,
 						phaseEnd: 1.25,
@@ -304,6 +307,9 @@ it.each(["menu", "blade"] as const)(
 						segmentIndex: 1,
 						availableStart: 6.5,
 						availableEnd: 6.75,
+						moveStart: 6,
+						moveEnd: 7,
+						sourceRate: 1,
 						sliceIndex: 1,
 						phaseStart: 1.5,
 						phaseEnd: 1.75,
@@ -422,6 +428,9 @@ it.each(["trim", "extend", "cancel"] as const)(
 						end: 6.5,
 						availableStart: 6,
 						availableEnd: 6.5,
+						moveStart: 6,
+						moveEnd: 7,
+						sourceRate: 2,
 						segmentIndex: 1,
 						sliceIndex: 1,
 						phaseStart: action === "extend" ? 1.25 : 1,
@@ -465,6 +474,94 @@ it.each(["trim", "extend", "cancel"] as const)(
 			sourceEnd: 5,
 			attachment: { sourceTime: 4 },
 		});
+	},
+);
+
+it.each(["commit", "cancel"] as const)(
+	"moves just the visible projected fragment and can %s",
+	async (action) => {
+		const sourceSlices: ZoomSegment["sourceSlices"] = [
+			{
+				phaseStart: 0,
+				phaseEnd: 1,
+				sourceEnd: 4,
+				attachment: { kind: "clip", id: "left", clipId: "a", sourceTime: 3 },
+			},
+			{
+				phaseStart: 1,
+				phaseEnd: 2,
+				sourceEnd: 5,
+				attachment: { kind: "clip", id: "right", clipId: "b", sourceTime: 4 },
+			},
+		];
+		const span = {
+			start: 6,
+			end: 6.125,
+			availableStart: 6,
+			availableEnd: 6.125,
+			moveStart: 6,
+			moveEnd: 7,
+			sourceRate: 2,
+			segmentIndex: 1,
+			sliceIndex: 1,
+			phaseStart: 1,
+			phaseEnd: 1.25,
+		};
+		vi.mocked(commands.projectZoomTrack).mockResolvedValueOnce([
+			{
+				groupIndex: 0,
+				hasConflict: true,
+				hasMissingSource: false,
+				spans: [
+					span,
+					{
+						...span,
+						start: 6.25,
+						end: 6.375,
+						availableStart: 6.25,
+						availableEnd: 6.375,
+						phaseStart: 1.5,
+						phaseEnd: 1.75,
+					},
+				],
+			},
+		]);
+		mount([{ ...segment(3, 5), sourceSlices }]);
+		const displayed = () => [
+			...document.querySelectorAll<HTMLElement>(
+				'[data-zoom-projection="slice"]',
+			),
+		];
+		await vi.waitFor(() => expect(displayed()).toHaveLength(2));
+		mouse(displayed()[1], "mousedown", 200);
+		mouse(window, "mousemove", 210);
+		const group = () => context.project.timeline.zoomSegments[0];
+		const slices = () => group().sourceSlices ?? [];
+		expect(slices()).toMatchObject([
+			sourceSlices[0],
+			{ phaseStart: 1, phaseEnd: 1.5, sourceEnd: 4.5 },
+			{
+				phaseStart: 1.5,
+				phaseEnd: 1.75,
+				sourceEnd: 4.75,
+				attachment: { sourceTime: 4.5 },
+			},
+			{ phaseStart: 1.75, phaseEnd: 2, sourceEnd: 5 },
+		]);
+		expect(slices()[2].sourceOffset).toBeCloseTo(0.2);
+		expect(slices()[1].sourceOffset).toBeUndefined();
+		expect(slices()[3].sourceOffset).toBeUndefined();
+		if (action === "cancel") {
+			document.body.dispatchEvent(
+				new KeyboardEvent("keydown", { key: "Escape", bubbles: true }),
+			);
+		} else {
+			mouse(window, "mouseup", 210, 0);
+			expect(context.projectHistory.canUndo()).toBe(true);
+			context.projectHistory.undo();
+		}
+		expect(group()).toMatchObject({ start: 3, end: 5, sourceSlices });
+		expect(context.projectHistory.canUndo()).toBe(false);
 	},
 );
 

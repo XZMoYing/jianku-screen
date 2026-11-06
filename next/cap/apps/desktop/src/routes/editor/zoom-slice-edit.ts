@@ -96,3 +96,54 @@ export function trimZoomSourceSlice(
 		? undefined
 		: next;
 }
+
+export function prepareZoomSliceMove(
+	slices: readonly ZoomSourceSlice[],
+	span: ZoomTrackSpan,
+) {
+	const slice = slices[span.sliceIndex];
+	const attachment = slice?.attachment;
+	if (
+		!slice ||
+		attachment?.kind !== "clip" ||
+		slice.sourceEnd == null ||
+		span.sourceRate <= 0 ||
+		span.phaseEnd <= span.phaseStart ||
+		slice.sourceEnd <= attachment.sourceTime
+	)
+		return null;
+	const start = Math.max(slice.phaseStart, span.phaseStart);
+	const end = Math.min(slice.phaseEnd, span.phaseEnd);
+	if (end <= start) return null;
+	const phaseBounds = [slice.phaseStart];
+	if (start - slice.phaseStart > 1e-7) phaseBounds.push(start);
+	const selected = phaseBounds.length - 1;
+	if (slice.phaseEnd - end > 1e-7) phaseBounds.push(end);
+	phaseBounds.push(slice.phaseEnd);
+	const rate =
+		(slice.sourceEnd - attachment.sourceTime) /
+		(slice.phaseEnd - slice.phaseStart);
+	const atPhase = (phase: number) =>
+		attachment.sourceTime + (phase - slice.phaseStart) * rate;
+	const parts = phaseBounds.slice(0, -1).map((phaseStart, index) => ({
+		...slice,
+		phaseStart,
+		phaseEnd: phaseBounds[index + 1],
+		sourceEnd: atPhase(phaseBounds[index + 1]),
+		trim: index === selected ? undefined : slice.trim,
+		attachment: {
+			...attachment,
+			id: index === 0 ? attachment.id : `overlay-${crypto.randomUUID()}`,
+			sourceTime: atPhase(phaseStart),
+		},
+	}));
+	return {
+		slices: [
+			...slices.slice(0, span.sliceIndex),
+			...parts,
+			...slices.slice(span.sliceIndex + 1),
+		],
+		index: span.sliceIndex + selected,
+		offset: slice.sourceOffset ?? 0,
+	};
+}

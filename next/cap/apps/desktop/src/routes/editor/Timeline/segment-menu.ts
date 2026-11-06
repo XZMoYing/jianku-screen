@@ -86,6 +86,14 @@ export function createTimelineSegmentMenu(moveTo: (time: number) => void) {
 									},
 								]
 							: []),
+						...(projectedZoom.resetOffset
+							? [
+									{
+										label: localize("Reset zoom slice alignment"),
+										run: projectedZoom.resetOffset,
+									},
+								]
+							: []),
 					]
 				: []),
 			...(association

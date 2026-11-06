@@ -620,6 +620,9 @@ struct PhaseSpan {
     end: f64,
     original_start: f64,
     rate: f64,
+    move_start: f64,
+    move_end: f64,
+    source_rate: f64,
 }
 
 impl PhaseSpan {
@@ -668,6 +671,9 @@ pub struct ZoomTrackSpan {
     pub phase_end: f64,
     pub available_start: f64,
     pub available_end: f64,
+    pub move_start: f64,
+    pub move_end: f64,
+    pub source_rate: f64,
 }
 
 struct ProjectedPhases {
@@ -814,6 +820,13 @@ fn project_zoom_phases(
         if !original_rate.is_finite() || original_rate < 0.0 {
             return None;
         }
+        let offset = slice
+            .source_offset
+            .filter(|offset| offset.is_finite())
+            .unwrap_or(0.0);
+        changed |= offset != 0.0;
+        let shifted_start = source_time + offset;
+        let shifted_end = source_end + offset;
         let current_clip = timeline.segments.iter().enumerate().find(|(_, clip)| {
             clip.id.as_ref() == Some(clip_id)
                 && slice
@@ -846,7 +859,7 @@ fn project_zoom_phases(
         {
             let span = if current.timescale == 0.0 {
                 let frozen_source = current.recording_start;
-                if original_rate == 0.0 && (*source_time - frozen_source).abs() <= 1e-6 {
+                if original_rate == 0.0 && (shifted_start - frozen_source).abs() <= 1e-6 {
                     Some(PhaseSpan {
                         segment_index,
                         slice_index,
@@ -854,16 +867,19 @@ fn project_zoom_phases(
                         end: current.timeline_end,
                         original_start,
                         rate: phase_duration / (current.timeline_end - current.timeline_start),
+                        move_start: current.timeline_start,
+                        move_end: current.timeline_end,
+                        source_rate: 0.0,
                     })
                 } else if original_rate > 0.0
-                    && frozen_source >= *source_time
-                    && frozen_source < source_end
+                    && frozen_source >= shifted_start
+                    && frozen_source < shifted_end
                     && !segment.source_slices.iter().any(|other| {
                         matches!(&other.attachment, Some(OverlayAttachment::Clip {
                             clip_id: other_id, source_time: frozen_at, ..
                         }) if other_id == clip_id
                             && other.source_end == Some(*frozen_at)
-                            && (*frozen_at - frozen_source).abs() <= 1e-6)
+                            && (*frozen_at + other.source_offset.unwrap_or(0.0) - frozen_source).abs() <= 1e-6)
                     })
                 {
                     Some(PhaseSpan {
@@ -872,8 +888,11 @@ fn project_zoom_phases(
                         start: current.timeline_start,
                         end: current.timeline_end,
                         original_start: original_start
-                            + (frozen_source - source_time) / original_rate,
+                            + (frozen_source - shifted_start) / original_rate,
                         rate: 0.0,
+                        move_start: current.timeline_start,
+                        move_end: current.timeline_end,
+                        source_rate: 0.0,
                     })
                 } else {
                     None
@@ -881,8 +900,8 @@ fn project_zoom_phases(
             } else if original_rate > 0.0 {
                 let current_source_end = current.recording_start
                     + (current.timeline_end - current.timeline_start) * current.timescale;
-                let retained_start = source_time.max(current.recording_start);
-                let retained_end = source_end.min(clip.end).min(current_source_end);
+                let retained_start = shifted_start.max(current.recording_start);
+                let retained_end = shifted_end.min(clip.end).min(current_source_end);
                 (retained_start < retained_end).then(|| PhaseSpan {
                     segment_index,
                     slice_index,
@@ -890,8 +909,12 @@ fn project_zoom_phases(
                         + (retained_start - current.recording_start) / current.timescale,
                     end: current.timeline_start
                         + (retained_end - current.recording_start) / current.timescale,
-                    original_start: original_start + (retained_start - source_time) / original_rate,
+                    original_start: original_start
+                        + (retained_start - shifted_start) / original_rate,
                     rate: current.timescale / original_rate,
+                    move_start: current.timeline_start,
+                    move_end: current.timeline_end,
+                    source_rate: current.timescale,
                 })
             } else {
                 None
@@ -1007,6 +1030,9 @@ pub fn zoom_track_projection(timeline: &TimelineConfiguration) -> Vec<ZoomTrackP
                     phase_end: span.original_time(span.end) - group.phase_origin,
                     available_start: available.start,
                     available_end: available.end,
+                    move_start: span.move_start,
+                    move_end: span.move_end,
+                    source_rate: span.source_rate,
                 })
                 .collect(),
             has_conflict: group.has_conflict,
@@ -2131,6 +2157,9 @@ mod tests {
             end: 5.0,
             original_start: 0.0,
             rate: 1.0,
+            move_start: 0.0,
+            move_end: 8.0,
+            source_rate: 1.0,
         };
         let next = PhaseSpan {
             start: 4.5,
@@ -2248,6 +2277,45 @@ mod tests {
         let expected = reference.sample(6.25);
         assert_eq!(actual.t, expected.t);
         assert_eq!(actual.bounds, expected.bounds);
+    }
+
+    #[test]
+    fn source_relative_move_follows_clip_speed_without_retiming_the_original_phase() {
+        let mut project = project_with_sliced_zoom(4.0);
+        let timeline = project.timeline.as_mut().unwrap();
+        timeline.segments[1].timescale = 2.0;
+        timeline
+            .main_track_gaps
+            .before_clip
+            .insert("right".into(), 2.0);
+        let cursor = CursorEvents {
+            moves: vec![move_event(3100.0, 0.2, 0.3), move_event(4200.0, 0.8, 0.7)],
+            ..Default::default()
+        };
+        let size = XY::new(1000, 1000);
+        let mut reference = ZoomTransformTimeline::from_project(&project, &cursor, 8.0, size);
+        reference.precompute();
+        let timeline = project.timeline.as_mut().unwrap();
+        timeline.zoom_segments[0].source_slices[1].source_offset = Some(0.5);
+        let moved = zoom_track_projection(timeline);
+        assert_eq!(
+            (moved[0].spans[1].start, moved[0].spans[1].end),
+            (6.25, 6.75)
+        );
+        assert_eq!(moved[0].spans[1].source_rate, 2.0);
+        let mut shifted = ZoomTransformTimeline::from_project(&project, &cursor, 8.0, size);
+        shifted.precompute();
+        assert_eq!(shifted.sample(6.5).bounds, reference.sample(6.25).bounds);
+        let timeline = project.timeline.as_mut().unwrap();
+        timeline.segments[1].timescale = 4.0;
+        let faster = zoom_track_projection(timeline);
+        assert_eq!(
+            (faster[0].spans[1].start, faster[0].spans[1].end),
+            (6.125, 6.375)
+        );
+        let mut retimed = ZoomTransformTimeline::from_project(&project, &cursor, 8.0, size);
+        retimed.precompute();
+        assert_eq!(retimed.sample(6.25).bounds, reference.sample(6.25).bounds);
     }
 
     #[test]

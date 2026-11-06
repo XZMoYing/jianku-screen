@@ -258,6 +258,55 @@ describe("overlay attachment", () => {
 		});
 	});
 
+	it("rebinds an offset zoom at the displayed source range while retaining original phase", () => {
+		const clips = sameSourceTwice();
+		const zoom = {
+			start: 1.5,
+			end: 2.5,
+			sourceSlices: [
+				{
+					phaseStart: 0,
+					phaseEnd: 1,
+					sourceEnd: 6.5,
+					sourceOffset: 0.5,
+					attachment: attachOverlayToClip(
+						{ start: 1.5, end: 2.5 },
+						overlayAttachmentLayout(clips),
+						"a",
+						"followClipSpeed",
+					),
+				},
+			],
+		};
+		const timeline = { ...clips, zoomSegments: [zoom] };
+		editClipsWithOverlayAttachments(timeline, (replacements) => {
+			timeline.segments.splice(
+				0,
+				1,
+				{ ...clip("a"), end: 6.5 },
+				{ ...clip("a-right"), start: 6.5 },
+			);
+			replacements.set("a", ["a-right"]);
+			return true;
+		});
+		expect(zoom.sourceSlices).toMatchObject([
+			{
+				phaseStart: 0,
+				phaseEnd: 0.5,
+				sourceEnd: 6,
+				sourceOffset: 0.5,
+				attachment: { clipId: "a", sourceTime: 5.5 },
+			},
+			{
+				phaseStart: 0.5,
+				phaseEnd: 1,
+				sourceEnd: 6.5,
+				sourceOffset: 0.5,
+				attachment: { clipId: "a-right", sourceTime: 6 },
+			},
+		]);
+	});
+
 	it("keeps the original zoom phases through a partial cut and ripple deletion", () => {
 		const clips = sameSourceTwice();
 		const layout = overlayAttachmentLayout(clips);

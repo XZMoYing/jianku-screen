@@ -1072,6 +1072,8 @@ pub struct ZoomSourceSlice {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub trim: Option<ZoomSliceTrim>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_offset: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub attachment: Option<OverlayAttachment>,
 }
 
