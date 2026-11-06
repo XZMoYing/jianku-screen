@@ -1,0 +1,513 @@
+{
+  "build-source": {
+    "commit": "fee1bd9faaaa89831504ec8691c21769da0a1418",
+    "version": "0.2.0-alpha.79",
+    "build": "2026.79.0"
+  },
+  "linked-layout": {
+    "order": [
+      "red",
+      "green",
+      "purple"
+    ],
+    "placements": {
+      "red": {
+        "start": 0,
+        "end": 3.0,
+        "source": [
+          0.0,
+          3.0
+        ]
+      },
+      "green": {
+        "start": 3.0,
+        "end": 6.0,
+        "source": [
+          4.0,
+          7.0
+        ]
+      },
+      "purple": {
+        "start": 6.0,
+        "end": 9.0,
+        "source": [
+          8.0,
+          11.0
+        ]
+      }
+    },
+    "duration": 9.0,
+    "gaps": {},
+    "images": [
+      [
+        4.0,
+        5.0,
+        {
+          "kind": "clip",
+          "id": "overlay-38a7c4a1-b9d4-430d-9150-1e24ba6664fa",
+          "clipId": "green",
+          "sourceTime": 5.0,
+          "timing": "preserveDuration"
+        }
+      ]
+    ]
+  },
+  "overlay-cancel-layout": {
+    "order": [
+      "red",
+      "green",
+      "purple"
+    ],
+    "placements": {
+      "red": {
+        "start": 0,
+        "end": 3.0,
+        "source": [
+          0.0,
+          3.0
+        ]
+      },
+      "green": {
+        "start": 3.0,
+        "end": 6.0,
+        "source": [
+          4.0,
+          7.0
+        ]
+      },
+      "purple": {
+        "start": 6.0,
+        "end": 9.0,
+        "source": [
+          8.0,
+          11.0
+        ]
+      }
+    },
+    "duration": 9.0,
+    "gaps": {},
+    "images": [
+      [
+        4.0,
+        5.0,
+        {
+          "kind": "clip",
+          "id": "overlay-38a7c4a1-b9d4-430d-9150-1e24ba6664fa",
+          "clipId": "green",
+          "sourceTime": 5.0,
+          "timing": "preserveDuration"
+        }
+      ]
+    ]
+  },
+  "overlay-drag-layout": {
+    "order": [
+      "red",
+      "green",
+      "purple"
+    ],
+    "placements": {
+      "red": {
+        "start": 0,
+        "end": 3.0,
+        "source": [
+          0.0,
+          3.0
+        ]
+      },
+      "green": {
+        "start": 3.0,
+        "end": 6.0,
+        "source": [
+          4.0,
+          7.0
+        ]
+      },
+      "purple": {
+        "start": 6.0,
+        "end": 9.0,
+        "source": [
+          8.0,
+          11.0
+        ]
+      }
+    },
+    "duration": 9.0,
+    "gaps": {},
+    "images": [
+      [
+        4.5026332809757,
+        5.5026332809757,
+        {
+          "kind": "clip",
+          "id": "overlay-38a7c4a1-b9d4-430d-9150-1e24ba6664fa",
+          "clipId": "green",
+          "sourceTime": 5.5026332809757,
+          "timing": "preserveDuration"
+        }
+      ]
+    ]
+  },
+  "follows-layout": {
+    "order": [
+      "red",
+      "purple",
+      "green"
+    ],
+    "placements": {
+      "red": {
+        "start": 0,
+        "end": 3.0,
+        "source": [
+          0.0,
+          3.0
+        ]
+      },
+      "purple": {
+        "start": 3.0,
+        "end": 6.0,
+        "source": [
+          8.0,
+          11.0
+        ]
+      },
+      "green": {
+        "start": 6.0,
+        "end": 9.0,
+        "source": [
+          4.0,
+          7.0
+        ]
+      }
+    },
+    "duration": 9.0,
+    "gaps": {},
+    "images": [
+      [
+        7.5026332809757,
+        8.5026332809757,
+        {
+          "kind": "clip",
+          "id": "overlay-38a7c4a1-b9d4-430d-9150-1e24ba6664fa",
+          "clipId": "green",
+          "sourceTime": 5.5026332809757,
+          "timing": "preserveDuration"
+        }
+      ]
+    ]
+  },
+  "timing-layout": {
+    "order": [
+      "red",
+      "purple",
+      "green"
+    ],
+    "placements": {
+      "red": {
+        "start": 0,
+        "end": 3.0,
+        "source": [
+          0.0,
+          3.0
+        ]
+      },
+      "purple": {
+        "start": 3.0,
+        "end": 6.0,
+        "source": [
+          8.0,
+          11.0
+        ]
+      },
+      "green": {
+        "start": 6.0,
+        "end": 9.0,
+        "source": [
+          4.0,
+          7.0
+        ]
+      }
+    },
+    "duration": 9.0,
+    "gaps": {},
+    "images": [
+      [
+        7.5026332809757,
+        8.5026332809757,
+        {
+          "kind": "clip",
+          "id": "overlay-38a7c4a1-b9d4-430d-9150-1e24ba6664fa",
+          "clipId": "green",
+          "sourceTime": 5.5026332809757,
+          "timing": "followClipSpeed"
+        }
+      ]
+    ]
+  },
+  "unlinked-layout": {
+    "order": [
+      "red",
+      "purple",
+      "green"
+    ],
+    "placements": {
+      "red": {
+        "start": 0,
+        "end": 3.0,
+        "source": [
+          0.0,
+          3.0
+        ]
+      },
+      "purple": {
+        "start": 3.0,
+        "end": 6.0,
+        "source": [
+          8.0,
+          11.0
+        ]
+      },
+      "green": {
+        "start": 6.0,
+        "end": 9.0,
+        "source": [
+          4.0,
+          7.0
+        ]
+      }
+    },
+    "duration": 9.0,
+    "gaps": {},
+    "images": [
+      [
+        7.5026332809757,
+        8.5026332809757,
+        {
+          "kind": "timeline",
+          "id": "overlay-38a7c4a1-b9d4-430d-9150-1e24ba6664fa"
+        }
+      ]
+    ]
+  },
+  "unlinked-reorder-layout": {
+    "order": [
+      "red",
+      "green",
+      "purple"
+    ],
+    "placements": {
+      "red": {
+        "start": 0,
+        "end": 3.0,
+        "source": [
+          0.0,
+          3.0
+        ]
+      },
+      "green": {
+        "start": 3.0,
+        "end": 6.0,
+        "source": [
+          4.0,
+          7.0
+        ]
+      },
+      "purple": {
+        "start": 6.0,
+        "end": 9.0,
+        "source": [
+          8.0,
+          11.0
+        ]
+      }
+    },
+    "duration": 9.0,
+    "gaps": {},
+    "images": [
+      [
+        7.5026332809757,
+        8.5026332809757,
+        {
+          "kind": "timeline",
+          "id": "overlay-38a7c4a1-b9d4-430d-9150-1e24ba6664fa"
+        }
+      ]
+    ]
+  },
+  "missing-source-layout": {
+    "order": [
+      "red",
+      "purple"
+    ],
+    "placements": {
+      "red": {
+        "start": 0,
+        "end": 3.0,
+        "source": [
+          0.0,
+          3.0
+        ]
+      },
+      "purple": {
+        "start": 3.0,
+        "end": 6.0,
+        "source": [
+          8.0,
+          11.0
+        ]
+      }
+    },
+    "duration": 9.0,
+    "gaps": {
+      "trailing": 3.0
+    },
+    "images": [
+      [
+        7.5026332809757,
+        8.5026332809757,
+        {
+          "kind": "clip",
+          "id": "overlay-38a7c4a1-b9d4-430d-9150-1e24ba6664fa",
+          "clipId": "green",
+          "sourceTime": 5.5026332809757,
+          "timing": "followClipSpeed"
+        }
+      ]
+    ]
+  },
+  "new-fixed-text": {
+    "start": 7.0026332809757,
+    "end": 8.0026332809757,
+    "attachment": {
+      "kind": "timeline",
+      "id": "overlay-96b3842f-4677-48f9-b966-6f76df780b83"
+    }
+  },
+  "reopened-layout": {
+    "order": [
+      "red",
+      "purple",
+      "green"
+    ],
+    "placements": {
+      "red": {
+        "start": 0,
+        "end": 3.0,
+        "source": [
+          0.0,
+          3.0
+        ]
+      },
+      "purple": {
+        "start": 3.0,
+        "end": 6.0,
+        "source": [
+          8.0,
+          11.0
+        ]
+      },
+      "green": {
+        "start": 6.0,
+        "end": 9.0,
+        "source": [
+          4.0,
+          7.0
+        ]
+      }
+    },
+    "duration": 9.0,
+    "gaps": {},
+    "images": [
+      [
+        7.5026332809757,
+        8.5026332809757,
+        {
+          "kind": "clip",
+          "id": "overlay-38a7c4a1-b9d4-430d-9150-1e24ba6664fa",
+          "clipId": "green",
+          "sourceTime": 5.5026332809757,
+          "timing": "followClipSpeed"
+        }
+      ]
+    ]
+  },
+  "follows-export-pixels": {
+    "duration": 9,
+    "frames": 216,
+    "samples": {
+      "24": [
+        223,
+        49,
+        30
+      ],
+      "108": [
+        73,
+        63,
+        193
+      ],
+      "144": [
+        16,
+        119,
+        59
+      ],
+      "180": [
+        16,
+        119,
+        59
+      ],
+      "181": [
+        255,
+        214,
+        0
+      ],
+      "195": [
+        255,
+        214,
+        0
+      ],
+      "204": [
+        255,
+        214,
+        0
+      ],
+      "205": [
+        16,
+        119,
+        59
+      ],
+      "215": [
+        16,
+        119,
+        59
+      ]
+    }
+  },
+  "package-installed": {
+    "path": "/Applications/Jianku Screen Next.app",
+    "version": "0.2.0-alpha.79",
+    "build": "2026.79.0",
+    "signature": "ad-hoc; strict deep verification passed",
+    "executables": {
+      "Jianku Screen Next": "e29382aaa5ab0f5e4216ed91efccb948e7b6d51e3d4773f7cef24877597d3b43",
+      "cap-cli": "65e9efdcf2f8cb528e07ca8f3640aa7aff5b89ce71b089e70cad36c75e20426d",
+      "cap-exporter": "447422f7cfe375ed3e19f760d9e2d15da23d090edac593c10d8cb631c4ac2ce4",
+      "cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+      "jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+      "jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+    }
+  },
+  "rollback-archive": {
+    "path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.78/Jianku Screen Next.app",
+    "version": "0.2.0-alpha.78",
+    "build": "2026.78.0",
+    "signature": "ad-hoc; strict deep verification passed",
+    "executables": {
+      "Jianku Screen Next": "e6c91a326f5a5648a55ba31c0d4dfa6366e1d8f7b2013a4d382bd42464bbfd34",
+      "cap-cli": "5560ec6f95b78357495f89b9b4cd9b8aea3fff71d5c8a1e2bc543bd48dc2a3b1",
+      "cap-exporter": "5560ec6f95b78357495f89b9b4cd9b8aea3fff71d5c8a1e2bc543bd48dc2a3b1",
+      "cap-muxer": "a94d28f2f243a57180a7d01dfb2e7002215d10f4c6635880f5406da9325c947a",
+      "jianku-device-capture": "66345a304181dafa86d3980ca68ec9c13e5d7ef9acd67de746dd32ed2cf3dfef",
+      "jianku-android-capture": "bac5c35f6a684f9d3c7f37a9be6922b0770f33312c313cc226d0d3247413b539"
+    }
+  }
+}
