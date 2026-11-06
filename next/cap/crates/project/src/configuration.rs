@@ -1066,6 +1066,8 @@ pub struct ZoomSourceSlice {
     pub phase_start: f64,
     pub phase_end: f64,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_end: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub attachment: Option<OverlayAttachment>,
 }
 

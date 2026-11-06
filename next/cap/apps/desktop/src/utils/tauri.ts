@@ -1506,7 +1506,7 @@ export type WindowUnderCursor = { id: WindowId; app_name: string; bounds: Logica
 export type XY<T> = { x: T; y: T }
 export type ZoomMode = "auto" | { manual: { x: number; y: number } }
 export type ZoomSegment = { start: number; end: number; attachment?: OverlayAttachment | null; sourceSlices?: ZoomSourceSlice[]; amount: number; mode: ZoomMode; glideDirection?: GlideDirection; glideSpeed?: number; instantAnimation?: boolean; edgeSnapRatio?: number }
-export type ZoomSourceSlice = { phaseStart: number; phaseEnd: number; attachment?: OverlayAttachment | null }
+export type ZoomSourceSlice = { phaseStart: number; phaseEnd: number; sourceEnd?: number | null; attachment?: OverlayAttachment | null }
 
 /** tauri-specta globals **/
 

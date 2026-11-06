@@ -6837,6 +6837,7 @@ pub fn generate_zoom_segments_for_timeline(
 }
 
 fn attach_generated_zooms(timeline: &TimelineConfiguration, zooms: &mut [ZoomSegment]) {
+    let holds = timeline.hold_windows();
     for zoom in zooms {
         let Some(ranges) = timeline.primary_source_ranges(zoom.start..zoom.end) else {
             continue;
@@ -6846,6 +6847,18 @@ fn attach_generated_zooms(timeline: &TimelineConfiguration, zooms: &mut [ZoomSeg
             .map(|range| ZoomSourceSlice {
                 phase_start: range.output.start - zoom.start,
                 phase_end: range.output.end - zoom.start,
+                source_end: range.source_at_start.and_then(|source| {
+                    if source.segment.id.is_none()
+                        || holds.iter().any(|(start, end)| {
+                            *start < range.output.end && *end > range.output.start
+                        })
+                    {
+                        return None;
+                    }
+                    let end = source.source_time
+                        + (range.output.end - range.output.start) * source.segment.timescale;
+                    (end.is_finite() && end > source.source_time).then_some(end)
+                }),
                 attachment: range.source_at_start.and_then(|source| {
                     Some(OverlayAttachment::Clip {
                         id: format!("overlay-{}", uuid::Uuid::new_v4()),
@@ -7761,6 +7774,9 @@ mod tests {
         assert_eq!((left.phase_start, left.phase_end), (0.0, 0.5));
         assert_eq!((gap.phase_start, gap.phase_end), (0.5, 0.75));
         assert_eq!((right.phase_start, right.phase_end), (0.75, 1.0));
+        assert_eq!(left.source_end, Some(4.0));
+        assert_eq!(gap.source_end, None);
+        assert_eq!(right.source_end, Some(4.25));
         assert!(
             matches!(&left.attachment, Some(OverlayAttachment::Clip { clip_id, source_time: 3.5, .. }) if clip_id == "left")
         );

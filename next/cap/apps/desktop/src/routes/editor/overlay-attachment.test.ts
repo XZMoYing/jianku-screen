@@ -104,8 +104,8 @@ describe("overlay attachment", () => {
 			start: 2,
 			end: 4,
 			sourceSlices: [
-				{ phaseStart: 0, phaseEnd: 1, attachment: left },
-				{ phaseStart: 1, phaseEnd: 2, attachment: right },
+				{ phaseStart: 0, phaseEnd: 1, sourceEnd: 7, attachment: left },
+				{ phaseStart: 1, phaseEnd: 2, sourceEnd: 5, attachment: right },
 			],
 		};
 		const timeline = { ...clips, zoomSegments: [zoom] };
@@ -126,10 +126,11 @@ describe("overlay attachment", () => {
 			start: 2,
 			end: 4,
 			sourceSlices: [
-				{ phaseStart: 0, phaseEnd: 0.5, attachment: left },
+				{ phaseStart: 0, phaseEnd: 0.5, sourceEnd: 6.5, attachment: left },
 				{
 					phaseStart: 0.5,
 					phaseEnd: 1,
+					sourceEnd: 7,
 					attachment: { clipId: "a-right", sourceTime: 6.5 },
 				},
 				{ phaseStart: 1, phaseEnd: 2, attachment: right },
@@ -193,6 +194,24 @@ describe("overlay attachment", () => {
 			phaseStart: 1.5,
 			phaseEnd: 2.5,
 			ratio: 0.5,
+		});
+		const editedAgain = overlayAttachmentLayout({
+			...moved,
+			segments: [clip("a"), { ...clip("b"), start: 5, timescale: 4 }],
+		});
+		expect(
+			projectZoomSourceSlice(
+				{ ...right, sourceEnd: 5.5 },
+				2,
+				after,
+				editedAgain,
+			),
+		).toEqual({
+			start: 5,
+			end: 5.125,
+			phaseStart: 2,
+			phaseEnd: 2.5,
+			ratio: 0.25,
 		});
 		moved.segments[1].start = 6;
 		expect(
