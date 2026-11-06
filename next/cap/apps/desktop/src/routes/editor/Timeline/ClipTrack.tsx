@@ -17,7 +17,6 @@ import {
 	Show,
 	Switch,
 } from "solid-js";
-import { produce } from "solid-js/store";
 import { t as localize } from "~/utils/i18n";
 import type { TimelineSegment } from "~/utils/tauri";
 import IconLucideArrowLeftToLine from "~icons/lucide/arrow-left-to-line";
@@ -55,6 +54,7 @@ import {
 	planMainTrackMove,
 	trimPositionedMainTrackClip,
 } from "../main-track-edit";
+import { captureOverlayAttachmentLayout } from "../overlay-attachment";
 import { TextInput } from "../TextInput";
 import {
 	effectiveToOutput,
@@ -900,8 +900,12 @@ export function ClipTrack(
 		return visible;
 	});
 
-	function onHandleReleased() {
-		projectActions.normalizeClipTransitions();
+	function onHandleReleased(
+		attachments: ReturnType<typeof captureOverlayAttachmentLayout>,
+		normalize: boolean,
+	) {
+		projectActions.finishClipTrim(attachments, normalize);
+		if (!normalize) return;
 		const { transform } = editorState.timeline;
 
 		if (transform.position + transform.zoom > totalDuration() + 4) {
@@ -1051,6 +1055,8 @@ export function ClipTrack(
 				: [];
 			const magnetic = mainTrackMagnetic();
 			const timeline = project.timeline;
+			const attachments =
+				magnetic && timeline ? captureOverlayAttachmentLayout(timeline) : null;
 			const sourceLimits = magnetic
 				? undefined
 				: {
@@ -1210,8 +1216,12 @@ export function ClipTrack(
 								editorState.previewTime === lastPreview
 							)
 								setEditorState("previewTime", previousPreview);
-						} else if (resumeHistory && valid() && reason !== "history")
-							onHandleReleased();
+						} else if (
+							resumeHistory &&
+							valid() &&
+							(reason !== "history" || attachments)
+						)
+							onHandleReleased(attachments, reason !== "history");
 						resumeHistory?.();
 					});
 				},
@@ -1457,18 +1467,17 @@ export function ClipTrack(
 															<CutOffsetButton
 																value={value()}
 																onClick={() => {
-																	setProject(
-																		"timeline",
-																		"segments",
-																		produce((s) => {
-																			if (markerValue().type === "reset") {
-																				s[i() - 1].end = s[i()].end;
-																				s.splice(i(), 1);
-																			} else {
-																				s[i() - 1].end = s[i()].start;
-																			}
-																		}),
-																	);
+																	if (markerValue().type === "reset")
+																		projectActions.mergeClipSegment(
+																			i(),
+																			"previous",
+																		);
+																	else
+																		projectActions.restoreClipEdge(
+																			i() - 1,
+																			"end",
+																			segment().start,
+																		);
 																}}
 															/>
 														</div>
@@ -1498,9 +1507,7 @@ export function ClipTrack(
 																value={value()}
 																class="-left-px absolute rounded-r-full pl-1.5! rounded-tl-full"
 																onClick={() => {
-																	setProject(
-																		"timeline",
-																		"segments",
+																	projectActions.restoreClipEdge(
 																		i(),
 																		"start",
 																		0,
@@ -1949,9 +1956,7 @@ export function ClipTrack(
 													value={value()}
 													class="-right-px absolute rounded-l-full pr-1.5! rounded-tr-full"
 													onClick={() => {
-														setProject(
-															"timeline",
-															"segments",
+														projectActions.restoreClipEdge(
 															i(),
 															"end",
 															segmentRecording().display.duration,

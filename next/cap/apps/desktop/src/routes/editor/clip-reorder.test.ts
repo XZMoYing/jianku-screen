@@ -3,8 +3,8 @@ import { reorderClipInstance } from "./clip-reorder";
 import type { ClipTransition } from "./clip-transitions";
 import {
 	attachOverlayToClip,
+	editClipsWithOverlayAttachments,
 	keepOverlayAtTimelineTime,
-	moveClipsWithOverlayAttachments,
 	overlayAttachmentLayout,
 } from "./overlay-attachment";
 
@@ -108,7 +108,7 @@ it("reorders linked overlays while keeping an explicit timeline position through
 		],
 	};
 	expect(
-		moveClipsWithOverlayAttachments(
+		editClipsWithOverlayAttachments(
 			project,
 			() => reorderClipInstance(project, "b", 3) !== null,
 		),

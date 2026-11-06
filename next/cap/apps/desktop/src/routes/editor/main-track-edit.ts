@@ -14,6 +14,7 @@ import {
 	maxTransitionDuration,
 	normalizeClipTransitions,
 } from "./clip-transitions";
+import type { ClipReplacements } from "./overlay-attachment";
 
 type MainTrack = {
 	segments: TimelineSegment[];
@@ -232,6 +233,7 @@ export function cutPositionedMainTrackRange(
 	index: number,
 	start: number,
 	end: number,
+	replacements?: ClipReplacements,
 ) {
 	const next = placements(track);
 	const placement = next[index];
@@ -260,7 +262,11 @@ export function cutPositionedMainTrackRange(
 	}
 	if (!retained.length && next.length === 1) return false;
 	next.splice(index, 1, ...retained);
-	return applyPlacements(track, next, duration(track));
+	if (!applyPlacements(track, next, duration(track))) return false;
+	const newId = retained[1]?.clip.id;
+	if (replacements && clip.id && newId)
+		replacements.set(clip.id, [...(replacements.get(clip.id) ?? []), newId]);
+	return true;
 }
 
 function moveLayout(track: MainTrack, clipId: string) {

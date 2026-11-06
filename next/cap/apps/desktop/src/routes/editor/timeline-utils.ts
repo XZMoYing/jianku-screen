@@ -10,6 +10,7 @@ import {
 	transitionsAfterClipSplit,
 } from "./clip-transitions";
 import { rippleDeleteKeyboardTrack } from "./keyboard-timing";
+import type { AttachmentSpan, ClipReplacements } from "./overlay-attachment";
 import {
 	CAMERA3D_TRACK_KEYS,
 	type Camera3DTracks,
@@ -56,13 +57,14 @@ export function shiftCaptionTimesAfterCut(
 }
 
 export function rippleDeleteFromTrack(
-	segments: Array<{ start: number; end: number }>,
+	segments: AttachmentSpan[],
 	cutStart: number,
 	cutEnd: number,
 	shiftDuration = cutEnd - cutStart,
 ) {
 	for (let i = segments.length - 1; i >= 0; i--) {
 		const seg = segments[i];
+		if (seg.attachment) continue;
 		if (seg.end <= cutStart) {
 			continue;
 		}
@@ -82,9 +84,7 @@ export function rippleDeleteFromTrack(
 	}
 }
 
-type RippleMaskSegment = {
-	start: number;
-	end: number;
+type RippleMaskSegment = AttachmentSpan & {
 	keyframes?: {
 		position?: Array<{ time: number }>;
 		size?: Array<{ time: number }>;
@@ -103,6 +103,7 @@ function rippleDeleteMaskTrack(
 	);
 	rippleDeleteFromTrack(segments, cutStart, cutEnd, shift);
 	for (const segment of segments) {
+		if (segment.attachment) continue;
 		const oldStart = previousStarts.get(segment);
 		if (oldStart === undefined || !segment.keyframes) continue;
 		const duration = segment.end - segment.start;
@@ -120,9 +121,7 @@ function rippleDeleteMaskTrack(
 	}
 }
 
-type RippleAudioSegment = {
-	start: number;
-	end: number;
+type RippleAudioSegment = AttachmentSpan & {
 	trimStart?: number;
 	fadeIn?: number;
 };
@@ -134,6 +133,7 @@ function rippleDeleteAudioTrack(
 	shift: number,
 ) {
 	for (const segment of segments) {
+		if (segment.attachment) continue;
 		if (
 			segment.start >= cutStart &&
 			segment.start < cutEnd &&
@@ -147,9 +147,7 @@ function rippleDeleteAudioTrack(
 	rippleDeleteFromTrack(segments, cutStart, cutEnd, shift);
 }
 
-type RippleCamera3DSegment = {
-	start: number;
-	end: number;
+type RippleCamera3DSegment = AttachmentSpan & {
 	tracks: Camera3DTracks;
 	transitionIn?: number;
 	transitionOut?: number;
@@ -167,6 +165,7 @@ function rippleDeleteCamera3DTrack(
 		segmentIndex--
 	) {
 		const segment = segments[segmentIndex];
+		if (segment.attachment) continue;
 		if (segment.end <= cutStart) continue;
 		if (segment.start >= cutEnd) {
 			segment.start -= shift;
@@ -283,6 +282,7 @@ export function cutClipSegmentsForRange(
 	cutEnd: number,
 	requestedSegmentIndex?: number,
 	gaps?: MainTrackGaps,
+	replacements?: ClipReplacements,
 ) {
 	const editedOffsets = clipTimelineOffsets(segments, transitions, gaps);
 	let startSegIdx = -1;
@@ -321,9 +321,14 @@ export function cutClipSegmentsForRange(
 		}
 		if (seg.end > afterStart + 0.001) {
 			const remaining = { ...seg, start: afterStart };
-			newSegs.push(
-				newSegs.length > 0 && seg.id ? newClipInstance(remaining) : remaining,
-			);
+			if (newSegs.length > 0 && seg.id) {
+				const right = newClipInstance(remaining);
+				newSegs.push(right);
+				replacements?.set(seg.id, [
+					...(replacements.get(seg.id) ?? []),
+					right.id,
+				]);
+			} else newSegs.push(remaining);
 		}
 
 		if (segments.length === 1 && newSegs.length === 0) return transitions;
@@ -366,12 +371,12 @@ export function rippleDeleteAllTracks(
 		}>;
 		transitions?: ClipTransition[] | null;
 		mainTrackGaps?: MainTrackGaps;
-		styleSegments?: Array<{ start: number; end: number }> | null;
-		imageSegments?: Array<{ start: number; end: number }> | null;
-		zoomSegments?: Array<{ start: number; end: number }> | null;
-		sceneSegments?: Array<{ start: number; end: number }> | null;
+		styleSegments?: AttachmentSpan[] | null;
+		imageSegments?: AttachmentSpan[] | null;
+		zoomSegments?: AttachmentSpan[] | null;
+		sceneSegments?: AttachmentSpan[] | null;
 		maskSegments?: RippleMaskSegment[] | null;
-		textSegments?: Array<HoldSourceSegment> | null;
+		textSegments?: (HoldSourceSegment & AttachmentSpan)[] | null;
 		captionSegments?: Array<{ start: number; end: number }> | null;
 		keyboardSegments?: KeyboardTrackSegment[] | null;
 		audioSegments?: RippleAudioSegment[] | null;
@@ -385,6 +390,7 @@ export function rippleDeleteAllTracks(
 		end: number;
 		removeHoldAtStart?: boolean;
 	},
+	replacements?: ClipReplacements,
 ) {
 	// The clip cut below works in the gapless recording-flow domain, but the
 	// overlay tracks live in output time, which includes fullscreen-text
@@ -417,6 +423,7 @@ export function rippleDeleteAllTracks(
 		cutEnd,
 		requestedSegmentIndex,
 		timeline.mainTrackGaps,
+		replacements,
 	);
 	timeline.transitions = nextTransitions;
 	const clipChanged =
@@ -440,7 +447,7 @@ export function rippleDeleteAllTracks(
 				transition.duration !== current.duration
 			);
 		});
-	if (!clipChanged) return;
+	if (!clipChanged) return false;
 	const shiftDuration = Math.max(
 		0,
 		durationBefore -
@@ -450,9 +457,24 @@ export function rippleDeleteAllTracks(
 				timeline.mainTrackGaps,
 			),
 	);
+	const heldTimeInCut =
+		overlayCutEnd - overlayCutStart - (trackCutEnd - trackCutStart);
+	const retainedHolds = holdWindows(
+		timeline.textSegments?.filter((text) => text.attachment),
+	);
+	const retainedTimeInCut = retainedHolds.reduce(
+		(sum, [start, end]) =>
+			sum +
+			Math.max(
+				0,
+				Math.min(end, overlayCutEnd) - Math.max(start, overlayCutStart),
+			),
+		0,
+	);
 	const overlayShift =
 		shiftDuration +
-		(overlayCutEnd - overlayCutStart - (trackCutEnd - trackCutStart));
+		heldTimeInCut -
+		Math.min(Math.max(heldTimeInCut, 0), retainedTimeInCut);
 	for (const track of [timeline.styleSegments, timeline.imageSegments]) {
 		if (track)
 			rippleDeleteFromTrack(
@@ -519,6 +541,7 @@ export function rippleDeleteAllTracks(
 			overlayShift,
 		);
 	}
+	return true;
 }
 
 export function deleteClipAndRippleAllTracks(
@@ -547,12 +570,11 @@ export function deleteClipAndRippleAllTracks(
 			timeline.mainTrackGaps,
 		)?.duration ?? 0;
 	const end = start + clipDuration(segment);
-	rippleDeleteAllTracks(timeline, start, end, segmentIndex, {
+	return rippleDeleteAllTracks(timeline, start, end, segmentIndex, {
 		start: start + incomingDuration,
 		end: end - outgoingDuration,
 		removeHoldAtStart: true,
 	});
-	return true;
 }
 
 if (import.meta.vitest) {

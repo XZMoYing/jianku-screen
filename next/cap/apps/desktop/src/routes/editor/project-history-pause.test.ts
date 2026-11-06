@@ -1,6 +1,12 @@
 import { createRoot } from "solid-js";
-import { createStore } from "solid-js/store";
+import { createStore, produce } from "solid-js/store";
 import { afterEach, expect, it } from "vitest";
+import {
+	applyOverlayAttachmentEdit,
+	attachOverlayToClip,
+	captureOverlayAttachmentLayout,
+	overlayAttachmentLayout,
+} from "./overlay-attachment";
 import { createStoreHistory } from "./project-history";
 
 let dispose: (() => void) | undefined;
@@ -55,6 +61,46 @@ it("records one actual transaction without prior toolbar reads", () => {
 	expect(f.state).toMatchObject({ start: 2, end: 6 });
 	f.history.redo();
 	expect(f.state).toMatchObject({ start: 3, end: 7 });
+});
+
+it("undoes a live clip trim and its linked overlay position together", () => {
+	createRoot((end) => {
+		dispose = end;
+		const clips = {
+			segments: [
+				{ id: "a", start: 0, end: 4, timescale: 1 },
+				{ id: "b", start: 4, end: 8, timescale: 1 },
+			],
+			transitions: [],
+		};
+		const span = { start: 6, end: 7 };
+		const attachment = attachOverlayToClip(
+			span,
+			overlayAttachmentLayout(clips),
+			"b",
+		);
+		const [state, setState] = createStore({
+			...clips,
+			imageSegments: [{ ...span, attachment }],
+		});
+		const history = createStoreHistory(state, setState);
+		const before = captureOverlayAttachmentLayout(state);
+		const finish = history.pause();
+		setState("segments", 0, "end", 3.5);
+		setState("segments", 0, "end", 3);
+		setState(
+			produce((timeline) => applyOverlayAttachmentEdit(timeline, before)),
+		);
+		finish();
+		expect(state.imageSegments[0].start).toBe(5);
+		history.undo();
+		expect(state.segments[0].end).toBe(4);
+		expect(state.imageSegments[0].start).toBe(6);
+		expect(history.canUndo()).toBe(false);
+		history.redo();
+		expect(state.segments[0].end).toBe(3);
+		expect(state.imageSegments[0].start).toBe(5);
+	});
 });
 it("keeps property edits when only the range was reverted", () => {
 	const f = mount();

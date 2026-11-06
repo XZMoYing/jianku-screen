@@ -1,14 +1,19 @@
 import { describe, expect, it } from "vitest";
-import { movePositionedMainTrackClip } from "./main-track-edit";
+import {
+	cutPositionedMainTrackRange,
+	movePositionedMainTrackClip,
+	setPositionedMainTrackSpeed,
+} from "./main-track-edit";
 import {
 	attachOverlayToClip,
+	editClipsWithOverlayAttachments,
 	keepOverlayAtTimelineTime,
-	moveClipsWithOverlayAttachments,
 	overlayAttachmentLayout,
 	overlayAttachmentStatus,
 	projectOverlayAttachment,
 } from "./overlay-attachment";
 import { defaultCamera3DSegment, normalizeCamera3DSegments } from "./three-d";
+import { deleteClipAndRippleAllTracks } from "./timeline-utils";
 
 const clip = (id: string) => ({
 	id,
@@ -23,6 +28,126 @@ const sameSourceTwice = () => ({
 });
 
 describe("overlay attachment", () => {
+	it("rebinds only to a retained part of the same instance, then keeps the attachment after a merge", () => {
+		const clips = sameSourceTwice();
+		const layout = overlayAttachmentLayout(clips);
+		const span = { start: 5, end: 5.5 };
+		const image = {
+			...span,
+			attachment: attachOverlayToClip(span, layout, "b"),
+		};
+		const timeline = { ...clips, imageSegments: [image] };
+		expect(
+			editClipsWithOverlayAttachments(timeline, (replacements) =>
+				cutPositionedMainTrackRange(timeline, 1, 4.25, 4.75, replacements),
+			),
+		).toBe(true);
+		const right = timeline.segments[2].id;
+		expect(right).not.toBe("b");
+		expect(image.attachment).toMatchObject({ clipId: right, sourceTime: 6 });
+		expect(image.start).toBe(5);
+		editClipsWithOverlayAttachments(timeline, (replacements) => {
+			timeline.segments = [clip("a"), clip("b")];
+			Object.assign(timeline, { mainTrackGaps: undefined });
+			replacements.set(right, ["b"]);
+			return true;
+		});
+		expect(image.attachment).toMatchObject({ clipId: "b", sourceTime: 6 });
+		expect(image.start).toBe(5);
+	});
+
+	it("keeps fixed content and the missing source reference through ripple deletion", () => {
+		const clips = sameSourceTwice();
+		const layout = overlayAttachmentLayout(clips);
+		const span = { start: 4, end: 5 };
+		const linked = {
+			...span,
+			attachment: attachOverlayToClip(span, layout, "b"),
+		};
+		const fixed = { ...span, attachment: keepOverlayAtTimelineTime(span) };
+		const timeline = {
+			...clips,
+			imageSegments: [linked, fixed, { start: 5, end: 5.5 }],
+		};
+		expect(
+			editClipsWithOverlayAttachments(timeline, () =>
+				deleteClipAndRippleAllTracks(timeline, 1),
+			),
+		).toBe(true);
+		expect(timeline.imageSegments).toEqual([linked, fixed]);
+		expect(linked.start).toBe(4);
+		expect(fixed.start).toBe(4);
+		expect(
+			overlayAttachmentStatus(
+				linked.attachment,
+				overlayAttachmentLayout(timeline),
+			),
+		).toBe("missing-clip");
+	});
+
+	it("retimes 3D keys and their animation lengths together without stretching linked audio", () => {
+		const clips = sameSourceTwice();
+		const layout = overlayAttachmentLayout(clips);
+		const shot = defaultCamera3DSegment(4, 6);
+		shot.attachment = attachOverlayToClip(shot, layout, "b", "followClipSpeed");
+		shot.transitionIn = 0.25;
+		shot.tracks.tiltX = [
+			{ time: 1.5, value: 20, inEasing: null, outEasing: null },
+		];
+		const audio = {
+			start: 4,
+			end: 6,
+			attachment: attachOverlayToClip(
+				{ start: 4, end: 6 },
+				layout,
+				"b",
+				"followClipSpeed",
+			),
+		};
+		const timeline = {
+			...clips,
+			camera3dSegments: [shot],
+			audioSegments: [audio],
+		};
+		expect(
+			editClipsWithOverlayAttachments(timeline, () =>
+				setPositionedMainTrackSpeed(timeline, 1, 2),
+			),
+		).toBe(true);
+		expect(shot).toMatchObject({ start: 3.5, end: 4.5, transitionIn: 0.125 });
+		expect(shot.tracks.tiltX).toMatchObject([{ time: 0.75, value: 20 }]);
+		expect(audio).toMatchObject({ start: 3.5, end: 5.5 });
+	});
+
+	it("retains an overlay at its current location when following would create a lane overlap", () => {
+		const clips = sameSourceTwice();
+		const span = { start: 4, end: 5 };
+		const linked = {
+			...span,
+			attachment: attachOverlayToClip(
+				span,
+				overlayAttachmentLayout(clips),
+				"b",
+			),
+		};
+		const fixed = { start: 7, end: 8 };
+		const timeline = { ...clips, imageSegments: [linked, fixed] };
+		expect(
+			editClipsWithOverlayAttachments(timeline, () =>
+				movePositionedMainTrackClip(timeline, "b", 6),
+			),
+		).toBe(true);
+		expect(linked.start).toBe(4);
+		expect(fixed.start).toBe(7);
+		expect(
+			overlayAttachmentStatus(
+				linked.attachment,
+				overlayAttachmentLayout(timeline),
+				linked.start,
+			),
+		).toBe("offset");
+	});
+
 	it("moves a linked title hold before projecting later overlays in the same clip move", () => {
 		const clips = sameSourceTwice();
 		const originalTitle = {
@@ -54,7 +179,7 @@ describe("overlay attachment", () => {
 			imageSegments: [fixed, image],
 		};
 		expect(
-			moveClipsWithOverlayAttachments(timeline, () =>
+			editClipsWithOverlayAttachments(timeline, () =>
 				movePositionedMainTrackClip(timeline, "b", 6),
 			),
 		).toBe(true);

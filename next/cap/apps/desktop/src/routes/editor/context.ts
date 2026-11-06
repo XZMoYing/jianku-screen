@@ -118,7 +118,13 @@ import {
 	trimPositionedMainTrackClip,
 } from "./main-track-edit";
 import type { MaskSegment } from "./masks";
-import { moveClipsWithOverlayAttachments } from "./overlay-attachment";
+import {
+	type AttachmentSpan,
+	applyOverlayAttachmentEdit,
+	type ClipReplacements,
+	type captureOverlayAttachmentLayout,
+	editClipsWithOverlayAttachments,
+} from "./overlay-attachment";
 import { usePreparingEditor } from "./preparing-editor-context";
 import { createPreparingPlaybackHandoff } from "./preparing-playback-handoff";
 import {
@@ -444,15 +450,33 @@ export const [EditorContextProvider, useBaseEditorContext] =
 			);
 			const mainTrackMagnetic = () =>
 				magneticMode() && !hasMainTrackGaps(project.timeline);
+			const editMainTrack = (
+				update: (
+					timeline: EditorTimelineConfiguration,
+					replacements: ClipReplacements,
+				) => boolean,
+			) => {
+				let changed = false;
+				setProject(
+					produce((project) => {
+						const timeline = project.timeline;
+						if (timeline)
+							changed = editClipsWithOverlayAttachments(
+								timeline,
+								(replacements) => update(timeline, replacements),
+							);
+					}),
+				);
+				return changed;
+			};
 			const toggleMainTrackMagnetism = () => {
 				const next = !mainTrackMagnetic();
 				batch(() => {
 					if (next && hasMainTrackGaps(project.timeline))
-						setProject(
-							produce((project) => {
-								if (project.timeline) closeMainTrackGaps(project.timeline);
-							}),
-						);
+						editMainTrack((timeline) => {
+							closeMainTrackGaps(timeline);
+							return true;
+						});
 					setMagneticMode(next);
 					setPreferredMagnetism(next);
 				});
@@ -464,109 +488,103 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				transition: ClipTransitionInput | null,
 			) => {
 				if (!mainTrackMagnetic()) {
-					let changed = false;
-					setProject(
-						produce((project) => {
-							if (project.timeline)
-								changed = setPositionedMainTrackTransition(
-									project.timeline,
-									segmentIndex,
-									transition,
-								);
-						}),
+					const changed = editMainTrack((timeline) =>
+						setPositionedMainTrackTransition(
+							timeline,
+							segmentIndex,
+							transition,
+						),
 					);
 					if (!changed)
 						toast.error(localize("Not enough room to change this transition"));
 					return;
 				}
-				setProject(
-					produce((project) => {
-						const timeline = project.timeline;
-						if (!timeline || segmentIndex <= 0) return;
-						const segment = timeline.segments[segmentIndex];
-						const previous = timeline.segments[segmentIndex - 1];
-						if (
-							!segment ||
-							!previous ||
-							clipGapBefore(segment, timeline.mainTrackGaps) > 0
-						)
-							return;
-						const transitions = timeline.transitions ?? [];
+				editMainTrack((timeline) => {
+					if (segmentIndex <= 0) return false;
+					const segment = timeline.segments[segmentIndex];
+					const previous = timeline.segments[segmentIndex - 1];
+					if (
+						!segment ||
+						!previous ||
+						clipGapBefore(segment, timeline.mainTrackGaps) > 0
+					)
+						return false;
+					const transitions = timeline.transitions ?? [];
 
-						const oldDuration =
-							getClipTransition(
-								timeline.segments,
-								transitions,
-								segmentIndex,
-								timeline.mainTrackGaps,
-							)?.duration ?? 0;
-						const duration = transition
-							? clampTransitionDuration(transition.duration, previous, segment)
-							: 0;
-						const boundary = effectiveToOutput(
-							holdWindows(timeline.textSegments),
-							clipTimelineOffsets(
-								timeline.segments,
-								transitions,
-								timeline.mainTrackGaps,
-							)[segmentIndex] + oldDuration,
-						);
-						const shift = oldDuration - duration;
+					const oldDuration =
+						getClipTransition(
+							timeline.segments,
+							transitions,
+							segmentIndex,
+							timeline.mainTrackGaps,
+						)?.duration ?? 0;
+					const duration = transition
+						? clampTransitionDuration(transition.duration, previous, segment)
+						: 0;
+					const boundary = effectiveToOutput(
+						holdWindows(timeline.textSegments),
+						clipTimelineOffsets(
+							timeline.segments,
+							transitions,
+							timeline.mainTrackGaps,
+						)[segmentIndex] + oldDuration,
+					);
+					const shift = oldDuration - duration;
 
-						timeline.transitions = transitions.filter(
-							(value) => value.segmentIndex !== segmentIndex,
+					timeline.transitions = transitions.filter(
+						(value) => value.segmentIndex !== segmentIndex,
+					);
+					if (transition && duration > 0) {
+						timeline.transitions.push({
+							...transition,
+							segmentIndex,
+							duration,
+						});
+						timeline.transitions.sort(
+							(a, b) => a.segmentIndex - b.segmentIndex,
 						);
-						if (transition && duration > 0) {
-							timeline.transitions.push({
-								...transition,
-								segmentIndex,
-								duration,
-							});
-							timeline.transitions.sort(
-								(a, b) => a.segmentIndex - b.segmentIndex,
-							);
-						}
+					}
 
-						if (shift === 0) return;
-						const camera3dSegments = timeline.camera3dSegments ?? [];
-						const previousCamera3dDurations = camera3dSegments.map(
-							(segment) => segment.end - segment.start,
-						);
-						const tracks = [
-							timeline.styleSegments,
-							timeline.imageSegments,
-							timeline.zoomSegments,
-							timeline.sceneSegments ?? [],
-							timeline.maskSegments,
-							timeline.textSegments,
-							timeline.captionSegments ?? [],
-							timeline.audioSegments ?? [],
-							camera3dSegments,
-						];
-						for (const track of tracks) {
-							rippleTimelineTrack(track, boundary, shift);
-						}
-						rippleKeyboardTrack(
-							timeline.keyboardSegments ?? [],
+					if (shift === 0) return true;
+					const camera3dSegments = timeline.camera3dSegments ?? [];
+					const previousCamera3dDurations = camera3dSegments.map(
+						(segment) => segment.end - segment.start,
+					);
+					const tracks: AttachmentSpan[][] = [
+						timeline.styleSegments,
+						timeline.imageSegments,
+						timeline.zoomSegments,
+						timeline.sceneSegments ?? [],
+						timeline.maskSegments,
+						timeline.textSegments,
+						timeline.captionSegments ?? [],
+						timeline.audioSegments ?? [],
+						camera3dSegments,
+					];
+					for (const track of tracks) {
+						rippleTimelineTrack(
+							track.filter((row) => !row.attachment),
 							boundary,
 							shift,
 						);
-						for (let index = 0; index < camera3dSegments.length; index++) {
-							const camera3dSegment = camera3dSegments[index];
-							const previousDuration = previousCamera3dDurations[index];
-							// Keyframe times are relative to the segment start, so a
-							// segment the ripple resized (the straddling case) has to
-							// have them rescaled onto its new length.
-							const nextDuration = camera3dSegment.end - camera3dSegment.start;
-							if (previousDuration <= 0 || nextDuration === previousDuration)
-								continue;
-							scaleKeyframeTimes(
-								camera3dSegment.tracks,
-								nextDuration / previousDuration,
-							);
-						}
-					}),
-				);
+					}
+					rippleKeyboardTrack(timeline.keyboardSegments ?? [], boundary, shift);
+					for (let index = 0; index < camera3dSegments.length; index++) {
+						const camera3dSegment = camera3dSegments[index];
+						const previousDuration = previousCamera3dDurations[index];
+						// Keyframe times are relative to the segment start, so a
+						// segment the ripple resized (the straddling case) has to
+						// have them rescaled onto its new length.
+						const nextDuration = camera3dSegment.end - camera3dSegment.start;
+						if (previousDuration <= 0 || nextDuration === previousDuration)
+							continue;
+						scaleKeyframeTimes(
+							camera3dSegment.tracks,
+							nextDuration / previousDuration,
+						);
+					}
+					return true;
+				});
 			};
 
 			// Output-time boundaries of every clip that fall strictly inside a range.
@@ -722,16 +740,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 							})
 						: [];
 				return batch(() => {
-					let moved = false;
-					setProject(
-						produce((project) => {
-							const timeline = project.timeline;
-							if (timeline)
-								moved = moveClipsWithOverlayAttachments(timeline, () =>
-									update(timeline),
-								);
-						}),
-					);
+					const moved = editMainTrack(update);
 					if (!moved) return false;
 					const ids = selectedIds.includes(clipId) ? selectedIds : [clipId];
 					const indices = clipIndicesForIds(
@@ -749,7 +758,10 @@ export const [EditorContextProvider, useBaseEditorContext] =
 
 			const projectActions = {
 				setClipTransition,
-				normalizeClipTransitions: () => {
+				finishClipTrim: (
+					attachments: ReturnType<typeof captureOverlayAttachmentLayout>,
+					normalize: boolean,
+				) => {
 					setProject(
 						produce((project) => {
 							const timeline = project.timeline;
@@ -760,21 +772,44 @@ export const [EditorContextProvider, useBaseEditorContext] =
 								timeline.mainTrackGaps,
 							);
 							if (
-								normalized.length === timeline.transitions.length &&
-								normalized.every((transition, index) => {
-									const current = timeline.transitions[index];
-									return (
-										current?.segmentIndex === transition.segmentIndex &&
-										current.type === transition.type &&
-										current.duration === transition.duration
-									);
-								})
+								normalize &&
+								!(
+									normalized.length === timeline.transitions.length &&
+									normalized.every((transition, index) => {
+										const current = timeline.transitions[index];
+										return (
+											current?.segmentIndex === transition.segmentIndex &&
+											current.type === transition.type &&
+											current.duration === transition.duration
+										);
+									})
+								)
 							)
-								return;
-							timeline.transitions = normalized;
+								timeline.transitions = normalized;
+							applyOverlayAttachmentEdit(timeline, attachments);
 						}),
 					);
 				},
+				restoreClipEdge: (
+					index: number,
+					edge: "start" | "end",
+					sourceTime: number,
+				) =>
+					editMainTrack((timeline) => {
+						const clip = timeline.segments[index];
+						if (
+							!clip ||
+							!Number.isFinite(sourceTime) ||
+							sourceTime < 0 ||
+							clip[edge] === sourceTime ||
+							(edge === "start"
+								? sourceTime >= clip.end
+								: sourceTime <= clip.start)
+						)
+							return false;
+						clip[edge] = sourceTime;
+						return true;
+					}),
 				deleteClipTransition: (segmentIndex: number) => {
 					setClipTransition(segmentIndex, null);
 					setEditorState("timeline", "selection", null);
@@ -858,95 +893,77 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					sourceTime: number,
 				) => {
 					if (mainTrackMagnetic()) return false;
-					let trimmed = false;
-					setProject(
-						produce((project) => {
-							if (project.timeline)
-								trimmed = trimPositionedMainTrackClip(
-									project.timeline,
-									clipId,
-									edge,
-									sourceTime,
-								);
-						}),
+					return editMainTrack((timeline) =>
+						trimPositionedMainTrackClip(timeline, clipId, edge, sourceTime),
 					);
-					return trimmed;
 				},
 				splitClipSegment: (time: number, requestedSegmentIndex?: number) => {
-					let didSplit = false;
-					setProject(
-						produce((project) => {
-							const timeline = project.timeline;
-							if (!timeline) return;
-							const segments = timeline.segments;
-							// The click position is in held-output time; clip offsets
-							// live in the gapless recording-flow domain.
-							time -= heldTimeBefore(holdWindows(timeline.textSegments), time);
-							const offsets = clipTimelineOffsets(
-								segments,
-								timeline.transitions ?? [],
-								timeline.mainTrackGaps,
-							);
-							let currentSegmentIndex = requestedSegmentIndex ?? -1;
-							if (currentSegmentIndex < 0) {
-								for (let index = 0; index < segments.length; index++) {
-									const duration =
-										(segments[index].end - segments[index].start) /
-										segments[index].timescale;
-									if (
-										time >= offsets[index] &&
-										time <= offsets[index] + duration
-									) {
-										currentSegmentIndex = index;
-									}
+					const didSplit = editMainTrack((timeline, replacements) => {
+						const segments = timeline.segments;
+						// The click position is in held-output time; clip offsets
+						// live in the gapless recording-flow domain.
+						time -= heldTimeBefore(holdWindows(timeline.textSegments), time);
+						const offsets = clipTimelineOffsets(
+							segments,
+							timeline.transitions ?? [],
+							timeline.mainTrackGaps,
+						);
+						let currentSegmentIndex = requestedSegmentIndex ?? -1;
+						if (currentSegmentIndex < 0) {
+							for (let index = 0; index < segments.length; index++) {
+								const duration =
+									(segments[index].end - segments[index].start) /
+									segments[index].timescale;
+								if (
+									time >= offsets[index] &&
+									time <= offsets[index] + duration
+								) {
+									currentSegmentIndex = index;
 								}
 							}
+						}
 
-							if (currentSegmentIndex === -1) return;
-							const segment = segments[currentSegmentIndex];
-							const localTime = time - offsets[currentSegmentIndex];
-							const duration =
-								(segment.end - segment.start) / segment.timescale;
-							if (localTime <= 0 || localTime >= duration) return;
-							const incomingDuration =
-								getClipTransition(
-									segments,
-									timeline.transitions ?? [],
-									currentSegmentIndex,
-									timeline.mainTrackGaps,
-								)?.duration ?? 0;
-							const outgoingDuration =
-								getClipTransition(
-									segments,
-									timeline.transitions ?? [],
-									currentSegmentIndex + 1,
-									timeline.mainTrackGaps,
-								)?.duration ?? 0;
-							if (
-								localTime < incomingDuration * 2 ||
-								duration - localTime < outgoingDuration * 2
-							)
-								return;
-							const splitPositionInRecording = localTime * segment.timescale;
-
-							segments.splice(
-								currentSegmentIndex + 1,
-								0,
-								newClipInstance({
-									...segment,
-									start: segment.start + splitPositionInRecording,
-									end: segment.end,
-								}),
-							);
-							segments[currentSegmentIndex].end =
-								segment.start + splitPositionInRecording;
-							timeline.transitions = transitionsAfterClipSplit(
+						const segment = segments[currentSegmentIndex];
+						if (!segment) return false;
+						const localTime = time - offsets[currentSegmentIndex];
+						const duration = (segment.end - segment.start) / segment.timescale;
+						if (localTime <= 0 || localTime >= duration) return false;
+						const incomingDuration =
+							getClipTransition(
+								segments,
 								timeline.transitions ?? [],
 								currentSegmentIndex,
-							);
-							didSplit = true;
-						}),
-					);
+								timeline.mainTrackGaps,
+							)?.duration ?? 0;
+						const outgoingDuration =
+							getClipTransition(
+								segments,
+								timeline.transitions ?? [],
+								currentSegmentIndex + 1,
+								timeline.mainTrackGaps,
+							)?.duration ?? 0;
+						if (
+							localTime < incomingDuration * 2 ||
+							duration - localTime < outgoingDuration * 2
+						)
+							return false;
+						const splitPositionInRecording = localTime * segment.timescale;
+
+						const right = newClipInstance({
+							...segment,
+							start: segment.start + splitPositionInRecording,
+							end: segment.end,
+						});
+						segments.splice(currentSegmentIndex + 1, 0, right);
+						if (segment.id) replacements.set(segment.id, [right.id]);
+						segments[currentSegmentIndex].end =
+							segment.start + splitPositionInRecording;
+						timeline.transitions = transitionsAfterClipSplit(
+							timeline.transitions ?? [],
+							currentSegmentIndex,
+						);
+						return true;
+					});
 					if (didSplit) setEditorState("timeline", "selection", null);
 				},
 				deleteClipSegment: (segmentIndex: number) => {
@@ -954,16 +971,12 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					if (project.timeline.segments.length < 2) return;
 
 					batch(() => {
-						setProject(
-							produce((project) => {
-								const timeline = project.timeline;
-								if (!timeline) return;
-								if (mainTrackMagnetic())
-									deleteClipAndRippleAllTracks(timeline, segmentIndex);
-								else deletePositionedMainTrackClip(timeline, segmentIndex);
-							}),
+						const deleted = editMainTrack((timeline) =>
+							mainTrackMagnetic()
+								? deleteClipAndRippleAllTracks(timeline, segmentIndex)
+								: deletePositionedMainTrackClip(timeline, segmentIndex),
 						);
-						setEditorState("timeline", "selection", null);
+						if (deleted) setEditorState("timeline", "selection", null);
 					});
 				},
 				splitZoomSegment: (index: number, time: number) => {
@@ -1704,142 +1717,117 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					if (!mainTrackMagnetic()) {
 						if (project.timeline?.segments[index]?.timescale === timescale)
 							return;
-						let changed = false;
-						setProject(
-							produce((project) => {
-								if (project.timeline)
-									changed = setPositionedMainTrackSpeed(
-										project.timeline,
-										index,
-										timescale,
-									);
-							}),
+						const changed = editMainTrack((timeline) =>
+							setPositionedMainTrackSpeed(timeline, index, timescale),
 						);
 						if (!changed)
 							toast.error(localize("Not enough room to change the clip speed"));
 						return;
 					}
-					setProject(
-						produce((project) => {
-							const timeline = project.timeline;
-							if (!timeline) return;
+					editMainTrack((timeline) => {
+						const segment = timeline.segments[index];
+						if (
+							!segment ||
+							segment.timescale === timescale ||
+							!Number.isFinite(timescale) ||
+							timescale <= 0
+						)
+							return false;
 
-							const segment = timeline.segments[index];
-							if (!segment) return;
-
-							const oldDuration = clipTimelineDuration(
+						const oldDuration = clipTimelineDuration(
+							timeline.segments,
+							timeline.transitions ?? [],
+							timeline.mainTrackGaps,
+						);
+						const oldOffsets = clipTimelineOffsets(
+							timeline.segments,
+							timeline.transitions ?? [],
+							timeline.mainTrackGaps,
+						);
+						const oldHolds = holdWindows(timeline.textSegments);
+						const incomingDuration =
+							getClipTransition(
 								timeline.segments,
 								timeline.transitions ?? [],
+								index,
 								timeline.mainTrackGaps,
+							)?.duration ?? 0;
+						segment.timescale = timescale;
+						timeline.transitions = normalizeClipTransitions(
+							timeline.segments,
+							timeline.transitions ?? [],
+							timeline.mainTrackGaps,
+						);
+						const newDuration = clipTimelineDuration(
+							timeline.segments,
+							timeline.transitions,
+							timeline.mainTrackGaps,
+						);
+						const newOffsets = clipTimelineOffsets(
+							timeline.segments,
+							timeline.transitions,
+							timeline.mainTrackGaps,
+						);
+						const absoluteStart = oldOffsets[index] + incomingDuration;
+						const oldNextBoundary = oldOffsets[index + 1] ?? oldDuration;
+						const newNextBoundary = newOffsets[index + 1] ?? newDuration;
+
+						const diff = (value: number) =>
+							timelineShiftAfterClipDurationChange(
+								value,
+								oldOffsets[index],
+								newOffsets[index],
+								absoluteStart,
+								oldNextBoundary,
+								newNextBoundary,
 							);
-							const oldOffsets = clipTimelineOffsets(
-								timeline.segments,
-								timeline.transitions ?? [],
-								timeline.mainTrackGaps,
+						const mapOutputTime = (value: number) => {
+							const held = heldTimeBefore(oldHolds, value);
+							return value + diff(value - held);
+						};
+
+						const rippleTracks: AttachmentSpan[][] = [
+							timeline.styleSegments,
+							timeline.imageSegments,
+							timeline.zoomSegments,
+							timeline.sceneSegments ?? [],
+							timeline.maskSegments,
+							timeline.textSegments,
+							timeline.audioSegments ?? [],
+							timeline.captionSegments ?? [],
+						];
+						for (const track of rippleTracks) {
+							for (const row of track) {
+								if (row.attachment) continue;
+								row.start = mapOutputTime(row.start);
+								row.end = mapOutputTime(row.end);
+							}
+						}
+
+						mapKeyboardTrackTimes(
+							timeline.keyboardSegments ?? [],
+							mapOutputTime,
+						);
+
+						for (const camera3dSegment of timeline.camera3dSegments ?? []) {
+							if (camera3dSegment.attachment) continue;
+							const previousDuration =
+								camera3dSegment.end - camera3dSegment.start;
+							camera3dSegment.start = mapOutputTime(camera3dSegment.start);
+							camera3dSegment.end = mapOutputTime(camera3dSegment.end);
+							// Keyframe times are relative to the segment start, so they
+							// have to follow the segment's new length rather than the
+							// absolute shift the other tracks use.
+							const nextDuration = camera3dSegment.end - camera3dSegment.start;
+							if (previousDuration <= 0 || nextDuration === previousDuration)
+								continue;
+							scaleKeyframeTimes(
+								camera3dSegment.tracks,
+								nextDuration / previousDuration,
 							);
-							const oldHolds = holdWindows(timeline.textSegments);
-							const incomingDuration =
-								getClipTransition(
-									timeline.segments,
-									timeline.transitions ?? [],
-									index,
-									timeline.mainTrackGaps,
-								)?.duration ?? 0;
-							segment.timescale = timescale;
-							timeline.transitions = normalizeClipTransitions(
-								timeline.segments,
-								timeline.transitions ?? [],
-								timeline.mainTrackGaps,
-							);
-							const newDuration = clipTimelineDuration(
-								timeline.segments,
-								timeline.transitions,
-								timeline.mainTrackGaps,
-							);
-							const newOffsets = clipTimelineOffsets(
-								timeline.segments,
-								timeline.transitions,
-								timeline.mainTrackGaps,
-							);
-							const absoluteStart = oldOffsets[index] + incomingDuration;
-							const oldNextBoundary = oldOffsets[index + 1] ?? oldDuration;
-							const newNextBoundary = newOffsets[index + 1] ?? newDuration;
-
-							const diff = (value: number) =>
-								timelineShiftAfterClipDurationChange(
-									value,
-									oldOffsets[index],
-									newOffsets[index],
-									absoluteStart,
-									oldNextBoundary,
-									newNextBoundary,
-								);
-							const mapOutputTime = (value: number) => {
-								const held = heldTimeBefore(oldHolds, value);
-								return value + diff(value - held);
-							};
-
-							for (const overlay of [
-								...timeline.styleSegments,
-								...timeline.imageSegments,
-							]) {
-								overlay.start = mapOutputTime(overlay.start);
-								overlay.end = mapOutputTime(overlay.end);
-							}
-							for (const zoomSegment of timeline.zoomSegments) {
-								zoomSegment.start = mapOutputTime(zoomSegment.start);
-								zoomSegment.end = mapOutputTime(zoomSegment.end);
-							}
-
-							for (const sceneSegment of timeline.sceneSegments ?? []) {
-								sceneSegment.start = mapOutputTime(sceneSegment.start);
-								sceneSegment.end = mapOutputTime(sceneSegment.end);
-							}
-
-							for (const maskSegment of timeline.maskSegments) {
-								maskSegment.start = mapOutputTime(maskSegment.start);
-								maskSegment.end = mapOutputTime(maskSegment.end);
-							}
-
-							for (const textSegment of timeline.textSegments) {
-								textSegment.start = mapOutputTime(textSegment.start);
-								textSegment.end = mapOutputTime(textSegment.end);
-							}
-
-							for (const audioSegment of timeline.audioSegments ?? []) {
-								audioSegment.start = mapOutputTime(audioSegment.start);
-								audioSegment.end = mapOutputTime(audioSegment.end);
-							}
-
-							for (const captionSegment of timeline.captionSegments ?? []) {
-								captionSegment.start = mapOutputTime(captionSegment.start);
-								captionSegment.end = mapOutputTime(captionSegment.end);
-							}
-
-							mapKeyboardTrackTimes(
-								timeline.keyboardSegments ?? [],
-								mapOutputTime,
-							);
-
-							for (const camera3dSegment of timeline.camera3dSegments ?? []) {
-								const previousDuration =
-									camera3dSegment.end - camera3dSegment.start;
-								camera3dSegment.start = mapOutputTime(camera3dSegment.start);
-								camera3dSegment.end = mapOutputTime(camera3dSegment.end);
-								// Keyframe times are relative to the segment start, so they
-								// have to follow the segment's new length rather than the
-								// absolute shift the other tracks use.
-								const nextDuration =
-									camera3dSegment.end - camera3dSegment.start;
-								if (previousDuration <= 0 || nextDuration === previousDuration)
-									continue;
-								scaleKeyframeTimes(
-									camera3dSegment.tracks,
-									nextDuration / previousDuration,
-								);
-							}
-						}),
-					);
+						}
+						return true;
+					});
 				},
 				setClipSegmentSpeedAudioMode: (
 					index: number,
@@ -1929,26 +1917,24 @@ export const [EditorContextProvider, useBaseEditorContext] =
 						// Dropping the transition on the merged boundary first lets
 						// setClipTransition ripple the other tracks for the overlap it
 						// gave back; the merge itself is duration-neutral.
-						setClipTransition(kept + 1, null);
-						setProject(
-							produce((project) => {
-								const timeline = project.timeline;
-								if (!timeline) return;
-								const left = timeline.segments[kept];
-								const right = timeline.segments[kept + 1];
-								const settingsFrom = timeline.segments[index];
-								if (!left || !right || !settingsFrom) return;
-								timeline.segments.splice(
-									kept,
-									2,
-									mergedClipSegment(left, right, settingsFrom),
-								);
-								timeline.transitions = transitionsAfterClipMerge(
-									timeline.transitions ?? [],
-									kept,
-								);
-							}),
-						);
+						if (mainTrackMagnetic()) setClipTransition(kept + 1, null);
+						editMainTrack((timeline, replacements) => {
+							const left = timeline.segments[kept];
+							const right = timeline.segments[kept + 1];
+							const settingsFrom = timeline.segments[index];
+							if (!left || !right || !settingsFrom) return false;
+							if (left.id && right.id) replacements.set(right.id, [left.id]);
+							timeline.segments.splice(
+								kept,
+								2,
+								mergedClipSegment(left, right, settingsFrom),
+							);
+							timeline.transitions = transitionsAfterClipMerge(
+								timeline.transitions ?? [],
+								kept,
+							);
+							return true;
+						});
 						setEditorState("timeline", "selection", {
 							type: "clip",
 							indices: [kept],

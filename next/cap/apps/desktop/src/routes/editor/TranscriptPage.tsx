@@ -37,6 +37,10 @@ import {
 } from "./clip-transitions";
 import { FPS, useEditorContext } from "./context";
 import { cutPositionedMainTrackRange } from "./main-track-edit";
+import {
+	type ClipReplacements,
+	editClipsWithOverlayAttachments,
+} from "./overlay-attachment";
 import { routeEditorPlaybackIntent } from "./playback-intent-routing";
 import { rippleDeleteAllTracks } from "./timeline-utils";
 
@@ -437,6 +441,7 @@ export function TranscriptPanel() {
 						mainTrackGaps: timeline.mainTrackGaps,
 					}
 				: null;
+		const positionedReplacements: ClipReplacements = new Map();
 		if (
 			positioned &&
 			cuts.some(
@@ -446,6 +451,7 @@ export function TranscriptPanel() {
 						range.segmentIndex,
 						range.start,
 						range.end,
+						positionedReplacements,
 					),
 			)
 		) {
@@ -478,21 +484,31 @@ export function TranscriptPanel() {
 					}
 				}
 
-				if (p.timeline) {
+				const timeline = p.timeline;
+				if (!timeline || !cuts.length) return;
+				editClipsWithOverlayAttachments(timeline, (replacements) => {
 					if (positioned) {
-						p.timeline.segments = positioned.segments;
-						p.timeline.transitions = positioned.transitions;
-						p.timeline.mainTrackGaps = positioned.mainTrackGaps;
-					} else
-						for (const range of cuts) {
+						timeline.segments = positioned.segments;
+						timeline.transitions = positioned.transitions;
+						timeline.mainTrackGaps = positioned.mainTrackGaps;
+						for (const [id, children] of positionedReplacements)
+							replacements.set(id, children);
+						return true;
+					}
+					let edited = false;
+					for (const range of cuts) {
+						edited =
 							rippleDeleteAllTracks(
-								p.timeline,
+								timeline,
 								range.start,
 								range.end,
 								range.segmentIndex,
-							);
-						}
-				}
+								undefined,
+								replacements,
+							) || edited;
+					}
+					return edited;
+				});
 			}),
 		);
 		setEditorState("styleEditIndex", null);
