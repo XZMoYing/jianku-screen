@@ -1,3 +1,4 @@
+mod audio_probe;
 mod sync_report;
 
 use crate::{ArcLock, general_settings::GeneralSettingsStore, permissions};
@@ -456,8 +457,13 @@ pub async fn run_diagnostic(
 
     // `collect_report` probes displays and disk mounts; both can block for tens
     // of seconds, so it never runs on the async runtime's cooperative threads.
-    let report = tokio::task::spawn_blocking(move || {
-        let mut report = cap_recording::diagnostics::collect_report(
+    let (report, audio_probe_status) = tokio::task::spawn_blocking(move || {
+        let (microphones, audio_outputs, audio_probe_status) =
+            match audio_probe::collect_audio_devices() {
+                Ok((microphones, audio_outputs)) => (microphones, audio_outputs, "complete"),
+                Err(error) => (Vec::new(), Vec::new(), error.status()),
+            };
+        let mut report = cap_recording::diagnostics::collect_report_with_audio_devices(
             cap_recording::diagnostics::DiagnosticReportArgs {
                 flavor: "tauri",
                 app_version: &app_version,
@@ -469,9 +475,11 @@ pub async fn run_diagnostic(
                 sync_test,
                 sync_test_error: sync_test_error_for_report,
             },
+            microphones,
+            audio_outputs,
         );
         minimize_local_report(&mut report);
-        report
+        (report, audio_probe_status)
     })
     .await
     .map_err(|e| format!("Failed to collect diagnostic report: {e}"))?;
@@ -489,8 +497,9 @@ pub async fn run_diagnostic(
         .and_then(|v| v.as_str())
         .map(str::to_string);
 
-    let report_value = serde_json::to_value(&report)
+    let mut report_value = serde_json::to_value(&report)
         .map_err(|e| format!("Failed to serialize diagnostic report: {e}"))?;
+    report_value["audioDeviceProbe"] = serde_json::Value::String(audio_probe_status.to_string());
     let report_json = serde_json::to_string_pretty(&report_value)
         .map_err(|e| format!("Failed to serialize diagnostic report: {e}"))?;
 

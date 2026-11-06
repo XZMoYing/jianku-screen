@@ -719,13 +719,20 @@ pub struct DiagnosticReport {
 }
 
 pub fn collect_report(args: DiagnosticReportArgs<'_>) -> DiagnosticReport {
+    collect_report_with_audio_devices(args, collect_microphones(), collect_audio_outputs())
+}
+
+pub fn collect_report_with_audio_devices(
+    args: DiagnosticReportArgs<'_>,
+    microphones: Vec<MicrophoneDiagnostics>,
+    audio_outputs: Vec<AudioOutputDiagnostics>,
+) -> DiagnosticReport {
     // Display enumeration is the expensive probe here and microphone
     // enumeration re-walks every device's supported configs, so both run once
     // and feed the report and its matrix hints. Probing twice also let the two
     // disagree when hardware changed in between, breaking the invariant that
     // there is one video hint per display.
     let displays = collect_displays();
-    let microphones = collect_microphones();
     let matrix_hints = SyncMatrixHints {
         video: video_hints_from_displays(
             &displays,
@@ -748,7 +755,7 @@ pub fn collect_report(args: DiagnosticReportArgs<'_>) -> DiagnosticReport {
         displays,
         cameras: collect_cameras(),
         microphones,
-        audio_outputs: collect_audio_outputs(),
+        audio_outputs,
         storage: args.recordings_dir.and_then(collect_storage_info),
         permissions: args.permissions,
         settings: args.settings,
