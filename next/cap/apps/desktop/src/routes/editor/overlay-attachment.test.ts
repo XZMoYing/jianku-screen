@@ -7,6 +7,7 @@ import {
 import {
 	attachOverlayToClip,
 	editClipsWithOverlayAttachments,
+	initialOverlayAttachment,
 	keepOverlayAtTimelineTime,
 	overlayAttachmentLayout,
 	overlayAttachmentStatus,
@@ -29,6 +30,17 @@ const sameSourceTwice = () => ({
 });
 
 describe("overlay attachment", () => {
+	it("fixes newly authored content to the timeline when the selected clip cannot provide an anchor", () => {
+		const layout = overlayAttachmentLayout(sameSourceTwice());
+		const span = { start: 4, end: 5 };
+		expect(initialOverlayAttachment(span, layout, null).kind).toBe("timeline");
+		expect(initialOverlayAttachment(span, layout, "a").kind).toBe("timeline");
+		expect(initialOverlayAttachment(span, layout, "b")).toMatchObject({
+			kind: "clip",
+			clipId: "b",
+			sourceTime: 5,
+		});
+	});
 	it("gives a split overlay its own identity and anchors the right part to its new start", () => {
 		const layout = overlayAttachmentLayout(sameSourceTwice());
 		const span = { start: 3.25, end: 5 };

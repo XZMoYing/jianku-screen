@@ -113,6 +113,22 @@ export function keepOverlayAtTimelineTime(
 	return { kind: "timeline", id: attachmentId(span) };
 }
 
+export function initialOverlayAttachment(
+	span: AttachmentSpan,
+	layout: AttachmentLayout | null,
+	clipId: string | null | undefined,
+): OverlayAttachment {
+	if (layout && clipId) {
+		const attachment = attachOverlayToClip(span, layout, clipId);
+		if (
+			attachment &&
+			overlayAttachmentStatus(attachment, layout) === "attached"
+		)
+			return attachment;
+	}
+	return keepOverlayAtTimelineTime(span);
+}
+
 export function overlayPartAfterSplit<T extends AttachmentSpan>(
 	span: T,
 	layout: AttachmentLayout | null,

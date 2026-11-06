@@ -209,11 +209,17 @@ export function SceneTrack(props: {
 										}
 									}
 
-									sceneSegments.splice(index, 0, {
+									const segment = {
 										start: time,
 										end: time + maxDuration,
-										mode: "cameraOnly",
-									});
+										mode: "cameraOnly" as const,
+									};
+									sceneSegments.splice(
+										index,
+										0,
+										projectActions.withSelectedClipAttachment?.(segment) ??
+											segment,
+									);
 								}),
 							);
 						});

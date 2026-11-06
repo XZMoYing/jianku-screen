@@ -127,6 +127,7 @@ import {
 	type ClipReplacements,
 	type captureOverlayAttachmentLayout,
 	editClipsWithOverlayAttachments,
+	initialOverlayAttachment,
 	keepOverlayAtTimelineTime,
 	overlayAttachmentLayout,
 	overlayAttachmentStatus,
@@ -777,13 +778,14 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				span: T,
 				clipId = selectedClip()?.id,
 			): T => {
-				const layout = attachmentLayout();
-				if (!layout || !clipId) return span;
-				const attachment = attachOverlayToClip(span, layout, clipId);
-				return attachment &&
-					overlayAttachmentStatus(attachment, layout) === "attached"
-					? { ...span, attachment }
-					: span;
+				return {
+					...span,
+					attachment: initialOverlayAttachment(
+						span,
+						attachmentLayout(),
+						clipId,
+					),
+				};
 			};
 			const overlayRowsForAttachment = (
 				type: TimelineTrackType,
