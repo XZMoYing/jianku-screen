@@ -31,7 +31,7 @@ const { showMenu } = vi.hoisted(() => ({
 			(
 				event: MouseEvent | KeyboardEvent,
 				title: string,
-				entries: { danger?: boolean; run: () => void }[],
+				entries: { label: string; danger?: boolean; run: () => void }[],
 			) => void
 		>(),
 }));
@@ -52,7 +52,7 @@ function segment(start: number, end = start + 4): ZoomSegment {
 		edgeSnapRatio: 0.25,
 	};
 }
-function fixture(segments: ZoomSegment[]) {
+function fixture(segments: ZoomSegment[], associations = false) {
 	const [project, setProject] = createStore({
 		timeline: { zoomSegments: segments },
 	});
@@ -75,6 +75,40 @@ function fixture(segments: ZoomSegment[]) {
 		keymap: { label: () => "Delete" },
 		timelineCommands: {
 			trackSegments: () => project.timeline.zoomSegments,
+			overlayAssociation: (_type: string, index: number) => {
+				if (!associations) return null;
+				const attachment = project.timeline.zoomSegments[index]?.attachment;
+				return {
+					attachment,
+					status:
+						attachment?.kind === "clip"
+							? "attached"
+							: attachment
+								? "timeline"
+								: "unassigned",
+					label:
+						attachment?.kind === "clip"
+							? "Follows test clip"
+							: attachment
+								? "Fixed timeline position"
+								: "No clip association",
+					canFollowSpeed: true,
+				};
+			},
+			overlayAssociationTarget: () => ({ id: "video-a", name: "test clip" }),
+			setOverlayAttachment: vi.fn(
+				(_type: string, index: number, clipId: string | null) => {
+					setProject(
+						"timeline",
+						"zoomSegments",
+						index,
+						"attachment",
+						clipId
+							? { kind: "clip", id: "overlay-a", clipId, sourceTime: 2 }
+							: { kind: "timeline", id: "overlay-a" },
+					);
+				},
+			),
 			selectSegments: (type: "zoom", indices: number[]) =>
 				setEditorState("timeline", "selection", { type, indices }),
 			deleteSelection: () =>
@@ -127,11 +161,11 @@ afterEach(() => {
 const roots = () => [
 	...document.querySelectorAll<HTMLElement>('[title^="自动缩放"]'),
 ];
-function mount(segments = [segment(2), segment(10)]) {
+function mount(segments = [segment(2), segment(10)], associations = false) {
 	const [shown, setShown] = createSignal(true);
 	const onDragStateChanged = vi.fn();
 	dispose = render(() => {
-		context = fixture(segments);
+		context = fixture(segments, associations);
 		const menu = createTimelineSegmentMenu(() => {});
 		return (
 			<TimelineContextProvider
@@ -181,6 +215,45 @@ function begin(node: HTMLElement) {
 	mouse(window, "mousemove", 250);
 	mouse(window, "mousemove", 300);
 }
+
+it("exposes linking, unlinking and the source state on the timeline segment", () => {
+	const bounds = vi
+		.spyOn(HTMLElement.prototype, "getBoundingClientRect")
+		.mockReturnValue(new DOMRect(0, 0, 1000, 44));
+	try {
+		mount([segment(2)], true);
+		mouse(roots()[0], "contextmenu", 200, 0, 2);
+		const link = showMenu.mock.lastCall?.[2].find(
+			(entry) => entry.label === "Associate with {name}",
+		);
+		expect(link).toBeDefined();
+		link?.run();
+		expect(context.timelineCommands.setOverlayAttachment).toHaveBeenCalledWith(
+			"zoom",
+			0,
+			"video-a",
+		);
+		expect(
+			roots()[0]
+				.querySelector('[data-overlay-association="attached"]')
+				?.getAttribute("aria-label"),
+		).toBe("Follows test clip");
+		mouse(roots()[0], "contextmenu", 200, 0, 2);
+		const unlink = showMenu.mock.lastCall?.[2].find(
+			(entry) => entry.label === "Unlink and keep current position",
+		);
+		expect(unlink).toBeDefined();
+		unlink?.run();
+		expect(
+			context.timelineCommands.setOverlayAttachment,
+		).toHaveBeenLastCalledWith("zoom", 0, null);
+		expect(
+			roots()[0].querySelector('[data-overlay-association="timeline"]'),
+		).not.toBeNull();
+	} finally {
+		bounds.mockRestore();
+	}
+});
 
 it.each([
 	"blur",

@@ -4,10 +4,10 @@ use cap_media_info::ffmpeg_sample_format_for;
 use cap_project::CursorMoveEvent;
 use cap_project::cursor::SHORT_CURSOR_SHAPE_DEBOUNCE_MS;
 use cap_project::{
-    CameraShape, CursorClickEvent, GlideDirection, InstantRecordingMeta, MultipleSegments,
-    Platform, ProjectConfiguration, RecordingMeta, RecordingMetaInner, SharingMeta,
-    StudioRecordingMeta, StudioRecordingStatus, TimelineConfiguration, TimelineSegment, ZoomMode,
-    ZoomSegment, cursor::CursorEvents,
+    CameraShape, ClipAttachmentTiming, CursorClickEvent, GlideDirection, InstantRecordingMeta,
+    MultipleSegments, OverlayAttachment, Platform, ProjectConfiguration, RecordingMeta,
+    RecordingMetaInner, SharingMeta, StudioRecordingMeta, StudioRecordingStatus,
+    TimelineConfiguration, TimelineSegment, ZoomMode, ZoomSegment, cursor::CursorEvents,
 };
 #[cfg(target_os = "macos")]
 use cap_recording::SendableShareableContent;
@@ -6788,6 +6788,7 @@ pub fn generate_zoom_segments_for_timeline(
                 .effective_transition(index + 1)
                 .map_or(0.0, |transition| transition.duration))
             * 1000.0;
+        output_offset_ms += timeline.gap_before(index) * 1000.0;
         let take_index = clip.recording_clip as usize;
         let (events, origin_ms) = takes
             .get(take_index)
@@ -6827,12 +6828,38 @@ pub fn generate_zoom_segments_for_timeline(
         // an outgoing tail must not contribute clicks for the same output span.
         output_offset_ms += visible_duration_ms;
     }
-    Ok(generate_zoom_segments_from_clicks_impl(
-        clicks,
-        Vec::new(),
-        duration,
-        zoom_amount,
-    ))
+    let mut zooms =
+        generate_zoom_segments_from_clicks_impl(clicks, Vec::new(), duration, zoom_amount);
+    attach_generated_zooms(timeline, &mut zooms);
+    Ok(zooms)
+}
+
+fn attach_generated_zooms(timeline: &TimelineConfiguration, zooms: &mut [ZoomSegment]) {
+    for zoom in zooms {
+        let Some(start) = timeline
+            .get_frame_mapping(zoom.start)
+            .and_then(|mapping| mapping.primary_source())
+        else {
+            continue;
+        };
+        let end_time = (zoom.end - 1e-7).max(zoom.start);
+        let Some(end) = timeline
+            .get_frame_mapping(end_time)
+            .and_then(|mapping| mapping.primary_source())
+        else {
+            continue;
+        };
+        if start.segment_index == end.segment_index
+            && let Some(clip_id) = &start.segment.id
+        {
+            zoom.attachment = Some(OverlayAttachment::Clip {
+                id: format!("overlay-{}", uuid::Uuid::new_v4()),
+                clip_id: clip_id.clone(),
+                source_time: start.source_time,
+                timing: ClipAttachmentTiming::FollowClipSpeed,
+            });
+        }
+    }
 }
 
 pub(crate) fn apply_studio_sound_default(app: &AppHandle, config: &mut ProjectConfiguration) {
@@ -6906,7 +6933,7 @@ fn project_config_from_recording(
         .iter()
         .enumerate()
         .map(|(i, segment)| TimelineSegment {
-            id: None,
+            id: Some(format!("recording-clip-{i}")),
             recording_clip: i as u32,
             start: 0.0,
             end: segment.duration(),
@@ -6918,7 +6945,7 @@ fn project_config_from_recording(
         })
         .collect::<Vec<_>>();
 
-    let zoom_segments = if settings.auto_zoom_on_clicks {
+    let mut zoom_segments = if settings.auto_zoom_on_clicks {
         generate_zoom_segments_from_clicks(
             completed_recording,
             recordings,
@@ -6941,7 +6968,10 @@ fn project_config_from_recording(
         });
     }
 
-    config.timeline = Some(recording_timeline(timeline_segments, zoom_segments));
+    let mut timeline = recording_timeline(timeline_segments, Vec::new());
+    attach_generated_zooms(&timeline, &mut zoom_segments);
+    timeline.zoom_segments = zoom_segments;
+    config.timeline = Some(timeline);
 
     config
 }
@@ -7671,6 +7701,39 @@ mod tests {
             .into_iter()
             .map(|segment| (segment.start, segment.end))
             .collect()
+    }
+
+    #[test]
+    fn automatic_zoom_uses_gap_time_and_anchors_only_within_one_clip() {
+        let (_directory, meta, recordings) =
+            auto_zoom_project_fixture(&[8.0], &[0.5], &[vec![2500.0]]);
+        let mut timeline = edited_zoom_timeline(serde_json::json!([
+            {"id":"take-with-gap","recordingSegment":0,"timescale":1,"start":0,"end":8}
+        ]));
+        timeline
+            .main_track_gaps
+            .before_clip
+            .insert("take-with-gap".into(), 2.0);
+        let zooms =
+            generate_zoom_segments_for_timeline(&meta, &recordings, &timeline, 1.5).unwrap();
+        assert_eq!(zooms.len(), 1);
+        assert_eq!((zooms[0].start, zooms[0].end), (3.7, 6.5));
+        assert!(
+            matches!(&zooms[0].attachment, Some(OverlayAttachment::Clip { clip_id, source_time, timing: ClipAttachmentTiming::FollowClipSpeed, .. }) if clip_id == "take-with-gap" && (*source_time - 1.7).abs() < 1e-9)
+        );
+
+        let split = edited_zoom_timeline(serde_json::json!([
+            {"id":"left","recordingSegment":0,"timescale":1,"start":0,"end":4},
+            {"id":"right","recordingSegment":0,"timescale":1,"start":4,"end":8}
+        ]));
+        let mut across = [ZoomSegment {
+            start: 3.5,
+            end: 4.5,
+            attachment: None,
+            ..zooms[0].clone()
+        }];
+        attach_generated_zooms(&split, &mut across);
+        assert!(across[0].attachment.is_none());
     }
 
     #[test]

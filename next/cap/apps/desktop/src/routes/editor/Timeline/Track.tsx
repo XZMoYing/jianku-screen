@@ -11,6 +11,9 @@ import {
 	Switch,
 	splitProps,
 } from "solid-js";
+import IconLucideLink2 from "~icons/lucide/link-2";
+import IconLucideLink2Off from "~icons/lucide/link-2-off";
+import IconLucideTriangleAlert from "~icons/lucide/triangle-alert";
 import { useEditorContext } from "../context";
 import { isContextMenuKey } from "../editor-context-menu";
 import type { SegmentMenuTarget } from "./context";
@@ -97,8 +100,14 @@ export function SegmentRoot(
 		"ref",
 		"children",
 	]);
-	const { editorState } = useEditorContext();
+	const { editorState, timelineCommands } = useEditorContext();
 	const { isSegmentVisible, showSegmentMenu } = useTimelineContext();
+	const association = createMemo(() => {
+		const target = local.menuTarget;
+		return target && !local.ghost
+			? timelineCommands?.overlayAssociation?.(target.type, target.index)
+			: null;
+	});
 	const translateX = useSegmentTranslateX(() => local.segment);
 	const width = useSegmentWidth(() => local.segment);
 	const visible = createMemo(
@@ -112,6 +121,11 @@ export function SegmentRoot(
 			<SegmentContextProvider width={width} segment={() => local.segment}>
 				<div
 					{...rest}
+					title={
+						association()?.attachment
+							? [rest.title, association()?.label].filter(Boolean).join(" · ")
+							: rest.title
+					}
 					data-timeline-segment=""
 					tabIndex={
 						showSegmentMenu && local.menuTarget && local.selected
@@ -168,6 +182,36 @@ export function SegmentRoot(
 						}
 					>
 						{local.children}
+						<Show
+							when={
+								association()?.attachment && width() >= 26
+									? association()
+									: null
+							}
+						>
+							{(info) => (
+								<span
+									role="img"
+									aria-label={info().label}
+									data-overlay-association={info().status}
+									class={cx(
+										"pointer-events-none absolute right-2 top-1 z-20 grid size-4 place-items-center rounded-md bg-ed-card/75",
+										info().status === "attached" || info().status === "timeline"
+											? "text-ed-text-2"
+											: "text-amber-10",
+									)}
+								>
+									<Switch fallback={<IconLucideTriangleAlert class="size-3" />}>
+										<Match when={info().status === "attached"}>
+											<IconLucideLink2 class="size-3" />
+										</Match>
+										<Match when={info().status === "timeline"}>
+											<IconLucideLink2Off class="size-3" />
+										</Match>
+									</Switch>
+								</span>
+							)}
+						</Show>
 					</div>
 				</div>
 			</SegmentContextProvider>

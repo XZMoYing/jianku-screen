@@ -10,6 +10,7 @@ import {
 	keepOverlayAtTimelineTime,
 	overlayAttachmentLayout,
 	overlayAttachmentStatus,
+	overlayPartAfterSplit,
 	projectOverlayAttachment,
 } from "./overlay-attachment";
 import { defaultCamera3DSegment, normalizeCamera3DSegments } from "./three-d";
@@ -28,6 +29,21 @@ const sameSourceTwice = () => ({
 });
 
 describe("overlay attachment", () => {
+	it("gives a split overlay its own identity and anchors the right part to its new start", () => {
+		const layout = overlayAttachmentLayout(sameSourceTwice());
+		const span = { start: 3.25, end: 5 };
+		const attachment = attachOverlayToClip(span, layout, "b");
+		const right = overlayPartAfterSplit(
+			{ ...span, start: 4, attachment },
+			layout,
+		);
+		expect(right.attachment).toMatchObject({
+			kind: "clip",
+			clipId: "b",
+			sourceTime: 5,
+		});
+		expect(right.attachment?.id).not.toBe(attachment?.id);
+	});
 	it("rebinds only to a retained part of the same instance, then keeps the attachment after a merge", () => {
 		const clips = sameSourceTwice();
 		const layout = overlayAttachmentLayout(clips);

@@ -258,6 +258,7 @@ export function SceneTrack(props: {
 									s?.sort((a, b) => a.start - b.start);
 								}),
 							);
+							projectActions.reanchorOverlay?.("scene", segment);
 						});
 						setPreviewTime(minValue);
 					};
@@ -352,6 +353,14 @@ export function SceneTrack(props: {
 										)
 											setEditorState("previewTime", previewBefore);
 									}
+									if (
+										(reason === "release" ||
+											reason === "history" ||
+											cause === "superseded") &&
+										ownsRange() &&
+										segment.start !== drag.original.start
+									)
+										projectActions.reanchorOverlay?.("scene", segment);
 									resumeHistory?.();
 
 									const currentIndex = i();

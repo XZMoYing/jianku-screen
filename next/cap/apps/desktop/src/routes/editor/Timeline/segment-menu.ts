@@ -41,6 +41,13 @@ export function createTimelineSegmentMenu(moveTo: (time: number) => void) {
 			type === "style" || type === "audio" || isOverlayTrackKind(type)
 				? getSegmentTrack(segment)
 				: undefined;
+		const association = timelineCommands.overlayAssociation?.(
+			type,
+			clickedIndex,
+		);
+		const clip = association
+			? timelineCommands.overlayAssociationTarget()
+			: null;
 		menu.show(event, name, [
 			{
 				label: localize("编辑此片段属性"),
@@ -62,6 +69,63 @@ export function createTimelineSegmentMenu(moveTo: (time: number) => void) {
 				label: localize("选中此轨道的全部片段"),
 				run: () => timelineCommands.selectTrack(type, lane),
 			},
+			...(association
+				? [
+						{ label: association.label, disabled: true, run: () => {} },
+						{
+							label: clip
+								? localize("Associate with {name}", { name: clip.name })
+								: localize("Select a video clip or move the playhead onto one"),
+							disabled:
+								!clip ||
+								(association.status === "attached" &&
+									association.attachment?.kind === "clip" &&
+									association.attachment.clipId === clip.id),
+							run: () => {
+								const index = currentIndex();
+								if (index >= 0 && clip)
+									timelineCommands.setOverlayAttachment(type, index, clip.id);
+							},
+						},
+						{
+							label: localize(
+								association.attachment?.kind === "clip"
+									? "Unlink and keep current position"
+									: "Keep timeline position",
+							),
+							disabled: association.status === "timeline",
+							run: () => {
+								const index = currentIndex();
+								if (index >= 0)
+									timelineCommands.setOverlayAttachment(type, index, null);
+							},
+						},
+						...(association.canFollowSpeed &&
+						association.attachment?.kind === "clip"
+							? [
+									{
+										label: localize(
+											association.attachment.timing === "followClipSpeed"
+												? "Keep overlay duration when speed changes"
+												: "Follow clip speed",
+										),
+										run: () => {
+											const index = currentIndex();
+											if (index >= 0)
+												timelineCommands.setOverlayAttachmentTiming(
+													type,
+													index,
+													association.attachment?.kind === "clip" &&
+														association.attachment.timing === "followClipSpeed"
+														? "preserveDuration"
+														: "followClipSpeed",
+												);
+										},
+									},
+								]
+							: []),
+					]
+				: []),
 			{
 				label:
 					targets.length > 1

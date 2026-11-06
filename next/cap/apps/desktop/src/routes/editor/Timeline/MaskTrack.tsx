@@ -136,10 +136,13 @@ export function MaskTrack(props: {
 			"maskSegments",
 			produce((segments) => {
 				segments ??= [];
-				segments.push({
+				const segment = {
 					...defaultMaskSegment(placement.start, placement.end),
 					track: props.laneIndex,
-				});
+				};
+				segments.push(
+					projectActions.withSelectedClipAttachment?.(segment) ?? segment,
+				);
 				sortTrackSegments(segments);
 			}),
 		);
@@ -305,6 +308,12 @@ export function MaskTrack(props: {
 						)
 							setEditorState("previewTime", previewBefore);
 					}
+					if (
+						(reason === "release" || reason === "history") &&
+						ownsRange() &&
+						segment.start !== drag.original.start
+					)
+						projectActions.reanchorOverlay?.("mask", segment);
 					resumeHistory();
 					if (!moved && e) {
 						e.stopPropagation();

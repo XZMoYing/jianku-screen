@@ -43,6 +43,7 @@ import {
 	type FrameData,
 } from "~/utils/socket";
 import {
+	type ClipAttachmentTiming,
 	type ClipSpeedAudioMode,
 	type ColorCorrectionConfiguration,
 	commands,
@@ -87,6 +88,7 @@ import {
 	clampTransitionDuration,
 	clipDuration,
 	clipGapBefore,
+	clipSourceTimeAt,
 	clipTimelineDuration,
 	clipTimelineOffsets,
 	getClipTransition,
@@ -121,9 +123,15 @@ import type { MaskSegment } from "./masks";
 import {
 	type AttachmentSpan,
 	applyOverlayAttachmentEdit,
+	attachOverlayToClip,
 	type ClipReplacements,
 	type captureOverlayAttachmentLayout,
 	editClipsWithOverlayAttachments,
+	keepOverlayAtTimelineTime,
+	overlayAttachmentLayout,
+	overlayAttachmentStatus,
+	overlayAttachmentTrack,
+	overlayPartAfterSplit,
 } from "./overlay-attachment";
 import { usePreparingEditor } from "./preparing-editor-context";
 import { createPreparingPlaybackHandoff } from "./preparing-playback-handoff";
@@ -756,8 +764,80 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				});
 			};
 
+			const attachmentLayout = createMemo(() =>
+				project.timeline ? overlayAttachmentLayout(project.timeline) : null,
+			);
+			const selectedClip = () => {
+				const selection = editorState.timeline.selection;
+				return selection?.type === "clip" && selection.indices.length === 1
+					? project.timeline?.segments[selection.indices[0]]
+					: undefined;
+			};
+			const withSelectedClipAttachment = <T extends AttachmentSpan>(
+				span: T,
+				clipId = selectedClip()?.id,
+			): T => {
+				const layout = attachmentLayout();
+				if (!layout || !clipId) return span;
+				const attachment = attachOverlayToClip(span, layout, clipId);
+				return attachment &&
+					overlayAttachmentStatus(attachment, layout) === "attached"
+					? { ...span, attachment }
+					: span;
+			};
+			const overlayRowsForAttachment = (
+				type: TimelineTrackType,
+				timeline = project.timeline,
+			): AttachmentSpan[] | undefined => {
+				const key = overlayAttachmentTrack(type);
+				return key ? timeline?.[key] : undefined;
+			};
+			const writeOverlayAttachment = (
+				type: TimelineTrackType,
+				index: number,
+				attachment: AttachmentSpan["attachment"],
+			) => {
+				setProject(
+					produce((project) => {
+						const row = overlayRowsForAttachment(type, project.timeline)?.[
+							index
+						];
+						if (row) row.attachment = attachment;
+					}),
+				);
+			};
+			const canOverlayFollowSpeed = (
+				type: TimelineTrackType,
+				row: AttachmentSpan,
+			) =>
+				type !== "audio" &&
+				!(type === "text" && "layout" in row && row.layout === "fullscreen");
+			const attachmentClipName = (id: string) => {
+				const clips = project.timeline?.segments ?? [];
+				const index = clips.findIndex((clip) => clip.id === id);
+				return index < 0
+					? null
+					: clips[index].name?.trim() ||
+							localize("Clip {count}", { count: index + 1 });
+			};
 			const projectActions = {
 				setClipTransition,
+				withSelectedClipAttachment,
+				reanchorOverlay: (type: TimelineTrackType, row: AttachmentSpan) => {
+					const attachment = row.attachment;
+					const layout = attachmentLayout();
+					if (attachment?.kind !== "clip" || !layout) return;
+					const index = overlayRowsForAttachment(type)?.indexOf(row) ?? -1;
+					if (index < 0) return;
+					const next = attachOverlayToClip(
+						row,
+						layout,
+						attachment.clipId,
+						attachment.timing,
+					);
+					if (next && Math.abs(next.sourceTime - attachment.sourceTime) > 1e-7)
+						writeOverlayAttachment(type, index, next);
+				},
 				finishClipTrim: (
 					attachments: ReturnType<typeof captureOverlayAttachmentLayout>,
 					normalize: boolean,
@@ -991,11 +1071,18 @@ export const [EditorContextProvider, useBaseEditorContext] =
 
 							if (newLengths.some((l) => l < 1)) return;
 
-							segments.splice(index + 1, 0, {
-								...segment,
-								start: segment.start + time,
-								end: segment.end,
-							});
+							segments.splice(
+								index + 1,
+								0,
+								overlayPartAfterSplit(
+									{
+										...segment,
+										start: segment.start + time,
+										end: segment.end,
+									},
+									attachmentLayout(),
+								),
+							);
 							segments[index].end = segment.start + time;
 							sortTrackSegments(segments);
 						}),
@@ -1035,10 +1122,12 @@ export const [EditorContextProvider, useBaseEditorContext] =
 									track.some((key) => key.outSpring),
 								)
 							) {
+								const [left, right] = splitCamera3DMotion(segment, time);
 								segments.splice(
 									index,
 									1,
-									...splitCamera3DMotion(segment, time),
+									left,
+									overlayPartAfterSplit(right, attachmentLayout()),
 								);
 								sortTrackSegments(segments);
 								return;
@@ -1062,7 +1151,11 @@ export const [EditorContextProvider, useBaseEditorContext] =
 								tracks: defaultCamera3DTracks(),
 							};
 							setMotion(right, midPose, endPose, easing);
-							segments.splice(index + 1, 0, right);
+							segments.splice(
+								index + 1,
+								0,
+								overlayPartAfterSplit(right, attachmentLayout()),
+							);
 
 							const left = segments[index];
 							left.end = segment.start + time;
@@ -1183,14 +1276,18 @@ export const [EditorContextProvider, useBaseEditorContext] =
 						return;
 					}
 					insertCamera3DShots([
-						newCamera3DShot(placement.start, placement.end),
+						withSelectedClipAttachment(
+							newCamera3DShot(placement.start, placement.end),
+						),
 					]);
 				},
 				// Drag-create hands over the range it drew, so the shot lands exactly
 				// where the pointer left it rather than being re-placed.
 				addCamera3DShotRange: (start: number, end: number) => {
 					if (!(end > start)) return;
-					insertCamera3DShots([newCamera3DShot(start, end)]);
+					insertCamera3DShots([
+						withSelectedClipAttachment(newCamera3DShot(start, end)),
+					]);
 				},
 				// The auto scene owns the whole track: picking a count re-lays every
 				// shot, so the number on the pill is the number on the timeline.
@@ -1252,13 +1349,25 @@ export const [EditorContextProvider, useBaseEditorContext] =
 									structuredClone(unwrap(timeline.styleSegments[index])),
 									time,
 								);
-								if (parts) timeline.styleSegments.splice(index, 1, ...parts);
+								if (parts)
+									timeline.styleSegments.splice(
+										index,
+										1,
+										parts[0],
+										overlayPartAfterSplit(parts[1], attachmentLayout()),
+									);
 							} else {
 								const parts = splitOverlaySegment(
 									structuredClone(unwrap(timeline.imageSegments[index])),
 									time,
 								);
-								if (parts) timeline.imageSegments.splice(index, 1, ...parts);
+								if (parts)
+									timeline.imageSegments.splice(
+										index,
+										1,
+										parts[0],
+										overlayPartAfterSplit(parts[1], attachmentLayout()),
+									);
 							}
 						}),
 					);
@@ -1295,10 +1404,12 @@ export const [EditorContextProvider, useBaseEditorContext] =
 						"styleSegments",
 						produce((segments) => {
 							segments.push(
-								defaultStyleSegment(
-									placement.start,
-									placement.end,
-									placement.lane,
+								withSelectedClipAttachment(
+									defaultStyleSegment(
+										placement.start,
+										placement.end,
+										placement.lane,
+									),
 								),
 							);
 							sortTrackSegments(segments);
@@ -1312,6 +1423,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					replaceIndex?: number,
 				) => {
 					if (editorState.importingImage) return;
+					const clipId = selectedClip()?.id ?? null;
 					const original =
 						replaceIndex === undefined
 							? null
@@ -1359,12 +1471,15 @@ export const [EditorContextProvider, useBaseEditorContext] =
 							"imageSegments",
 							produce((segments) => {
 								segments.push(
-									defaultImageSegment(
-										asset,
-										placement.start,
-										placement.end,
-										placement.lane,
-										output,
+									withSelectedClipAttachment(
+										defaultImageSegment(
+											asset,
+											placement.start,
+											placement.end,
+											placement.lane,
+											output,
+										),
+										clipId,
 									),
 								);
 								sortTrackSegments(segments);
@@ -1391,11 +1506,18 @@ export const [EditorContextProvider, useBaseEditorContext] =
 							const remaining = duration - time;
 							if (time < 1 || remaining < 1) return;
 
-							segments.splice(index + 1, 0, {
-								...segment,
-								start: segment.start + time,
-								end: segment.end,
-							});
+							segments.splice(
+								index + 1,
+								0,
+								overlayPartAfterSplit(
+									{
+										...segment,
+										start: segment.start + time,
+										end: segment.end,
+									},
+									attachmentLayout(),
+								),
+							);
 							segments[index].end = segment.start + time;
 							sortTrackSegments(segments);
 						}),
@@ -1431,11 +1553,18 @@ export const [EditorContextProvider, useBaseEditorContext] =
 							const remaining = duration - time;
 							if (time < 1 || remaining < 1) return;
 
-							segments.splice(index + 1, 0, {
-								...segment,
-								start: segment.start + time,
-								end: segment.end,
-							});
+							segments.splice(
+								index + 1,
+								0,
+								overlayPartAfterSplit(
+									{
+										...segment,
+										start: segment.start + time,
+										end: segment.end,
+									},
+									attachmentLayout(),
+								),
+							);
 							segments[index].end = segment.start + time;
 							sortTrackSegments(segments);
 						}),
@@ -1472,15 +1601,22 @@ export const [EditorContextProvider, useBaseEditorContext] =
 							if (time < MIN_AUDIO_SEGMENT_DURATION) return;
 							if (remaining < MIN_AUDIO_SEGMENT_DURATION) return;
 
-							segments.splice(index + 1, 0, {
-								...segment,
-								start: segment.start + time,
-								end: segment.end,
-								trimStart: segment.trimStart + time,
-								// Fades belong to the outer edges of the original clip; the
-								// new boundary created by the split should be a hard cut.
-								fadeIn: 0,
-							});
+							segments.splice(
+								index + 1,
+								0,
+								overlayPartAfterSplit(
+									{
+										...segment,
+										start: segment.start + time,
+										end: segment.end,
+										trimStart: segment.trimStart + time,
+										// Fades belong to the outer edges of the original clip; the
+										// new boundary created by the split should be a hard cut.
+										fadeIn: 0,
+									},
+									attachmentLayout(),
+								),
+							);
 							segments[index].end = segment.start + time;
 							segments[index].fadeOut = 0;
 							sortTrackSegments(segments);
@@ -1527,8 +1663,8 @@ export const [EditorContextProvider, useBaseEditorContext] =
 							"audioSegments",
 							produce((segments) => {
 								segments ??= [];
-								segments.push(
-									createAudioTrackSegment({
+								segments.push({
+									...createAudioTrackSegment({
 										start,
 										end: start + length,
 										track: laneIndex,
@@ -1536,7 +1672,11 @@ export const [EditorContextProvider, useBaseEditorContext] =
 										name: imported.name,
 										duration: hasSourceDuration ? imported.duration : null,
 									}),
-								);
+									attachment: keepOverlayAtTimelineTime({
+										start,
+										end: start + length,
+									}),
+								});
 								sortTrackSegments(segments);
 							}),
 						);
@@ -1691,11 +1831,18 @@ export const [EditorContextProvider, useBaseEditorContext] =
 
 							if (newLengths.some((l) => l < 1)) return;
 
-							segments.splice(index + 1, 0, {
-								...segment,
-								start: segment.start + time,
-								end: segment.end,
-							});
+							segments.splice(
+								index + 1,
+								0,
+								overlayPartAfterSplit(
+									{
+										...segment,
+										start: segment.start + time,
+										end: segment.end,
+									},
+									attachmentLayout(),
+								),
+							);
 							segments[index].end = segment.start + time;
 						}),
 					);
@@ -2879,6 +3026,86 @@ export const [EditorContextProvider, useBaseEditorContext] =
 			const timelineCommands = {
 				trackSegments,
 				selectSegments,
+				overlayAssociation(type: TimelineTrackType, index: number) {
+					const layout = attachmentLayout();
+					const row = overlayRowsForAttachment(type)?.[index];
+					if (!layout || !row) return null;
+					const attachment = row.attachment;
+					const status = overlayAttachmentStatus(attachment, layout, row.start);
+					const name =
+						attachment?.kind === "clip"
+							? attachmentClipName(attachment.clipId)
+							: null;
+					const label = {
+						unassigned: () => localize("No clip association"),
+						timeline: () => localize("Fixed timeline position"),
+						attached: () => localize("Follows {name}", { name: name ?? "" }),
+						"missing-clip": () => localize("Associated clip is missing"),
+						"outside-clip": () =>
+							localize("Anchor outside {name}", { name: name ?? "" }),
+						offset: () =>
+							localize("Position offset from {name}", { name: name ?? "" }),
+					}[status]();
+					return {
+						status,
+						attachment,
+						label,
+						canFollowSpeed: canOverlayFollowSpeed(type, row),
+					};
+				},
+				overlayAssociationTarget() {
+					const timeline = project.timeline;
+					const layout = attachmentLayout();
+					const time = editorState.playbackTime;
+					const source =
+						timeline && layout && time >= 0 && time < totalDuration()
+							? clipSourceTimeAt(
+									timeline.segments,
+									timeline.transitions,
+									time - heldTimeBefore(layout.holds, time),
+									timeline.mainTrackGaps,
+								)
+							: null;
+					const target =
+						selectedClip() ??
+						(source ? timeline?.segments[source.segmentIndex] : undefined);
+					return target?.id
+						? {
+								id: target.id,
+								name: attachmentClipName(target.id) ?? target.id,
+							}
+						: null;
+				},
+				setOverlayAttachment(
+					type: TimelineTrackType,
+					index: number,
+					clipId: string | null,
+				) {
+					const row = overlayRowsForAttachment(type)?.[index];
+					const layout = attachmentLayout();
+					if (!row || !layout) return;
+					const timing =
+						row.attachment?.kind === "clip" ? row.attachment.timing : undefined;
+					const attachment =
+						clipId === null
+							? keepOverlayAtTimelineTime(row)
+							: attachOverlayToClip(row, layout, clipId, timing);
+					if (attachment) writeOverlayAttachment(type, index, attachment);
+				},
+				setOverlayAttachmentTiming(
+					type: TimelineTrackType,
+					index: number,
+					timing: ClipAttachmentTiming,
+				) {
+					const row = overlayRowsForAttachment(type)?.[index];
+					if (
+						row &&
+						canOverlayFollowSpeed(type, row) &&
+						row.attachment?.kind === "clip" &&
+						row.attachment.timing !== timing
+					)
+						writeOverlayAttachment(type, index, { ...row.attachment, timing });
+				},
 				splitAtPlayhead(index?: number) {
 					const time = editorState.previewTime ?? editorState.playbackTime;
 					if (index !== undefined) {

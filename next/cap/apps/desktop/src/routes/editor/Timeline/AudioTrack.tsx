@@ -354,6 +354,14 @@ export function AudioTrack(props: {
 						)
 							setEditorState("previewTime", previewBefore);
 					}
+					if (
+						(reason === "release" ||
+							reason === "history" ||
+							cause === "superseded") &&
+						ownsRange() &&
+						segment.start !== originalRange.start
+					)
+						projectActions.reanchorOverlay?.("audio", segment);
 					resumeHistory();
 					setDraggingSegment(null);
 					if (!moved && e) {

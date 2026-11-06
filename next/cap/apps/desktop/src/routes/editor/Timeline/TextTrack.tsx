@@ -137,11 +137,14 @@ export function TextTrack(props: {
 			"textSegments",
 			produce((segments) => {
 				segments ??= [];
-				segments.push({
+				const segment = {
 					...defaultTextSegment(placement.start, placement.end),
 					color: autoTextColorAt(canvasControls()),
 					track: props.laneIndex,
-				});
+				};
+				segments.push(
+					projectActions.withSelectedClipAttachment?.(segment) ?? segment,
+				);
 				sortTrackSegments(segments);
 			}),
 		);
@@ -281,6 +284,12 @@ export function TextTrack(props: {
 						)
 							setEditorState("previewTime", previewBefore);
 					}
+					if (
+						(reason === "release" || reason === "history") &&
+						ownsRange() &&
+						segment.start !== drag.original.start
+					)
+						projectActions.reanchorOverlay?.("text", segment);
 					resumeHistory();
 					if (!moved && e) {
 						e.stopPropagation();

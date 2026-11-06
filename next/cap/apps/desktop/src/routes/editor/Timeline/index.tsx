@@ -677,11 +677,13 @@ export function Timeline(props: {
 					"textSegments",
 					produce((segments) => {
 						segments ??= [];
-						segments.push({
-							...defaultTextSegment(start, end),
-							color: autoTextColorAt(canvasControls()),
-							track: lane,
-						});
+						segments.push(
+							projectActions.withSelectedClipAttachment({
+								...defaultTextSegment(start, end),
+								color: autoTextColorAt(canvasControls()),
+								track: lane,
+							}),
+						);
 						sortTrackSegments(segments);
 					}),
 				);
@@ -691,7 +693,12 @@ export function Timeline(props: {
 					"maskSegments",
 					produce((segments) => {
 						segments ??= [];
-						segments.push({ ...defaultMaskSegment(start, end), track: lane });
+						segments.push(
+							projectActions.withSelectedClipAttachment({
+								...defaultMaskSegment(start, end),
+								track: lane,
+							}),
+						);
 						sortTrackSegments(segments);
 					}),
 				);

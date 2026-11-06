@@ -375,7 +375,10 @@ export function ThreeDTrack(props: {
 								break;
 							}
 						}
-						writeShot(item, { start: minValue });
+						batch(() => {
+							writeShot(item, { start: minValue });
+							projectActions.reanchorOverlay?.("3d", item);
+						});
 						setPreviewTime(minValue);
 					};
 
@@ -447,6 +450,14 @@ export function ThreeDTrack(props: {
 										)
 											setEditorState("previewTime", previewBefore);
 									}
+									if (
+										(reason === "release" ||
+											reason === "history" ||
+											cause === "superseded") &&
+										ownsRange() &&
+										item.start !== drag.original.start
+									)
+										projectActions.reanchorOverlay?.("3d", item);
 									resumeHistory?.();
 									if (!moved && e) {
 										e.stopPropagation();

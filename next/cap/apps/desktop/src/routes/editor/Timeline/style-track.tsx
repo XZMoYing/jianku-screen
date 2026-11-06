@@ -231,6 +231,12 @@ export function OverlayTrack(
 							setEditorState("playbackTime", initialPlaybackTime);
 						});
 					}
+					if (
+						(reason === "release" || reason === "history") &&
+						sameRange() &&
+						segment.start !== initial.start
+					)
+						projectActions.reanchorOverlay?.(type, segment);
 					resume?.();
 					props.onDragStateChanged({ type: "idle" });
 				},

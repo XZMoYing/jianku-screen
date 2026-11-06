@@ -54,6 +54,23 @@ type AttachmentLayout = ReturnType<typeof overlayAttachmentLayout>;
 type ClipAttachment = Extract<OverlayAttachment, { kind: "clip" }>;
 export type ClipReplacements = Map<string, string[]>;
 
+const trackKeys = {
+	zoom: "zoomSegments",
+	scene: "sceneSegments",
+	mask: "maskSegments",
+	text: "textSegments",
+	audio: "audioSegments",
+	style: "styleSegments",
+	image: "imageSegments",
+	"3d": "camera3dSegments",
+} as const;
+
+export function overlayAttachmentTrack(type: string) {
+	return Object.hasOwn(trackKeys, type)
+		? trackKeys[type as keyof typeof trackKeys]
+		: undefined;
+}
+
 const attachmentTracks = [
 	"zoomSegments",
 	"sceneSegments",
@@ -94,6 +111,23 @@ export function keepOverlayAtTimelineTime(
 	span: AttachmentSpan,
 ): OverlayAttachment {
 	return { kind: "timeline", id: attachmentId(span) };
+}
+
+export function overlayPartAfterSplit<T extends AttachmentSpan>(
+	span: T,
+	layout: AttachmentLayout | null,
+): T {
+	if (!span.attachment) return span;
+	const attachment = {
+		...span.attachment,
+		id: `overlay-${crypto.randomUUID()}`,
+	};
+	const next = { ...span, attachment };
+	if (attachment.kind === "clip" && layout)
+		next.attachment =
+			attachOverlayToClip(next, layout, attachment.clipId, attachment.timing) ??
+			attachment;
+	return next;
 }
 
 export function attachOverlayToClip(

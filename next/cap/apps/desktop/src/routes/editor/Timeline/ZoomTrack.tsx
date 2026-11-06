@@ -211,12 +211,14 @@ export function ZoomTrack(props: {
 				expectedEnd = end;
 				if (!created) {
 					resumeHistory = projectHistory.pause();
-					created = {
+					const segment: ZoomSegment = {
 						start: base.start,
 						end,
 						amount: generalSettings.data?.defaultZoomAmount ?? 1.5,
 						mode: "auto",
 					};
+					created =
+						projectActions.withSelectedClipAttachment?.(segment) ?? segment;
 					const value = created;
 					batch(() => {
 						setProject("timeline", "zoomSegments", (items) => items ?? []);
@@ -378,7 +380,10 @@ export function ZoomTrack(props: {
 							for (const other of zoomSegments())
 								if (other !== item && other.end <= item.start)
 									minValue = Math.max(minValue, other.end);
-							writeZoom(item, { start: minValue });
+							batch(() => {
+								writeZoom(item, { start: minValue });
+								projectActions.reanchorOverlay?.("zoom", item);
+							});
 							setPreviewTime(minValue);
 						};
 						const fillEnd = () => {
@@ -441,6 +446,14 @@ export function ZoomTrack(props: {
 											)
 												setEditorState("previewTime", previewBefore);
 										}
+										if (
+											(reason === "release" ||
+												reason === "history" ||
+												cause === "superseded") &&
+											ownsRange() &&
+											item.start !== drag.original.start
+										)
+											projectActions.reanchorOverlay?.("zoom", item);
 										resumeHistory?.();
 										if (!moved && e) {
 											e.stopPropagation();
