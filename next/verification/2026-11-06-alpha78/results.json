@@ -1,0 +1,525 @@
+{
+  "build-source": {
+    "commit": "021330c29093d6bdbe8df0ec7082e9ca0ace839a",
+    "version": "0.2.0-alpha.78",
+    "build": "2026.78.0"
+  },
+  "magnetic-reorder": {
+    "order": [
+      "green",
+      "red",
+      "purple"
+    ],
+    "placements": {
+      "green": {
+        "start": 0,
+        "end": 3.0,
+        "source": [
+          4.0,
+          7.0
+        ]
+      },
+      "red": {
+        "start": 3.0,
+        "end": 6.0,
+        "source": [
+          0.0,
+          3.0
+        ]
+      },
+      "purple": {
+        "start": 6.0,
+        "end": 9.0,
+        "source": [
+          8.0,
+          11.0
+        ]
+      }
+    },
+    "duration": 9.0,
+    "gaps": {},
+    "images": [
+      [
+        4.0,
+        5.0
+      ]
+    ]
+  },
+  "after-delete": {
+    "order": [
+      "red",
+      "purple"
+    ],
+    "placements": {
+      "red": {
+        "start": 0,
+        "end": 3.0,
+        "source": [
+          0.0,
+          3.0
+        ]
+      },
+      "purple": {
+        "start": 6.0,
+        "end": 9.0,
+        "source": [
+          8.0,
+          11.0
+        ]
+      }
+    },
+    "duration": 9.0,
+    "gaps": {
+      "beforeClip": {
+        "purple": 3.0
+      }
+    },
+    "images": [
+      [
+        4.0,
+        5.0
+      ]
+    ]
+  },
+  "move-cancel": {
+    "order": [
+      "red",
+      "purple"
+    ],
+    "placements": {
+      "red": {
+        "start": 0,
+        "end": 3.0,
+        "source": [
+          0.0,
+          3.0
+        ]
+      },
+      "purple": {
+        "start": 6.0,
+        "end": 9.0,
+        "source": [
+          8.0,
+          11.0
+        ]
+      }
+    },
+    "duration": 9.0,
+    "gaps": {
+      "beforeClip": {
+        "purple": 3.0
+      }
+    },
+    "images": [
+      [
+        4.0,
+        5.0
+      ]
+    ]
+  },
+  "after-move": {
+    "order": [
+      "red",
+      "purple"
+    ],
+    "placements": {
+      "red": {
+        "start": 0,
+        "end": 3.0,
+        "source": [
+          0.0,
+          3.0
+        ]
+      },
+      "purple": {
+        "start": 3.0,
+        "end": 6.0,
+        "source": [
+          8.0,
+          11.0
+        ]
+      }
+    },
+    "duration": 9.0,
+    "gaps": {
+      "trailing": 3.0
+    },
+    "images": [
+      [
+        4.0,
+        5.0
+      ]
+    ]
+  },
+  "after-right-trim": {
+    "order": [
+      "red",
+      "purple"
+    ],
+    "placements": {
+      "red": {
+        "start": 0,
+        "end": 2.000647,
+        "source": [
+          0.0,
+          2.0006467707659614
+        ]
+      },
+      "purple": {
+        "start": 6.0,
+        "end": 9.0,
+        "source": [
+          8.0,
+          11.0
+        ]
+      }
+    },
+    "duration": 9.0,
+    "gaps": {
+      "beforeClip": {
+        "purple": 3.9993532292340386
+      }
+    },
+    "images": [
+      [
+        4.0,
+        5.0
+      ]
+    ]
+  },
+  "after-left-trim": {
+    "order": [
+      "red",
+      "purple"
+    ],
+    "placements": {
+      "red": {
+        "start": 0.502633,
+        "end": 2.000647,
+        "source": [
+          0.5026332809756999,
+          2.0006467707659614
+        ]
+      },
+      "purple": {
+        "start": 6.0,
+        "end": 9.0,
+        "source": [
+          8.0,
+          11.0
+        ]
+      }
+    },
+    "duration": 9.0,
+    "gaps": {
+      "beforeClip": {
+        "purple": 3.9993532292340386,
+        "red": 0.5026332809756999
+      }
+    },
+    "images": [
+      [
+        4.0,
+        5.0
+      ]
+    ]
+  },
+  "trim-snap-normal": {
+    "order": [
+      "red",
+      "purple"
+    ],
+    "placements": {
+      "red": {
+        "start": 0.502633,
+        "end": 4.0,
+        "source": [
+          0.5026332809756999,
+          4.0
+        ]
+      },
+      "purple": {
+        "start": 6.0,
+        "end": 9.0,
+        "source": [
+          8.0,
+          11.0
+        ]
+      }
+    },
+    "duration": 9.0,
+    "gaps": {
+      "beforeClip": {
+        "purple": 2.0,
+        "red": 0.5026332809756999
+      }
+    },
+    "images": [
+      [
+        4.0,
+        5.0
+      ]
+    ]
+  },
+  "trim-snap-alt": {
+    "order": [
+      "red",
+      "purple"
+    ],
+    "placements": {
+      "red": {
+        "start": 0.502633,
+        "end": 4.023007,
+        "source": [
+          0.5026332809756999,
+          4.023006560103483
+        ]
+      },
+      "purple": {
+        "start": 6.0,
+        "end": 9.0,
+        "source": [
+          8.0,
+          11.0
+        ]
+      }
+    },
+    "duration": 9.0,
+    "gaps": {
+      "beforeClip": {
+        "purple": 1.9769934398965168,
+        "red": 0.5026332809756999
+      }
+    },
+    "images": [
+      [
+        4.0,
+        5.0
+      ]
+    ]
+  },
+  "packed": {
+    "order": [
+      "red",
+      "purple"
+    ],
+    "placements": {
+      "red": {
+        "start": 0,
+        "end": 1.498013,
+        "source": [
+          0.5026332809756999,
+          2.0006467707659614
+        ]
+      },
+      "purple": {
+        "start": 1.498013,
+        "end": 4.498013,
+        "source": [
+          8.0,
+          11.0
+        ]
+      }
+    },
+    "duration": 4.498013,
+    "gaps": {},
+    "images": [
+      [
+        4.0,
+        5.0
+      ]
+    ]
+  },
+  "reopened-layout": {
+    "order": [
+      "red",
+      "purple"
+    ],
+    "placements": {
+      "red": {
+        "start": 0.502633,
+        "end": 2.000647,
+        "source": [
+          0.5026332809756999,
+          2.0006467707659614
+        ]
+      },
+      "purple": {
+        "start": 6.0,
+        "end": 9.0,
+        "source": [
+          8.0,
+          11.0
+        ]
+      }
+    },
+    "duration": 9.0,
+    "gaps": {
+      "beforeClip": {
+        "purple": 3.9993532292340386,
+        "red": 0.5026332809756999
+      }
+    },
+    "images": [
+      [
+        4.0,
+        5.0
+      ]
+    ]
+  },
+  "after-append": {
+    "order": [
+      "red",
+      "purple",
+      "clip-5ec90f73-3da7-4314-8318-03916efe2719"
+    ],
+    "placements": {
+      "red": {
+        "start": 0.502633,
+        "end": 2.000647,
+        "source": [
+          0.5026332809756999,
+          2.0006467707659614
+        ]
+      },
+      "purple": {
+        "start": 6.0,
+        "end": 9.0,
+        "source": [
+          8.0,
+          11.0
+        ]
+      },
+      "clip-5ec90f73-3da7-4314-8318-03916efe2719": {
+        "start": 9.0,
+        "end": 21.0,
+        "source": [
+          0.0,
+          12.0
+        ]
+      }
+    },
+    "duration": 21.0,
+    "gaps": {
+      "beforeClip": {
+        "purple": 3.9993532292340386,
+        "red": 0.5026332809756999
+      }
+    },
+    "images": [
+      [
+        4.0,
+        5.0
+      ]
+    ]
+  },
+  "edited-export-pixels": {
+    "frames": 216,
+    "duration": 9,
+    "sampled_frame_center_rgb": {
+      "0": [
+        9,
+        47,
+        154
+      ],
+      "12": [
+        7,
+        47,
+        154
+      ],
+      "13": [
+        223,
+        49,
+        30
+      ],
+      "24": [
+        223,
+        49,
+        30
+      ],
+      "47": [
+        223,
+        49,
+        30
+      ],
+      "49": [
+        7,
+        47,
+        154
+      ],
+      "88": [
+        7,
+        47,
+        154
+      ],
+      "108": [
+        255,
+        214,
+        0
+      ],
+      "119": [
+        255,
+        214,
+        0
+      ],
+      "120": [
+        7,
+        47,
+        154
+      ],
+      "131": [
+        7,
+        47,
+        154
+      ],
+      "143": [
+        7,
+        47,
+        154
+      ],
+      "144": [
+        73,
+        63,
+        193
+      ],
+      "179": [
+        73,
+        63,
+        193
+      ],
+      "215": [
+        73,
+        63,
+        193
+      ]
+    }
+  },
+  "installed": {
+    "path": "/Applications/Jianku Screen Next.app",
+    "version": "0.2.0-alpha.78",
+    "build": "2026.78.0",
+    "signature": "ad-hoc; strict deep verification passed",
+    "executables": {
+      "Jianku Screen Next": "e6c91a326f5a5648a55ba31c0d4dfa6366e1d8f7b2013a4d382bd42464bbfd34",
+      "cap-cli": "5560ec6f95b78357495f89b9b4cd9b8aea3fff71d5c8a1e2bc543bd48dc2a3b1",
+      "cap-exporter": "5560ec6f95b78357495f89b9b4cd9b8aea3fff71d5c8a1e2bc543bd48dc2a3b1",
+      "cap-muxer": "a94d28f2f243a57180a7d01dfb2e7002215d10f4c6635880f5406da9325c947a",
+      "jianku-device-capture": "66345a304181dafa86d3980ca68ec9c13e5d7ef9acd67de746dd32ed2cf3dfef",
+      "jianku-android-capture": "bac5c35f6a684f9d3c7f37a9be6922b0770f33312c313cc226d0d3247413b539"
+    }
+  },
+  "rollback": {
+    "path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.77/Jianku Screen Next.app",
+    "version": "0.2.0-alpha.77",
+    "build": "2026.77.0",
+    "signature": "ad-hoc; strict deep verification passed",
+    "executables": {
+      "Jianku Screen Next": "3c0efc5f3e3fcf3637cbd63f90ec5b5c841a25fb04a646c0e36599d73bad3cc5",
+      "cap-cli": "db2ef3e0c428be86689632261ed0e9c6b96cbe41f9faff5e913f4a2d18db13db",
+      "cap-exporter": "4bd79237b872c7fe6b5762da628f16ea5626b88ae3f35033d85e42b838e5581f",
+      "cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+      "jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+      "jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+    }
+  }
+}
