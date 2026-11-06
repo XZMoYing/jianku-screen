@@ -1950,6 +1950,16 @@ pub enum TimelineFrameMapping<'a> {
     },
 }
 
+impl<'a> TimelineFrameMapping<'a> {
+    pub fn primary_source(self) -> Option<TimelineSource<'a>> {
+        match self {
+            Self::Gap { .. } => None,
+            Self::Single { source, .. } | Self::Hold { source, .. } => Some(source),
+            Self::Transition { incoming, .. } => Some(incoming),
+        }
+    }
+}
+
 #[derive(Type, Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct CaptionTrackSegment {
@@ -2221,16 +2231,8 @@ impl TimelineConfiguration {
     }
 
     pub fn get_segment_time(&self, frame_time: f64) -> Option<(f64, &TimelineSegment)> {
-        match self.get_frame_mapping(frame_time)? {
-            TimelineFrameMapping::Gap { .. } => None,
-            TimelineFrameMapping::Single { source, .. }
-            | TimelineFrameMapping::Hold { source, .. } => {
-                Some((source.source_time, source.segment))
-            }
-            TimelineFrameMapping::Transition { incoming, .. } => {
-                Some((incoming.source_time, incoming.segment))
-            }
-        }
+        let source = self.get_frame_mapping(frame_time)?.primary_source()?;
+        Some((source.source_time, source.segment))
     }
 
     fn get_segment_time_without_transitions(
@@ -3114,6 +3116,10 @@ impl ProjectConfiguration {
         self.timeline
             .as_ref()
             .and_then(|t| t.get_segment_time(frame_time))
+    }
+
+    pub fn get_frame_mapping(&self, frame_time: f64) -> Option<TimelineFrameMapping<'_>> {
+        self.timeline.as_ref()?.get_frame_mapping(frame_time)
     }
 
     pub fn cursor_visibility_at(&self, output_time: f64) -> f64 {

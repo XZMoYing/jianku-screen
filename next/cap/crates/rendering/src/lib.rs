@@ -728,6 +728,8 @@ pub async fn render_video_to_channel(
     }
 
     let needs_camera = project.requires_camera();
+    let empty_cursor = CursorEvents::default();
+    let mut decoded_source_frame = false;
     let mut last_successful_frame: Option<RenderedFrame> = None;
     let mut consecutive_failures = 0u32;
     const MAX_CONSECUTIVE_FAILURES: u32 = 200;
@@ -740,45 +742,52 @@ pub async fn render_video_to_channel(
         };
 
         let frame_time = current_frame_number as f64 / fps as f64;
-        let transition_mapping = project.timeline.as_ref().and_then(|timeline| {
-            if timeline.transitions.is_empty() {
-                return None;
-            }
-            match timeline.get_frame_mapping(frame_time) {
-                Some(TimelineFrameMapping::Transition {
-                    outgoing,
-                    kind,
-                    progress,
-                    ..
-                }) => Some((outgoing, kind, progress)),
-                _ => None,
-            }
-        });
-
-        let Some((segment_time, segment)) = project.get_segment_time(frame_time) else {
+        let Some(mapping) = project.get_frame_mapping(frame_time) else {
             break;
         };
-
-        let clip_config = project
-            .clips
-            .iter()
-            .find(|v| v.index == segment.recording_clip);
+        let transition_mapping = match mapping {
+            TimelineFrameMapping::Transition {
+                outgoing,
+                kind,
+                progress,
+                ..
+            } => Some((outgoing, kind, progress)),
+            _ => None,
+        };
+        let source = mapping.primary_source();
+        let segment_time = source.map_or(0.0, |source| source.source_time);
+        let clip_config = source.and_then(|source| {
+            project
+                .clips
+                .iter()
+                .find(|clip| clip.index == source.segment.recording_clip)
+        });
 
         next_frame = frame_windows.next_after(current_frame_number);
         last_frame_number = current_frame_number;
         frames_rendered += 1;
 
-        let render_segment = &render_segments[segment.recording_clip as usize];
-        let is_initial_frame = current_frame_number == 0 || last_successful_frame.is_none();
-        let segment_clip_index = segment.recording_clip as usize;
+        let segment_clip_index = source.map_or(0, |source| source.segment.recording_clip as usize);
+        let render_segment = source.map(|_| &render_segments[segment_clip_index]);
+        let render_display = render_segment.is_some_and(|segment| segment.render_display);
+        let cursor = render_segment.map_or(&empty_cursor, |segment| segment.cursor.as_ref());
+        let is_initial_frame = !decoded_source_frame || last_successful_frame.is_none();
 
         let zoom_until = (current_frame_number as f32 + 1.0) / fps as f32;
-        zoom_timelines[segment_clip_index].ensure_precomputed_until(zoom_until);
-        if let Some(timelines) = &mut outgoing_zoom_timelines {
-            timelines[segment_clip_index].ensure_precomputed_until(zoom_until);
+        if source.is_some() {
+            zoom_timelines[segment_clip_index].ensure_precomputed_until(zoom_until);
+            if let Some(timelines) = &mut outgoing_zoom_timelines {
+                timelines[segment_clip_index].ensure_precomputed_until(zoom_until);
+            }
         }
 
         let incoming_decode = async {
+            let Some(render_segment) = render_segment else {
+                prefetched_decode = None;
+                return Some(DecodedSegmentFrames::main_track_gap(
+                    constants.options.screen_size,
+                ));
+            };
             if let Some((pf_num, _pf_time, pf_clip, pf_result)) = prefetched_decode.take() {
                 if pf_num == current_frame_number && pf_clip == segment_clip_index {
                     pf_result
@@ -829,21 +838,31 @@ pub async fn render_video_to_channel(
         if let Some(segment_frames) = segment_frames {
             consecutive_failures = 0;
 
-            let zoom_timeline = &zoom_timelines[segment_clip_index];
-            let precomputed_cursor = &precomputed_cursor_timelines[segment_clip_index];
-
-            let uniforms = ProjectUniforms::new_with_precomputed_cursor(
-                constants,
-                project,
-                current_frame_number,
-                fps,
-                resolution_base,
-                &render_segment.cursor,
-                &segment_frames,
-                duration,
-                zoom_timeline,
-                precomputed_cursor,
-            );
+            let uniforms = if source.is_some() {
+                decoded_source_frame = true;
+                ProjectUniforms::new_with_precomputed_cursor(
+                    constants,
+                    project,
+                    current_frame_number,
+                    fps,
+                    resolution_base,
+                    cursor,
+                    &segment_frames,
+                    duration,
+                    &zoom_timelines[segment_clip_index],
+                    &precomputed_cursor_timelines[segment_clip_index],
+                )
+            } else {
+                ProjectUniforms::for_main_track_gap(
+                    constants,
+                    project,
+                    current_frame_number,
+                    fps,
+                    resolution_base,
+                    &segment_frames,
+                    duration,
+                )
+            };
 
             let mut next_prefetch_meta: Option<(u32, f64, usize)> = None;
             let prefetch_future = if let Some(next_frame_number) = next_frame
@@ -859,7 +878,7 @@ pub async fn render_video_to_channel(
                         .clips
                         .iter()
                         .find(|v| v.index == next_segment.recording_clip);
-                    let next_is_initial = last_successful_frame.is_none();
+                    let next_is_initial = !decoded_source_frame || last_successful_frame.is_none();
 
                     Some(decode_segment_frames_with_retry(
                         &next_render_segment.decoders,
@@ -901,8 +920,8 @@ pub async fn render_video_to_channel(
                     TransitionRenderInput {
                         segment_frames,
                         uniforms,
-                        cursor: &render_segment.cursor,
-                        render_display: render_segment.render_display,
+                        cursor,
+                        render_display,
                     },
                 );
                 if let Some(prefetch) = prefetch_future {
@@ -922,8 +941,8 @@ pub async fn render_video_to_channel(
                     frame_renderer.render(
                         segment_frames,
                         uniforms,
-                        &render_segment.cursor,
-                        render_segment.render_display,
+                        cursor,
+                        render_display,
                         &mut layers,
                     ),
                     prefetch
@@ -942,8 +961,8 @@ pub async fn render_video_to_channel(
                     .render(
                         segment_frames,
                         uniforms,
-                        &render_segment.cursor,
-                        render_segment.render_display,
+                        cursor,
+                        render_display,
                         &mut layers,
                     )
                     .await
@@ -953,6 +972,11 @@ pub async fn render_video_to_channel(
                 return Err(RenderingError::CameraBlurUnavailable);
             }
 
+            if source.is_none()
+                && let Err(error) = render_result
+            {
+                return Err(error);
+            }
             match render_result {
                 Ok(Some(frame)) if frame.width > 0 && frame.height > 0 => {
                     last_successful_frame = Some(frame.clone());
@@ -1197,6 +1221,8 @@ pub async fn render_video_to_channel_nv12(
     let frame_renderer_and_layers_setup_ms = renderer_setup_start.elapsed().as_millis() as u64;
 
     let needs_camera = project.requires_camera();
+    let empty_cursor = CursorEvents::default();
+    let mut decoded_source_frame = false;
 
     let mut last_successful_frame: Option<Nv12RenderedFrame> = None;
     let mut consecutive_failures = 0u32;
@@ -1215,48 +1241,55 @@ pub async fn render_video_to_channel_nv12(
         };
 
         let frame_time = current_frame_number as f64 / fps as f64;
-        let transition_mapping = project.timeline.as_ref().and_then(|timeline| {
-            if timeline.transitions.is_empty() {
-                return None;
-            }
-            match timeline.get_frame_mapping(frame_time) {
-                Some(TimelineFrameMapping::Transition {
-                    outgoing,
-                    kind,
-                    progress,
-                    ..
-                }) => Some((outgoing, kind, progress)),
-                _ => None,
-            }
-        });
-
-        let Some((segment_time, segment)) = project.get_segment_time(frame_time) else {
+        let Some(mapping) = project.get_frame_mapping(frame_time) else {
             break;
         };
-
-        let clip_config = project
-            .clips
-            .iter()
-            .find(|v| v.index == segment.recording_clip);
+        let transition_mapping = match mapping {
+            TimelineFrameMapping::Transition {
+                outgoing,
+                kind,
+                progress,
+                ..
+            } => Some((outgoing, kind, progress)),
+            _ => None,
+        };
+        let source = mapping.primary_source();
+        let segment_time = source.map_or(0.0, |source| source.source_time);
+        let clip_config = source.and_then(|source| {
+            project
+                .clips
+                .iter()
+                .find(|clip| clip.index == source.segment.recording_clip)
+        });
 
         next_frame = frame_windows.next_after(current_frame_number);
         last_frame_number = current_frame_number;
         frames_rendered += 1;
 
-        let render_segment = &render_segments[segment.recording_clip as usize];
-        let is_initial_frame = current_frame_number == 0 || last_successful_frame.is_none();
-        let segment_clip_index = segment.recording_clip as usize;
+        let segment_clip_index = source.map_or(0, |source| source.segment.recording_clip as usize);
+        let render_segment = source.map(|_| &render_segments[segment_clip_index]);
+        let render_display = render_segment.is_some_and(|segment| segment.render_display);
+        let cursor = render_segment.map_or(&empty_cursor, |segment| segment.cursor.as_ref());
+        let is_initial_frame = !decoded_source_frame || last_successful_frame.is_none();
 
         let zoom_pre_start = Instant::now();
         let zoom_until = (current_frame_number as f32 + 1.0) / fps as f32;
-        zoom_timelines[segment_clip_index].ensure_precomputed_until(zoom_until);
-        if let Some(timelines) = &mut outgoing_zoom_timelines {
-            timelines[segment_clip_index].ensure_precomputed_until(zoom_until);
+        if source.is_some() {
+            zoom_timelines[segment_clip_index].ensure_precomputed_until(zoom_until);
+            if let Some(timelines) = &mut outgoing_zoom_timelines {
+                timelines[segment_clip_index].ensure_precomputed_until(zoom_until);
+            }
         }
         let this_zoom_pre_ms = zoom_pre_start.elapsed().as_millis() as u64;
 
         let decode_wall_start = Instant::now();
         let incoming_decode = async {
+            let Some(render_segment) = render_segment else {
+                prefetched_decode = None;
+                return Some(DecodedSegmentFrames::main_track_gap(
+                    constants.options.screen_size,
+                ));
+            };
             if let Some((pf_num, _pf_time, pf_clip, pf_result)) = prefetched_decode.take() {
                 if pf_num == current_frame_number && pf_clip == segment_clip_index {
                     pf_result
@@ -1308,21 +1341,31 @@ pub async fn render_video_to_channel_nv12(
         if let Some(segment_frames) = segment_frames {
             consecutive_failures = 0;
 
-            let zoom_timeline = &zoom_timelines[segment_clip_index];
-            let precomputed_cursor = &precomputed_cursor_timelines[segment_clip_index];
-
-            let uniforms = ProjectUniforms::new_with_precomputed_cursor(
-                constants,
-                project,
-                current_frame_number,
-                fps,
-                resolution_base,
-                &render_segment.cursor,
-                &segment_frames,
-                duration,
-                zoom_timeline,
-                precomputed_cursor,
-            );
+            let uniforms = if source.is_some() {
+                decoded_source_frame = true;
+                ProjectUniforms::new_with_precomputed_cursor(
+                    constants,
+                    project,
+                    current_frame_number,
+                    fps,
+                    resolution_base,
+                    cursor,
+                    &segment_frames,
+                    duration,
+                    &zoom_timelines[segment_clip_index],
+                    &precomputed_cursor_timelines[segment_clip_index],
+                )
+            } else {
+                ProjectUniforms::for_main_track_gap(
+                    constants,
+                    project,
+                    current_frame_number,
+                    fps,
+                    resolution_base,
+                    &segment_frames,
+                    duration,
+                )
+            };
 
             let mut next_prefetch_meta: Option<(u32, f64, usize)> = None;
             let prefetch_future = if let Some(next_frame_number) = next_frame
@@ -1338,7 +1381,7 @@ pub async fn render_video_to_channel_nv12(
                         .clips
                         .iter()
                         .find(|v| v.index == next_segment.recording_clip);
-                    let next_is_initial = last_successful_frame.is_none();
+                    let next_is_initial = !decoded_source_frame || last_successful_frame.is_none();
 
                     Some(decode_segment_frames_with_retry(
                         &next_render_segment.decoders,
@@ -1385,8 +1428,8 @@ pub async fn render_video_to_channel_nv12(
                     TransitionRenderInput {
                         segment_frames,
                         uniforms,
-                        cursor: &render_segment.cursor,
-                        render_display: render_segment.render_display,
+                        cursor,
+                        render_display,
                     },
                 );
                 if let Some(prefetch) = prefetch_future {
@@ -1445,8 +1488,8 @@ pub async fn render_video_to_channel_nv12(
                             .render_nv12(
                                 segment_frames,
                                 uniforms,
-                                &render_segment.cursor,
-                                render_segment.render_display,
+                                cursor,
+                                render_display,
                                 &mut layers,
                             )
                             .await;
@@ -1476,8 +1519,8 @@ pub async fn render_video_to_channel_nv12(
                         frame_renderer.render_nv12(
                             segment_frames,
                             uniforms,
-                            &render_segment.cursor,
-                            render_segment.render_display,
+                            cursor,
+                            render_display,
                             &mut layers,
                         ),
                         prefetch
@@ -1498,8 +1541,8 @@ pub async fn render_video_to_channel_nv12(
                     .render_nv12(
                         segment_frames,
                         uniforms,
-                        &render_segment.cursor,
-                        render_segment.render_display,
+                        cursor,
+                        render_display,
                         &mut layers,
                     )
                     .await;
@@ -1514,8 +1557,8 @@ pub async fn render_video_to_channel_nv12(
                     .render_nv12(
                         segment_frames,
                         uniforms,
-                        &render_segment.cursor,
-                        render_segment.render_display,
+                        cursor,
+                        render_display,
                         &mut layers,
                     )
                     .await;
@@ -1542,6 +1585,11 @@ pub async fn render_video_to_channel_nv12(
                 return Err(RenderingError::CameraBlurUnavailable);
             }
 
+            if source.is_none()
+                && let Err(error) = render_result
+            {
+                return Err(error);
+            }
             match render_result {
                 Ok(Some(frame)) if frame.width > 0 && frame.height > 0 => {
                     if record_first_frame_nv12_phases {
@@ -2445,6 +2493,7 @@ pub struct ProjectUniforms {
     pub frame_rate: u32,
     pub frame_number: u32,
     pub recording_time: f64,
+    main_track_gap: bool,
     display: CompositeVideoFrameUniforms,
     camera: Option<CompositeVideoFrameUniforms>,
     camera_only: Option<CompositeVideoFrameUniforms>,
@@ -3000,6 +3049,37 @@ pub(crate) struct DisplayLayout {
 }
 
 impl ProjectUniforms {
+    pub fn for_main_track_gap(
+        constants: &RenderVideoConstants,
+        project: &ProjectConfiguration,
+        frame_number: u32,
+        fps: u32,
+        resolution_base: XY<u32>,
+        frames: &DecodedSegmentFrames,
+        total_duration: f64,
+    ) -> Self {
+        let mut uniforms = Self::new_inner(
+            constants,
+            project,
+            frame_number,
+            fps,
+            resolution_base,
+            &CursorEvents::default(),
+            frames,
+            total_duration,
+            &|_| InterpolatedZoom::default(),
+            &|_, _| false,
+            None,
+            &|_| None,
+            &|_, _| CursorPose::default(),
+        );
+        uniforms.main_track_gap = true;
+        uniforms.camera3d = None;
+        uniforms.camera3d_zoom = None;
+        uniforms.camera3d_motion = None;
+        uniforms
+    }
+
     /// 0..1 multiplier for recording-anchored overlays (captions, keyboard).
     /// A Fullscreen takeover hides the recording and pauses its clock, so the
     /// overlays fade with the display — they would otherwise hang frozen over
@@ -3330,6 +3410,9 @@ impl ProjectUniforms {
     }
 
     fn camera_background_effect_mode(&self) -> Option<cap_camera_effects::BlurMode> {
+        if self.main_track_gap {
+            return None;
+        }
         blur_mode_from_config(&self.project.camera.background_blur).filter(|mode| {
             *mode != cap_camera_effects::BlurMode::Remove
                 || (self.camera.is_some() && self.scene.regular_camera_transition_opacity() > 0.01)
@@ -4933,6 +5016,7 @@ impl ProjectUniforms {
             frame_rate: fps,
             frame_number,
             recording_time: current_recording_time as f64,
+            main_track_gap: false,
             prev_cursor: prev_interpolated_cursor,
             cursor_clip_visibility,
             click_ripples,
@@ -5764,6 +5848,19 @@ pub struct DecodedSegmentFrames {
     pub segment_time: f32,
     pub recording_time: f32,
     pub segment_has_camera: bool,
+}
+
+impl DecodedSegmentFrames {
+    pub fn main_track_gap(screen_size: XY<u32>) -> Self {
+        Self {
+            screen_size,
+            screen_frame: None,
+            camera_frame: None,
+            segment_time: 0.0,
+            recording_time: 0.0,
+            segment_has_camera: false,
+        }
+    }
 }
 
 #[derive(Clone)]
@@ -8370,11 +8467,9 @@ impl RendererLayers {
             // nothing visible; skip the pass entirely.
             && uniforms.display.opacity > 0.001
             && self.display.has_valid_frame();
-        let should_render_cursor = if render_display {
-            uniforms.scene.should_render_screen()
-        } else {
-            true
-        };
+        let should_render_cursor =
+            !uniforms.main_track_gap && (!render_display || uniforms.scene.should_render_screen());
+        let should_render_images = render_display || uniforms.main_track_gap;
 
         // When a 3D camera pose is active, the content group (frame chrome,
         // display, cursor, notch, camera) renders into the spare ping-pong
@@ -8600,7 +8695,7 @@ impl RendererLayers {
             }
 
             if let Some(overlays) = &self.overlays {
-                if render_display && overlays.images.has_content() {
+                if should_render_images && overlays.images.has_content() {
                     let mut pass = render_pass!(session.current_texture_view(), wgpu::LoadOp::Load);
                     overlays.images.render(&mut pass);
                 }
@@ -8623,7 +8718,7 @@ impl RendererLayers {
                         }
                     }
                     OverlayTrackKind::Image
-                        if render_display && overlays.images.has_track(overlay.track) =>
+                        if should_render_images && overlays.images.has_track(overlay.track) =>
                     {
                         let mut pass =
                             render_pass!(session.current_texture_view(), wgpu::LoadOp::Load);

@@ -94,7 +94,7 @@ impl MovExportSettings {
             );
             let mut frame_count = 0;
 
-            while let Some((frame, frame_number)) = video_rx.blocking_recv() {
+            while let Some((frame, _)) = video_rx.blocking_recv() {
                 if !on_progress(frame_count) {
                     return Err(ExportError::Other("Export cancelled".to_string()));
                 }
@@ -104,7 +104,7 @@ impl MovExportSettings {
                 let encoded_frame = if sample_timing.is_some() {
                     frame_count
                 } else {
-                    frame_number
+                    frame.frame_number
                 };
                 let timestamp = Duration::from_secs_f64(encoded_frame as f64 / fps as f64);
 
@@ -147,7 +147,7 @@ impl MovExportSettings {
                     cursor: s.cursor.clone(),
                     keyboard: s.keyboard.clone(),
                     decoders: s.decoders.clone(),
-                    render_display: false,
+                    render_display: !self.cursor_only,
                 })
                 .collect(),
             fps,

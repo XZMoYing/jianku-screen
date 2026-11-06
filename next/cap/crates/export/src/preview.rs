@@ -4,8 +4,9 @@ use base64::{Engine, engine::general_purpose::STANDARD};
 use cap_editor::EditorInstance;
 use cap_project::{CursorEvents, ProjectConfiguration, RecordingMeta, TimelineFrameMapping, XY};
 use cap_rendering::{
-    FrameRenderer, ProjectUniforms, RecordingSegmentDecoders, RenderVideoConstants, RenderedFrame,
-    RendererLayers, TransitionRenderInput, ZoomTransformTimeline,
+    DecodedSegmentFrames, FrameRenderer, ProjectUniforms, RecordingSegmentDecoders,
+    RenderVideoConstants, RenderedFrame, RendererLayers, TransitionRenderInput,
+    ZoomTransformTimeline,
 };
 use image::{
     Rgba,
@@ -220,69 +221,68 @@ async fn render_preview_frame(
         segments,
         total_duration,
     } = source;
-    let transition_mapping = project_config.timeline.as_ref().and_then(|timeline| {
-        if timeline.transitions.is_empty() {
-            return None;
-        }
-        match timeline.get_frame_mapping(frame_time) {
-            Some(TimelineFrameMapping::Transition {
-                outgoing,
-                kind,
-                progress,
-                ..
-            }) => Some((outgoing, kind, progress)),
-            _ => None,
-        }
-    });
-    let Some((segment_time, segment)) = project_config.get_segment_time(frame_time) else {
-        return Err(ExportError::Other(
-            "Frame time is outside video duration".to_string(),
-        ));
-    };
-
-    let segment_media = segments
-        .get(segment.recording_clip as usize)
-        .ok_or_else(|| ExportError::Other("Recording clip is unavailable".to_string()))?;
-    let clip_config = project_config
-        .clips
-        .iter()
-        .find(|v| v.index == segment.recording_clip);
-
-    let render_start = std::time::Instant::now();
-
-    let segment_frames = segment_media
-        .decoders
-        .get_frames(
-            segment_time as f32,
-            project_config.requires_camera() && !settings.cursor_only,
-            !settings.cursor_only,
-            clip_config.map(|v| v.offsets).unwrap_or_default(),
-        )
-        .await
-        .ok_or_else(|| ExportError::Other("Failed to decode frame".to_string()))?;
-
+    let mapping = project_config
+        .get_frame_mapping(frame_time)
+        .ok_or_else(|| ExportError::Other("Frame time is outside video duration".to_string()))?;
     let frame_number = (frame_time * settings.fps as f64).floor() as u32;
+    let render_start = std::time::Instant::now();
+    let empty_cursor = CursorEvents::default();
 
-    let mut zoom_timeline = ZoomTransformTimeline::from_project_for_clip(
-        project_config,
-        segment_media.cursor,
-        total_duration,
-        render_constants.options.screen_size,
-        segment.recording_clip,
-    );
-    zoom_timeline.ensure_precomputed_until((frame_number as f32 + 1.0) / settings.fps as f32);
-
-    let uniforms = ProjectUniforms::new(
-        render_constants,
-        project_config,
-        frame_number,
-        settings.fps,
-        settings.resolution_base,
-        segment_media.cursor,
-        &segment_frames,
-        total_duration,
-        &zoom_timeline,
-    );
+    let (segment_frames, uniforms, cursor, render_display) = if let Some(source) =
+        mapping.primary_source()
+    {
+        let recording_clip = source.segment.recording_clip;
+        let segment_media = segments
+            .get(recording_clip as usize)
+            .ok_or_else(|| ExportError::Other("Recording clip is unavailable".to_string()))?;
+        let clip_config = project_config
+            .clips
+            .iter()
+            .find(|v| v.index == recording_clip);
+        let frames = segment_media
+            .decoders
+            .get_frames(
+                source.source_time as f32,
+                project_config.requires_camera() && !settings.cursor_only,
+                !settings.cursor_only,
+                clip_config.map(|v| v.offsets).unwrap_or_default(),
+            )
+            .await
+            .ok_or_else(|| ExportError::Other("Failed to decode frame".to_string()))?;
+        let cursor = segment_media.cursor;
+        let mut zoom_timeline = ZoomTransformTimeline::from_project_for_clip(
+            project_config,
+            cursor,
+            total_duration,
+            render_constants.options.screen_size,
+            recording_clip,
+        );
+        zoom_timeline.ensure_precomputed_until((frame_number as f32 + 1.0) / settings.fps as f32);
+        let uniforms = ProjectUniforms::new(
+            render_constants,
+            project_config,
+            frame_number,
+            settings.fps,
+            settings.resolution_base,
+            cursor,
+            &frames,
+            total_duration,
+            &zoom_timeline,
+        );
+        (frames, uniforms, cursor, !settings.cursor_only)
+    } else {
+        let frames = DecodedSegmentFrames::main_track_gap(render_constants.options.screen_size);
+        let uniforms = ProjectUniforms::for_main_track_gap(
+            render_constants,
+            project_config,
+            frame_number,
+            settings.fps,
+            settings.resolution_base,
+            &frames,
+            total_duration,
+        );
+        (frames, uniforms, &empty_cursor, false)
+    };
 
     let mut frame_renderer = FrameRenderer::new(render_constants);
     let mut layers = RendererLayers::new_with_options(
@@ -291,7 +291,13 @@ async fn render_preview_frame(
         render_constants.is_software_adapter,
     );
 
-    let frame = if let Some((outgoing, kind, progress)) = transition_mapping {
+    let frame = if let TimelineFrameMapping::Transition {
+        outgoing,
+        kind,
+        progress,
+        ..
+    } = mapping
+    {
         let outgoing_media = segments
             .get(outgoing.segment.recording_clip as usize)
             .ok_or_else(|| {
@@ -344,8 +350,8 @@ async fn render_preview_frame(
                 TransitionRenderInput {
                     segment_frames,
                     uniforms,
-                    cursor: segment_media.cursor,
-                    render_display: !settings.cursor_only,
+                    cursor,
+                    render_display,
                 },
                 kind,
                 progress as f32,
@@ -357,8 +363,8 @@ async fn render_preview_frame(
             .render_immediate(
                 segment_frames,
                 uniforms,
-                segment_media.cursor,
-                !settings.cursor_only,
+                cursor,
+                render_display,
                 &mut layers,
             )
             .await?
