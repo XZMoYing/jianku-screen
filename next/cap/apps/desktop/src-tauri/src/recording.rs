@@ -7,7 +7,8 @@ use cap_project::{
     CameraShape, ClipAttachmentTiming, CursorClickEvent, GlideDirection, InstantRecordingMeta,
     MultipleSegments, OverlayAttachment, Platform, ProjectConfiguration, RecordingMeta,
     RecordingMetaInner, SharingMeta, StudioRecordingMeta, StudioRecordingStatus,
-    TimelineConfiguration, TimelineSegment, ZoomMode, ZoomSegment, cursor::CursorEvents,
+    TimelineConfiguration, TimelineSegment, ZoomMode, ZoomSegment, ZoomSourceSlice,
+    cursor::CursorEvents,
 };
 #[cfg(target_os = "macos")]
 use cap_recording::SendableShareableContent;
@@ -6615,6 +6616,7 @@ fn generate_zoom_segments_from_clicks_impl(
         .into_iter()
         .map(|(start, end)| ZoomSegment {
             attachment: None,
+            source_slices: Vec::new(),
             start: start.round() / MS_PER_SECOND,
             end: end.round() / MS_PER_SECOND,
             amount: zoom_amount,
@@ -6836,17 +6838,28 @@ pub fn generate_zoom_segments_for_timeline(
 
 fn attach_generated_zooms(timeline: &TimelineConfiguration, zooms: &mut [ZoomSegment]) {
     for zoom in zooms {
-        if let Some(ranges) = timeline.primary_source_ranges(zoom.start..zoom.end)
-            && let [range] = ranges.as_slice()
-            && let Some(start) = range.source_at_start
-            && let Some(clip_id) = &start.segment.id
-        {
-            zoom.attachment = Some(OverlayAttachment::Clip {
-                id: format!("overlay-{}", uuid::Uuid::new_v4()),
-                clip_id: clip_id.clone(),
-                source_time: start.source_time,
-                timing: ClipAttachmentTiming::FollowClipSpeed,
-            });
+        let Some(ranges) = timeline.primary_source_ranges(zoom.start..zoom.end) else {
+            continue;
+        };
+        let mut slices: Vec<_> = ranges
+            .into_iter()
+            .map(|range| ZoomSourceSlice {
+                phase_start: range.output.start - zoom.start,
+                phase_end: range.output.end - zoom.start,
+                attachment: range.source_at_start.and_then(|source| {
+                    Some(OverlayAttachment::Clip {
+                        id: format!("overlay-{}", uuid::Uuid::new_v4()),
+                        clip_id: source.segment.id.clone()?,
+                        source_time: source.source_time,
+                        timing: ClipAttachmentTiming::FollowClipSpeed,
+                    })
+                }),
+            })
+            .collect();
+        if slices.len() == 1 {
+            zoom.attachment = slices.pop().and_then(|slice| slice.attachment);
+        } else if slices.iter().any(|slice| slice.attachment.is_some()) {
+            zoom.source_slices = slices;
         }
     }
 }
@@ -7693,8 +7706,8 @@ mod tests {
     }
 
     #[test]
-    fn automatic_zoom_uses_gap_time_and_anchors_only_within_one_clip() {
-        let (_directory, meta, recordings) =
+    fn automatic_zoom_uses_gap_time_and_saves_source_slices_under_one_animation() {
+        let (directory, meta, recordings) =
             auto_zoom_project_fixture(&[8.0], &[0.5], &[vec![2500.0]]);
         let mut timeline = edited_zoom_timeline(serde_json::json!([
             {"id":"take-with-gap","recordingSegment":0,"timescale":1,"start":0,"end":8}
@@ -7710,11 +7723,16 @@ mod tests {
         assert!(
             matches!(&zooms[0].attachment, Some(OverlayAttachment::Clip { clip_id, source_time, timing: ClipAttachmentTiming::FollowClipSpeed, .. }) if clip_id == "take-with-gap" && (*source_time - 1.7).abs() < 1e-9)
         );
+        assert!(zooms[0].source_slices.is_empty());
 
-        let split = edited_zoom_timeline(serde_json::json!([
+        let mut split = edited_zoom_timeline(serde_json::json!([
             {"id":"left","recordingSegment":0,"timescale":1,"start":0,"end":4},
             {"id":"right","recordingSegment":0,"timescale":1,"start":4,"end":8}
         ]));
+        split
+            .main_track_gaps
+            .before_clip
+            .insert("right".into(), 0.25);
         let mut across = [ZoomSegment {
             start: 3.5,
             end: 4.5,
@@ -7723,6 +7741,33 @@ mod tests {
         }];
         attach_generated_zooms(&split, &mut across);
         assert!(across[0].attachment.is_none());
+        split.zoom_segments = Vec::from(across);
+
+        let project = ProjectConfiguration {
+            timeline: Some(split),
+            ..Default::default()
+        };
+        let path = directory.path().join("cross-cut-zoom.jks");
+        std::fs::create_dir(&path).unwrap();
+        project.write(&path).unwrap();
+        let timeline = ProjectConfiguration::load(&path).unwrap().timeline.unwrap();
+        let [zoom] = timeline.zoom_segments.as_slice() else {
+            panic!("expected one animation");
+        };
+        assert_eq!((zoom.start, zoom.end), (3.5, 4.5));
+        let [left, gap, right] = zoom.source_slices.as_slice() else {
+            panic!("expected two clip slices and the intervening gap");
+        };
+        assert_eq!((left.phase_start, left.phase_end), (0.0, 0.5));
+        assert_eq!((gap.phase_start, gap.phase_end), (0.5, 0.75));
+        assert_eq!((right.phase_start, right.phase_end), (0.75, 1.0));
+        assert!(
+            matches!(&left.attachment, Some(OverlayAttachment::Clip { clip_id, source_time: 3.5, .. }) if clip_id == "left")
+        );
+        assert!(gap.attachment.is_none());
+        assert!(
+            matches!(&right.attachment, Some(OverlayAttachment::Clip { clip_id, source_time: 4.0, .. }) if clip_id == "right")
+        );
     }
 
     #[test]

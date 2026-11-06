@@ -1059,6 +1059,7 @@ mod tests {
     fn manual_segment(start: f64, end: f64, amount: f64, x: f64, y: f64) -> ZoomSegment {
         ZoomSegment {
             attachment: None,
+            source_slices: Vec::new(),
             start,
             end,
             amount,

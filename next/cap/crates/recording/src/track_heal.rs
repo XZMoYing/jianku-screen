@@ -1058,6 +1058,7 @@ mod tests {
             transitions: Vec::new(),
             zoom_segments: vec![ZoomSegment {
                 attachment: None,
+                source_slices: Vec::new(),
                 start: 100.0,
                 end: 150.0,
                 amount: 2.0,
@@ -1215,6 +1216,7 @@ mod tests {
             transitions: Vec::new(),
             zoom_segments: vec![ZoomSegment {
                 attachment: None,
+                source_slices: Vec::new(),
                 start: 10.0,
                 end: 20.0,
                 amount: 2.0,

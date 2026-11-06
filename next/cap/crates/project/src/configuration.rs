@@ -1046,6 +1046,8 @@ pub struct ZoomSegment {
     pub end: f64,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub attachment: Option<OverlayAttachment>,
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
+    pub source_slices: Vec<ZoomSourceSlice>,
     pub amount: f64,
     pub mode: ZoomMode,
     #[serde(default)]
@@ -1056,6 +1058,15 @@ pub struct ZoomSegment {
     pub instant_animation: bool,
     #[serde(default = "ZoomSegment::default_edge_snap_ratio")]
     pub edge_snap_ratio: f64,
+}
+
+#[derive(Type, Serialize, Deserialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ZoomSourceSlice {
+    pub phase_start: f64,
+    pub phase_end: f64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub attachment: Option<OverlayAttachment>,
 }
 
 impl ZoomSegment {

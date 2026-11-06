@@ -1534,6 +1534,7 @@ pub fn insert_zoom_segment(
         index,
         ZoomSegment {
             attachment: None,
+            source_slices: Vec::new(),
             start,
             end,
             amount,
@@ -2079,6 +2080,7 @@ pub fn generate_zoom_segments_from_clicks(
         .into_iter()
         .map(|(start, end)| ZoomSegment {
             attachment: None,
+            source_slices: Vec::new(),
             start: start.round() / MS_PER_SECOND,
             end: end.round() / MS_PER_SECOND,
             amount: zoom_amount,
@@ -3999,6 +4001,7 @@ mod tests {
         }];
         timeline.zoom_segments = vec![cap_project::ZoomSegment {
             attachment: None,
+            source_slices: Vec::new(),
             start: 12.0,
             end: 14.0,
             amount: 1.5,
