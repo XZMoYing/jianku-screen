@@ -15,6 +15,7 @@ import {
 	PhysicalPosition,
 } from "@tauri-apps/api/window";
 import * as dialog from "@tauri-apps/plugin-dialog";
+import { type as ostype } from "@tauri-apps/plugin-os";
 import * as shell from "@tauri-apps/plugin-shell";
 import { cx } from "cva";
 import {
@@ -3303,6 +3304,7 @@ function Page() {
 												<div class="workspace-recording-body">
 													<Show
 														when={
+															ostype() === "macos" &&
 															rawOptions.mode !== "screenshot" &&
 															(activeMenu() === "window" ||
 																rawOptions.captureTarget.variant === "window")

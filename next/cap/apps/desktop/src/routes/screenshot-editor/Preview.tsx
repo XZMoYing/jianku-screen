@@ -8,6 +8,7 @@ import {
 	Show,
 } from "solid-js";
 import { t as localize } from "~/utils/i18n";
+import { supportsScreenshotOcr } from "~/utils/platform-capabilities";
 import IconCapZoomIn from "~icons/cap/zoom-in";
 import IconCapZoomOut from "~icons/cap/zoom-out";
 import { EditorButton, Slider } from "../editor/ui";
@@ -772,14 +773,16 @@ export function Preview(props: { zoom: number; setZoom: (z: number) => void }) {
 											}}
 											onMouseDown={handleMouseDown}
 										/>
-										<OcrSelectionOverlay
-											bounds={bounds()}
-											cssWidth={scaledWidth()}
-											cssHeight={scaledHeight()}
-											imageRect={imageRect()}
-											originalImageSize={originalImageSize()}
-											crop={project.background.crop}
-										/>
+										<Show when={supportsScreenshotOcr()}>
+											<OcrSelectionOverlay
+												bounds={bounds()}
+												cssWidth={scaledWidth()}
+												cssHeight={scaledHeight()}
+												imageRect={imageRect()}
+												originalImageSize={originalImageSize()}
+												crop={project.background.crop}
+											/>
+										</Show>
 										<AnnotationLayer
 											bounds={bounds()}
 											cssWidth={scaledWidth()}

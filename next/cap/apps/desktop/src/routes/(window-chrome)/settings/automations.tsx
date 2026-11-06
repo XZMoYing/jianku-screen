@@ -53,6 +53,7 @@ import {
 	testAutomation,
 } from "~/utils/automations";
 import { t as localize } from "~/utils/i18n";
+import { supportsScreenshotOcr } from "~/utils/platform-capabilities";
 import IconLucideBell from "~icons/lucide/bell";
 import IconLucideChevronDown from "~icons/lucide/chevron-down";
 import IconLucideChevronUp from "~icons/lucide/chevron-up";
@@ -100,6 +101,10 @@ const ALL_ACTION_TYPES: ActionType[] = [
 	"webhook",
 	"deleteLocalFiles",
 ];
+
+function actionAvailableOnPlatform(type: ActionType): boolean {
+	return type !== "recognizeTextToClipboard" || supportsScreenshotOcr();
+}
 
 const ALL_CONDITION_TYPES: Condition["type"][] = [
 	"captureTargetIs",
@@ -480,7 +485,12 @@ export default function AutomationsSettings() {
 					)}
 				>
 					<div class="grid grid-cols-2 gap-2.5">
-						<For each={TEMPLATES}>
+						<For
+							each={TEMPLATES.filter(
+								(template) =>
+									template.id !== "ocr-screenshot" || supportsScreenshotOcr(),
+							)}
+						>
 							{(template) => (
 								<TemplateCard
 									template={template}
@@ -668,8 +678,11 @@ function RuleEditorBody(props: {
 		props.onChange((r) => {
 			const type = actionAppliesToTrigger("copyToClipboard", r.trigger)
 				? "copyToClipboard"
-				: (ALL_ACTION_TYPES.find((t) => actionAppliesToTrigger(t, r.trigger)) ??
-					"notify");
+				: (ALL_ACTION_TYPES.find(
+						(t) =>
+							actionAvailableOnPlatform(t) &&
+							actionAppliesToTrigger(t, r.trigger),
+					) ?? "notify");
 			r.actions.push(defaultActionForType(type));
 		});
 
@@ -974,13 +987,20 @@ function ActionRow(props: {
 				<SelectInput<ActionType>
 					class="flex-1"
 					value={props.action.type}
-					options={ALL_ACTION_TYPES.map((t) => ({
+					options={ALL_ACTION_TYPES.filter(
+						(t) => t === props.action.type || actionAvailableOnPlatform(t),
+					).map((t) => ({
 						value: t,
 						label: ACTION_LABELS[t],
 					}))}
 					onChange={(t) => props.onReplace(defaultActionForType(t))}
 				/>
-				<Show when={props.support === false}>
+				<Show
+					when={
+						props.support === false ||
+						!actionAvailableOnPlatform(props.action.type)
+					}
+				>
 					<span
 						title={localize("Not supported on this device; will be skipped")}
 						class="text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded-md bg-amber-500/15 text-amber-600 dark:text-amber-500"

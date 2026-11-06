@@ -965,6 +965,7 @@ pub async fn list_automation_capabilities() -> Vec<String> {
         "OpenFile".to_string(),
         "RunCommand".to_string(),
         "Webhook".to_string(),
+        #[cfg(any(target_os = "macos", target_os = "windows"))]
         "RecognizeText".to_string(),
         "Notify".to_string(),
         "OpenEditor".to_string(),
