@@ -84,6 +84,71 @@ describe("overlay attachment", () => {
 		expect(image.start).toBe(5);
 	});
 
+	it("splits zoom source metadata at a main-track cut while keeping one animation", () => {
+		const clips = sameSourceTwice();
+		const layout = overlayAttachmentLayout(clips);
+		const left = attachOverlayToClip(
+			{ start: 2, end: 3 },
+			layout,
+			"a",
+			"followClipSpeed",
+		);
+		const right = attachOverlayToClip(
+			{ start: 3, end: 4 },
+			layout,
+			"b",
+			"followClipSpeed",
+		);
+		const zoom = {
+			start: 2,
+			end: 4,
+			sourceSlices: [
+				{ phaseStart: 0, phaseEnd: 1, attachment: left },
+				{ phaseStart: 1, phaseEnd: 2, attachment: right },
+			],
+		};
+		const timeline = { ...clips, zoomSegments: [zoom] };
+		expect(
+			editClipsWithOverlayAttachments(timeline, (replacements) => {
+				timeline.segments.splice(
+					0,
+					1,
+					{ ...clip("a"), end: 6.5 },
+					{ ...clip("a-right"), start: 6.5 },
+				);
+				replacements.set("a", ["a-right"]);
+				return true;
+			}),
+		).toBe(true);
+		expect(timeline.zoomSegments).toHaveLength(1);
+		expect(zoom).toMatchObject({
+			start: 2,
+			end: 4,
+			sourceSlices: [
+				{ phaseStart: 0, phaseEnd: 0.5, attachment: left },
+				{
+					phaseStart: 0.5,
+					phaseEnd: 1,
+					attachment: { clipId: "a-right", sourceTime: 6.5 },
+				},
+				{ phaseStart: 1, phaseEnd: 2, attachment: right },
+			],
+		});
+		expect(zoom.sourceSlices[1].attachment?.id).not.toBe(left?.id);
+		expect(
+			editClipsWithOverlayAttachments(timeline, (replacements) => {
+				timeline.segments.splice(0, 2, clip("a"));
+				replacements.set("a-right", ["a"]);
+				return true;
+			}),
+		).toBe(true);
+		expect(zoom.sourceSlices[1]).toMatchObject({
+			phaseStart: 0.5,
+			phaseEnd: 1,
+			attachment: { clipId: "a", sourceTime: 6.5 },
+		});
+	});
+
 	it("keeps fixed content and the missing source reference through ripple deletion", () => {
 		const clips = sameSourceTwice();
 		const layout = overlayAttachmentLayout(clips);

@@ -31,7 +31,7 @@ export type AttachmentSpan = {
 	end: number;
 	track?: number;
 	attachment?: OverlayAttachment | null;
-	sourceSlices?: readonly ZoomSourceSlice[];
+	sourceSlices?: ZoomSourceSlice[];
 };
 
 export function overlayAttachmentLayout(timeline: AttachmentTimeline) {
@@ -284,6 +284,72 @@ function resolveReplacement(
 	return attachment;
 }
 
+function rebindZoomSourceSlice(
+	slice: ZoomSourceSlice,
+	row: AttachmentSpan,
+	before: AttachmentLayout,
+	after: AttachmentLayout,
+	replacements: ClipReplacements,
+): ZoomSourceSlice[] {
+	const attachment = slice.attachment;
+	if (attachment?.kind !== "clip" || !replacements.has(attachment.clipId))
+		return [slice];
+	const clip = before.clips.get(attachment.clipId);
+	const start = row.start + slice.phaseStart;
+	const end = row.start + slice.phaseEnd;
+	if (
+		!clip ||
+		!Number.isFinite(start) ||
+		!Number.isFinite(end) ||
+		!Number.isFinite(clip.timescale) ||
+		clip.timescale <= 0 ||
+		end <= start ||
+		overlayAttachmentStatus(attachment, before, start) !== "attached" ||
+		before.holds.some(
+			([holdStart, holdEnd]) => holdStart < end && holdEnd > start,
+		)
+	)
+		return [slice];
+
+	const sourceEnd = attachment.sourceTime + (end - start) * clip.timescale;
+	const rebound: ZoomSourceSlice[] = [];
+	let sourceTime = attachment.sourceTime;
+	let phaseStart = slice.phaseStart;
+	while (phaseStart < slice.phaseEnd) {
+		const next = resolveReplacement(
+			{ ...attachment, sourceTime },
+			after,
+			replacements,
+		);
+		const placement = after.clips.get(next.clipId);
+		if (!placement || overlayAttachmentStatus(next, after) !== "attached")
+			return [slice];
+		const phaseEnd =
+			placement.sourceEnd + 1e-7 >= sourceEnd
+				? slice.phaseEnd
+				: slice.phaseStart +
+					(placement.sourceEnd - attachment.sourceTime) / clip.timescale;
+		if (phaseEnd <= phaseStart) return [slice];
+		if (
+			rebound.length === 0 &&
+			next.clipId === attachment.clipId &&
+			phaseEnd === slice.phaseEnd
+		)
+			return [slice];
+		rebound.push({
+			phaseStart,
+			phaseEnd,
+			attachment: {
+				...next,
+				id: rebound.length ? `overlay-${crypto.randomUUID()}` : next.id,
+			},
+		});
+		phaseStart = phaseEnd;
+		sourceTime = placement.sourceEnd;
+	}
+	return rebound;
+}
+
 function scaleAttachedAnimation(row: AttachmentSpan, ratio: number) {
 	if (ratio === 1) return;
 	const timed = row as AttachmentSpan &
@@ -416,6 +482,18 @@ export function applyOverlayAttachmentEdit(
 				previousClipIds.set(row, attachment.clipId);
 				row.attachment = next;
 			}
+		}
+		for (const zoom of timeline.zoomSegments ?? []) {
+			const slices = zoom.sourceSlices;
+			if (zoom.attachment || !slices?.length) continue;
+			const rebound = slices.flatMap((slice) =>
+				rebindZoomSourceSlice(slice, zoom, before, afterClips, replacements),
+			);
+			if (
+				rebound.length !== slices.length ||
+				rebound.some((slice, index) => slice !== slices[index])
+			)
+				zoom.sourceSlices = rebound;
 		}
 	}
 	const titles = (timeline.textSegments ?? []).flatMap((text) => {
