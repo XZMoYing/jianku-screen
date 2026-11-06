@@ -27,7 +27,7 @@
 
 use cap_project::{
     Crop, CursorEvents, OverlayAttachment, ProjectConfiguration, ScreenMovementSpring,
-    TimelineConfiguration, XY, ZoomMode, ZoomSegment,
+    TimelineConfiguration, XY, ZoomMode, ZoomSegment, ZoomSourceSlice,
 };
 
 use crate::{
@@ -666,6 +666,8 @@ pub struct ZoomTrackSpan {
     pub end: f64,
     pub phase_start: f64,
     pub phase_end: f64,
+    pub available_start: f64,
+    pub available_end: f64,
 }
 
 struct ProjectedPhases {
@@ -679,8 +681,51 @@ struct PlacedZoomGroup<'a> {
     segment: &'a ZoomSegment,
     phase_origin: f64,
     original: ProjectedPhases,
-    visible: Vec<PhaseSpan>,
+    visible: Vec<VisibleZoomSpan>,
     has_conflict: bool,
+}
+
+struct VisibleZoomSpan {
+    span: PhaseSpan,
+    available: PhaseSpan,
+}
+
+fn slice_trim(slice: &ZoomSourceSlice) -> Option<cap_project::ZoomSliceTrim> {
+    slice.trim.filter(|trim| {
+        trim.start.is_finite()
+            && trim.end.is_finite()
+            && trim.start < trim.end
+            && (trim.start > slice.phase_start || trim.end < slice.phase_end)
+    })
+}
+
+fn trim_visible_span(
+    available: PhaseSpan,
+    slice: &ZoomSourceSlice,
+    phase_origin: f64,
+) -> Option<VisibleZoomSpan> {
+    let span = if let Some(trim) = slice_trim(slice) {
+        let low = phase_origin + trim.start.max(slice.phase_start);
+        let high = phase_origin + trim.end.min(slice.phase_end);
+        if available.rate == 0.0 {
+            if !(low..high).contains(&available.original_start) {
+                return None;
+            }
+            available
+        } else {
+            let time_at_phase =
+                |phase| available.start + (phase - available.original_start) / available.rate;
+            let start = available.start.max(time_at_phase(low));
+            let end = available.end.min(time_at_phase(high));
+            if end <= start {
+                return None;
+            }
+            available.within(start, end)
+        }
+    } else {
+        available
+    };
+    Some(VisibleZoomSpan { span, available })
 }
 
 fn visible_phase_spans(
@@ -744,6 +789,7 @@ fn project_zoom_phases(
     let mut changed = false;
     let mut has_missing_source = false;
     for (slice_index, slice) in segment.source_slices.iter().enumerate() {
+        changed |= slice_trim(slice).is_some();
         let phase_duration = slice.phase_end - slice.phase_start;
         if !phase_duration.is_finite()
             || phase_duration <= 0.0
@@ -894,9 +940,34 @@ fn place_zoom_groups<'a>(
     let groups = projected
         .into_iter()
         .map(|(group_index, segment, phase_origin, original)| {
-            let (visible, has_conflict) =
+            let (available, has_conflict) =
                 visible_phase_spans(&original.spans, &stationary, &claimed);
-            claimed.extend_from_slice(&visible);
+            let visible: Vec<_> = available
+                .into_iter()
+                .filter_map(|span| {
+                    trim_visible_span(span, &segment.source_slices[span.slice_index], phase_origin)
+                })
+                .collect();
+            let has_conflict = has_conflict && {
+                let requested: f64 = original
+                    .spans
+                    .iter()
+                    .filter_map(|span| {
+                        trim_visible_span(
+                            *span,
+                            &segment.source_slices[span.slice_index],
+                            phase_origin,
+                        )
+                    })
+                    .map(|visible| visible.span.end - visible.span.start)
+                    .sum();
+                let shown: f64 = visible
+                    .iter()
+                    .map(|visible| visible.span.end - visible.span.start)
+                    .sum();
+                requested - shown > 1e-7
+            };
+            claimed.extend(visible.iter().map(|visible| visible.span));
             PlacedZoomGroup {
                 group_index,
                 segment,
@@ -927,13 +998,15 @@ pub fn zoom_track_projection(timeline: &TimelineConfiguration) -> Vec<ZoomTrackP
             spans: group
                 .visible
                 .into_iter()
-                .map(|span| ZoomTrackSpan {
+                .map(|VisibleZoomSpan { span, available }| ZoomTrackSpan {
                     segment_index: span.segment_index as u32,
                     slice_index: span.slice_index as u32,
                     start: span.start,
                     end: span.end,
                     phase_start: span.original_start - group.phase_origin,
                     phase_end: span.original_time(span.end) - group.phase_origin,
+                    available_start: available.start,
+                    available_end: available.end,
                 })
                 .collect(),
             has_conflict: group.has_conflict,
@@ -1033,7 +1106,11 @@ impl ZoomTransformTimeline {
                 selection,
             );
             phase_tracks.push(PhaseTrack {
-                spans: group.visible,
+                spans: group
+                    .visible
+                    .into_iter()
+                    .map(|visible| visible.span)
+                    .collect(),
                 original,
             });
         }
@@ -2132,6 +2209,45 @@ mod tests {
             after.snapped_within(6.23, 6.27)
         );
         assert!(!after.snapped_within(6.23, 6.27));
+    }
+
+    #[test]
+    fn trim_keeps_source_bounds_and_samples_the_same_surviving_phase() {
+        let mut project = project_with_sliced_zoom(4.0);
+        let timeline = project.timeline.as_mut().unwrap();
+        timeline.segments[1].timescale = 2.0;
+        timeline
+            .main_track_gaps
+            .before_clip
+            .insert("right".into(), 2.0);
+        let cursor = CursorEvents {
+            moves: vec![move_event(3100.0, 0.2, 0.3), move_event(4200.0, 0.8, 0.7)],
+            ..Default::default()
+        };
+        let size = XY::new(1000, 1000);
+        let mut reference = ZoomTransformTimeline::from_project(&project, &cursor, 8.0, size);
+        reference.precompute();
+        let timeline = project.timeline.as_mut().unwrap();
+        timeline.zoom_segments[0].source_slices[1].trim = Some(cap_project::ZoomSliceTrim {
+            start: 1.25,
+            end: 1.75,
+        });
+        let projected = zoom_track_projection(timeline);
+        let span = &projected[0].spans[1];
+        assert_eq!((span.start, span.end), (6.125, 6.375));
+        assert_eq!((span.available_start, span.available_end), (6.0, 6.5));
+        assert_eq!(
+            timeline.zoom_segments[0].source_slices[1].source_end,
+            Some(5.0)
+        );
+        let mut trimmed = ZoomTransformTimeline::from_project(&project, &cursor, 8.0, size);
+        trimmed.precompute();
+        assert!(trimmed.phase_sample_at(6.05).is_none());
+        assert!(trimmed.phase_sample_at(6.45).is_none());
+        let actual = trimmed.sample(6.25);
+        let expected = reference.sample(6.25);
+        assert_eq!(actual.t, expected.t);
+        assert_eq!(actual.bounds, expected.bounds);
     }
 
     #[test]

@@ -17,6 +17,7 @@ import { t as localize } from "~/utils/i18n";
 import {
 	commands,
 	type ZoomSegment,
+	type ZoomSliceTrim,
 	type ZoomTrackProjection,
 	type ZoomTrackSpan,
 } from "~/utils/tauri";
@@ -24,7 +25,11 @@ import IconLucideLink2 from "~icons/lucide/link-2";
 import IconLucideTriangleAlert from "~icons/lucide/triangle-alert";
 import { createAutoZoomGeneration } from "../auto-zoom-generation";
 import { serializeProjectConfiguration, useEditorContext } from "../context";
-import { splitZoomSourceSlice, zoomSliceCut } from "../zoom-slice-edit";
+import {
+	splitZoomSourceSlice,
+	trimZoomSourceSlice,
+	zoomSliceCut,
+} from "../zoom-slice-edit";
 import { useTimelineContext, useTrackContext } from "./context";
 import {
 	createTimelineMouseDrag,
@@ -33,6 +38,7 @@ import {
 } from "./mouse-drag";
 import {
 	createOrderedTimelineRangeDrag,
+	createTimelineRangeDrag,
 	sameTimelineRange,
 	type TimelineRangeEdge,
 } from "./range-snapping";
@@ -169,10 +175,16 @@ export function ZoomTrack(props: {
 		byIndex: Map<number, ZoomTrackProjection>;
 		byRow: Map<ZoomSegment, ZoomTrackProjection>;
 	}>();
+	const [trimPreview, setTrimPreview] = createSignal<{
+		row: ZoomSegment;
+		span: ZoomTrackSpan;
+		range: { start: number; end: number };
+	}>();
 	createEffect(() => {
 		const input = projectionInput();
 		if (!input) {
 			setProjection(undefined);
+			setTrimPreview(undefined);
 			return;
 		}
 		const rows = untrack(() => [...zoomSegments()]);
@@ -183,20 +195,26 @@ export function ZoomTrack(props: {
 		void commands.projectZoomTrack(JSON.parse(input)).then(
 			(groups) => {
 				if (current)
-					setProjection({
-						input,
-						byIndex: new Map(groups.map((group) => [group.groupIndex, group])),
-						byRow: new Map(
-							groups.flatMap((group) => {
-								const row = rows[group.groupIndex];
-								return row ? [[row, group] as const] : [];
-							}),
-						),
+					batch(() => {
+						setProjection({
+							input,
+							byIndex: new Map(
+								groups.map((group) => [group.groupIndex, group]),
+							),
+							byRow: new Map(
+								groups.flatMap((group) => {
+									const row = rows[group.groupIndex];
+									return row ? [[row, group] as const] : [];
+								}),
+							),
+						});
+						setTrimPreview(undefined);
 					});
 			},
 			(error) => {
 				if (current) {
 					setProjection(undefined);
+					setTrimPreview(undefined);
 					console.error("Failed to project zoom track:", error);
 				}
 			},
@@ -237,6 +255,108 @@ export function ZoomTrack(props: {
 		);
 	};
 	const startGesture = createTimelineMouseDrag();
+	const beginProjectedTrim = (
+		row: ZoomSegment,
+		span: ZoomTrackSpan,
+		edge: "start" | "end",
+		downEvent: MouseEvent,
+		setDragging: (dragging: boolean) => void,
+	) => {
+		if (downEvent.button !== 0 || editorState.timeline.interactMode !== "seek")
+			return;
+		downEvent.stopPropagation();
+		const cut = cutAt(row, span, (span.start + span.end) / 2);
+		if (!cut) return;
+		startGesture(() => {
+			const initial = { ...cut.slice };
+			let expectedInput = projectionInput();
+			let expectedTrim = initial.trim;
+			const scale = secsPerPixel();
+			const drag = createTimelineRangeDrag(
+				snapping,
+				span,
+				edge,
+				{ prevEnd: span.availableStart, nextStart: span.availableEnd },
+				Math.min(1 / 60, span.end - span.start),
+				editorState.playbackTime,
+			);
+			const beforePreview = editorState.previewTime;
+			let lastPreview: number | undefined;
+			let resumeHistory: (() => void) | undefined;
+			const sameTrim = (
+				a: ZoomSliceTrim | null | undefined,
+				b: ZoomSliceTrim | null | undefined,
+			) => a?.start === b?.start && a?.end === b?.end;
+			const ownsTrim = () =>
+				zoomSegments().includes(row) &&
+				row.sourceSlices?.[span.sliceIndex] === cut.slice &&
+				sameTrim(cut.slice.trim, expectedTrim);
+			const writeTrim = (trim: ZoomSliceTrim | null | undefined) => {
+				const index = zoomSegments().indexOf(row);
+				if (index < 0) return;
+				setProject(
+					"timeline",
+					"zoomSegments",
+					index,
+					"sourceSlices",
+					span.sliceIndex,
+					"trim",
+					trim,
+				);
+				expectedInput = projectionInput();
+				expectedTrim = trim;
+			};
+			setDragging(true);
+			props.onDragStateChanged({ type: "movePending" });
+			return {
+				isValid: () =>
+					editorState.timeline.interactMode === "seek" &&
+					ownsTrim() &&
+					expectedInput === projectionInput() &&
+					secsPerPixel() === scale,
+				update: (event) => {
+					const dx = event.clientX - downEvent.clientX;
+					if (!resumeHistory && Math.abs(dx) <= 2) return;
+					const range = drag.edit(dx * scale, scale, event.altKey);
+					const trim = trimZoomSourceSlice(initial, span, edge, range[edge]);
+					if (trim === null) return;
+					if (!sameTrim(trim, expectedTrim)) {
+						if (!resumeHistory) {
+							resumeHistory = projectHistory.pause();
+							props.onDragStateChanged({ type: "moving" });
+						}
+						batch(() => {
+							setTrimPreview({ row, span, range });
+							writeTrim(trim);
+						});
+					}
+					lastPreview = range[edge];
+					setPreviewTime(lastPreview);
+				},
+				finish: (_event, reason, cause) => {
+					drag.clear();
+					batch(() => {
+						if (reason === "cancel" && cause !== "superseded" && ownsTrim()) {
+							if (!sameTrim(expectedTrim, initial.trim)) {
+								setTrimPreview({ row, span, range: drag.original });
+								writeTrim(initial.trim);
+							}
+							if (
+								lastPreview !== undefined &&
+								editorState.previewTime === lastPreview
+							)
+								setEditorState("previewTime", beforePreview);
+						}
+						if (!ownsTrim() || projection()?.input === projectionInput())
+							setTrimPreview(undefined);
+						setDragging(false);
+						props.onDragStateChanged({ type: "idle" });
+					});
+					resumeHistory?.();
+				},
+			};
+		});
+	};
 	const clearGeneratedSources = (item: ZoomSegment) => {
 		const index = zoomSegments().indexOf(item);
 		if (index >= 0 && item.sourceSlices?.length)
@@ -807,6 +927,8 @@ export function ZoomTrack(props: {
 														sliceIndex: -1,
 														phaseStart: 0,
 														phaseEnd: 0,
+														availableStart: 0,
+														availableEnd: 0,
 													},
 												]
 											: [];
@@ -877,6 +999,36 @@ export function ZoomTrack(props: {
 															: {}),
 													};
 												};
+												const activeTrim = () => {
+													const preview = trimPreview();
+													const visible = span();
+													return preview?.row === item &&
+														preview.span.sliceIndex === visible.sliceIndex &&
+														preview.span.availableStart ===
+															visible.availableStart &&
+														preview.span.availableEnd === visible.availableEnd
+														? preview.range
+														: undefined;
+												};
+												const canTrim = (edge: "start" | "end") => {
+													const visible = span();
+													return (
+														editorState.timeline.interactMode === "seek" &&
+														(activeTrim() ||
+															cutAt(
+																item,
+																visible,
+																(visible.start + visible.end) / 2,
+															)) &&
+														!group().spans.some(
+															(other) =>
+																other.sliceIndex === visible.sliceIndex &&
+																(edge === "start"
+																	? other.start < visible.start
+																	: other.end > visible.end),
+														)
+													);
+												};
 												return (
 													<SegmentRoot
 														menuTarget={{
@@ -885,7 +1037,7 @@ export function ZoomTrack(props: {
 															projectedZoom: sliceActions(),
 														}}
 														segColor="var(--track-zoom)"
-														class="cursor-pointer"
+														class="group cursor-pointer"
 														style={
 															sharesTransition()
 																? {
@@ -909,7 +1061,7 @@ export function ZoomTrack(props: {
 															span().segmentIndex >= 0 ? "slice" : "inactive"
 														}
 														data-zoom-group-index={index()}
-														segment={span()}
+														segment={activeTrim() ?? span()}
 														onMouseDown={(event) => {
 															event.stopPropagation();
 															if (event.button !== 0) return;
@@ -940,6 +1092,26 @@ export function ZoomTrack(props: {
 															}
 														}}
 													>
+														<Show when={canTrim("start")}>
+															<SegmentHandle
+																position="start"
+																data-zoom-slice-trim="start"
+																onMouseDown={(event) => {
+																	selectGroup();
+																	beginProjectedTrim(
+																		item,
+																		span(),
+																		"start",
+																		event,
+																		(dragging) =>
+																			setTrackState(
+																				"draggingSegment",
+																				dragging,
+																			),
+																	);
+																}}
+															/>
+														</Show>
 														<SegmentLabel
 															full={() => (
 																<span class="flex items-center gap-1.5">
@@ -960,6 +1132,26 @@ export function ZoomTrack(props: {
 															)}
 															glyph={marker}
 														/>
+														<Show when={canTrim("end")}>
+															<SegmentHandle
+																position="end"
+																data-zoom-slice-trim="end"
+																onMouseDown={(event) => {
+																	selectGroup();
+																	beginProjectedTrim(
+																		item,
+																		span(),
+																		"end",
+																		event,
+																		(dragging) =>
+																			setTrackState(
+																				"draggingSegment",
+																				dragging,
+																			),
+																	);
+																}}
+															/>
+														</Show>
 													</SegmentRoot>
 												);
 											}}

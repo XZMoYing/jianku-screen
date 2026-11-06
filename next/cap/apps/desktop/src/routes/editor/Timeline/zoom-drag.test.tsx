@@ -292,6 +292,8 @@ it.each(["menu", "blade"] as const)(
 						start: 6,
 						end: 6.25,
 						segmentIndex: 1,
+						availableStart: 6,
+						availableEnd: 6.25,
 						sliceIndex: 1,
 						phaseStart: 1,
 						phaseEnd: 1.25,
@@ -300,6 +302,8 @@ it.each(["menu", "blade"] as const)(
 						start: 6.5,
 						end: 6.75,
 						segmentIndex: 1,
+						availableStart: 6.5,
+						availableEnd: 6.75,
 						sliceIndex: 1,
 						phaseStart: 1.5,
 						phaseEnd: 1.75,
@@ -386,6 +390,81 @@ it.each(["menu", "blade"] as const)(
 			sourceSlices,
 		});
 		expect(context.projectHistory.canUndo()).toBe(false);
+	},
+);
+
+it.each(["trim", "extend", "cancel"] as const)(
+	"projected slice handles %s without rewriting the source",
+	async (action) => {
+		const sourceSlices: ZoomSegment["sourceSlices"] = [
+			{
+				phaseStart: 0,
+				phaseEnd: 1,
+				sourceEnd: 4,
+				attachment: { kind: "clip", id: "left", clipId: "a", sourceTime: 3 },
+			},
+			{
+				phaseStart: 1,
+				phaseEnd: 2,
+				sourceEnd: 5,
+				attachment: { kind: "clip", id: "right", clipId: "b", sourceTime: 4 },
+				...(action === "extend" ? { trim: { start: 1.25, end: 2 } } : {}),
+			},
+		];
+		vi.mocked(commands.projectZoomTrack).mockResolvedValueOnce([
+			{
+				groupIndex: 0,
+				hasConflict: false,
+				hasMissingSource: false,
+				spans: [
+					{
+						start: action === "extend" ? 6.125 : 6,
+						end: 6.5,
+						availableStart: 6,
+						availableEnd: 6.5,
+						segmentIndex: 1,
+						sliceIndex: 1,
+						phaseStart: action === "extend" ? 1.25 : 1,
+						phaseEnd: 2,
+					},
+				],
+			},
+		]);
+		mount([{ ...segment(3, 5), sourceSlices }]);
+		const edge = action === "cancel" ? "end" : "start";
+		const handle = () =>
+			document.querySelector<HTMLElement>(`[data-zoom-slice-trim="${edge}"]`);
+		await vi.waitFor(() => expect(handle()).not.toBeNull());
+		const row = () => context.project.timeline.zoomSegments[0];
+		const slice = () => row().sourceSlices?.[1];
+		const targetHandle = handle();
+		if (!targetHandle) throw new Error("Missing projected trim handle");
+		mouse(targetHandle, "mousedown", 200);
+		const target = action === "trim" ? 210 : 180;
+		mouse(window, "mousemove", target);
+		if (action === "trim") expect(slice()?.trim?.start).toBeCloseTo(1.2);
+		if (action === "extend") expect(slice()?.trim).toBeUndefined();
+		if (action === "cancel") {
+			expect(slice()?.trim?.end).toBeCloseTo(1.6);
+			document.body.dispatchEvent(
+				new KeyboardEvent("keydown", { key: "Escape", bubbles: true }),
+			);
+			expect(slice()?.trim).toBeUndefined();
+			expect(context.projectHistory.canUndo()).toBe(false);
+		} else {
+			mouse(window, "mouseup", target, 0);
+			expect(context.projectHistory.canUndo()).toBe(true);
+			context.projectHistory.undo();
+			expect(row().sourceSlices).toEqual(sourceSlices);
+			expect(context.projectHistory.canUndo()).toBe(false);
+		}
+		expect(row()).toMatchObject({ start: 3, end: 5 });
+		expect(slice()).toMatchObject({
+			phaseStart: 1,
+			phaseEnd: 2,
+			sourceEnd: 5,
+			attachment: { sourceTime: 4 },
+		});
 	},
 );
 

@@ -1070,7 +1070,16 @@ pub struct ZoomSourceSlice {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub source_end: Option<f64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub trim: Option<ZoomSliceTrim>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub attachment: Option<OverlayAttachment>,
+}
+
+#[derive(Type, Serialize, Deserialize, Clone, Copy, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ZoomSliceTrim {
+    pub start: f64,
+    pub end: f64,
 }
 
 impl ZoomSegment {

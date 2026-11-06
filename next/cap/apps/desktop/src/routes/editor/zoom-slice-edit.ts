@@ -1,4 +1,8 @@
-import type { ZoomSourceSlice, ZoomTrackSpan } from "~/utils/tauri";
+import type {
+	ZoomSliceTrim,
+	ZoomSourceSlice,
+	ZoomTrackSpan,
+} from "~/utils/tauri";
 
 export function zoomSliceCut(
 	slices: readonly ZoomSourceSlice[],
@@ -56,4 +60,39 @@ export function splitZoomSourceSlice(
 		},
 		...slices.slice(index + 1),
 	];
+}
+
+export function trimZoomSourceSlice(
+	slice: ZoomSourceSlice,
+	span: ZoomTrackSpan,
+	edge: "start" | "end",
+	time: number,
+): ZoomSliceTrim | null | undefined {
+	if (time === span[edge]) return slice.trim ?? undefined;
+	if (
+		time < span.availableStart ||
+		time > span.availableEnd ||
+		span.phaseEnd <= span.phaseStart
+	)
+		return null;
+	const phase =
+		span.phaseStart +
+		((time - span.start) / (span.end - span.start)) *
+			(span.phaseEnd - span.phaseStart);
+	if (!Number.isFinite(phase)) return null;
+	const next = {
+		start:
+			edge === "start"
+				? Math.max(slice.phaseStart, phase)
+				: (slice.trim?.start ?? slice.phaseStart),
+		end:
+			edge === "end"
+				? Math.min(slice.phaseEnd, phase)
+				: (slice.trim?.end ?? slice.phaseEnd),
+	};
+	if (next.end <= next.start) return null;
+	return next.start - slice.phaseStart < 1e-7 &&
+		slice.phaseEnd - next.end < 1e-7
+		? undefined
+		: next;
 }
