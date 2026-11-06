@@ -1,0 +1,131 @@
+{
+  "source": {
+    "commit": "1017498e1b0bf4ea6aae4709aa9783d9d60953f8",
+    "version": "0.2.0-alpha.76",
+    "build": "2026.76.0"
+  },
+  "releaseSession": 14742,
+  "installSession": 89806,
+  "baseline": {
+    "id": "clip-1e662434-77ba-4c9c-ac3b-7613ef1db927",
+    "recordingSegment": 0,
+    "timescale": 2.0,
+    "start": 0.0,
+    "end": 12.0,
+    "name": null,
+    "hideCursor": true
+  },
+  "left": {
+    "id": "clip-1e662434-77ba-4c9c-ac3b-7613ef1db927",
+    "recordingSegment": 0,
+    "timescale": 2.0,
+    "start": 1.1999999999999993,
+    "end": 12.0,
+    "name": null,
+    "hideCursor": true
+  },
+  "right": {
+    "id": "clip-1e662434-77ba-4c9c-ac3b-7613ef1db927",
+    "recordingSegment": 0,
+    "timescale": 2.0,
+    "start": 0.0,
+    "end": 8.200000000000003,
+    "name": null,
+    "hideCursor": true
+  },
+  "alt": {
+    "id": "clip-1e662434-77ba-4c9c-ac3b-7613ef1db927",
+    "recordingSegment": 0,
+    "timescale": 2.0,
+    "start": 0.0,
+    "end": 8.274999999999999,
+    "name": null,
+    "hideCursor": true
+  },
+  "escapeRestored": true,
+  "hold": {
+    "start": 14.0,
+    "end": 14.5,
+    "track": 0,
+    "enabled": true,
+    "content": "暂停窗样本",
+    "center": {
+      "x": 0.5,
+      "y": 0.49814102564102564
+    },
+    "size": {
+      "x": 0.08625163898601397,
+      "y": 0.05128205128205128
+    },
+    "fontFamily": "sans-serif",
+    "fontSize": 48.0,
+    "fontWeight": 700.0,
+    "italic": false,
+    "color": "#000000",
+    "backgroundStyle": "box",
+    "uppercase": false,
+    "strokeWidth": 0.0,
+    "strokeColor": "#000000",
+    "glow": 0.0,
+    "fadeDuration": 0.15,
+    "align": "center",
+    "letterSpacing": 0.0,
+    "lineHeight": 1.2,
+    "opacity": 1.0,
+    "shadow": 0.0,
+    "animationIn": "fade",
+    "animationOut": "fade",
+    "animationInDuration": 0.15,
+    "animationOutDuration": 0.15,
+    "layout": "fullscreen",
+    "layoutTransition": 0.5
+  },
+  "targets": [
+    {
+      "start": 12.1,
+      "end": 12.75,
+      "track": 0,
+      "enabled": true,
+      "name": "左裁剪参考",
+      "overrides": {}
+    },
+    {
+      "start": 16.1,
+      "end": 16.8,
+      "track": 0,
+      "enabled": true,
+      "name": "右裁剪参考",
+      "overrides": {}
+    }
+  ],
+  "adjacentTrim": {
+    "id": "legacy-clip-1",
+    "recordingSegment": 0,
+    "timescale": 1.0,
+    "start": 0.5,
+    "end": 1.9987064584680772,
+    "name": "步骤乙（重复素材）",
+    "hideCursor": true
+  },
+  "preservedTransition": {
+    "segmentIndex": 1,
+    "type": "cross-fade",
+    "duration": 0.5
+  },
+  "reopened": {
+    "appIsForeground": true,
+    "bounds": {
+      "Height": 954,
+      "Width": 1680,
+      "X": 0,
+      "Y": 25
+    },
+    "editorSelection": "unique own CG editor title and matching AX window geometry",
+    "focusedWindowTitle": "简库镜传 · 视频编辑",
+    "ownedEditorWindowCount": 1,
+    "path": "/Applications/Jianku Screen Next.app",
+    "pid": 32481,
+    "trusted": true,
+    "windowID": 22541
+  }
+}
