@@ -1497,7 +1497,6 @@ pub struct App {
     camera_cleanup_done: bool,
     camera_feed: ActorRef<feeds::camera::CameraFeed>,
     server_url: String,
-    logs_dir: PathBuf,
     disconnected_inputs: HashSet<RecordingInputKind>,
     was_camera_only_recording: bool,
 }
@@ -2357,8 +2356,8 @@ async fn apply_mic_input(
 
 #[tauri::command]
 #[specta::specta]
-async fn upload_logs(app_handle: AppHandle) -> Result<(), String> {
-    logging::upload_log_file(&app_handle).await
+async fn upload_logs(_app_handle: AppHandle) -> Result<(), String> {
+    Err(logging::ONLINE_LOG_FEEDBACK_UNAVAILABLE.into())
 }
 
 #[tauri::command]
@@ -7599,7 +7598,6 @@ pub async fn run(recording_logging_handle: LoggingHandle, logs_dir: PathBuf) {
                     camera_cleanup_done: false,
                     camera_feed,
                     server_url,
-                    logs_dir: logs_dir.clone(),
                     disconnected_inputs: HashSet::new(),
                     was_camera_only_recording: false,
                 })));

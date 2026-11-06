@@ -269,20 +269,6 @@ async fn run_sync_test(
     ))
 }
 
-/// Strip credentials from a configured server URL without hiding the host,
-/// which is the part support needs to know about.
-fn redact_url_credentials(url: &str) -> String {
-    let Some((scheme, rest)) = url.split_once("://") else {
-        return url.to_string();
-    };
-    let authority_end = rest.find('/').unwrap_or(rest.len());
-    let (authority, path) = rest.split_at(authority_end);
-    match authority.rsplit_once('@') {
-        Some((_, host)) => format!("{scheme}://***@{host}{path}"),
-        None => url.to_string(),
-    }
-}
-
 fn settings_snapshot(settings: &GeneralSettingsStore) -> serde_json::Value {
     use cap_recording::diagnostics::redact_home_paths;
 
@@ -304,8 +290,6 @@ fn settings_snapshot(settings: &GeneralSettingsStore) -> serde_json::Value {
             .map(|p| redact_home_paths(p))
             .collect::<Vec<_>>(),
         "updateChannel": settings.update_channel,
-        "serverUrl": redact_url_credentials(&settings.server_url),
-        "instanceId": settings.instance_id,
         "enableTelemetry": settings.enable_telemetry,
         "editorPreviewQuality": settings.editor_preview_quality,
         "captureKeyboardEvents": settings.capture_keyboard_events,
@@ -536,11 +520,8 @@ pub async fn run_diagnostic(
 #[tauri::command]
 #[specta::specta]
 pub async fn upload_diagnostic_report(app: AppHandle, report_path: String) -> Result<(), String> {
-    let path = validate_report_path(&app, &report_path)?;
-    let report = std::fs::read_to_string(&path)
-        .map_err(|e| format!("Failed to read diagnostic report: {e}"))?;
-
-    crate::logging::upload_log_file_inner(&app, Some(report)).await
+    drop((app, report_path));
+    Err(crate::logging::ONLINE_LOG_FEEDBACK_UNAVAILABLE.into())
 }
 
 #[tauri::command]
@@ -748,16 +729,17 @@ mod tests {
     }
 
     #[test]
-    fn redacts_only_url_credentials() {
-        assert_eq!(
-            redact_url_credentials("https://cap.so"),
-            "https://cap.so".to_string()
-        );
-        assert_eq!(
-            redact_url_credentials("https://user:pass@self.hosted/cap"),
-            "https://***@self.hosted/cap".to_string()
-        );
-        assert_eq!(redact_url_credentials("not a url"), "not a url".to_string());
+    fn local_diagnostic_settings_omit_server_and_instance_identity() {
+        let settings = GeneralSettingsStore {
+            server_url: "https://user:secret@example.invalid/?token=sentinel".into(),
+            ..Default::default()
+        };
+        let snapshot = settings_snapshot(&settings);
+
+        assert!(snapshot.get("serverUrl").is_none());
+        assert!(snapshot.get("instanceId").is_none());
+        assert!(snapshot.get("maxFps").is_some());
+        assert!(!snapshot.to_string().contains("sentinel"));
     }
 
     #[test]
