@@ -1043,6 +1043,7 @@ mod tests {
 
         let dir = tempfile::tempdir().unwrap();
         let timeline = TimelineConfiguration {
+            main_track_gaps: Default::default(),
             segments: vec![TimelineSegment {
                 id: None,
                 recording_clip: 0,
@@ -1102,6 +1103,7 @@ mod tests {
 
         let dir = tempfile::tempdir().unwrap();
         let timeline = TimelineConfiguration {
+            main_track_gaps: Default::default(),
             segments: vec![TimelineSegment {
                 id: None,
                 recording_clip: 0,
@@ -1183,6 +1185,7 @@ mod tests {
 
         let dir = tempfile::tempdir().unwrap();
         let timeline = TimelineConfiguration {
+            main_track_gaps: Default::default(),
             segments: vec![
                 TimelineSegment {
                     id: None,

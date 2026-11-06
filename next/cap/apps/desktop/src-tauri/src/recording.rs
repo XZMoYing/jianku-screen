@@ -6950,6 +6950,7 @@ pub(crate) fn recording_timeline(
     zoom_segments: Vec<ZoomSegment>,
 ) -> TimelineConfiguration {
     TimelineConfiguration {
+        main_track_gaps: Default::default(),
         segments,
         transitions: Vec::new(),
         zoom_segments,

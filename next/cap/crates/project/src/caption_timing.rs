@@ -12,6 +12,7 @@ pub(crate) fn clip_timeline_offsets(timeline: &TimelineConfiguration) -> Vec<f64
         .iter()
         .enumerate()
         .map(|(index, segment)| {
+            offset += timeline.gap_before(index);
             offset -= timeline
                 .effective_transition(index)
                 .map_or(0.0, |transition| transition.duration);

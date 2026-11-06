@@ -1085,6 +1085,7 @@ mod tests {
     fn project() -> ProjectConfiguration {
         ProjectConfiguration {
             timeline: Some(TimelineConfiguration {
+                main_track_gaps: Default::default(),
                 segments: vec![segment(0, 0.001_01, 0.33), segment(1, 0.002_01, 0.29)],
                 transitions: Vec::new(),
                 zoom_segments: Vec::new(),

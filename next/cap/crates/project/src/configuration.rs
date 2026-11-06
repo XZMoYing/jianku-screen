@@ -1866,10 +1866,27 @@ where
     Ok(by_segment.into_values().collect())
 }
 
+#[derive(Type, Serialize, Deserialize, Clone, Debug, Default)]
+#[serde(rename_all = "camelCase", default)]
+pub struct MainTrackGaps {
+    #[serde(skip_serializing_if = "BTreeMap::is_empty", default)]
+    pub before_clip: BTreeMap<String, f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub trailing: Option<f64>,
+}
+
+impl MainTrackGaps {
+    fn is_empty(&self) -> bool {
+        self.before_clip.is_empty() && self.trailing.is_none()
+    }
+}
+
 #[derive(Type, Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct TimelineConfiguration {
     pub segments: Vec<TimelineSegment>,
+    #[serde(skip_serializing_if = "MainTrackGaps::is_empty", default)]
+    pub main_track_gaps: MainTrackGaps,
     #[serde(
         default,
         deserialize_with = "deserialize_clip_transitions",
@@ -1908,6 +1925,9 @@ pub struct TimelineSource<'a> {
 
 #[derive(Clone, Copy, Debug)]
 pub enum TimelineFrameMapping<'a> {
+    Gap {
+        output_end: f64,
+    },
     Single {
         source: TimelineSource<'a>,
         output_end: f64,
@@ -1953,9 +1973,42 @@ pub struct CaptionTrackSegment {
     pub font_size_override: Option<u32>,
 }
 
+fn positive_gap(seconds: f64) -> f64 {
+    if seconds.is_finite() && seconds > 0.0 {
+        seconds
+    } else {
+        0.0
+    }
+}
+
 impl TimelineConfiguration {
+    pub fn gap_before(&self, index: usize) -> f64 {
+        if self.main_track_gaps.before_clip.is_empty() {
+            return 0.0;
+        }
+        self.segments
+            .get(index)
+            .and_then(|segment| segment.id.as_ref())
+            .and_then(|id| self.main_track_gaps.before_clip.get(id))
+            .copied()
+            .map_or(0.0, positive_gap)
+    }
+
+    pub fn trailing_gap(&self) -> f64 {
+        self.main_track_gaps.trailing.map_or(0.0, positive_gap)
+    }
+
+    pub fn has_main_track_gaps(&self) -> bool {
+        self.trailing_gap() > 0.0
+            || (!self.main_track_gaps.before_clip.is_empty()
+                && (0..self.segments.len()).any(|index| self.gap_before(index) > 0.0))
+    }
+
     pub fn effective_transition(&self, segment_index: usize) -> Option<ClipTransition> {
-        if segment_index == 0 || segment_index >= self.segments.len() {
+        if segment_index == 0
+            || segment_index >= self.segments.len()
+            || self.gap_before(segment_index) > 0.0
+        {
             return None;
         }
 
@@ -2031,6 +2084,11 @@ impl TimelineConfiguration {
         if let Some((hold_start, hold_end)) = active_hold_window(&holds, frame_time) {
             let effective = hold_start - held_time_before(&holds, hold_start);
             let source = match self.get_frame_mapping_unheld(effective)? {
+                TimelineFrameMapping::Gap { .. } => {
+                    return Some(TimelineFrameMapping::Gap {
+                        output_end: hold_end,
+                    });
+                }
                 TimelineFrameMapping::Single { source, .. }
                 | TimelineFrameMapping::Hold { source, .. } => source,
                 TimelineFrameMapping::Transition { incoming, .. } => incoming,
@@ -2055,6 +2113,9 @@ impl TimelineConfiguration {
             next_hold_start.map_or(output_end, |hold| output_end.min(hold))
         };
         Some(match self.get_frame_mapping_unheld(effective)? {
+            TimelineFrameMapping::Gap { output_end } => TimelineFrameMapping::Gap {
+                output_end: clamp_end(output_end),
+            },
             TimelineFrameMapping::Single { source, output_end } => TimelineFrameMapping::Single {
                 source,
                 output_end: clamp_end(output_end),
@@ -2079,7 +2140,7 @@ impl TimelineConfiguration {
     }
 
     fn get_frame_mapping_unheld(&self, frame_time: f64) -> Option<TimelineFrameMapping<'_>> {
-        if self.transitions.is_empty() {
+        if self.transitions.is_empty() && !self.has_main_track_gaps() {
             return self.get_segment_time_without_transitions(frame_time).map(
                 |(source_time, segment, segment_index, output_end)| TimelineFrameMapping::Single {
                     source: TimelineSource {
@@ -2095,6 +2156,13 @@ impl TimelineConfiguration {
         let mut segment_start = 0.0;
 
         for (segment_index, segment) in self.segments.iter().enumerate() {
+            let start_after_gap = segment_start + self.gap_before(segment_index);
+            if frame_time >= segment_start && frame_time < start_after_gap {
+                return Some(TimelineFrameMapping::Gap {
+                    output_end: start_after_gap,
+                });
+            }
+            segment_start = start_after_gap;
             let incoming = self.effective_transition(segment_index);
             let incoming_duration = incoming.as_ref().map_or(0.0, |value| value.duration);
 
@@ -2147,11 +2215,14 @@ impl TimelineConfiguration {
             segment_start += segment.duration() - next_duration;
         }
 
-        None
+        let output_end = segment_start + self.trailing_gap();
+        (frame_time >= segment_start && frame_time < output_end)
+            .then_some(TimelineFrameMapping::Gap { output_end })
     }
 
     pub fn get_segment_time(&self, frame_time: f64) -> Option<(f64, &TimelineSegment)> {
         match self.get_frame_mapping(frame_time)? {
+            TimelineFrameMapping::Gap { .. } => None,
             TimelineFrameMapping::Single { source, .. }
             | TimelineFrameMapping::Hold { source, .. } => {
                 Some((source.source_time, source.segment))
@@ -2200,7 +2271,10 @@ impl TimelineConfiguration {
                     .sum::<f64>()
         };
 
-        segment_duration + self.held_duration()
+        let gaps: f64 = (0..self.segments.len())
+            .map(|index| self.gap_before(index))
+            .sum();
+        segment_duration + gaps + self.trailing_gap() + self.held_duration()
     }
 
     /// Gapless-time windows covered by clips that hide the cursor, with
@@ -2212,6 +2286,7 @@ impl TimelineConfiguration {
         let mut windows: Vec<(f64, f64)> = Vec::new();
         let mut segment_start = 0.0;
         for (index, segment) in self.segments.iter().enumerate() {
+            segment_start += self.gap_before(index);
             let next_duration = self
                 .effective_transition(index + 1)
                 .map_or(0.0, |transition| transition.duration);
@@ -2224,7 +2299,7 @@ impl TimelineConfiguration {
             }
             segment_start = end;
         }
-        (windows, segment_start)
+        (windows, segment_start + self.trailing_gap())
     }
 
     /// 0..1 multiplier for the cursor (and its click ripples) at an output
@@ -2233,6 +2308,14 @@ impl TimelineConfiguration {
     /// hidden run. The ramp is skipped at the timeline's own start and end so
     /// the cursor never blinks in for a hidden first or last clip.
     pub fn cursor_visibility_at(&self, output_time: f64) -> f64 {
+        if self.has_main_track_gaps()
+            && matches!(
+                self.get_frame_mapping(output_time),
+                Some(TimelineFrameMapping::Gap { .. })
+            )
+        {
+            return 0.0;
+        }
         if !self.segments.iter().any(TimelineSegment::hides_cursor) {
             return 1.0;
         }
@@ -3147,6 +3230,70 @@ mod tests {
     use super::*;
 
     #[test]
+    fn main_track_gaps_are_stable_id_intervals_with_no_source() {
+        let timeline: TimelineConfiguration = serde_json::from_value(serde_json::json!({
+            "segments": [
+                {"id": "a", "start": 0, "end": 2, "timescale": 1},
+                {"id": "b", "start": 4, "end": 7, "timescale": 1}
+            ],
+            "transitions": [{"segmentIndex": 1, "type": "cross-fade", "duration": 0.5}],
+            "zoomSegments": [],
+            "mainTrackGaps": {"beforeClip": {"a": 1, "b": 0.75, "removed": 99}, "trailing": 0.5}
+        }))
+        .unwrap();
+        assert_eq!(timeline.duration(), 7.25);
+        assert_eq!(
+            crate::caption_timing::clip_timeline_offsets(&timeline),
+            vec![1.0, 3.75]
+        );
+        assert!(timeline.effective_transition(1).is_none());
+        for (time, end) in [(0.0, 1.0), (3.0, 3.75), (6.75, 7.25)] {
+            assert!(
+                matches!(timeline.get_frame_mapping(time), Some(TimelineFrameMapping::Gap { output_end }) if output_end == end)
+            );
+            assert!(timeline.get_segment_time(time).is_none());
+            assert_eq!(timeline.cursor_visibility_at(time), 0.0);
+        }
+        assert!(timeline.get_frame_mapping(7.25).is_none());
+        let (time, clip) = timeline.get_segment_time(3.75).unwrap();
+        assert_eq!(time, 4.0);
+        assert_eq!(clip.id.as_deref(), Some("b"));
+
+        let encoded = serde_json::to_value(&timeline).unwrap();
+        let mut legacy = encoded.clone();
+        legacy.as_object_mut().unwrap().remove("mainTrackGaps");
+        let legacy: TimelineConfiguration = serde_json::from_value(legacy).unwrap();
+        assert_eq!(legacy.duration(), 4.5);
+        assert_eq!(legacy.effective_transition(1).unwrap().duration, 0.5);
+        assert!(
+            serde_json::to_value(legacy)
+                .unwrap()
+                .get("mainTrackGaps")
+                .is_none()
+        );
+    }
+
+    #[test]
+    fn a_hold_inside_a_main_track_gap_keeps_the_empty_interval() {
+        let timeline: TimelineConfiguration = serde_json::from_value(serde_json::json!({
+            "segments": [
+                {"id": "a", "start": 0, "end": 2, "timescale": 1},
+                {"id": "b", "start": 4, "end": 7, "timescale": 1}
+            ],
+            "zoomSegments": [],
+            "mainTrackGaps": {"beforeClip": {"b": 1}},
+            "textSegments": [{"start": 2.25, "end": 3.25, "layout": "fullscreen", "content": "Hold"}]
+        })).unwrap();
+        assert_eq!(timeline.duration(), 7.0);
+        for (time, end) in [(2.0, 2.25), (2.5, 3.25), (3.5, 4.0)] {
+            assert!(
+                matches!(timeline.get_frame_mapping(time), Some(TimelineFrameMapping::Gap { output_end }) if output_end == end)
+            );
+        }
+        assert_eq!(timeline.get_segment_time(4.0).unwrap().0, 4.0);
+    }
+
+    #[test]
     fn inset_preserves_legacy_values_and_round_trips_optional_style() {
         let legacy: BackgroundConfiguration =
             serde_json::from_str(r#"{"inset":32,"padding":17}"#).unwrap();
@@ -3219,6 +3366,7 @@ mod tests {
 
     fn timeline_with_transitions(transitions: Vec<ClipTransition>) -> TimelineConfiguration {
         TimelineConfiguration {
+            main_track_gaps: Default::default(),
             segments: vec![
                 TimelineSegment {
                     id: None,
@@ -4139,6 +4287,7 @@ mod tests {
 
     fn cursor_timeline(segments: Vec<TimelineSegment>) -> TimelineConfiguration {
         TimelineConfiguration {
+            main_track_gaps: Default::default(),
             segments,
             ..timeline_with_transitions(Vec::new())
         }
@@ -4390,6 +4539,7 @@ mod tests {
     ) {
         let config = ProjectConfiguration {
             timeline: Some(TimelineConfiguration {
+                main_track_gaps: Default::default(),
                 segments: Vec::new(),
                 transitions: Vec::new(),
                 zoom_segments: Vec::new(),
@@ -4499,6 +4649,7 @@ mod tests {
     fn write_config_with_text_fade(project_path: &std::path::Path, fade_duration: f64) {
         let mut config = ProjectConfiguration {
             timeline: Some(TimelineConfiguration {
+                main_track_gaps: Default::default(),
                 segments: Vec::new(),
                 transitions: Vec::new(),
                 zoom_segments: Vec::new(),

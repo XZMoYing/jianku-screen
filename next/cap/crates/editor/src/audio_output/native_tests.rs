@@ -404,6 +404,7 @@ fn preparing_test_sources(
 ) -> PreparingAudioSources {
     let project = Arc::new(ProjectConfiguration {
         timeline: Some(cap_project::TimelineConfiguration {
+            main_track_gaps: Default::default(),
             segments: vec![cap_project::TimelineSegment {
                 recording_clip: 0,
                 start: 0.0,

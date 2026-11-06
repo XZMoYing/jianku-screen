@@ -419,6 +419,7 @@ pub fn preflight(path: &std::path::Path) -> Result<ProjectSummary, String> {
     // instance hands over then replaces it wholesale.
     if config.timeline.is_none() {
         config.timeline = Some(cap_project::TimelineConfiguration {
+            main_track_gaps: Default::default(),
             segments: recordings
                 .segments
                 .iter()
@@ -11965,6 +11966,7 @@ mod tests {
         };
         let mut project = ProjectConfiguration {
             timeline: Some(TimelineConfiguration {
+                main_track_gaps: Default::default(),
                 segments: vec![cap_project::TimelineSegment {
                     id: None,
                     recording_clip: 0,
@@ -12020,6 +12022,7 @@ mod tests {
     fn caption_split_delete_survives_a_repeated_trimmed_edl() {
         let mut project = ProjectConfiguration {
             timeline: Some(TimelineConfiguration {
+                main_track_gaps: Default::default(),
                 segments: vec![
                     cap_project::TimelineSegment {
                         id: None,

@@ -376,6 +376,7 @@ fn ensure_project_timeline<'a>(
 ) -> Result<&'a mut TimelineConfiguration, String> {
     if config.timeline.is_none() {
         config.timeline = Some(TimelineConfiguration {
+            main_track_gaps: Default::default(),
             segments: full_timeline_for_segments(project_path, segments)?,
             transitions: Vec::new(),
             zoom_segments: Vec::new(),

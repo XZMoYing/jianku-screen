@@ -9,6 +9,7 @@ fn sources(duration: f64, loader: Option<ProgressiveAudio>) -> PreparingAudioSou
     PreparingAudioSources {
         project: Arc::new(ProjectConfiguration {
             timeline: Some(TimelineConfiguration {
+                main_track_gaps: Default::default(),
                 segments: vec![TimelineSegment {
                     recording_clip: 0,
                     start: 0.0,

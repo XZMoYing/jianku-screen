@@ -1826,6 +1826,7 @@ pub fn ensure_timeline(project: &mut ProjectConfiguration, clip_display_duration
         return false;
     }
     project.timeline = Some(TimelineConfiguration {
+        main_track_gaps: Default::default(),
         segments: clip_display_durations
             .iter()
             .enumerate()

@@ -896,6 +896,7 @@ mod fixture {
 
         let project_config = ProjectConfiguration {
             timeline: Some(TimelineConfiguration {
+                main_track_gaps: Default::default(),
                 segments: vec![TimelineSegment {
                     id: None,
                     recording_clip: 0,

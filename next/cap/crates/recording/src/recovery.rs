@@ -2353,6 +2353,7 @@ impl RecoveryManager {
         };
 
         config.timeline = Some(TimelineConfiguration {
+            main_track_gaps: Default::default(),
             segments: timeline_segments,
             transitions: Vec::new(),
             zoom_segments: Vec::new(),

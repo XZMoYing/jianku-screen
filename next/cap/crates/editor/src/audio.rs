@@ -315,6 +315,7 @@ impl AudioRenderer {
             sources.check_cancelled()?;
             let (mapping, span) = if !timeline.transitions.is_empty()
                 || !timeline.hold_windows().is_empty()
+                || timeline.has_main_track_gaps()
             {
                 let Some((mapping, output_end_samples)) = self.next_transition_mapping(timeline)
                 else {
@@ -364,7 +365,7 @@ impl AudioRenderer {
                             apply_clip_volume(output, source.segment);
                         }
                     }
-                    TimelineFrameMapping::Hold { .. } => {}
+                    TimelineFrameMapping::Hold { .. } | TimelineFrameMapping::Gap { .. } => {}
                     TimelineFrameMapping::Transition {
                         outgoing,
                         incoming,
@@ -412,6 +413,7 @@ impl AudioRenderer {
                 span_offset += count;
             }
             self.cursor = match mapping {
+                TimelineFrameMapping::Gap { .. } => self.cursor,
                 TimelineFrameMapping::Single { source, .. } => {
                     source_cursor(source, self.playhead_to_samples(source.source_time) + span)
                 }
@@ -439,7 +441,8 @@ impl AudioRenderer {
             let output_end = match mapping {
                 TimelineFrameMapping::Single { output_end, .. }
                 | TimelineFrameMapping::Transition { output_end, .. }
-                | TimelineFrameMapping::Hold { output_end, .. } => output_end,
+                | TimelineFrameMapping::Hold { output_end, .. }
+                | TimelineFrameMapping::Gap { output_end } => output_end,
             };
             let output_end_samples = self.playhead_to_samples(output_end);
             if output_end_samples > self.elapsed_samples {
@@ -460,7 +463,10 @@ impl AudioRenderer {
     ) -> Option<(usize, Vec<f32>)> {
         // Transitions and fullscreen-text holds both need the mapping-driven
         // path; the accumulation fast path below knows nothing about either.
-        if !timeline.transitions.is_empty() || !timeline.hold_windows().is_empty() {
+        if !timeline.transitions.is_empty()
+            || !timeline.hold_windows().is_empty()
+            || timeline.has_main_track_gaps()
+        {
             return self.render_timeline_transition_frame_raw(samples, project, timeline);
         }
 
@@ -536,6 +542,7 @@ impl AudioRenderer {
                 .min(samples - written);
 
             match mapping {
+                TimelineFrameMapping::Gap { .. } => {}
                 TimelineFrameMapping::Single { source, .. } => {
                     let source_samples = self.playhead_to_samples(source.source_time);
                     self.render_segment_chunk(
@@ -2581,6 +2588,7 @@ mod tests {
 
         let project = ProjectConfiguration {
             timeline: Some(TimelineConfiguration {
+                main_track_gaps: Default::default(),
                 segments: vec![
                     TimelineSegment {
                         id: None,
@@ -2784,6 +2792,7 @@ mod tests {
             speed_segment.speed_audio_mode = Some(mode);
             let project = ProjectConfiguration {
                 timeline: Some(TimelineConfiguration {
+                    main_track_gaps: Default::default(),
                     segments: vec![speed_segment],
                     transitions: Vec::new(),
                     zoom_segments: Vec::new(),
@@ -3072,6 +3081,7 @@ mod tests {
 
         let project = ProjectConfiguration {
             timeline: Some(TimelineConfiguration {
+                main_track_gaps: Default::default(),
                 segments,
                 transitions: Vec::new(),
                 zoom_segments: Vec::new(),
@@ -3185,6 +3195,7 @@ mod tests {
         ];
         let project = ProjectConfiguration {
             timeline: Some(TimelineConfiguration {
+                main_track_gaps: Default::default(),
                 segments: vec![segment(0, 0.0, 1.0, 1.0), segment(1, 0.0, 1.0, 1.0)],
                 transitions: vec![ClipTransition {
                     segment_index: 1,
@@ -3232,6 +3243,38 @@ mod tests {
             (expected(8000) + expected(16000)) * std::f32::consts::FRAC_1_SQRT_2;
 
         assert!((midpoint - expected_midpoint).abs() < 0.01);
+    }
+
+    #[test]
+    fn main_track_gaps_emit_silence_and_preserve_the_next_source() {
+        let (_dir, mut renderer, mut project) = single_clip_fixture(
+            &[8000, 16000],
+            vec![segment(0, 0.0, 1.0, 1.0), segment(0, 1.0, 2.0, 1.0)],
+        );
+        let timeline = project.timeline.as_mut().unwrap();
+        timeline.segments[0].id = Some("first".into());
+        timeline.segments[1].id = Some("second".into());
+        timeline
+            .main_track_gaps
+            .before_clip
+            .insert("first".into(), 0.25);
+        timeline
+            .main_track_gaps
+            .before_clip
+            .insert("second".into(), 0.5);
+        timeline.main_track_gaps.trailing = Some(0.25);
+
+        renderer.set_playhead(0.0, &project);
+        let samples = (3.0 * AudioData::SAMPLE_RATE as f64) as usize;
+        let (written, audio) = renderer.render_frame_raw(samples, &project).unwrap();
+        assert_eq!(written, samples);
+        for (time, value) in [(0.125, 0), (0.5, 8000), (1.5, 0), (2.0, 16000), (2.875, 0)] {
+            assert!((left_at_time(&audio, time) - expected(value)).abs() < 0.001);
+        }
+        let exported = render_export_audio(&mut renderer, &project, 30, 90);
+        for time in [0.125, 0.5, 1.5, 2.0, 2.875] {
+            assert!((left_at_time(&audio, time) - left_at_time(&exported, time)).abs() < 0.001);
+        }
     }
 
     #[test]
@@ -3420,6 +3463,7 @@ mod tests {
         }]);
         let project = ProjectConfiguration {
             timeline: Some(TimelineConfiguration {
+                main_track_gaps: Default::default(),
                 segments: vec![segment(0, 0.0, 3.0, 1.0)],
                 transitions: Vec::new(),
                 zoom_segments: Vec::new(),
@@ -3462,6 +3506,7 @@ mod tests {
         }];
         let project = ProjectConfiguration {
             timeline: Some(TimelineConfiguration {
+                main_track_gaps: Default::default(),
                 segments: vec![segment(0, 0.0, 3.0, 1.0)],
                 transitions: Vec::new(),
                 zoom_segments: Vec::new(),
@@ -3605,6 +3650,7 @@ mod tests {
     fn music_project(audio_segments: Vec<cap_project::AudioTrackSegment>) -> ProjectConfiguration {
         ProjectConfiguration {
             timeline: Some(TimelineConfiguration {
+                main_track_gaps: Default::default(),
                 segments: vec![segment(0, 0.0, 3.0, 1.0)],
                 transitions: Vec::new(),
                 zoom_segments: Vec::new(),

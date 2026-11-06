@@ -271,6 +271,7 @@ pub fn synthesize_default_timeline(
         .collect();
     if !segments.is_empty() {
         project_config.timeline = Some(TimelineConfiguration {
+            main_track_gaps: Default::default(),
             segments,
             transitions: Vec::new(),
             zoom_segments: Vec::new(),

@@ -2912,6 +2912,7 @@ async fn stop_recording(
     let mut project_config = cap_project::ProjectConfiguration::default();
     if !timeline_segments.is_empty() {
         project_config.timeline = Some(TimelineConfiguration {
+            main_track_gaps: Default::default(),
             segments: timeline_segments,
             transitions: Vec::new(),
             zoom_segments: Vec::new(),

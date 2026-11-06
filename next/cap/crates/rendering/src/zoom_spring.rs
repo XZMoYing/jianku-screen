@@ -432,6 +432,7 @@ fn build_time_map(timeline: Option<&TimelineConfiguration>) -> Vec<TimeMapSegmen
     let mut map = Vec::with_capacity(timeline.segments.len());
     let mut accum = 0.0;
     for (segment_index, segment) in timeline.segments.iter().enumerate() {
+        accum += timeline.gap_before(segment_index);
         if !timeline.transitions.is_empty() {
             accum -= timeline
                 .effective_transition(segment_index)
@@ -471,6 +472,13 @@ fn build_time_map(timeline: Option<&TimelineConfiguration>) -> Vec<TimeMapSegmen
             let (hold_start, hold_end) = holds[hold_idx];
             if hold_start >= piece_start_out + remaining {
                 break;
+            }
+            if timeline.has_main_track_gaps() && hold_start < piece_start_out {
+                let hold_len = hold_end - hold_start;
+                piece_start_out += hold_len;
+                shift += hold_len;
+                hold_idx += 1;
+                continue;
             }
             if hold_start > piece_start_out {
                 let len = hold_start - piece_start_out;
@@ -1112,6 +1120,7 @@ mod tests {
     ) -> ProjectConfiguration {
         ProjectConfiguration {
             timeline: Some(TimelineConfiguration {
+                main_track_gaps: Default::default(),
                 segments: Vec::new(),
                 transitions: Vec::new(),
                 zoom_segments,
@@ -2102,6 +2111,7 @@ mod tests {
         // so timeline t=1s corresponds to recording t=11s. A click at
         // recording 11s must aim the zoom; a click at recording 1s must not.
         let timeline_config = TimelineConfiguration {
+            main_track_gaps: Default::default(),
             segments: vec![TimelineSegment {
                 id: None,
                 recording_clip: 0,
@@ -2163,6 +2173,7 @@ mod tests {
     #[test]
     fn timeline_mapping_uses_incoming_source_during_transition() {
         let timeline = TimelineConfiguration {
+            main_track_gaps: Default::default(),
             segments: vec![
                 TimelineSegment {
                     id: None,

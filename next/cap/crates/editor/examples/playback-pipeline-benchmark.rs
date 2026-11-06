@@ -311,6 +311,7 @@ async fn load_recording(
 
         if !timeline_segments.is_empty() {
             project.timeline = Some(TimelineConfiguration {
+                main_track_gaps: Default::default(),
                 segments: timeline_segments,
                 transitions: Vec::new(),
                 zoom_segments: Vec::new(),

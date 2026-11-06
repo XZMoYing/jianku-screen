@@ -235,6 +235,7 @@ mod tests {
     fn applying_keeps_the_current_timeline_clips_and_layer_order() {
         let current = ProjectConfiguration {
             timeline: Some(cap_project::TimelineConfiguration {
+                main_track_gaps: Default::default(),
                 segments: Vec::new(),
                 transitions: Vec::new(),
                 zoom_segments: Vec::new(),

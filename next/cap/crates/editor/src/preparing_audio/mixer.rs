@@ -472,6 +472,7 @@ mod tests {
         PreparingAudioSources {
             project: Arc::new(ProjectConfiguration {
                 timeline: Some(TimelineConfiguration {
+                    main_track_gaps: Default::default(),
                     segments: durations
                         .iter()
                         .enumerate()

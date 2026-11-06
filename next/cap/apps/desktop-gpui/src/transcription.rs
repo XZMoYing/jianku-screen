@@ -2064,6 +2064,7 @@ pub fn apply_caption_result(
 
     if project.timeline.is_none() {
         project.timeline = Some(TimelineConfiguration {
+            main_track_gaps: Default::default(),
             segments: vec![TimelineSegment {
                 id: None,
                 recording_clip: 0,
