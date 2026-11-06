@@ -1,0 +1,91 @@
+{
+  "source": {
+    "commit": "0fec5bd0cfe1fc6f377d7f3e504fea22a8df5a4c",
+    "version": "0.2.0-alpha.77",
+    "build": "2026.77.0"
+  },
+  "releaseSession": 58604,
+  "installSession": 71706,
+  "baseline": {
+    "start": 4.0,
+    "end": 5.5,
+    "track": 0,
+    "path": "assets/snap-fixture.wav",
+    "name": "音频吸附样本",
+    "enabled": true,
+    "trimStart": 0.75,
+    "volumeDb": 0.0,
+    "fadeIn": 0.05,
+    "fadeOut": 0.1,
+    "duration": 12.0
+  },
+  "bookmarkTrim": {
+    "start": 4.0,
+    "end": 6.17,
+    "track": 0,
+    "path": "assets/snap-fixture.wav",
+    "name": "音频吸附样本",
+    "enabled": true,
+    "trimStart": 0.75,
+    "volumeDb": 0.0,
+    "fadeIn": 0.05,
+    "fadeOut": 0.1,
+    "duration": 12.0
+  },
+  "altTrim": {
+    "start": 4.0,
+    "end": 6.1375,
+    "track": 0,
+    "path": "assets/snap-fixture.wav",
+    "name": "音频吸附样本",
+    "enabled": true,
+    "trimStart": 0.75,
+    "volumeDb": 0.0,
+    "fadeIn": 0.05,
+    "fadeOut": 0.1,
+    "duration": 12.0
+  },
+  "topFade": {
+    "start": 4.0,
+    "end": 6.17,
+    "track": 0,
+    "path": "assets/snap-fixture.wav",
+    "name": "音频吸附样本",
+    "enabled": true,
+    "trimStart": 0.75,
+    "volumeDb": 0.0,
+    "fadeIn": 0.05,
+    "fadeOut": 0.41993699369936993,
+    "duration": 12.0
+  },
+  "leftTrim": {
+    "start": 4.35,
+    "end": 6.17,
+    "track": 0,
+    "path": "assets/snap-fixture.wav",
+    "name": "音频吸附样本",
+    "enabled": true,
+    "trimStart": 1.0999999999999996,
+    "volumeDb": 0.0,
+    "fadeIn": 0.05,
+    "fadeOut": 0.1,
+    "duration": 12.0
+  },
+  "fadeUndoRestored": true,
+  "reopened": {
+    "appIsForeground": true,
+    "bounds": {
+      "Height": 954,
+      "Width": 1680,
+      "X": 0,
+      "Y": 25
+    },
+    "editorSelection": "unique own CG editor title and matching AX window geometry",
+    "focusedWindowTitle": "简库镜传 · 视频编辑",
+    "ownedEditorWindowCount": 1,
+    "path": "/Applications/Jianku Screen Next.app",
+    "pid": 43816,
+    "trusted": true,
+    "windowID": 22556
+  }
+}
