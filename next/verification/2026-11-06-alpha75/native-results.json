@@ -1,0 +1,83 @@
+{
+  "source": {
+    "commit": "aa427f651464317c3c4f807b2d8cffc79c62a2c2",
+    "version": "0.2.0-alpha.75",
+    "build": "2026.75.0"
+  },
+  "releaseSession": 8048,
+  "installSession": 71613,
+  "audioTrim": {
+    "start": 4.0,
+    "end": 6.1,
+    "track": 0,
+    "path": "assets/snap-fixture.wav",
+    "name": "音频吸附样本",
+    "enabled": true,
+    "trimStart": 0.75,
+    "volumeDb": 0.0,
+    "fadeIn": 0.05,
+    "fadeOut": 0.4625,
+    "duration": 12.0
+  },
+  "audioMove": {
+    "start": 5.6,
+    "end": 7.1,
+    "track": 0,
+    "path": "assets/snap-fixture.wav",
+    "name": "音频吸附样本",
+    "enabled": true,
+    "trimStart": 0.75,
+    "volumeDb": 0.0,
+    "fadeIn": 0.05,
+    "fadeOut": 0.1,
+    "duration": 12.0
+  },
+  "zoomMove": {
+    "start": 5.6,
+    "end": 7.1,
+    "amount": 1.5,
+    "mode": "auto",
+    "glideDirection": "none",
+    "glideSpeed": 0.5,
+    "instantAnimation": false,
+    "edgeSnapRatio": 0.25
+  },
+  "camera3dMove": {
+    "start": 5.6,
+    "end": 7.1,
+    "otherFieldsPreserved": true
+  },
+  "sceneMove": {
+    "start": 5.6,
+    "end": 7.1,
+    "mode": "hideCamera",
+    "splitLayout": null,
+    "transitionIn": 0.12,
+    "transitionOut": 0.12
+  },
+  "sceneAlt": {
+    "start": 5.575,
+    "end": 7.075,
+    "mode": "hideCamera",
+    "splitLayout": null,
+    "transitionIn": 0.12,
+    "transitionOut": 0.12
+  },
+  "sceneEscapeRestored": true,
+  "reopened": {
+    "appIsForeground": true,
+    "bounds": {
+      "Height": 954,
+      "Width": 1680,
+      "X": 0,
+      "Y": 25
+    },
+    "editorSelection": "unique own CG editor title and matching AX window geometry",
+    "focusedWindowTitle": "简库镜传 · 视频编辑",
+    "ownedEditorWindowCount": 1,
+    "path": "/Applications/Jianku Screen Next.app",
+    "pid": 20126,
+    "trusted": true,
+    "windowID": 22514
+  }
+}
