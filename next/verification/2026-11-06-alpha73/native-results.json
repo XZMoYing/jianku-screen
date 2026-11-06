@@ -53,5 +53,40 @@
     "pid": 47390,
     "trusted": true,
     "windowID": 22413
+  },
+  "followUp": {
+    "bladeFreeTime": 7.075000562059556,
+    "bladeSnappedTime": 7.1,
+    "styleTrim": {
+      "start": 6.1,
+      "end": 7.5,
+      "track": 0,
+      "enabled": true,
+      "name": "吸附样式",
+      "overrides": {}
+    },
+    "imageMove": {
+      "start": 6.1,
+      "end": 7.1,
+      "track": 0,
+      "enabled": true,
+      "path": "assets/snap-fixture.png",
+      "name": "图片吸附样本",
+      "center": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "size": {
+        "x": 0.3,
+        "y": 0.3
+      },
+      "opacity": 1.0,
+      "rotation": 0.0,
+      "rounding": 8.0,
+      "flipX": false,
+      "flipY": false,
+      "lockAspect": true
+    },
+    "restoredAndReopened": true
   }
 }
