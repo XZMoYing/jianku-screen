@@ -381,6 +381,39 @@ it.each(["start", "end"] as const)(
 		expect(start < end && oldStart < oldEnd).toBe(true);
 	},
 );
+it("restores generated sources on cancel and undo after a manual zoom move", () => {
+	const sourceSlices: ZoomSegment["sourceSlices"] = [
+		{
+			phaseStart: 0,
+			phaseEnd: 2,
+			sourceEnd: 4,
+			attachment: { kind: "clip", id: "left", clipId: "a", sourceTime: 2 },
+		},
+		{
+			phaseStart: 2,
+			phaseEnd: 4,
+			sourceEnd: 2,
+			attachment: { kind: "clip", id: "right", clipId: "b", sourceTime: 0 },
+		},
+	];
+	mount([{ ...segment(2), sourceSlices }]);
+	const zoom = () => context.project.timeline.zoomSegments[0];
+	begin(content());
+	expect(zoom().sourceSlices).toBeUndefined();
+	document.body.dispatchEvent(
+		new KeyboardEvent("keydown", { key: "Escape", bubbles: true }),
+	);
+	expect(zoom()).toMatchObject({ start: 2, sourceSlices });
+	expect(context.projectHistory.canUndo()).toBe(false);
+
+	begin(content());
+	mouse(window, "mouseup", 300, 0);
+	expect(zoom()).toMatchObject({ start: 3, end: 7 });
+	expect(zoom().sourceSlices).toBeUndefined();
+	context.projectHistory.undo();
+	expect(zoom()).toMatchObject({ start: 2, end: 6, sourceSlices });
+});
+
 it("keeps adjacent end boundaries and ignores non-primary release", () => {
 	mount([segment(2), segment(6)]);
 	const handle = roots()[0].querySelectorAll("[data-compact]")[1];

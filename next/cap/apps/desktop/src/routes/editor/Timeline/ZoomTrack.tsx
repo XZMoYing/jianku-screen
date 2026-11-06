@@ -120,6 +120,11 @@ export function ZoomTrack(props: {
 
 	const zoomSegments = () => project.timeline?.zoomSegments ?? [];
 	const startGesture = createTimelineMouseDrag();
+	const clearGeneratedSources = (item: ZoomSegment) => {
+		const index = zoomSegments().indexOf(item);
+		if (index >= 0 && item.sourceSlices?.length)
+			setProject("timeline", "zoomSegments", index, "sourceSlices", undefined);
+	};
 	const writeZoom = (
 		item: ZoomSegment,
 		changes: Partial<Pick<ZoomSegment, "start" | "end">>,
@@ -381,6 +386,7 @@ export function ZoomTrack(props: {
 								if (other !== item && other.end <= item.start)
 									minValue = Math.max(minValue, other.end);
 							batch(() => {
+								if (item.start !== minValue) clearGeneratedSources(item);
 								writeZoom(item, { start: minValue });
 								projectActions.reanchorOverlay?.("zoom", item);
 							});
@@ -392,7 +398,10 @@ export function ZoomTrack(props: {
 							for (const other of zoomSegments())
 								if (other !== item && other.start >= item.end)
 									maxValue = Math.min(maxValue, other.start);
-							writeZoom(item, { end: maxValue });
+							batch(() => {
+								if (item.end !== maxValue) clearGeneratedSources(item);
+								writeZoom(item, { end: maxValue });
+							});
 							setPreviewTime(maxValue);
 						};
 
@@ -418,6 +427,7 @@ export function ZoomTrack(props: {
 										editorState.playbackTime,
 									);
 									let expected = drag.original;
+									const generatedSources = item.sourceSlices;
 									const previewBefore = editorState.previewTime;
 									let lastPreview: number | undefined;
 									const ownsRange = () =>
@@ -433,27 +443,46 @@ export function ZoomTrack(props: {
 										cause?: TimelineMouseDragEndCause,
 									) {
 										drag.clear();
-										if (
-											reason === "cancel" &&
-											cause !== "superseded" &&
-											ownsRange()
-										) {
-											if (!sameTimelineRange(item, drag.original))
-												writeZoom(item, drag.original);
+										batch(() => {
 											if (
-												lastPreview !== undefined &&
-												editorState.previewTime === lastPreview
+												reason === "cancel" &&
+												cause !== "superseded" &&
+												ownsRange()
+											) {
+												if (!sameTimelineRange(item, drag.original)) {
+													expected = drag.original;
+													writeZoom(item, drag.original);
+												}
+												if (
+													lastPreview !== undefined &&
+													editorState.previewTime === lastPreview
+												)
+													setEditorState("previewTime", previewBefore);
+											}
+											if (
+												ownsRange() &&
+												sameTimelineRange(item, drag.original) &&
+												generatedSources?.length &&
+												!item.sourceSlices
 											)
-												setEditorState("previewTime", previewBefore);
-										}
+												setProject(
+													"timeline",
+													"zoomSegments",
+													index(),
+													"sourceSlices",
+													generatedSources,
+												);
+										});
 										if (
 											(reason === "release" ||
 												reason === "history" ||
 												cause === "superseded") &&
 											ownsRange() &&
-											item.start !== drag.original.start
-										)
-											projectActions.reanchorOverlay?.("zoom", item);
+											!sameTimelineRange(item, drag.original)
+										) {
+											if (item.start !== drag.original.start)
+												projectActions.reanchorOverlay?.("zoom", item);
+										}
 										resumeHistory?.();
 										if (!moved && e) {
 											e.stopPropagation();
@@ -533,7 +562,10 @@ export function ZoomTrack(props: {
 											if (!sameTimelineRange(item, range)) {
 												resumeHistory ??= projectHistory.pause();
 												expected = range;
-												writeZoom(item, range);
+												batch(() => {
+													clearGeneratedSources(item);
+													writeZoom(item, range);
+												});
 											}
 											if (edge !== "move") {
 												lastPreview = range[edge];

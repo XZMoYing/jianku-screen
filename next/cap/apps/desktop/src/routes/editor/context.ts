@@ -1081,11 +1081,13 @@ export const [EditorContextProvider, useBaseEditorContext] =
 										...segment,
 										start: segment.start + time,
 										end: segment.end,
+										sourceSlices: undefined,
 									},
 									attachmentLayout(),
 								),
 							);
 							segments[index].end = segment.start + time;
+							segments[index].sourceSlices = undefined;
 							sortTrackSegments(segments);
 						}),
 					);
