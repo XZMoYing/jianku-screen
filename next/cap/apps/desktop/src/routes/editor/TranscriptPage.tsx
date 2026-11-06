@@ -95,6 +95,7 @@ export function TranscriptPanel() {
 			recordingSegments(),
 			project.timeline?.transitions ?? [],
 			project.timeline?.textSegments,
+			project.timeline?.mainTrackGaps,
 		),
 	);
 
@@ -186,16 +187,21 @@ export function TranscriptPanel() {
 						Math.max(total - 0.25, 0),
 					)
 				: Math.max(editorState.playbackTime, 0);
-		const start =
-			mapEditedTimeToSource(
-				outputStart,
-				project.timeline?.segments ?? [],
-				recordingSegments(),
-				project.timeline?.transitions ?? [],
-				undefined,
-				"incoming",
-				project.timeline?.textSegments,
-			) ?? outputStart;
+		const sourceTime = mapEditedTimeToSource(
+			outputStart,
+			project.timeline?.segments ?? [],
+			recordingSegments(),
+			project.timeline?.transitions ?? [],
+			undefined,
+			"incoming",
+			project.timeline?.textSegments,
+			project.timeline?.mainTrackGaps,
+		);
+		if (sourceTime === null && project.timeline?.mainTrackGaps) {
+			toast.error(localize("No video at this position"));
+			return;
+		}
+		const start = sourceTime ?? outputStart;
 		const end = start + defaultDuration;
 		const text = localize("新字幕");
 
@@ -283,6 +289,7 @@ export function TranscriptPanel() {
 			undefined,
 			"incoming",
 			project.timeline?.textSegments,
+			project.timeline?.mainTrackGaps,
 		);
 		if (sourceTime === null) return -1;
 
@@ -309,6 +316,7 @@ export function TranscriptPanel() {
 				recordingSegments(),
 				project.timeline?.transitions ?? [],
 				project.timeline?.textSegments,
+				project.timeline?.mainTrackGaps,
 			);
 			if (outputTime === null) return;
 			const accepted = await routeEditorPlaybackIntent(
@@ -372,6 +380,7 @@ export function TranscriptPanel() {
 					project.timeline?.segments ?? [],
 					recordingSegments(),
 					project.timeline?.transitions ?? [],
+					project.timeline?.mainTrackGaps,
 				),
 			)
 			.sort((a, b) => a.start - b.start || a.segmentIndex - b.segmentIndex);
@@ -400,6 +409,7 @@ export function TranscriptPanel() {
 						timeline.transitions ?? [],
 						range.start,
 						range.end,
+						timeline.mainTrackGaps,
 					) ||
 					!clipCutPreservesTransitionGeometry(
 						timeline.segments,
@@ -407,6 +417,7 @@ export function TranscriptPanel() {
 						range.segmentIndex,
 						range.start,
 						range.end,
+						timeline.mainTrackGaps,
 					),
 			)
 		) {

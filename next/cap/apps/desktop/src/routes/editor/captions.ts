@@ -8,6 +8,7 @@ import {
 	type CaptionTrackSegment,
 	type CaptionWord,
 	commands,
+	type MainTrackGaps,
 	type SegmentRecordings,
 	type TimelineSegment,
 } from "~/utils/tauri";
@@ -99,6 +100,7 @@ function buildSourceToEditedMappings(
 	timelineSegments: TimelineSegment[],
 	recordingSegments: SegmentRecordings[],
 	transitions: ClipTransition[] = [],
+	gaps?: MainTrackGaps,
 ): SourceToEditedMapping[] {
 	const recordingOffsets: number[] = [];
 	let cumulativeOffset = 0;
@@ -108,7 +110,11 @@ function buildSourceToEditedMappings(
 	}
 
 	const mappings: SourceToEditedMapping[] = [];
-	const editedOffsets = clipTimelineOffsets(timelineSegments, transitions);
+	const editedOffsets = clipTimelineOffsets(
+		timelineSegments,
+		transitions,
+		gaps,
+	);
 
 	for (let index = 0; index < timelineSegments.length; index++) {
 		const seg = timelineSegments[index];
@@ -174,6 +180,7 @@ export function mapCaptionsToEditedTimeline(
 	recordingSegments: SegmentRecordings[],
 	transitions: ClipTransition[] = [],
 	textSegments?: readonly TextSegment[],
+	gaps?: MainTrackGaps,
 ): CaptionSegment[] {
 	const sanitizedSegments = rawSegments.map(clampCaptionSegmentWords);
 
@@ -185,6 +192,7 @@ export function mapCaptionsToEditedTimeline(
 		timelineSegments,
 		recordingSegments,
 		transitions,
+		gaps,
 	);
 
 	// The edit-list mappings live in the gapless recording-flow domain; the
@@ -327,6 +335,7 @@ export function deriveCaptionTrackSegments(
 	previousTrack: CaptionTrackSegment[] = [],
 	transitions: ClipTransition[] = [],
 	textSegments?: readonly TextSegment[],
+	gaps?: MainTrackGaps,
 ): CaptionTrackSegment[] {
 	const overridesBySourceId = new Map<string, CaptionTrackOverrides>();
 	for (const segment of previousTrack) {
@@ -349,6 +358,7 @@ export function deriveCaptionTrackSegments(
 		recordingSegments,
 		transitions,
 		textSegments,
+		gaps,
 	);
 
 	return mapped
@@ -375,11 +385,13 @@ export function mapSourceTimeToEdited(
 	recordingSegments: SegmentRecordings[],
 	transitions: ClipTransition[] = [],
 	textSegments?: readonly TextSegment[],
+	gaps?: MainTrackGaps,
 ): number | null {
 	const mappings = buildSourceToEditedMappings(
 		timelineSegments,
 		recordingSegments,
 		transitions,
+		gaps,
 	);
 	for (const mapping of mappings) {
 		if (sourceTime >= mapping.sourceStart && sourceTime <= mapping.sourceEnd) {
@@ -406,11 +418,13 @@ export function mapSourceRangeToEdited(
 	timelineSegments: TimelineSegment[],
 	recordingSegments: SegmentRecordings[],
 	transitions: ClipTransition[] = [],
+	gaps?: MainTrackGaps,
 ): MappedTimeRange[] {
 	const mappings = buildSourceToEditedMappings(
 		timelineSegments,
 		recordingSegments,
 		transitions,
+		gaps,
 	);
 	const ranges: MappedTimeRange[] = [];
 	for (const mapping of mappings) {
@@ -433,6 +447,7 @@ export function mapEditedTimeToSource(
 	sourceRange?: { start: number; end: number },
 	overlapPreference: "outgoing" | "incoming" = "outgoing",
 	textSegments?: readonly TextSegment[],
+	gaps?: MainTrackGaps,
 ): number | null {
 	// Output time includes fullscreen-text holds; the mappings below live in
 	// the gapless recording-flow domain.
@@ -441,6 +456,7 @@ export function mapEditedTimeToSource(
 		timelineSegments,
 		recordingSegments,
 		transitions,
+		gaps,
 	);
 	let fallback: number | null = null;
 	for (const mapping of mappings) {
@@ -480,6 +496,7 @@ export function applyCaptionResultToProject<
 					captionSegments?: CaptionTrackSegment[] | null;
 					transitions?: ClipTransition[] | null;
 					textSegments?: TextSegment[] | null;
+					mainTrackGaps?: MainTrackGaps;
 			  } & Record<string, unknown>)
 			| null;
 	},
@@ -525,6 +542,7 @@ export function applyCaptionResultToProject<
 		timeline.captionSegments ?? [],
 		timeline.transitions ?? [],
 		timeline.textSegments ?? [],
+		timeline.mainTrackGaps,
 	);
 }
 
@@ -680,6 +698,44 @@ if (import.meta.vitest) {
 	});
 
 	describe("mapCaptionsToEditedTimeline", () => {
+		it("projects captions after both a main-track gap and a fullscreen hold", () => {
+			const clips = [
+				{ id: "a", start: 0, end: 2, timescale: 1 },
+				{ id: "b", start: 4, end: 7, timescale: 1 },
+			];
+			const recordings = [{ display: { duration: 8 } }] as SegmentRecordings[];
+			const holds = [
+				{ layout: "fullscreen", start: 2.25, end: 3.25 },
+			] as TextSegment[];
+			const gaps = { beforeClip: { b: 1 } };
+			const mapped = mapCaptionsToEditedTimeline(
+				[{ id: "caption", start: 4.25, end: 4.75, text: "second clip" }],
+				clips,
+				recordings,
+				[],
+				holds,
+				gaps,
+			);
+			expect(mapped).toMatchObject([
+				{ start: 4.25, end: 4.75, text: "second clip" },
+			]);
+			expect(
+				mapEditedTimeToSource(
+					3.5,
+					clips,
+					recordings,
+					[],
+					undefined,
+					"incoming",
+					holds,
+					gaps,
+				),
+			).toBeNull();
+			expect(
+				mapSourceTimeToEdited(4.25, clips, recordings, [], holds, gaps),
+			).toBe(4.25);
+		});
+
 		it("splits caption words across retained timeline ranges", () => {
 			const result = mapCaptionsToEditedTimeline(
 				[

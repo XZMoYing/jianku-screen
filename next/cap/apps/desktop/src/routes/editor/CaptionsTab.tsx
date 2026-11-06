@@ -295,6 +295,7 @@ export function CaptionsTab(props: {
 					sourceRange,
 					"outgoing",
 					timeline.textSegments,
+					timeline.mainTrackGaps,
 				);
 				const end = mapEditedTimeToSource(
 					timelineSegment.end,
@@ -304,6 +305,7 @@ export function CaptionsTab(props: {
 					sourceRange,
 					"outgoing",
 					timeline.textSegments,
+					timeline.mainTrackGaps,
 				);
 				if (start !== null) source.start = start;
 				if (end !== null) source.end = end;

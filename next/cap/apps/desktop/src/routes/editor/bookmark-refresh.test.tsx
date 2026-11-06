@@ -51,7 +51,7 @@ function deferred() {
 function fixture(): TimelineConfiguration {
 	return {
 		segments: [
-			{ recordingSegment: 0, start: 0, end: 8, timescale: 1 },
+			{ id: "first", recordingSegment: 0, start: 0, end: 8, timescale: 1 },
 			{ recordingSegment: 1, start: 0, end: 8, timescale: 1 },
 		],
 		transitions: [],
@@ -144,6 +144,22 @@ it("keeps the real bookmark track and editor connected while remapping and preve
 	await vi.waitFor(() => expect(view.session.loading()).toBe(false));
 	expect(await view.session.jump(1)).toBe(true);
 	expect(view.seek).toHaveBeenCalledWith(1);
+});
+
+it("refreshes the visible bookmark after a gap moves its source clip", async () => {
+	const view = mount();
+	await vi.waitFor(() => expect(view.session.items()).toEqual(located()));
+	vi.mocked(commands.getRecordingBookmarks).mockResolvedValueOnce(located(3));
+	view.setTimeline(
+		(value) =>
+			value && {
+				...value,
+				mainTrackGaps: { beforeClip: { first: 1 } },
+			},
+	);
+	await vi.waitFor(() => expect(view.session.items()).toEqual(located(3)));
+	expect(await view.session.jump(3)).toBe(true);
+	expect(view.seek).toHaveBeenCalledWith(3);
 });
 
 it("does not refetch bookmark positions during 3D movement or clip appearance edits", async () => {

@@ -1,5 +1,6 @@
 import type {
 	CaptionSegment,
+	MainTrackGaps,
 	SegmentRecordings,
 	TimelineSegment,
 } from "~/utils/tauri";
@@ -111,6 +112,7 @@ export function createCaptionExportCues(
 	recordingSegments: SegmentRecordings[],
 	transitions: ClipTransition[] = [],
 	textSegments?: readonly TextSegment[],
+	gaps?: MainTrackGaps,
 ): CaptionExportCue[] {
 	return mapCaptionsToEditedTimeline(
 		segments,
@@ -118,6 +120,7 @@ export function createCaptionExportCues(
 		recordingSegments,
 		transitions,
 		textSegments,
+		gaps,
 	)
 		.map(cueFromCaptionSegment)
 		.filter((cue): cue is CaptionExportCue => cue !== null)

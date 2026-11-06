@@ -37,6 +37,8 @@ import {
 	type ClipTransitionKind,
 	clampTransitionDuration,
 	clipDuration,
+	clipGapAfter,
+	clipGapBefore,
 	clipTimelineOffsets,
 	clipTransitionMap,
 	DEFAULT_CLIP_TRANSITION_DURATION,
@@ -50,7 +52,11 @@ import {
 	isContextMenuKey,
 } from "../editor-context-menu";
 import { TextInput } from "../TextInput";
-import { effectiveToOutput, holdWindows } from "../timeline-holds";
+import {
+	effectiveToOutput,
+	effectiveToOutputEnd,
+	holdWindows,
+} from "../timeline-holds";
 import { createClipTrim } from "./clip-trim";
 import { useSegmentContext, useTimelineContext } from "./context";
 import { createTimelineMouseDrag } from "./mouse-drag";
@@ -467,7 +473,12 @@ function ClipSettingsControl(props: {
 		return time > props.box.start && time < props.box.end;
 	};
 	const mergeBlocker = (direction: ClipMergeDirection) =>
-		clipMergeBlocker(segments(), props.index, direction);
+		clipMergeBlocker(
+			segments(),
+			props.index,
+			direction,
+			project.timeline?.mainTrackGaps,
+		);
 	const mergeHint = (direction: ClipMergeDirection) => {
 		const blocker = mergeBlocker(direction);
 		return blocker ? localize(clipMergeBlockerHint(blocker)) : undefined;
@@ -673,6 +684,11 @@ export function ClipTrack(
 		return preview?.clip === clip ? preview.startOffset : 0;
 	};
 
+	const canAddTransition = (index: number) =>
+		index > 0 &&
+		index < segments().length &&
+		clipGapBefore(segments()[index], project.timeline?.mainTrackGaps) === 0;
+
 	function editTransition(index: number) {
 		setEditorState("timeline", "selection", { type: "transition", index });
 	}
@@ -689,12 +705,14 @@ export function ClipTrack(
 			return;
 		const previous = segments()[index - 1];
 		const next = segments()[index];
-		if (!previous || !next) return;
+		if (!previous || !next || !canAddTransition(index)) return;
 		const current = transitionAt(index);
 		const currentIndex = () => {
 			const clips = segments();
 			const target = clips.indexOf(next);
-			return target > 0 && clips[target - 1] === previous ? target : -1;
+			return canAddTransition(target) && clips[target - 1] === previous
+				? target
+				: -1;
 		};
 		const types = [
 			["cross-fade", "交叉淡化"],
@@ -755,17 +773,30 @@ export function ClipTrack(
 		return new Set(selection.indices);
 	});
 	const effectiveTransitions = createMemo(() =>
-		clipTransitionMap(segments(), project.timeline?.transitions ?? []),
+		clipTransitionMap(
+			segments(),
+			project.timeline?.transitions ?? [],
+			project.timeline?.mainTrackGaps,
+		),
 	);
 
 	const segmentOffsets = createMemo(() => {
 		const segs = segments();
 		const transitions = project.timeline?.transitions ?? [];
-		const offsets = clipTimelineOffsets(segs, transitions);
+		const offsets = clipTimelineOffsets(
+			segs,
+			transitions,
+			project.timeline?.mainTrackGaps,
+		);
 		const drag = transitionDrag();
 		if (drag) {
 			const committed =
-				getClipTransition(segs, transitions, drag.index)?.duration ?? 0;
+				getClipTransition(
+					segs,
+					transitions,
+					drag.index,
+					project.timeline?.mainTrackGaps,
+				)?.duration ?? 0;
 			const shift = committed - drag.duration;
 			for (let index = drag.index; index < offsets.length; index++) {
 				offsets[index] += shift;
@@ -791,6 +822,14 @@ export function ClipTrack(
 	const heldWindows = createMemo(() =>
 		holdWindows(project.timeline?.textSegments),
 	);
+
+	const clipEndOnOutput = (index: number, end: number) => {
+		const convert =
+			clipGapAfter(segments(), index, project.timeline?.mainTrackGaps) > 0
+				? effectiveToOutputEnd
+				: effectiveToOutput;
+		return convert(heldWindows(), end);
+	};
 
 	const selectedHoldWindows = createMemo(() => {
 		const selection = editorState.timeline.selection;
@@ -819,8 +858,8 @@ export function ClipTrack(
 			const seg = segs[i];
 			const offset = trimStartOffset(seg);
 			const segStart = effectiveToOutput(holds, offsets[i] + offset);
-			const segEnd = effectiveToOutput(
-				holds,
+			const segEnd = clipEndOnOutput(
+				i,
 				offsets[i] + offset + clipDuration(seg),
 			);
 			if (
@@ -1103,8 +1142,8 @@ export function ClipTrack(
 								effectiveToOutput(holds, prevDuration() + offset),
 								0,
 							),
-							end: effectiveToOutput(
-								holds,
+							end: clipEndOnOutput(
+								i(),
 								prevDuration() + offset + clipDuration(seg),
 							),
 							timescale: seg.timescale,
@@ -1332,10 +1371,14 @@ export function ClipTrack(
 											segments(),
 											project.timeline?.transitions ?? [],
 											index,
+											project.timeline?.mainTrackGaps,
 										);
 										const initialDuration = initialTransition?.duration ?? 0;
 										const canDrag =
-											index > 0 && !e.shiftKey && !e.ctrlKey && !e.metaKey;
+											canAddTransition(index) &&
+											!e.shiftKey &&
+											!e.ctrlKey &&
+											!e.metaKey;
 										const startX = e.clientX;
 										let active = false;
 										let nextDuration = initialDuration;
@@ -1485,7 +1528,7 @@ export function ClipTrack(
 									}}
 								</For>
 
-								<Show when={i() > 0 && !transitionAt(i())}>
+								<Show when={canAddTransition(i()) && !transitionAt(i())}>
 									<button
 										type="button"
 										data-transition
@@ -1804,7 +1847,17 @@ function useSectionMarker(
 		position: "left" | "right";
 	},
 ) {
-	const { editorInstance } = useEditorContext();
+	const { editorInstance, project } = useEditorContext();
 
-	return () => getSectionMarker(props(), editorInstance.recordings.segments);
+	return () => {
+		const options = props();
+		const gaps = project.timeline?.mainTrackGaps;
+		const adjacentGap =
+			options.position === "left"
+				? clipGapBefore(options.segments[options.i], gaps)
+				: clipGapAfter(options.segments, options.i, gaps);
+		return adjacentGap > 0
+			? null
+			: getSectionMarker(options, editorInstance.recordings.segments);
+	};
 }

@@ -3,8 +3,18 @@ import { createEventListenerMap } from "@solid-primitives/event-listener";
 import { cx } from "cva";
 import { createMemo, createRoot, createSignal, For, onCleanup } from "solid-js";
 
-import { clipTimelineOffsets } from "../clip-transitions";
+import {
+	clipDuration,
+	clipGapAfter,
+	clipGapBefore,
+	clipTimelineOffsets,
+} from "../clip-transitions";
 import { useEditorContext } from "../context";
+import {
+	effectiveToOutput,
+	effectiveToOutputEnd,
+	holdWindows,
+} from "../timeline-holds";
 
 const MIN_CHIP_WIDTH = 20;
 
@@ -34,9 +44,22 @@ export function Minimap() {
 
 	const clipBoundaries = createMemo(() => {
 		const timeline = project.timeline;
-		if (!timeline || timeline.segments.length < 2) return [];
-		return clipTimelineOffsets(timeline.segments, timeline.transitions ?? [])
-			.slice(1)
+		if (!timeline) return [];
+		const { segments, mainTrackGaps } = timeline;
+		const holds = holdWindows(timeline.textSegments);
+		return clipTimelineOffsets(
+			segments,
+			timeline.transitions ?? [],
+			mainTrackGaps,
+		)
+			.flatMap((start, index) => [
+				...(index > 0 || clipGapBefore(segments[index], mainTrackGaps) > 0
+					? [effectiveToOutput(holds, start)]
+					: []),
+				...(clipGapAfter(segments, index, mainTrackGaps) > 0
+					? [effectiveToOutputEnd(holds, start + clipDuration(segments[index]))]
+					: []),
+			])
 			.filter((offset) => offset > 0 && offset < total());
 	});
 

@@ -1,0 +1,6 @@
+model.log: Test Files  9 passed (9)
+model.log:      Tests  62 passed (62)
+interface-confirmed.log: Test Files  4 passed (4)
+interface-confirmed.log:      Tests  78 passed (78)
+Checked 19 files in 105ms. Fixed 1 file.
+binary file matches (found "\0" byte around offset 1191)

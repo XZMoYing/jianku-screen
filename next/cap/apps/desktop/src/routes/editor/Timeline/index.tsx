@@ -44,7 +44,11 @@ import {
 	getSelectedTranscriptionSettings,
 	transcribeEditorCaptions,
 } from "../captions";
-import { clipDuration, clipTimelineOffsets } from "../clip-transitions";
+import {
+	clipDuration,
+	clipGapAfter,
+	clipTimelineOffsets,
+} from "../clip-transitions";
 import { FPS, type TimelineTrackType, useEditorContext } from "../context";
 import {
 	createEditorContextMenu,
@@ -52,7 +56,11 @@ import {
 } from "../editor-context-menu";
 import { defaultMaskSegment, type MaskSegment } from "../masks";
 import { autoTextColorAt, defaultTextSegment, type TextSegment } from "../text";
-import { effectiveToOutput, holdWindows } from "../timeline-holds";
+import {
+	effectiveToOutput,
+	effectiveToOutputEnd,
+	holdWindows,
+} from "../timeline-holds";
 import {
 	getOverlayTrackRows,
 	getSegmentTrack,
@@ -259,7 +267,11 @@ export function Timeline(props: {
 		targets: (exclude?: object, stableClipPrefix?: number) => {
 			const timeline = project.timeline;
 			const clips = timeline?.segments ?? [];
-			const offsets = clipTimelineOffsets(clips, timeline?.transitions ?? []);
+			const offsets = clipTimelineOffsets(
+				clips,
+				timeline?.transitions ?? [],
+				timeline?.mainTrackGaps,
+			);
 			const holds = holdWindows(timeline?.textSegments);
 			return [
 				...clips.flatMap((clip, index) =>
@@ -268,7 +280,12 @@ export function Timeline(props: {
 						? []
 						: [
 								effectiveToOutput(holds, offsets[index]),
-								effectiveToOutput(holds, offsets[index] + clipDuration(clip)),
+								(clipGapAfter(clips, index, timeline?.mainTrackGaps) > 0
+									? effectiveToOutputEnd
+									: effectiveToOutput)(
+									holds,
+									offsets[index] + clipDuration(clip),
+								),
 							],
 				),
 				...(recordingBookmarks.items() ?? []).flatMap(
@@ -1806,11 +1823,14 @@ function TrackRow(props: {
 				const offsets = clipTimelineOffsets(
 					segments,
 					timeline?.transitions ?? [],
+					timeline?.mainTrackGaps,
 				);
 				const holds = holdWindows(timeline?.textSegments);
 				return segments.map((segment, index) => ({
 					start: effectiveToOutput(holds, offsets[index]),
-					end: effectiveToOutput(holds, offsets[index] + clipDuration(segment)),
+					end: (clipGapAfter(segments, index, timeline?.mainTrackGaps) > 0
+						? effectiveToOutputEnd
+						: effectiveToOutput)(holds, offsets[index] + clipDuration(segment)),
 				}));
 			}
 		}

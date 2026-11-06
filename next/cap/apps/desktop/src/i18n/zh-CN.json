@@ -31,6 +31,7 @@
 	"Microphone settings": "麦克风设置",
 	"Compatibility mode may reduce this setting.": "兼容模式可能降低此设置。",
 	"Loading...": "正在加载…",
+	"No video at this position": "此处没有视频片段",
 	"Browse": "浏览",
 	"Target": "目标",
 	"Storage": "存储",
@@ -1639,5 +1640,6 @@
 	"No clip on that side": "此侧没有片段",
 	"Different recording": "来自不同素材",
 	"Footage was cut between them": "两个片段之间的源画面已被剪除",
+	"The clips are separated by a gap": "两个片段在时间线上有空隙",
 	"Match the clip speeds first": "请先统一片段速度"
 }

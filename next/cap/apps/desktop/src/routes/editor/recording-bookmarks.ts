@@ -13,6 +13,7 @@ import {
 	type RecordingBookmark,
 	type TimelineConfiguration,
 } from "~/utils/tauri";
+import { clipGapBefore } from "./clip-transitions";
 import { registerEditorResource } from "./editor-fallback-diagnostics";
 import { holdWindows } from "./timeline-holds";
 
@@ -36,6 +37,7 @@ export function createRecordingBookmarks(
 							clip.start,
 							clip.end,
 							clip.timescale,
+							clipGapBefore(clip, value.mainTrackGaps),
 						]),
 						transitions: (value.transitions ?? []).map((transition) => [
 							transition.segmentIndex,

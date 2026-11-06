@@ -1,4 +1,4 @@
-import type { KeyboardTrackSegment } from "~/utils/tauri";
+import type { KeyboardTrackSegment, MainTrackGaps } from "~/utils/tauri";
 import { newClipInstance } from "./clip-identity";
 import {
 	type ClipTransition,
@@ -282,8 +282,9 @@ export function cutClipSegmentsForRange(
 	cutStart: number,
 	cutEnd: number,
 	requestedSegmentIndex?: number,
+	gaps?: MainTrackGaps,
 ) {
-	const editedOffsets = clipTimelineOffsets(segments, transitions);
+	const editedOffsets = clipTimelineOffsets(segments, transitions, gaps);
 	let startSegIdx = -1;
 	let startRelative = 0;
 	let endSegIdx = -1;
@@ -364,6 +365,7 @@ export function rippleDeleteAllTracks(
 			end: number;
 		}>;
 		transitions?: ClipTransition[] | null;
+		mainTrackGaps?: MainTrackGaps;
 		styleSegments?: Array<{ start: number; end: number }> | null;
 		imageSegments?: Array<{ start: number; end: number }> | null;
 		zoomSegments?: Array<{ start: number; end: number }> | null;
@@ -400,6 +402,7 @@ export function rippleDeleteAllTracks(
 	const durationBefore = clipTimelineDuration(
 		timeline.segments,
 		timeline.transitions ?? [],
+		timeline.mainTrackGaps,
 	);
 	const previousSegments = timeline.segments.map((segment) => ({ ...segment }));
 	const previousTransitions = (timeline.transitions ?? []).map(
@@ -413,6 +416,7 @@ export function rippleDeleteAllTracks(
 		cutStart,
 		cutEnd,
 		requestedSegmentIndex,
+		timeline.mainTrackGaps,
 	);
 	timeline.transitions = nextTransitions;
 	const clipChanged =
@@ -439,7 +443,12 @@ export function rippleDeleteAllTracks(
 	if (!clipChanged) return;
 	const shiftDuration = Math.max(
 		0,
-		durationBefore - clipTimelineDuration(timeline.segments, nextTransitions),
+		durationBefore -
+			clipTimelineDuration(
+				timeline.segments,
+				nextTransitions,
+				timeline.mainTrackGaps,
+			),
 	);
 	const overlayShift =
 		shiftDuration +
@@ -521,18 +530,21 @@ export function deleteClipAndRippleAllTracks(
 	const start = clipTimelineOffsets(
 		timeline.segments,
 		timeline.transitions ?? [],
+		timeline.mainTrackGaps,
 	)[segmentIndex];
 	const incomingDuration =
 		getClipTransition(
 			timeline.segments,
 			timeline.transitions ?? [],
 			segmentIndex,
+			timeline.mainTrackGaps,
 		)?.duration ?? 0;
 	const outgoingDuration =
 		getClipTransition(
 			timeline.segments,
 			timeline.transitions ?? [],
 			segmentIndex + 1,
+			timeline.mainTrackGaps,
 		)?.duration ?? 0;
 	const end = start + clipDuration(segment);
 	rippleDeleteAllTracks(timeline, start, end, segmentIndex, {

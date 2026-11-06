@@ -39,13 +39,16 @@ export function reorderClipInstance(
 			timeline.segments,
 			timeline.transitions,
 			transition.segmentIndex,
+			timeline.mainTrackGaps,
 		);
 		if (!effective) continue;
 		const boundary = effectiveToOutput(
 			holdWindows(timeline.textSegments),
-			clipTimelineOffsets(timeline.segments, timeline.transitions)[
-				transition.segmentIndex
-			] + effective.duration,
+			clipTimelineOffsets(
+				timeline.segments,
+				timeline.transitions,
+				timeline.mainTrackGaps,
+			)[transition.segmentIndex] + effective.duration,
 		);
 		timeline.transitions = timeline.transitions.filter(
 			(candidate) => candidate.segmentIndex !== transition.segmentIndex,

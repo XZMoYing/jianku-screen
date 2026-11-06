@@ -1,9 +1,14 @@
-import type { TimelineSegment } from "~/utils/tauri";
-import type { ClipTransition } from "./clip-transitions";
+import type { MainTrackGaps, TimelineSegment } from "~/utils/tauri";
+import { type ClipTransition, clipGapBefore } from "./clip-transitions";
 
 export type ClipMergeDirection = "previous" | "next";
 
-export type ClipMergeBlocker = "edge" | "different-recording" | "gap" | "speed";
+export type ClipMergeBlocker =
+	| "edge"
+	| "different-recording"
+	| "gap"
+	| "timeline-gap"
+	| "speed";
 
 const CONTIGUOUS_EPSILON = 1e-6;
 
@@ -18,11 +23,13 @@ export function clipMergeBlocker(
 	segments: ReadonlyArray<TimelineSegment>,
 	index: number,
 	direction: ClipMergeDirection,
+	gaps?: MainTrackGaps,
 ): ClipMergeBlocker | null {
 	const kept = clipMergeKeptIndex(index, direction);
 	const left = segments[kept];
 	const right = segments[kept + 1];
 	if (!left || !right) return "edge";
+	if (clipGapBefore(right, gaps) > 0) return "timeline-gap";
 	if ((left.recordingSegment ?? 0) !== (right.recordingSegment ?? 0))
 		return "different-recording";
 	if (Math.abs(left.end - right.start) > CONTIGUOUS_EPSILON) return "gap";
@@ -38,6 +45,8 @@ export function clipMergeBlockerHint(blocker: ClipMergeBlocker): string {
 			return "Different recording";
 		case "gap":
 			return "Footage was cut between them";
+		case "timeline-gap":
+			return "The clips are separated by a gap";
 		case "speed":
 			return "Match the clip speeds first";
 	}

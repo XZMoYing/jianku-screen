@@ -41,6 +41,7 @@ import type {
 	CaptionTrackSegment,
 	ClipOffsets,
 	KeyboardTrackSegment,
+	MainTrackGaps,
 	NotchConfiguration,
 	SceneMode,
 	SceneSegment,
@@ -2100,31 +2101,38 @@ function zoomPreviewSource(
 	timeline:
 		| {
 				segments: TimelineSegment[];
+				mainTrackGaps?: MainTrackGaps;
 				transitions?: ClipTransition[];
 				textSegments?: TextSegment[];
 		  }
 		| null
 		| undefined,
 	editedTime: number,
-): { recordingSegment: number; sourceTime: number } {
-	const gapless =
+): { recordingSegment: number; sourceTime: number } | null {
+	const unheld =
 		editedTime -
 		heldTimeBefore(holdWindows(timeline?.textSegments), editedTime);
-	return (
-		clipSourceTimeAt(
-			timeline?.segments ?? [],
-			timeline?.transitions ?? [],
-			gapless,
-		) ?? { recordingSegment: 0, sourceTime: gapless }
-	);
+	return timeline
+		? clipSourceTimeAt(
+				timeline.segments,
+				timeline.transitions ?? [],
+				unheld,
+				timeline.mainTrackGaps,
+			)
+		: { recordingSegment: 0, sourceTime: unheld };
 }
 
 // The mapping memos return fresh objects; compare by value so unrelated
 // timeline edits don't restart the preview <video>.
 const zoomPreviewSourceEquals = (
-	a: { recordingSegment: number; sourceTime: number },
-	b: { recordingSegment: number; sourceTime: number },
-) => a.recordingSegment === b.recordingSegment && a.sourceTime === b.sourceTime;
+	a: ReturnType<typeof zoomPreviewSource>,
+	b: ReturnType<typeof zoomPreviewSource>,
+) =>
+	a === b ||
+	(a !== null &&
+		b !== null &&
+		a.recordingSegment === b.recordingSegment &&
+		a.sourceTime === b.sourceTime);
 
 function ZoomSegmentPreview(props: {
 	segmentIndex: number;
@@ -2139,11 +2147,17 @@ function ZoomSegmentPreview(props: {
 	);
 
 	const video = document.createElement("video");
+	const [loaded, setLoaded] = createSignal(false);
 	createEffect(() => {
+		const current = source();
+		if (!current) {
+			setLoaded(false);
+			video.removeAttribute("src");
+			video.load();
+			return;
+		}
 		const path = convertFileSrc(
-			`${editorInstance.path}/content/segments/segment-${
-				source().recordingSegment
-			}/display.mp4`,
+			`${editorInstance.path}/content/segments/segment-${current.recordingSegment}/display.mp4`,
 		);
 		video.src = path;
 		video.preload = "auto";
@@ -2151,7 +2165,9 @@ function ZoomSegmentPreview(props: {
 	});
 
 	createEffect(() => {
-		const t = source().sourceTime;
+		const current = source();
+		if (!current) return;
+		const t = current.sourceTime;
 
 		if (video.readyState >= 2) {
 			video.currentTime = t;
@@ -2165,7 +2181,8 @@ function ZoomSegmentPreview(props: {
 	});
 
 	const render = () => {
-		if (!canvasRef || video.readyState < 2) return;
+		const current = source();
+		if (!current || !canvasRef || video.readyState < 2) return;
 
 		const ctx = canvasRef.getContext("2d");
 		if (!ctx) return;
@@ -2174,7 +2191,7 @@ function ZoomSegmentPreview(props: {
 		ctx.clearRect(0, 0, canvasRef.width, canvasRef.height);
 
 		const raw = (
-			editorInstance.recordings.segments[source().recordingSegment] ??
+			editorInstance.recordings.segments[current.recordingSegment] ??
 			editorInstance.recordings.segments[0]
 		).display;
 		const croppedPosition = project.background.crop?.position || { x: 0, y: 0 };
@@ -2196,14 +2213,16 @@ function ZoomSegmentPreview(props: {
 		);
 	};
 
-	const [loaded, setLoaded] = createSignal(false);
 	video.onloadeddata = () => {
+		if (!source()) return;
 		setLoaded(true);
 		render();
 	};
 	video.onseeked = render;
 	video.onerror = () => {
-		setTimeout(() => video.load(), 100);
+		setTimeout(() => {
+			if (source()) video.load();
+		}, 100);
 	};
 
 	let canvasRef!: HTMLCanvasElement;
@@ -2224,7 +2243,7 @@ function ZoomSegmentPreview(props: {
 					/>
 					<Show when={!loaded()}>
 						<p class="flex absolute inset-0 justify-center items-center text-xs text-gray-11">
-							{localize("Loading...")}
+							{localize(source() ? "Loading..." : "No video at this position")}
 						</p>
 					</Show>
 				</div>
@@ -2332,10 +2351,7 @@ function ZoomSegmentConfig(props: {
 							{(mode) => {
 								// Frozen while history is paused so drags don't thrash the
 								// <video> seek.
-								const source = createMemo<{
-									recordingSegment: number;
-									sourceTime: number;
-								}>(
+								const source = createMemo<ReturnType<typeof zoomPreviewSource>>(
 									(prev) => {
 										if (projectHistory.isPaused()) return prev;
 
@@ -2350,10 +2366,15 @@ function ZoomSegmentConfig(props: {
 
 								const video = document.createElement("video");
 								createEffect(() => {
+									const current = source();
+									if (!current) {
+										setLoaded(false);
+										video.removeAttribute("src");
+										video.load();
+										return;
+									}
 									const path = convertFileSrc(
-										`${editorInstance.path}/content/segments/segment-${
-											source().recordingSegment
-										}/display.mp4`,
+										`${editorInstance.path}/content/segments/segment-${current.recordingSegment}/display.mp4`,
 									);
 									video.src = path;
 									video.preload = "auto";
@@ -2362,7 +2383,9 @@ function ZoomSegmentConfig(props: {
 								});
 
 								createEffect(() => {
-									const t = source().sourceTime;
+									const current = source();
+									if (!current) return;
+									const t = current.sourceTime;
 
 									// Ensure video is ready before seeking
 									if (video.readyState >= 2) {
@@ -2392,7 +2415,8 @@ function ZoomSegmentConfig(props: {
 								);
 
 								const render = () => {
-									if (!canvasRef || video.readyState < 2) return;
+									const current = source();
+									if (!current || !canvasRef || video.readyState < 2) return;
 
 									const ctx = canvasRef.getContext("2d");
 									if (!ctx) return;
@@ -2416,6 +2440,7 @@ function ZoomSegmentConfig(props: {
 
 								const [loaded, setLoaded] = createSignal(false);
 								video.onloadeddata = () => {
+									if (!source()) return;
 									setLoaded(true);
 									render();
 								};
@@ -2426,7 +2451,7 @@ function ZoomSegmentConfig(props: {
 									console.error("Failed to load video for zoom preview:", e);
 									// Try to reload after a short delay
 									setTimeout(() => {
-										video.load();
+										if (source()) video.load();
 									}, 100);
 								};
 
@@ -2437,7 +2462,7 @@ function ZoomSegmentConfig(props: {
 								const rawSize = () => {
 									const raw = (
 										editorInstance.recordings.segments[
-											source().recordingSegment
+											source()?.recordingSegment ?? 0
 										] ?? editorInstance.recordings.segments[0]
 									).display;
 									return { x: raw.width, y: raw.height };
@@ -2468,6 +2493,7 @@ function ZoomSegmentConfig(props: {
 											height: `calc(${visualHeight()}px + 0.25rem)`,
 										}}
 										onMouseDown={(downEvent) => {
+											if (!source()) return;
 											const bounds =
 												downEvent.currentTarget.getBoundingClientRect();
 
@@ -2505,15 +2531,17 @@ function ZoomSegmentConfig(props: {
 											);
 										}}
 									>
-										<div
-											class="absolute z-10 w-6 h-6 rounded-full border border-gray-400 -translate-x-1/2 -translate-y-1/2 bg-gray-1"
-											style={{
-												left: `${mode().x * 100}%`,
-												top: `${mode().y * 100}%`,
-											}}
-										>
-											<div class="size-1.5 bg-gray-5 rounded-full" />
-										</div>
+										<Show when={source()}>
+											<div
+												class="absolute z-10 w-6 h-6 rounded-full border border-gray-400 -translate-x-1/2 -translate-y-1/2 bg-gray-1"
+												style={{
+													left: `${mode().x * 100}%`,
+													top: `${mode().y * 100}%`,
+												}}
+											>
+												<div class="size-1.5 bg-gray-5 rounded-full" />
+											</div>
+										</Show>
 										<div class="overflow-hidden relative rounded-lg border border-gray-3 bg-gray-2">
 											<canvas
 												ref={canvasRef}
@@ -2525,7 +2553,11 @@ function ZoomSegmentConfig(props: {
 											<Show when={!loaded()}>
 												<div class="flex absolute inset-0 justify-center items-center bg-gray-2">
 													<div class="text-sm text-gray-11">
-														{localize("Loading preview...")}
+														{localize(
+															source()
+																? "Loading preview..."
+																: "No video at this position",
+														)}
 													</div>
 												</div>
 											</Show>

@@ -4,6 +4,7 @@ import {
 	type ClipTransition,
 	clampTransitionDuration,
 	clipCutPreservesTransitionGeometry,
+	clipSourceTimeAt,
 	clipTimelineDuration,
 	clipTimelineOffsets,
 	getClipTransition,
@@ -30,6 +31,26 @@ const transition = (
 ): ClipTransition => ({ segmentIndex, type, duration });
 
 describe("clip transitions", () => {
+	it("lays out leading, internal and trailing gaps without a source or overlapping transition", () => {
+		const segments = [
+			{ ...segment(2), id: "a" },
+			{ ...segment(3), id: "b", start: 4, end: 7 },
+		];
+		const transitions = [transition(1, 0.5)];
+		const gaps = { beforeClip: { a: 1, b: 0.75, removed: 99 }, trailing: 0.5 };
+		expect(clipTimelineOffsets(segments, transitions, gaps)).toEqual([1, 3.75]);
+		expect(clipTimelineDuration(segments, transitions, gaps)).toBe(7.25);
+		expect(getClipTransition(segments, transitions, 1, gaps)).toBeNull();
+		for (const time of [0, 0.5, 3, 3.5, 6.75, 7]) {
+			expect(clipSourceTimeAt(segments, transitions, time, gaps)).toBeNull();
+		}
+		expect(clipSourceTimeAt(segments, transitions, 3.75, gaps)).toEqual({
+			segmentIndex: 1,
+			recordingSegment: 0,
+			sourceTime: 4,
+		});
+	});
+
 	it("keeps a legacy timeline unchanged", () => {
 		const segments = [segment(4), segment(6), segment(2)];
 

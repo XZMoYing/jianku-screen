@@ -599,7 +599,9 @@ export function CanvasElementsOverlay(props: { size: Size }) {
 					project.timeline?.transitions ?? [],
 					time() -
 						heldTimeBefore(holdWindows(project.timeline?.textSegments), time()),
+					project.timeline?.mainTrackGaps,
 				);
+				if (!source && project.timeline?.mainTrackGaps) return null;
 				const raw =
 					editorInstance.recordings.segments[source?.recordingSegment ?? 0]
 						?.display ?? editorInstance.recordings.segments[0]?.display;

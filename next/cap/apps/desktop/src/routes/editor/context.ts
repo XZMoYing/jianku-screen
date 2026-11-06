@@ -85,6 +85,7 @@ import {
 	type ClipTransitionInput,
 	clampTransitionDuration,
 	clipDuration,
+	clipGapBefore,
 	clipTimelineDuration,
 	clipTimelineOffsets,
 	getClipTransition,
@@ -433,20 +434,31 @@ export const [EditorContextProvider, useBaseEditorContext] =
 						if (!timeline || segmentIndex <= 0) return;
 						const segment = timeline.segments[segmentIndex];
 						const previous = timeline.segments[segmentIndex - 1];
-						if (!segment || !previous) return;
+						if (
+							!segment ||
+							!previous ||
+							clipGapBefore(segment, timeline.mainTrackGaps) > 0
+						)
+							return;
 						const transitions = timeline.transitions ?? [];
 
 						const oldDuration =
-							getClipTransition(timeline.segments, transitions, segmentIndex)
-								?.duration ?? 0;
+							getClipTransition(
+								timeline.segments,
+								transitions,
+								segmentIndex,
+								timeline.mainTrackGaps,
+							)?.duration ?? 0;
 						const duration = transition
 							? clampTransitionDuration(transition.duration, previous, segment)
 							: 0;
 						const boundary = effectiveToOutput(
 							holdWindows(timeline.textSegments),
-							clipTimelineOffsets(timeline.segments, transitions)[
-								segmentIndex
-							] + oldDuration,
+							clipTimelineOffsets(
+								timeline.segments,
+								transitions,
+								timeline.mainTrackGaps,
+							)[segmentIndex] + oldDuration,
 						);
 						const shift = oldDuration - duration;
 
@@ -515,6 +527,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				const offsets = clipTimelineOffsets(
 					timeline.segments,
 					timeline.transitions ?? [],
+					timeline.mainTrackGaps,
 				);
 				const cuts: number[] = [];
 				for (let index = 0; index < timeline.segments.length; index++) {
@@ -656,6 +669,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 							const normalized = normalizeClipTransitions(
 								timeline.segments,
 								timeline.transitions ?? [],
+								timeline.mainTrackGaps,
 							);
 							if (
 								normalized.length === timeline.transitions.length &&
@@ -778,6 +792,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 							const offsets = clipTimelineOffsets(
 								segments,
 								timeline.transitions ?? [],
+								timeline.mainTrackGaps,
 							);
 							let currentSegmentIndex = requestedSegmentIndex ?? -1;
 							if (currentSegmentIndex < 0) {
@@ -805,12 +820,14 @@ export const [EditorContextProvider, useBaseEditorContext] =
 									segments,
 									timeline.transitions ?? [],
 									currentSegmentIndex,
+									timeline.mainTrackGaps,
 								)?.duration ?? 0;
 							const outgoingDuration =
 								getClipTransition(
 									segments,
 									timeline.transitions ?? [],
 									currentSegmentIndex + 1,
+									timeline.mainTrackGaps,
 								)?.duration ?? 0;
 							if (
 								localTime < incomingDuration * 2 ||
@@ -1600,10 +1617,12 @@ export const [EditorContextProvider, useBaseEditorContext] =
 							const oldDuration = clipTimelineDuration(
 								timeline.segments,
 								timeline.transitions ?? [],
+								timeline.mainTrackGaps,
 							);
 							const oldOffsets = clipTimelineOffsets(
 								timeline.segments,
 								timeline.transitions ?? [],
+								timeline.mainTrackGaps,
 							);
 							const oldHolds = holdWindows(timeline.textSegments);
 							const incomingDuration =
@@ -1611,19 +1630,23 @@ export const [EditorContextProvider, useBaseEditorContext] =
 									timeline.segments,
 									timeline.transitions ?? [],
 									index,
+									timeline.mainTrackGaps,
 								)?.duration ?? 0;
 							segment.timescale = timescale;
 							timeline.transitions = normalizeClipTransitions(
 								timeline.segments,
 								timeline.transitions ?? [],
+								timeline.mainTrackGaps,
 							);
 							const newDuration = clipTimelineDuration(
 								timeline.segments,
 								timeline.transitions,
+								timeline.mainTrackGaps,
 							);
 							const newOffsets = clipTimelineOffsets(
 								timeline.segments,
 								timeline.transitions,
+								timeline.mainTrackGaps,
 							);
 							const absoluteStart = oldOffsets[index] + incomingDuration;
 							const oldNextBoundary = oldOffsets[index + 1] ?? oldDuration;
@@ -1765,7 +1788,15 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				mergeClipSegment: (index: number, direction: ClipMergeDirection) => {
 					const timeline = project.timeline;
 					if (!timeline) return;
-					if (clipMergeBlocker(timeline.segments, index, direction)) return;
+					if (
+						clipMergeBlocker(
+							timeline.segments,
+							index,
+							direction,
+							timeline.mainTrackGaps,
+						)
+					)
+						return;
 					const kept = clipMergeKeptIndex(index, direction);
 					batch(() => {
 						// Dropping the transition on the merged boundary first lets
@@ -1950,6 +1981,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					? clipTimelineDuration(
 							project.timeline.segments,
 							project.timeline.transitions ?? [],
+							project.timeline.mainTrackGaps,
 						) + totalHeldDuration(holdWindows(project.timeline.textSegments))
 					: props.editorInstance.recordingDuration;
 
@@ -2363,6 +2395,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 							undefined,
 							"incoming",
 							timeline.textSegments,
+							timeline.mainTrackGaps,
 						);
 					const inverted = segments.flatMap((segment) => {
 						const start = toSource(segment.start);
@@ -2403,7 +2436,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 						const timelineSig = timeline.segments
 							.map(
 								(s) =>
-									`${s.start}|${s.end}|${s.timescale}|${s.recordingSegment ?? 0}`,
+									`${s.start}|${s.end}|${s.timescale}|${s.recordingSegment ?? 0}|${clipGapBefore(s, timeline.mainTrackGaps)}`,
 							)
 							.join(",");
 						const transitionSig = (timeline.transitions ?? [])
@@ -2430,6 +2463,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 							timeline.captionSegments ?? [],
 							timeline.transitions ?? [],
 							timeline.textSegments,
+							timeline.mainTrackGaps,
 						);
 						setProject(
 							"timeline",

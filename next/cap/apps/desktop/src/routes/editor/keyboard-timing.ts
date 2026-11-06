@@ -1,4 +1,5 @@
-import type { KeyboardTrackSegment } from "~/utils/tauri";
+import type { KeyboardTrackSegment, MainTrackGaps } from "~/utils/tauri";
+import { clipGapBefore } from "./clip-transitions";
 
 type TimelineSignatureInput = {
 	segments: Array<{
@@ -6,7 +7,9 @@ type TimelineSignatureInput = {
 		end: number;
 		timescale: number;
 		recordingSegment?: number | null;
+		id?: string | null;
 	}>;
+	mainTrackGaps?: MainTrackGaps;
 	transitions?: Array<{
 		segmentIndex: number;
 		type: string;
@@ -173,7 +176,7 @@ export function keyboardTimelineSignature(
 	const segments = timeline.segments
 		.map(
 			(segment) =>
-				`${segment.start}|${segment.end}|${segment.timescale}|${segment.recordingSegment ?? 0}`,
+				`${segment.start}|${segment.end}|${segment.timescale}|${segment.recordingSegment ?? 0}|${clipGapBefore(segment, timeline.mainTrackGaps)}`,
 		)
 		.join(",");
 	const transitions = (timeline.transitions ?? [])
