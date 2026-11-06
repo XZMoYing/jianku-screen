@@ -1136,6 +1136,151 @@ async fn native_preparing_bgra_surface_matches_default_avasset_editor_frame() {
     .await;
 }
 
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn ordinary_editor_scrubs_and_plays_main_track_gaps() {
+    let mut fixture = fixture(false);
+    let mut preparing = fixture.input();
+    preparing
+        .project
+        .timeline
+        .as_mut()
+        .unwrap()
+        .main_track_gaps
+        .trailing = Some(0.5);
+    assert!(matches!(
+        validate_input(&preparing),
+        Err(PreparingPreviewError::InvalidInput(message)) if message.contains("unchanged stopped timeline")
+    ));
+
+    let cap_project::RecordingMetaInner::Studio(studio) = &mut fixture.reference_metadata.inner
+    else {
+        panic!("Studio recording expected");
+    };
+    let cap_project::StudioRecordingMeta::MultipleSegments { inner } = studio.as_mut() else {
+        panic!("Indexed recording expected");
+    };
+    inner.segments[0].mic = None;
+    fixture.reference_metadata.save_for_project().unwrap();
+    let root = &fixture.reference_metadata.project_path;
+    image::RgbaImage::from_pixel(32, 32, image::Rgba([255, 225, 0, 255]))
+        .save(root.join("overlay.png"))
+        .unwrap();
+    fixture.project.background.source = BackgroundSource::Color {
+        value: [12, 45, 150],
+        alpha: 255,
+    };
+    fixture.project.timeline = Some(
+        serde_json::from_value(serde_json::json!({
+            "segments": [
+                {"id": "first", "start": 0.0, "end": 0.5, "timescale": 1.0},
+                {"id": "second", "start": 1.0, "end": 1.5, "timescale": 1.0}
+            ],
+            "mainTrackGaps": {"beforeClip": {"first": 0.5, "second": 0.5}, "trailing": 0.5},
+            "zoomSegments": [],
+            "imageSegments": [{"path": "overlay.png", "start": 1.15, "end": 1.4}]
+        }))
+        .unwrap(),
+    );
+    fixture.project.write(root).unwrap();
+
+    let (send, mut receive) = tokio::sync::mpsc::unbounded_channel();
+    #[cfg(target_os = "macos")]
+    let format = EditorFrameFormat::BgraSurface;
+    #[cfg(not(target_os = "macos"))]
+    let format = EditorFrameFormat::Rgba;
+    let editor = crate::EditorInstance::new_with_audio_output_and_frame_format(
+        root.clone(),
+        |_| {},
+        Box::new(move |output, layout| {
+            let frame = match output {
+                EditorFrameOutput::Rgba(frame) => frame,
+                #[cfg(target_os = "macos")]
+                EditorFrameOutput::Surface(frame) => surface_rgba(frame),
+                EditorFrameOutput::Nv12(_) => panic!("Unexpected NV12 preview"),
+            };
+            let _ = send.send((frame, layout));
+        }),
+        None,
+        format,
+        Arc::new(crate::AudioOutput::new_headless(Box::new(|_, _| {}))),
+    )
+    .await
+    .unwrap();
+
+    let fps = 20;
+    let resolution = XY::new(160, 120);
+    assert_eq!(editor.get_total_frames(fps), 50);
+    let gap = |frame| matches!(frame, 0..=9 | 20..=29 | 40..=49);
+    let verify = |frame: &RenderedFrame, layout: FrameLayout| {
+        let index = frame.frame_number;
+        assert_eq!(layout.output_size, [frame.width, frame.height]);
+        if gap(index) {
+            assert_eq!(layout.display, [0.0; 4], "frame {index}");
+            assert!(layout.camera.is_none(), "frame {index}");
+            let pixel = |x: u32, y: u32| {
+                let offset = (y * frame.padded_bytes_per_row + x * 4) as usize;
+                &frame.data[offset..offset + 4]
+            };
+            let background = [12, 45, 150, 255];
+            let center = if (23..28).contains(&index) {
+                [255, 225, 0, 255]
+            } else {
+                background
+            };
+            assert_eq!(pixel(2, 2), background, "frame {index}");
+            assert_eq!(
+                pixel(frame.width / 2, frame.height / 2),
+                center,
+                "frame {index}"
+            );
+        } else {
+            assert!(layout.display[2] > layout.display[0], "frame {index}");
+            assert!(layout.camera.is_some(), "frame {index}");
+        }
+    };
+
+    for target in [15, 25, 35, 45, 0] {
+        editor
+            .preview_tx
+            .send(Some((target, fps, resolution)))
+            .unwrap();
+        let (frame, layout) = tokio::time::timeout(Duration::from_secs(5), receive.recv())
+            .await
+            .unwrap()
+            .unwrap();
+        assert_eq!(frame.frame_number, target);
+        verify(&frame, layout);
+    }
+    for start in [0, 25] {
+        let mut playback = editor
+            .start_playback_with_handle(fps, resolution, Some(start))
+            .await
+            .unwrap();
+        tokio::time::timeout(Duration::from_secs(10), async {
+            while !matches!(*playback.receive_event().await, crate::PlaybackEvent::Stop) {}
+        })
+        .await
+        .unwrap();
+        let mut frames = Vec::new();
+        while let Ok((frame, layout)) = receive.try_recv() {
+            verify(&frame, layout);
+            frames.push(frame.frame_number);
+        }
+        assert_eq!(frames.first(), Some(&start), "{frames:?}");
+        assert_eq!(frames.last(), Some(&49), "{frames:?}");
+        for (begin, end) in [(0, 9), (10, 19), (23, 27), (30, 39), (40, 49)] {
+            if end >= start {
+                assert!(
+                    frames.iter().any(|i| (begin..=end).contains(i)),
+                    "{frames:?}"
+                );
+            }
+        }
+        eprintln!("Main-track gap playback from {start}: {frames:?}");
+    }
+    editor.dispose().await;
+}
+
 fn handoff_fixture() -> Fixture {
     use std::io::Write;
 

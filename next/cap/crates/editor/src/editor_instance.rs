@@ -7,9 +7,9 @@ use cap_project::{
     TimelineFrameMapping, TimelineSegment, XY,
 };
 use cap_rendering::{
-    PrecomputedCursorTimeline, ProjectRecordingsMeta, ProjectUniforms, RecordingSegmentDecoders,
-    RenderVideoConstants, SegmentVideoPaths, SharedWgpuDevice, Video, ZoomTransformTimeline,
-    get_duration, spring_mass_damper::SpringMassDamperSimulationConfig,
+    DecodedSegmentFrames, PrecomputedCursorTimeline, ProjectRecordingsMeta, ProjectUniforms,
+    RecordingSegmentDecoders, RenderVideoConstants, SegmentVideoPaths, SharedWgpuDevice, Video,
+    ZoomTransformTimeline, get_duration, spring_mass_damper::SpringMassDamperSimulationConfig,
 };
 use std::{
     path::{Path, PathBuf},
@@ -969,6 +969,7 @@ impl EditorInstance {
         tokio::spawn(async move {
             let mut prefetch_cancel_token: Option<CancellationToken> = None;
             let mut cursor_cache = PreviewCursorCache::default();
+            let empty_cursor = Arc::new(CursorEvents::default());
 
             loop {
                 preview_rx.changed().await.unwrap();
@@ -995,27 +996,47 @@ impl EditorInstance {
 
                     let project = self.project_config.1.borrow().clone();
                     let frame_time = frame_number as f64 / fps as f64;
-                    let transition_mapping = project.timeline.as_ref().and_then(|timeline| {
-                        if timeline.transitions.is_empty() {
-                            return None;
-                        }
-                        match timeline.get_frame_mapping(frame_time) {
-                            Some(TimelineFrameMapping::Transition {
-                                outgoing,
-                                kind,
-                                progress,
-                                ..
-                            }) => Some((outgoing, kind, progress)),
-                            _ => None,
-                        }
-                    });
-
-                    let Some((segment_time, segment)) = project.get_segment_time(frame_time) else {
+                    let Some(mapping) = project.get_frame_mapping(frame_time) else {
                         warn!(
                             "Preview renderer: no segment found for frame {}",
                             frame_number
                         );
                         break;
+                    };
+                    let Some(source) = mapping.primary_source() else {
+                        let frames = DecodedSegmentFrames::main_track_gap(
+                            self.render_constants.options.screen_size,
+                        );
+                        let uniforms = ProjectUniforms::for_main_track_gap(
+                            &self.render_constants,
+                            &project,
+                            frame_number,
+                            fps,
+                            resolution_base,
+                            &frames,
+                            project
+                                .timeline
+                                .as_ref()
+                                .map_or(0.0, |timeline| timeline.duration()),
+                        );
+                        self.renderer
+                            .render_frame_confirmed(frames, uniforms, empty_cursor.clone())
+                            .await;
+                        if preview_rx.has_changed().unwrap_or(false) {
+                            continue;
+                        }
+                        break;
+                    };
+                    let segment_time = source.source_time;
+                    let segment = source.segment;
+                    let transition_mapping = match mapping {
+                        TimelineFrameMapping::Transition {
+                            outgoing,
+                            kind,
+                            progress,
+                            ..
+                        } => Some((outgoing, kind, progress)),
+                        _ => None,
                     };
 
                     let segment_medias = &self.segment_medias[segment.recording_clip as usize];

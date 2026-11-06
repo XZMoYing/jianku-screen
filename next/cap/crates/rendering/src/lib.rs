@@ -3092,6 +3092,13 @@ impl ProjectUniforms {
     }
 
     pub fn frame_layout(&self) -> FrameLayout {
+        if self.main_track_gap {
+            return FrameLayout {
+                display: [0.0; 4],
+                camera: None,
+                output_size: [self.output_size.0, self.output_size.1],
+            };
+        }
         FrameLayout {
             display: self.display_outer_bounds,
             camera: self.camera.as_ref().map(|c| c.target_bounds),
@@ -8025,6 +8032,7 @@ impl RendererLayers {
         cursor: &CursorEvents,
         render_display: bool,
     ) -> Result<(), RenderingError> {
+        let render_display = render_display && !uniforms.main_track_gap;
         self.validate_overlay_uniforms(uniforms)?;
         self.camera_blur_unavailable = false;
         self.background
@@ -8178,6 +8186,7 @@ impl RendererLayers {
         encoder: &mut wgpu::CommandEncoder,
         render_display: bool,
     ) -> Result<FrameRenderStageTimings, RenderingError> {
+        let render_display = render_display && !uniforms.main_track_gap;
         self.validate_overlay_uniforms(uniforms)?;
         self.camera_blur_unavailable = false;
         let mut timings = FrameRenderStageTimings::default();
@@ -8398,6 +8407,7 @@ impl RendererLayers {
         uniforms: &ProjectUniforms,
         render_display: bool,
     ) -> Result<(), RenderingError> {
+        let render_display = render_display && !uniforms.main_track_gap;
         self.validate_overlay_uniforms(uniforms)?;
         macro_rules! render_pass {
             ($view:expr, $load:expr) => {

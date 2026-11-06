@@ -345,7 +345,8 @@ pub(crate) fn validate_input(input: &PreparingPreviewInput) -> Result<f64, Prepa
     let Some(timeline) = &project.timeline else {
         return Err(invalid("Resolved stopped timeline is required"));
     };
-    if timeline.segments.len() != count
+    if timeline.has_main_track_gaps()
+        || timeline.segments.len() != count
         || input.segments.iter().enumerate().any(|(index, segment)| {
             segment.video.segment_index() != index
                 || !segment.video.matches_metadata(meta)

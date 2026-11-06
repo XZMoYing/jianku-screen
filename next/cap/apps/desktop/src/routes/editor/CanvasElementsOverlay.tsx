@@ -59,6 +59,11 @@ function normRect(
 	};
 }
 
+function displayRectFromLayout(layout: FrameLayoutEvent): NormRect | null {
+	const rect = normRect(layout.display, layout);
+	return rect.w > 0 && rect.h > 0 ? rect : null;
+}
+
 // The renderer's classic camera inset (CAMERA_PADDING px at 1080p), exposed
 // as snap lines so a freely-dragged camera can land back on the stock look.
 function classicMargin(layout: FrameLayoutEvent) {
@@ -88,7 +93,8 @@ export function useCanvasSnapTargets() {
 		const layout = latestFrameLayout();
 
 		if (layout) {
-			if (exclude !== "display") rects.push(normRect(layout.display, layout));
+			const display = displayRectFromLayout(layout);
+			if (display && exclude !== "display") rects.push(display);
 			if (layout.camera && exclude !== "camera")
 				rects.push(normRect(layout.camera, layout));
 		}
@@ -291,7 +297,7 @@ export function CanvasElementsOverlay(props: { size: Size }) {
 		const optimistic = dragRects()?.display;
 		if (optimistic) return optimistic;
 		const layout = latestFrameLayout();
-		return layout ? normRect(layout.display, layout) : null;
+		return layout ? displayRectFromLayout(layout) : null;
 	});
 
 	const cameraRect = createMemo<NormRect | null>(() => {

@@ -1,5 +1,6 @@
 use cap_project::{
-    ClipOffsets, ClipTransitionType, ProjectConfiguration, TimelineFrameMapping, XY,
+    ClipOffsets, ClipTransitionType, CursorEvents, ProjectConfiguration, TimelineConfiguration,
+    TimelineFrameMapping, XY,
 };
 use cap_rendering::{
     DecodedFrame, DecodedSegmentFrames, PrecomputedCursorTimeline, ProjectUniforms,
@@ -49,6 +50,14 @@ const FRAME_CACHE_SIZE: usize = 4;
 const MAX_FRAME_CACHE_BYTES: usize = 64 * 1024 * 1024;
 const RAMP_UP_FRAME_COUNT: u32 = 15;
 
+fn main_track_gaps_changed(previous: &TimelineConfiguration, next: &TimelineConfiguration) -> bool {
+    (previous.has_main_track_gaps() || next.has_main_track_gaps())
+        && (previous.trailing_gap() != next.trailing_gap()
+            || !(0..previous.segments.len())
+                .map(|index| previous.gap_before(index))
+                .eq((0..next.segments.len()).map(|index| next.gap_before(index))))
+}
+
 fn playback_mapping_changed(previous: &ProjectConfiguration, next: &ProjectConfiguration) -> bool {
     let clip = |segment: &cap_project::TimelineSegment| {
         (
@@ -88,6 +97,7 @@ fn playback_mapping_changed(previous: &ProjectConfiguration, next: &ProjectConfi
                     .map(transition)
                     .eq(next.transitions.iter().map(transition))
                 || previous.hold_windows() != next.hold_windows()
+                || main_track_gaps_changed(previous, next)
         }
         (None, None) => false,
         _ => true,
@@ -156,6 +166,7 @@ fn playback_audio_changed(previous: &ProjectConfiguration, next: &ProjectConfigu
                     .map(transition)
                     .eq(next.transitions.iter().map(transition))
                 || previous.hold_windows() != next.hold_windows()
+                || main_track_gaps_changed(previous, next)
         }
         (None, None) => false,
         _ => true,
@@ -260,7 +271,7 @@ struct PrefetchedFrame {
     seek_generation: u64,
     frame_number: u32,
     segment_frames: DecodedSegmentFrames,
-    segment_index: u32,
+    segment_index: Option<u32>,
     transition: Option<PrefetchedTransition>,
 }
 
@@ -325,7 +336,11 @@ fn should_reset_prefetch(
 }
 
 type CachedTransition = (Arc<DecodedSegmentFrames>, u32, ClipTransitionType, f32);
-type CachedFrame = (Arc<DecodedSegmentFrames>, u32, Option<CachedTransition>);
+type CachedFrame = (
+    Arc<DecodedSegmentFrames>,
+    Option<u32>,
+    Option<CachedTransition>,
+);
 
 fn decoded_frame_byte_len(frame: &DecodedFrame) -> usize {
     frame.byte_len()
@@ -456,7 +471,7 @@ impl FrameCache {
         &mut self,
         frame_number: u32,
         segment_frames: Arc<DecodedSegmentFrames>,
-        segment_index: u32,
+        segment_index: Option<u32>,
         transition: Option<CachedTransition>,
     ) {
         let frame = (segment_frames, segment_index, transition);
@@ -526,7 +541,7 @@ struct PrefetchDecodeRequest {
 type PrefetchDecodeResult = (
     u64,
     u32,
-    u32,
+    Option<u32>,
     Option<DecodedSegmentFrames>,
     Option<PrefetchedTransition>,
 );
@@ -589,7 +604,7 @@ async fn decode_prefetched_frame(request: PrefetchDecodeRequest) -> PrefetchDeco
     (
         seek_generation,
         frame_number,
-        segment_index,
+        Some(segment_index),
         segment_frames,
         transition,
     )
@@ -736,6 +751,7 @@ impl Playback {
         let mut prefetch_stop_rx = stop_rx.clone();
         let mut prefetch_project = self.project.clone();
         let prefetch_segment_medias = self.segment_medias.clone();
+        let prefetch_screen_size = self.render_constants.options.screen_size;
         let (mut prefetch_duration, has_timeline) = self
             .project
             .borrow()
@@ -881,11 +897,12 @@ impl Playback {
                         continue;
                     }
 
-                    if let Some((segment_time, segment)) =
-                        cached_project.get_segment_time(prefetch_time)
+                    let mapping = cached_project.get_frame_mapping(prefetch_time);
+                    if let Some(source) = mapping.and_then(TimelineFrameMapping::primary_source)
                         && let Some(segment_media) =
-                            prefetch_segment_medias.get(segment.recording_clip as usize)
+                            prefetch_segment_medias.get(source.segment.recording_clip as usize)
                     {
+                        let segment = source.segment;
                         let clip_offsets = cached_project
                             .clips
                             .iter()
@@ -911,13 +928,24 @@ impl Playback {
                             seek_generation,
                             frame_number: frame_num,
                             decoders,
-                            segment_time,
+                            segment_time: source.source_time,
                             segment_index,
                             offsets: clip_offsets,
                             hide_camera,
                             is_initial,
                             transition,
                         })));
+                    } else if matches!(mapping, Some(TimelineFrameMapping::Gap { .. })) {
+                        if let Ok(mut in_flight_guard) = prefetch_in_flight.write() {
+                            in_flight_guard.insert(frame_num);
+                        }
+                        in_flight.push(Box::pin(std::future::ready((
+                            seek_generation,
+                            frame_num,
+                            None,
+                            Some(DecodedSegmentFrames::main_track_gap(prefetch_screen_size)),
+                            None,
+                        ))));
                     }
 
                     next_prefetch_frame += 1;
@@ -942,7 +970,9 @@ impl Playback {
                         if let Ok(mut in_flight_guard) = prefetch_in_flight.write() {
                             in_flight_guard.remove(&frame_num);
                         }
-                        frames_decoded = frames_decoded.saturating_add(1);
+                        if segment_index.is_some() {
+                            frames_decoded = frames_decoded.saturating_add(1);
+                        }
 
                         if let Some(segment_frames) = result {
                             let frame = PrefetchedFrame {
@@ -962,7 +992,7 @@ impl Playback {
                         } else if frames_decoded <= 5 {
                             warn!(
                                 frame = frame_num,
-                                segment = segment_index,
+                                segment = ?segment_index,
                                 "Prefetch: decoder returned no frames"
                             );
                         }
@@ -1217,6 +1247,7 @@ impl Playback {
             let mut zoom_timelines = build_zoom_timelines(&cached_project, duration);
             let mut outgoing_zoom_timelines =
                 build_outgoing_zoom_timelines(&cached_project, duration);
+            let empty_cursor = Arc::new(CursorEvents::default());
 
             if !*stop_rx.borrow()
                 && let Some(prefetched_idx) = prefetch_buffer
@@ -1228,48 +1259,37 @@ impl Playback {
                 let frame_acquire_duration = frame_acquire_start.elapsed();
                 let (segment_frames, segment_index, transition) = prefetched.into_cached();
 
-                if let Some(segment_media) = self.segment_medias.get(segment_index as usize) {
+                let media = segment_index.and_then(|index| self.segment_medias.get(index as usize));
+                if segment_index.is_none() || media.is_some() {
+                    let cursor = media.map_or(&empty_cursor, |media| &media.cursor);
                     let zoom_until = (frame_number as f32 + 1.0) / fps as f32;
-                    if let Some(timeline) = zoom_timelines.get_mut(segment_index as usize) {
-                        timeline.ensure_precomputed_until(zoom_until);
-                    }
-                    if let Some(timeline) = outgoing_zoom_timelines.get_mut(segment_index as usize)
-                    {
-                        timeline.ensure_precomputed_until(zoom_until);
-                    }
-                    let zoom_timeline = zoom_timelines.get(segment_index as usize);
-
-                    let empty_timeline;
-                    let zoom_ref = match zoom_timeline {
-                        Some(timeline) => timeline,
-                        None => {
-                            empty_timeline = ZoomTransformTimeline::new(
-                                &[],
-                                None,
-                                &segment_media.cursor,
-                                cached_project.screen_movement_spring,
-                                duration,
-                                None,
-                            );
-                            &empty_timeline
-                        }
-                    };
-
-                    let precomputed_cursor = &cursor_timelines[segment_index as usize];
                     let resolution_base = *resolution_rx.borrow();
                     let uniforms_start = Instant::now();
-                    let uniforms = ProjectUniforms::new_with_precomputed_cursor(
-                        &self.render_constants,
-                        &cached_project,
-                        frame_number,
-                        fps,
-                        resolution_base,
-                        &segment_media.cursor,
-                        &segment_frames,
-                        duration,
-                        zoom_ref,
-                        precomputed_cursor,
-                    );
+                    let uniforms = if let Some(index) = segment_index.map(|index| index as usize) {
+                        zoom_timelines[index].ensure_precomputed_until(zoom_until);
+                        ProjectUniforms::new_with_precomputed_cursor(
+                            &self.render_constants,
+                            &cached_project,
+                            frame_number,
+                            fps,
+                            resolution_base,
+                            cursor,
+                            &segment_frames,
+                            duration,
+                            &zoom_timelines[index],
+                            &cursor_timelines[index],
+                        )
+                    } else {
+                        ProjectUniforms::for_main_track_gap(
+                            &self.render_constants,
+                            &cached_project,
+                            frame_number,
+                            fps,
+                            resolution_base,
+                            &segment_frames,
+                            duration,
+                        )
+                    };
                     let uniforms_duration = uniforms_start.elapsed();
                     let submit_start = Instant::now();
                     let submitted_frame_number = frame_number;
@@ -1304,7 +1324,7 @@ impl Playback {
                             editor::RendererTransitionInput {
                                 segment_frames: Arc::unwrap_or_clone(segment_frames),
                                 uniforms,
-                                cursor: segment_media.cursor.clone(),
+                                cursor: cursor.clone(),
                             },
                             kind,
                             progress,
@@ -1313,7 +1333,7 @@ impl Playback {
                         self.renderer.render_frame_wait(
                             Arc::unwrap_or_clone(segment_frames),
                             uniforms,
-                            segment_media.cursor.clone(),
+                            cursor.clone(),
                         )
                     };
                     let submit_duration = submit_start.elapsed();
@@ -1910,14 +1930,16 @@ impl Playback {
                 let frame_acquire_duration = frame_acquire_start.elapsed();
 
                 if let Some((segment_frames, segment_index, transition)) = segment_frames_opt {
-                    let Some(segment_media) = self.segment_medias.get(segment_index as usize)
-                    else {
+                    let media =
+                        segment_index.and_then(|index| self.segment_medias.get(index as usize));
+                    if segment_index.is_some() && media.is_none() {
                         if adopted.is_some() {
                             break;
                         }
                         frame_number = frame_number.saturating_add(1);
                         continue;
-                    };
+                    }
+                    let cursor = media.map_or(&empty_cursor, |media| &media.cursor);
 
                     if !was_cached {
                         frame_cache.insert(
@@ -1933,47 +1955,33 @@ impl Playback {
                     }
 
                     let zoom_until = (frame_number as f32 + 1.0) / fps as f32;
-                    if let Some(timeline) = zoom_timelines.get_mut(segment_index as usize) {
-                        timeline.ensure_precomputed_until(zoom_until);
-                    }
-                    if let Some(timeline) = outgoing_zoom_timelines.get_mut(segment_index as usize)
-                    {
-                        timeline.ensure_precomputed_until(zoom_until);
-                    }
-                    let zoom_timeline = zoom_timelines.get(segment_index as usize);
-
-                    let empty_timeline;
-                    let zoom_ref = match zoom_timeline {
-                        Some(timeline) => timeline,
-                        None => {
-                            empty_timeline = ZoomTransformTimeline::new(
-                                &[],
-                                None,
-                                &segment_media.cursor,
-                                cached_project.screen_movement_spring,
-                                duration,
-                                None,
-                            );
-                            &empty_timeline
-                        }
-                    };
-
-                    let precomputed_cursor = &cursor_timelines[segment_index as usize];
-
                     let resolution_base = *resolution_rx.borrow();
                     let uniforms_start = Instant::now();
-                    let uniforms = ProjectUniforms::new_with_precomputed_cursor(
-                        &self.render_constants,
-                        &cached_project,
-                        frame_number,
-                        fps,
-                        resolution_base,
-                        &segment_media.cursor,
-                        &segment_frames,
-                        duration,
-                        zoom_ref,
-                        precomputed_cursor,
-                    );
+                    let uniforms = if let Some(index) = segment_index.map(|index| index as usize) {
+                        zoom_timelines[index].ensure_precomputed_until(zoom_until);
+                        ProjectUniforms::new_with_precomputed_cursor(
+                            &self.render_constants,
+                            &cached_project,
+                            frame_number,
+                            fps,
+                            resolution_base,
+                            cursor,
+                            &segment_frames,
+                            duration,
+                            &zoom_timelines[index],
+                            &cursor_timelines[index],
+                        )
+                    } else {
+                        ProjectUniforms::for_main_track_gap(
+                            &self.render_constants,
+                            &cached_project,
+                            frame_number,
+                            fps,
+                            resolution_base,
+                            &segment_frames,
+                            duration,
+                        )
+                    };
                     let uniforms_duration = uniforms_start.elapsed();
                     let submit_start = Instant::now();
                     let submitted_frame_number = frame_number;
@@ -2005,7 +2013,7 @@ impl Playback {
                             editor::RendererTransitionInput {
                                 segment_frames: Arc::unwrap_or_clone(segment_frames),
                                 uniforms,
-                                cursor: segment_media.cursor.clone(),
+                                cursor: cursor.clone(),
                             },
                             kind,
                             progress,
@@ -2014,7 +2022,7 @@ impl Playback {
                         self.renderer.render_frame(
                             Arc::unwrap_or_clone(segment_frames),
                             uniforms,
-                            segment_media.cursor.clone(),
+                            cursor.clone(),
                         );
                     }
                     let submit_duration = submit_start.elapsed();
@@ -2335,7 +2343,7 @@ mod tests {
             seek_generation,
             frame_number,
             segment_frames: decoded_frames(4),
-            segment_index: 0,
+            segment_index: Some(0),
             transition: None,
         }
     }
@@ -2431,8 +2439,8 @@ mod tests {
     #[test]
     fn frame_cache_evicts_oldest_frames_to_stay_within_byte_budget() {
         let mut cache = FrameCache::new(10, 15);
-        cache.insert(1, Arc::new(decoded_frames(10)), 0, None);
-        cache.insert(2, Arc::new(decoded_frames(10)), 0, None);
+        cache.insert(1, Arc::new(decoded_frames(10)), Some(0), None);
+        cache.insert(2, Arc::new(decoded_frames(10)), Some(0), None);
 
         assert_eq!(cache.cache.len(), 1);
         assert_eq!(cache.cache_bytes, 10);
@@ -2443,7 +2451,7 @@ mod tests {
     #[test]
     fn frame_cache_keeps_one_oversized_frame() {
         let mut cache = FrameCache::new(10, 4);
-        cache.insert(1, Arc::new(decoded_frames(10)), 0, None);
+        cache.insert(1, Arc::new(decoded_frames(10)), Some(0), None);
 
         assert_eq!(cache.cache.len(), 1);
         assert_eq!(cache.cache_bytes, 10);
@@ -2454,12 +2462,12 @@ mod tests {
     fn frame_cache_holds_multiple_frames_within_byte_budget() {
         let retina_frame = 24 * 1024 * 1024;
         let mut cache = FrameCache::new(FRAME_CACHE_SIZE, MAX_FRAME_CACHE_BYTES);
-        cache.insert(1, Arc::new(decoded_frames(retina_frame)), 0, None);
-        cache.insert(2, Arc::new(decoded_frames(retina_frame)), 0, None);
+        cache.insert(1, Arc::new(decoded_frames(retina_frame)), Some(0), None);
+        cache.insert(2, Arc::new(decoded_frames(retina_frame)), Some(0), None);
         assert!(cache.get(1).is_some());
         assert!(cache.get(2).is_some());
 
-        cache.insert(3, Arc::new(decoded_frames(retina_frame)), 0, None);
+        cache.insert(3, Arc::new(decoded_frames(retina_frame)), Some(0), None);
         assert_eq!(cache.cache.len(), 2);
         assert!(cache.cache_bytes <= MAX_FRAME_CACHE_BYTES);
         assert!(cache.get(3).is_some());
@@ -2483,9 +2491,9 @@ mod tests {
     #[test]
     fn frame_cache_accounts_for_count_based_eviction() {
         let mut cache = FrameCache::new(2, usize::MAX);
-        cache.insert(1, Arc::new(decoded_frames(10)), 0, None);
-        cache.insert(2, Arc::new(decoded_frames(10)), 0, None);
-        cache.insert(3, Arc::new(decoded_frames(10)), 0, None);
+        cache.insert(1, Arc::new(decoded_frames(10)), Some(0), None);
+        cache.insert(2, Arc::new(decoded_frames(10)), Some(0), None);
+        cache.insert(3, Arc::new(decoded_frames(10)), Some(0), None);
 
         assert_eq!(cache.cache.len(), 2);
         assert_eq!(cache.cache_bytes, 20);
