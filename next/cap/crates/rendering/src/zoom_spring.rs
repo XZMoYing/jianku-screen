@@ -181,6 +181,28 @@ impl CursorCropMaps {
             .collect();
         maps
     }
+
+    fn for_original_phases(&self, spans: &[PhaseSpan]) -> Self {
+        let styles = self
+            .styles
+            .iter()
+            .flat_map(|style| {
+                spans.iter().filter_map(|span| {
+                    let start = style.start.max(span.start);
+                    let end = style.end.min(span.end);
+                    (span.rate > 0.0 && start < end).then(|| TimedCursorCropMap {
+                        start: span.original_time(start),
+                        end: span.original_time(end),
+                        crop: style.crop,
+                    })
+                })
+            })
+            .collect();
+        Self {
+            base: self.base,
+            styles,
+        }
+    }
 }
 
 struct CroppedClusters {
@@ -598,6 +620,12 @@ struct PhaseSpan {
     rate: f64,
 }
 
+impl PhaseSpan {
+    fn original_time(&self, output_time: f64) -> f64 {
+        self.original_start + (output_time - self.start) * self.rate
+    }
+}
+
 struct PhaseTrack {
     spans: Vec<PhaseSpan>,
     original: ZoomTransformTimeline,
@@ -822,7 +850,6 @@ impl ZoomTransformTimeline {
             zoom_segments
                 .iter()
                 .any(|segment| !segment.source_slices.is_empty())
-                && crops.styles.is_empty()
         });
         for (index, segment) in zoom_segments.iter().enumerate() {
             let phase_origin = (STEP_MS + (segment.start * 1000.0).rem_euclid(STEP_MS)) / 1000.0;
@@ -851,6 +878,7 @@ impl ZoomTransformTimeline {
                 original_segment.start = phase_origin;
                 original_segment.end = phase_origin + (segment.end - segment.start);
                 let original_duration = original_segment.end;
+                let original_crops = crops.for_original_phases(&spans);
                 let original = Self::from_render_plan(
                     ZoomRenderPlan {
                         segments: vec![original_segment],
@@ -860,7 +888,7 @@ impl ZoomTransformTimeline {
                     cursor_events,
                     spring,
                     original_duration,
-                    &crops,
+                    &original_crops,
                     selection,
                 );
                 plan.phase_tracks.push(PhaseTrack { spans, original });
@@ -1160,7 +1188,7 @@ impl ZoomTransformTimeline {
                 .spans
                 .iter()
                 .filter(|span| span.start <= until)
-                .map(|span| span.original_start + (until.min(span.end) - span.start) * span.rate)
+                .map(|span| span.original_time(until.min(span.end)))
                 .max_by(f64::total_cmp);
             if let Some(phase) = phase {
                 track.original.ensure_precomputed_until(phase as f32);
@@ -1183,7 +1211,7 @@ impl ZoomTransformTimeline {
             if let Some(span) = track.spans.iter().find(|span| {
                 span.segment_index == owner.segment_index && time >= span.start && time < span.end
             }) {
-                let phase = span.original_start + (time - span.start) * span.rate;
+                let phase = span.original_time(time);
                 let mut sample = track.original.sample_state(phase)?;
                 let previous = track.original.sample_state(phase - step * span.rate)?;
                 sample.snapped |= time - step < span.start;
@@ -1743,6 +1771,72 @@ mod tests {
     fn follow_center(focus: (f64, f64)) -> XY<f32> {
         let (x, y) = SegmentBounds::calculate_follow_center(focus, 0.25);
         XY::new(x as f32, y as f32)
+    }
+
+    #[test]
+    fn relocated_zoom_uses_the_crop_styles_at_its_new_output_time() {
+        let mut project = project_with_sliced_zoom(4.0);
+        let bottom = Crop {
+            position: XY::new(0, 500),
+            size: XY::new(1000, 500),
+        };
+        let cursor = CursorEvents {
+            moves: vec![move_event(3100.0, 0.5, 0.75), move_event(4200.0, 0.5, 0.75)],
+            ..Default::default()
+        };
+        let size = XY::new(1000, 1000);
+        project.timeline.as_mut().unwrap().style_segments = vec![
+            crop_style(4.25, 4.75, 0, Some(bottom.clone())),
+            crop_style(4.5, 4.625, 1, None),
+        ];
+        let mut reference = ZoomTransformTimeline::from_project(&project, &cursor, 8.0, size);
+        reference.precompute();
+        assert!(
+            (reference.sample(4.125).bounds.top_left.y
+                - reference.sample(4.4375).bounds.top_left.y)
+                .abs()
+                > 0.1
+        );
+
+        let timeline = project.timeline.as_mut().unwrap();
+        timeline.segments[1].timescale = 2.0;
+        timeline
+            .main_track_gaps
+            .before_clip
+            .insert("right".into(), 2.0);
+        timeline.style_segments = vec![
+            crop_style(6.125, 6.375, 0, Some(bottom)),
+            crop_style(6.25, 6.3125, 1, None),
+            crop_style(
+                4.0,
+                5.0,
+                9,
+                Some(Crop {
+                    position: XY::new(0, 0),
+                    size: XY::new(500, 1000),
+                }),
+            ),
+        ];
+        let mut edited = ZoomTransformTimeline::from_project(&project, &cursor, 8.0, size);
+        assert_eq!(edited.phase_tracks.len(), 1);
+        edited.ensure_precomputed_until(6.5);
+        for original in [4.125, 4.4375, 4.5625, 4.6875, 4.875] {
+            let output = 6.0 + (original - 4.0) * 0.5;
+            let actual = edited.sample(output);
+            let expected = reference.sample(original);
+            assert!(
+                (actual.t - expected.t).abs() < 1e-5,
+                "{output} -> {original}"
+            );
+            assert!(
+                (actual.bounds.top_left.y - expected.bounds.top_left.y).abs() < 1e-5,
+                "{output} -> {original}"
+            );
+            assert!(
+                (actual.bounds.bottom_right.x - expected.bounds.bottom_right.x).abs() < 1e-5,
+                "{output} -> {original}"
+            );
+        }
     }
 
     #[test]
