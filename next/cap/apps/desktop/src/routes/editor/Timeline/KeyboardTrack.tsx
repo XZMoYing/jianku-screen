@@ -1,10 +1,17 @@
 import { createMemo, For } from "solid-js";
 import { t as localize } from "~/utils/i18n";
-import type { KeyboardTrackSegment } from "~/utils/tauri";
 
 import { useEditorContext } from "../context";
 import { useTimelineContext } from "./context";
-import { createTimelineMouseDrag } from "./mouse-drag";
+import {
+	createTimelineMouseDrag,
+	type TimelineMouseDragEndReason,
+} from "./mouse-drag";
+import {
+	createTimelineRangeDrag,
+	sameTimelineRange,
+	type TimelineRangeEdge,
+} from "./range-snapping";
 import {
 	SegmentContent,
 	SegmentHandle,
@@ -34,7 +41,7 @@ export function KeyboardTrack(props: {
 		projectHistory,
 		projectActions,
 	} = useEditorContext();
-	const { secsPerPixel, timelineBounds } = useTimelineContext();
+	const { secsPerPixel, timelineBounds, snapping } = useTimelineContext();
 
 	const minDuration = () =>
 		Math.max(MIN_SEGMENT_SECS, secsPerPixel() * MIN_SEGMENT_PIXELS);
@@ -62,14 +69,9 @@ export function KeyboardTrack(props: {
 
 	const startDrag = createTimelineMouseDrag();
 
-	function createMouseDownDrag<T>(
+	function createMouseDownDrag(
 		segmentIndex: () => number,
-		setup: () => T,
-		update: (
-			e: MouseEvent,
-			value: T,
-			initialMouseX: number,
-		) => Partial<Pick<KeyboardTrackSegment, "start" | "end">>,
+		edge: TimelineRangeEdge,
 	) {
 		return (downEvent: MouseEvent) => {
 			if (
@@ -84,12 +86,39 @@ export function KeyboardTrack(props: {
 				const id = segment.id;
 				const scale = secsPerPixel();
 				const duration = totalDuration();
-				const initial = setup();
+				const drag = createTimelineRangeDrag(
+					snapping,
+					segment,
+					edge,
+					neighborBounds(segmentIndex()),
+					minDuration(),
+					editorState.playbackTime,
+				);
+				let expected = drag.original;
+				const ownsRange = () =>
+					segment.id === id &&
+					keyboardSegments().includes(segment) &&
+					sameTimelineRange(segment, expected);
 				let moved = false;
 				let resumeHistory: (() => void) | undefined;
 				props.onDragStateChanged({ type: "movePending" });
 
-				function finish(event?: MouseEvent) {
+				function finish(
+					event?: MouseEvent,
+					reason?: TimelineMouseDragEndReason,
+				) {
+					drag.clear();
+					if (
+						reason === "cancel" &&
+						ownsRange() &&
+						!sameTimelineRange(segment, drag.original)
+					)
+						setProject(
+							"timeline",
+							"keyboardSegments",
+							segmentIndex(),
+							drag.original,
+						);
 					resumeHistory?.();
 					if (!moved && event) {
 						event.stopPropagation();
@@ -125,14 +154,15 @@ export function KeyboardTrack(props: {
 						moved = true;
 						props.onDragStateChanged({ type: "moving" });
 					}
-					const changes = update(event, initial, downEvent.clientX);
-					if (
-						(changes.start ?? segment.start) === segment.start &&
-						(changes.end ?? segment.end) === segment.end
-					)
-						return;
+					const range = drag.edit(
+						(event.clientX - downEvent.clientX) * scale,
+						scale,
+						event.altKey,
+					);
+					if (sameTimelineRange(segment, range)) return;
 					resumeHistory ??= projectHistory.pause();
-					setProject("timeline", "keyboardSegments", segmentIndex(), changes);
+					expected = range;
+					setProject("timeline", "keyboardSegments", segmentIndex(), range);
 				}
 
 				return {
@@ -158,8 +188,7 @@ export function KeyboardTrack(props: {
 						editorState.timeline.interactMode === "seek" &&
 						secsPerPixel() === scale &&
 						totalDuration() === duration &&
-						segment.id === id &&
-						keyboardSegments().includes(segment),
+						ownsRange(),
 					update: handleUpdate,
 					finish,
 				};
@@ -232,56 +261,11 @@ export function KeyboardTrack(props: {
 						>
 							<SegmentHandle
 								position="start"
-								onMouseDown={createMouseDownDrag(
-									index,
-									() => {
-										const bounds = neighborBounds(index());
-										const start = segment.start;
-										const minValue = bounds.prevEnd;
-										const maxValue = Math.max(
-											minValue,
-											Math.min(
-												segment.end - minDuration(),
-												bounds.nextStart - minDuration(),
-											),
-										);
-										return { start, minValue, maxValue };
-									},
-									(e, value, initialMouseX) => {
-										const delta = (e.clientX - initialMouseX) * secsPerPixel();
-										const next = Math.max(
-											value.minValue,
-											Math.min(value.maxValue, value.start + delta),
-										);
-										return { start: next };
-									},
-								)}
+								onMouseDown={createMouseDownDrag(index, "start")}
 							/>
 							<SegmentContent
 								class="flex items-center cursor-grab overflow-hidden"
-								onMouseDown={createMouseDownDrag(
-									index,
-									() => {
-										const original = { ...segment };
-										const bounds = neighborBounds(index());
-										const minDelta = bounds.prevEnd - original.start;
-										const maxDelta = bounds.nextStart - original.end;
-										return { original, minDelta, maxDelta };
-									},
-									(e, value, initialMouseX) => {
-										const delta = (e.clientX - initialMouseX) * secsPerPixel();
-										const lowerBound = Math.min(value.minDelta, value.maxDelta);
-										const upperBound = Math.max(value.minDelta, value.maxDelta);
-										const clampedDelta = Math.min(
-											upperBound,
-											Math.max(lowerBound, delta),
-										);
-										return {
-											start: value.original.start + clampedDelta,
-											end: value.original.end + clampedDelta,
-										};
-									},
-								)}
+								onMouseDown={createMouseDownDrag(index, "move")}
 							>
 								<SegmentLabel
 									compactAt={24}
@@ -292,24 +276,7 @@ export function KeyboardTrack(props: {
 							</SegmentContent>
 							<SegmentHandle
 								position="end"
-								onMouseDown={createMouseDownDrag(
-									index,
-									() => {
-										const bounds = neighborBounds(index());
-										const end = segment.end;
-										const minValue = segment.start + minDuration();
-										const maxValue = Math.max(minValue, bounds.nextStart);
-										return { end, minValue, maxValue };
-									},
-									(e, value, initialMouseX) => {
-										const delta = (e.clientX - initialMouseX) * secsPerPixel();
-										const next = Math.max(
-											value.minValue,
-											Math.min(value.maxValue, value.end + delta),
-										);
-										return { end: next };
-									},
-								)}
+								onMouseDown={createMouseDownDrag(index, "end")}
 							/>
 						</SegmentRoot>
 					);

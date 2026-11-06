@@ -1,9 +1,17 @@
-import { createEventListenerMap } from "@solid-primitives/event-listener";
-import { createMemo, createRoot, For } from "solid-js";
+import { createMemo, For } from "solid-js";
 import { t as localize } from "~/utils/i18n";
 
 import { useEditorContext } from "../context";
 import { useTimelineContext } from "./context";
+import {
+	createTimelineMouseDrag,
+	type TimelineMouseDragEndReason,
+} from "./mouse-drag";
+import {
+	createTimelineRangeDrag,
+	sameTimelineRange,
+	type TimelineRangeEdge,
+} from "./range-snapping";
 import {
 	SegmentContent,
 	SegmentHandle,
@@ -35,15 +43,14 @@ export function CaptionsTrack(props: {
 		projectHistory,
 		projectActions,
 	} = useEditorContext();
-	const { secsPerPixel } = useTimelineContext();
+	const { secsPerPixel, snapping } = useTimelineContext();
 
 	const minDuration = () =>
 		Math.max(MIN_SEGMENT_SECS, secsPerPixel() * MIN_SEGMENT_PIXELS);
 
+	const allCaptionSegments = () => project.timeline?.captionSegments ?? [];
 	const captionSegments = createMemo(() =>
-		(project.timeline?.captionSegments ?? []).filter(
-			(s) => s.start < totalDuration(),
-		),
+		allCaptionSegments().filter((segment) => segment.start < totalDuration()),
 	);
 	const selectedCaptionIndices = createMemo(() => {
 		const selection = editorState.timeline.selection;
@@ -51,87 +58,104 @@ export function CaptionsTrack(props: {
 		return new Set(selection.indices);
 	});
 
-	const neighborBounds = (index: number) => {
-		const segments = captionSegments();
-		return {
-			prevEnd: segments[index - 1]?.end ?? 0,
-			nextStart: segments[index + 1]?.start ?? totalDuration(),
-		};
-	};
+	const startDrag = createTimelineMouseDrag();
 
-	function createMouseDownDrag<T>(
+	function createMouseDownDrag(
 		segmentIndex: () => number,
-		setup: () => T,
-		update: (e: MouseEvent, value: T, initialMouseX: number) => void,
+		edge: TimelineRangeEdge,
 	) {
 		return (downEvent: MouseEvent) => {
-			if (editorState.timeline.interactMode !== "seek") return;
+			if (
+				downEvent.button !== 0 ||
+				editorState.timeline.interactMode !== "seek"
+			)
+				return;
 			downEvent.stopPropagation();
-			const initial = setup();
-			let moved = false;
-			let initialMouseX: number | null = null;
-
-			const resumeHistory = projectHistory.pause();
-			props.onDragStateChanged({ type: "movePending" });
-
-			function finish(e: MouseEvent) {
-				resumeHistory();
-				if (!moved) {
-					e.stopPropagation();
-					const index = segmentIndex();
-					const isMultiSelect = e.ctrlKey || e.metaKey;
-
-					if (isMultiSelect) {
-						const currentSelection = editorState.timeline.selection;
-						if (currentSelection?.type === "caption") {
-							const base = currentSelection.indices;
-							const exists = base.includes(index);
-							const next = exists
-								? base.filter((i) => i !== index)
-								: [...base, index];
-							setEditorState(
-								"timeline",
-								"selection",
-								next.length > 0 ? { type: "caption", indices: next } : null,
-							);
-						} else {
-							setEditorState("timeline", "selection", {
-								type: "caption",
-								indices: [index],
-							});
-						}
-					} else {
-						setEditorState("timeline", "selection", {
-							type: "caption",
-							indices: [index],
-						});
-					}
-					props.handleUpdatePlayhead(e);
-				}
-				props.onDragStateChanged({ type: "idle" });
-			}
-
-			function handleUpdate(event: MouseEvent) {
-				if (Math.abs(event.clientX - downEvent.clientX) > 2) {
-					if (!moved) {
-						moved = true;
-						initialMouseX = event.clientX;
-						props.onDragStateChanged({ type: "moving" });
-					}
-				}
-				if (initialMouseX === null) return;
-				update(event, initial, initialMouseX);
-			}
-
-			createRoot((dispose) => {
-				createEventListenerMap(window, {
-					mousemove: (e) => handleUpdate(e),
-					mouseup: (e) => {
-						handleUpdate(e);
-						finish(e);
-						dispose();
+			startDrag(() => {
+				const segment = allCaptionSegments()[segmentIndex()];
+				if (!segment) return null;
+				const ordered = captionSegments()
+					.slice()
+					.sort((a, b) => a.start - b.start);
+				const position = ordered.indexOf(segment);
+				const drag = createTimelineRangeDrag(
+					snapping,
+					segment,
+					edge,
+					{
+						prevEnd: ordered[position - 1]?.end ?? 0,
+						nextStart: ordered[position + 1]?.start ?? totalDuration(),
 					},
-				});
+					minDuration(),
+					editorState.playbackTime,
+				);
+				let expected = drag.original;
+				let initialMouseX: number | null = null;
+				let resumeHistory: (() => void) | undefined;
+				const ownsRange = () =>
+					allCaptionSegments().includes(segment) &&
+					sameTimelineRange(segment, expected);
+				props.onDragStateChanged({ type: "movePending" });
+
+				function finish(
+					event?: MouseEvent,
+					reason?: TimelineMouseDragEndReason,
+				) {
+					drag.clear();
+					if (
+						reason === "cancel" &&
+						ownsRange() &&
+						!sameTimelineRange(segment, drag.original)
+					)
+						setProject(
+							"timeline",
+							"captionSegments",
+							segmentIndex(),
+							drag.original,
+						);
+					resumeHistory?.();
+					if (initialMouseX === null && event) {
+						event.stopPropagation();
+						const index = segmentIndex();
+						const selection = editorState.timeline.selection;
+						const indices =
+							(event.ctrlKey || event.metaKey) && selection?.type === "caption"
+								? selection.indices.includes(index)
+									? selection.indices.filter((value) => value !== index)
+									: [...selection.indices, index]
+								: [index];
+						setEditorState(
+							"timeline",
+							"selection",
+							indices.length ? { type: "caption", indices } : null,
+						);
+						props.handleUpdatePlayhead(event);
+					}
+					props.onDragStateChanged({ type: "idle" });
+				}
+
+				return {
+					isValid: () =>
+						editorState.timeline.interactMode === "seek" && ownsRange(),
+					update(event) {
+						if (initialMouseX === null) {
+							if (Math.abs(event.clientX - downEvent.clientX) <= 2) return;
+							initialMouseX = event.clientX;
+							props.onDragStateChanged({ type: "moving" });
+						}
+						const scale = secsPerPixel();
+						const range = drag.edit(
+							(event.clientX - initialMouseX) * scale,
+							scale,
+							event.altKey,
+						);
+						if (sameTimelineRange(segment, range)) return;
+						resumeHistory ??= projectHistory.pause();
+						expected = range;
+						setProject("timeline", "captionSegments", segmentIndex(), range);
+					},
+					finish,
+				};
 			});
 		};
 	}
@@ -164,11 +188,12 @@ export function CaptionsTrack(props: {
 					</div>
 				}
 			>
-				{(segment, i) => {
+				{(segment) => {
+					const index = () => allCaptionSegments().indexOf(segment);
 					const isSelected = createMemo(() => {
 						const indices = selectedCaptionIndices();
 						if (!indices) return false;
-						return indices.has(i());
+						return indices.has(index());
 					});
 
 					const segmentWidth = () =>
@@ -186,9 +211,9 @@ export function CaptionsTrack(props: {
 
 					return (
 						<SegmentRoot
-							menuTarget={{ type: "caption", index: i() }}
+							menuTarget={{ type: "caption", index: index() }}
 							data-caption-segment
-							data-index={i()}
+							data-index={index()}
 							segColor="var(--track-caption)"
 							class="group"
 							selected={isSelected()}
@@ -203,69 +228,17 @@ export function CaptionsTrack(props: {
 									const rect = e.currentTarget.getBoundingClientRect();
 									const fraction = (e.clientX - rect.left) / rect.width;
 									const splitTime = fraction * segmentWidth();
-									projectActions.splitCaptionSegment(i(), splitTime);
+									projectActions.splitCaptionSegment(index(), splitTime);
 								}
 							}}
 						>
 							<SegmentHandle
 								position="start"
-								onMouseDown={createMouseDownDrag(
-									i,
-									() => {
-										const bounds = neighborBounds(i());
-										const start = segment.start;
-										const minValue = bounds.prevEnd;
-										const maxValue = Math.max(
-											minValue,
-											Math.min(
-												segment.end - minDuration(),
-												bounds.nextStart - minDuration(),
-											),
-										);
-										return { start, minValue, maxValue };
-									},
-									(e, value, initialMouseX) => {
-										const delta = (e.clientX - initialMouseX) * secsPerPixel();
-										const next = Math.max(
-											value.minValue,
-											Math.min(value.maxValue, value.start + delta),
-										);
-										setProject(
-											"timeline",
-											"captionSegments",
-											i(),
-											"start",
-											next,
-										);
-									},
-								)}
+								onMouseDown={createMouseDownDrag(index, "start")}
 							/>
 							<SegmentContent
 								class="flex items-center cursor-grab overflow-hidden"
-								onMouseDown={createMouseDownDrag(
-									i,
-									() => {
-										const original = { ...segment };
-										const bounds = neighborBounds(i());
-										const minDelta = bounds.prevEnd - original.start;
-										const maxDelta = bounds.nextStart - original.end;
-										return { original, minDelta, maxDelta };
-									},
-									(e, value, initialMouseX) => {
-										const delta = (e.clientX - initialMouseX) * secsPerPixel();
-										const lowerBound = Math.min(value.minDelta, value.maxDelta);
-										const upperBound = Math.max(value.minDelta, value.maxDelta);
-										const clampedDelta = Math.min(
-											upperBound,
-											Math.max(lowerBound, delta),
-										);
-										setProject("timeline", "captionSegments", i(), {
-											...value.original,
-											start: value.original.start + clampedDelta,
-											end: value.original.end + clampedDelta,
-										});
-									},
-								)}
+								onMouseDown={createMouseDownDrag(index, "move")}
 							>
 								<SegmentLabel
 									compactAt={24}
@@ -275,24 +248,7 @@ export function CaptionsTrack(props: {
 							</SegmentContent>
 							<SegmentHandle
 								position="end"
-								onMouseDown={createMouseDownDrag(
-									i,
-									() => {
-										const bounds = neighborBounds(i());
-										const end = segment.end;
-										const minValue = segment.start + minDuration();
-										const maxValue = Math.max(minValue, bounds.nextStart);
-										return { end, minValue, maxValue };
-									},
-									(e, value, initialMouseX) => {
-										const delta = (e.clientX - initialMouseX) * secsPerPixel();
-										const next = Math.max(
-											value.minValue,
-											Math.min(value.maxValue, value.end + delta),
-										);
-										setProject("timeline", "captionSegments", i(), "end", next);
-									},
-								)}
+								onMouseDown={createMouseDownDrag(index, "end")}
 							/>
 						</SegmentRoot>
 					);

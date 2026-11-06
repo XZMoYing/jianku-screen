@@ -25,7 +25,7 @@ type ShowSegmentMenu = (
 	target: SegmentMenuTarget,
 ) => void;
 
-type TimelineSnapping = {
+export type TimelineSnapping = {
 	enabled: Accessor<boolean>;
 	targets(exclude?: object): number[];
 	setGuide(time: number | null): void;

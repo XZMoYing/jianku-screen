@@ -7,7 +7,7 @@ import { defaultMaskSegment } from "../masks";
 import { defaultTextSegment } from "../text";
 import { sortTrackSegments } from "../timelineTracks";
 import { AudioTrack } from "./AudioTrack";
-import { TimelineContextProvider } from "./context";
+import { TimelineContextProvider, type TimelineSnapping } from "./context";
 import { MaskTrack } from "./MaskTrack";
 import { TextTrack } from "./TextTrack";
 
@@ -77,7 +77,7 @@ afterEach(() => {
 	document.body.innerHTML = "";
 	vi.unstubAllGlobals();
 });
-function mount(kind: Kind) {
+function mount(kind: Kind, snapping?: TimelineSnapping) {
 	context = fixture();
 	const onDragStateChanged = vi.fn();
 	const handleUpdatePlayhead = vi.fn();
@@ -88,6 +88,7 @@ function mount(kind: Kind) {
 			<TimelineContextProvider
 				duration={60}
 				secsPerPixel={0.01}
+				snapping={snapping}
 				timelineBounds={{
 					left: 0,
 					top: 0,
@@ -150,6 +151,32 @@ function begin(content: HTMLElement) {
 	mouse(window, "mousemove", 203);
 	mouse(window, "mousemove", 303);
 }
+it.each(["text", "mask"] as const)(
+	"%s snaps an owned range and rolls it back on Escape",
+	(kind) => {
+		const guide = vi.fn();
+		const f = mount(kind, {
+			enabled: () => true,
+			targets: () => [3.04],
+			setGuide: guide,
+		});
+		const segment = context.project.timeline[`${kind}Segments`][0];
+		begin(f.content);
+		expect(segment.start).toBeCloseTo(3.04);
+		expect(guide).toHaveBeenLastCalledWith(3.04);
+		window.dispatchEvent(
+			new MouseEvent("mousemove", { clientX: 303, buttons: 1, altKey: true }),
+		);
+		expect(segment.start).toBeCloseTo(3);
+		expect(guide).toHaveBeenLastCalledWith(null);
+		window.dispatchEvent(
+			new KeyboardEvent("keydown", { key: "Escape", bubbles: true }),
+		);
+		expect(segment).toMatchObject({ start: 2, end: 6 });
+		expect(context.resume).toHaveBeenCalledTimes(1);
+	},
+);
+
 for (const kind of ["text", "mask", "audio"] as const) {
 	it.each(["blur", "escape", "unmount", "mode", "lane", "delete"] as const)(
 		`${kind}: ends once on %s and never writes from a later mouse event`,

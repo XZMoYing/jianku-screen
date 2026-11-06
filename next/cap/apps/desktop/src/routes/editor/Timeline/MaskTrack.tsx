@@ -6,7 +6,15 @@ import { useEditorContext } from "../context";
 import { defaultMaskSegment, type MaskSegment } from "../masks";
 import { getSegmentTrack, sortTrackSegments } from "../timelineTracks";
 import { useTimelineContext } from "./context";
-import { createTimelineMouseDrag } from "./mouse-drag";
+import {
+	createTimelineMouseDrag,
+	type TimelineMouseDragEndReason,
+} from "./mouse-drag";
+import {
+	createTimelineRangeDrag,
+	sameTimelineRange,
+	type TimelineRangeEdge,
+} from "./range-snapping";
 import {
 	SegmentContent,
 	SegmentHandle,
@@ -38,7 +46,7 @@ export function MaskTrack(props: {
 		projectHistory,
 		projectActions,
 	} = useEditorContext();
-	const { secsPerPixel, timelineBounds } = useTimelineContext();
+	const { secsPerPixel, timelineBounds, snapping } = useTimelineContext();
 	const [draggingSegment, setDraggingSegment] = createSignal(false);
 	const [hoveringTrack, setHoveringTrack] = createSignal(false);
 	const setPreviewTime = useSetPreviewTime();
@@ -248,10 +256,9 @@ export function MaskTrack(props: {
 
 	const startDrag = createTimelineMouseDrag();
 
-	function createMouseDownDrag<T>(
+	function createMouseDownDrag(
 		segmentIndex: () => number,
-		setup: () => T,
-		update: (e: MouseEvent, value: T, initialMouseX: number) => void,
+		edge: TimelineRangeEdge,
 	) {
 		return (downEvent: MouseEvent) => {
 			if (
@@ -262,8 +269,24 @@ export function MaskTrack(props: {
 			downEvent.stopPropagation();
 			startDrag(() => {
 				const segment = maskSegments()[segmentIndex()];
+				if (!segment) return null;
 				const lane = props.laneIndex;
-				const initial = setup();
+				const drag = createTimelineRangeDrag(
+					snapping,
+					segment,
+					edge,
+					neighborBounds(segmentIndex()),
+					minDuration(),
+					editorState.playbackTime,
+				);
+				let expected = drag.original;
+				const previewBefore = editorState.previewTime;
+				let lastPreview: number | undefined;
+				const ownsRange = () =>
+					props.laneIndex === lane &&
+					getSegmentTrack(segment) === lane &&
+					maskSegments().includes(segment) &&
+					sameTimelineRange(segment, expected);
 				let moved = false;
 				let initialMouseX: number | null = null;
 
@@ -271,7 +294,17 @@ export function MaskTrack(props: {
 				setDraggingSegment(true);
 				props.onDragStateChanged({ type: "movePending" });
 
-				function finish(e?: MouseEvent) {
+				function finish(e?: MouseEvent, reason?: TimelineMouseDragEndReason) {
+					drag.clear();
+					if (reason === "cancel" && ownsRange()) {
+						if (!sameTimelineRange(segment, drag.original))
+							writeSegment(segment, drag.original);
+						if (
+							lastPreview !== undefined &&
+							editorState.previewTime === lastPreview
+						)
+							setEditorState("previewTime", previewBefore);
+					}
 					resumeHistory();
 					if (!moved && e) {
 						e.stopPropagation();
@@ -336,16 +369,25 @@ export function MaskTrack(props: {
 					}
 
 					if (initialMouseX === null) return;
-					update(event, initial, initialMouseX);
+					const scale = secsPerPixel();
+					const range = drag.edit(
+						(event.clientX - initialMouseX) * scale,
+						scale,
+						event.altKey,
+					);
+					if (!sameTimelineRange(segment, range)) {
+						expected = range;
+						writeSegment(segment, range);
+					}
+					if (edge !== "move") {
+						lastPreview = range[edge];
+						setPreviewTime(lastPreview);
+					}
 				}
 
 				return {
 					isValid: () =>
-						editorState.timeline.interactMode === "seek" &&
-						props.laneIndex === lane &&
-						!!segment &&
-						getSegmentTrack(segment) === lane &&
-						maskSegments().includes(segment),
+						editorState.timeline.interactMode === "seek" && ownsRange(),
 					update: handleUpdate,
 					finish,
 				};
@@ -446,62 +488,11 @@ export function MaskTrack(props: {
 						>
 							<SegmentHandle
 								position="start"
-								onMouseDown={createMouseDownDrag(
-									() => index(),
-									() => {
-										const bounds = neighborBounds(index());
-										const start = segment.start;
-										const minValue = bounds.prevEnd;
-										const maxValue = Math.max(
-											minValue,
-											Math.min(
-												segment.end - minDuration(),
-												bounds.nextStart - minDuration(),
-											),
-										);
-										return { start, minValue, maxValue };
-									},
-									(e, value, initialMouseX) => {
-										const delta = (e.clientX - initialMouseX) * secsPerPixel();
-										const next = Math.max(
-											value.minValue,
-											Math.min(value.maxValue, value.start + delta),
-										);
-										writeSegment(segment, { start: next });
-										setPreviewTime(next);
-									},
-								)}
+								onMouseDown={createMouseDownDrag(() => index(), "start")}
 							/>
 							<SegmentContent
 								class="flex items-center cursor-grab"
-								onMouseDown={createMouseDownDrag(
-									() => index(),
-									() => {
-										const original = { ...segment };
-										const bounds = neighborBounds(index());
-										const minDelta = bounds.prevEnd - original.start;
-										const maxDelta = bounds.nextStart - original.end;
-										return {
-											original,
-											minDelta,
-											maxDelta,
-										};
-									},
-									(e, value, initialMouseX) => {
-										const delta = (e.clientX - initialMouseX) * secsPerPixel();
-										const lowerBound = Math.min(value.minDelta, value.maxDelta);
-										const upperBound = Math.max(value.minDelta, value.maxDelta);
-										const clampedDelta = Math.min(
-											upperBound,
-											Math.max(lowerBound, delta),
-										);
-										writeSegment(segment, {
-											...value.original,
-											start: value.original.start + clampedDelta,
-											end: value.original.end + clampedDelta,
-										});
-									},
-								)}
+								onMouseDown={createMouseDownDrag(() => index(), "move")}
 							>
 								<SegmentLabel
 									full={() => (
@@ -521,25 +512,7 @@ export function MaskTrack(props: {
 							</SegmentContent>
 							<SegmentHandle
 								position="end"
-								onMouseDown={createMouseDownDrag(
-									() => index(),
-									() => {
-										const bounds = neighborBounds(index());
-										const end = segment.end;
-										const minValue = segment.start + minDuration();
-										const maxValue = Math.max(minValue, bounds.nextStart);
-										return { end, minValue, maxValue };
-									},
-									(e, value, initialMouseX) => {
-										const delta = (e.clientX - initialMouseX) * secsPerPixel();
-										const next = Math.max(
-											value.minValue,
-											Math.min(value.maxValue, value.end + delta),
-										);
-										writeSegment(segment, { end: next });
-										setPreviewTime(next);
-									},
-								)}
+								onMouseDown={createMouseDownDrag(() => index(), "end")}
 							/>
 						</SegmentRoot>
 					);
