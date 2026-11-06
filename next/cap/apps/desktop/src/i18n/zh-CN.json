@@ -1601,6 +1601,7 @@
 	"Upload + copy link": "上传并复制链接",
 	"Transcription source video file was not found": "找不到要转写的源视频。",
 	"Caption model not found. Please download it first": "找不到字幕模型，请先下载。",
+	"Screen recording permission is required to run the sync test.": "请在系统设置中为简库镜传开启屏幕录制权限，再运行音画同步测试。",
 	"Recognize text (OCR) to clipboard": "识别文字并复制到剪贴板",
 	"Show notification": "显示通知",
 	"Skip editor (headless)": "完成录制后不打开编辑器",

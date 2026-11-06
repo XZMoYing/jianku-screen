@@ -339,7 +339,8 @@ export default function FeedbackTab() {
 									<Show when={report().syncTestError}>
 										{(error) => (
 											<p class="text-xs leading-relaxed text-amber-400">
-												{localize("The sync test couldn't run:")} {error()}
+												{localize("The sync test couldn't run:")}{" "}
+												{localize(error())}
 												{localize(
 													". The report still contains your system information.",
 												)}

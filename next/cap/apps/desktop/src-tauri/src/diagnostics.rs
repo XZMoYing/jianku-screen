@@ -446,10 +446,19 @@ pub async fn run_diagnostic(
         }
     }
 
+    let permissions = tokio::task::spawn_blocking(permissions_snapshot)
+        .await
+        .map_err(|e| format!("Failed to check diagnostic permissions: {e}"))?;
     let mut sync_test = None;
     let mut sync_test_error = None;
 
-    if options.include_sync_test {
+    if options.include_sync_test
+        && cfg!(target_os = "macos")
+        && permissions["screenRecording"] != "granted"
+    {
+        sync_test_error =
+            Some("Screen recording permission is required to run the sync test.".to_string());
+    } else if options.include_sync_test {
         match run_sync_test(&app, &options).await {
             Ok(report) => sync_test = Some(report),
             Err(e) => {
@@ -490,7 +499,7 @@ pub async fn run_diagnostic(
                 flavor: "tauri",
                 app_version: &app_version,
                 settings: settings_json,
-                permissions: Some(permissions_snapshot()),
+                permissions: Some(permissions),
                 recordings_dir: Some(recordings_dir.as_path()),
                 configured_max_fps,
                 fragmented_recording,
