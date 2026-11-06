@@ -60,6 +60,7 @@ import { registerEditorResource } from "./editor-fallback-diagnostics";
 import {
 	DEFAULT_TIMELINE_HEIGHT,
 	editorInspectorWidth,
+	editorMaterialsDocked,
 	editorVerticalLayout,
 } from "./editor-layout";
 import { EditorSkeleton } from "./editor-skeleton";
@@ -871,19 +872,14 @@ function Inner(props: {
 		createSignal<HTMLDivElement>();
 
 	const splitBounds = createElementBounds(splitContainerRef);
-	const materialsDocked = () => (splitBounds.width ?? 1024) >= 1024;
+	const workspaceWidth = () => splitBounds.width ?? 1275;
 	const materialsWidth = () =>
-		Math.min(280, Math.max(224, (splitBounds.width ?? 1024) - 32));
-	const inspectorAvailableWidth = () =>
-		(splitBounds.width ?? 1024) -
-		(isClipsMode() && materialsDocked() ? materialsWidth() + 8 : 0);
+		Math.min(280, Math.max(224, workspaceWidth() - 32));
 	const clampInspectorWidth = (preferred: number) =>
-		editorInspectorWidth(
-			inspectorAvailableWidth(),
-			preferred,
-			isClipsMode() && materialsDocked() ? 400 : undefined,
-		);
+		editorInspectorWidth(workspaceWidth(), preferred);
 	const inspectorWidth = () => clampInspectorWidth(preferredInspectorWidth());
+	const materialsDocked = () =>
+		editorMaterialsDocked(workspaceWidth(), materialsWidth(), inspectorWidth());
 	let endInspectorResize: (() => void) | undefined;
 	onCleanup(() => endInspectorResize?.());
 	const handleInspectorResizeStart = (event: PointerEvent) => {

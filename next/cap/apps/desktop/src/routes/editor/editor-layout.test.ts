@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
 	DEFAULT_TIMELINE_HEIGHT,
 	editorInspectorWidth,
+	editorMaterialsDocked,
 	editorVerticalLayout,
 } from "./editor-layout";
 
@@ -26,6 +27,21 @@ describe("editor startup layout", () => {
 			timelineHeight: 0,
 		});
 	});
+});
+
+it("uses an overlaid materials drawer when docking would crowd the preview", () => {
+	expect(
+		editorMaterialsDocked(1275, 280, editorInspectorWidth(1275, 352)),
+	).toBe(false);
+	expect(
+		editorMaterialsDocked(1440, 280, editorInspectorWidth(1440, 489)),
+	).toBe(false);
+	expect(
+		editorMaterialsDocked(1440, 280, editorInspectorWidth(1440, 352)),
+	).toBe(true);
+	expect(
+		editorMaterialsDocked(1680, 280, editorInspectorWidth(1680, 489)),
+	).toBe(true);
 });
 
 describe("editor inspector split", () => {
