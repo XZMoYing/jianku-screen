@@ -539,10 +539,27 @@ fn map_timeline_to_recording_secs(
         return first.recording_start;
     }
 
+    if let Some(segment) =
+        active_time_map_segment(map, timeline_secs, recording_clip, prefer_outgoing)
+    {
+        return segment.recording_start
+            + (timeline_secs - segment.timeline_start) * segment.timescale;
+    }
+
+    let last = map.last().expect("map is non-empty");
+    last.recording_start + (last.timeline_end - last.timeline_start) * last.timescale
+}
+
+fn active_time_map_segment(
+    map: &[TimeMapSegment],
+    timeline_secs: f64,
+    recording_clip: Option<u32>,
+    prefer_outgoing: bool,
+) -> Option<&TimeMapSegment> {
     let contains = |segment: &&TimeMapSegment| {
         timeline_secs >= segment.timeline_start && timeline_secs < segment.timeline_end
     };
-    let segment = recording_clip
+    recording_clip
         .and_then(|recording_clip| {
             if prefer_outgoing {
                 map.iter()
@@ -555,14 +572,7 @@ fn map_timeline_to_recording_secs(
                     .find(|segment| segment.recording_clip == recording_clip)
             }
         })
-        .or_else(|| map.iter().rev().find(contains));
-    if let Some(segment) = segment {
-        return segment.recording_start
-            + (timeline_secs - segment.timeline_start) * segment.timescale;
-    }
-
-    let last = map.last().expect("map is non-empty");
-    last.recording_start + (last.timeline_end - last.timeline_start) * last.timescale
+        .or_else(|| map.iter().rev().find(contains))
 }
 
 /// One precomputed step. Sample times are implicit: `samples[i]` is the state
@@ -594,6 +604,7 @@ struct StepTargets {
 }
 
 struct PhaseSpan {
+    segment_index: usize,
     start: f64,
     end: f64,
     original_start: f64,
@@ -673,6 +684,7 @@ fn project_zoom_phases(
             || (end - segment.start - slice.phase_end).abs() > 1e-6
             || (original_rate - current.timescale).abs() > 1e-6;
         spans.push(PhaseSpan {
+            segment_index: current.segment_index,
             start,
             end,
             original_start: phase_origin
@@ -763,7 +775,6 @@ impl ZoomTransformTimeline {
             zoom_segments
                 .iter()
                 .any(|segment| !segment.source_slices.is_empty())
-                && timeline.transitions.is_empty()
                 && timeline.hold_windows().is_empty()
                 && crops.styles.is_empty()
         });
@@ -1112,13 +1123,20 @@ impl ZoomTransformTimeline {
     }
 
     fn phase_sample_at(&self, time: f64) -> Option<(TimelineSample, TimelineSample)> {
+        if self.phase_tracks.is_empty() {
+            return None;
+        }
+        let owner = active_time_map_segment(
+            &self.time_map,
+            time,
+            self.recording_clip,
+            self.prefer_outgoing,
+        )?;
         let step = STEP_MS / 1000.0;
         for track in &self.phase_tracks {
-            if let Some(span) = track
-                .spans
-                .iter()
-                .find(|span| time >= span.start && time < span.end)
-            {
+            if let Some(span) = track.spans.iter().find(|span| {
+                span.segment_index == owner.segment_index && time >= span.start && time < span.end
+            }) {
                 let phase = span.original_start + (time - span.start) * span.rate;
                 let mut sample = track.original.sample_state(phase)?;
                 let previous = track.original.sample_state(phase - step * span.rate)?;
@@ -1373,26 +1391,30 @@ mod tests {
         )
     }
 
-    #[test]
-    fn relocated_zoom_slice_samples_its_original_phase_after_trim_and_speed_change() {
-        let mut project: ProjectConfiguration = serde_json::from_value(serde_json::json!({
+    fn project_with_sliced_zoom(right_source_start: f64) -> ProjectConfiguration {
+        serde_json::from_value(serde_json::json!({
             "timeline": {
                 "segments": [
                     {"id":"left","recordingSegment":0,"start":0,"end":4,"timescale":1},
-                    {"id":"right","recordingSegment":0,"start":4,"end":8,"timescale":1}
+                    {"id":"right","recordingSegment":0,"start":right_source_start,"end":right_source_start + 4.0,"timescale":1}
                 ],
                 "zoomSegments": [{
                     "start":3.0,"end":5.0,"amount":2.0,"mode":"auto",
                     "sourceSlices":[
                         {"phaseStart":0.0,"phaseEnd":1.0,"sourceEnd":4.0,
                          "attachment":{"kind":"clip","id":"a","clipId":"left","sourceTime":3.0}},
-                        {"phaseStart":1.0,"phaseEnd":2.0,"sourceEnd":5.0,
-                         "attachment":{"kind":"clip","id":"b","clipId":"right","sourceTime":4.0}}
+                        {"phaseStart":1.0,"phaseEnd":2.0,"sourceEnd":right_source_start + 1.0,
+                         "attachment":{"kind":"clip","id":"b","clipId":"right","sourceTime":right_source_start}}
                     ]
                 }]
             }
         }))
-        .unwrap();
+        .unwrap()
+    }
+
+    #[test]
+    fn relocated_zoom_slice_samples_its_original_phase_after_trim_and_speed_change() {
+        let mut project = project_with_sliced_zoom(4.0);
         let cursor = CursorEvents {
             moves: vec![move_event(3100.0, 0.2, 0.3), move_event(4200.0, 0.8, 0.7)],
             ..Default::default()
@@ -1425,6 +1447,40 @@ mod tests {
             );
         }
         assert!(edited.sample(5.75).t < 0.01);
+    }
+
+    #[test]
+    fn transition_samples_the_distinct_zoom_phases_of_two_instances_of_one_recording() {
+        let mut project = project_with_sliced_zoom(6.0);
+        let cursor = CursorEvents {
+            moves: vec![move_event(3100.0, 0.2, 0.3), move_event(6000.0, 0.8, 0.7)],
+            ..Default::default()
+        };
+        let size = XY::new(1000, 1000);
+        let mut reference =
+            ZoomTransformTimeline::from_project_for_clip(&project, &cursor, 8.0, size, 0);
+        reference.precompute();
+        let before_cut = reference.sample(3.75);
+        let after_cut = reference.sample(4.25);
+        assert!((before_cut.bounds.top_left.x - after_cut.bounds.top_left.x).abs() > 0.1);
+
+        project.timeline.as_mut().unwrap().transitions = vec![ClipTransition {
+            segment_index: 1,
+            kind: ClipTransitionType::CrossFade,
+            duration: 0.5,
+        }];
+        let mut outgoing =
+            ZoomTransformTimeline::from_project_for_outgoing_clip(&project, &cursor, 7.5, size, 0);
+        let mut incoming =
+            ZoomTransformTimeline::from_project_for_clip(&project, &cursor, 7.5, size, 0);
+        for (timeline, expected) in [(&mut outgoing, before_cut), (&mut incoming, after_cut)] {
+            assert_eq!(timeline.phase_tracks.len(), 1);
+            timeline.ensure_precomputed_until(3.75);
+            let actual = timeline.sample(3.75);
+            assert!((actual.t - expected.t).abs() < 1e-5);
+            assert!((actual.bounds.top_left.x - expected.bounds.top_left.x).abs() < 1e-5);
+            assert!((actual.bounds.bottom_right.y - expected.bounds.bottom_right.y).abs() < 1e-5);
+        }
     }
 
     fn project_with_crop_styles(
