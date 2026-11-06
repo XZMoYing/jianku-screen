@@ -1,0 +1,111 @@
+{
+	"version": "0.2.0-alpha.83",
+	"build": "2026.83.0",
+	"platform": "macOS",
+	"gestures": [
+		{
+			"track": "imageSegments",
+			"edge": "start",
+			"gesture": "normal",
+			"approach": 1.27,
+			"savedBoundary": 1.25,
+			"restoredBaseline": true
+		},
+		{
+			"track": "imageSegments",
+			"edge": "end",
+			"gesture": "normal",
+			"approach": 3.98,
+			"savedBoundary": 4.0,
+			"restoredBaseline": true
+		},
+		{
+			"track": "textSegments",
+			"edge": "start",
+			"gesture": "normal",
+			"approach": 1.27,
+			"savedBoundary": 1.25,
+			"restoredBaseline": true
+		},
+		{
+			"track": "textSegments",
+			"edge": "end",
+			"gesture": "normal",
+			"approach": 3.98,
+			"savedBoundary": 4.0,
+			"restoredBaseline": true
+		},
+		{
+			"track": "maskSegments",
+			"edge": "start",
+			"gesture": "normal",
+			"approach": 1.27,
+			"savedBoundary": 1.25,
+			"restoredBaseline": true
+		},
+		{
+			"track": "maskSegments",
+			"edge": "end",
+			"gesture": "normal",
+			"approach": 3.98,
+			"savedBoundary": 4.0,
+			"restoredBaseline": true
+		},
+		{
+			"track": "keyboardSegments",
+			"edge": "start",
+			"gesture": "normal",
+			"approach": 1.27,
+			"savedBoundary": 1.25,
+			"restoredBaseline": true
+		},
+		{
+			"track": "keyboardSegments",
+			"edge": "end",
+			"gesture": "normal",
+			"approach": 3.98,
+			"savedBoundary": 4.0,
+			"restoredBaseline": true
+		},
+		{
+			"track": "captionSegments",
+			"edge": "start",
+			"gesture": "normal",
+			"approach": 1.27,
+			"savedBoundary": 1.25,
+			"restoredBaseline": true
+		},
+		{
+			"track": "captionSegments",
+			"edge": "end",
+			"gesture": "normal",
+			"approach": 4.005,
+			"savedBoundary": 4.0,
+			"restoredBaseline": true
+		},
+		{
+			"track": "imageSegments",
+			"edge": "start",
+			"gesture": "alt",
+			"approach": 1.27,
+			"savedBoundary": 1.268783894301042,
+			"restoredBaseline": true
+		},
+		{
+			"track": "captionSegments",
+			"edge": "end",
+			"gesture": "escape",
+			"approach": 3.98,
+			"savedBoundary": 3.5,
+			"restoredBaseline": true
+		}
+	],
+	"firstDirectImageTrimSavedStart": 1.8758200129354152,
+	"recheck": {
+		"reopenedAllSavedValuesExceptDerivedTextFit": true,
+		"directFromOtherSelection": 1.25,
+		"directAfterReopen": 1.25,
+		"snapRestoredOff": true,
+		"timelineSplitterY": 649
+	}
+}
