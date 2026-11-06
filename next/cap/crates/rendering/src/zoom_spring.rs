@@ -612,6 +612,7 @@ struct StepTargets {
     snap: bool,
 }
 
+#[derive(Clone, Copy)]
 struct PhaseSpan {
     segment_index: usize,
     start: f64,
@@ -624,6 +625,15 @@ impl PhaseSpan {
     fn original_time(&self, output_time: f64) -> f64 {
         self.original_start + (output_time - self.start) * self.rate
     }
+
+    fn within(&self, start: f64, end: f64) -> Self {
+        Self {
+            start,
+            end,
+            original_start: self.original_time(start),
+            ..*self
+        }
+    }
 }
 
 struct PhaseTrack {
@@ -635,6 +645,41 @@ struct ZoomRenderPlan {
     segments: Vec<ZoomSegment>,
     time_map: Vec<TimeMapSegment>,
     phase_tracks: Vec<PhaseTrack>,
+}
+
+fn visible_phase_spans(spans: &[PhaseSpan], plan: &ZoomRenderPlan) -> Vec<PhaseSpan> {
+    let mut visible = Vec::new();
+    for span in spans {
+        let mut blocked: Vec<_> = plan
+            .segments
+            .iter()
+            .filter(|segment| segment.start < segment.end)
+            .map(|segment| (segment.start.next_up(), segment.end.next_up()))
+            .chain(
+                plan.phase_tracks
+                    .iter()
+                    .flat_map(|track| &track.spans)
+                    .filter(|other| other.segment_index == span.segment_index)
+                    .map(|other| (other.start, other.end)),
+            )
+            .filter(|&(start, end)| start < span.end && end > span.start)
+            .collect();
+        blocked.sort_unstable_by(|left, right| left.0.total_cmp(&right.0));
+        let mut start = span.start;
+        for (blocked_start, blocked_end) in blocked {
+            if blocked_start > start {
+                visible.push(span.within(start, blocked_start));
+            }
+            start = start.max(blocked_end);
+            if start >= span.end {
+                break;
+            }
+        }
+        if start < span.end {
+            visible.push(span.within(start, span.end));
+        }
+    }
+    visible
 }
 
 fn project_zoom_phases(
@@ -851,50 +896,46 @@ impl ZoomTransformTimeline {
                 .iter()
                 .any(|segment| !segment.source_slices.is_empty())
         });
-        for (index, segment) in zoom_segments.iter().enumerate() {
+        let mut ordered: Vec<_> = zoom_segments.iter().collect();
+        ordered.sort_by(|a, b| a.start.total_cmp(&b.start).then(a.end.total_cmp(&b.end)));
+        let mut projected_groups = Vec::new();
+        for segment in ordered {
             let phase_origin = (STEP_MS + (segment.start * 1000.0).rem_euclid(STEP_MS)) / 1000.0;
             let projected = phase_timeline.and_then(|timeline| {
                 project_zoom_phases(segment, timeline, &plan.time_map, phase_origin)
             });
-            if let Some((spans, original_map)) = projected
-                && !spans.iter().any(|span| {
-                    zoom_segments
-                        .iter()
-                        .enumerate()
-                        .any(|(other_index, other)| {
-                            index != other_index && span.start < other.end && span.end > other.start
-                        })
-                        || plan
-                            .phase_tracks
-                            .iter()
-                            .flat_map(|track| &track.spans)
-                            .any(|other| span.start < other.end && span.end > other.start)
-                })
-            {
-                if spans.is_empty() {
-                    continue;
-                }
-                let mut original_segment = segment.clone();
-                original_segment.start = phase_origin;
-                original_segment.end = phase_origin + (segment.end - segment.start);
-                let original_duration = original_segment.end;
-                let original_crops = crops.for_original_phases(&spans);
-                let original = Self::from_render_plan(
-                    ZoomRenderPlan {
-                        segments: vec![original_segment],
-                        time_map: original_map,
-                        phase_tracks: Vec::new(),
-                    },
-                    cursor_events,
-                    spring,
-                    original_duration,
-                    &original_crops,
-                    selection,
-                );
-                plan.phase_tracks.push(PhaseTrack { spans, original });
+            if let Some((spans, original_map)) = projected {
+                projected_groups.push((segment, phase_origin, spans, original_map));
             } else {
                 plan.segments.push(segment.clone());
             }
+        }
+        for (segment, phase_origin, spans, original_map) in projected_groups {
+            let visible = visible_phase_spans(&spans, &plan);
+            if visible.is_empty() {
+                continue;
+            }
+            let mut original_segment = segment.clone();
+            original_segment.start = phase_origin;
+            original_segment.end = phase_origin + (segment.end - segment.start);
+            let original_duration = original_segment.end;
+            let original_crops = crops.for_original_phases(&spans);
+            let original = Self::from_render_plan(
+                ZoomRenderPlan {
+                    segments: vec![original_segment],
+                    time_map: original_map,
+                    phase_tracks: Vec::new(),
+                },
+                cursor_events,
+                spring,
+                original_duration,
+                &original_crops,
+                selection,
+            );
+            plan.phase_tracks.push(PhaseTrack {
+                spans: visible,
+                original,
+            });
         }
         Self::from_render_plan(
             plan,
@@ -919,11 +960,10 @@ impl ZoomTransformTimeline {
             prefer_outgoing,
         } = selection;
         let ZoomRenderPlan {
-            segments: mut zoom_segments,
+            segments: zoom_segments,
             time_map,
             phase_tracks,
         } = plan;
-        zoom_segments.sort_by(|a, b| a.start.total_cmp(&b.start).then(a.end.total_cmp(&b.end)));
         let clusters = zoom_segments
             .iter()
             .map(|segment| match segment.mode {
@@ -1837,6 +1877,81 @@ mod tests {
                 "{output} -> {original}"
             );
         }
+    }
+
+    #[test]
+    fn a_placed_zoom_only_overrides_the_overlapping_portion_of_a_relocated_slice() {
+        let mut project = project_with_sliced_zoom(4.0);
+        let cursor = CursorEvents {
+            moves: vec![move_event(3100.0, 0.2, 0.3), move_event(4200.0, 0.8, 0.7)],
+            ..Default::default()
+        };
+        let size = XY::new(1000, 1000);
+        let mut reference = ZoomTransformTimeline::from_project(&project, &cursor, 8.0, size);
+        reference.precompute();
+
+        let timeline = project.timeline.as_mut().unwrap();
+        timeline
+            .main_track_gaps
+            .before_clip
+            .insert("right".into(), 2.0);
+        let mut placed = manual_segment(6.25, 6.5, 3.0, 0.5, 0.5);
+        placed.instant_animation = true;
+        timeline.zoom_segments.push(placed);
+        let mut edited = ZoomTransformTimeline::from_project(&project, &cursor, 10.0, size);
+        edited.ensure_precomputed_until(7.0);
+        assert!(edited.phase_sample_at(6.25).is_some());
+        assert!(edited.phase_sample_at(6.5).is_none());
+        assert_eq!(
+            edited.sample(6.375).bounds,
+            SegmentBounds::from_amount_center(3.0, XY::new(0.5, 0.5)),
+        );
+        assert!(edited.snapped_within(6.49, 6.52));
+        for output in [6.125, 6.75] {
+            let expected = reference.sample(output - 2.0);
+            let actual = edited.sample(output);
+            assert!((actual.t - expected.t).abs() < 1e-5);
+            assert!((actual.bounds.top_left.x - expected.bounds.top_left.x).abs() < 1e-5);
+        }
+    }
+
+    #[test]
+    fn overlapping_projected_groups_keep_the_first_claim_only_for_the_same_clip_instance() {
+        let first = PhaseSpan {
+            segment_index: 0,
+            start: 4.0,
+            end: 5.0,
+            original_start: 0.0,
+            rate: 1.0,
+        };
+        let plan = ZoomRenderPlan {
+            segments: Vec::new(),
+            time_map: Vec::new(),
+            phase_tracks: vec![PhaseTrack {
+                spans: vec![first],
+                original: timeline_for(&[], &CursorEvents::default(), 8.0),
+            }],
+        };
+        let next = PhaseSpan {
+            start: 4.5,
+            end: 6.0,
+            original_start: 1.0,
+            rate: 2.0,
+            ..first
+        };
+        let other_clip = PhaseSpan {
+            segment_index: 1,
+            ..next
+        };
+        let visible = visible_phase_spans(&[next, other_clip], &plan);
+        let [same, other] = visible.as_slice() else {
+            panic!("expected both clips to retain their visible interval");
+        };
+        assert_eq!((same.start, same.end, same.original_start), (5.0, 6.0, 2.0));
+        assert_eq!(
+            (other.start, other.end, other.original_start),
+            (4.5, 6.0, 1.0)
+        );
     }
 
     #[test]
