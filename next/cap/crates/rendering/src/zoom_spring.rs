@@ -26,8 +26,8 @@
 //! export matches playback by construction.
 
 use cap_project::{
-    Crop, CursorEvents, ProjectConfiguration, ScreenMovementSpring, TimelineConfiguration, XY,
-    ZoomMode, ZoomSegment,
+    Crop, CursorEvents, OverlayAttachment, ProjectConfiguration, ScreenMovementSpring,
+    TimelineConfiguration, XY, ZoomMode, ZoomSegment,
 };
 
 use crate::{
@@ -417,6 +417,7 @@ pub(crate) fn cluster_center_at_time(
 /// [`TimelineConfiguration::get_segment_time`]'s accumulation logic.
 #[derive(Clone, Copy)]
 struct TimeMapSegment {
+    segment_index: usize,
     timeline_start: f64,
     timeline_end: f64,
     recording_start: f64,
@@ -443,6 +444,7 @@ fn build_time_map(timeline: Option<&TimelineConfiguration>) -> Vec<TimeMapSegmen
             continue;
         }
         map.push(TimeMapSegment {
+            segment_index,
             timeline_start: accum,
             timeline_end: accum + duration,
             recording_start: segment.start,
@@ -483,6 +485,7 @@ fn build_time_map(timeline: Option<&TimelineConfiguration>) -> Vec<TimeMapSegmen
             if hold_start > piece_start_out {
                 let len = hold_start - piece_start_out;
                 out.push(TimeMapSegment {
+                    segment_index: segment.segment_index,
                     timeline_start: piece_start_out,
                     timeline_end: hold_start,
                     recording_start: piece_start_rec,
@@ -495,6 +498,7 @@ fn build_time_map(timeline: Option<&TimelineConfiguration>) -> Vec<TimeMapSegmen
             }
             let hold_len = hold_end - hold_start;
             out.push(TimeMapSegment {
+                segment_index: segment.segment_index,
                 timeline_start: piece_start_out,
                 timeline_end: piece_start_out + hold_len,
                 recording_start: piece_start_rec,
@@ -507,6 +511,7 @@ fn build_time_map(timeline: Option<&TimelineConfiguration>) -> Vec<TimeMapSegmen
         }
         if remaining > 0.0 {
             out.push(TimeMapSegment {
+                segment_index: segment.segment_index,
                 timeline_start: piece_start_out,
                 timeline_end: piece_start_out + remaining,
                 recording_start: piece_start_rec,
@@ -588,6 +593,101 @@ struct StepTargets {
     snap: bool,
 }
 
+struct PhaseSpan {
+    start: f64,
+    end: f64,
+    original_start: f64,
+    rate: f64,
+}
+
+struct PhaseTrack {
+    spans: Vec<PhaseSpan>,
+    original: ZoomTransformTimeline,
+}
+
+struct ZoomRenderPlan {
+    segments: Vec<ZoomSegment>,
+    time_map: Vec<TimeMapSegment>,
+    phase_tracks: Vec<PhaseTrack>,
+}
+
+fn project_zoom_phases(
+    segment: &ZoomSegment,
+    timeline: &TimelineConfiguration,
+    time_map: &[TimeMapSegment],
+    phase_origin: f64,
+) -> Option<(Vec<PhaseSpan>, Vec<TimeMapSegment>)> {
+    if segment.attachment.is_some()
+        || !matches!(segment.mode, ZoomMode::Auto)
+        || segment.source_slices.len() < 2
+        || !segment.start.is_finite()
+        || !segment.end.is_finite()
+    {
+        return None;
+    }
+    let mut spans = Vec::new();
+    let mut original_map = Vec::new();
+    let mut previous_end = 0.0;
+    let mut changed = false;
+    for slice in &segment.source_slices {
+        let Some(OverlayAttachment::Clip {
+            clip_id,
+            source_time,
+            ..
+        }) = &slice.attachment
+        else {
+            return None;
+        };
+        let source_end = slice.source_end?;
+        let phase_duration = slice.phase_end - slice.phase_start;
+        let original_rate = (source_end - source_time) / phase_duration;
+        if !original_rate.is_finite()
+            || original_rate <= 0.0
+            || phase_duration <= 0.0
+            || (slice.phase_start - previous_end).abs() > 1e-6
+        {
+            return None;
+        }
+        previous_end = slice.phase_end;
+        let current = time_map
+            .iter()
+            .find(|entry| timeline.segments[entry.segment_index].id.as_ref() == Some(clip_id))?;
+        original_map.push(TimeMapSegment {
+            timeline_start: phase_origin + slice.phase_start,
+            timeline_end: phase_origin + slice.phase_end,
+            recording_start: *source_time,
+            timescale: original_rate,
+            ..*current
+        });
+        let retained_start = source_time.max(current.recording_start);
+        let retained_end = source_end.min(timeline.segments[current.segment_index].end);
+        if retained_start >= retained_end {
+            changed = true;
+            continue;
+        }
+        let start =
+            current.timeline_start + (retained_start - current.recording_start) / current.timescale;
+        let end =
+            current.timeline_start + (retained_end - current.recording_start) / current.timescale;
+        changed |= (start - segment.start - slice.phase_start).abs() > 1e-6
+            || (end - segment.start - slice.phase_end).abs() > 1e-6
+            || (original_rate - current.timescale).abs() > 1e-6;
+        spans.push(PhaseSpan {
+            start,
+            end,
+            original_start: phase_origin
+                + slice.phase_start
+                + (retained_start - source_time) / original_rate,
+            rate: current.timescale / original_rate,
+        });
+    }
+    if !changed || (previous_end - (segment.end - segment.start)).abs() > 1e-6 {
+        return None;
+    }
+    spans.sort_by(|a, b| a.start.total_cmp(&b.start));
+    Some((spans, original_map))
+}
+
 /// Deterministic, lazily precomputed zoom transform timeline.
 ///
 /// Construction is cheap (clusters only); integration happens on demand via
@@ -602,12 +702,14 @@ pub struct ZoomTransformTimeline {
     /// Auto segments, `None` for Manual ones.
     clusters: Vec<Option<ZoomClusters>>,
     time_map: Vec<TimeMapSegment>,
+    phase_tracks: Vec<PhaseTrack>,
     recording_clip: Option<u32>,
     prefer_outgoing: bool,
     /// Total number of samples covering [0, duration] plus one lerp partner.
     total_samples: usize,
 }
 
+#[derive(Clone, Copy)]
 struct RecordingClipSelection {
     recording_clip: Option<u32>,
     prefer_outgoing: bool,
@@ -648,18 +750,95 @@ impl ZoomTransformTimeline {
         crops: CursorCropMaps,
         selection: RecordingClipSelection,
     ) -> Self {
+        let mut plan = ZoomRenderPlan {
+            segments: Vec::new(),
+            time_map: if zoom_segments.is_empty() {
+                Vec::new()
+            } else {
+                build_time_map(timeline)
+            },
+            phase_tracks: Vec::new(),
+        };
+        let linear_timeline = timeline.filter(|timeline| {
+            zoom_segments
+                .iter()
+                .any(|segment| !segment.source_slices.is_empty())
+                && timeline.transitions.is_empty()
+                && timeline.hold_windows().is_empty()
+                && crops.styles.is_empty()
+        });
+        for (index, segment) in zoom_segments.iter().enumerate() {
+            let phase_origin = (STEP_MS + (segment.start * 1000.0).rem_euclid(STEP_MS)) / 1000.0;
+            let projected = linear_timeline.and_then(|timeline| {
+                project_zoom_phases(segment, timeline, &plan.time_map, phase_origin)
+            });
+            if let Some((spans, original_map)) = projected
+                && !spans.iter().any(|span| {
+                    zoom_segments
+                        .iter()
+                        .enumerate()
+                        .any(|(other_index, other)| {
+                            index != other_index && span.start < other.end && span.end > other.start
+                        })
+                        || plan
+                            .phase_tracks
+                            .iter()
+                            .flat_map(|track| &track.spans)
+                            .any(|other| span.start < other.end && span.end > other.start)
+                })
+            {
+                if spans.is_empty() {
+                    continue;
+                }
+                let mut original_segment = segment.clone();
+                original_segment.start = phase_origin;
+                original_segment.end = phase_origin + (segment.end - segment.start);
+                let original_duration = original_segment.end;
+                let original = Self::from_render_plan(
+                    ZoomRenderPlan {
+                        segments: vec![original_segment],
+                        time_map: original_map,
+                        phase_tracks: Vec::new(),
+                    },
+                    cursor_events,
+                    spring,
+                    original_duration,
+                    &crops,
+                    selection,
+                );
+                plan.phase_tracks.push(PhaseTrack { spans, original });
+            } else {
+                plan.segments.push(segment.clone());
+            }
+        }
+        Self::from_render_plan(
+            plan,
+            cursor_events,
+            spring,
+            duration_secs,
+            &crops,
+            selection,
+        )
+    }
+
+    fn from_render_plan(
+        plan: ZoomRenderPlan,
+        cursor_events: &CursorEvents,
+        spring: ScreenMovementSpring,
+        duration_secs: f64,
+        crops: &CursorCropMaps,
+        selection: RecordingClipSelection,
+    ) -> Self {
         let RecordingClipSelection {
             recording_clip,
             prefer_outgoing,
         } = selection;
-        let mut zoom_segments = zoom_segments.to_vec();
+        let ZoomRenderPlan {
+            segments: mut zoom_segments,
+            time_map,
+            phase_tracks,
+        } = plan;
         zoom_segments.sort_by(|a, b| a.start.total_cmp(&b.start).then(a.end.total_cmp(&b.end)));
-
-        let time_map = if zoom_segments.is_empty() {
-            Vec::new()
-        } else {
-            build_time_map(timeline)
-        };
         let clusters = zoom_segments
             .iter()
             .map(|segment| match segment.mode {
@@ -682,7 +861,7 @@ impl ZoomTransformTimeline {
                         recording_start,
                         recording_end,
                         segment,
-                        &crops,
+                        crops,
                     ))
                 }
                 ZoomMode::Manual { .. } => None,
@@ -697,13 +876,14 @@ impl ZoomTransformTimeline {
         // One sample per step across the duration, plus one trailing sample so
         // a lookup right at the end always has a lerp partner.
         let total_samples = (duration_secs * 1000.0 / STEP_MS).ceil() as usize + 2;
-        if zoom_segments.is_empty() {
+        if zoom_segments.is_empty() && phase_tracks.is_empty() {
             return Self {
                 samples: Vec::new(),
                 state: None,
                 zoom_segments,
                 clusters,
                 time_map,
+                phase_tracks,
                 recording_clip,
                 prefer_outgoing,
                 total_samples: 1,
@@ -722,6 +902,7 @@ impl ZoomTransformTimeline {
             zoom_segments,
             clusters,
             time_map,
+            phase_tracks,
             recording_clip,
             prefer_outgoing,
             total_samples,
@@ -729,30 +910,35 @@ impl ZoomTransformTimeline {
 
         // Seed the simulations at rest on the t=0 target so the very first
         // frame is already correct and `samples` is never empty.
+        timeline.prepare_phase_samples(0.0);
         let initial = timeline.targets_at(0.0, XY::new(0.5, 0.5));
+        let initial_sample = timeline.phase_sample_at(0.0).map(|(sample, _)| sample);
+        let initial_amount = initial_sample.map_or(initial.amount, |sample| sample.amount);
+        let initial_center = initial_sample.map_or(initial.center, |sample| sample.center);
+        let initial_activity = initial_sample.map_or(initial.activity, |sample| sample.activity);
         let mut center_sim = SpringMassDamperSimulation::new(spring_config);
-        center_sim.set_position(initial.center);
+        center_sim.set_position(initial_center);
         center_sim.set_velocity(XY::new(0.0, 0.0));
         center_sim.set_target_position(initial.center);
 
         let mut aux_sim = SpringMassDamperSimulation::new(spring_config);
-        aux_sim.set_position(XY::new(initial.amount, initial.activity));
+        aux_sim.set_position(XY::new(initial_amount, initial_activity));
         aux_sim.set_velocity(XY::new(0.0, 0.0));
         aux_sim.set_target_position(XY::new(initial.amount, initial.activity));
 
         timeline.samples.push(TimelineSample {
-            amount: initial.amount.max(1.0),
+            amount: initial_amount.max(1.0),
             center: XY::new(
-                initial.center.x.clamp(0.0, 1.0),
-                initial.center.y.clamp(0.0, 1.0),
+                initial_center.x.clamp(0.0, 1.0),
+                initial_center.y.clamp(0.0, 1.0),
             ),
-            activity: initial.activity.clamp(0.0, 1.0),
+            activity: initial_activity.clamp(0.0, 1.0),
             snapped: false,
         });
         timeline.state = Some(PrecomputeState {
             center_sim,
             aux_sim,
-            held_center_target: initial.center,
+            held_center_target: initial_center,
         });
         timeline
     }
@@ -848,6 +1034,7 @@ impl ZoomTransformTimeline {
         let need_ms = (f64::from(timeline_secs).max(0.0)) * 1000.0;
         // +2: floor index plus its lerp partner.
         let need_samples = ((need_ms / STEP_MS).ceil() as usize + 2).min(self.total_samples);
+        self.prepare_phase_samples((need_samples.saturating_sub(1)) as f64 * STEP_MS / 1000.0);
         while self.samples.len() < need_samples && self.state.is_some() {
             self.advance_one_step();
         }
@@ -855,6 +1042,9 @@ impl ZoomTransformTimeline {
 
     /// Precomputes the full duration.
     pub fn precompute(&mut self) {
+        for track in &mut self.phase_tracks {
+            track.original.precompute();
+        }
         while self.state.is_some() {
             self.advance_one_step();
         }
@@ -865,14 +1055,30 @@ impl ZoomTransformTimeline {
     /// safe for the render hot path. Times outside the precomputed range clamp
     /// to the nearest cached sample.
     pub fn sample(&self, timeline_secs: f32) -> InterpolatedZoom {
-        let Some(last) = self.samples.len().checked_sub(1) else {
+        let time = f64::from(timeline_secs);
+        let Some(sample) = self
+            .phase_sample_at(time)
+            .map(|(sample, _)| sample)
+            .or_else(|| self.sample_state(time))
+        else {
             return InterpolatedZoom {
                 t: 0.0,
                 bounds: SegmentBounds::default(),
             };
         };
 
-        let pos = (f64::from(timeline_secs).max(0.0)) * 1000.0 / STEP_MS;
+        InterpolatedZoom {
+            t: f64::from(sample.activity).clamp(0.0, 1.0),
+            bounds: SegmentBounds::from_amount_center(
+                f64::from(sample.amount),
+                XY::new(f64::from(sample.center.x), f64::from(sample.center.y)),
+            ),
+        }
+    }
+
+    fn sample_state(&self, timeline_secs: f64) -> Option<TimelineSample> {
+        let last = self.samples.len().checked_sub(1)?;
+        let pos = timeline_secs.max(0.0) * 1000.0 / STEP_MS;
         let idx = (pos as usize).min(last);
         let next = (idx + 1).min(last);
         let frac = (pos - idx as f64).clamp(0.0, 1.0) as f32;
@@ -880,18 +1086,47 @@ impl ZoomTransformTimeline {
         let a = self.samples[idx];
         let b = self.samples[next];
 
-        let amount = a.amount + (b.amount - a.amount) * frac;
-        let center_x = a.center.x + (b.center.x - a.center.x) * frac;
-        let center_y = a.center.y + (b.center.y - a.center.y) * frac;
-        let activity = a.activity + (b.activity - a.activity) * frac;
-
-        InterpolatedZoom {
-            t: f64::from(activity).clamp(0.0, 1.0),
-            bounds: SegmentBounds::from_amount_center(
-                f64::from(amount),
-                XY::new(f64::from(center_x), f64::from(center_y)),
+        Some(TimelineSample {
+            amount: a.amount + (b.amount - a.amount) * frac,
+            center: XY::new(
+                a.center.x + (b.center.x - a.center.x) * frac,
+                a.center.y + (b.center.y - a.center.y) * frac,
             ),
+            activity: a.activity + (b.activity - a.activity) * frac,
+            snapped: a.snapped || b.snapped,
+        })
+    }
+
+    fn prepare_phase_samples(&mut self, until: f64) {
+        for track in &mut self.phase_tracks {
+            let phase = track
+                .spans
+                .iter()
+                .filter(|span| span.start <= until)
+                .map(|span| span.original_start + (until.min(span.end) - span.start) * span.rate)
+                .max_by(f64::total_cmp);
+            if let Some(phase) = phase {
+                track.original.ensure_precomputed_until(phase as f32);
+            }
         }
+    }
+
+    fn phase_sample_at(&self, time: f64) -> Option<(TimelineSample, TimelineSample)> {
+        let step = STEP_MS / 1000.0;
+        for track in &self.phase_tracks {
+            if let Some(span) = track
+                .spans
+                .iter()
+                .find(|span| time >= span.start && time < span.end)
+            {
+                let phase = span.original_start + (time - span.start) * span.rate;
+                let mut sample = track.original.sample_state(phase)?;
+                let previous = track.original.sample_state(phase - step * span.rate)?;
+                sample.snapped |= time - step < span.start;
+                return Some((sample, previous));
+            }
+        }
+        None
     }
 
     /// Whether any precomputed step in `[from_secs, to_secs]` was an instant
@@ -917,6 +1152,28 @@ impl ZoomTransformTimeline {
 
         let step_index = self.samples.len();
         let step_secs = step_index as f64 * STEP_MS / 1000.0;
+        if let Some((sample, previous)) = self.phase_sample_at(step_secs)
+            && let Some(state) = &mut self.state
+        {
+            state.held_center_target = sample.center;
+            state.center_sim.set_position(sample.center);
+            state.center_sim.set_velocity(XY::new(
+                (sample.center.x - previous.center.x) / STEP_MS as f32,
+                (sample.center.y - previous.center.y) / STEP_MS as f32,
+            ));
+            state
+                .aux_sim
+                .set_position(XY::new(sample.amount, sample.activity));
+            state.aux_sim.set_velocity(XY::new(
+                (sample.amount - previous.amount) / STEP_MS as f32,
+                (sample.activity - previous.activity) / STEP_MS as f32,
+            ));
+            self.samples.push(sample);
+            if self.samples.len() >= self.total_samples {
+                self.state = None;
+            }
+            return;
+        }
         let targets = self.targets_at(step_secs, held_center);
 
         let Some(state) = self.state.as_mut() else {
@@ -1114,6 +1371,60 @@ mod tests {
             duration,
             None,
         )
+    }
+
+    #[test]
+    fn relocated_zoom_slice_samples_its_original_phase_after_trim_and_speed_change() {
+        let mut project: ProjectConfiguration = serde_json::from_value(serde_json::json!({
+            "timeline": {
+                "segments": [
+                    {"id":"left","recordingSegment":0,"start":0,"end":4,"timescale":1},
+                    {"id":"right","recordingSegment":0,"start":4,"end":8,"timescale":1}
+                ],
+                "zoomSegments": [{
+                    "start":3.0,"end":5.0,"amount":2.0,"mode":"auto",
+                    "sourceSlices":[
+                        {"phaseStart":0.0,"phaseEnd":1.0,"sourceEnd":4.0,
+                         "attachment":{"kind":"clip","id":"a","clipId":"left","sourceTime":3.0}},
+                        {"phaseStart":1.0,"phaseEnd":2.0,"sourceEnd":5.0,
+                         "attachment":{"kind":"clip","id":"b","clipId":"right","sourceTime":4.0}}
+                    ]
+                }]
+            }
+        }))
+        .unwrap();
+        let cursor = CursorEvents {
+            moves: vec![move_event(3100.0, 0.2, 0.3), move_event(4200.0, 0.8, 0.7)],
+            ..Default::default()
+        };
+        let size = XY::new(1000, 1000);
+        let mut reference = ZoomTransformTimeline::from_project(&project, &cursor, 9.0, size);
+        assert!(reference.phase_tracks.is_empty());
+        reference.precompute();
+
+        let timeline = project.timeline.as_mut().unwrap();
+        timeline.segments[1].start = 4.25;
+        timeline.segments[1].timescale = 2.0;
+        timeline
+            .main_track_gaps
+            .before_clip
+            .insert("right".into(), 2.0);
+        let mut edited = ZoomTransformTimeline::from_project(&project, &cursor, 9.0, size);
+        assert_eq!(edited.phase_tracks.len(), 1);
+        edited.ensure_precomputed_until(6.3);
+        for (output, original) in [(3.25, 3.25), (6.0, 4.25), (6.1, 4.45), (6.3, 4.85)] {
+            let projected = edited.sample(output);
+            let expected = reference.sample(original);
+            assert!(
+                (projected.t - expected.t).abs() < 1e-5,
+                "{output} -> {original}: {projected:?} != {expected:?}"
+            );
+            assert!((projected.bounds.top_left.x - expected.bounds.top_left.x).abs() < 1e-5);
+            assert!(
+                (projected.bounds.bottom_right.y - expected.bounds.bottom_right.y).abs() < 1e-5
+            );
+        }
+        assert!(edited.sample(5.75).t < 0.01);
     }
 
     fn project_with_crop_styles(
