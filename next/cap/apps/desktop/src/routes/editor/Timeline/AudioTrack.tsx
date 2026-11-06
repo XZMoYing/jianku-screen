@@ -175,7 +175,7 @@ function FadeControl(props: {
 					}
 					aria-valuenow={Math.round(props.fadeSeconds * 1000)}
 					tabindex={-1}
-					class="timeline-fade-cursor absolute inset-y-0 z-40 w-5 -translate-x-1/2 pointer-events-auto"
+					class="timeline-fade-cursor absolute top-0 z-40 h-4 w-5 -translate-x-1/2 pointer-events-auto"
 					style={{
 						left: `${Math.max(geometry().boundaryX, props.active ? 0.5 : 0)}%`,
 					}}
