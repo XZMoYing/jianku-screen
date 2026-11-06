@@ -37,7 +37,6 @@ import {
 	type ClipTransitionKind,
 	clampTransitionDuration,
 	clipDuration,
-	clipTimelineDuration,
 	clipTimelineOffsets,
 	clipTransitionMap,
 	DEFAULT_CLIP_TRANSITION_DURATION,
@@ -52,7 +51,9 @@ import {
 } from "../editor-context-menu";
 import { TextInput } from "../TextInput";
 import { effectiveToOutput, holdWindows } from "../timeline-holds";
+import { createClipTrim } from "./clip-trim";
 import { useSegmentContext, useTimelineContext } from "./context";
+import { createTimelineMouseDrag } from "./mouse-drag";
 import { getSectionMarker } from "./sectionMarker";
 import { SPLIT_SNAP_PX, snapSplitTime } from "./split-snapping";
 import {
@@ -662,6 +663,15 @@ export function ClipTrack(
 	const segments = (): Array<TimelineSegment> =>
 		project.timeline?.segments ?? [{ start: 0, end: duration(), timescale: 1 }];
 	const transitionMenu = createEditorContextMenu();
+	const startTrim = createTimelineMouseDrag();
+	const [trimPreview, setTrimPreview] = createSignal<{
+		clip: TimelineSegment;
+		startOffset: number;
+	} | null>(null);
+	const trimStartOffset = (clip: TimelineSegment) => {
+		const preview = trimPreview();
+		return preview?.clip === clip ? preview.startOffset : 0;
+	};
 
 	function editTransition(index: number) {
 		setEditorState("timeline", "selection", { type: "transition", index });
@@ -744,12 +754,6 @@ export function ClipTrack(
 		if (!selection || selection.type !== "clip") return null;
 		return new Set(selection.indices);
 	});
-	const totalClipTimelineDuration = createMemo(() => {
-		return clipTimelineDuration(
-			segments(),
-			project.timeline?.transitions ?? [],
-		);
-	});
 	const effectiveTransitions = createMemo(() =>
 		clipTransitionMap(segments(), project.timeline?.transitions ?? []),
 	);
@@ -813,12 +817,17 @@ export function ClipTrack(
 		const visible: number[] = [];
 		for (let i = 0; i < segs.length; i++) {
 			const seg = segs[i];
-			const segStart = effectiveToOutput(holds, offsets[i]);
+			const offset = trimStartOffset(seg);
+			const segStart = effectiveToOutput(holds, offsets[i] + offset);
 			const segEnd = effectiveToOutput(
 				holds,
-				offsets[i] + (seg.end - seg.start) / seg.timescale,
+				offsets[i] + offset + clipDuration(seg),
 			);
-			if (i === draggedIndex || isSegmentVisible(segStart, segEnd)) {
+			if (
+				i === draggedIndex ||
+				trimPreview()?.clip === seg ||
+				isSegmentVisible(segStart, segEnd)
+			) {
 				visible.push(i);
 			}
 		}
@@ -835,6 +844,141 @@ export function ClipTrack(
 				editorState.previewTime ?? editorState.playbackTime,
 			);
 		}
+	}
+
+	function beginClipTrim(
+		downEvent: MouseEvent,
+		clip: TimelineSegment,
+		edge: "start" | "end",
+	) {
+		if (downEvent.button !== 0 || split() || transitionDrag()) return;
+		downEvent.stopPropagation();
+		startTrim(() => {
+			const items = project.timeline?.segments;
+			const index = items?.indexOf(clip) ?? -1;
+			if (!items || index < 0 || clip.timescale <= 0) return null;
+			const recording =
+				editorInstance.recordings.segments[clip.recordingSegment ?? 0];
+			if (!recording || !Number.isFinite(recording.display.duration))
+				return null;
+
+			const scale = secsPerPixel();
+			const offsets = segmentOffsets();
+			const effectiveStart = offsets[index] ?? 0;
+			const holds = heldWindows();
+			const initial = clip[edge];
+			const fixedEdge = edge === "start" ? "end" : "start";
+			const fixed = clip[fixedEdge];
+			const timescale = clip.timescale;
+			const recordingSegment = clip.recordingSegment;
+			const initialTransitions = project.timeline?.transitions;
+			const previous = items[index - 1];
+			const next = items[index + 1];
+			const previousEnd = previous?.end;
+			const nextStart = next?.start;
+			const targets = snapping
+				? [editorState.playbackTime, ...snapping.targets(clip, index)]
+				: [];
+			const trim = createClipTrim({
+				clip,
+				edge,
+				effectiveStart,
+				holds,
+				previous,
+				next,
+				sourceDuration: recording.display.duration,
+				minSourceDuration: Math.max(
+					1,
+					scale * MIN_CLIP_SEGMENT_PIXEL_WIDTH * timescale,
+					Math.max(
+						effectiveTransitions()[index]?.duration ?? 0,
+						effectiveTransitions()[index + 1]?.duration ?? 0,
+					) *
+						2 *
+						timescale,
+				),
+			});
+
+			let expected = initial;
+			let moved = false;
+			let resumeHistory: (() => void) | undefined;
+			const previousPreview = editorState.previewTime;
+			let lastPreview: number | null = null;
+			const ownsEdge = () =>
+				project.timeline?.segments[index] === clip &&
+				clip.timescale === timescale &&
+				clip.recordingSegment === recordingSegment &&
+				clip[fixedEdge] === fixed &&
+				clip[edge] === expected;
+			const sameContext = () =>
+				Math.abs((segmentOffsets()[index] ?? 0) - effectiveStart) < 1e-7 &&
+				project.timeline?.segments[index - 1] === previous &&
+				project.timeline?.segments[index + 1] === next &&
+				previous?.end === previousEnd &&
+				next?.start === nextStart &&
+				project.timeline?.transitions === initialTransitions &&
+				heldWindows().length === holds.length &&
+				heldWindows().every(
+					([start, end], i) => start === holds[i][0] && end === holds[i][1],
+				);
+			const valid = () => !split() && ownsEdge() && sameContext();
+
+			return {
+				isValid: valid,
+				update(event) {
+					const delta = event.clientX - downEvent.clientX;
+					if (!moved) {
+						if (Math.abs(delta) <= 2) return;
+						moved = true;
+					}
+					const result = trim.edit(
+						delta,
+						scale,
+						snapping?.enabled() && !event.altKey ? targets : [],
+					);
+					snapping?.setGuide(result.guide);
+					if (result.sourceTime === clip[edge]) return;
+					resumeHistory ??= projectHistory.pause();
+					expected = result.sourceTime;
+					batch(() => {
+						setTrimPreview({
+							clip,
+							startOffset:
+								edge === "start" ? (expected - initial) / timescale : 0,
+						});
+						setProject("timeline", "segments", index, edge, expected);
+						setPreviewTime(
+							edge === "start"
+								? effectiveToOutput(holds, effectiveStart)
+								: result.outputTime,
+						);
+						lastPreview = editorState.previewTime;
+					});
+				},
+				finish(_event, reason, cause) {
+					snapping?.setGuide(null);
+					batch(() => {
+						setTrimPreview(null);
+						if (
+							reason === "cancel" &&
+							cause !== "superseded" &&
+							ownsEdge() &&
+							sameContext()
+						) {
+							if (clip[edge] !== initial)
+								setProject("timeline", "segments", index, edge, initial);
+							if (
+								lastPreview !== null &&
+								editorState.previewTime === lastPreview
+							)
+								setEditorState("previewTime", previousPreview);
+						} else if (resumeHistory && valid() && reason !== "history")
+							onHandleReleased();
+						resumeHistory?.();
+					});
+				},
+			};
+		});
 	}
 
 	const split = () => editorState.timeline.interactMode === "split";
@@ -947,17 +1091,11 @@ export function ClipTrack(
 						return parts.join(" · ");
 					};
 
-					const [startHandleDrag, setStartHandleDrag] = createSignal<null | {
-						offset: number;
-						initialStart: number;
-					}>(null);
-
 					const prevDuration = createMemo(() => segmentOffsets()[i()] ?? 0);
 
 					const relativeSegment = createMemo(() => {
-						const ds = startHandleDrag();
-						const offset = ds?.offset ?? 0;
 						const seg = segment();
+						const offset = trimStartOffset(seg);
 						const holds = heldWindows();
 
 						return {
@@ -967,8 +1105,7 @@ export function ClipTrack(
 							),
 							end: effectiveToOutput(
 								holds,
-								prevDuration() +
-									(offset + (seg.end - seg.start)) / seg.timescale,
+								prevDuration() + offset + clipDuration(seg),
 							),
 							timescale: seg.timescale,
 							recordingSegment: seg.recordingSegment,
@@ -1497,101 +1634,9 @@ export function ClipTrack(
 									onContextMenu={(event) => {
 										if (i() > 0) showTransitionMenu(event, i());
 									}}
-									onMouseDown={(downEvent) => {
-										if (split()) return;
-										const seg = segment();
-										const minRecordedDuration = Math.max(
-											1,
-											secsPerPixel() *
-												MIN_CLIP_SEGMENT_PIXEL_WIDTH *
-												seg.timescale,
-											Math.max(
-												effectiveTransitions()[i()]?.duration ?? 0,
-												effectiveTransitions()[i() + 1]?.duration ?? 0,
-											) *
-												2 *
-												seg.timescale,
-										);
-
-										const initialStart = seg.start;
-										setStartHandleDrag({
-											offset: 0,
-											initialStart,
-										});
-
-										const maxSegmentDuration =
-											editorInstance.recordings.segments[
-												seg.recordingSegment ?? 0
-											].display.duration;
-
-										const availableTimelineDuration =
-											editorInstance.recordingDuration -
-											(totalClipTimelineDuration() -
-												(seg.end - seg.start) / seg.timescale);
-
-										const maxDuration = Math.min(
-											maxSegmentDuration,
-											availableTimelineDuration,
-										);
-
-										const prevSegment = segments()[i() - 1];
-										const prevSegmentIsSameClip =
-											prevSegment?.recordingSegment !== undefined
-												? prevSegment.recordingSegment === seg.recordingSegment
-												: false;
-
-										function update(event: MouseEvent) {
-											const newStart =
-												initialStart +
-												(event.clientX - downEvent.clientX) *
-													secsPerPixel() *
-													seg.timescale;
-
-											const clampedStart = Math.min(
-												Math.max(
-													newStart,
-													prevSegmentIsSameClip ? prevSegment.end : 0,
-													seg.end - maxDuration,
-												),
-												seg.end - minRecordedDuration,
-											);
-
-											setStartHandleDrag({
-												offset: clampedStart - initialStart,
-												initialStart,
-											});
-
-											batch(() => {
-												setProject(
-													"timeline",
-													"segments",
-													i(),
-													"start",
-													clampedStart,
-												);
-												setPreviewTime(prevDuration());
-											});
-										}
-
-										const resumeHistory = projectHistory.pause();
-										createRoot((dispose) => {
-											onCleanup(() => {
-												resumeHistory();
-												setStartHandleDrag(null);
-												onHandleReleased();
-											});
-
-											createEventListenerMap(window, {
-												mousemove: update,
-												mouseup: (e) => {
-													update(e);
-													dispose();
-												},
-												blur: () => dispose(),
-												mouseleave: () => dispose(),
-											});
-										});
-									}}
+									onMouseDown={(event) =>
+										beginClipTrim(event, segment(), "start")
+									}
 								/>
 								<SegmentContent class="relative items-center">
 									<SegmentLabel
@@ -1622,94 +1667,9 @@ export function ClipTrack(
 										if (i() + 1 < segments().length)
 											showTransitionMenu(event, i() + 1);
 									}}
-									onMouseDown={(downEvent) => {
-										const seg = segment();
-										const end = seg.end;
-										const minRecordedDuration = Math.max(
-											1,
-											secsPerPixel() *
-												MIN_CLIP_SEGMENT_PIXEL_WIDTH *
-												seg.timescale,
-											Math.max(
-												effectiveTransitions()[i()]?.duration ?? 0,
-												effectiveTransitions()[i() + 1]?.duration ?? 0,
-											) *
-												2 *
-												seg.timescale,
-										);
-
-										if (split()) return;
-										const maxSegmentDuration =
-											editorInstance.recordings.segments[
-												seg.recordingSegment ?? 0
-											].display.duration;
-
-										const availableTimelineDuration =
-											editorInstance.recordingDuration -
-											(totalClipTimelineDuration() -
-												(seg.end - seg.start) / seg.timescale);
-
-										const nextSegment = segments()[i() + 1];
-										const nextSegmentIsSameClip =
-											nextSegment?.recordingSegment !== undefined
-												? nextSegment.recordingSegment === seg.recordingSegment
-												: false;
-
-										function update(event: MouseEvent) {
-											const deltaRecorded =
-												(event.clientX - downEvent.clientX) *
-												secsPerPixel() *
-												seg.timescale;
-											const newEnd = end + deltaRecorded;
-											const clampedEnd = Math.max(
-												Math.min(
-													newEnd,
-													end + availableTimelineDuration * seg.timescale,
-													nextSegmentIsSameClip
-														? nextSegment.start
-														: maxSegmentDuration,
-												),
-												seg.start + minRecordedDuration,
-											);
-
-											batch(() => {
-												setProject(
-													"timeline",
-													"segments",
-													i(),
-													"end",
-													clampedEnd,
-												);
-												setPreviewTime(
-													prevDuration() +
-														(clampedEnd - seg.start) / seg.timescale,
-												);
-											});
-										}
-
-										const resumeHistory = projectHistory.pause();
-										createRoot((dispose) => {
-											createEventListenerMap(window, {
-												mousemove: update,
-												mouseup: (e) => {
-													dispose();
-													resumeHistory();
-													update(e);
-													onHandleReleased();
-												},
-												blur: () => {
-													dispose();
-													resumeHistory();
-													onHandleReleased();
-												},
-												mouseleave: () => {
-													dispose();
-													resumeHistory();
-													onHandleReleased();
-												},
-											});
-										});
-									}}
+									onMouseDown={(event) =>
+										beginClipTrim(event, segment(), "end")
+									}
 								/>
 							</SegmentRoot>
 							<Show

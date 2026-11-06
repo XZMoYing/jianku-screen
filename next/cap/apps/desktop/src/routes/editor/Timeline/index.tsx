@@ -256,16 +256,21 @@ export function Timeline(props: {
 	};
 	const snapping = {
 		enabled: snappingEnabled,
-		targets: (exclude?: object) => {
+		targets: (exclude?: object, stableClipPrefix?: number) => {
 			const timeline = project.timeline;
 			const clips = timeline?.segments ?? [];
 			const offsets = clipTimelineOffsets(clips, timeline?.transitions ?? []);
 			const holds = holdWindows(timeline?.textSegments);
 			return [
-				...clips.flatMap((clip, index) => [
-					effectiveToOutput(holds, offsets[index]),
-					effectiveToOutput(holds, offsets[index] + clipDuration(clip)),
-				]),
+				...clips.flatMap((clip, index) =>
+					clip === exclude ||
+					(stableClipPrefix !== undefined && index >= stableClipPrefix)
+						? []
+						: [
+								effectiveToOutput(holds, offsets[index]),
+								effectiveToOutput(holds, offsets[index] + clipDuration(clip)),
+							],
+				),
 				...(recordingBookmarks.items() ?? []).flatMap(
 					(bookmark) => bookmark.positions,
 				),

@@ -27,7 +27,7 @@ type ShowSegmentMenu = (
 
 export type TimelineSnapping = {
 	enabled: Accessor<boolean>;
-	targets(exclude?: object): number[];
+	targets(exclude?: object, stableClipPrefix?: number): number[];
 	setGuide(time: number | null): void;
 };
 
