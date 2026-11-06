@@ -6861,6 +6861,9 @@ fn attach_generated_zooms(timeline: &TimelineConfiguration, zooms: &mut [ZoomSeg
             .map(|range| ZoomSourceSlice {
                 phase_start: range.output.start - zoom.start,
                 phase_end: range.output.end - zoom.start,
+                recording_segment: range
+                    .source_at_start
+                    .map(|source| source.segment.recording_clip),
                 source_end: range.source_at_start.and_then(|source| {
                     if range.source_frozen {
                         return Some(source.source_time);
@@ -7791,9 +7794,12 @@ mod tests {
         assert_eq!((hold.phase_start, hold.phase_end), (0.875, 1.125));
         assert_eq!((resumed.phase_start, resumed.phase_end), (1.125, 1.25));
         assert_eq!(left.source_end, Some(4.0));
+        assert_eq!(left.recording_segment, Some(0));
         assert_eq!(gap.source_end, None);
+        assert_eq!(gap.recording_segment, None);
         assert_eq!(right.source_end, Some(4.125));
         assert_eq!(hold.source_end, Some(4.125));
+        assert_eq!(hold.recording_segment, Some(0));
         assert_eq!(resumed.source_end, Some(4.25));
         assert!(
             matches!(&left.attachment, Some(OverlayAttachment::Clip { clip_id, source_time: 3.5, .. }) if clip_id == "left")

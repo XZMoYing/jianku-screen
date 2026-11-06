@@ -127,6 +127,7 @@ import {
 	type ClipReplacements,
 	type captureOverlayAttachmentLayout,
 	editClipsWithOverlayAttachments,
+	hasOverlayAttachment,
 	initialOverlayAttachment,
 	keepOverlayAtTimelineTime,
 	overlayAttachmentLayout,
@@ -572,7 +573,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					];
 					for (const track of tracks) {
 						rippleTimelineTrack(
-							track.filter((row) => !row.attachment),
+							track.filter((row) => !hasOverlayAttachment(row)),
 							boundary,
 							shift,
 						);
@@ -1949,7 +1950,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 						];
 						for (const track of rippleTracks) {
 							for (const row of track) {
-								if (row.attachment) continue;
+								if (hasOverlayAttachment(row)) continue;
 								row.start = mapOutputTime(row.start);
 								row.end = mapOutputTime(row.end);
 							}

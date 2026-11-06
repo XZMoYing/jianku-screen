@@ -10,7 +10,11 @@ import {
 	transitionsAfterClipSplit,
 } from "./clip-transitions";
 import { rippleDeleteKeyboardTrack } from "./keyboard-timing";
-import type { AttachmentSpan, ClipReplacements } from "./overlay-attachment";
+import {
+	type AttachmentSpan,
+	type ClipReplacements,
+	hasOverlayAttachment,
+} from "./overlay-attachment";
 import {
 	CAMERA3D_TRACK_KEYS,
 	type Camera3DTracks,
@@ -64,7 +68,7 @@ export function rippleDeleteFromTrack(
 ) {
 	for (let i = segments.length - 1; i >= 0; i--) {
 		const seg = segments[i];
-		if (seg.attachment) continue;
+		if (hasOverlayAttachment(seg)) continue;
 		if (seg.end <= cutStart) {
 			continue;
 		}

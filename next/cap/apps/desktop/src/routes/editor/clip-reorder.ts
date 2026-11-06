@@ -6,7 +6,10 @@ import {
 } from "./clip-transitions";
 import type { EditorProjectConfiguration } from "./context";
 import { rippleKeyboardTrack } from "./keyboard-timing";
-import type { AttachmentSpan } from "./overlay-attachment";
+import {
+	type AttachmentSpan,
+	hasOverlayAttachment,
+} from "./overlay-attachment";
 import { scaleKeyframeTimes } from "./three-d";
 import { effectiveToOutput, holdWindows } from "./timeline-holds";
 
@@ -71,7 +74,7 @@ export function reorderClipInstance(
 		];
 		for (const track of rippleTracks)
 			rippleTimelineTrack(
-				track.filter((row) => !row.attachment),
+				track.filter((row) => !hasOverlayAttachment(row)),
 				boundary,
 				effective.duration,
 			);

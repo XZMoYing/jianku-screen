@@ -258,6 +258,80 @@ describe("overlay attachment", () => {
 		});
 	});
 
+	it("keeps the original zoom phases through a partial cut and ripple deletion", () => {
+		const clips = sameSourceTwice();
+		const layout = overlayAttachmentLayout(clips);
+		const zoom = {
+			start: 2,
+			end: 4,
+			sourceSlices: [
+				{
+					phaseStart: 0,
+					phaseEnd: 1,
+					sourceEnd: 7,
+					attachment: attachOverlayToClip(
+						{ start: 2, end: 3 },
+						layout,
+						"a",
+						"followClipSpeed",
+					),
+				},
+				{
+					phaseStart: 1,
+					phaseEnd: 2,
+					sourceEnd: 5,
+					attachment: attachOverlayToClip(
+						{ start: 3, end: 4 },
+						layout,
+						"b",
+						"followClipSpeed",
+					),
+				},
+			],
+		};
+		const timeline = { ...clips, zoomSegments: [zoom] };
+		expect(
+			editClipsWithOverlayAttachments(timeline, (replacements) =>
+				cutPositionedMainTrackRange(timeline, 0, 2.25, 2.5, replacements),
+			),
+		).toBe(true);
+		const retained = timeline.segments[1].id;
+		expect(zoom.sourceSlices).toMatchObject([
+			{
+				phaseStart: 0,
+				phaseEnd: 0.25,
+				sourceEnd: 6.25,
+				attachment: { clipId: "a", sourceTime: 6 },
+			},
+			{
+				phaseStart: 0.25,
+				phaseEnd: 0.5,
+				sourceEnd: 6.5,
+				attachment: { clipId: "a", sourceTime: 6.25 },
+			},
+			{
+				phaseStart: 0.5,
+				phaseEnd: 1,
+				sourceEnd: 7,
+				attachment: { clipId: retained, sourceTime: 6.5 },
+			},
+			{ phaseStart: 1, phaseEnd: 2, sourceEnd: 5, attachment: { clipId: "b" } },
+		]);
+		expect(
+			editClipsWithOverlayAttachments(timeline, () =>
+				deleteClipAndRippleAllTracks(timeline, 2),
+			),
+		).toBe(true);
+		expect(timeline.zoomSegments).toEqual([zoom]);
+		expect(zoom).toMatchObject({ start: 2, end: 4 });
+		expect(zoom.sourceSlices[3]).toMatchObject({
+			recordingSegment: 0,
+			phaseStart: 1,
+			phaseEnd: 2,
+			attachment: { clipId: "b" },
+		});
+	});
+
 	it("keeps fixed content and the missing source reference through ripple deletion", () => {
 		const clips = sameSourceTwice();
 		const layout = overlayAttachmentLayout(clips);

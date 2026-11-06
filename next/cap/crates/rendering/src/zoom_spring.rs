@@ -652,20 +652,30 @@ fn project_zoom_phases(
         if !original_rate.is_finite() || original_rate < 0.0 {
             return None;
         }
-        let (segment_index, clip) = timeline
-            .segments
-            .iter()
-            .enumerate()
-            .find(|(_, clip)| clip.id.as_ref() == Some(clip_id))?;
-        let original_start = phase_origin + slice.phase_start;
-        original_map.push(TimeMapSegment {
-            segment_index,
-            timeline_start: original_start,
-            timeline_end: phase_origin + slice.phase_end,
-            recording_start: *source_time,
-            timescale: original_rate,
-            recording_clip: clip.recording_clip,
+        let current_clip = timeline.segments.iter().enumerate().find(|(_, clip)| {
+            clip.id.as_ref() == Some(clip_id)
+                && slice
+                    .recording_segment
+                    .is_none_or(|recording| recording == clip.recording_clip)
         });
+        let original_start = phase_origin + slice.phase_start;
+        if let Some(recording_clip) = slice
+            .recording_segment
+            .or_else(|| current_clip.map(|(_, clip)| clip.recording_clip))
+        {
+            original_map.push(TimeMapSegment {
+                segment_index: current_clip.map_or(usize::MAX, |(index, _)| index),
+                timeline_start: original_start,
+                timeline_end: phase_origin + slice.phase_end,
+                recording_start: *source_time,
+                timescale: original_rate,
+                recording_clip,
+            });
+        }
+        let Some((segment_index, clip)) = current_clip else {
+            changed = true;
+            continue;
+        };
         let mut covered_phase = 0.0;
         for current in time_map
             .iter()
@@ -730,10 +740,7 @@ fn project_zoom_phases(
         }
         changed |= (covered_phase - phase_duration).abs() > 1e-6;
     }
-    if !changed
-        || original_map.is_empty()
-        || (previous_end - (segment.end - segment.start)).abs() > 1e-6
-    {
+    if !changed || (previous_end - (segment.end - segment.start)).abs() > 1e-6 {
         return None;
     }
     spans.sort_by(|a, b| a.start.total_cmp(&b.start));
@@ -1645,6 +1652,40 @@ mod tests {
             map_timeline_to_recording_secs(&map, 4.375, Some(0), false),
             6.375
         );
+    }
+
+    #[test]
+    fn deleted_zoom_sources_preserve_the_remaining_phase_without_zooming_another_clip() {
+        let mut project = project_with_sliced_zoom(6.0);
+        let timeline = project.timeline.as_mut().unwrap();
+        let mut unrelated = timeline.segments[0].clone();
+        unrelated.id = Some("repeated".into());
+        timeline.segments.push(unrelated);
+        for slice in &mut timeline.zoom_segments[0].source_slices {
+            slice.recording_segment = Some(0);
+        }
+        let cursor = CursorEvents {
+            moves: vec![move_event(3100.0, 0.2, 0.3), move_event(6000.0, 0.8, 0.7)],
+            ..Default::default()
+        };
+        let size = XY::new(1000, 1000);
+        let mut reference = ZoomTransformTimeline::from_project(&project, &cursor, 12.0, size);
+        reference.precompute();
+        let expected = reference.sample(4.125);
+
+        project.timeline.as_mut().unwrap().segments.remove(0);
+        let mut edited = ZoomTransformTimeline::from_project(&project, &cursor, 8.0, size);
+        edited.ensure_precomputed_until(4.25);
+        let actual = edited.sample(0.125);
+        assert!((actual.t - expected.t).abs() < 1e-5);
+        assert!((actual.bounds.top_left.x - expected.bounds.top_left.x).abs() < 1e-5);
+        assert!(edited.sample(4.25).t < 0.01);
+
+        project.timeline.as_mut().unwrap().segments.remove(0);
+        let mut removed = ZoomTransformTimeline::from_project(&project, &cursor, 4.0, size);
+        removed.ensure_precomputed_until(3.75);
+        assert_eq!(removed.sample(3.75).t, 0.0);
+        assert_eq!(removed.sample(3.75).bounds, SegmentBounds::default());
     }
 
     fn project_with_crop_styles(

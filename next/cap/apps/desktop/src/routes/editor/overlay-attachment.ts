@@ -35,6 +35,13 @@ export type AttachmentSpan = {
 	sourceSlices?: ZoomSourceSlice[];
 };
 
+export function hasOverlayAttachment(row: AttachmentSpan) {
+	return (
+		!!row.attachment ||
+		!!row.sourceSlices?.some((slice) => slice.attachment?.kind === "clip")
+	);
+}
+
 export function overlayAttachmentLayout(timeline: AttachmentTimeline) {
 	const offsets = clipTimelineOffsets(
 		timeline.segments,
@@ -49,6 +56,7 @@ export function overlayAttachmentLayout(timeline: AttachmentTimeline) {
 			sourceStart: number;
 			sourceEnd: number;
 			timescale: number;
+			recordingSegment: number;
 		}
 	>();
 	for (const [index, clip] of timeline.segments.entries()) {
@@ -62,6 +70,7 @@ export function overlayAttachmentLayout(timeline: AttachmentTimeline) {
 				sourceStart: clip.start,
 				sourceEnd: clip.end,
 				timescale: clip.timescale,
+				recordingSegment: clip.recordingSegment ?? 0,
 			});
 	}
 	return { clips, holds: holdWindows(timeline.textSegments) };
@@ -265,22 +274,34 @@ export function captureOverlayAttachmentLayout(timeline: AttachedTimeline) {
 		: null;
 }
 
-function resolveReplacement(
-	attachment: ClipAttachment,
-	after: AttachmentLayout,
-	replacements: ClipReplacements,
-) {
+function* replacementClipIds(clipId: string, replacements: ClipReplacements) {
 	const visited = new Set<string>();
-	const candidates = [attachment.clipId];
+	const candidates = [clipId];
 	for (let index = 0; index < candidates.length; index++) {
 		const clipId = candidates[index];
 		if (visited.has(clipId)) continue;
 		visited.add(clipId);
+		yield clipId;
+		candidates.push(...(replacements.get(clipId) ?? []));
+	}
+}
+
+function resolveReplacement(
+	attachment: ClipAttachment,
+	after: AttachmentLayout,
+	replacements: ClipReplacements,
+	recordingSegment?: number | null,
+) {
+	for (const clipId of replacementClipIds(attachment.clipId, replacements)) {
+		if (
+			recordingSegment != null &&
+			after.clips.get(clipId)?.recordingSegment !== recordingSegment
+		)
+			continue;
 		const candidate =
 			clipId === attachment.clipId ? attachment : { ...attachment, clipId };
 		if (overlayAttachmentStatus(candidate, after) === "attached")
 			return candidate;
-		candidates.push(...(replacements.get(clipId) ?? []));
 	}
 	return attachment;
 }
@@ -296,52 +317,56 @@ function rebindZoomSourceSlice(
 	if (attachment?.kind !== "clip" || !replacements.has(attachment.clipId))
 		return [slice];
 	if (slice.sourceEnd === attachment.sourceTime) {
-		const next = resolveReplacement(attachment, after, replacements);
+		const next = resolveReplacement(
+			attachment,
+			after,
+			replacements,
+			slice.recordingSegment,
+		);
 		return next === attachment ? [slice] : [{ ...slice, attachment: next }];
 	}
 	const sourceEnd = originalZoomSourceEnd(slice, attachment, row.start, before);
 	if (sourceEnd === null) return [slice];
 	const sourceRate =
 		(sourceEnd - attachment.sourceTime) / (slice.phaseEnd - slice.phaseStart);
-	const rebound: ZoomSourceSlice[] = [];
-	let sourceTime = attachment.sourceTime;
-	let phaseStart = slice.phaseStart;
-	while (phaseStart < slice.phaseEnd) {
+	const cuts = new Set([attachment.sourceTime, sourceEnd]);
+	for (const id of replacementClipIds(attachment.clipId, replacements)) {
+		const placement = after.clips.get(id);
+		if (
+			!placement ||
+			(slice.recordingSegment != null &&
+				placement.recordingSegment !== slice.recordingSegment)
+		)
+			continue;
+		for (const time of [placement.sourceStart, placement.sourceEnd]) {
+			if (time > attachment.sourceTime && time < sourceEnd) cuts.add(time);
+		}
+	}
+	const bounds = [...cuts].sort((a, b) => a - b);
+	const phase = (time: number) =>
+		slice.phaseStart + (time - attachment.sourceTime) / sourceRate;
+	return bounds.slice(0, -1).map((sourceTime, index) => {
 		const next = resolveReplacement(
 			{ ...attachment, sourceTime },
 			after,
 			replacements,
+			slice.recordingSegment,
 		);
-		const placement = after.clips.get(next.clipId);
-		if (!placement || overlayAttachmentStatus(next, after) !== "attached")
-			return [slice];
-		const phaseEnd =
-			placement.sourceEnd + 1e-7 >= sourceEnd
-				? slice.phaseEnd
-				: slice.phaseStart +
-					(placement.sourceEnd - attachment.sourceTime) / sourceRate;
-		if (phaseEnd <= phaseStart) return [slice];
-		if (
-			rebound.length === 0 &&
-			next.clipId === attachment.clipId &&
-			phaseEnd === slice.phaseEnd
-		)
-			return [slice];
-		rebound.push({
-			phaseStart,
-			phaseEnd,
-			...(slice.sourceEnd == null
-				? {}
-				: { sourceEnd: Math.min(sourceEnd, placement.sourceEnd) }),
+		if (bounds.length === 2 && next.clipId === attachment.clipId) return slice;
+		return {
+			...slice,
+			phaseStart: phase(sourceTime),
+			phaseEnd:
+				bounds[index + 1] === sourceEnd
+					? slice.phaseEnd
+					: phase(bounds[index + 1]),
+			sourceEnd: bounds[index + 1],
 			attachment: {
 				...next,
-				id: rebound.length ? `overlay-${crypto.randomUUID()}` : next.id,
+				id: index > 0 ? `overlay-${crypto.randomUUID()}` : next.id,
 			},
-		});
-		phaseStart = phaseEnd;
-		sourceTime = placement.sourceEnd;
-	}
-	return rebound;
+		};
+	});
 }
 
 function scaleAttachedAnimation(row: AttachmentSpan, ratio: number) {
@@ -541,18 +566,34 @@ export function applyOverlayAttachmentEdit(
 				row.attachment = next;
 			}
 		}
-		for (const zoom of timeline.zoomSegments ?? []) {
-			const slices = zoom.sourceSlices;
-			if (zoom.attachment || !slices?.length) continue;
-			const rebound = slices.flatMap((slice) =>
-				rebindZoomSourceSlice(slice, zoom, before, afterClips, replacements),
-			);
+	}
+	for (const zoom of timeline.zoomSegments ?? []) {
+		const slices = zoom.sourceSlices;
+		if (zoom.attachment || !slices?.length) continue;
+		const rebound = slices.flatMap((slice) => {
+			const attachment = slice.attachment;
 			if (
-				rebound.length !== slices.length ||
-				rebound.some((slice, index) => slice !== slices[index])
-			)
-				zoom.sourceSlices = rebound;
-		}
+				attachment?.kind === "clip" &&
+				slice.recordingSegment == null &&
+				!afterClips.clips.has(attachment.clipId)
+			) {
+				const original = before.clips.get(attachment.clipId);
+				if (original)
+					slice = { ...slice, recordingSegment: original.recordingSegment };
+			}
+			return rebindZoomSourceSlice(
+				slice,
+				zoom,
+				before,
+				afterClips,
+				replacements,
+			);
+		});
+		if (
+			rebound.length !== slices.length ||
+			rebound.some((slice, index) => slice !== slices[index])
+		)
+			zoom.sourceSlices = rebound;
 	}
 	const titles = (timeline.textSegments ?? []).flatMap((text) => {
 		const attachment = text.attachment;
