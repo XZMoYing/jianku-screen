@@ -1599,6 +1599,8 @@
 	"Save to location": "保存到指定位置",
 	"Export with profile": "按指定参数导出",
 	"Upload + copy link": "上传并复制链接",
+	"Transcription source video file was not found": "找不到要转写的源视频。",
+	"Caption model not found. Please download it first": "找不到字幕模型，请先下载。",
 	"Recognize text (OCR) to clipboard": "识别文字并复制到剪贴板",
 	"Show notification": "显示通知",
 	"Skip editor (headless)": "完成录制后不打开编辑器",

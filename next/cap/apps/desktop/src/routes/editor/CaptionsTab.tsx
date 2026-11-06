@@ -756,7 +756,6 @@ export function CaptionsTab(props: {
 				);
 			}
 		} catch (error) {
-			console.error("Error generating captions:", error);
 			const errorMessage = getCaptionGenerationErrorMessage(error);
 			toast.error(
 				localize("字幕生成失败：{error}", { error: localize(errorMessage) }),

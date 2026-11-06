@@ -275,8 +275,7 @@ export function TranscriptPanel() {
 					format: format.toUpperCase(),
 				}),
 			);
-		} catch (error) {
-			console.error("Failed to save captions:", error);
+		} catch {
 			toast.error(localize("Failed to save captions"));
 		} finally {
 			setExportingFormat(null);

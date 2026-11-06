@@ -297,11 +297,11 @@ function createCaptionsStore() {
 							normalizeCaptionSettings(localCaptionsData.settings),
 						);
 					}
-				} catch (e) {
-					console.error("Error loading saved captions from localStorage:", e);
+				} catch {
+					console.error("Error loading saved captions from localStorage");
 				}
-			} catch (e) {
-				console.error("Error loading captions:", e);
+			} catch {
+				console.error("Error loading captions");
 			}
 		},
 
@@ -341,8 +341,8 @@ function createCaptionsStore() {
 					`captions-${videoPath}`,
 					JSON.stringify(captionsData),
 				);
-			} catch (e) {
-				console.error("Error saving captions:", e);
+			} catch {
+				console.error("Error saving captions");
 			}
 		},
 

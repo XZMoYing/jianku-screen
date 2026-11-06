@@ -1339,9 +1339,10 @@ export function Timeline(props: {
 			setEditorState("captions", "isStale", false);
 			toast.success(localize("Captions generated successfully!"));
 		} catch (error) {
-			console.error("Error generating captions:", error);
 			const errorMessage = getCaptionGenerationErrorMessage(error);
-			toast.error(`Failed to generate captions: ${errorMessage}`);
+			toast.error(
+				localize("字幕生成失败：{error}", { error: localize(errorMessage) }),
+			);
 		} finally {
 			setEditorState("captions", "isGenerating", false);
 		}

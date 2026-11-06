@@ -262,7 +262,6 @@ impl RecordingMeta {
         let mut config = ProjectConfiguration::load_or_default(&self.project_path)?;
 
         let captions_path = self.project_path.join("captions.json");
-        debug!("Checking for captions at: {:?}", captions_path);
 
         if config.captions.is_none()
             && let Ok(captions_str) = std::fs::read_to_string(&captions_path)

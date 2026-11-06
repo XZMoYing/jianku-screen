@@ -1,8 +1,8 @@
 import { cx } from "cva";
 import { createMemo, Show } from "solid-js";
-import { t as localize } from "~/utils/i18n";
 import { produce } from "solid-js/store";
 import toast from "solid-toast";
+import { t as localize } from "~/utils/i18n";
 import {
 	applyCaptionResultToProject,
 	getSelectedTranscriptionSettings,
@@ -50,9 +50,8 @@ export function CaptionsRegenerateBadge(props: { class?: string }) {
 			);
 
 			setEditorState("captions", "isStale", false);
-				toast.success(localize("Captions regenerated!"));
-		} catch (error) {
-			console.error("Error regenerating captions:", error);
+			toast.success(localize("Captions regenerated!"));
+		} catch {
 			toast.error(localize("Failed to regenerate captions"));
 		} finally {
 			setEditorState("captions", "isGenerating", false);

@@ -102,10 +102,7 @@ async fn invalidate_parakeet_cache_for_dir(model_dir: &Path) {
         .as_ref()
         .is_some_and(|cached| parakeet_model_dir_matches(&cached.model_dir, model_dir))
     {
-        tracing::info!(
-            "Invalidating cached Parakeet context for {}",
-            model_dir.display()
-        );
+        tracing::info!("Invalidating cached Parakeet context");
         *ctx = None;
     }
 }
@@ -224,14 +221,14 @@ fn validate_model_path(app: &AppHandle, path: &str) -> Result<PathBuf, String> {
 
 #[tauri::command]
 #[specta::specta]
-#[instrument]
+#[instrument(skip_all)]
 pub async fn create_dir(path: String, _recursive: bool) -> Result<(), String> {
     std::fs::create_dir_all(path).map_err(|e| format!("Failed to create directory: {e}"))
 }
 
 #[tauri::command]
 #[specta::specta]
-#[instrument]
+#[instrument(skip_all)]
 pub async fn save_model_file(path: String, data: Vec<u8>) -> Result<(), String> {
     std::fs::write(&path, &data).map_err(|e| format!("Failed to write model file: {e}"))
 }
@@ -264,8 +261,6 @@ fn resolve_audio_extraction_source(video_path: &str) -> Result<AudioExtractionSo
 
 async fn extract_audio_from_video(video_path: &str, output_path: &PathBuf) -> Result<(), String> {
     log::info!("=== EXTRACT AUDIO START ===");
-    log::info!("Attempting to extract audio from: {video_path}");
-    log::info!("Output path: {output_path:?}");
 
     match resolve_audio_extraction_source(video_path)? {
         AudioExtractionSource::ProjectDirectory { base_path } => {
@@ -301,9 +296,7 @@ async fn extract_audio_from_video(video_path: &str, output_path: &PathBuf) -> Re
                                         offset_secs: 0.0,
                                     });
                                 }
-                                Err(error) => {
-                                    log::warn!("Failed to process audio source {path:?}: {error}")
-                                }
+                                Err(_) => log::warn!("Failed to decode a recording audio track"),
                             }
                         }
                     }
@@ -342,9 +335,7 @@ async fn extract_audio_from_video(video_path: &str, output_path: &PathBuf) -> Re
                                         offset_secs,
                                     });
                                 }
-                                Err(error) => {
-                                    log::warn!("Failed to process audio source {path:?}: {error}")
-                                }
+                                Err(_) => log::warn!("Failed to decode a recording audio track"),
                             }
                         };
 
@@ -728,7 +719,7 @@ fn get_whisper_context_blocking(model_path: &str) -> Result<Arc<WhisperContext>,
         return Ok(existing.context.clone());
     }
 
-    log::info!("Initializing Whisper context with model: {model_path}");
+    log::info!("Initializing Whisper context");
     let ctx = WhisperContext::new_with_params(model_path, WhisperContextParameters::default())
         .map_err(|e| format!("Failed to load Whisper model: {e}"))?;
 
@@ -756,17 +747,11 @@ fn is_special_token(token_text: &str) -> bool {
         return true;
     }
 
-    let is_special = trimmed.contains('[')
+    trimmed.contains('[')
         || trimmed.contains(']')
         || trimmed.contains("_TT_")
         || trimmed.contains("_BEG_")
-        || trimmed.contains("<|");
-
-    if is_special {
-        log::debug!("Filtering special token: {token_text:?}");
-    }
-
-    is_special
+        || trimmed.contains("<|")
 }
 
 fn caption_token_attaches_to_previous(text: &str) -> bool {
@@ -956,8 +941,6 @@ fn process_with_whisper(
     transcription_hints: &[String],
 ) -> Result<CaptionData, String> {
     log::info!("=== WHISPER TRANSCRIPTION START ===");
-    log::info!("Processing audio file: {audio_path:?}");
-    log::info!("Language setting: {language}");
 
     let mut params = FullParams::new(SamplingStrategy::BeamSearch {
         beam_size: 5,
@@ -980,8 +963,8 @@ fn process_with_whisper(
         "Whisper params - translate: false, token_timestamps: true, beam_size: 5, max_len: MAX"
     );
 
-    let mut audio_file = File::open(audio_path)
-        .map_err(|e| format!("Failed to open audio file: {e} at path: {audio_path:?}"))?;
+    let mut audio_file =
+        File::open(audio_path).map_err(|e| format!("Failed to open temporary audio file: {e}"))?;
     let mut audio_data = Vec::new();
     audio_file
         .read_to_end(&mut audio_data)
@@ -1023,11 +1006,6 @@ fn process_with_whisper(
 
         if rms < 0.001 {
             log::warn!("WARNING: Audio RMS is very low ({rms:.6}) - audio may be nearly silent!");
-        }
-
-        log::info!("First 20 audio samples:");
-        for (i, sample) in audio_data_f32.iter().take(20).enumerate() {
-            log::info!("  Sample[{i}] = {sample:.6}");
         }
     }
 
@@ -1083,16 +1061,12 @@ fn process_with_whisper(
         let mut current_word = String::new();
         let mut word_start: Option<f32> = None;
         let mut word_end: f32 = start_time;
+        let mut missing_timings = 0;
 
         for t in 0..num_tokens {
             let token_text = state.full_get_token_text(i, t).unwrap_or_default();
-            let token_id = state.full_get_token_id(i, t).unwrap_or(0);
-            let token_prob = state.full_get_token_prob(i, t).unwrap_or(0.0);
 
             if is_special_token(&token_text) {
-                log::debug!(
-                    "  Token[{t}]: id={token_id}, text={token_text:?} -> SKIPPED (special)"
-                );
                 continue;
             }
 
@@ -1102,22 +1076,10 @@ fn process_with_whisper(
                 let token_start = (data.t0 as f32) / 100.0;
                 let token_end = (data.t1 as f32) / 100.0;
 
-                // debug, not info: release builds filter at info, and these
-                // carry the transcript verbatim into an uploadable log.
-                log::debug!(
-                    "  Token[{t}]: id={token_id}, text={token_text:?}, t0={token_start:.2}s, t1={token_end:.2}s, prob={token_prob:.4}"
-                );
-
                 if token_text.starts_with(' ') || token_text.starts_with('\n') {
                     if !current_word.is_empty()
                         && let Some(ws) = word_start
                     {
-                        log::debug!(
-                            "    -> Completing word: '{}' ({:.2}s - {:.2}s)",
-                            current_word.trim(),
-                            ws,
-                            word_end
-                        );
                         words.push(CaptionWord {
                             text: current_word.trim().to_string(),
                             start: ws,
@@ -1126,30 +1088,25 @@ fn process_with_whisper(
                     }
                     current_word = token_text.trim().to_string();
                     word_start = Some(token_start);
-                    log::debug!("    -> Starting new word: '{current_word}' at {token_start:.2}s");
                 } else {
                     if word_start.is_none() {
                         word_start = Some(token_start);
-                        log::debug!("    -> Word start set to {token_start:.2}s");
                     }
                     current_word.push_str(&token_text);
-                    log::debug!("    -> Appending to word: '{current_word}'");
                 }
                 word_end = token_end;
             } else {
-                log::warn!("  Token[{t}]: id={token_id}, text={token_text:?} -> NO TIMING DATA");
+                missing_timings += 1;
             }
+        }
+
+        if missing_timings > 0 {
+            log::warn!("Segment {i} has {missing_timings} tokens without timing data");
         }
 
         if !current_word.trim().is_empty()
             && let Some(ws) = word_start
         {
-            log::info!(
-                "    -> Final word: '{}' ({:.2}s - {:.2}s)",
-                current_word.trim(),
-                ws,
-                word_end
-            );
             words.push(CaptionWord {
                 text: current_word.trim().to_string(),
                 start: ws,
@@ -1160,16 +1117,6 @@ fn process_with_whisper(
         let words = normalize_caption_words(words);
 
         log::info!("  Segment {} produced {} words", i, words.len());
-        for (w_idx, word) in words.iter().enumerate() {
-            log::info!(
-                "    Word[{}]: '{}' ({:.2}s - {:.2}s)",
-                w_idx,
-                word.text,
-                word.start,
-                word.end
-            );
-        }
-
         if words.is_empty() {
             log::warn!("  Segment {i} has no words, skipping");
             continue;
@@ -1199,18 +1146,6 @@ fn process_with_whisper(
 
     let total_words: usize = segments.iter().map(|s| s.words.len()).sum();
     log::info!("Total words: {total_words}");
-
-    log::info!("=== FINAL TRANSCRIPTION SUMMARY ===");
-    for segment in &segments {
-        log::info!(
-            "Segment '{}' ({:.2}s - {:.2}s): {}",
-            segment.id,
-            segment.start,
-            segment.end,
-            segment.text
-        );
-    }
-    log::info!("=== END SUMMARY ===");
 
     Ok(CaptionData {
         segments,
@@ -1244,9 +1179,6 @@ fn process_with_parakeet(
     audio_path: &std::path::Path,
     model_dir: &str,
 ) -> Result<CaptionData, String> {
-    tracing::info!("Processing audio file: {audio_path:?}");
-    tracing::info!("Model directory: {model_dir}");
-
     let cached_model = {
         let guard = PARAKEET_CONTEXT.blocking_lock();
         guard.as_ref().and_then(|cached| {
@@ -1262,7 +1194,7 @@ fn process_with_parakeet(
         tracing::info!("Reusing cached Parakeet TDT model");
         model
     } else {
-        tracing::info!("Loading Parakeet TDT model from: {model_dir}");
+        tracing::info!("Loading Parakeet TDT model");
         cap_camera_effects::initialize_onnx_runtime().map_err(|error| format!("{error:#}"))?;
         let model = ParakeetTDT::from_pretrained(model_dir, None).map_err(|e| format!("{e}"))?;
         let loaded_model = Arc::new(std::sync::Mutex::new(model));
@@ -1293,7 +1225,6 @@ fn process_with_parakeet(
             .map_err(|e| format!("Parakeet transcription failed: {e}"))?
     };
 
-    tracing::info!("Transcription text: {}", result.text);
     tracing::info!("Got {} timed tokens", result.tokens.len());
 
     let words = normalize_caption_words(
@@ -1352,7 +1283,7 @@ fn process_with_parakeet(
 
 #[tauri::command]
 #[specta::specta]
-#[instrument]
+#[instrument(skip_all)]
 pub async fn transcribe_audio(
     app: AppHandle,
     video_path: String,
@@ -1361,48 +1292,41 @@ pub async fn transcribe_audio(
     engine: TranscriptionEngine,
 ) -> Result<CaptionData, String> {
     log::info!("=== TRANSCRIBE AUDIO COMMAND START ===");
-    log::info!("Video path: {}", video_path);
-    log::info!("Model path: {}", model_path);
-    log::info!("Language: {}", language);
+    tracing::info!(?engine, "Starting local transcription");
 
     let validated_model_path = validate_model_path(&app, &model_path)?;
 
     if !std::path::Path::new(&video_path).exists() {
-        log::error!("Video file not found at path: {video_path}");
-        return Err(format!("Video file not found at path: {video_path}"));
+        log::error!("Transcription source video file was not found");
+        return Err("Transcription source video file was not found".to_string());
     }
 
     if !validated_model_path.exists() {
-        log::error!("Model file not found at path: {model_path}");
-        return Err(format!("Model file not found at path: {model_path}"));
+        log::error!("Transcription model was not found");
+        return Err("Model file not found".to_string());
     }
 
     let model_path = validated_model_path.to_string_lossy().to_string();
 
     let temp_dir = tempdir().map_err(|e| format!("Failed to create temporary directory: {e}"))?;
     let audio_path = temp_dir.path().join("audio.wav");
-    log::info!("Temp audio path: {:?}", audio_path);
 
     match extract_audio_from_video(&video_path, &audio_path).await {
-        Ok(_) => log::info!("Successfully extracted audio to {audio_path:?}"),
+        Ok(_) => log::info!("Transcription audio extracted"),
         Err(e) => {
-            log::error!("Failed to extract audio: {e}");
+            log::error!("Failed to extract transcription audio");
             return Err(format!("Failed to extract audio from video: {e}"));
         }
     }
 
     if !audio_path.exists() {
-        log::error!("Audio file was not created at {audio_path:?}");
+        log::error!("Transcription audio file was not created");
         return Err("Failed to create audio file for transcription".to_string());
     }
 
     let audio_metadata = std::fs::metadata(&audio_path).ok();
     if let Some(meta) = &audio_metadata {
-        log::info!(
-            "Audio file created at: {:?}, size: {} bytes",
-            audio_path,
-            meta.len()
-        );
+        log::info!("Transcription audio file size: {} bytes", meta.len());
     }
 
     let transcription_result = match engine {
@@ -1432,7 +1356,7 @@ pub async fn transcribe_audio(
                         ctx
                     }
                     Err(e) => {
-                        log::error!("Failed to initialize Whisper context: {e}");
+                        log::error!("Failed to initialize Whisper context");
                         return Err(format!("Failed to initialize transcription model: {e}"));
                     }
                 };
@@ -1454,15 +1378,6 @@ pub async fn transcribe_audio(
                 captions.segments.len()
             );
 
-            for (idx, segment) in captions.segments.iter().enumerate() {
-                log::info!(
-                    "  Result Segment[{}]: '{}' ({} words)",
-                    idx,
-                    segment.text,
-                    segment.words.len()
-                );
-            }
-
             if captions.segments.is_empty() {
                 log::warn!("No caption segments were generated");
                 return Err("No speech detected in the audio".to_string());
@@ -1472,7 +1387,7 @@ pub async fn transcribe_audio(
             Ok(captions)
         }
         Err(e) => {
-            log::error!("Failed to process audio with Whisper: {e}");
+            tracing::error!(?engine, "Local transcription failed");
             log::info!("=== TRANSCRIBE AUDIO COMMAND END (error) ===");
             Err(format!("Failed to transcribe audio: {e}"))
         }
@@ -1481,51 +1396,26 @@ pub async fn transcribe_audio(
 
 #[tauri::command]
 #[specta::specta]
-#[instrument(skip(app))]
+#[instrument(skip_all)]
 pub async fn save_captions(
     app: AppHandle,
     video_id: String,
     captions: CaptionData,
 ) -> Result<(), String> {
     tracing::info!("=== SAVE CAPTIONS START ===");
-    tracing::info!("Saving captions for video_id: {}", video_id);
     tracing::info!("Received {} segments to save", captions.segments.len());
-
-    for (idx, segment) in captions.segments.iter().enumerate() {
-        tracing::info!(
-            "  Segment[{}] '{}': '{}' ({} words, {:.2}s - {:.2}s)",
-            idx,
-            segment.id,
-            segment.text,
-            segment.words.len(),
-            segment.start,
-            segment.end
-        );
-        for (w_idx, word) in segment.words.iter().enumerate() {
-            tracing::debug!(
-                "    Word[{}]: '{}' ({:.2}s - {:.2}s)",
-                w_idx,
-                word.text,
-                word.start,
-                word.end
-            );
-        }
-    }
 
     let storage = app_captions_paths(&app, &video_id)?;
     let captions_dir = storage.directory();
 
     if !captions_dir.exists() {
-        tracing::info!("Creating captions directory: {:?}", captions_dir);
         std::fs::create_dir_all(captions_dir).map_err(|e| {
-            tracing::error!("Failed to create captions directory: {}", e);
+            tracing::error!(kind = ?e.kind(), "Failed to create captions directory");
             format!("Failed to create captions directory: {e}")
         })?;
     }
 
     let captions_path = captions_dir.join("captions.json");
-
-    tracing::info!("Writing captions to: {:?}", captions_path);
 
     let settings = captions.settings.unwrap_or_default();
 
@@ -1571,7 +1461,7 @@ pub async fn save_captions(
             .collect::<Vec<_>>(),
     )
     .map_err(|e| {
-        tracing::error!("Failed to serialize captions segments: {}", e);
+        tracing::error!(category = ?e.classify(), "Failed to serialize captions segments");
         format!("Failed to serialize captions: {e}")
     })?;
 
@@ -1659,12 +1549,12 @@ pub async fn save_captions(
     );
 
     let json = serde_json::to_string_pretty(&json_obj).map_err(|e| {
-        tracing::error!("Failed to serialize captions: {}", e);
+        tracing::error!(category = ?e.classify(), "Failed to serialize captions");
         format!("Failed to serialize captions: {e}")
     })?;
 
     std::fs::write(captions_path, json).map_err(|e| {
-        tracing::error!("Failed to write captions file: {}", e);
+        tracing::error!(kind = ?e.kind(), "Failed to write captions file");
         format!("Failed to write captions file: {e}")
     })?;
 
@@ -1885,27 +1775,25 @@ pub fn parse_captions_json(json: &str) -> Result<cap_project::CaptionsData, Stri
 
 #[tauri::command]
 #[specta::specta]
-#[instrument(skip(app))]
+#[instrument(skip_all)]
 pub async fn load_captions(
     app: AppHandle,
     video_id: String,
 ) -> Result<Option<CaptionData>, String> {
     tracing::info!("=== LOAD CAPTIONS START ===");
-    tracing::info!("Loading captions for video_id: {}", video_id);
 
     let captions_path = app_captions_paths(&app, &video_id)?.json_for_read();
 
     if !captions_path.exists() {
-        tracing::info!("No captions file found at: {:?}", captions_path);
+        tracing::info!("No captions file found");
         tracing::info!("=== LOAD CAPTIONS END (no file) ===");
         return Ok(None);
     }
 
-    tracing::info!("Reading captions from: {:?}", captions_path);
     let json = match std::fs::read_to_string(captions_path.clone()) {
         Ok(j) => j,
         Err(e) => {
-            tracing::error!("Failed to read captions file: {}", e);
+            tracing::error!(kind = ?e.kind(), "Failed to read captions file");
             return Err(format!("Failed to read captions file: {e}"));
         }
     };
@@ -1920,18 +1808,6 @@ pub async fn load_captions(
                 project_captions.segments.len()
             );
 
-            for (idx, segment) in project_captions.segments.iter().enumerate() {
-                tracing::info!(
-                    "  Loaded Segment[{}] '{}': '{}' ({} words, {:.2}s - {:.2}s)",
-                    idx,
-                    segment.id,
-                    segment.text,
-                    segment.words.len(),
-                    segment.start,
-                    segment.end
-                );
-            }
-
             let tauri_captions = CaptionData {
                 segments: project_captions.segments,
                 settings: Some(project_captions.settings),
@@ -1941,7 +1817,7 @@ pub async fn load_captions(
             Ok(Some(tauri_captions))
         }
         Err(e) => {
-            tracing::error!("Failed to parse captions: {}", e);
+            tracing::error!("Failed to parse saved captions");
             tracing::info!("=== LOAD CAPTIONS END (error) ===");
             Err(format!("Failed to parse captions: {e}"))
         }
@@ -1952,15 +1828,12 @@ fn app_captions_paths(
     app: &AppHandle,
     video_id: &str,
 ) -> Result<cap_project::CaptionStoragePaths, String> {
-    tracing::info!("Getting captions directory for video_id: {}", video_id);
-
     let app_dir = app
         .path()
         .app_data_dir()
         .map_err(|_| "Failed to get app data directory".to_string())?;
 
     let paths = cap_project::caption_storage_paths(&app_dir, video_id);
-    tracing::info!("Captions directory path: {:?}", paths.directory());
     Ok(paths)
 }
 
@@ -2090,7 +1963,7 @@ async fn clear_model_download_status(path: &Path) {
 
 #[tauri::command]
 #[specta::specta]
-#[instrument(skip(app))]
+#[instrument(skip_all)]
 pub async fn get_model_download_status(
     app: AppHandle,
     target_path: String,
@@ -2103,7 +1976,7 @@ pub async fn get_model_download_status(
 
 #[tauri::command]
 #[specta::specta]
-#[instrument(skip(app))]
+#[instrument(skip_all)]
 pub async fn download_whisper_model(
     app: AppHandle,
     model_name: String,
@@ -2261,7 +2134,7 @@ async fn total_content_length(client: &reqwest::Client, urls: &[&str]) -> u64 {
 
 #[tauri::command]
 #[specta::specta]
-#[instrument(skip(app))]
+#[instrument(skip_all)]
 pub async fn check_model_exists(app: AppHandle, model_path: String) -> Result<bool, String> {
     let validated_path = validate_model_path(&app, &model_path)?;
     Ok(validated_path.exists())
@@ -2269,7 +2142,7 @@ pub async fn check_model_exists(app: AppHandle, model_path: String) -> Result<bo
 
 #[tauri::command]
 #[specta::specta]
-#[instrument(skip(app))]
+#[instrument(skip_all)]
 pub async fn delete_whisper_model(app: AppHandle, model_path: String) -> Result<(), String> {
     let validated_path = validate_model_path(&app, &model_path)?;
 
@@ -2464,7 +2337,7 @@ fn finalize_parakeet_model_download(
 #[cfg(not(all(target_os = "macos", target_arch = "x86_64")))]
 #[tauri::command]
 #[specta::specta]
-#[instrument(skip(app))]
+#[instrument(skip_all)]
 pub async fn download_parakeet_model(app: AppHandle, output_dir: String) -> Result<(), String> {
     let validated_dir = validate_model_path(&app, &output_dir)?;
     let key = model_download_key(&validated_dir);
@@ -2591,7 +2464,7 @@ async fn download_parakeet_model_to_dir(
     .await;
 
     if let Err(e) = &download_result {
-        tracing::warn!("Download failed, cleaning up staging directory: {e}");
+        tracing::warn!("Parakeet model download failed, cleaning up staging directory");
         let _ = std::fs::remove_dir_all(&staging_dir);
         return Err(e.clone());
     }
@@ -2611,7 +2484,7 @@ async fn download_parakeet_model_to_dir(
 #[cfg(all(target_os = "macos", target_arch = "x86_64"))]
 #[tauri::command]
 #[specta::specta]
-#[instrument(skip(_app))]
+#[instrument(skip_all)]
 pub async fn download_parakeet_model(_app: AppHandle, _output_dir: String) -> Result<(), String> {
     Err(PARAKEET_UNSUPPORTED_MESSAGE.to_string())
 }
@@ -2619,7 +2492,7 @@ pub async fn download_parakeet_model(_app: AppHandle, _output_dir: String) -> Re
 #[cfg(not(all(target_os = "macos", target_arch = "x86_64")))]
 #[tauri::command]
 #[specta::specta]
-#[instrument(skip(app))]
+#[instrument(skip_all)]
 pub async fn check_parakeet_model_exists(
     app: AppHandle,
     model_dir: String,
@@ -2643,7 +2516,7 @@ pub async fn check_parakeet_model_exists(
 #[cfg(all(target_os = "macos", target_arch = "x86_64"))]
 #[tauri::command]
 #[specta::specta]
-#[instrument(skip(_app))]
+#[instrument(skip_all)]
 pub async fn check_parakeet_model_exists(
     _app: AppHandle,
     _model_dir: String,
@@ -2653,7 +2526,7 @@ pub async fn check_parakeet_model_exists(
 
 #[tauri::command]
 #[specta::specta]
-#[instrument(skip(app))]
+#[instrument(skip_all)]
 pub async fn delete_parakeet_model(app: AppHandle, model_dir: String) -> Result<(), String> {
     let validated_dir = validate_model_path(&app, &model_dir)?;
 
@@ -2698,12 +2571,12 @@ fn format_srt_time(seconds: f64) -> String {
 
 #[tauri::command]
 #[specta::specta]
-#[instrument(skip(app))]
+#[instrument(skip_all)]
 pub async fn export_captions_srt(
     app: AppHandle,
     video_id: String,
 ) -> Result<Option<PathBuf>, String> {
-    tracing::info!("Starting SRT export for video_id: {}", video_id);
+    tracing::info!("Starting SRT export");
 
     let captions = match load_captions(app.clone(), video_id.clone()).await? {
         Some(c) => {
@@ -2711,7 +2584,7 @@ pub async fn export_captions_srt(
             c
         }
         None => {
-            tracing::info!("No captions found for video_id: {}", video_id);
+            tracing::info!("No captions found for SRT export");
             return Ok(None);
         }
     };
@@ -2731,15 +2604,14 @@ pub async fn export_captions_srt(
     std::fs::create_dir_all(captions_dir)
         .map_err(|error| format!("Failed to create captions directory: {error}"))?;
     let srt_path = captions_dir.join("captions.srt");
-    tracing::info!("Will write SRT file to: {:?}", srt_path);
 
     match std::fs::write(&srt_path, srt_content) {
         Ok(_) => {
-            tracing::info!("Successfully wrote SRT file to: {:?}", srt_path);
+            tracing::info!("SRT export saved");
             Ok(Some(srt_path))
         }
         Err(e) => {
-            tracing::error!("Failed to write SRT file: {}", e);
+            tracing::error!(kind = ?e.kind(), "Failed to write SRT file");
             Err(format!("Failed to write SRT file: {e}"))
         }
     }
