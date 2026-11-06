@@ -104,7 +104,7 @@ export function SegmentRoot(
 	const { isSegmentVisible, showSegmentMenu } = useTimelineContext();
 	const association = createMemo(() => {
 		const target = local.menuTarget;
-		return target && !local.ghost
+		return target && !target.projectedZoom && !local.ghost
 			? timelineCommands?.overlayAssociation?.(target.type, target.index)
 			: null;
 	});
@@ -147,14 +147,19 @@ export function SegmentRoot(
 										event.currentTarget === event.target &&
 										local.menuTarget &&
 										isContextMenuKey(event)
-									)
+									) {
 										showSegmentMenu(event, local.menuTarget);
+										return;
+									}
+									if (typeof local.onKeyDown === "function")
+										local.onKeyDown(event);
 								}
 							: local.onKeyDown
 					}
 					class={cx(
 						"absolute overflow-visible inset-y-0",
 						editorState.timeline.interactMode === "split" &&
+							!local.menuTarget?.projectedZoom &&
 							"timeline-scissors-cursor",
 						local.class,
 					)}

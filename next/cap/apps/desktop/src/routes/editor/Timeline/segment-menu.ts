@@ -11,7 +11,7 @@ export function createTimelineSegmentMenu(moveTo: (time: number) => void) {
 
 	function show(
 		event: MouseEvent | KeyboardEvent,
-		{ type, index, cancelGesture }: SegmentMenuTarget,
+		{ type, index, cancelGesture, projectedZoom }: SegmentMenuTarget,
 		name: string,
 	) {
 		if (event.defaultPrevented) return;
@@ -41,34 +41,41 @@ export function createTimelineSegmentMenu(moveTo: (time: number) => void) {
 			type === "style" || type === "audio" || isOverlayTrackKind(type)
 				? getSegmentTrack(segment)
 				: undefined;
-		const association = timelineCommands.overlayAssociation?.(
-			type,
-			clickedIndex,
-		);
+		const association = projectedZoom
+			? null
+			: timelineCommands.overlayAssociation?.(type, clickedIndex);
 		const clip = association
 			? timelineCommands.overlayAssociationTarget()
 			: null;
 		menu.show(event, name, [
 			{
-				label: localize("编辑此片段属性"),
+				label: projectedZoom
+					? localize("Edit zoom group")
+					: localize("编辑此片段属性"),
 				run: () => {
 					const target = currentIndex();
 					if (target >= 0) timelineCommands.selectSegments(type, [target]);
 				},
 			},
 			{
-				label: localize("定位到片段开头"),
+				label: projectedZoom
+					? localize("Go to zoom slice start")
+					: localize("定位到片段开头"),
+				disabled: projectedZoom?.start === null,
 				run: () => {
 					const target = currentIndex();
-					if (target < 0) return;
+					if (target < 0 || projectedZoom?.start === null) return;
 					setEditorState("previewTime", null);
-					moveTo(segment.start);
+					moveTo(projectedZoom?.start ?? segment.start);
 				},
 			},
 			{
 				label: localize("选中此轨道的全部片段"),
 				run: () => timelineCommands.selectTrack(type, lane),
 			},
+			...(projectedZoom
+				? [{ label: projectedZoom.label, disabled: true, run: () => {} }]
+				: []),
 			...(association
 				? [
 						{ label: association.label, disabled: true, run: () => {} },
@@ -130,7 +137,9 @@ export function createTimelineSegmentMenu(moveTo: (time: number) => void) {
 				label:
 					targets.length > 1
 						? localize("删除 {count} 个片段", { count: targets.length })
-						: localize("删除此片段"),
+						: projectedZoom
+							? localize("Delete zoom group")
+							: localize("删除此片段"),
 				shortcut: keymap.label("delete"),
 				danger: true,
 				run: () => {

@@ -5173,6 +5173,14 @@ async fn update_project_config_in_memory(
     Ok(())
 }
 
+#[tauri::command(async)]
+#[specta::specta]
+fn project_zoom_track(
+    timeline: cap_project::TimelineConfiguration,
+) -> Vec<cap_rendering::ZoomTrackProjection> {
+    cap_rendering::zoom_track_projection(&timeline)
+}
+
 #[tauri::command]
 #[specta::specta]
 #[instrument(skip(app, editor_instance))]
@@ -7013,6 +7021,7 @@ fn specta_builder() -> tauri_specta::Builder {
             set_project_config,
             update_project_config_in_memory,
             generate_zoom_segments_from_clicks,
+            project_zoom_track,
             generate_keyboard_segments,
             render_screenshot_for_export,
             render_screenshot_project_for_export,

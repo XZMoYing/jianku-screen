@@ -139,7 +139,9 @@ use takeover::InterpolatedTakeover;
 pub use takeover::TakeoverDisplayMorph;
 use text::{PreparedText, prepare_texts};
 use zoom::*;
-pub use zoom_spring::{CursorCropMap, ZoomTransformTimeline};
+pub use zoom_spring::{
+    CursorCropMap, ZoomTrackProjection, ZoomTransformTimeline, zoom_track_projection,
+};
 
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct Nv12RenderStartupBreakdownMs {

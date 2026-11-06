@@ -2,7 +2,7 @@ import { batch, createSignal, Show } from "solid-js";
 import { createStore, produce, unwrap } from "solid-js/store";
 import { render } from "solid-js/web";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import type { ZoomSegment } from "~/utils/tauri";
+import { commands, type ZoomSegment } from "~/utils/tauri";
 import { createStoreHistory } from "../project-history";
 import { TimelineContextProvider } from "./context";
 import { createTimelineSegmentMenu } from "./segment-menu";
@@ -19,7 +19,10 @@ vi.mock("~/store", () => ({
 	},
 }));
 vi.mock("~/utils/tauri", () => ({
-	commands: { generateZoomSegmentsFromClicks: vi.fn(async () => []) },
+	commands: {
+		generateZoomSegmentsFromClicks: vi.fn(async () => []),
+		projectZoomTrack: vi.fn(async () => []),
+	},
 }));
 vi.mock("@tauri-apps/api/menu", () => ({
 	Menu: { new: vi.fn(async () => ({ popup: vi.fn() })) },
@@ -54,7 +57,13 @@ function segment(start: number, end = start + 4): ZoomSegment {
 }
 function fixture(segments: ZoomSegment[], associations = false) {
 	const [project, setProject] = createStore({
-		timeline: { zoomSegments: segments },
+		timeline: {
+			segments: [
+				{ id: "a", name: "Source A", start: 0, end: 4, timescale: 1 },
+				{ id: "b", name: "Source B", start: 4, end: 8, timescale: 1 },
+			],
+			zoomSegments: segments,
+		},
 	});
 	const [editorState, setEditorState] = createStore({
 		previewTime: null as number | null,
@@ -164,9 +173,10 @@ const roots = () => [
 function mount(segments = [segment(2), segment(10)], associations = false) {
 	const [shown, setShown] = createSignal(true);
 	const onDragStateChanged = vi.fn();
+	const moveTo = vi.fn();
 	dispose = render(() => {
 		context = fixture(segments, associations);
-		const menu = createTimelineSegmentMenu(() => {});
+		const menu = createTimelineSegmentMenu(moveTo);
 		return (
 			<TimelineContextProvider
 				duration={context.totalDuration()}
@@ -192,7 +202,7 @@ function mount(segments = [segment(2), segment(10)], associations = false) {
 	}, document.body);
 	const lane = document.body.firstElementChild;
 	if (!(lane instanceof HTMLElement)) throw new Error("Missing zoom lane");
-	return { setShown, lane, onDragStateChanged };
+	return { setShown, lane, onDragStateChanged, moveTo };
 }
 function content(index = 0) {
 	const node = roots()[index]?.querySelector(".cursor-grab");
@@ -253,6 +263,74 @@ it("exposes linking, unlinking and the source state on the timeline segment", ()
 	} finally {
 		bounds.mockRestore();
 	}
+});
+
+it("draws effective slices and targets their actual time without editing the source group", async () => {
+	const sourceSlices: ZoomSegment["sourceSlices"] = [
+		{
+			phaseStart: 0,
+			phaseEnd: 1,
+			sourceEnd: 4,
+			attachment: { kind: "clip", id: "left", clipId: "a", sourceTime: 3 },
+		},
+		{
+			phaseStart: 1,
+			phaseEnd: 2,
+			sourceEnd: 5,
+			attachment: { kind: "clip", id: "right", clipId: "b", sourceTime: 4 },
+		},
+	];
+	vi.mocked(commands.projectZoomTrack).mockResolvedValueOnce([
+		{
+			groupIndex: 1,
+			hasConflict: true,
+			hasMissingSource: false,
+			spans: [
+				{ start: 6, end: 6.25, segmentIndex: 1 },
+				{ start: 6.5, end: 6.75, segmentIndex: 1 },
+			],
+		},
+		{ groupIndex: 2, hasConflict: false, hasMissingSource: true, spans: [] },
+	]);
+	const mounted = mount(
+		[
+			segment(10),
+			{ ...segment(3, 5), sourceSlices },
+			{ ...segment(7, 9), sourceSlices },
+		],
+		true,
+	);
+	const slices = () => [
+		...document.querySelectorAll<HTMLElement>('[data-zoom-projection="slice"]'),
+	];
+	await vi.waitFor(() => expect(slices()).toHaveLength(2));
+	expect(roots()).toHaveLength(1);
+	const position = (node: HTMLElement) =>
+		Number.parseFloat(node.style.getPropertyValue("--segment-x"));
+	expect(position(slices()[0])).toBeCloseTo(position(roots()[0]) * 0.6);
+	expect(position(slices()[1])).toBeCloseTo(position(roots()[0]) * 0.65);
+	expect(slices()[1].title).toContain("Some zoom slices are covered");
+	expect(
+		document
+			.querySelector('[data-zoom-projection="inactive"]')
+			?.getAttribute("title"),
+	).toContain("Some zoom sources are missing");
+
+	mouse(slices()[1], "mousedown", 660);
+	expect(context.editorState.timeline.selection).toEqual({
+		type: "zoom",
+		indices: [1],
+	});
+	mouse(slices()[1], "contextmenu", 660, 0, 2);
+	const menu = showMenu.mock.lastCall?.[2];
+	menu?.find((entry) => entry.label === "Go to zoom slice start")?.run();
+	expect(mounted.moveTo).toHaveBeenCalledWith(6.5);
+	expect(context.project.timeline.zoomSegments[1]).toMatchObject({
+		start: 3,
+		end: 5,
+		sourceSlices,
+	});
+	expect(context.projectHistory.canUndo()).toBe(false);
 });
 
 it.each([

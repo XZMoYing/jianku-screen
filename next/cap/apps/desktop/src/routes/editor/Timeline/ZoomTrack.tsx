@@ -5,14 +5,22 @@ import {
 	createMemo,
 	createSignal,
 	For,
+	Index,
 	onCleanup,
 	Show,
+	untrack,
 } from "solid-js";
 import { produce, unwrap } from "solid-js/store";
 import toast from "solid-toast";
 import { generalSettingsStore } from "~/store";
 import { t as localize } from "~/utils/i18n";
-import { commands, type ZoomSegment } from "~/utils/tauri";
+import {
+	commands,
+	type ZoomSegment,
+	type ZoomTrackProjection,
+} from "~/utils/tauri";
+import IconLucideLink2 from "~icons/lucide/link-2";
+import IconLucideTriangleAlert from "~icons/lucide/triangle-alert";
 import { createAutoZoomGeneration } from "../auto-zoom-generation";
 import { serializeProjectConfiguration, useEditorContext } from "../context";
 import { useTimelineContext, useTrackContext } from "./context";
@@ -119,6 +127,95 @@ export function ZoomTrack(props: {
 		);
 
 	const zoomSegments = () => project.timeline?.zoomSegments ?? [];
+	const projectionInput = createMemo(() => {
+		const timeline = project.timeline;
+		if (
+			!timeline ||
+			!timeline.zoomSegments.some(
+				(row) =>
+					row.mode === "auto" && !row.attachment && row.sourceSlices?.length,
+			)
+		)
+			return null;
+		return JSON.stringify({
+			segments: timeline.segments,
+			transitions: timeline.transitions,
+			mainTrackGaps: timeline.mainTrackGaps,
+			textSegments: timeline.textSegments
+				?.filter((segment) => segment.layout === "fullscreen")
+				.map(({ start, end, enabled, layout }) => ({
+					start,
+					end,
+					enabled,
+					layout,
+					content: "",
+				})),
+			zoomSegments: timeline.zoomSegments.map(
+				({ start, end, mode, attachment, sourceSlices }) => ({
+					start,
+					end,
+					mode: mode === "auto" ? mode : { manual: { x: 0.5, y: 0.5 } },
+					amount: 1,
+					attachment,
+					sourceSlices,
+				}),
+			),
+		});
+	});
+	const [projection, setProjection] = createSignal<{
+		input: string;
+		byIndex: Map<number, ZoomTrackProjection>;
+		byRow: Map<ZoomSegment, ZoomTrackProjection>;
+	}>();
+	createEffect(() => {
+		const input = projectionInput();
+		if (!input) {
+			setProjection(undefined);
+			return;
+		}
+		const rows = untrack(() => [...zoomSegments()]);
+		let current = true;
+		onCleanup(() => {
+			current = false;
+		});
+		void commands.projectZoomTrack(JSON.parse(input)).then(
+			(groups) => {
+				if (current)
+					setProjection({
+						input,
+						byIndex: new Map(groups.map((group) => [group.groupIndex, group])),
+						byRow: new Map(
+							groups.flatMap((group) => {
+								const row = rows[group.groupIndex];
+								return row ? [[row, group] as const] : [];
+							}),
+						),
+					});
+			},
+			(error) => {
+				if (current) {
+					setProjection(undefined);
+					console.error("Failed to project zoom track:", error);
+				}
+			},
+		);
+	});
+	const projectedZoom = (row: ZoomSegment) => {
+		const layout = projection();
+		if (
+			!layout ||
+			row.mode !== "auto" ||
+			row.attachment ||
+			!row.sourceSlices?.length
+		)
+			return undefined;
+		return layout.input === projectionInput()
+			? layout.byIndex.get(zoomSegments().indexOf(row))
+			: layout.byRow.get(row);
+	};
+	const projectedSpans = createMemo(() =>
+		zoomSegments().flatMap((row) => projectedZoom(row)?.spans ?? []),
+	);
 	const startGesture = createTimelineMouseDrag();
 	const clearGeneratedSources = (item: ZoomSegment) => {
 		const index = zoomSegments().indexOf(item);
@@ -182,9 +279,11 @@ export function ZoomTrack(props: {
 		let min = 0;
 		let max = totalDuration();
 		for (const item of zoomSegments()) {
-			if (time >= item.start && time < item.end) return;
-			if (item.end <= time) min = Math.max(min, item.end);
-			if (item.start >= time) max = Math.min(max, item.start);
+			for (const span of projectedZoom(item)?.spans ?? [item]) {
+				if (time >= span.start && time < span.end) return;
+				if (span.end <= time) min = Math.max(min, span.end);
+				if (span.start >= time) max = Math.min(max, span.start);
+			}
 		}
 		const minDuration = newSegmentMinDuration();
 		if (max - min < minDuration) return;
@@ -584,7 +683,7 @@ export function ZoomTrack(props: {
 							return indices.has(index());
 						});
 
-						return (
+						const normalSegment = () => (
 							<SegmentRoot
 								menuTarget={{
 									type: "zoom",
@@ -669,6 +768,153 @@ export function ZoomTrack(props: {
 									onMouseDown={createMouseDownDrag("end")}
 								/>
 							</SegmentRoot>
+						);
+						return (
+							<Show when={projectedZoom(item)} fallback={normalSegment()}>
+								{(group) => {
+									const displaySpans = () => {
+										if (group().spans.length) return group().spans;
+										const end = Math.min(item.end, totalDuration());
+										return end > 0
+											? [
+													{
+														start: Math.max(
+															0,
+															Math.min(item.start, end - 0.15),
+														),
+														end,
+														segmentIndex: -1,
+													},
+												]
+											: [];
+									};
+									const selectGroup = () => {
+										if (index() >= 0)
+											setEditorState("timeline", "selection", {
+												type: "zoom",
+												indices: [index()],
+											});
+									};
+									return (
+										<Index each={displaySpans()}>
+											{(span) => {
+												const clipName = () =>
+													project.timeline?.segments[span().segmentIndex]?.name;
+												const sharesTransition = () =>
+													span().segmentIndex >= 0 &&
+													projectedSpans().some(
+														(other) =>
+															other.segmentIndex !== span().segmentIndex &&
+															other.start < span().end &&
+															span().start < other.end,
+													);
+												const status = () =>
+													[
+														span().segmentIndex < 0
+															? localize("No visible zoom slice")
+															: clipName()
+																? localize("Follows {name}", {
+																		name: clipName() ?? "",
+																	})
+																: localize("Generated zoom slice"),
+														group().hasMissingSource
+															? localize("Some zoom sources are missing")
+															: "",
+														group().hasConflict
+															? localize("Some zoom slices are covered")
+															: "",
+													]
+														.filter(Boolean)
+														.join(" · ");
+												const marker = () =>
+													group().hasMissingSource ||
+													group().hasConflict ||
+													span().segmentIndex < 0 ? (
+														<IconLucideTriangleAlert class="size-3.5 shrink-0 text-amber-10" />
+													) : (
+														<IconLucideLink2 class="size-3.5 shrink-0 cap-seg-label" />
+													);
+												return (
+													<SegmentRoot
+														menuTarget={{
+															type: "zoom",
+															index: index(),
+															projectedZoom: {
+																start:
+																	span().segmentIndex >= 0
+																		? span().start
+																		: null,
+																label: status(),
+															},
+														}}
+														segColor="var(--track-zoom)"
+														class="cursor-pointer"
+														style={
+															sharesTransition()
+																? {
+																		top:
+																			span().segmentIndex % 2 === 0
+																				? "0"
+																				: "50%",
+																		bottom: "auto",
+																		height: "50%",
+																	}
+																: undefined
+														}
+														selected={isSelected()}
+														muted={span().segmentIndex < 0}
+														title={status()}
+														aria-label={status()}
+														aria-pressed={isSelected()}
+														role="button"
+														tabIndex={0}
+														data-zoom-projection={
+															span().segmentIndex >= 0 ? "slice" : "inactive"
+														}
+														data-zoom-group-index={index()}
+														segment={span()}
+														onMouseDown={(event) => {
+															event.stopPropagation();
+															if (event.button !== 0) return;
+															startGesture(() => null);
+															selectGroup();
+															if (span().segmentIndex >= 0)
+																props.handleUpdatePlayhead(event);
+														}}
+														onKeyDown={(event) => {
+															if (event.key === "Enter" || event.key === " ") {
+																event.preventDefault();
+																selectGroup();
+															}
+														}}
+													>
+														<SegmentLabel
+															full={() => (
+																<span class="flex items-center gap-1.5">
+																	{marker()}
+																	<span class="cap-seg-label truncate">
+																		{clipName() || zoomModeLabel()} ·{" "}
+																		{zoomPercentage()}
+																	</span>
+																</span>
+															)}
+															compact={() => (
+																<span class="flex items-center gap-1">
+																	{marker()}
+																	<span class="cap-seg-label">
+																		{zoomPercentage()}
+																	</span>
+																</span>
+															)}
+															glyph={marker}
+														/>
+													</SegmentRoot>
+												);
+											}}
+										</Index>
+									);
+								}}
+							</Show>
 						);
 					}}
 				</For>
