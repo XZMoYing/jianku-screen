@@ -21,7 +21,16 @@ import {
 } from "../three-d";
 import { ShotCountPills } from "../three-d-panel";
 import { useTimelineContext, useTrackContext } from "./context";
-import { createTimelineMouseDrag } from "./mouse-drag";
+import {
+	createTimelineMouseDrag,
+	type TimelineMouseDragEndCause,
+	type TimelineMouseDragEndReason,
+} from "./mouse-drag";
+import {
+	createOrderedTimelineRangeDrag,
+	sameTimelineRange,
+	type TimelineRangeEdge,
+} from "./range-snapping";
 import {
 	SegmentContent,
 	SegmentHandle,
@@ -60,7 +69,7 @@ export function ThreeDTrack(props: {
 		camera3DAutoScenePreview,
 	} = useEditorContext();
 
-	const { duration, secsPerPixel } = useTimelineContext();
+	const { duration, secsPerPixel, snapping } = useTimelineContext();
 	const setPreviewTime = useSetPreviewTime();
 
 	// The range being drawn by a drag on empty lane space. While it is set the
@@ -384,16 +393,7 @@ export function ThreeDTrack(props: {
 						setPreviewTime(maxValue);
 					};
 
-					function createMouseDownDrag<T>(
-						setup: () => T,
-						_update: (
-							event: MouseEvent,
-							value: T,
-							initialMouseX: number,
-						) => Partial<Pick<Camera3DSegment, "start" | "end">> & {
-							previewTime?: number;
-						},
-					) {
+					function createMouseDownDrag(edge: TimelineRangeEdge) {
 						return (downEvent: MouseEvent) => {
 							if (
 								downEvent.button !== 0 ||
@@ -402,19 +402,51 @@ export function ThreeDTrack(props: {
 								return;
 							downEvent.stopPropagation();
 							startGesture(() => {
-								const initial = setup();
 								const tracks = item.tracks;
 								const properties = item.properties;
 								const scale = secsPerPixel();
 								const span = totalDuration();
 								const timelineDuration = duration();
-								let expectedStart = item.start;
-								let expectedEnd = item.end;
+								const drag = createOrderedTimelineRangeDrag(
+									snapping,
+									item,
+									edge,
+									camera3dSegments(),
+									duration(),
+									Math.max(1, scale * MIN_THREE_D_SEGMENT_PIXEL_WIDTH),
+									editorState.playbackTime,
+								);
+								let expected = drag.original;
+								const previewBefore = editorState.previewTime;
+								let lastPreview: number | undefined;
+								const ownsRange = () =>
+									camera3dSegments().includes(item) &&
+									sameTimelineRange(item, expected) &&
+									item.tracks === tracks &&
+									item.properties === properties;
 								let moved = false;
 								let resumeHistory: (() => void) | undefined;
 								setTrackState("draggingSegment", true);
 								props.onDragStateChanged({ type: "movePending" });
-								function finish(e?: MouseEvent) {
+								function finish(
+									e?: MouseEvent,
+									reason?: TimelineMouseDragEndReason,
+									cause?: TimelineMouseDragEndCause,
+								) {
+									drag.clear();
+									if (
+										reason === "cancel" &&
+										cause !== "superseded" &&
+										ownsRange()
+									) {
+										if (!sameTimelineRange(item, drag.original))
+											writeShot(item, drag.original);
+										if (
+											lastPreview !== undefined &&
+											editorState.previewTime === lastPreview
+										)
+											setEditorState("previewTime", previewBefore);
+									}
 									resumeHistory?.();
 									if (!moved && e) {
 										e.stopPropagation();
@@ -475,11 +507,7 @@ export function ThreeDTrack(props: {
 								return {
 									isValid: () =>
 										editorState.timeline.interactMode === "seek" &&
-										camera3dSegments().includes(item) &&
-										item.start === expectedStart &&
-										item.end === expectedEnd &&
-										item.tracks === tracks &&
-										item.properties === properties &&
+										ownsRange() &&
 										secsPerPixel() === scale &&
 										totalDuration() === span &&
 										duration() === timelineDuration,
@@ -490,21 +518,20 @@ export function ThreeDTrack(props: {
 											moved = true;
 											props.onDragStateChanged({ type: "moving" });
 										}
-										const { previewTime, ...changes } = _update(
-											event,
-											initial,
-											downEvent.clientX,
+										const range = drag.edit(
+											(event.clientX - downEvent.clientX) * scale,
+											scale,
+											event.altKey,
 										);
-										if (
-											(changes.start ?? item.start) !== item.start ||
-											(changes.end ?? item.end) !== item.end
-										) {
+										if (!sameTimelineRange(item, range)) {
 											resumeHistory ??= projectHistory.pause();
-											expectedStart = changes.start ?? item.start;
-											expectedEnd = changes.end ?? item.end;
-											writeShot(item, changes);
+											expected = range;
+											writeShot(item, range);
 										}
-										if (previewTime !== undefined) setPreviewTime(previewTime);
+										if (edge !== "move") {
+											lastPreview = range[edge];
+											setPreviewTime(lastPreview);
+										}
 									},
 									finish,
 								};
@@ -551,80 +578,11 @@ export function ThreeDTrack(props: {
 									e.stopPropagation();
 									fillStart();
 								}}
-								onMouseDown={createMouseDownDrag(
-									() => {
-										const start = segment().start;
-										const minDuration = Math.max(
-											1,
-											secsPerPixel() * MIN_THREE_D_SEGMENT_PIXEL_WIDTH,
-										);
-
-										let minValue = 0;
-
-										const maxValue = segment().end - minDuration;
-
-										for (let j = camera3dSegments().length - 1; j >= 0; j--) {
-											const other = camera3dSegments()[j];
-											if (!other) continue;
-											if (other.end <= start) {
-												minValue = other.end;
-												break;
-											}
-										}
-
-										return { start, minValue, maxValue };
-									},
-									(e, value, initialMouseX) => {
-										const newStart =
-											value.start +
-											(e.clientX - initialMouseX) * secsPerPixel();
-										const nextStart = Math.min(
-											value.maxValue,
-											Math.max(value.minValue, newStart),
-										);
-
-										return { start: nextStart, previewTime: nextStart };
-									},
-								)}
+								onMouseDown={createMouseDownDrag("start")}
 							/>
 							<SegmentContent
 								class="flex items-center cursor-grab"
-								onMouseDown={createMouseDownDrag(
-									() => {
-										const original = { ...segment() };
-
-										const prevSegment = camera3dSegments()[index() - 1];
-										const nextSegment = camera3dSegments()[index() + 1];
-
-										const minStart = prevSegment?.end ?? 0;
-										const maxEnd = nextSegment?.start ?? duration();
-
-										return {
-											original,
-											minStart,
-											maxEnd,
-										};
-									},
-									(e, value, initialMouseX) => {
-										const rawDelta =
-											(e.clientX - initialMouseX) * secsPerPixel();
-
-										const newStart = value.original.start + rawDelta;
-										const newEnd = value.original.end + rawDelta;
-
-										let delta = rawDelta;
-
-										if (newStart < value.minStart)
-											delta = value.minStart - value.original.start;
-										else if (newEnd > value.maxEnd)
-											delta = value.maxEnd - value.original.end;
-
-										return {
-											start: value.original.start + delta,
-											end: value.original.end + delta,
-										};
-									},
-								)}
+								onMouseDown={createMouseDownDrag("move")}
 							>
 								{(() => {
 									const visibleBox = useSegmentVisibleBox();
@@ -663,40 +621,7 @@ export function ThreeDTrack(props: {
 									e.stopPropagation();
 									fillEnd();
 								}}
-								onMouseDown={createMouseDownDrag(
-									() => {
-										const end = segment().end;
-										const minDuration = Math.max(
-											1,
-											secsPerPixel() * MIN_THREE_D_SEGMENT_PIXEL_WIDTH,
-										);
-
-										const minValue = segment().start + minDuration;
-
-										let maxValue = duration();
-
-										for (let j = 0; j < camera3dSegments().length; j++) {
-											const other = camera3dSegments()[j];
-											if (!other) continue;
-											if (other !== item && other.start >= end) {
-												maxValue = other.start;
-												break;
-											}
-										}
-
-										return { end, minValue, maxValue };
-									},
-									(e, value, initialMouseX) => {
-										const newEnd =
-											value.end + (e.clientX - initialMouseX) * secsPerPixel();
-										const nextEnd = Math.min(
-											value.maxValue,
-											Math.max(value.minValue, newEnd),
-										);
-
-										return { end: nextEnd, previewTime: nextEnd };
-									},
-								)}
+								onMouseDown={createMouseDownDrag("end")}
 							/>
 							{/* The two poses of the selected shot, on the shot itself:
 							    the same control as the panel's pose cards. They sit

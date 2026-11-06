@@ -177,6 +177,25 @@ it.each(["text", "mask"] as const)(
 	},
 );
 
+it("does not advertise an audio snap beyond the available source", () => {
+	const guide = vi.fn();
+	const f = mount("audio", {
+		enabled: () => true,
+		targets: () => [6.22],
+		setGuide: guide,
+	});
+	context.setProject("timeline", "audioSegments", 0, "duration", 4.2);
+	const handle = f.root.querySelectorAll(".cursor-col-resize")[1];
+	if (!(handle instanceof HTMLElement)) throw new Error("Missing end handle");
+	mouse(handle, "mousedown", 600);
+	mouse(window, "mousemove", 603);
+	mouse(window, "mousemove", 621);
+	expect(context.project.timeline.audioSegments[0].end).toBeCloseTo(6.18);
+	expect(guide).toHaveBeenLastCalledWith(null);
+	mouse(window, "mouseup", 621, 0);
+	expect(context.resume).toHaveBeenCalledTimes(1);
+});
+
 for (const kind of ["text", "mask", "audio"] as const) {
 	it.each(["blur", "escape", "unmount", "mode", "lane", "delete"] as const)(
 		`${kind}: ends once on %s and never writes from a later mouse event`,

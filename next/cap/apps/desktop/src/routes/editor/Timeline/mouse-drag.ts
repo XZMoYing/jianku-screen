@@ -15,7 +15,7 @@ import {
 
 export type TimelineMouseDragEndReason = "release" | "cancel" | "history";
 
-type EndCause =
+export type TimelineMouseDragEndCause =
 	| "release"
 	| "escape"
 	| "blur"
@@ -30,14 +30,18 @@ type MouseDrag = {
 	diagnostics?: { kind: "keyboard"; snapshot(): TimelineGestureSnapshot };
 	isValid(): boolean;
 	update(event: MouseEvent): void;
-	finish(event?: MouseEvent, reason?: TimelineMouseDragEndReason): void;
+	finish(
+		event?: MouseEvent,
+		reason?: TimelineMouseDragEndReason,
+		cause?: TimelineMouseDragEndCause,
+	): void;
 };
 
 export function createTimelineMouseDrag() {
 	const keymap = useContext(EditorKeymapContext);
 	const [active, setActive] = createSignal<{
 		isValid(): boolean;
-		finish(cause: EndCause): void;
+		finish(cause: TimelineMouseDragEndCause): void;
 	} | null>(null);
 	let disposed = false;
 	createComputed(() => {
@@ -61,7 +65,7 @@ export function createTimelineMouseDrag() {
 		const finish = (
 			event?: MouseEvent,
 			reason: TimelineMouseDragEndReason = "cancel",
-			cause: EndCause = "invalid",
+			cause: TimelineMouseDragEndCause = "invalid",
 		) => {
 			if (ended) return;
 			ended = true;
@@ -87,7 +91,7 @@ export function createTimelineMouseDrag() {
 					snapshot,
 				});
 			}
-			drag.finish(event, reason);
+			drag.finish(event, reason, cause);
 		};
 		const interrupt = () => finish(undefined, "cancel", "blur");
 		const move = (event: MouseEvent) => {

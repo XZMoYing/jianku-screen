@@ -7,7 +7,16 @@ import { type AudioTrackSegment, MIN_AUDIO_SEGMENT_DURATION } from "../audio";
 import { useEditorContext } from "../context";
 import { getSegmentTrack, sortTrackSegments } from "../timelineTracks";
 import { useTimelineContext } from "./context";
-import { createTimelineMouseDrag } from "./mouse-drag";
+import {
+	createTimelineMouseDrag,
+	type TimelineMouseDragEndCause,
+	type TimelineMouseDragEndReason,
+} from "./mouse-drag";
+import {
+	createTimelineSnapGesture,
+	sameTimelineRange,
+	type TimelineRangeEdge,
+} from "./range-snapping";
 import {
 	SegmentContent,
 	SegmentHandle,
@@ -221,7 +230,7 @@ export function AudioTrack(props: {
 		projectHistory,
 		projectActions,
 	} = useEditorContext();
-	const { secsPerPixel } = useTimelineContext();
+	const { secsPerPixel, snapping } = useTimelineContext();
 	const setPreviewTime = useSetPreviewTime();
 	const [draggingSegment, setDraggingSegment] =
 		createSignal<AudioTrackSegment | null>(null);
@@ -286,10 +295,9 @@ export function AudioTrack(props: {
 
 	const startDrag = createTimelineMouseDrag();
 
-	function createMouseDownDrag<T>(
+	function createMouseDownDrag(
 		segmentIndex: () => number,
-		setup: () => T,
-		update: (e: MouseEvent, value: T, initialMouseX: number) => void,
+		edge: TimelineRangeEdge,
 	) {
 		return (downEvent: MouseEvent) => {
 			if (
@@ -300,15 +308,52 @@ export function AudioTrack(props: {
 			downEvent.stopPropagation();
 			startDrag(() => {
 				const segment = audioSegments()[segmentIndex()];
+				if (!segment) return null;
 				const lane = props.laneIndex;
-				const initial = setup();
+				const original = { ...segment };
+				const snap = createTimelineSnapGesture(
+					snapping,
+					segment,
+					editorState.playbackTime,
+				);
+				const originalRange = {
+					...snap.original,
+					trimStart: original.trimStart,
+				};
+				let expected = originalRange;
+				const previewBefore = editorState.previewTime;
+				let lastPreview: number | undefined;
+				const ownsRange = () =>
+					props.laneIndex === lane &&
+					getSegmentTrack(segment) === lane &&
+					audioSegments().includes(segment) &&
+					sameTimelineRange(segment, expected) &&
+					segment.trimStart === expected.trimStart &&
+					segment.duration === original.duration;
 				let moved = false;
 				let initialMouseX: number | null = null;
 
 				const resumeHistory = projectHistory.pause();
 				props.onDragStateChanged({ type: "movePending" });
 
-				function finish(e?: MouseEvent) {
+				function finish(
+					e?: MouseEvent,
+					reason?: TimelineMouseDragEndReason,
+					cause?: TimelineMouseDragEndCause,
+				) {
+					snap.clear();
+					if (reason === "cancel" && cause !== "superseded" && ownsRange()) {
+						if (
+							!sameTimelineRange(segment, originalRange) ||
+							segment.trimStart !== originalRange.trimStart
+						)
+							writeSegment(segment, originalRange);
+						if (
+							lastPreview !== undefined &&
+							editorState.previewTime === lastPreview
+						)
+							setEditorState("previewTime", previewBefore);
+					}
 					resumeHistory();
 					setDraggingSegment(null);
 					if (!moved && e) {
@@ -370,16 +415,67 @@ export function AudioTrack(props: {
 					}
 
 					if (initialMouseX === null) return;
-					update(event, initial, initialMouseX);
+					const scale = secsPerPixel();
+					const total = totalDuration();
+					const minimum = minDuration();
+					const range = snap.edit(
+						edge,
+						(event.clientX - initialMouseX) * scale,
+						scale,
+						event.altKey,
+						(delta) => {
+							if (edge === "move")
+								return computeMovedAudioSegment(
+									original,
+									delta,
+									total,
+									minimum,
+								);
+							if (edge === "start") {
+								const min = Math.max(0, original.start - original.trimStart);
+								const max = Math.max(min, original.end - minimum);
+								const start = Math.max(
+									min,
+									Math.min(max, original.start + delta),
+								);
+								return {
+									start,
+									end: original.end,
+									trimStart: Math.max(
+										0,
+										original.trimStart + (start - original.start),
+									),
+								};
+							}
+							const min = original.start + minimum;
+							const sourceLimit =
+								original.duration && original.duration > 0
+									? original.start + (original.duration - original.trimStart)
+									: total;
+							const max = Math.max(min, Math.min(total, sourceLimit));
+							return {
+								start: original.start,
+								end: Math.max(min, Math.min(max, original.end + delta)),
+								trimStart: original.trimStart,
+							};
+						},
+					);
+					if (
+						!sameTimelineRange(segment, range) ||
+						segment.trimStart !== range.trimStart
+					) {
+						expected = range;
+						writeSegment(segment, range);
+					}
+					if (edge !== "move") {
+						lastPreview = range[edge];
+						setPreviewTime(lastPreview);
+					}
 				}
 
 				return {
 					isValid: () =>
-						editorState.timeline.interactMode === "seek" &&
-						props.laneIndex === lane &&
-						!!segment &&
-						getSegmentTrack(segment) === lane &&
-						audioSegments().includes(segment),
+						editorState.timeline.interactMode === "seek" && ownsRange(),
 					update: handleUpdate,
 					finish,
 				};
@@ -513,49 +609,11 @@ export function AudioTrack(props: {
 						>
 							<SegmentHandle
 								position="start"
-								onMouseDown={createMouseDownDrag(
-									() => index(),
-									() => {
-										const start = segment.start;
-										const trimStart = segment.trimStart;
-										const minValue = Math.max(0, start - trimStart);
-										const maxValue = Math.max(
-											minValue,
-											segment.end - minDuration(),
-										);
-										return { start, trimStart, minValue, maxValue };
-									},
-									(e, value, initialMouseX) => {
-										const delta = (e.clientX - initialMouseX) * secsPerPixel();
-										const next = Math.max(
-											value.minValue,
-											Math.min(value.maxValue, value.start + delta),
-										);
-										const trimDelta = next - value.start;
-										writeSegment(segment, {
-											start: next,
-											trimStart: Math.max(0, value.trimStart + trimDelta),
-										});
-										setPreviewTime(next);
-									},
-								)}
+								onMouseDown={createMouseDownDrag(index, "start")}
 							/>
 							<SegmentContent
 								class="relative z-0 flex items-center cursor-grab overflow-hidden"
-								onMouseDown={createMouseDownDrag(
-									() => index(),
-									() => ({ original: { ...segment } }),
-									(e, value, initialMouseX) => {
-										const delta = (e.clientX - initialMouseX) * secsPerPixel();
-										const next = computeMovedAudioSegment(
-											value.original,
-											delta,
-											totalDuration(),
-											minDuration(),
-										);
-										writeSegment(segment, next);
-									},
-								)}
+								onMouseDown={createMouseDownDrag(index, "move")}
 							>
 								<SegmentLabel
 									compactAt={24}
@@ -580,31 +638,7 @@ export function AudioTrack(props: {
 							</SegmentContent>
 							<SegmentHandle
 								position="end"
-								onMouseDown={createMouseDownDrag(
-									() => index(),
-									() => {
-										const end = segment.end;
-										const minValue = segment.start + minDuration();
-										const sourceLimit =
-											segment.duration && segment.duration > 0
-												? segment.start + (segment.duration - segment.trimStart)
-												: totalDuration();
-										const maxValue = Math.max(
-											minValue,
-											Math.min(totalDuration(), sourceLimit),
-										);
-										return { end, minValue, maxValue };
-									},
-									(e, value, initialMouseX) => {
-										const delta = (e.clientX - initialMouseX) * secsPerPixel();
-										const next = Math.max(
-											value.minValue,
-											Math.min(value.maxValue, value.end + delta),
-										);
-										writeSegment(segment, { end: next });
-										setPreviewTime(next);
-									},
-								)}
+								onMouseDown={createMouseDownDrag(index, "end")}
 							/>
 							<FadeControl
 								edge="in"

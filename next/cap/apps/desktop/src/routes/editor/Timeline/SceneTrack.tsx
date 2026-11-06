@@ -1,7 +1,4 @@
-import {
-	createEventListener,
-	createEventListenerMap,
-} from "@solid-primitives/event-listener";
+import { createEventListener } from "@solid-primitives/event-listener";
 import {
 	batch,
 	createEffect,
@@ -16,6 +13,17 @@ import { t as localize } from "~/utils/i18n";
 
 import { useEditorContext } from "../context";
 import { useTimelineContext, useTrackContext } from "./context";
+import {
+	createTimelineMouseDrag,
+	type TimelineMouseDragEndCause,
+	type TimelineMouseDragEndReason,
+} from "./mouse-drag";
+import {
+	createOrderedTimelineRangeDrag,
+	sameTimelineRange,
+	type TimelineRange,
+	type TimelineRangeEdge,
+} from "./range-snapping";
 import {
 	SegmentContent,
 	SegmentHandle,
@@ -46,7 +54,8 @@ export function SceneTrack(props: {
 		totalDuration,
 	} = useEditorContext();
 
-	const { duration, secsPerPixel } = useTimelineContext();
+	const { duration, secsPerPixel, snapping } = useTimelineContext();
+	const startDrag = createTimelineMouseDrag();
 	const setPreviewTime = useSetPreviewTime();
 	const selectedSceneIndices = createMemo(() => {
 		const selection = editorState.timeline.selection;
@@ -276,133 +285,142 @@ export function SceneTrack(props: {
 						setPreviewTime(maxValue);
 					};
 
-					function createMouseDownDrag<T>(
-						setup: () => T,
-						_update: (e: MouseEvent, v: T, initialMouseX: number) => void,
-					) {
+					function createMouseDownDrag(edge: TimelineRangeEdge) {
 						return (downEvent: MouseEvent) => {
-							if (editorState.timeline.interactMode !== "seek") return;
-
+							if (
+								downEvent.button !== 0 ||
+								editorState.timeline.interactMode !== "seek"
+							)
+								return;
 							downEvent.stopPropagation();
+							startDrag(() => {
+								const scale = secsPerPixel();
+								const drag = createOrderedTimelineRangeDrag(
+									snapping,
+									segment,
+									edge,
+									sceneSegments(),
+									duration(),
+									Math.max(1, scale * MIN_SCENE_SEGMENT_PIXEL_WIDTH),
+									editorState.playbackTime,
+									false,
+								);
+								let expected = drag.original;
+								let initialMouseX: number | null = null;
+								let moved = false;
+								let resumeHistory: (() => void) | undefined;
+								const previewBefore = editorState.previewTime;
+								let lastPreview: number | undefined;
+								const ownsRange = () =>
+									sceneSegments().includes(segment) &&
+									sameTimelineRange(segment, expected);
+								setTrackState("draggingSegment", true);
+								props.onDragStateChanged({ type: "movePending" });
 
-							const initial = setup();
-
-							let moved = false;
-							let initialMouseX: null | number = null;
-
-							setTrackState("draggingSegment", true);
-
-							const resumeHistory = projectHistory.pause();
-
-							props.onDragStateChanged({ type: "movePending" });
-
-							function finish(e: MouseEvent) {
-								resumeHistory();
-
-								const currentIndex = i();
-								const selection = editorState.timeline.selection;
-								const isMac =
-									navigator.platform.toUpperCase().indexOf("MAC") >= 0;
-								const isMultiSelect = isMac ? e.metaKey : e.ctrlKey;
-								const isRangeSelect = e.shiftKey;
-
-								if (!moved) {
-									e.stopPropagation();
-
-									if (
-										isRangeSelect &&
-										selection &&
-										selection.type === "scene"
-									) {
-										// Range selection: select from last selected to current
-										const existingIndices = selection.indices;
-										const lastIndex =
-											existingIndices[existingIndices.length - 1];
-										const start = Math.min(lastIndex, currentIndex);
-										const end = Math.max(lastIndex, currentIndex);
-										const rangeIndices = Array.from(
-											{ length: end - start + 1 },
-											(_, idx) => start + idx,
-										);
-
-										setEditorState("timeline", "selection", {
-											type: "scene" as const,
-											indices: rangeIndices,
-										});
-									} else if (
-										isMultiSelect &&
-										selection &&
-										selection.type === "scene"
-									) {
-										// Multi-select: toggle current index
-										const existingIndices = selection.indices;
-
-										if (existingIndices.includes(currentIndex)) {
-											// Remove from selection
-											const newIndices = existingIndices.filter(
-												(idx) => idx !== currentIndex,
+								function writeRange(range: TimelineRange) {
+									const index = sceneSegments().indexOf(segment);
+									if (index < 0) return;
+									batch(() => {
+										setProject("timeline", "sceneSegments", index, range);
+										if (edge !== "move")
+											setProject(
+												"timeline",
+												"sceneSegments",
+												produce((items) => {
+													items?.sort((a, b) => a.start - b.start);
+												}),
 											);
-											if (newIndices.length > 0) {
-												setEditorState("timeline", "selection", {
-													type: "scene" as const,
-													indices: newIndices,
-												});
-											} else {
-												setEditorState("timeline", "selection", null);
-											}
-										} else {
-											// Add to selection
-											setEditorState("timeline", "selection", {
-												type: "scene" as const,
-												indices: [...existingIndices, currentIndex],
-											});
+									});
+								}
+
+								function finish(
+									e?: MouseEvent,
+									reason?: TimelineMouseDragEndReason,
+									cause?: TimelineMouseDragEndCause,
+								) {
+									drag.clear();
+									if (
+										reason === "cancel" &&
+										cause !== "superseded" &&
+										ownsRange()
+									) {
+										if (!sameTimelineRange(segment, drag.original))
+											writeRange(drag.original);
+										if (
+											lastPreview !== undefined &&
+											editorState.previewTime === lastPreview
+										)
+											setEditorState("previewTime", previewBefore);
+									}
+									resumeHistory?.();
+
+									const currentIndex = i();
+									if (e && !moved) {
+										e.stopPropagation();
+										const selection = editorState.timeline.selection;
+										const selected =
+											selection?.type === "scene" ? selection.indices : [];
+										const isMac =
+											navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+										let indices = [currentIndex];
+										if (e.shiftKey && selected.length) {
+											const anchor = selected[selected.length - 1];
+											const first = Math.min(anchor, currentIndex);
+											const last = Math.max(anchor, currentIndex);
+											indices = Array.from(
+												{ length: last - first + 1 },
+												(_, index) => first + index,
+											);
+										} else if (isMac ? e.metaKey : e.ctrlKey) {
+											indices = selected.includes(currentIndex)
+												? selected.filter((index) => index !== currentIndex)
+												: [...selected, currentIndex];
 										}
-									} else {
-										// Normal single selection
+										setEditorState(
+											"timeline",
+											"selection",
+											indices.length ? { type: "scene", indices } : null,
+										);
+										props.handleUpdatePlayhead(e);
+									} else if (reason === "release") {
 										setEditorState("timeline", "selection", {
-											type: "scene" as const,
+											type: "scene",
 											indices: [currentIndex],
 										});
 									}
-
-									props.handleUpdatePlayhead(e);
-								} else {
-									setEditorState("timeline", "selection", {
-										type: "scene" as const,
-										indices: [currentIndex],
-									});
-								}
-								props.onDragStateChanged({ type: "idle" });
-								setTrackState("draggingSegment", false);
-							}
-
-							function update(event: MouseEvent) {
-								if (Math.abs(event.clientX - downEvent.clientX) > 2) {
-									if (!moved) {
-										moved = true;
-										initialMouseX = event.clientX;
-										props.onDragStateChanged({
-											type: "moving",
-										});
-									}
+									props.onDragStateChanged({ type: "idle" });
+									setTrackState("draggingSegment", false);
 								}
 
-								if (initialMouseX === null) return;
-
-								_update(event, initial, initialMouseX);
-							}
-
-							createRoot((dispose) => {
-								createEventListenerMap(window, {
-									mousemove: (e) => {
-										update(e);
+								return {
+									isValid: () =>
+										editorState.timeline.interactMode === "seek" && ownsRange(),
+									update(event) {
+										if (initialMouseX === null) {
+											if (Math.abs(event.clientX - downEvent.clientX) <= 2)
+												return;
+											moved = true;
+											initialMouseX = event.clientX;
+											props.onDragStateChanged({ type: "moving" });
+										}
+										const scale = secsPerPixel();
+										const range = drag.edit(
+											(event.clientX - initialMouseX) * scale,
+											scale,
+											event.altKey,
+										);
+										if (!sameTimelineRange(segment, range)) {
+											resumeHistory ??= projectHistory.pause();
+											expected = range;
+											writeRange(range);
+										}
+										if (edge !== "move") {
+											lastPreview = range[edge];
+											setPreviewTime(lastPreview);
+										}
 									},
-									mouseup: (e) => {
-										update(e);
-										finish(e);
-										dispose();
-									},
-								});
+									finish,
+								};
 							});
 						};
 					}
@@ -446,97 +464,11 @@ export function SceneTrack(props: {
 									e.stopPropagation();
 									fillStart();
 								}}
-								onMouseDown={createMouseDownDrag(
-									() => {
-										const start = segment.start;
-										const minDuration = Math.max(
-											1,
-											secsPerPixel() * MIN_SCENE_SEGMENT_PIXEL_WIDTH,
-										);
-
-										let minValue = 0;
-
-										const maxValue = segment.end - minDuration;
-
-										for (let i = sceneSegments().length - 1; i >= 0; i--) {
-											const segment = sceneSegments()[i];
-											if (!segment) continue;
-											if (segment.end <= start) {
-												minValue = segment.end;
-												break;
-											}
-										}
-
-										return { start, minValue, maxValue };
-									},
-									(e, value, initialMouseX) => {
-										const newStart =
-											value.start +
-											(e.clientX - initialMouseX) * secsPerPixel();
-										const nextStart = Math.min(
-											value.maxValue,
-											Math.max(value.minValue, newStart),
-										);
-
-										setProject(
-											"timeline",
-											"sceneSegments",
-											i(),
-											"start",
-											nextStart,
-										);
-
-										setProject(
-											"timeline",
-											"sceneSegments",
-											produce((s) => {
-												if (s) {
-													s.sort((a, b) => a.start - b.start);
-												}
-											}),
-										);
-										setPreviewTime(nextStart);
-									},
-								)}
+								onMouseDown={createMouseDownDrag("start")}
 							/>
 							<SegmentContent
 								class="flex items-center cursor-grab"
-								onMouseDown={createMouseDownDrag(
-									() => {
-										const original = { ...segment };
-
-										const prevSegment = sceneSegments()[i() - 1];
-										const nextSegment = sceneSegments()[i() + 1];
-
-										const minStart = prevSegment?.end ?? 0;
-										const maxEnd = nextSegment?.start ?? duration();
-
-										return {
-											original,
-											minStart,
-											maxEnd,
-										};
-									},
-									(e, value, initialMouseX) => {
-										const rawDelta =
-											(e.clientX - initialMouseX) * secsPerPixel();
-
-										const newStart = value.original.start + rawDelta;
-										const newEnd = value.original.end + rawDelta;
-
-										let delta = rawDelta;
-
-										if (newStart < value.minStart)
-											delta = value.minStart - value.original.start;
-										else if (newEnd > value.maxEnd)
-											delta = value.maxEnd - value.original.end;
-
-										setProject("timeline", "sceneSegments", i(), {
-											start: value.original.start + delta,
-											end: value.original.end + delta,
-										});
-									},
-								)}
+								onMouseDown={createMouseDownDrag("move")}
 							>
 								<SegmentLabel
 									full={() => (
@@ -567,57 +499,7 @@ export function SceneTrack(props: {
 									e.stopPropagation();
 									fillEnd();
 								}}
-								onMouseDown={createMouseDownDrag(
-									() => {
-										const end = segment.end;
-										const minDuration = Math.max(
-											1,
-											secsPerPixel() * MIN_SCENE_SEGMENT_PIXEL_WIDTH,
-										);
-
-										const minValue = segment.start + minDuration;
-
-										let maxValue = duration();
-
-										for (let i = 0; i < sceneSegments().length; i++) {
-											const segment = sceneSegments()[i];
-											if (!segment) continue;
-											if (segment.start > end) {
-												maxValue = segment.start;
-												break;
-											}
-										}
-
-										return { end, minValue, maxValue };
-									},
-									(e, value, initialMouseX) => {
-										const newEnd =
-											value.end + (e.clientX - initialMouseX) * secsPerPixel();
-										const nextEnd = Math.min(
-											value.maxValue,
-											Math.max(value.minValue, newEnd),
-										);
-
-										setProject(
-											"timeline",
-											"sceneSegments",
-											i(),
-											"end",
-											nextEnd,
-										);
-
-										setProject(
-											"timeline",
-											"sceneSegments",
-											produce((s) => {
-												if (s) {
-													s.sort((a, b) => a.start - b.start);
-												}
-											}),
-										);
-										setPreviewTime(nextEnd);
-									},
-								)}
+								onMouseDown={createMouseDownDrag("end")}
 							/>
 						</SegmentRoot>
 					);
