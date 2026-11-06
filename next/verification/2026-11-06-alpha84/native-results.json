@@ -1,0 +1,11 @@
+{
+	"version": "0.2.0-alpha.84",
+	"build": "2026.84.0",
+	"localizedError": true,
+	"invalidConfigBytesPreservedOnOpenAndReload": true,
+	"invalidConfigSha256": "41046a21a5a8f7c1dcd7b4def4be98238ce552637b7875b7e6a50b15dcaaba34",
+	"sameWindowLoadedRestoredConfig": true,
+	"restoredOriginalClipCount": 2,
+	"validProjectStillOpens": true,
+	"missingConfigInitializedDuration": 8.0
+}
