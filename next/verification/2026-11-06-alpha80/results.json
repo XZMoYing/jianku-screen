@@ -1,0 +1,338 @@
+{
+  "build-source": {
+    "commit": "5d1a57bc74d11570c07cb96b08a54f61b596e919",
+    "version": "0.2.0-alpha.80",
+    "build": "2026.80.0"
+  },
+  "new-no-input": [
+    {
+      "start": 0.0,
+      "end": 1.0,
+      "attachment": {
+        "kind": "timeline",
+        "id": "overlay-255dfef6-ba0d-4e9e-bf61-8e8f9b42bd84"
+      },
+      "track": 0,
+      "enabled": true,
+      "content": "Text",
+      "center": {
+        "x": 0.5,
+        "y": 0.49814102564102564
+      },
+      "size": {
+        "x": 0.07260101010101011,
+        "y": 0.05128205128205128
+      },
+      "fontFamily": "sans-serif",
+      "fontSize": 48.0,
+      "fontWeight": 700.0,
+      "italic": false,
+      "color": "#ffffff",
+      "backgroundStyle": "box",
+      "uppercase": false,
+      "strokeWidth": 0.0,
+      "strokeColor": "#000000",
+      "glow": 0.0,
+      "fadeDuration": 0.15,
+      "align": "center",
+      "letterSpacing": 0.0,
+      "lineHeight": 1.2,
+      "opacity": 1.0,
+      "shadow": 0.0,
+      "animationIn": "fade",
+      "animationOut": "fade",
+      "animationInDuration": 0.15,
+      "animationOutDuration": 0.15,
+      "layout": "overlay",
+      "layoutTransition": 0.5
+    }
+  ],
+  "empty-undo-state": [],
+  "empty-redo-state": [
+    {
+      "start": 0.0,
+      "end": 1.0,
+      "attachment": {
+        "kind": "timeline",
+        "id": "overlay-255dfef6-ba0d-4e9e-bf61-8e8f9b42bd84"
+      },
+      "track": 0,
+      "enabled": true,
+      "content": "Text",
+      "center": {
+        "x": 0.5,
+        "y": 0.49814102564102564
+      },
+      "size": {
+        "x": 0.07260101010101011,
+        "y": 0.05128205128205128
+      },
+      "fontFamily": "sans-serif",
+      "fontSize": 48.0,
+      "fontWeight": 700.0,
+      "italic": false,
+      "color": "#ffffff",
+      "backgroundStyle": "box",
+      "uppercase": false,
+      "strokeWidth": 0.0,
+      "strokeColor": "#000000",
+      "glow": 0.0,
+      "fadeDuration": 0.15,
+      "align": "center",
+      "letterSpacing": 0.0,
+      "lineHeight": 1.2,
+      "opacity": 1.0,
+      "shadow": 0.0,
+      "animationIn": "fade",
+      "animationOut": "fade",
+      "animationInDuration": 0.15,
+      "animationOutDuration": 0.15,
+      "layout": "overlay",
+      "layoutTransition": 0.5
+    }
+  ],
+  "typed-state": [
+    {
+      "start": 0.06767994086667284,
+      "end": 1.0676799408666728,
+      "attachment": {
+        "kind": "timeline",
+        "id": "overlay-4108de51-8ee5-4d7f-bc67-14899a4ebb1b"
+      },
+      "track": 0,
+      "enabled": true,
+      "content": "Inline check",
+      "center": {
+        "x": 0.5,
+        "y": 0.49814102564102564
+      },
+      "size": {
+        "x": 0.19167972831765936,
+        "y": 0.05128205128205128
+      },
+      "fontFamily": "sans-serif",
+      "fontSize": 48.0,
+      "fontWeight": 700.0,
+      "italic": false,
+      "color": "#ffffff",
+      "backgroundStyle": "box",
+      "uppercase": false,
+      "strokeWidth": 0.0,
+      "strokeColor": "#000000",
+      "glow": 0.0,
+      "fadeDuration": 0.15,
+      "align": "center",
+      "letterSpacing": 0.0,
+      "lineHeight": 1.2,
+      "opacity": 1.0,
+      "shadow": 0.0,
+      "animationIn": "fade",
+      "animationOut": "fade",
+      "animationInDuration": 0.15,
+      "animationOutDuration": 0.15,
+      "layout": "overlay",
+      "layoutTransition": 0.5
+    }
+  ],
+  "typed-undo-state": [
+    {
+      "start": 0.06767994086667284,
+      "end": 1.0676799408666728,
+      "attachment": {
+        "kind": "timeline",
+        "id": "overlay-4108de51-8ee5-4d7f-bc67-14899a4ebb1b"
+      },
+      "track": 0,
+      "enabled": true,
+      "content": "Text",
+      "center": {
+        "x": 0.5,
+        "y": 0.49814102564102564
+      },
+      "size": {
+        "x": 0.07260101010101011,
+        "y": 0.05128205128205128
+      },
+      "fontFamily": "sans-serif",
+      "fontSize": 48.0,
+      "fontWeight": 700.0,
+      "italic": false,
+      "color": "#ffffff",
+      "backgroundStyle": "box",
+      "uppercase": false,
+      "strokeWidth": 0.0,
+      "strokeColor": "#000000",
+      "glow": 0.0,
+      "fadeDuration": 0.15,
+      "align": "center",
+      "letterSpacing": 0.0,
+      "lineHeight": 1.2,
+      "opacity": 1.0,
+      "shadow": 0.0,
+      "animationIn": "fade",
+      "animationOut": "fade",
+      "animationInDuration": 0.15,
+      "animationOutDuration": 0.15,
+      "layout": "overlay",
+      "layoutTransition": 0.5
+    }
+  ],
+  "typed-create-undo-state": [],
+  "typed-create-redo-state": [
+    {
+      "start": 0.06767994086667284,
+      "end": 1.0676799408666728,
+      "attachment": {
+        "kind": "timeline",
+        "id": "overlay-4108de51-8ee5-4d7f-bc67-14899a4ebb1b"
+      },
+      "track": 0,
+      "enabled": true,
+      "content": "Text",
+      "center": {
+        "x": 0.5,
+        "y": 0.49814102564102564
+      },
+      "size": {
+        "x": 0.07260101010101011,
+        "y": 0.05128205128205128
+      },
+      "fontFamily": "sans-serif",
+      "fontSize": 48.0,
+      "fontWeight": 700.0,
+      "italic": false,
+      "color": "#ffffff",
+      "backgroundStyle": "box",
+      "uppercase": false,
+      "strokeWidth": 0.0,
+      "strokeColor": "#000000",
+      "glow": 0.0,
+      "fadeDuration": 0.15,
+      "align": "center",
+      "letterSpacing": 0.0,
+      "lineHeight": 1.2,
+      "opacity": 1.0,
+      "shadow": 0.0,
+      "animationIn": "fade",
+      "animationOut": "fade",
+      "animationInDuration": 0.15,
+      "animationOutDuration": 0.15,
+      "layout": "overlay",
+      "layoutTransition": 0.5
+    }
+  ],
+  "typed-redo-state": [
+    {
+      "start": 0.06767994086667284,
+      "end": 1.0676799408666728,
+      "attachment": {
+        "kind": "timeline",
+        "id": "overlay-4108de51-8ee5-4d7f-bc67-14899a4ebb1b"
+      },
+      "track": 0,
+      "enabled": true,
+      "content": "Inline check",
+      "center": {
+        "x": 0.5,
+        "y": 0.49814102564102564
+      },
+      "size": {
+        "x": 0.19167972831765936,
+        "y": 0.05128205128205128
+      },
+      "fontFamily": "sans-serif",
+      "fontSize": 48.0,
+      "fontWeight": 700.0,
+      "italic": false,
+      "color": "#ffffff",
+      "backgroundStyle": "box",
+      "uppercase": false,
+      "strokeWidth": 0.0,
+      "strokeColor": "#000000",
+      "glow": 0.0,
+      "fadeDuration": 0.15,
+      "align": "center",
+      "letterSpacing": 0.0,
+      "lineHeight": 1.2,
+      "opacity": 1.0,
+      "shadow": 0.0,
+      "animationIn": "fade",
+      "animationOut": "fade",
+      "animationInDuration": 0.15,
+      "animationOutDuration": 0.15,
+      "layout": "overlay",
+      "layoutTransition": 0.5
+    }
+  ],
+  "reopened-text": [
+    {
+      "start": 0.06767994086667284,
+      "end": 1.0676799408666728,
+      "attachment": {
+        "kind": "timeline",
+        "id": "overlay-4108de51-8ee5-4d7f-bc67-14899a4ebb1b"
+      },
+      "track": 0,
+      "enabled": true,
+      "content": "Inline check",
+      "center": {
+        "x": 0.5,
+        "y": 0.49814102564102564
+      },
+      "size": {
+        "x": 0.19167972831765936,
+        "y": 0.05128205128205128
+      },
+      "fontFamily": "sans-serif",
+      "fontSize": 48.0,
+      "fontWeight": 700.0,
+      "italic": false,
+      "color": "#ffffff",
+      "backgroundStyle": "box",
+      "uppercase": false,
+      "strokeWidth": 0.0,
+      "strokeColor": "#000000",
+      "glow": 0.0,
+      "fadeDuration": 0.15,
+      "align": "center",
+      "letterSpacing": 0.0,
+      "lineHeight": 1.2,
+      "opacity": 1.0,
+      "shadow": 0.0,
+      "animationIn": "fade",
+      "animationOut": "fade",
+      "animationInDuration": 0.15,
+      "animationOutDuration": 0.15,
+      "layout": "overlay",
+      "layoutTransition": 0.5
+    }
+  ],
+  "package-installed": {
+    "path": "/Applications/Jianku Screen Next.app",
+    "version": "0.2.0-alpha.80",
+    "build": "2026.80.0",
+    "signature": "ad-hoc; strict deep verification passed",
+    "executables": {
+      "Jianku Screen Next": "d7ba56fb73d53c5c2b692498ab2aabad57ac8e3c0757163e91a2449cb762b50b",
+      "cap-cli": "5be9b9ed6a57af96f35fb6bd522d0bd1de72a967c1219c70878ecfaddbd229d4",
+      "cap-exporter": "3b4fdc378f41c85f65573007819b0edcede6b2872cf1a9b2e7cd52451492104e",
+      "cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+      "jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+      "jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+    }
+  },
+  "rollback-archive": {
+    "path": "/Users/moyingxz/Documents/Zzx/05_项目开发/Jianku Screen Next Builds/0.2.0-alpha.79/Jianku Screen Next.app",
+    "version": "0.2.0-alpha.79",
+    "build": "2026.79.0",
+    "signature": "ad-hoc; strict deep verification passed",
+    "executables": {
+      "Jianku Screen Next": "e29382aaa5ab0f5e4216ed91efccb948e7b6d51e3d4773f7cef24877597d3b43",
+      "cap-cli": "65e9efdcf2f8cb528e07ca8f3640aa7aff5b89ce71b089e70cad36c75e20426d",
+      "cap-exporter": "447422f7cfe375ed3e19f760d9e2d15da23d090edac593c10d8cb631c4ac2ce4",
+      "cap-muxer": "f5ffec3c52a13e3c6fbb80840b3e0232a9b0545b8a7688db7543fdbb5f34d8ba",
+      "jianku-device-capture": "083c24308268738c0f2952e8504e2d67c71fb24ee2c2f12627d3d99dc971e981",
+      "jianku-android-capture": "b91f3f59da634f4960368f72f54e430ec2fbf1aea1b2d4dbe94112fcc1c10672"
+    }
+  }
+}
