@@ -3,7 +3,7 @@ use std::{
     collections::BTreeMap,
     fmt,
     io::Write,
-    ops::{Add, Div, Mul, Sub, SubAssign},
+    ops::{Add, Div, Mul, Range, Sub, SubAssign},
     path::Path,
     sync::LazyLock,
 };
@@ -1941,6 +1941,12 @@ pub struct TimelineSource<'a> {
     pub segment: &'a TimelineSegment,
 }
 
+#[derive(Clone, Debug)]
+pub struct TimelineSourceRange<'a> {
+    pub output: Range<f64>,
+    pub source_at_start: Option<TimelineSource<'a>>,
+}
+
 #[derive(Clone, Copy, Debug)]
 pub enum TimelineFrameMapping<'a> {
     Gap {
@@ -2149,7 +2155,13 @@ impl TimelineConfiguration {
             let output_end = effective_to_output(&holds, output_end);
             next_hold_start.map_or(output_end, |hold| output_end.min(hold))
         };
-        Some(match self.get_frame_mapping_unheld(effective)? {
+        let mut mapping = self.get_frame_mapping_unheld(effective)?;
+        let unheld_end = mapping.output_end();
+        // Removing a hold can round an exact output cut back into the outgoing span.
+        if clamp_end(unheld_end) <= frame_time {
+            mapping = self.get_frame_mapping_unheld(unheld_end)?;
+        }
+        Some(match mapping {
             TimelineFrameMapping::Gap { output_end } => TimelineFrameMapping::Gap {
                 output_end: clamp_end(output_end),
             },
@@ -2235,7 +2247,7 @@ impl TimelineConfiguration {
             let next_transition = self.effective_transition(segment_index + 1);
             let next_duration = next_transition.as_ref().map_or(0.0, |value| value.duration);
             let single_start = segment_start + incoming_duration;
-            let output_end = segment_start + segment.duration() - next_duration;
+            let output_end = segment_start + (segment.duration() - next_duration);
 
             if frame_time >= single_start && frame_time < output_end {
                 let source_time = segment.interpolate_time(frame_time - segment_start)?;
@@ -2249,7 +2261,7 @@ impl TimelineConfiguration {
                 });
             }
 
-            segment_start += segment.duration() - next_duration;
+            segment_start = output_end;
         }
 
         let output_end = segment_start + self.trailing_gap();
@@ -2257,10 +2269,7 @@ impl TimelineConfiguration {
             .then_some(TimelineFrameMapping::Gap { output_end })
     }
 
-    pub fn primary_source_for_range(
-        &self,
-        range: std::ops::Range<f64>,
-    ) -> Option<TimelineSource<'_>> {
+    pub fn primary_source_ranges(&self, range: Range<f64>) -> Option<Vec<TimelineSourceRange<'_>>> {
         if !range.start.is_finite()
             || !range.end.is_finite()
             || range.start < 0.0
@@ -2269,23 +2278,30 @@ impl TimelineConfiguration {
             return None;
         }
 
-        let mut mapping = self.get_frame_mapping(range.start)?;
-        let first = mapping.primary_source()?;
+        let mut ranges: Vec<TimelineSourceRange<'_>> = Vec::new();
         let mut time = range.start;
-        loop {
-            if mapping.primary_source()?.segment_index != first.segment_index {
-                return None;
-            }
+        while time < range.end {
+            let mapping = self.get_frame_mapping(time)?;
             let end = mapping.output_end();
             if end <= time || !end.is_finite() {
                 return None;
             }
-            if end >= range.end {
-                return Some(first);
+            let end = end.min(range.end);
+            let source_at_start = mapping.primary_source();
+            let segment_index = source_at_start.map(|source| source.segment_index);
+            if let Some(previous) = ranges.last_mut()
+                && previous.source_at_start.map(|source| source.segment_index) == segment_index
+            {
+                previous.output.end = end;
+            } else {
+                ranges.push(TimelineSourceRange {
+                    output: time..end,
+                    source_at_start,
+                });
             }
             time = end;
-            mapping = self.get_frame_mapping(time)?;
         }
+        Some(ranges)
     }
 
     pub fn get_segment_time(&self, frame_time: f64) -> Option<(f64, &TimelineSegment)> {
@@ -2350,7 +2366,7 @@ impl TimelineConfiguration {
             let next_duration = self
                 .effective_transition(index + 1)
                 .map_or(0.0, |transition| transition.duration);
-            let end = segment_start + segment.duration() - next_duration;
+            let end = segment_start + (segment.duration() - next_duration);
             if segment.hides_cursor() {
                 match windows.last_mut() {
                     Some(last) if (last.1 - segment_start).abs() < 1e-9 => last.1 = end,
@@ -4081,15 +4097,20 @@ mod tests {
     }
 
     #[test]
-    fn primary_source_range_checks_cut_transition_hold_and_gap_boundaries() {
+    fn primary_source_ranges_preserve_clip_instances_and_unowned_time() {
         let mut timeline = timeline_with_transitions(Vec::new());
         timeline.segments[1].id = Some("incoming".into());
+        timeline.segments[1].recording_clip = timeline.segments[0].recording_clip;
 
-        let source = timeline.primary_source_for_range(3.5..4.0).unwrap();
-        assert_eq!(source.segment_index, 0);
-        assert_eq!(source.source_time, 3.5);
-        assert!(timeline.primary_source_for_range(3.5..4.00000005).is_none());
-        assert!(timeline.primary_source_for_range(9.0..11.0).is_none());
+        let ranges = timeline.primary_source_ranges(3.5..4.0).unwrap();
+        assert_eq!(ranges.len(), 1);
+        assert_eq!(ranges[0].source_at_start.unwrap().source_time, 3.5);
+        let ranges = timeline.primary_source_ranges(3.5..4.00000005).unwrap();
+        assert_eq!(ranges.len(), 2);
+        assert_eq!(ranges[0].output, 3.5..4.0);
+        assert_eq!(ranges[1].output, 4.0..4.00000005);
+        assert_eq!(ranges[1].source_at_start.unwrap().segment_index, 1);
+        assert!(timeline.primary_source_ranges(9.0..11.0).is_none());
 
         timeline.transitions = vec![ClipTransition {
             segment_index: 1,
@@ -4098,22 +4119,61 @@ mod tests {
         }];
         timeline.text_segments = vec![fullscreen_text(1.0, 2.0)];
 
-        let source = timeline.primary_source_for_range(0.5..4.0).unwrap();
-        assert_eq!(source.segment_index, 0);
-        assert_eq!(source.source_time, 0.5);
-        assert!(timeline.primary_source_for_range(0.5..4.5).is_none());
-        let incoming = timeline.primary_source_for_range(4.25..5.5).unwrap();
-        assert_eq!(incoming.segment_index, 1);
-        assert_eq!(incoming.source_time, 10.25);
+        let ranges = timeline.primary_source_ranges(0.5..5.5).unwrap();
+        assert_eq!(ranges.len(), 2);
+        assert_eq!(ranges[0].output, 0.5..4.0);
+        assert_eq!(ranges[0].source_at_start.unwrap().source_time, 0.5);
+        assert_eq!(ranges[1].output, 4.0..5.5);
+        assert_eq!(ranges[1].source_at_start.unwrap().source_time, 10.0);
 
         timeline
             .main_track_gaps
             .before_clip
             .insert("incoming".into(), 1.0);
-        assert!(timeline.primary_source_for_range(4.5..6.0).is_none());
-        assert!(timeline.primary_source_for_range(5.0..6.5).is_none());
-        let incoming = timeline.primary_source_for_range(6.0..6.5).unwrap();
-        assert_eq!(incoming.source_time, 10.0);
+        let ranges = timeline.primary_source_ranges(4.5..6.5).unwrap();
+        assert_eq!(ranges.len(), 3);
+        assert_eq!(ranges[0].output, 4.5..5.0);
+        assert_eq!(ranges[0].source_at_start.unwrap().source_time, 3.5);
+        assert_eq!(ranges[1].output, 5.0..6.0);
+        assert!(ranges[1].source_at_start.is_none());
+        assert_eq!(ranges[2].output, 6.0..6.5);
+        assert_eq!(ranges[2].source_at_start.unwrap().source_time, 10.0);
+    }
+
+    #[test]
+    fn outgoing_range_end_is_exactly_the_incoming_transition_start() {
+        let mut timeline = timeline_with_transitions(vec![ClipTransition {
+            segment_index: 2,
+            kind: ClipTransitionType::CrossFade,
+            duration: 0.1,
+        }]);
+        timeline.segments.push(timeline.segments[1].clone());
+        timeline.segments[0].end = 0.7;
+        timeline.segments[1].start = 0.0;
+        timeline.segments[1].end = 1.4;
+
+        let ranges = timeline.primary_source_ranges(1.5..2.1).unwrap();
+        assert_eq!(ranges.len(), 2);
+        assert_eq!(ranges[0].output.end, ranges[1].output.start);
+        assert_eq!(ranges[0].source_at_start.unwrap().segment_index, 1);
+        assert_eq!(ranges[1].source_at_start.unwrap().segment_index, 2);
+        assert!(matches!(
+            timeline.get_frame_mapping(ranges[0].output.end),
+            Some(TimelineFrameMapping::Transition { progress: 0.0, .. })
+        ));
+    }
+
+    #[test]
+    fn source_ranges_continue_at_a_decimal_cut_shifted_by_a_hold() {
+        let mut timeline = timeline_with_transitions(Vec::new());
+        timeline.segments[0].end = 0.8;
+        timeline.text_segments = vec![fullscreen_text(0.1, 0.1 + 0.2)];
+
+        let ranges = timeline.primary_source_ranges(0.5..1.5).unwrap();
+        assert_eq!(ranges.len(), 2);
+        assert_eq!(ranges[0].output, 0.5..1.0);
+        assert_eq!(ranges[1].output, 1.0..1.5);
+        assert_eq!(ranges[1].source_at_start.unwrap().source_time, 10.0);
     }
 
     #[test]

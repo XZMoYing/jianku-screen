@@ -6836,7 +6836,9 @@ pub fn generate_zoom_segments_for_timeline(
 
 fn attach_generated_zooms(timeline: &TimelineConfiguration, zooms: &mut [ZoomSegment]) {
     for zoom in zooms {
-        if let Some(start) = timeline.primary_source_for_range(zoom.start..zoom.end)
+        if let Some(ranges) = timeline.primary_source_ranges(zoom.start..zoom.end)
+            && let [range] = ranges.as_slice()
+            && let Some(start) = range.source_at_start
             && let Some(clip_id) = &start.segment.id
         {
             zoom.attachment = Some(OverlayAttachment::Clip {
