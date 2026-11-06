@@ -1,0 +1,29 @@
+{
+  "native": {
+    "wideClosedPlayerX": 589.5,
+    "wideDockedPlayerX": 733.5,
+    "compactClosedPlayerX": 387.0,
+    "compactDrawerPlayerX": 387.0,
+    "inspectorWidth": 489.0,
+    "previewPlayedToSeconds": 0.23333333333333334,
+    "clipSelectionRetained": true,
+    "projectUnchanged": true,
+    "restoredBounds": {
+      "Height": 953,
+      "Width": 1680,
+      "X": 0,
+      "Y": 25
+    }
+  },
+  "source": {
+    "commit": "b5b69264bb498a7cf785a5225e760a1aecb52b80",
+    "version": "0.2.0-alpha.83",
+    "build": "2026.83.0"
+  },
+  "oldMinimum": {
+    "Height": 800,
+    "Width": 1275,
+    "X": 0,
+    "Y": 25
+  }
+}
