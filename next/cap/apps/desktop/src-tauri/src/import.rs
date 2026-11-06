@@ -1,3 +1,5 @@
+mod staged_assets;
+
 use cap_enc_ffmpeg::{
     AudioEncoder,
     h264::{H264EncoderBuilder, H264Preset},
@@ -20,6 +22,7 @@ use image::ImageEncoder;
 use relative_path::{Component as RelativeComponent, RelativePathBuf};
 use serde::{Deserialize, Serialize};
 use specta::Type;
+use staged_assets::StagedImportAssets;
 use std::{
     collections::HashMap,
     path::{Path, PathBuf},
@@ -420,29 +423,6 @@ fn add_clip_configs(
     }
 }
 
-fn unique_segment_dir(
-    project_path: &Path,
-    index: u32,
-) -> Result<(PathBuf, String), std::io::Error> {
-    let segments_root = project_path.join("content").join("segments");
-    std::fs::create_dir_all(&segments_root)?;
-
-    let mut counter = 0;
-    loop {
-        let name = if counter == 0 {
-            format!("segment-{index}")
-        } else {
-            format!("segment-{index}-import-{counter}")
-        };
-        let path = segments_root.join(&name);
-        if !path.exists() {
-            std::fs::create_dir_all(&path)?;
-            return Ok((path, format!("content/segments/{name}")));
-        }
-        counter += 1;
-    }
-}
-
 fn relative_file_extension(path: &RelativePathBuf, fallback: &str) -> String {
     Path::new(path.as_str())
         .extension()
@@ -701,10 +681,19 @@ fn copy_source_cursor_images(
     target_project_path: &Path,
     target_cursors: &mut Cursors,
     import_token: &str,
+    assets: &mut StagedImportAssets,
 ) -> Result<HashMap<String, String>, String> {
-    let target_cursor_dir = target_project_path.join("content").join("cursors");
-    std::fs::create_dir_all(&target_cursor_dir)
-        .map_err(|e| format!("Failed to create cursor directory: {e}"))?;
+    if match source_cursors {
+        Cursors::Correct(cursors) => cursors.is_empty(),
+        Cursors::Old(cursors) => cursors.is_empty(),
+    } {
+        return Ok(HashMap::new());
+    }
+
+    let relative_dir = assets
+        .reserve_cursors()
+        .map_err(|error| format!("Failed to prepare imported cursor directory: {error}"))?;
+    let target_cursor_dir = target_project_path.join(&relative_dir);
 
     let target_cursors = normalize_cursors_to_correct(target_cursors);
     let mut id_map = HashMap::new();
@@ -727,7 +716,7 @@ fn copy_source_cursor_images(
                 let target_file_name =
                     unique_file_name(&target_cursor_dir, &format!("{new_id}-{source_file_name}"));
                 let target_relative_path =
-                    RelativePathBuf::from(format!("content/cursors/{target_file_name}"));
+                    RelativePathBuf::from(format!("{relative_dir}/{target_file_name}"));
 
                 copy_file_to_relative_path(
                     &source_path,
@@ -764,7 +753,7 @@ fn copy_source_cursor_images(
                 let target_file_name =
                     unique_file_name(&target_cursor_dir, &format!("{new_id}-{source_file_name}"));
                 let target_relative_path =
-                    RelativePathBuf::from(format!("content/cursors/{target_file_name}"));
+                    RelativePathBuf::from(format!("{relative_dir}/{target_file_name}"));
 
                 copy_file_to_relative_path(
                     &source_path,
@@ -1622,6 +1611,21 @@ pub async fn start_video_import(app: AppHandle, source_path: PathBuf) -> Result<
     Ok(return_path)
 }
 
+fn save_appended_project(
+    metadata: &RecordingMeta,
+    config: &ProjectConfiguration,
+    assets: StagedImportAssets,
+) -> Result<(), String> {
+    metadata
+        .save_for_project()
+        .map_err(|error| format!("Failed to save project metadata: {error:?}"))?;
+    // The metadata already references these assets even if the timeline write fails.
+    assets.retain();
+    config
+        .write(&metadata.project_path)
+        .map_err(|error| format!("Failed to save project config: {error}"))
+}
+
 async fn append_mp4_to_editor_project(
     app: AppHandle,
     target_project_path: PathBuf,
@@ -1642,16 +1646,6 @@ async fn append_mp4_to_editor_project(
     };
     ensure_project_timeline(&mut config, &target_project_path, &existing_segments)?;
 
-    let new_index = existing_segments.len() as u32;
-    let (_, target_relative_dir) = unique_segment_dir(&target_project_path, new_index)
-        .map_err(|e| format!("Failed to create imported segment directory: {e}"))?;
-
-    let output_video_relative_path =
-        RelativePathBuf::from(format!("{target_relative_dir}/display.mp4"));
-    let output_audio_relative_path =
-        RelativePathBuf::from(format!("{target_relative_dir}/audio.ogg"));
-    let output_video_path = output_video_relative_path.to_path(&target_project_path);
-    let output_audio_path = output_audio_relative_path.to_path(&target_project_path);
     let project_path_str = target_project_path.to_string_lossy().to_string();
 
     emit_progress(
@@ -1668,6 +1662,18 @@ async fn append_mp4_to_editor_project(
         return Err("Video format not supported or file is corrupted".to_string());
     }
 
+    let new_index = existing_segments.len() as u32;
+    let mut assets = StagedImportAssets::new(target_project_path.clone());
+    let target_relative_dir = assets
+        .reserve_segment(new_index)
+        .map_err(|error| format!("Failed to prepare imported segment directory: {error}"))?;
+    let output_video_relative_path =
+        RelativePathBuf::from(format!("{target_relative_dir}/display.mp4"));
+    let output_audio_relative_path =
+        RelativePathBuf::from(format!("{target_relative_dir}/audio.ogg"));
+    let output_video_path = output_video_relative_path.to_path(&target_project_path);
+    let output_audio_path = output_audio_relative_path.to_path(&target_project_path);
+
     emit_progress(
         &app,
         &project_path_str,
@@ -1683,15 +1689,16 @@ async fn append_mp4_to_editor_project(
     let project_path_str_for_transcode = project_path_str.clone();
     let target_project_path_for_transcode = target_project_path.clone();
 
-    let (fps, sample_rate) = tokio::task::spawn_blocking(move || {
-        transcode_video(
+    let (assets, fps, sample_rate) = tokio::task::spawn_blocking(move || {
+        let (fps, sample_rate) = transcode_video(
             &app_for_transcode,
             &source_path_for_transcode,
             &output_video_path_for_transcode,
             Some(&output_audio_path_for_transcode),
             &project_path_str_for_transcode,
             &target_project_path_for_transcode,
-        )
+        )?;
+        Ok::<_, ImportError>((assets, fps, sample_rate))
     })
     .await
     .map_err(|e| format!("Video import task failed: {e}"))?
@@ -1753,12 +1760,7 @@ async fn append_mp4_to_editor_project(
         std::slice::from_ref(&imported_segment),
     );
 
-    target_meta
-        .save_for_project()
-        .map_err(|e| format!("Failed to save project metadata: {e:?}"))?;
-    config
-        .write(&target_project_path)
-        .map_err(|e| format!("Failed to save project config: {e}"))?;
+    save_appended_project(&target_meta, &config, assets)?;
 
     emit_progress(
         &app,
@@ -1817,6 +1819,7 @@ async fn append_cap_project_to_editor_project(
     };
     ensure_project_timeline(&mut config, &target_project_path, &existing_segments)?;
 
+    let mut assets = StagedImportAssets::new(target_project_path.clone());
     let (base_index, copied_segments, source_to_target_index) = {
         let inner = ensure_multiple_segments(&mut target_meta)?;
         inner.status = Some(StudioRecordingStatus::Complete);
@@ -1829,6 +1832,7 @@ async fn append_cap_project_to_editor_project(
                 &target_project_path,
                 &mut inner.cursors,
                 &import_token,
+                &mut assets,
             )?
         } else {
             HashMap::new()
@@ -1839,9 +1843,9 @@ async fn append_cap_project_to_editor_project(
 
         for (source_index, source_segment) in source_segments.iter().enumerate() {
             let target_index = base_index + copied_segments.len() as u32;
-            let (_, target_relative_dir) =
-                unique_segment_dir(&target_project_path, target_index)
-                    .map_err(|e| format!("Failed to create imported segment directory: {e}"))?;
+            let target_relative_dir = assets.reserve_segment(target_index).map_err(|error| {
+                format!("Failed to prepare imported segment directory: {error}")
+            })?;
             let copied_segment = copy_source_segment(
                 &source_meta,
                 source_segment,
@@ -1887,12 +1891,7 @@ async fn append_cap_project_to_editor_project(
 
     add_clip_configs(&mut config, base_index, &copied_segments);
 
-    target_meta
-        .save_for_project()
-        .map_err(|e| format!("Failed to save project metadata: {e:?}"))?;
-    config
-        .write(&target_project_path)
-        .map_err(|e| format!("Failed to save project config: {e}"))?;
+    save_appended_project(&target_meta, &config, assets)?;
 
     Ok(copied_segments.len())
 }
