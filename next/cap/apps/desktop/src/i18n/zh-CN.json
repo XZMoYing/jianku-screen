@@ -1641,5 +1641,14 @@
 	"Different recording": "来自不同素材",
 	"Footage was cut between them": "两个片段之间的源画面已被剪除",
 	"The clips are separated by a gap": "两个片段在时间线上有空隙",
+	"Main track magnetism": "主轨磁吸",
+	"Main track magnetism is on. Turn off to leave gaps.": "主轨磁吸已开启，关闭后可保留空隙。",
+	"Main track magnetism is off. Turn on to close gaps.": "主轨磁吸已关闭，开启会收拢主轨空隙。",
+	"Turn off main track magnetism": "关闭主轨磁吸",
+	"Close gaps and turn on main track magnetism": "收拢空隙并开启主轨磁吸",
+	"Not enough room to change the clip speed": "空隙不足，无法将片段调整到这个速度。",
+	"Not enough room to change this transition": "空隙不足，无法调整这个转场。",
+	"Could not cut this range without moving other clips": "无法在保持其他片段位置的情况下剪除这段画面。",
+	"Remove the transition before merging these clips": "请先移除两个片段之间的转场，再合并。",
 	"Match the clip speeds first": "请先统一片段速度"
 }

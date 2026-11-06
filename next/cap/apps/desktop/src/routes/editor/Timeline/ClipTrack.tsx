@@ -51,17 +51,26 @@ import {
 	createEditorContextMenu,
 	isContextMenuKey,
 } from "../editor-context-menu";
+import {
+	planMainTrackMove,
+	trimPositionedMainTrackClip,
+} from "../main-track-edit";
 import { TextInput } from "../TextInput";
 import {
 	effectiveToOutput,
 	effectiveToOutputEnd,
+	heldTimeBefore,
 	holdWindows,
 } from "../timeline-holds";
 import { createClipTrim } from "./clip-trim";
 import { useSegmentContext, useTimelineContext } from "./context";
 import { createTimelineMouseDrag } from "./mouse-drag";
 import { getSectionMarker } from "./sectionMarker";
-import { SPLIT_SNAP_PX, snapSplitTime } from "./split-snapping";
+import {
+	nearestTimelineSnap,
+	SPLIT_SNAP_PX,
+	snapSplitTime,
+} from "./split-snapping";
 import {
 	SegmentContent,
 	SegmentHandle,
@@ -658,6 +667,8 @@ export function ClipTrack(
 		project,
 		setProject,
 		projectActions,
+		projectRevision,
+		mainTrackMagnetic,
 		editorInstance,
 		projectHistory,
 		editorState,
@@ -675,13 +686,28 @@ export function ClipTrack(
 		project.timeline?.segments ?? [{ start: 0, end: duration(), timescale: 1 }];
 	const transitionMenu = createEditorContextMenu();
 	const startTrim = createTimelineMouseDrag();
+	const [movePreview, setMovePreview] = createSignal<{
+		clip: TimelineSegment;
+		start: number;
+	} | null>(null);
 	const [trimPreview, setTrimPreview] = createSignal<{
 		clip: TimelineSegment;
 		startOffset: number;
+		endOffset?: number;
 	} | null>(null);
 	const trimStartOffset = (clip: TimelineSegment) => {
 		const preview = trimPreview();
 		return preview?.clip === clip ? preview.startOffset : 0;
+	};
+	const trimEndOffset = (clip: TimelineSegment) => {
+		const preview = trimPreview();
+		return preview?.clip === clip
+			? (preview.endOffset ?? preview.startOffset)
+			: 0;
+	};
+	const displayedClipStart = (clip: TimelineSegment, start: number) => {
+		const move = movePreview();
+		return move?.clip === clip ? move.start : start;
 	};
 
 	const canAddTransition = (index: number) =>
@@ -856,14 +882,15 @@ export function ClipTrack(
 		const visible: number[] = [];
 		for (let i = 0; i < segs.length; i++) {
 			const seg = segs[i];
-			const offset = trimStartOffset(seg);
-			const segStart = effectiveToOutput(holds, offsets[i] + offset);
+			const start = displayedClipStart(seg, offsets[i]);
+			const segStart = effectiveToOutput(holds, start + trimStartOffset(seg));
 			const segEnd = clipEndOnOutput(
 				i,
-				offsets[i] + offset + clipDuration(seg),
+				start + trimEndOffset(seg) + clipDuration(seg),
 			);
 			if (
 				i === draggedIndex ||
+				movePreview()?.clip === seg ||
 				trimPreview()?.clip === seg ||
 				isSegmentVisible(segStart, segEnd)
 			) {
@@ -883,6 +910,107 @@ export function ClipTrack(
 				editorState.previewTime ?? editorState.playbackTime,
 			);
 		}
+	}
+
+	function beginClipMove(downEvent: MouseEvent, clip: TimelineSegment) {
+		const timeline = project.timeline;
+		const clipId = clip.id;
+		if (!timeline || !clipId) return false;
+		const plan = planMainTrackMove(timeline, clipId);
+		if (!plan) return false;
+		const track = (downEvent.currentTarget as HTMLElement | null)?.closest(
+			"[data-main-track]",
+		);
+		const magnetic = mainTrackMagnetic();
+		const revision = projectRevision();
+		const holds = heldWindows();
+		const scale = secsPerPixel();
+		const origin = effectiveToOutput(holds, plan.start);
+		const targets = snapping
+			? [editorState.playbackTime, ...snapping.targets(clip)]
+			: [];
+		const offsets = segmentOffsets();
+		let insertion = 0;
+		let position = plan.start;
+		let active = false;
+		const unheld = (time: number) => time - heldTimeBefore(holds, time);
+		const valid = () =>
+			projectRevision() === revision &&
+			mainTrackMagnetic() === magnetic &&
+			!split() &&
+			segments().some((segment) => segment.id === clipId);
+		startTrim(() => ({
+			isValid: valid,
+			update(event) {
+				const delta = event.clientX - downEvent.clientX;
+				if (!active && Math.abs(delta) < 4) return;
+				active = true;
+				const requested = unheld(origin + delta * scale);
+				if (magnetic) {
+					const clips = segments();
+					const slot = offsets.findIndex(
+						(offset, index) =>
+							requested + plan.length / 2 <
+							offset + clipDuration(clips[index]) / 2,
+					);
+					insertion = slot < 0 ? clips.length : slot;
+					const boundary =
+						offsets[insertion] ??
+						(offsets.at(-1) ?? 0) + clipDuration(clips.at(-1) ?? clip);
+					snapping?.setGuide(effectiveToOutput(holds, boundary));
+					return;
+				}
+				position = plan.place(requested);
+				let guide: number | null = null;
+				if (snapping?.enabled() && !event.altKey) {
+					let distance = Infinity;
+					for (const edge of [0, plan.length]) {
+						const output = effectiveToOutput(holds, requested + edge);
+						const snap = nearestTimelineSnap(
+							[output],
+							targets,
+							SPLIT_SNAP_PX * scale,
+							(_delta, _edge, target) =>
+								Math.abs(
+									effectiveToOutput(
+										holds,
+										plan.place(unheld(target) - edge) + edge,
+									) - target,
+								) < 1e-7,
+						);
+						if (snap && Math.abs(snap.delta) < distance) {
+							guide = snap.time;
+							distance = Math.abs(snap.delta);
+							position = plan.place(unheld(snap.time) - edge);
+						}
+					}
+				}
+				snapping?.setGuide(guide);
+				setMovePreview({ clip, start: position });
+			},
+			finish(event, reason) {
+				setMovePreview(null);
+				snapping?.setGuide(null);
+				if (reason !== "release" || !event || !valid()) return;
+				const index = segments().findIndex((segment) => segment.id === clipId);
+				if (!active) {
+					if (index >= 0) selectClip(index, event);
+					return;
+				}
+				const rect = track?.getBoundingClientRect();
+				if (
+					rect &&
+					(event.clientX < rect.left ||
+						event.clientX > rect.right ||
+						event.clientY < rect.top ||
+						event.clientY > rect.bottom)
+				)
+					return;
+				if (magnetic) projectActions.moveClipSegment(clipId, insertion);
+				else projectActions.moveClipTo(clipId, position);
+			},
+		}));
+		return true;
 	}
 
 	function beginClipTrim(
@@ -916,8 +1044,24 @@ export function ClipTrack(
 			const previousEnd = previous?.end;
 			const nextStart = next?.start;
 			const targets = snapping
-				? [editorState.playbackTime, ...snapping.targets(clip, index)]
+				? [
+						editorState.playbackTime,
+						...snapping.targets(clip, mainTrackMagnetic() ? index : undefined),
+					]
 				: [];
+			const magnetic = mainTrackMagnetic();
+			const timeline = project.timeline;
+			const sourceLimits = magnetic
+				? undefined
+				: {
+						min:
+							clip.start -
+							clipGapBefore(clip, timeline?.mainTrackGaps) * timescale,
+						max: next
+							? clip.end +
+								clipGapAfter(items, index, timeline?.mainTrackGaps) * timescale
+							: recording.display.duration,
+					};
 			const trim = createClipTrim({
 				clip,
 				edge,
@@ -925,6 +1069,7 @@ export function ClipTrack(
 				holds,
 				previous,
 				next,
+				sourceLimits,
 				sourceDuration: recording.display.duration,
 				minSourceDuration: Math.max(
 					1,
@@ -937,6 +1082,59 @@ export function ClipTrack(
 						timescale,
 				),
 			});
+			if (!magnetic && timeline && clip.id) {
+				const clipId = clip.id;
+				const revision = projectRevision();
+				let sourceTime = initial;
+				const valid = () =>
+					!split() &&
+					!mainTrackMagnetic() &&
+					projectRevision() === revision &&
+					project.timeline?.segments[index]?.id === clipId;
+				return {
+					isValid: valid,
+					update(event) {
+						const delta = event.clientX - downEvent.clientX;
+						if (Math.abs(delta) <= 2 && sourceTime === initial) return;
+						const result = trim.edit(
+							delta,
+							scale,
+							snapping?.enabled() && !event.altKey ? targets : [],
+						);
+						const candidate = {
+							segments: timeline.segments.slice(),
+							transitions: timeline.transitions,
+							mainTrackGaps: timeline.mainTrackGaps,
+						};
+						if (
+							result.sourceTime !== initial &&
+							!trimPositionedMainTrackClip(
+								candidate,
+								clipId,
+								edge,
+								result.sourceTime,
+							)
+						) {
+							snapping?.setGuide(null);
+							return;
+						}
+						sourceTime = result.sourceTime;
+						const shift = (sourceTime - initial) / timescale;
+						snapping?.setGuide(result.guide);
+						setTrimPreview({
+							clip,
+							startOffset: edge === "start" ? shift : 0,
+							endOffset: edge === "end" ? shift : 0,
+						});
+					},
+					finish(_event, reason) {
+						setTrimPreview(null);
+						snapping?.setGuide(null);
+						if (reason === "release" && valid() && sourceTime !== initial)
+							projectActions.trimClipAtPosition(clipId, edge, sourceTime);
+					},
+				};
+			}
 
 			let expected = initial;
 			let moved = false;
@@ -960,7 +1158,8 @@ export function ClipTrack(
 				heldWindows().every(
 					([start, end], i) => start === holds[i][0] && end === holds[i][1],
 				);
-			const valid = () => !split() && ownsEdge() && sameContext();
+			const valid = () =>
+				!split() && mainTrackMagnetic() && ownsEdge() && sameContext();
 
 			return {
 				isValid: valid,
@@ -1076,6 +1275,7 @@ export function ClipTrack(
 
 	return (
 		<TrackRoot
+			data-main-track
 			ref={props.ref}
 			onContextMenu={showTransitionAtSeam}
 			onMouseEnter={() => setEditorState("timeline", "hoveredTrack", "clip")}
@@ -1134,17 +1334,17 @@ export function ClipTrack(
 
 					const relativeSegment = createMemo(() => {
 						const seg = segment();
-						const offset = trimStartOffset(seg);
+						const start = displayedClipStart(seg, prevDuration());
 						const holds = heldWindows();
 
 						return {
 							start: Math.max(
-								effectiveToOutput(holds, prevDuration() + offset),
+								effectiveToOutput(holds, start + trimStartOffset(seg)),
 								0,
 							),
 							end: clipEndOnOutput(
 								i(),
-								prevDuration() + offset + clipDuration(seg),
+								start + trimEndOffset(seg) + clipDuration(seg),
 							),
 							timescale: seg.timescale,
 							recordingSegment: seg.recordingSegment,
@@ -1366,6 +1566,14 @@ export function ClipTrack(
 										// recording-flow domain itself.
 										projectActions.splitClipSegment(splitTimeAt(e).time, i());
 									} else {
+										if (
+											!e.shiftKey &&
+											!e.ctrlKey &&
+											!e.metaKey &&
+											(!mainTrackMagnetic() || !e.altKey) &&
+											beginClipMove(e, segment())
+										)
+											return;
 										const index = i();
 										const initialTransition = getClipTransition(
 											segments(),
@@ -1847,9 +2055,10 @@ function useSectionMarker(
 		position: "left" | "right";
 	},
 ) {
-	const { editorInstance, project } = useEditorContext();
+	const { editorInstance, project, mainTrackMagnetic } = useEditorContext();
 
 	return () => {
+		if (!mainTrackMagnetic()) return null;
 		const options = props();
 		const gaps = project.timeline?.mainTrackGaps;
 		const adjacentGap =

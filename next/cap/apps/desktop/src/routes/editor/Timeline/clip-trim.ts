@@ -17,6 +17,7 @@ type ClipTrimOptions = {
 	minSourceDuration: number;
 	previous?: TimelineSegment;
 	next?: TimelineSegment;
+	sourceLimits?: { min: number; max: number };
 };
 
 export function createClipTrim({
@@ -28,6 +29,7 @@ export function createClipTrim({
 	minSourceDuration,
 	previous,
 	next,
+	sourceLimits,
 }: ClipTrimOptions) {
 	const { start, end, timescale } = clip;
 	const initial = clip[edge];
@@ -56,6 +58,10 @@ export function createClipTrim({
 				? next.start
 				: sourceDuration;
 		max = Math.max(end, Math.min(sourceDuration, nextLimit));
+	}
+	if (sourceLimits) {
+		min = Math.max(min, sourceLimits.min);
+		max = Math.min(max, sourceLimits.max);
 	}
 
 	function resolve(output: number) {

@@ -4,6 +4,7 @@ import {
 } from "@solid-primitives/bounds";
 import { createContextProvider } from "@solid-primitives/context";
 import { trackStore } from "@solid-primitives/deep";
+import { makePersisted } from "@solid-primitives/storage";
 import { createQuery, skipToken } from "@tanstack/solid-query";
 import {
 	type Accessor,
@@ -105,6 +106,17 @@ import {
 	rippleKeyboardTrack,
 	splitKeyboardSegment,
 } from "./keyboard-timing";
+import {
+	appendMainTrackClip,
+	closeMainTrackGaps,
+	deletePositionedMainTrackClip,
+	hasMainTrackGaps,
+	movePositionedMainTrackClip,
+	reorderPositionedMainTrackClip,
+	setPositionedMainTrackSpeed,
+	setPositionedMainTrackTransition,
+	trimPositionedMainTrackClip,
+} from "./main-track-edit";
 import type { MaskSegment } from "./masks";
 import { usePreparingEditor } from "./preparing-editor-context";
 import { createPreparingPlaybackHandoff } from "./preparing-playback-handoff";
@@ -422,12 +434,50 @@ export const [EditorContextProvider, useBaseEditorContext] =
 			const [project, setProject] = createStore<EditorProjectConfiguration>(
 				normalizeProject(props.editorInstance.savedProjectConfig),
 			);
+			const [preferredMagnetism, setPreferredMagnetism] = makePersisted(
+				createSignal(true),
+				{ name: "editorMainTrackMagnetism" },
+			);
+			const [magneticMode, setMagneticMode] = createSignal(
+				preferredMagnetism() && !hasMainTrackGaps(project.timeline),
+			);
+			const mainTrackMagnetic = () =>
+				magneticMode() && !hasMainTrackGaps(project.timeline);
+			const toggleMainTrackMagnetism = () => {
+				const next = !mainTrackMagnetic();
+				batch(() => {
+					if (next && hasMainTrackGaps(project.timeline))
+						setProject(
+							produce((project) => {
+								if (project.timeline) closeMainTrackGaps(project.timeline);
+							}),
+						);
+					setMagneticMode(next);
+					setPreferredMagnetism(next);
+				});
+			};
 			let clipSelectionBeforeRestore: string[] = [];
 
 			const setClipTransition = (
 				segmentIndex: number,
 				transition: ClipTransitionInput | null,
 			) => {
+				if (!mainTrackMagnetic()) {
+					let changed = false;
+					setProject(
+						produce((project) => {
+							if (project.timeline)
+								changed = setPositionedMainTrackTransition(
+									project.timeline,
+									segmentIndex,
+									transition,
+								);
+						}),
+					);
+					if (!changed)
+						toast.error(localize("Not enough room to change this transition"));
+					return;
+				}
 				setProject(
 					produce((project) => {
 						const timeline = project.timeline;
@@ -658,6 +708,39 @@ export const [EditorContextProvider, useBaseEditorContext] =
 			const [camera3DShotStop, setCamera3DShotStop] = createSignal<{
 				end: number;
 			} | null>(null);
+			const commitClipMove = (
+				clipId: string,
+				update: (timeline: EditorTimelineConfiguration) => boolean,
+			) => {
+				const selection = editorState.timeline.selection;
+				const selectedIds =
+					selection?.type === "clip"
+						? selection.indices.flatMap((index) => {
+								const id = project.timeline?.segments[index]?.id;
+								return id ? [id] : [];
+							})
+						: [];
+				return batch(() => {
+					let moved = false;
+					setProject(
+						produce((project) => {
+							if (project.timeline) moved = update(project.timeline);
+						}),
+					);
+					if (!moved) return false;
+					const ids = selectedIds.includes(clipId) ? selectedIds : [clipId];
+					const indices = clipIndicesForIds(
+						project.timeline?.segments ?? [],
+						ids,
+					);
+					setEditorState(
+						"timeline",
+						"selection",
+						indices.length ? { type: "clip", indices } : null,
+					);
+					return true;
+				});
+			};
 
 			const projectActions = {
 				setClipTransition,
@@ -714,6 +797,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 						end: duration,
 						timescale: 1,
 					});
+					let appended = false;
 					batch(() => {
 						setProject(
 							produce((project) => {
@@ -734,50 +818,54 @@ export const [EditorContextProvider, useBaseEditorContext] =
 									textSegments: [],
 									camera3dSegments: [],
 								};
-								project.timeline.segments.push(clip);
+								if (mainTrackMagnetic()) {
+									project.timeline.segments.push(clip);
+									appended = true;
+								} else appended = appendMainTrackClip(project.timeline, clip);
 							}),
 						);
-						setEditorState("timeline", "selection", {
-							type: "clip",
-							indices: [(project.timeline?.segments.length ?? 1) - 1],
-						});
+						if (appended)
+							setEditorState("timeline", "selection", {
+								type: "clip",
+								indices: [(project.timeline?.segments.length ?? 1) - 1],
+							});
 					});
-					return true;
+					return appended;
 				},
-				moveClipSegment: (clipId: string, insertionIndex: number) => {
-					const selection = editorState.timeline.selection;
-					const selectedIds =
-						selection?.type === "clip"
-							? selection.indices.flatMap((index) => {
-									const id = project.timeline?.segments[index]?.id;
-									return id ? [id] : [];
-								})
-							: [];
-					let moved = false;
-					batch(() => {
-						setProject(
-							produce((project) => {
-								if (project.timeline)
-									moved =
-										reorderClipInstance(
-											project.timeline,
-											clipId,
-											insertionIndex,
-										) !== null;
-							}),
-						);
-						if (!moved) return;
-						const ids = selectedIds.includes(clipId) ? selectedIds : [clipId];
-						const indices = clipIndicesForIds(
-							project.timeline?.segments ?? [],
-							ids,
-						);
-						setEditorState(
-							"timeline",
-							"selection",
-							indices.length ? { type: "clip", indices } : null,
-						);
-					});
+				moveClipSegment: (clipId: string, insertionIndex: number) =>
+					commitClipMove(clipId, (timeline) =>
+						mainTrackMagnetic()
+							? reorderClipInstance(timeline, clipId, insertionIndex) !== null
+							: reorderPositionedMainTrackClip(
+									timeline,
+									clipId,
+									insertionIndex,
+								),
+					),
+				moveClipTo: (clipId: string, start: number) =>
+					!mainTrackMagnetic() &&
+					commitClipMove(clipId, (timeline) =>
+						movePositionedMainTrackClip(timeline, clipId, start),
+					),
+				trimClipAtPosition: (
+					clipId: string,
+					edge: "start" | "end",
+					sourceTime: number,
+				) => {
+					if (mainTrackMagnetic()) return false;
+					let trimmed = false;
+					setProject(
+						produce((project) => {
+							if (project.timeline)
+								trimmed = trimPositionedMainTrackClip(
+									project.timeline,
+									clipId,
+									edge,
+									sourceTime,
+								);
+						}),
+					);
+					return trimmed;
 				},
 				splitClipSegment: (time: number, requestedSegmentIndex?: number) => {
 					let didSplit = false;
@@ -865,7 +953,9 @@ export const [EditorContextProvider, useBaseEditorContext] =
 							produce((project) => {
 								const timeline = project.timeline;
 								if (!timeline) return;
-								deleteClipAndRippleAllTracks(timeline, segmentIndex);
+								if (mainTrackMagnetic())
+									deleteClipAndRippleAllTracks(timeline, segmentIndex);
+								else deletePositionedMainTrackClip(timeline, segmentIndex);
 							}),
 						);
 						setEditorState("timeline", "selection", null);
@@ -1606,6 +1696,24 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					});
 				},
 				setClipSegmentTimescale: (index: number, timescale: number) => {
+					if (!mainTrackMagnetic()) {
+						if (project.timeline?.segments[index]?.timescale === timescale)
+							return;
+						let changed = false;
+						setProject(
+							produce((project) => {
+								if (project.timeline)
+									changed = setPositionedMainTrackSpeed(
+										project.timeline,
+										index,
+										timescale,
+									);
+							}),
+						);
+						if (!changed)
+							toast.error(localize("Not enough room to change the clip speed"));
+						return;
+					}
 					setProject(
 						produce((project) => {
 							const timeline = project.timeline;
@@ -1798,6 +1906,20 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					)
 						return;
 					const kept = clipMergeKeptIndex(index, direction);
+					if (
+						!mainTrackMagnetic() &&
+						getClipTransition(
+							timeline.segments,
+							timeline.transitions,
+							kept + 1,
+							timeline.mainTrackGaps,
+						)
+					) {
+						toast.error(
+							localize("Remove the transition before merging these clips"),
+						);
+						return;
+					}
 					batch(() => {
 						// Dropping the transition on the merged boundary first lets
 						// setClipTransition ripple the other tracks for the overlap it
@@ -2902,6 +3024,8 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				project,
 				setProject,
 				projectActions,
+				mainTrackMagnetic,
+				toggleMainTrackMagnetism,
 				flushProjectConfig: projectSave.flush,
 				projectRevision: projectSave.revision,
 				baseProject: project,

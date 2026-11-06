@@ -36,6 +36,7 @@ import {
 	rangeIntersectsClipTransition,
 } from "./clip-transitions";
 import { FPS, useEditorContext } from "./context";
+import { cutPositionedMainTrackRange } from "./main-track-edit";
 import { routeEditorPlaybackIntent } from "./playback-intent-routing";
 import { rippleDeleteAllTracks } from "./timeline-utils";
 
@@ -71,6 +72,7 @@ export function TranscriptPanel() {
 		editorState,
 		setEditorState,
 		project,
+		mainTrackMagnetic,
 		setProject,
 		editorInstance,
 		meta,
@@ -424,6 +426,34 @@ export function TranscriptPanel() {
 			toast.error(localize("请先移除附近的转场，再删除这段转录文本。"));
 			return;
 		}
+		const cuts = [...mergedOutputRanges]
+			.reverse()
+			.filter((range) => range.end - range.start > 0.001);
+		const positioned =
+			timeline && !mainTrackMagnetic() && cuts.length
+				? {
+						segments: timeline.segments.slice(),
+						transitions: timeline.transitions,
+						mainTrackGaps: timeline.mainTrackGaps,
+					}
+				: null;
+		if (
+			positioned &&
+			cuts.some(
+				(range) =>
+					!cutPositionedMainTrackRange(
+						positioned,
+						range.segmentIndex,
+						range.start,
+						range.end,
+					),
+			)
+		) {
+			toast.error(
+				localize("Could not cut this range without moving other clips"),
+			);
+			return;
+		}
 
 		setProject(
 			produce((p) => {
@@ -449,15 +479,19 @@ export function TranscriptPanel() {
 				}
 
 				if (p.timeline) {
-					for (const range of [...mergedOutputRanges].reverse()) {
-						if (range.end - range.start <= 0.001) continue;
-						rippleDeleteAllTracks(
-							p.timeline,
-							range.start,
-							range.end,
-							range.segmentIndex,
-						);
-					}
+					if (positioned) {
+						p.timeline.segments = positioned.segments;
+						p.timeline.transitions = positioned.transitions;
+						p.timeline.mainTrackGaps = positioned.mainTrackGaps;
+					} else
+						for (const range of cuts) {
+							rippleDeleteAllTracks(
+								p.timeline,
+								range.start,
+								range.end,
+								range.segmentIndex,
+							);
+						}
 				}
 			}),
 		);

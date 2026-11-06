@@ -25,6 +25,7 @@ import {
 import { produce } from "solid-js/store";
 import toast from "solid-toast";
 import { t as localize } from "~/utils/i18n";
+import IconLucideAlignHorizontalDistributeCenter from "~icons/lucide/align-horizontal-distribute-center";
 import IconLucideMagnet from "~icons/lucide/magnet";
 import IconLucidePalette from "~icons/lucide/palette";
 import { newClipInstance } from "../clip-identity";
@@ -228,6 +229,8 @@ export function Timeline(props: {
 		totalDuration,
 		editorState,
 		projectActions,
+		mainTrackMagnetic,
+		toggleMainTrackMagnetism,
 		meta,
 		previewResolutionBase,
 		canvasControls,
@@ -1112,6 +1115,14 @@ export function Timeline(props: {
 				run: () => queueMicrotask(() => setTrackPickerOpen(true)),
 			},
 			{
+				label: localize(
+					mainTrackMagnetic()
+						? "Turn off main track magnetism"
+						: "Close gaps and turn on main track magnetism",
+				),
+				run: toggleMainTrackMagnetism,
+			},
+			{
 				label: localize("显示整个时间线"),
 				shortcut: keymap.label("fit"),
 				run: timelineCommands.fit,
@@ -1426,6 +1437,25 @@ export function Timeline(props: {
 							onAdd={handleAddTrack}
 						/>
 					</div>
+					<button
+						type="button"
+						class={cx(
+							"absolute right-8 top-0.5 z-50 grid size-6 place-items-center rounded-md bg-ed-card focus-visible:outline-ed-accent",
+							mainTrackMagnetic() ? "text-ed-accent" : "text-ed-text-3",
+						)}
+						aria-label={localize("Main track magnetism")}
+						aria-pressed={mainTrackMagnetic()}
+						disabled={props.inactive}
+						title={localize(
+							mainTrackMagnetic()
+								? "Main track magnetism is on. Turn off to leave gaps."
+								: "Main track magnetism is off. Turn on to close gaps.",
+						)}
+						onMouseDown={(event) => event.stopPropagation()}
+						onClick={toggleMainTrackMagnetism}
+					>
+						<IconLucideAlignHorizontalDistributeCenter class="size-4" />
+					</button>
 					<button
 						type="button"
 						class={cx(
