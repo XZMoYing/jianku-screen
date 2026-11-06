@@ -1,0 +1,29 @@
+{
+	"version": "0.2.0-alpha.86",
+	"build": "2026.86.0",
+	"platform": "macOS",
+	"cursor": {
+		"missingCursorAtlas": true,
+		"inspectorRemainedUsable": true,
+		"builtInStylesVisible": true,
+		"cursorVisibilitySaved": true
+	},
+	"speech": {
+		"syntheticPhraseInProject": true,
+		"phraseAbsentFromNewAppLogs": true,
+		"captionLinesScanned": 42,
+		"captionSegmentCount": 4
+	},
+	"diagnostics": {
+		"windowConfirmed": true,
+		"reachedCollectingSystemInformation": true,
+		"reportProduced": false,
+		"observationSeconds": 120,
+		"blockingStack": [
+			"collect_report",
+			"collect_microphones",
+			"CPAL supported_configs",
+			"CoreAudio AudioUnitSetProperty"
+		]
+	}
+}
