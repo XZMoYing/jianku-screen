@@ -1,0 +1,165 @@
+{
+  "source": {
+    "commit": "d1aa05b34bbbdc768d5b753b48b241dbf4ed45c4",
+    "version": "0.2.0-alpha.74",
+    "build": "2026.74.0"
+  },
+  "releaseSession": 59172,
+  "installSession": 26602,
+  "textSnap": {
+    "start": 6.1,
+    "end": 7.1,
+    "track": 0,
+    "enabled": true,
+    "content": "文本吸附样本",
+    "center": {
+      "x": 0.5,
+      "y": 0.49814102564102564
+    },
+    "size": {
+      "x": 0.16958952505827504,
+      "y": 0.05128205128205128
+    },
+    "fontFamily": "sans-serif",
+    "fontSize": 48.0,
+    "fontWeight": 700.0,
+    "italic": false,
+    "color": "#000000",
+    "backgroundStyle": "box",
+    "uppercase": false,
+    "strokeWidth": 0.0,
+    "strokeColor": "#000000",
+    "glow": 0.0,
+    "fadeDuration": 0.15,
+    "align": "center",
+    "letterSpacing": 0.0,
+    "lineHeight": 1.2,
+    "opacity": 1.0,
+    "shadow": 0.0,
+    "animationIn": "fade",
+    "animationOut": "fade",
+    "animationInDuration": 0.15,
+    "animationOutDuration": 0.15,
+    "layout": "overlay",
+    "layoutTransition": 0.5
+  },
+  "textAlt": {
+    "start": 6.0375,
+    "end": 7.0375,
+    "track": 0,
+    "enabled": true,
+    "content": "文本吸附样本",
+    "center": {
+      "x": 0.5,
+      "y": 0.49814102564102564
+    },
+    "size": {
+      "x": 0.16958952505827504,
+      "y": 0.05128205128205128
+    },
+    "fontFamily": "sans-serif",
+    "fontSize": 48.0,
+    "fontWeight": 700.0,
+    "italic": false,
+    "color": "#000000",
+    "backgroundStyle": "box",
+    "uppercase": false,
+    "strokeWidth": 0.0,
+    "strokeColor": "#000000",
+    "glow": 0.0,
+    "fadeDuration": 0.15,
+    "align": "center",
+    "letterSpacing": 0.0,
+    "lineHeight": 1.2,
+    "opacity": 1.0,
+    "shadow": 0.0,
+    "animationIn": "fade",
+    "animationOut": "fade",
+    "animationInDuration": 0.15,
+    "animationOutDuration": 0.15,
+    "layout": "overlay",
+    "layoutTransition": 0.5
+  },
+  "maskTrim": {
+    "start": 4.5,
+    "end": 6.1,
+    "track": 0,
+    "enabled": true,
+    "maskType": "sensitive",
+    "center": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "size": {
+      "x": 0.18,
+      "y": 0.18
+    },
+    "feather": 0.06,
+    "opacity": 1.0,
+    "pixelation": 1016.0,
+    "darkness": 0.5,
+    "fadeDuration": 0.15,
+    "keyframes": {
+      "position": [],
+      "size": [],
+      "intensity": []
+    }
+  },
+  "keyboardMove": {
+    "id": "kb-edit-legacy-4-snap-key-74",
+    "start": 4.500061597215806,
+    "end": 5.500061597215806,
+    "displayText": "⌘ K",
+    "keys": [],
+    "fadeDurationOverride": 0.12,
+    "positionOverride": null,
+    "colorOverride": null,
+    "backgroundColorOverride": null,
+    "fontSizeOverride": null,
+    "uppercaseOverride": null
+  },
+  "captionBefore": {
+    "id": "snap-caption-74::edl0",
+    "start": 8.0,
+    "end": 9.0,
+    "text": "字幕吸附样本",
+    "words": [],
+    "fadeDurationOverride": null,
+    "lingerDurationOverride": null,
+    "positionOverride": null,
+    "colorOverride": null,
+    "backgroundColorOverride": null,
+    "fontSizeOverride": null
+  },
+  "captionMove": {
+    "id": "snap-caption-74::edl0",
+    "start": 4.500061597215806,
+    "end": 5.500061597215806,
+    "text": "字幕吸附样本",
+    "words": [],
+    "fadeDurationOverride": null,
+    "lingerDurationOverride": null,
+    "positionOverride": null,
+    "colorOverride": null,
+    "backgroundColorOverride": null,
+    "fontSizeOverride": null
+  },
+  "captionUndoRestored": true,
+  "captionEscapeRestored": true,
+  "reopened": {
+    "appIsForeground": true,
+    "bounds": {
+      "Height": 954,
+      "Width": 1680,
+      "X": 0,
+      "Y": 25
+    },
+    "editorSelection": "unique own CG editor title and matching AX window geometry",
+    "focusedWindowTitle": "简库镜传 · 视频编辑",
+    "ownedEditorWindowCount": 1,
+    "path": "/Applications/Jianku Screen Next.app",
+    "pid": 7110,
+    "trusted": true,
+    "windowID": 22496
+  }
+}

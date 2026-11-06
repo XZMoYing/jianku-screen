@@ -130,7 +130,7 @@ if let app=apps.first {
    }
    result["clickedWindow"]=windowID
   case "drag-window":
-   guard args.count==8,let windowID=Int(args[2]), windowID==ownedEditors[0][kCGWindowNumber as String] as? Int,let x0=Double(args[3]),let y0=Double(args[4]),let x1=Double(args[5]),let y1=Double(args[6]),let rect=ownedEditors[0][kCGWindowBounds as String] as? [String:Double],let ox=rect["X"],let oy=rect["Y"],let width=rect["Width"],let height=rect["Height"],[x0,x1].allSatisfy({$0>=0 && $0<width}),[y0,y1].allSatisfy({$0>=0 && $0<height}),["normal","alt"].contains(args[7]) else {exit(2)}
+   guard args.count==8,let windowID=Int(args[2]), windowID==ownedEditors[0][kCGWindowNumber as String] as? Int,let x0=Double(args[3]),let y0=Double(args[4]),let x1=Double(args[5]),let y1=Double(args[6]),let rect=ownedEditors[0][kCGWindowBounds as String] as? [String:Double],let ox=rect["X"],let oy=rect["Y"],let width=rect["Width"],let height=rect["Height"],[x0,x1].allSatisfy({$0>=0 && $0<width}),[y0,y1].allSatisfy({$0>=0 && $0<height}),["normal","alt","escape"].contains(args[7]) else {exit(2)}
    app.activate(options:[])
    RunLoop.current.run(until:Date(timeIntervalSinceNow:0.2))
    guard NSWorkspace.shared.frontmostApplication?.processIdentifier==app.processIdentifier else {exit(2)}
@@ -145,6 +145,9 @@ if let app=apps.first {
    send(.leftMouseDown,x0,y0,[])
    if abs(x1-x0)>3 {send(.leftMouseDragged,x0+(x1>x0 ? 3:-3),y0,flags)}
    for step in 1...6 {let t=Double(step)/6;send(.leftMouseDragged,x0+(x1-x0)*t,y0+(y1-y0)*t,flags)}
+   if args[7]=="escape" {
+    for down in [true,false] {CGEvent(keyboardEventSource:nil,virtualKey:53,keyDown:down)?.post(tap:.cghidEventTap);Thread.sleep(forTimeInterval:0.05)}
+   }
    send(.leftMouseUp,x1,y1,flags)
    result["draggedOwnedWindow"]=windowID
   case "capture-window":
