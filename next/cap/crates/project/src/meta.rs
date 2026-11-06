@@ -178,8 +178,16 @@ impl RecordingMeta {
     }
 
     pub fn load_for_project(project_path: &Path) -> Result<Self, Box<dyn Error>> {
+        crate::append_publication::ensure_no_pending_append(project_path)?;
         let meta_path = project_path.join("recording-meta.json");
-        let mut meta: Self = serde_json::from_str(&std::fs::read_to_string(&meta_path)?)?;
+        Ok(Self::from_project_json(
+            project_path,
+            &std::fs::read_to_string(meta_path)?,
+        )?)
+    }
+
+    pub(crate) fn from_project_json(project_path: &Path, json: &str) -> std::io::Result<Self> {
+        let mut meta: Self = serde_json::from_str(json)?;
         meta.project_path = project_path.to_path_buf();
         meta.normalize_paths();
 
@@ -187,6 +195,8 @@ impl RecordingMeta {
     }
 
     pub fn save_for_project(&self) -> Result<(), Either<serde_json::Error, std::io::Error>> {
+        let _guard = crate::append_publication::project_write_guard(&self.project_path)
+            .map_err(Either::Right)?;
         self.save_for_project_with(|file, bytes| {
             file.write_all(bytes)?;
             file.sync_all()
@@ -311,6 +321,27 @@ impl RecordingMeta {
             RecordingMetaInner::Instant(_) => self.project_path.join("content/output.mp4"),
             RecordingMetaInner::Studio(_) => self.project_path.join("output").join("result.mp4"),
         }
+    }
+
+    pub fn studio_source_count(&self) -> Option<usize> {
+        match self.studio_meta()? {
+            StudioRecordingMeta::SingleSegment { .. } => Some(1),
+            StudioRecordingMeta::MultipleSegments { inner } => Some(inner.segments.len()),
+        }
+    }
+
+    pub fn set_project_pretty_name(
+        project: &Path,
+        pretty_name: String,
+    ) -> Result<(), Box<dyn Error>> {
+        let _guard = crate::append_publication::project_write_guard(project)?;
+        let mut metadata = Self::load_for_project(project)?;
+        metadata.pretty_name = pretty_name;
+        metadata.save_for_project_with(|file, bytes| {
+            file.write_all(bytes)?;
+            file.sync_all()
+        })?;
+        Ok(())
     }
 
     pub fn studio_meta(&self) -> Option<&StudioRecordingMeta> {

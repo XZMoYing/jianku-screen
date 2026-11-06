@@ -3092,9 +3092,30 @@ impl ProjectConfiguration {
 
     pub fn load(project_path: impl AsRef<Path>) -> Result<Self, std::io::Error> {
         let project_path = project_path.as_ref();
-        let config_path = project_path.join("project-config.json");
-        let config_str = std::fs::read_to_string(&config_path)?;
-        let parsed_value = serde_json::from_str::<Value>(&config_str).ok();
+        crate::append_publication::ensure_no_pending_append(project_path)?;
+        let config_str = std::fs::read_to_string(project_path.join("project-config.json"))?;
+        let (config, needs_migration) = Self::parse_and_migrate(&config_str)?;
+        if needs_migration {
+            let result = (|| -> std::io::Result<()> {
+                let _guard = crate::append_publication::project_write_guard(project_path)?;
+                if std::fs::read_to_string(project_path.join("project-config.json"))? == config_str
+                {
+                    config.write_with(project_path, |file, bytes| {
+                        file.write_all(bytes)?;
+                        file.sync_all()
+                    })?;
+                }
+                Ok(())
+            })();
+            if let Err(error) = result {
+                eprintln!("Failed to migrate project-config.json: {error}");
+            }
+        }
+        Ok(config)
+    }
+
+    pub(crate) fn parse_and_migrate(config_str: &str) -> std::io::Result<(Self, bool)> {
+        let parsed_value = serde_json::from_str::<Value>(config_str).ok();
         let missing_screen_motion_blur = parsed_value.as_ref().is_some_and(|value| {
             value
                 .as_object()
@@ -3104,7 +3125,7 @@ impl ProjectConfiguration {
             .as_ref()
             .map(camera_config_needs_migration)
             .unwrap_or(false);
-        let mut config: Self = serde_json::from_str(&config_str)
+        let mut config: Self = serde_json::from_str(config_str)
             .map_err(|error| std::io::Error::new(std::io::ErrorKind::InvalidData, error))?;
         let cursor_motion_blur = config.cursor.motion_blur.clamp(0.0, 1.0);
         let screen_motion_blur = config.screen_motion_blur.clamp(0.0, 1.0);
@@ -3157,26 +3178,38 @@ impl ProjectConfiguration {
             .validate()
             .map_err(|error| std::io::Error::new(std::io::ErrorKind::InvalidData, error))?;
 
-        if needs_camera_migration
-            || needs_motion_blur_clamp
-            || needs_screen_motion_blur_migration
-            || needs_text_size_migration
-        {
-            match config.write(project_path) {
-                Ok(_) => {
-                    eprintln!("Updated project-config.json migrated settings");
-                }
-                Err(error) => {
-                    eprintln!("Failed to migrate project-config.json: {error}");
-                }
-            }
-        }
-
-        Ok(config)
+        Ok((
+            config,
+            needs_camera_migration
+                || needs_motion_blur_clamp
+                || needs_screen_motion_blur_migration
+                || needs_text_size_migration,
+        ))
     }
 
     pub fn write(&self, project_path: impl AsRef<Path>) -> Result<(), std::io::Error> {
-        self.write_with(project_path.as_ref(), |file, bytes| {
+        let project_path = project_path.as_ref();
+        let _guard = crate::append_publication::project_write_guard(project_path)?;
+        self.write_with(project_path, |file, bytes| {
+            file.write_all(bytes)?;
+            file.sync_all()
+        })
+    }
+
+    pub fn write_for_source_count(
+        &self,
+        project: &Path,
+        expected_sources: Option<usize>,
+    ) -> std::io::Result<()> {
+        let _guard = crate::append_publication::project_write_guard(project)?;
+        let metadata = crate::RecordingMeta::load_for_project(project)
+            .map_err(|error| std::io::Error::other(error.to_string()))?;
+        if metadata.studio_source_count() != expected_sources {
+            return Err(std::io::Error::other(
+                "The source list changed. Reopen the project before saving its timeline",
+            ));
+        }
+        self.write_with(project, |file, bytes| {
             file.write_all(bytes)?;
             file.sync_all()
         })

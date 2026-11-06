@@ -1,4 +1,5 @@
 mod animated_gradient;
+mod append_publication;
 mod bookmarks;
 mod caption_storage;
 mod caption_timing;
@@ -11,6 +12,7 @@ mod overlay_attachment;
 mod portable;
 
 pub use animated_gradient::*;
+pub use append_publication::{ProjectAppendSnapshot, recover_interrupted_project_append};
 pub use bookmarks::*;
 pub use caption_storage::*;
 pub use caption_timing::{derive_caption_track_segments, source_caption_id, synchronize_captions};

@@ -31,6 +31,7 @@ pub fn create_portable_project_copy(
     destination: &Path,
 ) -> io::Result<ProjectCopyReport> {
     let source = source.canonicalize()?;
+    crate::append_publication::ensure_no_pending_append(&source)?;
     let original_meta = fs::read(source.join("recording-meta.json"))?;
     let meta: RecordingMeta = serde_json::from_slice(&original_meta)?;
     let RecordingMetaInner::Studio(studio) = &meta.inner else {
@@ -147,6 +148,7 @@ pub fn create_portable_project_copy(
             serde_json::to_vec_pretty(&config)?,
         )?;
     }
+    crate::append_publication::ensure_no_pending_append(&source)?;
     if fs::read(source.join("recording-meta.json"))? != original_meta
         || read_optional_file(&source.join("project-config.json"))? != original_config
     {
@@ -289,6 +291,9 @@ fn copy_tree(source: &Path, destination: &Path) -> io::Result<()> {
     fs::create_dir_all(destination)?;
     for entry in fs::read_dir(source)? {
         let entry = entry?;
+        if crate::append_publication::is_append_artifact(&entry.file_name()) {
+            continue;
+        }
         let file_type = entry.file_type()?;
         if file_type.is_dir() {
             copy_tree(&entry.path(), &destination.join(entry.file_name()))?;

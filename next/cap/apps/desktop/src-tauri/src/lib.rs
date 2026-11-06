@@ -4959,6 +4959,8 @@ fn restore_recording_bookmark(
 #[tauri::command]
 #[specta::specta]
 async fn get_recording_meta_by_path(project_path: PathBuf) -> Result<RecordingMeta, String> {
+    cap_project::recover_interrupted_project_append(&project_path)
+        .map_err(|error| format!("Could not recover the previous import: {error}"))?;
     RecordingMeta::load_for_project(&project_path).map_err(|e| e.to_string())
 }
 
@@ -4966,9 +4968,8 @@ async fn get_recording_meta_by_path(project_path: PathBuf) -> Result<RecordingMe
 #[specta::specta]
 #[instrument(skip(editor))]
 async fn set_pretty_name(editor: WindowEditorInstance, pretty_name: String) -> Result<(), String> {
-    let mut meta = editor.meta().clone();
-    meta.pretty_name = pretty_name;
-    meta.save_for_project().map_err(|e| e.to_string())
+    RecordingMeta::set_project_pretty_name(&editor.project_path, pretty_name)
+        .map_err(|error| error.to_string())
 }
 
 #[tauri::command]
@@ -5146,10 +5147,13 @@ async fn set_project_config(
     editor_instance.project_config.0.send(config.clone()).ok();
 
     let project_path = editor_instance.project_path.clone();
-    tauri::async_runtime::spawn_blocking(move || config.write(project_path))
-        .await
-        .map_err(|error| format!("Project configuration save task failed: {error}"))?
-        .map_err(|error| format!("Failed to write project config: {error}"))?;
+    let expected_sources = editor_instance.meta().studio_source_count();
+    tauri::async_runtime::spawn_blocking(move || {
+        config.write_for_source_count(&project_path, expected_sources)
+    })
+    .await
+    .map_err(|error| format!("Project configuration save task failed: {error}"))?
+    .map_err(|error| format!("Failed to write project config: {error}"))?;
 
     Ok(())
 }
@@ -5807,6 +5811,8 @@ fn get_recording_meta(
     _file_type: FileType,
 ) -> Result<RecordingMetaWithMetadata, String> {
     let sort_time_millis = media_sort_time_millis(&path);
+    cap_project::recover_interrupted_project_append(&path)
+        .map_err(|error| format!("Could not recover the previous import: {error}"))?;
     RecordingMeta::load_for_project(&path)
         .map(|meta| RecordingMetaWithMetadata::new(meta, sort_time_millis))
         .map_err(|e| format!("Failed to load recording meta: {e}"))
@@ -5891,6 +5897,10 @@ fn list_recordings_inner(
     }
 
     newest_valid_media(result, limit, |path, timestamp| {
+        if let Err(error) = cap_project::recover_interrupted_project_append(&path) {
+            warn!(%error, "Could not recover an interrupted append while listing recordings");
+            return None;
+        }
         let meta = RecordingMeta::load_for_project(&path).ok()?;
         Some((path, RecordingMetaWithMetadata::new(meta, timestamp)))
     })
@@ -9248,6 +9258,8 @@ async fn wait_for_recording_ready_inner(app: &AppHandle, path: &Path) -> Result<
     let display_path = path;
     let project = FinalizationProject::observe(path.to_path_buf()).await?;
     let path = project.work_path();
+    cap_project::recover_interrupted_project_append(path)
+        .map_err(|error| format!("Could not recover the previous import: {error}"))?;
     let finalizing_state = app.state::<FinalizingRecordings>();
 
     if let Some(result) = finalizing_state.is_finalizing(&project) {
@@ -9620,6 +9632,8 @@ fn open_project_from_path(path: &Path, app: AppHandle) -> Result<(), String> {
         }
     }
 
+    cap_project::recover_interrupted_project_append(path)
+        .map_err(|error| format!("Could not recover the previous import: {error}"))?;
     let meta = RecordingMeta::load_for_project(path).map_err(|v| v.to_string())?;
 
     match &meta.inner {

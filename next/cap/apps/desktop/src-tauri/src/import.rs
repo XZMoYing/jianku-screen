@@ -9,8 +9,8 @@ use cap_enc_ffmpeg::{
 use cap_media_info::{AudioInfo, FFRational, Pixel, VideoInfo, ensure_even};
 use cap_project::{
     AudioMeta, ClipConfiguration, CursorEvents, CursorMeta, Cursors, InstantRecordingMeta,
-    MultipleSegment, MultipleSegments, Platform, ProjectConfiguration, RecordingMeta,
-    RecordingMetaInner, SingleSegment, StudioRecordingMeta, StudioRecordingStatus,
+    MultipleSegment, MultipleSegments, Platform, ProjectAppendSnapshot, ProjectConfiguration,
+    RecordingMeta, RecordingMetaInner, SingleSegment, StudioRecordingMeta, StudioRecordingStatus,
     TimelineConfiguration, TimelineSegment, VideoMeta, XY,
 };
 use ffmpeg::{
@@ -1611,21 +1611,6 @@ pub async fn start_video_import(app: AppHandle, source_path: PathBuf) -> Result<
     Ok(return_path)
 }
 
-fn save_appended_project(
-    metadata: &RecordingMeta,
-    config: &ProjectConfiguration,
-    assets: StagedImportAssets,
-) -> Result<(), String> {
-    metadata
-        .save_for_project()
-        .map_err(|error| format!("Failed to save project metadata: {error:?}"))?;
-    // The metadata already references these assets even if the timeline write fails.
-    assets.retain();
-    config
-        .write(&metadata.project_path)
-        .map_err(|error| format!("Failed to save project config: {error}"))
-}
-
 async fn append_mp4_to_editor_project(
     app: AppHandle,
     target_project_path: PathBuf,
@@ -1635,10 +1620,8 @@ async fn append_mp4_to_editor_project(
         return Err("Select an MP4 video file to import".to_string());
     }
 
-    let mut target_meta = RecordingMeta::load_for_project(&target_project_path)
-        .map_err(|e| format!("Failed to load target project metadata: {e}"))?;
-    let mut config = ProjectConfiguration::load_or_default(&target_project_path)
-        .map_err(|error| format!("Could not read the destination project-config.json: {error}"))?;
+    let (snapshot, mut target_meta, mut config) = ProjectAppendSnapshot::read(&target_project_path)
+        .map_err(|error| format!("Could not read the destination project: {error}"))?;
     let existing_segments = {
         let inner = ensure_multiple_segments(&mut target_meta)?;
         inner.status = Some(StudioRecordingStatus::Complete);
@@ -1760,7 +1743,9 @@ async fn append_mp4_to_editor_project(
         std::slice::from_ref(&imported_segment),
     );
 
-    save_appended_project(&target_meta, &config, assets)?;
+    snapshot
+        .commit(&target_meta, &config, || assets.retain())
+        .map_err(|error| format!("Failed to save imported clips: {error}"))?;
 
     emit_progress(
         &app,
@@ -1808,10 +1793,8 @@ async fn append_cap_project_to_editor_project(
         StudioRecordingMeta::SingleSegment { .. } => None,
     };
 
-    let mut target_meta = RecordingMeta::load_for_project(&target_project_path)
-        .map_err(|e| format!("Failed to load target project metadata: {e}"))?;
-    let mut config = ProjectConfiguration::load_or_default(&target_project_path)
-        .map_err(|error| format!("Could not read the destination project-config.json: {error}"))?;
+    let (snapshot, mut target_meta, mut config) = ProjectAppendSnapshot::read(&target_project_path)
+        .map_err(|error| format!("Could not read the destination project: {error}"))?;
     let existing_segments = {
         let inner = ensure_multiple_segments(&mut target_meta)?;
         inner.status = Some(StudioRecordingStatus::Complete);
@@ -1891,7 +1874,9 @@ async fn append_cap_project_to_editor_project(
 
     add_clip_configs(&mut config, base_index, &copied_segments);
 
-    save_appended_project(&target_meta, &config, assets)?;
+    snapshot
+        .commit(&target_meta, &config, || assets.retain())
+        .map_err(|error| format!("Failed to save imported clips: {error}"))?;
 
     Ok(copied_segments.len())
 }
@@ -1908,6 +1893,8 @@ pub async fn add_existing_recording_to_editor(
         return Err("Cannot import a recording into itself".to_string());
     }
 
+    cap_project::recover_interrupted_project_append(&target_project_path)
+        .map_err(|error| format!("Could not recover the previous import: {error}"))?;
     let app = window.app_handle().clone();
     let imported_count = if is_mp4_import_path(&source_path) {
         append_mp4_to_editor_project(app, target_project_path, source_path).await?
