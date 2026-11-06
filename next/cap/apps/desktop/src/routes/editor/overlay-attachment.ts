@@ -13,6 +13,7 @@ import {
 import { type Camera3DTracks, scaleKeyframeTimes } from "./three-d";
 import {
 	effectiveToOutput,
+	effectiveToOutputEnd,
 	type HoldSourceSegment,
 	heldTimeBefore,
 	holdWindows,
@@ -395,6 +396,74 @@ function overlaps(
 	);
 }
 
+const ZOOM_PHASE_TOLERANCE = 1e-6;
+
+export function projectZoomSourceSlice(
+	slice: ZoomSourceSlice,
+	groupStart: number,
+	before: AttachmentLayout,
+	after: AttachmentLayout,
+) {
+	const attachment = slice.attachment;
+	if (attachment?.kind !== "clip") return null;
+	const oldClip = before.clips.get(attachment.clipId);
+	const newClip = after.clips.get(attachment.clipId);
+	const oldStart = groupStart + slice.phaseStart;
+	const oldEnd = groupStart + slice.phaseEnd;
+	if (
+		!oldClip ||
+		!newClip ||
+		!Number.isFinite(oldClip.timescale) ||
+		!Number.isFinite(newClip.timescale) ||
+		oldClip.timescale <= 0 ||
+		newClip.timescale <= 0 ||
+		!Number.isFinite(oldStart) ||
+		!Number.isFinite(oldEnd) ||
+		oldEnd <= oldStart ||
+		overlayAttachmentStatus(attachment, before, oldStart) !== "attached" ||
+		oldEnd - heldTimeBefore(before.holds, oldEnd) >
+			oldClip.primaryEnd + ZOOM_PHASE_TOLERANCE ||
+		before.holds.some(([start, end]) => start < oldEnd && end > oldStart)
+	)
+		return null;
+
+	const sourceDuration =
+		(slice.phaseEnd - slice.phaseStart) * oldClip.timescale;
+	const sourceStart = Math.max(attachment.sourceTime, newClip.sourceStart);
+	const sourceEnd = Math.min(
+		attachment.sourceTime + sourceDuration,
+		newClip.sourceEnd,
+		newClip.sourceStart +
+			(newClip.primaryEnd - newClip.start) * newClip.timescale,
+	);
+	const offset = (source: number) =>
+		newClip.start + (source - newClip.sourceStart) / newClip.timescale;
+	const start = effectiveToOutput(after.holds, offset(sourceStart));
+	const end = effectiveToOutputEnd(after.holds, offset(sourceEnd));
+	if (
+		!Number.isFinite(start) ||
+		!Number.isFinite(end) ||
+		start < 0 ||
+		end <= start ||
+		after.holds.some(
+			([holdStart, holdEnd]) => holdStart < end && holdEnd > start,
+		)
+	)
+		return null;
+
+	return {
+		start,
+		end,
+		phaseStart:
+			slice.phaseStart +
+			(sourceStart - attachment.sourceTime) / oldClip.timescale,
+		phaseEnd:
+			slice.phaseEnd -
+			(attachment.sourceTime + sourceDuration - sourceEnd) / oldClip.timescale,
+		ratio: oldClip.timescale / newClip.timescale,
+	};
+}
+
 function projectGeneratedZoomTranslation(
 	row: AttachmentSpan,
 	before: AttachmentLayout,
@@ -403,42 +472,21 @@ function projectGeneratedZoomTranslation(
 	const slices = row.sourceSlices;
 	if (row.attachment || !slices || slices.length < 2) return null;
 
-	const tolerance = 1e-6;
+	const tolerance = ZOOM_PHASE_TOLERANCE;
 	let phase = 0;
 	let delta: number | undefined;
 	for (const slice of slices) {
-		const attachment = slice.attachment;
+		const projected = projectZoomSourceSlice(slice, row.start, before, after);
 		if (
-			attachment?.kind !== "clip" ||
-			!Number.isFinite(slice.phaseStart) ||
-			!Number.isFinite(slice.phaseEnd) ||
+			!projected ||
 			Math.abs(phase - slice.phaseStart) > tolerance ||
-			slice.phaseEnd <= slice.phaseStart
+			projected.ratio !== 1 ||
+			Math.abs(projected.phaseStart - slice.phaseStart) > tolerance ||
+			Math.abs(projected.phaseEnd - slice.phaseEnd) > tolerance
 		)
 			return null;
 		phase = slice.phaseEnd;
-		const span = {
-			start: row.start + slice.phaseStart,
-			end: row.start + slice.phaseEnd,
-			attachment,
-		};
-		const projected = projectOverlayAttachment(span, before, after);
-		const beforeClip = before.clips.get(attachment.clipId);
-		const afterClip = after.clips.get(attachment.clipId);
-		if (
-			!projected ||
-			projected.ratio !== 1 ||
-			!beforeClip ||
-			!afterClip ||
-			beforeClip.timescale !== afterClip.timescale ||
-			overlayAttachmentStatus(attachment, before, span.start) !== "attached" ||
-			span.end - heldTimeBefore(before.holds, span.end) >
-				beforeClip.primaryEnd + tolerance ||
-			projected.end - heldTimeBefore(after.holds, projected.end) >
-				afterClip.primaryEnd + tolerance
-		)
-			return null;
-		const shift = projected.start - span.start;
+		const shift = projected.start - (row.start + slice.phaseStart);
 		if (delta !== undefined && Math.abs(delta - shift) > tolerance) return null;
 		delta ??= shift;
 	}
@@ -449,18 +497,7 @@ function projectGeneratedZoomTranslation(
 	)
 		return null;
 
-	const start = row.start + delta;
-	const end = row.end + delta;
-	if (
-		before.holds.some(
-			([holdStart, holdEnd]) => holdStart < row.end && holdEnd > row.start,
-		) ||
-		after.holds.some(
-			([holdStart, holdEnd]) => holdStart < end && holdEnd > start,
-		)
-	)
-		return null;
-	return { start, end, ratio: 1 };
+	return { start: row.start + delta, end: row.end + delta, ratio: 1 };
 }
 
 export function applyOverlayAttachmentEdit(

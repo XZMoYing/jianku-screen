@@ -13,6 +13,7 @@ import {
 	overlayAttachmentStatus,
 	overlayPartAfterSplit,
 	projectOverlayAttachment,
+	projectZoomSourceSlice,
 } from "./overlay-attachment";
 import { defaultCamera3DSegment, normalizeCamera3DSegments } from "./three-d";
 import { deleteClipAndRippleAllTracks } from "./timeline-utils";
@@ -147,6 +148,56 @@ describe("overlay attachment", () => {
 			phaseEnd: 1,
 			attachment: { clipId: "a", sourceTime: 6.5 },
 		});
+	});
+
+	it("maps a moved, trimmed and sped-up zoom slice to the surviving original phase", () => {
+		const clips = sameSourceTwice();
+		const before = overlayAttachmentLayout(clips);
+		const left = {
+			phaseStart: 0,
+			phaseEnd: 1,
+			attachment: attachOverlayToClip(
+				{ start: 2, end: 3 },
+				before,
+				"a",
+				"followClipSpeed",
+			),
+		};
+		const right = {
+			phaseStart: 1,
+			phaseEnd: 2.5,
+			attachment: attachOverlayToClip(
+				{ start: 3, end: 4.5 },
+				before,
+				"b",
+				"followClipSpeed",
+			),
+		};
+		const moved = {
+			...clips,
+			segments: [clip("a"), { ...clip("b"), start: 4.5, timescale: 2 }],
+			mainTrackGaps: { beforeClip: { b: 2 } },
+			textSegments: [{ start: 5.5, end: 6, layout: "fullscreen" as const }],
+		};
+		const after = overlayAttachmentLayout(moved);
+		expect(projectZoomSourceSlice(left, 2, before, after)).toEqual({
+			start: 2,
+			end: 3,
+			phaseStart: 0,
+			phaseEnd: 1,
+			ratio: 1,
+		});
+		expect(projectZoomSourceSlice(right, 2, before, after)).toEqual({
+			start: 5,
+			end: 5.5,
+			phaseStart: 1.5,
+			phaseEnd: 2.5,
+			ratio: 0.5,
+		});
+		moved.segments[1].start = 6;
+		expect(
+			projectZoomSourceSlice(right, 2, before, overlayAttachmentLayout(moved)),
+		).toBeNull();
 	});
 
 	it("keeps fixed content and the missing source reference through ripple deletion", () => {
