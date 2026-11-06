@@ -3,8 +3,13 @@ import type {
 	MainTrackGaps,
 	OverlayAttachment,
 	TimelineSegment,
+	ZoomSourceSlice,
 } from "~/utils/tauri";
-import { type ClipTransition, clipTimelineOffsets } from "./clip-transitions";
+import {
+	type ClipTransition,
+	clipDuration,
+	clipTimelineOffsets,
+} from "./clip-transitions";
 import { type Camera3DTracks, scaleKeyframeTimes } from "./three-d";
 import {
 	effectiveToOutput,
@@ -26,6 +31,7 @@ export type AttachmentSpan = {
 	end: number;
 	track?: number;
 	attachment?: OverlayAttachment | null;
+	sourceSlices?: readonly ZoomSourceSlice[];
 };
 
 export function overlayAttachmentLayout(timeline: AttachmentTimeline) {
@@ -36,12 +42,22 @@ export function overlayAttachmentLayout(timeline: AttachmentTimeline) {
 	);
 	const clips = new Map<
 		string,
-		{ start: number; sourceStart: number; sourceEnd: number; timescale: number }
+		{
+			start: number;
+			primaryEnd: number;
+			sourceStart: number;
+			sourceEnd: number;
+			timescale: number;
+		}
 	>();
 	for (const [index, clip] of timeline.segments.entries()) {
 		if (clip.id)
 			clips.set(clip.id, {
 				start: offsets[index],
+				primaryEnd: Math.min(
+					offsets[index] + clipDuration(clip),
+					offsets[index + 1] ?? Infinity,
+				),
 				sourceStart: clip.start,
 				sourceEnd: clip.end,
 				timescale: clip.timescale,
@@ -237,7 +253,12 @@ export function projectOverlayAttachment(
 
 export function captureOverlayAttachmentLayout(timeline: AttachedTimeline) {
 	return attachmentTracks.some((track) =>
-		timeline[track]?.some(({ attachment }) => attachment?.kind === "clip"),
+		timeline[track]?.some(
+			({ attachment, sourceSlices }) =>
+				attachment?.kind === "clip" ||
+				(!attachment &&
+					sourceSlices?.some((slice) => slice.attachment?.kind === "clip")),
+		),
 	)
 		? overlayAttachmentLayout(timeline)
 		: null;
@@ -306,6 +327,74 @@ function overlaps(
 	return (
 		Math.min(left.end, right.end) - Math.max(left.start, right.start) > 1e-7
 	);
+}
+
+function projectGeneratedZoomTranslation(
+	row: AttachmentSpan,
+	before: AttachmentLayout,
+	after: AttachmentLayout,
+) {
+	const slices = row.sourceSlices;
+	if (row.attachment || !slices || slices.length < 2) return null;
+
+	const tolerance = 1e-6;
+	let phase = 0;
+	let delta: number | undefined;
+	for (const slice of slices) {
+		const attachment = slice.attachment;
+		if (
+			attachment?.kind !== "clip" ||
+			!Number.isFinite(slice.phaseStart) ||
+			!Number.isFinite(slice.phaseEnd) ||
+			Math.abs(phase - slice.phaseStart) > tolerance ||
+			slice.phaseEnd <= slice.phaseStart
+		)
+			return null;
+		phase = slice.phaseEnd;
+		const span = {
+			start: row.start + slice.phaseStart,
+			end: row.start + slice.phaseEnd,
+			attachment,
+		};
+		const projected = projectOverlayAttachment(span, before, after);
+		const beforeClip = before.clips.get(attachment.clipId);
+		const afterClip = after.clips.get(attachment.clipId);
+		if (
+			!projected ||
+			projected.ratio !== 1 ||
+			!beforeClip ||
+			!afterClip ||
+			beforeClip.timescale !== afterClip.timescale ||
+			overlayAttachmentStatus(attachment, before, span.start) !== "attached" ||
+			span.end - heldTimeBefore(before.holds, span.end) >
+				beforeClip.primaryEnd + tolerance ||
+			projected.end - heldTimeBefore(after.holds, projected.end) >
+				afterClip.primaryEnd + tolerance
+		)
+			return null;
+		const shift = projected.start - span.start;
+		if (delta !== undefined && Math.abs(delta - shift) > tolerance) return null;
+		delta ??= shift;
+	}
+	if (
+		delta === undefined ||
+		Math.abs(delta) <= tolerance ||
+		Math.abs(row.end - row.start - phase) > tolerance
+	)
+		return null;
+
+	const start = row.start + delta;
+	const end = row.end + delta;
+	if (
+		before.holds.some(
+			([holdStart, holdEnd]) => holdStart < row.end && holdEnd > row.start,
+		) ||
+		after.holds.some(
+			([holdStart, holdEnd]) => holdStart < end && holdEnd > start,
+		)
+	)
+		return null;
+	return { start, end, ratio: 1 };
 }
 
 export function applyOverlayAttachmentEdit(
@@ -390,13 +479,16 @@ export function applyOverlayAttachmentEdit(
 		>();
 		for (const row of rows) {
 			if (scheduled.has(row)) continue;
-			const projected = projectOverlayAttachment(
-				row,
-				before,
-				after,
-				previousClipIds.get(row),
-				track === "audioSegments",
-			);
+			const projected =
+				(track === "zoomSegments" &&
+					projectGeneratedZoomTranslation(row, before, after)) ||
+				projectOverlayAttachment(
+					row,
+					before,
+					after,
+					previousClipIds.get(row),
+					track === "audioSegments",
+				);
 			if (
 				!projected ||
 				(row.start === projected.start && row.end === projected.end)

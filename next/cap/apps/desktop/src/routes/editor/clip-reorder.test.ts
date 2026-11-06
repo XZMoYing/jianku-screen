@@ -59,6 +59,58 @@ it("resolves a captured identity after another reorder and ignores a removed ins
 	expect(JSON.stringify(project)).toBe(before);
 });
 
+it("moves an automatic zoom across a shared cut without splitting its animation", () => {
+	const base = timeline();
+	const layout = overlayAttachmentLayout(base);
+	const sourceSlices = [
+		{
+			phaseStart: 0,
+			phaseEnd: 0.5,
+			attachment: attachOverlayToClip(
+				{ start: 3.5, end: 4 },
+				layout,
+				"a",
+				"followClipSpeed",
+			),
+		},
+		{
+			phaseStart: 0.5,
+			phaseEnd: 1.5,
+			attachment: attachOverlayToClip(
+				{ start: 4, end: 5 },
+				layout,
+				"b",
+				"followClipSpeed",
+			),
+		},
+	];
+	const zoom = {
+		start: 3.5,
+		end: 5,
+		amount: 2,
+		mode: "auto" as const,
+		sourceSlices,
+	};
+	const project = { ...base, zoomSegments: [zoom] };
+	expect(
+		editClipsWithOverlayAttachments(
+			project,
+			() => !!reorderClipInstance(project, "c", 0),
+		),
+	).toBe(true);
+	expect(project.zoomSegments).toEqual([
+		{ start: 7.5, end: 9, amount: 2, mode: "auto", sourceSlices },
+	]);
+
+	expect(
+		editClipsWithOverlayAttachments(
+			project,
+			() => !!reorderClipInstance(project, "b", 0),
+		),
+	).toBe(true);
+	expect(zoom).toMatchObject({ start: 7.5, end: 9, sourceSlices });
+});
+
 it("keeps transitions only between their original adjacent pair", () => {
 	const project = timeline();
 	project.transitions = [
