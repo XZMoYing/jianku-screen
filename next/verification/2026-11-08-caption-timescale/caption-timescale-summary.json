@@ -1,0 +1,16 @@
+{
+  "appVersion": "0.2.0-alpha.104",
+  "fixture": "字幕变速空隙验收.jks（复制 alpha.89 字幕轨验收，注入 timeline.segments[0].timescale=1.5；原字幕有 1.79–2.09 空隙、4.92 邻接）",
+  "observations": {
+    "derivedProjection": "打开后 timeline.captionSegments 由母版按 timescale 投影：母版 (0,1.79),(2.09,4.92),(4.92,6.51),(7.37,8) → 时间线 (0,1.193),(1.393,3.28),(3.28,4.34),(4.913,5.176)，即母版时间 /1.5；空隙与邻接关系保持。",
+    "dragToolStatus": "本轮 ability 自动化拖动不稳定：多数拖动事件未生效（前台应用确认 com.jianku.screen.next 时一次视频右缘裁剪生效 8.0→7.7635，证明工具可用）；字幕拖动/裁剪多次尝试未改变母版与时间线，未取得可判定结果。",
+    "timescalePersistence": "未能在 timescale=1.5 下完成字幕拖动→保存→重开验证，U25b 保持开放。"
+  },
+  "conclusion": "确认变速工程中字幕时间线是母版按 timescale 的派生投影（比例正确、空隙保持）；但本轮字幕拖动自动化不稳定，未能验证变速/空隙组合下的字幕编辑回写与重开持久化。不据此关闭 U25b。",
+  "notCovered": [
+    "timescale≠1 下字幕拖动/裁剪回写母版与重开持久化",
+    "SRT/VTT 在变速投影下的时间",
+    "转场/变速/空隙组合的真实工程",
+    "拖动自动化稳定性问题"
+  ]
+}
