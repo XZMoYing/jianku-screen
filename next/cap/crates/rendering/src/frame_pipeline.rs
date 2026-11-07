@@ -340,13 +340,31 @@ impl Nv12SurfaceRing {
                 "NV12 pool is unavailable".to_string(),
             ));
         }
-        let pixel_buffer = acquire_surface_buffer(self, |this| {
+        let mut pixel_buffer = acquire_surface_buffer(self, |this| {
             this.pool
                 .as_ref()
                 .expect("pool checked above")
                 .pixel_buf_with_aux_attrs(Some(&this.allocation_attributes))
         })
         .await?;
+        // Tag the buffer as BT.709 limited range so VideoToolbox's hardware
+        // input path encodes these planes without re-interpreting the matrix
+        // or range (an untagged buffer shifted exported primary colors).
+        {
+            let keys: [&cf::Type; 3] = [
+                cv::image_buf_attachment::keys::ycbcr_matrix().as_ref(),
+                cv::image_buf_attachment::keys::color_primaries().as_ref(),
+                cv::image_buf_attachment::keys::transfer_fn().as_ref(),
+            ];
+            let values: [&cf::Type; 3] = [
+                cv::image_buf_attachment::ycbcr_matrix::itu_r_709_2().as_ref(),
+                cv::image_buf_attachment::color_primaries::itu_r_709_2().as_ref(),
+                cv::image_buf_attachment::transfer_fn::itu_r_709_2().as_ref(),
+            ];
+            if let Some(attachments) = cf::Dictionary::with_keys_values(&keys, &values) {
+                pixel_buffer.set_attaches(&attachments, cv::AttachMode::ShouldPropagate);
+            }
+        }
         let io_surface = pixel_buffer
             .io_surf()
             .ok_or_else(|| RenderingError::Surface("Pixel buffer has no IOSurface".to_string()))?;
