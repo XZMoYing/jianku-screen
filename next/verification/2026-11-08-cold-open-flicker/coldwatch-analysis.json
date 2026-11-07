@@ -1,0 +1,195 @@
+{
+  "movie": "/private/tmp/jianku-flicker-20261108/coldwatch.mov",
+  "frames": 164,
+  "duration": 3.97,
+  "first12": [
+    {
+      "t": 0.0,
+      "changedVsLoaded": 0.253,
+      "diff": 0,
+      "luma": 253.0,
+      "lightgray": 0.0,
+      "dark": 0.0
+    },
+    {
+      "t": 0.02,
+      "changedVsLoaded": 0.253,
+      "diff": 0.061,
+      "luma": 252.9,
+      "lightgray": 0.0008,
+      "dark": 0.0
+    },
+    {
+      "t": 0.038,
+      "changedVsLoaded": 0.253,
+      "diff": 0.003,
+      "luma": 252.9,
+      "lightgray": 0.0008,
+      "dark": 0.0
+    },
+    {
+      "t": 0.062,
+      "changedVsLoaded": 0.253,
+      "diff": 0.063,
+      "luma": 253.0,
+      "lightgray": 0.0,
+      "dark": 0.0
+    },
+    {
+      "t": 0.08,
+      "changedVsLoaded": 0.2528,
+      "diff": 0.035,
+      "luma": 253.0,
+      "lightgray": 0.0,
+      "dark": 0.0
+    },
+    {
+      "t": 0.097,
+      "changedVsLoaded": 0.2528,
+      "diff": 0.005,
+      "luma": 253.0,
+      "lightgray": 0.0,
+      "dark": 0.0
+    },
+    {
+      "t": 0.115,
+      "changedVsLoaded": 0.2528,
+      "diff": 0.002,
+      "luma": 253.0,
+      "lightgray": 0.0,
+      "dark": 0.0
+    },
+    {
+      "t": 0.133,
+      "changedVsLoaded": 0.2528,
+      "diff": 0.001,
+      "luma": 253.0,
+      "lightgray": 0.0,
+      "dark": 0.0
+    },
+    {
+      "t": 0.155,
+      "changedVsLoaded": 0.2528,
+      "diff": 0.002,
+      "luma": 253.0,
+      "lightgray": 0.0,
+      "dark": 0.0
+    },
+    {
+      "t": 0.178,
+      "changedVsLoaded": 0.2528,
+      "diff": 0.008,
+      "luma": 253.0,
+      "lightgray": 0.0,
+      "dark": 0.0
+    },
+    {
+      "t": 0.207,
+      "changedVsLoaded": 0.2528,
+      "diff": 0.006,
+      "luma": 253.0,
+      "lightgray": 0.0,
+      "dark": 0.0
+    },
+    {
+      "t": 0.227,
+      "changedVsLoaded": 0.2528,
+      "diff": 0.0,
+      "luma": 253.0,
+      "lightgray": 0.0,
+      "dark": 0.0
+    }
+  ],
+  "changedVsLoadedMax": 0.253,
+  "skeletonCandidates": [],
+  "diffTop": [
+    {
+      "t": 0.633,
+      "changedVsLoaded": 0.18,
+      "diff": 17.516,
+      "luma": 234.2,
+      "lightgray": 0.1744,
+      "dark": 0.0002
+    },
+    {
+      "t": 0.297,
+      "changedVsLoaded": 0.2261,
+      "diff": 6.986,
+      "luma": 246.0,
+      "lightgray": 0.0,
+      "dark": 0.0
+    },
+    {
+      "t": 0.663,
+      "changedVsLoaded": 0.1452,
+      "diff": 5.553,
+      "luma": 228.9,
+      "lightgray": 0.1456,
+      "dark": 0.0008
+    },
+    {
+      "t": 0.443,
+      "changedVsLoaded": 0.2371,
+      "diff": 5.191,
+      "luma": 249.1,
+      "lightgray": 0.0075,
+      "dark": 0.0
+    },
+    {
+      "t": 0.688,
+      "changedVsLoaded": 0.1337,
+      "diff": 4.726,
+      "luma": 224.5,
+      "lightgray": 0.1591,
+      "dark": 0.0008
+    },
+    {
+      "t": 0.763,
+      "changedVsLoaded": 0.0662,
+      "diff": 2.883,
+      "luma": 218.5,
+      "lightgray": 0.1574,
+      "dark": 0.0008
+    },
+    {
+      "t": 0.717,
+      "changedVsLoaded": 0.13,
+      "diff": 2.443,
+      "luma": 222.9,
+      "lightgray": 0.1578,
+      "dark": 0.0008
+    },
+    {
+      "t": 0.738,
+      "changedVsLoaded": 0.1217,
+      "diff": 1.864,
+      "luma": 221.2,
+      "lightgray": 0.1574,
+      "dark": 0.0008
+    },
+    {
+      "t": 0.81,
+      "changedVsLoaded": 0.0053,
+      "diff": 1.837,
+      "luma": 215.6,
+      "lightgray": 0.1545,
+      "dark": 0.0052
+    },
+    {
+      "t": 0.787,
+      "changedVsLoaded": 0.0488,
+      "diff": 1.258,
+      "luma": 217.4,
+      "lightgray": 0.1572,
+      "dark": 0.0008
+    }
+  ],
+  "lumaRange": [
+    214.2,
+    253.0
+  ],
+  "lightgrayRange": [
+    0.0,
+    0.1744
+  ]
+}

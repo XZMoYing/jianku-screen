@@ -1,0 +1,36 @@
+{
+  "appVersion": "0.2.0-alpha.94 / 2026.94.0",
+  "method": "watch-capture-editor：CGWindowListCopyWindowInfo 5ms 轮询应用窗口（视频编辑），窗口首次出现即 CGWindowListCreateImage 单窗口取帧 4s；未采集整屏",
+  "timeline": [
+    {
+      "t": "0.00–0.60s",
+      "frames": "约 0–64",
+      "state": "整窗纯白：whiteFrac≈0.996、meanLuma≈252.9",
+      "note": "窗口已在屏可见，但内容尚未绘制"
+    },
+    {
+      "t": "~0.62s",
+      "state": "首帧 UI 内容出现（f062.png：whiteFrac 0.401、meanLuma 234.1），随后逐步稳定"
+    },
+    {
+      "t": "0.76–1.0s",
+      "state": "接近加载完成（f100：whiteFrac 0.388、meanLuma 214.1）"
+    },
+    {
+      "t": "≥1.0s",
+      "state": "稳定编辑器，无进一步整窗变化"
+    }
+  ],
+  "diagnostics": {
+    "routeSuspenseRecord": "route-suspense connected=true at unix 1794073597338（窗口出现约 +0.45s），editor/meta pending、store/presets fetching",
+    "captureStartUnix": 1794073596893
+  },
+  "conclusion": "冷启动打开工程时，编辑器窗口先以纯白显示约 0.6 秒，随后才绘制 UI；与用户「初期闪屏」相符。未观察到 alpha58 那种整窗 EditorSkeleton 多段占位（本场景至少一次首帧白屏）。",
+  "caveat": "CGWindowListCreateImage 对尚未首次提交内容的窗口可能返回白帧，因此白屏在屏幕上的实际可见性需以用户观感/显示采集交叉确认；0.62s 后的 UI 帧是真实渲染内容。",
+  "notCovered": [
+    "多次冷启动统计白屏时长分布",
+    "热打开（应用已运行）场景",
+    "显示采集交叉确认用户可见性",
+    "修复方案（延后窗口显示/首帧就绪后显示）与回归"
+  ]
+}
