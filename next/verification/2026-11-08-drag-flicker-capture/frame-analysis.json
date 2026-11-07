@@ -1,0 +1,118 @@
+{
+  "baseline": {
+    "label": "baseline",
+    "frames": 139,
+    "duration": 3.461667,
+    "luma": {
+      "min": 213.5241769547325,
+      "max": 213.53459362139918
+    },
+    "whiteMax": 0.7334104938271605,
+    "lightgrayMax": 0.18441358024691357,
+    "darkMax": 0.005401234567901234,
+    "saturatedMax": 0.18383487654320987
+  },
+  "drag": {
+    "label": "drag",
+    "frames": 316,
+    "duration": 7.975,
+    "luma": {
+      "min": 204.90361368312756,
+      "max": 213.5315715020576
+    },
+    "whiteMax": 0.7332175925925926,
+    "lightgrayMax": 0.20601851851851852,
+    "darkMax": 0.0055941358024691355,
+    "saturatedMax": 0.18383487654320987,
+    "baselineWhiteMax": 0.7334104938271605,
+    "baselineLightgrayMax": 0.18441358024691357,
+    "candidateFrames": [],
+    "candidateRuns": [],
+    "topDiff": [
+      {
+        "index": 39,
+        "time": 0.972,
+        "diff": 15.99,
+        "white": 0.733,
+        "lightgray": 0.198
+      },
+      {
+        "index": 139,
+        "time": 3.475,
+        "diff": 0.14,
+        "white": 0.732,
+        "lightgray": 0.203
+      },
+      {
+        "index": 247,
+        "time": 6.258,
+        "diff": 0.08,
+        "white": 0.732,
+        "lightgray": 0.203
+      },
+      {
+        "index": 61,
+        "time": 1.525,
+        "diff": 0.07,
+        "white": 0.732,
+        "lightgray": 0.201
+      },
+      {
+        "index": 1,
+        "time": 0.025,
+        "diff": 0.06,
+        "white": 0.733,
+        "lightgray": 0.181
+      },
+      {
+        "index": 120,
+        "time": 3.0,
+        "diff": 0.05,
+        "white": 0.732,
+        "lightgray": 0.203
+      },
+      {
+        "index": 38,
+        "time": 0.948,
+        "diff": 0.05,
+        "white": 0.733,
+        "lightgray": 0.187
+      },
+      {
+        "index": 41,
+        "time": 1.02,
+        "diff": 0.04,
+        "white": 0.733,
+        "lightgray": 0.201
+      },
+      {
+        "index": 45,
+        "time": 1.125,
+        "diff": 0.04,
+        "white": 0.733,
+        "lightgray": 0.2
+      },
+      {
+        "index": 40,
+        "time": 0.993,
+        "diff": 0.04,
+        "white": 0.733,
+        "lightgray": 0.206
+      },
+      {
+        "index": 114,
+        "time": 2.845,
+        "diff": 0.03,
+        "white": 0.732,
+        "lightgray": 0.203
+      },
+      {
+        "index": 43,
+        "time": 1.075,
+        "diff": 0.03,
+        "white": 0.733,
+        "lightgray": 0.199
+      }
+    ]
+  }
+}
