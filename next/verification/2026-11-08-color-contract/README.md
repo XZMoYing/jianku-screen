@@ -56,3 +56,10 @@
 - `red-src.mp4`、`gray-src.mp4`、`blue-src.mp4`、`*-export.mp4`：纯色源与导出视频。
 - `*-export.log`：CLI 导出日志。
 - `run-color-contract.py`：工程替换、导出与测量脚本。
+
+## 硬件导出路径定位（6505d2d 之后）
+
+- 新增 GPU 单测 `frame_pipeline::surface_output_tests::bt709_limited_surface_conversion_for_primary_colors`：向 `RgbaToNv12Converter`（surface 输出）写入 red(252,0,0)/gray(128)/blue(0,0,251)，读取锁定的 NV12 平面，断言 BT.709 limited（[62,103,239]/[126,128,128]/[31,239,117]）——**通过**，说明 NV12 surface 转换本身正确。
+- 对比同一帧的 YUV：源 [62,102,239]；软件导出 [62,102,239]（一致）；**硬件零拷贝导出 [42,115,237]**（Y 偏低 20、U/V 变化，换算红色强度约 0.5）。
+- 结论：偏色发生在“正确的 NV12 surface → 硬件编码码流”之间（VideoToolbox 硬件输入 wrap 的 color attachments/range 解释、surface ring 复用或 wrap 时 plane/stride 绑定），不是着色器或软件编码路径。
+- 下一步（U11a2b）：在 `wrap_videotoolbox_pixel_buffer` 前后锁定并采样 CVPixelBuffer 的 Y/U/V，与同一帧 NV12 surface 对比；若 buffer 正确则查 VT/色彩附件，若已错则查 ring/format。修复后用纯色夹具验证硬件导出与源 ≤2/255、软硬一致，再整包 alpha 验证。

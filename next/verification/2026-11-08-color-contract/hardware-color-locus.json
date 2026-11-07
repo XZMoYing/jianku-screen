@@ -1,0 +1,11 @@
+{
+  "finding": "默认硬件零拷贝导出在 alpha.97+色彩修复后仍偏色：red 源 YUV[62,102,239] → 硬件导出 YUV[42,115,237]（RGB 225,0,3）；软件导出/源一致 YUV[62,102,239]（RGB 252,0,0）。",
+  "gpu_shader_verified": "新增 frame_pipeline surface 单测：向 RgbaToNv12Converter(surface output) 写入 red(252,0,0)/gray(128)/blue(0,0,251)，读取 YUV 断言 BT.709 limited（[62,103,239]/[126,128,128]/[31,239,117]），测试通过——NV12 转换本身是正确的。",
+  "locus": "硬件路径在拿到正确的 NV12 surface 之后、编码成码流之前发生了范围/矩阵/格式处理（导出的 Y 偏低 20、U/V 变化对应红色强度≈0.5），而非 NV12 着色器或软件编码路径。",
+  "candidates": [
+    "VideoToolbox 硬件输入 wrap NV12 pixel buffer 时未设置 color attachments/range，VT 按 full-range 或另一矩阵解释（420v 应 limited）",
+    "Surface ring 在硬件编码偷看前被复用/覆盖或 stride/plane 绑定在 wrap 时错位（需逐帧把送进编码器的 CVPixelBuffer 锁平面采样验证）",
+    "硬件编码器输出 VUI 标签与实际转换不一致（tag 709 但数据按其他矩阵生成）"
+  ],
+  "next": "U11a2b 下一步在 wrap_videotoolbox_pixel_buffer 前后采样 CVPixelBuffer 的 YUV（或导出 1 帧后直接锁硬件输入 buffer），并与同一帧的 NV12 surface 对比；若 buffer 正确则问题在 VT/色彩附件，若 buffer 已错则查 surface ring/format。修后整包与 CLI 双验证。"
+}
