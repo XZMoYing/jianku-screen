@@ -1,0 +1,558 @@
+{
+  "editor_keymap": {
+    "custom": {
+      "finalCutPro": {}
+    },
+    "preset": "finalCutPro"
+  },
+  "recording_start_safety": {
+    "confirmBeforeRecordingWithoutMicrophone": false
+  },
+  "general_settings": {
+    "autoCreateShareableLink": false,
+    "autoZoomOnClicks": true,
+    "cameraBlurDisabledByCrash": null,
+    "cameraWindowPosition": {
+      "displayId": "1",
+      "x": 1369,
+      "y": 630
+    },
+    "cameraWindowPositionsByMonitorName": {
+      "Built-in Retina Display": {
+        "displayId": "1",
+        "x": 1369,
+        "y": 630
+      }
+    },
+    "captureKeyboardEvents": true,
+    "commercialLicense": null,
+    "crashRecoveryRecording": true,
+    "custom_cursor_capture2": true,
+    "defaultProjectNameTemplate": null,
+    "defaultZoomAmount": null,
+    "deleteInstantRecordingsAfterUpload": false,
+    "disableAutoOpenLinks": false,
+    "editorPreviewQuality": "720p",
+    "enableGpuiApp": false,
+    "enableNativeCameraPreview": false,
+    "enableNotifications": true,
+    "enableTelemetry": true,
+    "excludedWindows": [
+      {
+        "windowTitle": "Cap"
+      },
+      {
+        "windowTitle": "Cap Settings"
+      },
+      {
+        "windowTitle": "Cap Recording Controls"
+      },
+      {
+        "windowTitle": "Cap Camera"
+      },
+      {
+        "windowTitle": "Cap Window Capture Occluder"
+      },
+      {
+        "windowTitle": "Cap Capture Area"
+      },
+      {
+        "windowTitle": "Cap Mode Selection"
+      },
+      {
+        "windowTitle": "Cap Recordings Overlay"
+      },
+      {
+        "windowTitle": "Cap Teleprompter"
+      },
+      {
+        "windowTitle": "简库镜传 Next"
+      },
+      {
+        "windowTitle": "简库镜传 · 设置"
+      },
+      {
+        "windowTitle": "简库镜传 · 捕获方式"
+      },
+      {
+        "windowTitle": "简库镜传 · 提词器"
+      },
+      {
+        "windowTitle": "简库镜传 · 录制控制"
+      },
+      {
+        "windowTitle": "简库镜传 · 摄像头"
+      },
+      {
+        "windowTitle": "简库镜传 · 窗口遮挡层"
+      },
+      {
+        "windowTitle": "简库镜传 · 区域选择"
+      },
+      {
+        "windowTitle": "简库镜传 · 录制悬浮层"
+      },
+      {
+        "windowTitle": "Jianku Screen Next"
+      },
+      {
+        "windowTitle": "Jianku Screen Next · Settings"
+      }
+    ],
+    "hasCompletedOnboarding": true,
+    "hasCompletedStartup": true,
+    "hideDockIcon": false,
+    "instanceId": "39013b63-d7f5-47fa-9f0e-2d454ccefb10",
+    "instantModeMaxResolution": 1920,
+    "isolateWindowCapture": false,
+    "lastVersion": null,
+    "macbookNotchOverlay": false,
+    "mainWindowAlwaysOnTop": false,
+    "mainWindowPosition": {
+      "displayId": "1",
+      "x": 250,
+      "y": 98
+    },
+    "mainWindowRecordingStartBehaviour": "close",
+    "maxFps": 60,
+    "outOfProcessMuxer": false,
+    "postDeletionBehaviour": "doNothing",
+    "postStudioRecordingBehaviour": "openEditor",
+    "previousRecordingsPaths": [],
+    "recordingCountdown": 3,
+    "recordingsPath": null,
+    "serverUrl": "http://127.0.0.1:9",
+    "studioRecordingQuality": "balanced",
+    "theme": "light",
+    "transcriptionHints": [
+      "Cap",
+      "TypeScript",
+      "My Brand Name",
+      "mywebsite.com"
+    ],
+    "updateChannel": "stable",
+    "uploadIndividualFiles": false,
+    "windowTransparency": false
+  },
+  "automations": {
+    "rules": [],
+    "version": 0
+  },
+  "uuid_projects_migrated": true,
+  "animated_gradients": {
+    "lastUsed": {
+      "colorStops": [
+        {
+          "color": [
+            125,
+            220,
+            249
+          ],
+          "position": 0
+        },
+        {
+          "color": [
+            111,
+            155,
+            245
+          ],
+          "position": 25
+        },
+        {
+          "color": [
+            107,
+            111,
+            232
+          ],
+          "position": 50
+        },
+        {
+          "color": [
+            154,
+            127,
+            245
+          ],
+          "position": 75
+        },
+        {
+          "color": [
+            192,
+            166,
+            247
+          ],
+          "position": 100
+        }
+      ],
+      "contrast": 104,
+      "curvature": 75,
+      "detail": 2,
+      "direction": 30,
+      "exposure": 0,
+      "flowScale": 0.8,
+      "flowStrength": 65,
+      "grainAmount": 7,
+      "grainSize": 1,
+      "light": 5,
+      "motionSpeed": 40,
+      "relief": 15,
+      "ripples": 100,
+      "seed": 0,
+      "shade": 20,
+      "vibrance": 110
+    },
+    "presets": [],
+    "selected": false
+  },
+  "teleprompter": {
+    "fontSize": 30,
+    "lineHeight": 1.5,
+    "mirror": false,
+    "script": "",
+    "showCueMarkers": true,
+    "windowOpacityPercent": 92,
+    "wordsPerMinute": 150
+  },
+  "jianku_expressive_appearance_v1": true,
+  "hotkeys": {
+    "hotkeys": {}
+  },
+  "color_scheme": {
+    "contrast": 0,
+    "seed": "#6b7351",
+    "source": "wallpaper",
+    "variant": "tonal",
+    "wallpaperIndex": 0,
+    "wallpaperSeeds": [
+      "#4e6388",
+      "#4d4e5b",
+      "#ccd2da"
+    ],
+    "wallpaperUpdatedAt": 1794068853898
+  },
+  "capture_style": {
+    "config": {
+      "annotations": [],
+      "aspectRatio": null,
+      "audio": {
+        "improve": true,
+        "isolation": "balanced",
+        "micStereoMode": "stereo",
+        "micVolumeDb": 0.0,
+        "mute": false,
+        "systemVolumeDb": 0.0
+      },
+      "background": {
+        "advancedShadow": {
+          "blur": 3.799999952316284,
+          "opacity": 68.0999984741211,
+          "size": 14.399999618530273
+        },
+        "blur": 0.0,
+        "border": {
+          "color": [
+            0,
+            0,
+            0
+          ],
+          "enabled": false,
+          "opacity": 50.0,
+          "width": 5.0
+        },
+        "crop": null,
+        "displayPosition": null,
+        "frame": null,
+        "inset": 0,
+        "insetStyle": null,
+        "notch": null,
+        "padding": 10.0,
+        "rounding": 7.5,
+        "roundingType": "squircle",
+        "shadow": 73.5999984741211,
+        "source": {
+          "path": "/Library/Application Support/com.apple.idleassetsd/Customer/4KSDR240FPS/A168628E-11EE-4456-AD66-E7E3E47D1B21.mov",
+          "type": "wallpaper"
+        }
+      },
+      "camera": {
+        "advancedShadow": {
+          "blur": 10.5,
+          "opacity": 44.20000076293945,
+          "size": 33.900001525878906
+        },
+        "backgroundBlur": {
+          "mode": "off"
+        },
+        "hide": false,
+        "manualPosition": null,
+        "mirror": false,
+        "position": {
+          "x": "right",
+          "y": "bottom"
+        },
+        "rounding": 100.0,
+        "roundingType": "squircle",
+        "scaleDuringZoom": 0.699999988079071,
+        "shadow": 62.5,
+        "shape": "square",
+        "size": 30.0,
+        "zoomSize": 60.0
+      },
+      "captions": null,
+      "clips": [],
+      "colorCorrection": {
+        "camera": {
+          "contrast": 0.0,
+          "exposure": 0.0,
+          "fade": 0.0,
+          "grain": 0.0,
+          "intensity": 1.0,
+          "preset": "none",
+          "saturation": 0.0,
+          "splitTone": 0.0,
+          "temperature": 0.0,
+          "tint": 0.0,
+          "vignette": 0.0
+        },
+        "gradeCursor": true,
+        "screen": {
+          "contrast": 0.0,
+          "exposure": 0.0,
+          "fade": 0.0,
+          "grain": 0.0,
+          "intensity": 1.0,
+          "preset": "none",
+          "saturation": 0.0,
+          "splitTone": 0.0,
+          "temperature": 0.0,
+          "tint": 0.0,
+          "vignette": 0.0
+        }
+      },
+      "cursor": {
+        "animationStyle": "mellow",
+        "baseRotation": 0.0,
+        "clickSpring": null,
+        "friction": 70.0,
+        "hide": false,
+        "hideWhenIdle": false,
+        "hideWhenIdleDelay": 2.0,
+        "mass": 3.0,
+        "motionBlur": 1.0,
+        "raw": false,
+        "ripple": {
+          "color": [
+            150,
+            211,
+            95
+          ],
+          "duration": 0.6000000238418579,
+          "enabled": false,
+          "size": 1.0,
+          "strength": 0.699999988079071
+        },
+        "rotationAmount": 0.15000000596046448,
+        "size": 149,
+        "stopMovementInLastSeconds": null,
+        "tension": 470.0,
+        "type": "macos",
+        "useSvg": true
+      },
+      "hotkeys": {
+        "show": false
+      },
+      "keyboard": null,
+      "screenMotionBlur": 1.0,
+      "screenMovementSpring": {
+        "damping": 40.0,
+        "mass": 2.25,
+        "stiffness": 200.0
+      },
+      "textAnimVersion": 1,
+      "textSizeVersion": 1,
+      "timeline": null
+    },
+    "desktopWallpaper": false
+  },
+  "presentation-options": {
+    "focusMode": "manual",
+    "idleSeconds": 4.0,
+    "outputAspectRatio": null,
+    "outputHeight": 1080,
+    "outputMonitor": null,
+    "outputResolution": 1920,
+    "outputWidth": 1728,
+    "project": {
+      "annotations": [],
+      "aspectRatio": null,
+      "audio": {
+        "improve": true,
+        "isolation": "balanced",
+        "micStereoMode": "stereo",
+        "micVolumeDb": 0.0,
+        "mute": false,
+        "systemVolumeDb": 0.0
+      },
+      "background": {
+        "advancedShadow": {
+          "blur": 3.799999952316284,
+          "opacity": 68.0999984741211,
+          "size": 14.399999618530273
+        },
+        "blur": 0.0,
+        "border": {
+          "color": [
+            0,
+            0,
+            0
+          ],
+          "enabled": false,
+          "opacity": 50.0,
+          "width": 5.0
+        },
+        "crop": null,
+        "displayPosition": null,
+        "frame": null,
+        "inset": 0,
+        "insetStyle": null,
+        "notch": null,
+        "padding": 10.0,
+        "rounding": 7.5,
+        "roundingType": "squircle",
+        "shadow": 73.5999984741211,
+        "source": {
+          "path": "/Library/Application Support/com.apple.idleassetsd/Customer/4KSDR240FPS/A168628E-11EE-4456-AD66-E7E3E47D1B21.mov",
+          "type": "wallpaper"
+        }
+      },
+      "camera": {
+        "advancedShadow": {
+          "blur": 10.5,
+          "opacity": 44.20000076293945,
+          "size": 33.900001525878906
+        },
+        "backgroundBlur": {
+          "mode": "off"
+        },
+        "hide": false,
+        "manualPosition": null,
+        "mirror": false,
+        "position": {
+          "x": "right",
+          "y": "bottom"
+        },
+        "rounding": 100.0,
+        "roundingType": "squircle",
+        "scaleDuringZoom": 0.699999988079071,
+        "shadow": 62.5,
+        "shape": "square",
+        "size": 30.0,
+        "zoomSize": 60.0
+      },
+      "captions": null,
+      "clips": [],
+      "colorCorrection": {
+        "camera": {
+          "contrast": 0.0,
+          "exposure": 0.0,
+          "fade": 0.0,
+          "grain": 0.0,
+          "intensity": 1.0,
+          "preset": "none",
+          "saturation": 0.0,
+          "splitTone": 0.0,
+          "temperature": 0.0,
+          "tint": 0.0,
+          "vignette": 0.0
+        },
+        "gradeCursor": true,
+        "screen": {
+          "contrast": 0.0,
+          "exposure": 0.0,
+          "fade": 0.0,
+          "grain": 0.0,
+          "intensity": 1.0,
+          "preset": "none",
+          "saturation": 0.0,
+          "splitTone": 0.0,
+          "temperature": 0.0,
+          "tint": 0.0,
+          "vignette": 0.0
+        }
+      },
+      "cursor": {
+        "animationStyle": "mellow",
+        "baseRotation": 0.0,
+        "clickSpring": null,
+        "friction": 70.0,
+        "hide": false,
+        "hideWhenIdle": false,
+        "hideWhenIdleDelay": 2.0,
+        "mass": 3.0,
+        "motionBlur": 1.0,
+        "raw": false,
+        "ripple": {
+          "color": [
+            150,
+            211,
+            95
+          ],
+          "duration": 0.6000000238418579,
+          "enabled": false,
+          "size": 1.0,
+          "strength": 0.699999988079071
+        },
+        "rotationAmount": 0.15000000596046448,
+        "size": 149,
+        "stopMovementInLastSeconds": null,
+        "tension": 470.0,
+        "type": "macos",
+        "useSvg": true
+      },
+      "hotkeys": {
+        "show": false
+      },
+      "keyboard": null,
+      "screenMotionBlur": 1.0,
+      "screenMovementSpring": {
+        "damping": 40.0,
+        "mass": 2.25,
+        "stiffness": 200.0
+      },
+      "textAnimVersion": 1,
+      "textSizeVersion": 1,
+      "timeline": null
+    },
+    "shortcut": "Super+Shift+Space",
+    "sourceId": "1",
+    "toggleEpoch": 78,
+    "zoomAmount": 1.5
+  },
+  "recording_settings": {
+    "cameraDeviceSettings": {},
+    "cameraId": null,
+    "micName": null,
+    "microphoneDeviceSettings": {},
+    "mode": "studio",
+    "organizationId": null,
+    "systemAudio": false,
+    "target": {
+      "bounds": {
+        "position": {
+          "x": 493,
+          "y": 75
+        },
+        "size": {
+          "height": 267,
+          "width": 267
+        }
+      },
+      "screen": "1",
+      "variant": "area"
+    }
+  },
+  "native_camera_preview_default_rollback_v1": true,
+  "interface_language": {
+    "language": "zh-CN"
+  },
+  "remove_cap_target_select_exclusion_v1": true
+}

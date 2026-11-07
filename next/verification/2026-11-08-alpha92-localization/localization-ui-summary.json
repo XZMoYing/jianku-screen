@@ -1,0 +1,206 @@
+{
+  "appVersion": "0.2.0-alpha.92 / 2026.92.0",
+  "languageSwitching": "通过应用持久化的 interface_language store 切换（与 setInterfaceLanguage 同源），核验后已恢复 zh-CN；未在 UI 菜单中逐项点击（AX 未暴露该自定义下拉的选项）",
+  "english": {
+    "home": [
+      {
+        "role": "AXButton",
+        "text": "",
+        "description": "Settings"
+      },
+      {
+        "role": "AXButton",
+        "text": "Open project",
+        "description": ""
+      },
+      {
+        "role": "AXCheckBox",
+        "text": "System audio Off",
+        "description": ""
+      },
+      {
+        "role": "AXStaticText",
+        "text": "New captures use this setting",
+        "description": ""
+      }
+    ],
+    "settingsLinks": [
+      {
+        "role": "AXLink",
+        "text": "General",
+        "description": ""
+      },
+      {
+        "role": "AXStaticText",
+        "text": "General",
+        "description": ""
+      },
+      {
+        "role": "AXLink",
+        "text": "Hotkeys",
+        "description": ""
+      },
+      {
+        "role": "AXStaticText",
+        "text": "Hotkeys",
+        "description": ""
+      },
+      {
+        "role": "AXLink",
+        "text": "Integrations",
+        "description": ""
+      },
+      {
+        "role": "AXStaticText",
+        "text": "Integrations",
+        "description": ""
+      },
+      {
+        "role": "AXLink",
+        "text": "Feedback",
+        "description": ""
+      },
+      {
+        "role": "AXStaticText",
+        "text": "Feedback",
+        "description": ""
+      },
+      {
+        "role": "AXHeading",
+        "text": "Language",
+        "description": ""
+      },
+      {
+        "role": "AXStaticText",
+        "text": "Language",
+        "description": ""
+      },
+      {
+        "role": "AXStaticText",
+        "text": "Language",
+        "description": ""
+      },
+      {
+        "role": "AXPopUpButton",
+        "text": "",
+        "description": "Language English"
+      }
+    ],
+    "hotkeys": [
+      {
+        "role": "AXHeading",
+        "text": "Editor shortcuts",
+        "description": ""
+      },
+      {
+        "role": "AXStaticText",
+        "text": "Editor shortcuts",
+        "description": ""
+      },
+      {
+        "role": "AXStaticText",
+        "text": "These shortcuts apply in the editor. Changes are saved separately for each preset.",
+        "description": ""
+      }
+    ],
+    "feedback": [
+      {
+        "role": "AXStaticText",
+        "text": "Screen Capture:",
+        "description": ""
+      },
+      {
+        "role": "AXStaticText",
+        "text": "Supported",
+        "description": ""
+      }
+    ],
+    "integrations": [
+      {
+        "role": "AXStaticText",
+        "text": "Google Drive",
+        "description": ""
+      },
+      {
+        "role": "AXButton",
+        "text": "Upgrade to Pro",
+        "description": ""
+      },
+      {
+        "role": "AXStaticText",
+        "text": "Connect Google Drive to store new shareable uploads in a private folder. Shared links are managed by the app's sharing s",
+        "description": ""
+      },
+      {
+        "role": "AXStaticText",
+        "text": "S3 Config",
+        "description": ""
+      },
+      {
+        "role": "AXButton",
+        "text": "Upgrade to Pro",
+        "description": ""
+      }
+    ]
+  },
+  "chinese": {
+    "home": [
+      {
+        "role": "AXButton",
+        "text": "",
+        "description": "应用设置"
+      },
+      {
+        "role": "AXButton",
+        "text": "打开工程",
+        "description": ""
+      },
+      {
+        "role": "AXCheckBox",
+        "text": "系统声音 已关闭",
+        "description": ""
+      },
+      {
+        "role": "AXStaticText",
+        "text": "新捕获使用此设置",
+        "description": ""
+      }
+    ],
+    "hotkeys": [
+      {
+        "role": "AXHeading",
+        "text": "编辑器快捷键",
+        "description": ""
+      },
+      {
+        "role": "AXStaticText",
+        "text": "编辑器快捷键",
+        "description": ""
+      },
+      {
+        "role": "AXStaticText",
+        "text": "仅在编辑器内生效。每套预设分别保留你的改键。",
+        "description": ""
+      }
+    ],
+    "feedback": [
+      {
+        "role": "AXStaticText",
+        "text": "捕获支持",
+        "description": ""
+      },
+      {
+        "role": "AXStaticText",
+        "text": "支持",
+        "description": ""
+      }
+    ]
+  },
+  "notRendered": [
+    "Google Drive/S3 的 Not connected/Configure/Managed by your organization 等状态（当前账户为 Pro 升级门控，未显示配置按钮）",
+    "Not Supported（当前录屏权限可用，未走不支持分支）",
+    "Failed to fetch changelog（未构造网络失败）",
+    "item/items（转写提示为空）",
+    "权限引导文案（权限已授予）"
+  ]
+}
