@@ -1,0 +1,257 @@
+{
+  "appVersion": "0.2.0-alpha.92 / 2026.92.0",
+  "source": "WorkspaceLayout.tsx：role=separator + tabIndex=0；onKeyDown 箭头 ±10、Home 复位；onDblClick 复位；makePersisted 保存 workspaceInspectorWidth / workspaceControlsHeight",
+  "steps": {
+    "baseline": [
+      {
+        "label": "调整首页预览与控制区高度",
+        "position": {
+          "x": 269,
+          "y": 573
+        },
+        "size": {
+          "height": 12,
+          "width": 682
+        }
+      },
+      {
+        "label": "调整首页画面设置宽度",
+        "position": {
+          "x": 951,
+          "y": 197
+        },
+        "size": {
+          "height": 682,
+          "width": 12
+        }
+      }
+    ],
+    "verticalArrowLeftX2": [
+      {
+        "label": "调整首页预览与控制区高度",
+        "position": {
+          "x": 269,
+          "y": 573
+        },
+        "size": {
+          "height": 12,
+          "width": 662
+        }
+      },
+      {
+        "label": "调整首页画面设置宽度",
+        "position": {
+          "x": 931,
+          "y": 197
+        },
+        "size": {
+          "height": 682,
+          "width": 12
+        }
+      }
+    ],
+    "verticalHomeReset": [
+      {
+        "label": "调整首页预览与控制区高度",
+        "position": {
+          "x": 269,
+          "y": 573
+        },
+        "size": {
+          "height": 12,
+          "width": 742
+        }
+      },
+      {
+        "label": "调整首页画面设置宽度",
+        "position": {
+          "x": 1011,
+          "y": 197
+        },
+        "size": {
+          "height": 682,
+          "width": 12
+        }
+      }
+    ],
+    "bottomArrowUpX2": [
+      {
+        "label": "调整首页预览与控制区高度",
+        "position": {
+          "x": 269,
+          "y": 553
+        },
+        "size": {
+          "height": 12,
+          "width": 742
+        }
+      },
+      {
+        "label": "调整首页画面设置宽度",
+        "position": {
+          "x": 1011,
+          "y": 197
+        },
+        "size": {
+          "height": 682,
+          "width": 12
+        }
+      }
+    ],
+    "bottomHomeReset": [
+      {
+        "label": "调整首页预览与控制区高度",
+        "position": {
+          "x": 269,
+          "y": 613
+        },
+        "size": {
+          "height": 12,
+          "width": 742
+        }
+      },
+      {
+        "label": "调整首页画面设置宽度",
+        "position": {
+          "x": 1011,
+          "y": 197
+        },
+        "size": {
+          "height": 682,
+          "width": 12
+        }
+      }
+    ],
+    "verticalMoved3ThenDoubleClickReset": {
+      "moved3": [
+        {
+          "label": "调整首页预览与控制区高度",
+          "position": {
+            "x": 269,
+            "y": 613
+          },
+          "size": {
+            "height": 12,
+            "width": 712
+          }
+        },
+        {
+          "label": "调整首页画面设置宽度",
+          "position": {
+            "x": 981,
+            "y": 197
+          },
+          "size": {
+            "height": 682,
+            "width": 12
+          }
+        }
+      ],
+      "afterDblClick": [
+        {
+          "label": "调整首页预览与控制区高度",
+          "position": {
+            "x": 269,
+            "y": 613
+          },
+          "size": {
+            "height": 12,
+            "width": 742
+          }
+        },
+        {
+          "label": "调整首页画面设置宽度",
+          "position": {
+            "x": 1011,
+            "y": 197
+          },
+          "size": {
+            "height": 682,
+            "width": 12
+          }
+        }
+      ]
+    },
+    "layoutPersistenceAcrossRestart": {
+      "beforeQuit": [
+        {
+          "label": "调整首页预览与控制区高度",
+          "position": {
+            "x": 269,
+            "y": 613
+          },
+          "size": {
+            "height": 12,
+            "width": 742
+          }
+        },
+        {
+          "label": "调整首页画面设置宽度",
+          "position": {
+            "x": 1011,
+            "y": 197
+          },
+          "size": {
+            "height": 682,
+            "width": 12
+          }
+        }
+      ],
+      "afterRestart": [
+        {
+          "label": "调整首页预览与控制区高度",
+          "position": {
+            "x": 269,
+            "y": 613
+          },
+          "size": {
+            "height": 12,
+            "width": 742
+          }
+        },
+        {
+          "label": "调整首页画面设置宽度",
+          "position": {
+            "x": 1011,
+            "y": 197
+          },
+          "size": {
+            "height": 682,
+            "width": 12
+          }
+        }
+      ]
+    },
+    "restoredOriginalUserLayout": [
+      {
+        "label": "调整首页预览与控制区高度",
+        "position": {
+          "x": 269,
+          "y": 573
+        },
+        "size": {
+          "height": 12,
+          "width": 682
+        }
+      },
+      {
+        "label": "调整首页画面设置宽度",
+        "position": {
+          "x": 951,
+          "y": 197
+        },
+        "size": {
+          "height": 682,
+          "width": 12
+        }
+      }
+    ]
+  },
+  "observations": [
+    "聚焦分隔条后方向键每次移动 10px：左区宽度 388→408（x951→931）等，方向符合 onKeyDown 语义",
+    "Home 恢复默认：竖向 side 328（x1011），横向 controls 254（y613）",
+    "双击分隔条恢复默认：移动 3 次到 981 后双击，回到 1011（side 328）",
+    "键盘/双击调整写入 workspaceInspectorWidth/workspaceControlsHeight，重启后保留",
+    "AXSplitter 未暴露 aria-valuenow 的稳定 value，且无按钮式重置入口；能力依赖键盘与双击，发现性不足（记录，不改产品）"
+  ]
+}
