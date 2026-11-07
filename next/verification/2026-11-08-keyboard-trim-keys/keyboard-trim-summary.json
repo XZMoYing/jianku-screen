@@ -1,0 +1,31 @@
+{
+  "appVersion": "0.2.0-alpha.97 / 2026.97.0（9ccddfa 键盘裁剪重基）",
+  "fixture": "自有合成工程 + keyboardSegments: kb-edit-verify 1.0–3.0 displayText abcd keys a@0 b@500 c@1200 d@1800；邻居 4.0–4.6 e@0",
+  "results": [
+    {
+      "case": "左裁剪 1.0→1.384",
+      "result": "keys 变为 b@116.3 c@816.3 d@1416.3（绝对时间保持≈1.5/2.2/2.8），a 被裁掉，displayText abcd→bcd"
+    },
+    {
+      "case": "一次撤销",
+      "result": "恢复 1.0–3.0、keys 0/500/1200/1800、displayText abcd"
+    },
+    {
+      "case": "右裁剪 3.0→2.516",
+      "result": "keys 0/500/1200 保留、d 被裁掉，displayText abc"
+    },
+    {
+      "case": "整段移动 +60px",
+      "result": "start/end 1.0–2.516→1.315–2.832，keys 偏移 0/500/1200 不变，displayText abc"
+    },
+    {
+      "case": "保存并关闭重开",
+      "result": "配置与界面一致：kb-edit-verify 1.315–2.832 abc、邻居 4.000–4.600 e 不受影响"
+    }
+  ],
+  "conclusion": "alpha.97 实际包验证通过：按键段左右边缘裁剪会裁掉越界 key、保留键 timeOffset 按新起点重基、逐键字符 displayText 同步更新；整段移动不改偏移；撤销一次回到裁剪前；保存重开后配置与界面一致；邻居段不受影响。",
+  "notCovered": [
+    "按键过滤项/选择/分割、失焦中断、成片预览/导出逐键时间点、真实采集按键数据",
+    "导出画面逐帧核对"
+  ]
+}
