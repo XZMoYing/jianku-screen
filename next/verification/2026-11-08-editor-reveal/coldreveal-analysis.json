@@ -1,0 +1,70 @@
+{
+  "frames": 155,
+  "duration": 3.948,
+  "first8": [
+    {
+      "t": 0.0,
+      "changedVsLoaded": 0.2253,
+      "diff": 0,
+      "luma": 246.0,
+      "std": 0.9
+    },
+    {
+      "t": 0.023,
+      "changedVsLoaded": 0.2253,
+      "diff": 0.001,
+      "luma": 246.0,
+      "std": 0.9
+    },
+    {
+      "t": 0.048,
+      "changedVsLoaded": 0.2253,
+      "diff": 0.0,
+      "luma": 246.0,
+      "std": 0.9
+    },
+    {
+      "t": 0.068,
+      "changedVsLoaded": 0.2253,
+      "diff": 0.002,
+      "luma": 246.0,
+      "std": 0.9
+    },
+    {
+      "t": 0.09,
+      "changedVsLoaded": 0.2253,
+      "diff": 0.002,
+      "luma": 246.0,
+      "std": 0.8
+    },
+    {
+      "t": 0.117,
+      "changedVsLoaded": 0.2383,
+      "diff": 5.2,
+      "luma": 249.1,
+      "std": 3.8
+    },
+    {
+      "t": 0.142,
+      "changedVsLoaded": 0.2383,
+      "diff": 0.001,
+      "luma": 249.1,
+      "std": 3.8
+    },
+    {
+      "t": 0.163,
+      "changedVsLoaded": 0.2383,
+      "diff": 0.001,
+      "luma": 249.1,
+      "std": 3.8
+    }
+  ],
+  "changedMax": 0.2383,
+  "firstStableTime": 0.5,
+  "lumaRange": [
+    214.2,
+    249.1
+  ],
+  "stdFirst": 0.9,
+  "stdMax": 70.8
+}

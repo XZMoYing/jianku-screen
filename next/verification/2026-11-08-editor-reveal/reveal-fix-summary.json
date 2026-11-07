@@ -1,0 +1,52 @@
+{
+  "appVersions": [
+    "0.2.0-alpha.94（基线，纯白）",
+    "0.2.0-alpha.95（仅原生背板色对齐，仍白）",
+    "0.2.0-alpha.96（前端首帧后显示，生效）"
+  ],
+  "alpha94_baseline": {
+    "firstFrameCenterRGB": [
+      253,
+      253,
+      253
+    ],
+    "uniformLuma": 253.0,
+    "windowFirstSize": "1276x800 空白后 resized"
+  },
+  "alpha95_attempt": {
+    "change": "窗口原生 background_color 从纯白改为 #fafaf5/#11120f",
+    "result": "首帧仍 (253,253,253) 纯白；因 WKWebView 在首帧前自身为不透明白底，原生背板被遮挡。",
+    "sourceCommit": "815c85d",
+    "package": "f8ab452? 不，95=8d0023a 冻结"
+  },
+  "alpha96_fix": {
+    "change": "Rust 不再立即 show 编辑器窗口；由前端 settings 就绪/骨架绘制后 reveal（Rust 1200ms 兜底）",
+    "sourceCommit": "5aef9b2",
+    "packageTag": "next-v0.2.0-alpha.96-candidate",
+    "observations": {
+      "firstFrame": {
+        "t": 0.0,
+        "centerRGB": [
+          249,
+          250,
+          243
+        ],
+        "uniformLuma": 246.0,
+        "std": 0.9,
+        "note": "与 app 背景 #fafaf5 匹配，非纯白"
+      },
+      "frames": 155,
+      "duration": 3.95,
+      "stableTime": "约 0.5s 后与最终 UI 差异 <2%",
+      "hotOpen": "应用运行中再打开第二个工程，两个编辑器窗口均 1680x954 可见、工程名正确"
+    }
+  },
+  "conclusion": "alpha.96 消除冷启动纯白闪屏：窗口首次可见即为 app 背景色，随后约 0.5s 内完成骨架/内容绘制；热打开正常。",
+  "notCovered": [
+    "多次冷启动统计",
+    "透明度设置开启（HudWindow）下的显示回归",
+    "深色主题下首帧颜色",
+    "前端 JS 失败时 1200ms 兜底显示的实际触发测试",
+    "用户观感确认"
+  ]
+}
