@@ -1,0 +1,25 @@
+{
+  "appVersion": "0.2.0-alpha.103",
+  "scans": {
+    "editorEnglishBaseSelections": {
+      "files": 5,
+      "result": "选中视频/字幕/按键/缩放/3D 轨道片段时，英文编辑器仅剩用户内容中文（工程名、片段名 合成语音），无 UI 中文残留"
+    },
+    "recordingsLibraryEnglish": {
+      "result": "仅用户录制名（简库镜传 2026-…、界面验收·合成画面 等）为中文，UI 文案均英文，属正确保留"
+    },
+    "screenshotsLibraryEnglish": {
+      "result": "仅用户截图名 界面验收·合成截图 为中文，UI 英文"
+    },
+    "presentModeEnglish": {
+      "result": "CJK 0"
+    }
+  },
+  "conclusion": "alpha.103 英文界面在编辑器选中态、录制库、截图库、演示模式下均未发现中文 UI 残留（仅用户内容中文）。其余未展开：字幕/文字/按键面板的折叠分组与导出/颜色校正/渐变深层面板、设备页、截图编辑器工具栏。",
+  "notCovered": [
+    "深层折叠面板与导出/颜色校正/渐变",
+    "设备/截图编辑器页面",
+    "下拉展开项",
+    "中文界面残留英文（本轮回看较少）"
+  ]
+}

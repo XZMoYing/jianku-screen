@@ -144,9 +144,10 @@ export function useScreenshotExport() {
 		try {
 			toastId = toast.loading(localize("正在渲染图片…"));
 			const outputCanvas = await renderExportCanvas();
-			const needsAlpha = destination === "clipboard"
-				? canvasNeedsTransparency(outputCanvas, project)
-				: false;
+			const needsAlpha =
+				destination === "clipboard"
+					? canvasNeedsTransparency(outputCanvas, project)
+					: false;
 			const blobCanvas =
 				destination === "clipboard" && !needsAlpha
 					? withWhiteBackground(outputCanvas)

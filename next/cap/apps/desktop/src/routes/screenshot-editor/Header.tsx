@@ -179,11 +179,7 @@ export function Header() {
 									</DropdownItem>
 									<DropdownItem
 										onSelect={async () => {
-											if (
-												await ask(
-													localize("确定要删除这张截图吗？"),
-												)
-											) {
+											if (await ask(localize("确定要删除这张截图吗？"))) {
 												await remove(path());
 												await getCurrentWindow().close();
 											}
