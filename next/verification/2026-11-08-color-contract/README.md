@@ -70,3 +70,19 @@
 - 同一导出文件码流解码后中心 YUV 为 **[42,115,237]**（RGB 225,0,3）。
 - 结论：偏色不在渲染/着色器/surface 转换，也不在导出帧数据，而发生在 **VideoToolbox 硬件编码输入/编码阶段**（wrap 的 CVPixelBuffer 未带 color attachments、VT 对 range/matrix 的默认处理，或 ffmpeg h264_videotoolbox hw 输入路径转换）。
 - 下一轮修复候选：给 wrap 前的 CVPixelBuffer 设置 `kCVImageBufferYCbCrMatrixKey=ITU_R_709_2`、`ColorPrimaries`、`TransferFunction`（并确保 420v video range）；或改 VT 会话/AVFrame 的 matrix/range；临时保底可回退软件帧路径（sws BT.709，实测正确）但需评估性能。
+
+## 硬件导出修复（4ccdc4a）
+
+- 修复：在 `Nv12SurfaceRing` 取得 CVPixelBuffer 后设置 BT.709 limited 附件（`kCVImageBufferYCbCrMatrixKey/ColorPrimaries/TransferFunction = ITU_R_709_2`，ShouldPropagate），VideoToolbox 硬件输入不再自行重解释矩阵/范围。
+- 复测（同一纯色工程，cap-cli 重新构建）：
+
+| 路径 | red | gray | blue |
+| --- | --- | --- | --- |
+| 源 | 252,0,0 | 125,127,127 | 0,0,251 |
+| 修复前硬件导出 | 225,0,3 | 113,116,115 | 0,0,239 |
+| 修复后硬件导出 | **251,0,0** | **124,126,123** | **0,0,251** |
+| 软件导出 | 252,0,0 | 124,126,126 | 0,0,251 |
+
+- 残余：gray 的 B 通道仍差约 4/255（其余 ≤1），接近中性灰、无明显偏色；未达“全通道 ≤2”目标，保留观察。
+- 软件/CPU 测试：rendering crate nv12 相关 8 项、GPU surface BT.709 单测均通过。
+- 待实际安装包验证（alpha.98 构建中）：安装后 GUI 导出与预览一致性、硬件/软件导出一致性。
