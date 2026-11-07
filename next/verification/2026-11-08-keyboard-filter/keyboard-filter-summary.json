@@ -1,0 +1,30 @@
+{
+  "appVersion": "0.2.0-alpha.104",
+  "fixture": "键盘过滤验收.jks（复制按键逐键夹具并注入 a/Shift/Enter/⌘ 四键）",
+  "uiToggle": {
+    "action": "按键标签→行为→显示修饰键 由开→关",
+    "configAfterToggle": false,
+    "persistAfterReopen": true,
+    "note": "关闭后工程配置 keyboard.settings.showModifiers=false；退出重开后 UI 复选框仍为 0，恢复为开并确认 true 后退出。"
+  },
+  "exportFilterTest": {
+    "variants": [
+      "all on (showModifiers/showSpecialKeys=true)",
+      "nomod (showModifiers=false)",
+      "nospecial (showSpecialKeys=false)"
+    ],
+    "framesCompared": [
+      "1.2s",
+      "1.8s",
+      "2.4s"
+    ],
+    "result": "四组导出帧逐字节/像素平均差均为 0.0；键盘启用 vs 禁用帧平均差 0.426（键盘确实参与导出）。"
+  },
+  "sourceTrace": "showModifiers/showSpecialKeys 仅用于 generate_keyboard_segments（录制事件→按键段生成）与 KeyboardTab 设置，渲染/导出不读取 → 导出对当前已有 segment 不随过滤项变化属设计行为。",
+  "conclusion": "过滤项（显示修饰键）在实包 UI 可切换且持久化；导出对已有按键段不受过滤项影响，与源码“生成期过滤”一致，不是导出缺陷。真实录制生成时修饰键过滤效果与成片逐键观感仍未验证。",
+  "notCovered": [
+    "真实录制事件在 showModifiers=false 下生成段落是否剔除修饰键",
+    "成片逐键字形/位置观感",
+    "显示功能键/大写开关的同类生成期验证"
+  ]
+}
