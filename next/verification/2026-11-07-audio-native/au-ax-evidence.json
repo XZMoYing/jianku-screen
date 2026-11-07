@@ -1,0 +1,122 @@
+[
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 364,
+      "y": 854
+    },
+    "size": {
+      "height": 44,
+      "width": 521
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 369,
+      "y": 868
+    },
+    "size": {
+      "height": 16,
+      "width": 4
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "音频A",
+    "position": {
+      "x": 377,
+      "y": 869
+    },
+    "size": {
+      "height": 14,
+      "width": 33
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "2s",
+    "position": {
+      "x": 417,
+      "y": 869
+    },
+    "size": {
+      "height": 13,
+      "width": 14
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 641,
+      "y": 868
+    },
+    "size": {
+      "height": 16,
+      "width": 4
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 985,
+      "y": 854
+    },
+    "size": {
+      "height": 44,
+      "width": 1142
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 990,
+      "y": 868
+    },
+    "size": {
+      "height": 16,
+      "width": 4
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "音频B",
+    "position": {
+      "x": 998,
+      "y": 869
+    },
+    "size": {
+      "height": 14,
+      "width": 33
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "2s",
+    "position": {
+      "x": 1038,
+      "y": 869
+    },
+    "size": {
+      "height": 13,
+      "width": 14
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 1262,
+      "y": 868
+    },
+    "size": {
+      "height": 16,
+      "width": 4
+    }
+  }
+]

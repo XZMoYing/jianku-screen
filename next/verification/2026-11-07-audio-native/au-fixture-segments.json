@@ -1,0 +1,28 @@
+[
+  {
+    "start": 1.0,
+    "end": 2.5,
+    "track": 0,
+    "path": "content/speech.wav",
+    "name": "音频A",
+    "enabled": true,
+    "trimStart": 0.0,
+    "volumeDb": 0.0,
+    "fadeIn": 0.0,
+    "fadeOut": 0.0,
+    "duration": 8.0
+  },
+  {
+    "start": 4.5,
+    "end": 6.0,
+    "track": 0,
+    "path": "content/speech.wav",
+    "name": "音频B",
+    "enabled": true,
+    "trimStart": 0.0,
+    "volumeDb": 0.0,
+    "fadeIn": 0.0,
+    "fadeOut": 0.0,
+    "duration": 8.0
+  }
+]
