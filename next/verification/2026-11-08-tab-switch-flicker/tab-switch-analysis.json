@@ -1,0 +1,175 @@
+{
+  "baseline": {
+    "label": "baseline",
+    "frames": 129,
+    "duration": 3.463,
+    "gapMs": {
+      "max": 40.0,
+      "p95": 33.33,
+      "over100ms": 0
+    },
+    "luma": {
+      "min": 214.2,
+      "max": 214.2
+    },
+    "lightgrayMax": 0.159,
+    "freezeRuns": [
+      {
+        "start": 0.02,
+        "frames": 128,
+        "duration": 3.443
+      }
+    ],
+    "topDiff": [
+      {
+        "t": 1.627,
+        "diff": 0.07
+      },
+      {
+        "t": 0.02,
+        "diff": 0.06
+      },
+      {
+        "t": 0.047,
+        "diff": 0.03
+      },
+      {
+        "t": 3.252,
+        "diff": 0.02
+      },
+      {
+        "t": 1.095,
+        "diff": 0.02
+      },
+      {
+        "t": 3.137,
+        "diff": 0.02
+      },
+      {
+        "t": 1.652,
+        "diff": 0.02
+      },
+      {
+        "t": 1.153,
+        "diff": 0.02
+      },
+      {
+        "t": 3.222,
+        "diff": 0.02
+      },
+      {
+        "t": 3.195,
+        "diff": 0.02
+      }
+    ]
+  },
+  "rapidSwitch": {
+    "label": "rapid-switch",
+    "frames": 507,
+    "duration": 11.958,
+    "gapMs": {
+      "max": 76.67,
+      "p95": 28.33,
+      "over100ms": 0
+    },
+    "luma": {
+      "min": 212.9,
+      "max": 218.2
+    },
+    "lightgrayMax": 0.166,
+    "freezeRuns": [
+      {
+        "start": 0.018,
+        "frames": 31,
+        "duration": 0.705
+      },
+      {
+        "start": 0.77,
+        "frames": 24,
+        "duration": 0.552
+      },
+      {
+        "start": 1.343,
+        "frames": 18,
+        "duration": 0.408
+      },
+      {
+        "start": 1.822,
+        "frames": 23,
+        "duration": 0.533
+      },
+      {
+        "start": 2.377,
+        "frames": 19,
+        "duration": 0.442
+      },
+      {
+        "start": 2.868,
+        "frames": 21,
+        "duration": 0.52
+      },
+      {
+        "start": 3.41,
+        "frames": 20,
+        "duration": 0.452
+      },
+      {
+        "start": 3.888,
+        "frames": 22,
+        "duration": 0.532
+      },
+      {
+        "start": 4.442,
+        "frames": 20,
+        "duration": 0.477
+      },
+      {
+        "start": 4.942,
+        "frames": 21,
+        "duration": 0.485
+      }
+    ],
+    "topDiff": [
+      {
+        "t": 3.388,
+        "diff": 37.45
+      },
+      {
+        "t": 3.862,
+        "diff": 37.32
+      },
+      {
+        "t": 0.723,
+        "diff": 37.31
+      },
+      {
+        "t": 1.322,
+        "diff": 37.31
+      },
+      {
+        "t": 4.42,
+        "diff": 37.31
+      },
+      {
+        "t": 9.057,
+        "diff": 37.31
+      },
+      {
+        "t": 1.752,
+        "diff": 37.31
+      },
+      {
+        "t": 2.355,
+        "diff": 37.3
+      },
+      {
+        "t": 2.818,
+        "diff": 37.3
+      },
+      {
+        "t": 7.507,
+        "diff": 33.09
+      }
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "appVersion": "0.2.0-alpha.92 / 2026.92.0",
+  "scenario": "编辑器内「字幕 ↔ 返回编辑器」8 次 + 「素材与片段」8 次快速切换，最后停在字幕面板",
+  "actionCount": 17,
+  "finalState": {
+    "headerButton": "返回编辑器（字幕面板打开）",
+    "SRT/VTT enabled": true,
+    "captionTextsVisible": [
+      "Synthetic Cobalt Lantern",
+      "This is an offline diagnostic test."
+    ],
+    "conclusion": "快速切换后最终显示与最后一次选择一致，无中间页残留"
+  },
+  "capture": {
+    "baselineFrames": 129,
+    "baselineGapMs": {
+      "max": 40.0,
+      "p95": 33.33,
+      "over100ms": 0
+    },
+    "switchFrames": 507,
+    "switchGapMs": {
+      "max": 76.67,
+      "p95": 28.33,
+      "over100ms": 0
+    }
+  },
+  "visual": {
+    "luma": [
+      212.9,
+      218.2
+    ],
+    "lightgrayMax": 0.166,
+    "baselineLightgrayMax": 0.159,
+    "wholeWindowPlaceholderFound": false
+  },
+  "limitations": [
+    "阈值/下采样导致 freezeRuns 把面板切换的小面积变化误判为静止，不作为主线程卡顿证据",
+    "未测量点击到画面更新的精确延迟；未覆盖其他页面/设置页/录制页切换与完整动画节奏",
+    "取帧最大间隔 76.7ms 反映采集调度，不是渲染帧率结论"
+  ]
+}
