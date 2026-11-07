@@ -19,3 +19,9 @@
 ## 证据
 
 - resize-lang-attempt-summary.json；resize.mov/log/analysis、lang.mov/log/analysis、lang-*.json 快照。
+
+## 语言切换第二次尝试（补充）
+
+- 打开自定义 ChoiceSelect 后，AX 仅暴露「简体中文」(y405) 与「跟随系统」(y491) 两个 StaticText，English 行不可见。
+- 用 click-screen 点击两者之间的估计 English 行位置 (1120,448)：language store 仍为 zh-CN；再次打开下拉后目标区域 AX 无节点（列表未暴露 English 行或点击落空）。
+- 结论：自定义 ChoiceSelect 选项行未被 AX 暴露且坐标点击未生效，语言切换无法通过当前自动化完成；语言切换闪屏仍未验证。

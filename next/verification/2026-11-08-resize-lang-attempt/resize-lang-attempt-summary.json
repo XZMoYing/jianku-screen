@@ -10,12 +10,17 @@
     "goal": "编辑器打开时切换界面语言触发重载/闪屏",
     "method": "设置-通用-界面语言（ChoiceSelect 自定义下拉）：点击弹层→Down→Return（英文）→再 Up→Return（中文）；capture 编辑器窗口 10s/449 帧。",
     "result": "键盘操作未改变自定义下拉值；语言 store 最终仍为 zh-CN；编辑器取帧 diff 0/luma 213.3 恒定 → 语言实际未切换，截图不能作为“语言切换无闪屏”结论。",
-    "conclusion": "自定义 ChoiceSelect 需点击具体选项（English 项未在 AX 可见区列出/被弹层遮挡）才能切换；语言切换闪屏触发未验证。"
+    "conclusion": "自定义 ChoiceSelect 需点击具体选项（English 项未在 AX 可见区列出/被弹层遮挡）才能切换；语言切换闪屏触发未验证。",
+    "secondTry": {
+      "method": "打开自定义 ChoiceSelect 后用 click-screen 点击夹在「简体中文」(y405) 与「跟随系统」(y491) 之间的 English 行估计位置 (1120,448)",
+      "result": "点击后 language store 仍 zh-CN；再次打开下拉后目标区域 AX 无节点（列表未暴露 English 行或点击落空）",
+      "conclusion": "自定义 ChoiceSelect 选项行未被 AX 暴露且坐标点击未生效，语言切换无法通过当前自动化完成；语言切换闪屏仍未验证。"
+    }
   },
   "notCovered": [
     "窗口缩放触发闪屏",
     "语言切换触发闪屏/重载",
-    "自定义 ChoiceSelect 选项点击",
+    "自定义 ChoiceSelect 选项点击（English 行 AX 不可见/点击无效）",
     "其它触发（bookmarks 等）"
   ]
 }
