@@ -1743,5 +1743,10 @@
 	"打开工程": "Open project",
 	"开启": "Enable",
 	"若系统中已开启但仍提示未授权，请在系统设置中关闭再开启该权限，然后重新启动应用。": "If the permission already looks enabled in System Settings but the app still reports it as unauthorized, turn it off and on again there, then restart the app.",
-	"工程正在保存，请稍后再关闭窗口": "The project is still saving; wait a moment before closing the window."
+	"工程正在保存，请稍后再关闭窗口": "The project is still saving; wait a moment before closing the window.",
+	"最小化": "Minimize",
+	"打开编辑器": "Open editor",
+	"在浮层中显示": "Show in overlay",
+	"不执行操作": "Do nothing",
+	"重新打开录制窗口": "Reopen recording window"
 }

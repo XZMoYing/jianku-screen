@@ -1,0 +1,39 @@
+{
+  "appVersion": "0.2.0-alpha.100 / 2026.100.0（冻结 48159d3）",
+  "languageMethod": "通过应用持久化 interface_language store 切换（同 setInterfaceLanguage 写入），验后恢复 zh-CN；自定义下拉选项仍未逐项点击。",
+  "english": {
+    "general": [
+      "System notifications 描述：Show a notification when copy or save finishes; allow notifications in System Settings.",
+      "Confirm when no microphone is selected 描述：Warn before recording when no microphone is selected or available.",
+      "Enhance audio in new recordings 描述：Automatically process microphone audio; it can still be disabled in the editor.",
+      "Recording countdown 弹层值：Recording countdown 3 seconds"
+    ],
+    "feedback": [
+      "Test duration 弹层值：Test duration 20 seconds",
+      "句子与说明为英文；Supported 等已显示英文"
+    ],
+    "residualFound": [
+      "After recording 弹层仍显示“打开编辑器”",
+      "After deleting a recording 弹层仍显示“不执行操作”",
+      "Main window when recording starts 弹层选项仍为中文（关闭/最小化）"
+    ]
+  },
+  "chinese": {
+    "general": [
+      "系统通知/复制、保存等操作完成时显示通知…",
+      "未选择麦克风或麦克风不可用时，开始录制前提醒。",
+      "自动处理麦克风声音，之后仍可在编辑器关闭。",
+      "录制开始后关闭或最小化主窗口。"
+    ],
+    "feedback": [
+      "测试时长 20 秒",
+      "测试的录制链路 录制与实时模式"
+    ]
+  },
+  "conclusion": "alpha.100 实际包中第二批本地化的描述、倒计时与测试时长选项已按语言正确显示；但“录制后/删除后/主窗口”三组下拉选项仍是中文，已在源码补 localize+词典（未包含在 alpha.100，待下一包复验）。",
+  "notCovered": [
+    "三组下拉选项的实际包复验（alpha.101）",
+    "自定义选择器下拉展开后的逐项文案",
+    "Google Drive 按钮（Pro/账户门控未显现）"
+  ]
+}

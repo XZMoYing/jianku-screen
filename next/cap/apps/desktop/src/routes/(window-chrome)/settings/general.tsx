@@ -526,8 +526,8 @@ function Inner(props: {
 								handleChange("mainWindowRecordingStartBehaviour", value)
 							}
 							options={[
-								{ text: "关闭", value: "close" },
-								{ text: "最小化", value: "minimise" },
+								{ text: localize("关闭"), value: "close" },
+								{ text: localize("最小化"), value: "minimise" },
 							]}
 						/>
 						<SelectSettingItem
@@ -538,8 +538,8 @@ function Inner(props: {
 								handleChange("postStudioRecordingBehaviour", value)
 							}
 							options={[
-								{ text: "打开编辑器", value: "openEditor" },
-								{ text: "在浮层中显示", value: "showOverlay" },
+								{ text: localize("打开编辑器"), value: "openEditor" },
+								{ text: localize("在浮层中显示"), value: "showOverlay" },
 							]}
 						/>
 						<SelectSettingItem
@@ -550,9 +550,9 @@ function Inner(props: {
 							value={settings.postDeletionBehaviour ?? "doNothing"}
 							onChange={(value) => handleChange("postDeletionBehaviour", value)}
 							options={[
-								{ text: "不执行操作", value: "doNothing" },
+								{ text: localize("不执行操作"), value: "doNothing" },
 								{
-									text: "重新打开录制窗口",
+									text: localize("重新打开录制窗口"),
 									value: "reopenRecordingWindow",
 								},
 							]}
