@@ -1,0 +1,115 @@
+{
+ "generatedAt": "2026-11-07T19:55:35+0800",
+ "appVersion": "0.2.0-alpha.88",
+ "cases": [
+  {
+   "case": "A-cold-open-a-single",
+   "pidBefore": null,
+   "pidAfter": 1489,
+   "openExit": 0,
+   "expectedHit": true,
+   "hitAfterSec": 1.54,
+   "editorWindows": 1,
+   "windowTitles": [
+    "简库镜传 Next",
+    "简库镜传 · 视频编辑"
+   ],
+   "expectedHits": [
+    {
+     "key": "AXValue",
+     "role": "AXTextField",
+     "value": "冷启动文件验收"
+    },
+    {
+     "key": "AXValue",
+     "role": "AXStaticText",
+     "value": "冷启动文件验收"
+    }
+   ],
+   "logKeyframeForRequested": true
+  },
+  {
+   "case": "C-hot-open-a-single",
+   "pidBefore": 1489,
+   "pidAfter": 1489,
+   "openExit": 0,
+   "expectedHit": true,
+   "hitAfterSec": 0.92,
+   "editorWindows": 2,
+   "windowTitles": [
+    "简库镜传 · 视频编辑",
+    "简库镜传 · 视频编辑"
+   ],
+   "expectedHits": [
+    {
+     "key": "AXValue",
+     "role": "AXTextField",
+     "value": "热打开验收"
+    },
+    {
+     "key": "AXValue",
+     "role": "AXStaticText",
+     "value": "热打开验收"
+    }
+   ],
+   "logKeyframeForRequested": true
+  },
+  {
+   "case": "B-cold-default-handler-single",
+   "pidBefore": null,
+   "pidAfter": 1574,
+   "openExit": 0,
+   "openStderr": "",
+   "expectedHit": true,
+   "hitAfterSec": 1.55,
+   "editorWindows": 1,
+   "windowTitles": [
+    "简库镜传 Next",
+    "简库镜传 · 视频编辑"
+   ],
+   "expectedHits": [
+    {
+     "key": "AXValue",
+     "role": "AXTextField",
+     "value": "热打开验收"
+    },
+    {
+     "key": "AXValue",
+     "role": "AXStaticText",
+     "value": "热打开验收"
+    }
+   ],
+   "logKeyframeForRequested": true
+  },
+  {
+   "case": "D-cold-open-a-multiple",
+   "pidBefore": null,
+   "pidAfter": 1621,
+   "openExit": 0,
+   "hitOnFirst": true,
+   "hitOnSecond": true,
+   "firstHitAfterSec": 1.8,
+   "secondHitAfterSec": 2.02,
+   "editorWindows": 2,
+   "windowTitles": [
+    "简库镜传 Next",
+    "简库镜传 · 视频编辑",
+    "简库镜传 · 视频编辑"
+   ],
+   "expectedHitsSecond": [
+    {
+     "key": "AXValue",
+     "role": "AXTextField",
+     "value": "多文件乙"
+    },
+    {
+     "key": "AXValue",
+     "role": "AXStaticText",
+     "value": "多文件乙"
+    }
+   ],
+   "logHasJia": true,
+   "logHasYi": true
+  }
+ ]
+}
