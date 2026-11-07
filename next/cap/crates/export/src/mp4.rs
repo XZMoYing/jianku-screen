@@ -805,6 +805,18 @@ struct FirstFrameNv12 {
 fn nv12_from_rendered_frame(frame: Nv12RenderedFrame) -> ExportFrame {
     #[cfg(target_os = "macos")]
     if let Some(surface) = frame.surface {
+        let sample = surface.with_locked_planes(|y, y_stride, uv, uv_stride| {
+            let width = frame.width as usize;
+            let height = frame.height as usize;
+            let y_index = (height / 2) * y_stride + width / 2;
+            let uv_index = (height / 4) * uv_stride + width / 2;
+            [y[y_index], uv[uv_index], uv[uv_index + 1]]
+        });
+        tracing::debug!(
+            frame_number = frame.frame_number,
+            surface_yuv = ?sample,
+            "Export frame uses NV12 surface"
+        );
         return ExportFrame {
             width: frame.width,
             height: frame.height,
