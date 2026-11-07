@@ -483,7 +483,7 @@ pub async fn run_diagnostic(
         .map(|s| s.crash_recovery_recording)
         .unwrap_or(cap_recording::DEFAULT_CRASH_RECOVERY_RECORDING);
     let settings_json = settings.as_ref().map(settings_snapshot);
-    let app_version = env!("CARGO_PKG_VERSION").to_string();
+    let app_version = app.package_info().version.to_string();
     let sync_test_error_for_report = sync_test_error.clone();
 
     // `collect_report` probes displays and disk mounts; both can block for tens
