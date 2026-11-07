@@ -1,0 +1,27 @@
+{
+  "step": "text-trim-left",
+  "text": [
+    {
+      "content": "文字甲",
+      "start": 1.0,
+      "end": 2.0
+    },
+    {
+      "content": "文字乙",
+      "start": 4.5,
+      "end": 5.5
+    }
+  ],
+  "mask": [
+    {
+      "maskType": "sensitive",
+      "start": 2.5,
+      "end": 3.5
+    },
+    {
+      "maskType": "highlight",
+      "start": 6.0,
+      "end": 7.0
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "textSegments": [
+    {
+      "start": 1.0,
+      "end": 2.0,
+      "track": 0,
+      "enabled": true,
+      "content": "文字甲",
+      "center": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "size": {
+        "x": 0.35,
+        "y": 0.2
+      },
+      "fontFamily": "sans-serif",
+      "fontSize": 48.0,
+      "fontWeight": 700.0,
+      "italic": false,
+      "color": "#ffffff",
+      "backgroundStyle": "box",
+      "uppercase": false,
+      "strokeWidth": 0.0,
+      "strokeColor": "#000000",
+      "glow": 0.0,
+      "fadeDuration": 0.15,
+      "align": "center",
+      "letterSpacing": 0.0,
+      "lineHeight": 1.2,
+      "opacity": 1.0,
+      "shadow": 0.0,
+      "animationIn": "fade",
+      "animationOut": "fade",
+      "animationInDuration": 0.15,
+      "animationOutDuration": 0.15,
+      "layout": "overlay",
+      "layoutTransition": 0.5
+    },
+    {
+      "start": 4.5,
+      "end": 5.5,
+      "track": 0,
+      "enabled": true,
+      "content": "文字乙",
+      "center": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "size": {
+        "x": 0.35,
+        "y": 0.2
+      },
+      "fontFamily": "sans-serif",
+      "fontSize": 48.0,
+      "fontWeight": 700.0,
+      "italic": false,
+      "color": "#ffffff",
+      "backgroundStyle": "box",
+      "uppercase": false,
+      "strokeWidth": 0.0,
+      "strokeColor": "#000000",
+      "glow": 0.0,
+      "fadeDuration": 0.15,
+      "align": "center",
+      "letterSpacing": 0.0,
+      "lineHeight": 1.2,
+      "opacity": 1.0,
+      "shadow": 0.0,
+      "animationIn": "fade",
+      "animationOut": "fade",
+      "animationInDuration": 0.15,
+      "animationOutDuration": 0.15,
+      "layout": "overlay",
+      "layoutTransition": 0.5
+    }
+  ],
+  "maskSegments": [
+    {
+      "start": 2.5,
+      "end": 3.5,
+      "track": 0,
+      "enabled": true,
+      "maskType": "sensitive",
+      "center": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "size": {
+        "x": 0.2,
+        "y": 0.2
+      },
+      "feather": 0.0,
+      "opacity": 1.0,
+      "pixelation": 16.0,
+      "darkness": 0.0,
+      "fadeDuration": 0.15,
+      "keyframes": {
+        "position": [],
+        "size": [],
+        "intensity": []
+      }
+    },
+    {
+      "start": 6.0,
+      "end": 7.0,
+      "track": 0,
+      "enabled": true,
+      "maskType": "highlight",
+      "center": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "size": {
+        "x": 0.2,
+        "y": 0.2
+      },
+      "feather": 0.0,
+      "opacity": 1.0,
+      "pixelation": 16.0,
+      "darkness": 0.0,
+      "fadeDuration": 0.15,
+      "keyframes": {
+        "position": [],
+        "size": [],
+        "intensity": []
+      }
+    }
+  ]
+}

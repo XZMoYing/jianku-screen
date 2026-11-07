@@ -1,0 +1,218 @@
+[
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 364,
+      "y": 854
+    },
+    "size": {
+      "height": 44,
+      "width": 426
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 369,
+      "y": 868
+    },
+    "size": {
+      "height": 16,
+      "width": 4
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "文字甲",
+    "position": {
+      "x": 425,
+      "y": 867
+    },
+    "size": {
+      "height": 17,
+      "width": 37
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 546,
+      "y": 868
+    },
+    "size": {
+      "height": 16,
+      "width": 4
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 985,
+      "y": 854
+    },
+    "size": {
+      "height": 44,
+      "width": 1047
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 990,
+      "y": 868
+    },
+    "size": {
+      "height": 16,
+      "width": 4
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "文字乙",
+    "position": {
+      "x": 1046,
+      "y": 867
+    },
+    "size": {
+      "height": 17,
+      "width": 37
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 1167,
+      "y": 868
+    },
+    "size": {
+      "height": 16,
+      "width": 4
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 649,
+      "y": 904
+    },
+    "size": {
+      "height": 44,
+      "width": 712
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 654,
+      "y": 918
+    },
+    "size": {
+      "height": 16,
+      "width": 4
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "遮罩",
+    "position": {
+      "x": 662,
+      "y": 919
+    },
+    "size": {
+      "height": 14,
+      "width": 25
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "隐私遮挡",
+    "position": {
+      "x": 694,
+      "y": 919
+    },
+    "size": {
+      "height": 13,
+      "width": 45
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 831,
+      "y": 918
+    },
+    "size": {
+      "height": 16,
+      "width": 4
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 1270,
+      "y": 904
+    },
+    "size": {
+      "height": 44,
+      "width": 1332
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 1275,
+      "y": 918
+    },
+    "size": {
+      "height": 16,
+      "width": 4
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "遮罩",
+    "position": {
+      "x": 1283,
+      "y": 919
+    },
+    "size": {
+      "height": 14,
+      "width": 25
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "重点标记",
+    "position": {
+      "x": 1315,
+      "y": 919
+    },
+    "size": {
+      "height": 13,
+      "width": 45
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 1452,
+      "y": 918
+    },
+    "size": {
+      "height": 16,
+      "width": 4
+    }
+  }
+]
