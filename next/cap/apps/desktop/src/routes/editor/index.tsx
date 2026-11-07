@@ -38,13 +38,12 @@ export default function () {
 	});
 	onCleanup(titleSave.dispose);
 
-	// The window is normally revealed by Rust as soon as it's built and
-	// positioned (the native background color is themed, so there's no flash).
-	// This reveal path only matters when window transparency is enabled — Rust
-	// keeps the window hidden so we can apply the HudWindow effects before it
-	// becomes visible. Note: requestAnimationFrame must NOT be used to schedule
-	// the reveal — hidden webviews throttle/suspend rAF, which silently pushed
-	// every editor open onto the slow fallback timeout.
+	// Rust always leaves the window hidden so this reveal runs after the editor
+	// skeleton has painted; showing it earlier exposes the webview's opaque
+	// white surface as a cold-open flash. Rust keeps a safety timer to reveal
+	// the window if this path fails. Note: requestAnimationFrame must NOT be
+	// used to schedule the reveal — hidden webviews throttle/suspend rAF, which
+	// silently pushed every editor open onto the slow fallback timeout.
 	let revealed = false;
 	const reveal = () => {
 		if (revealed) return;

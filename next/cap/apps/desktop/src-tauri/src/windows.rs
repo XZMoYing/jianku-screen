@@ -2363,26 +2363,25 @@ impl ShowCapWindow {
                 fit_content_window_bounds(&window, &_id, true).await;
                 window.maximize()?;
 
-                // Show immediately: the native background color is already
-                // themed, so the window can appear before the webview loads and
-                // the editor skeleton takes over. When window transparency is
-                // enabled we keep the old behaviour (the frontend reveals the
-                // window after applying the HudWindow effects) to avoid an
-                // opaque-to-transparent pop.
-                let transparency_enabled = GeneralSettingsStore::get(app)
-                    .ok()
-                    .flatten()
-                    .map(|s| s.window_transparency)
-                    .unwrap_or(false);
-                if !transparency_enabled {
-                    window.show().ok();
-                    window.set_focus().ok();
-                }
+                // Let the webview paint the editor skeleton before revealing the
+                // window: an opaque webview surface is white until its first
+                // paint, which showed as a bright flash on cold open even with a
+                // themed native backing. The frontend reveals the window after
+                // settings hydrate (and after applying HudWindow effects when
+                // transparency is on); this timer only guards frontend failure.
+                let fallback_window = window.clone();
+                tauri::async_runtime::spawn(async move {
+                    tokio::time::sleep(std::time::Duration::from_millis(1200)).await;
+                    if !fallback_window.is_visible().unwrap_or(true) {
+                        let _ = fallback_window.show();
+                        let _ = fallback_window.set_focus();
+                    }
+                });
 
                 info!(
-                    window_built_and_shown_ms = open_started.elapsed().as_millis() as u64,
-                    shown_from_rust = !transparency_enabled,
-                    "Editor open: window ready"
+                    window_built_ms = open_started.elapsed().as_millis() as u64,
+                    reveal = "frontend-after-paint",
+                    "Editor open: window built"
                 );
 
                 window
