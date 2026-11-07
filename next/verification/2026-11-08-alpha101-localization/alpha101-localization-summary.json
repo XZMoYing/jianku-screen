@@ -1,0 +1,27 @@
+{
+  "appVersion": "0.2.0-alpha.101 / 2026.101.0（冻结 19c6b10）",
+  "englishPopups": [
+    "Language English",
+    "Recording countdown 3 seconds",
+    "Main window when recording starts Off",
+    "After recording Open editor",
+    "After deleting a recording Do nothing",
+    "Max capture framerate 60 FPS (recommended)"
+  ],
+  "chinesePopups": [
+    "界面语言 简体中文",
+    "录制倒计时 3 秒",
+    "开始录制时的主窗口 关闭",
+    "录制完成后 打开编辑器",
+    "删除录制后 不执行操作",
+    "捕获帧率上限 60 帧/秒（推荐）"
+  ],
+  "settingsScanEnglish": "遍历 General/Recording quality/Hotkeys/CLI/Recordings/Screenshots/Automations/Transcription/Integrations/Experimental/Changelog：除录制/截图工程名（用户内容，正确保留中文）外未发现中文 UI 残留。",
+  "foundIssue": "英文主窗口选项显示 “Off”（关闭被全局译为 Off），语义不适合窗口关闭行为；已在源码改为 localize(\"Close window\") 并补 zh 词典（中文=关闭），未包含在 alpha.101，待 alpha.102 复验。",
+  "conclusion": "alpha.101 的三组下拉选项已按语言显示（Open editor/Do nothing/Minimize 等），设置各页英文扫描无中文 UI 泄漏；Close window 语义修正待下一包。U07/U08 因编辑器/时间线/导出与首页/库/设备/演示等页面范围仍开放。",
+  "notCovered": [
+    "Close window 实际包复验（alpha.102）",
+    "自定义下拉逐项展开的完整选项列表",
+    "首页/库/设备/演示/截图英文页面逐面扫描"
+  ]
+}

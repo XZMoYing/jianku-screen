@@ -526,7 +526,7 @@ function Inner(props: {
 								handleChange("mainWindowRecordingStartBehaviour", value)
 							}
 							options={[
-								{ text: localize("关闭"), value: "close" },
+								{ text: localize("Close window"), value: "close" },
 								{ text: localize("最小化"), value: "minimise" },
 							]}
 						/>
