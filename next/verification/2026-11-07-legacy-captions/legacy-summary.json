@@ -1,0 +1,41 @@
+{
+  "fixture": "/private/tmp/旧外置字幕验收2.jks（原工程无 captions 键）",
+  "legacyLocation": "/private/tmp/旧外置字幕验收2./captions.json（去扩展名列同级目录，点后缀变体）",
+  "legacyFileUnchanged": {
+    "sha256": "a6171604bd33379ec0d13175b8a21f4bd09a47249f4b7ff0e49162a1b3eb6a00",
+    "bytes": 690
+  },
+  "migratedMaster": [
+    [
+      "legacy-1",
+      0.5,
+      1.5,
+      "旧外置字幕一"
+    ],
+    [
+      "legacy-2",
+      3.0,
+      4.0,
+      "legacy two"
+    ]
+  ],
+  "migratedTrack": [
+    [
+      0.5,
+      1.5,
+      "旧外置字幕一"
+    ],
+    [
+      3.0,
+      4.0,
+      "legacy two"
+    ]
+  ],
+  "projectCaptionsJsonWritten": false,
+  "uiCaptionLabels": [
+    "旧外置字幕一",
+    "legacy two"
+  ],
+  "observation": "已存在 captions 对象（即使 segments 为空）的工程不会从旧外置文件迁移；无 captions 键的真正旧工程会迁移。",
+  "emptyCaptionsObjectFixture": "/private/tmp/旧外置字幕验收.jks 打开后 master/track 为空，旧外置文件仍被 load_captions 读取但不迁移。"
+}

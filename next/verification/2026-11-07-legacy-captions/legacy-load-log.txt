@@ -1,0 +1,8 @@
+2026-11-07T15:58:18.569199Z  INFO load_captions: cap_desktop_lib::captions: === LOAD CAPTIONS START ===
+2026-11-07T15:58:18.569295Z  INFO load_captions: cap_desktop_lib::captions: === LOAD CAPTIONS END (no file) ===
+2026-11-07T16:02:26.140017Z  INFO load_captions: cap_desktop_lib::captions: === LOAD CAPTIONS START ===
+2026-11-07T16:02:26.140142Z  INFO load_captions: cap_desktop_lib::captions: Successfully loaded 2 caption segments
+2026-11-07T16:02:26.140144Z  INFO load_captions: cap_desktop_lib::captions: === LOAD CAPTIONS END (success) ===
+2026-11-07T16:04:22.996235Z  INFO load_captions: cap_desktop_lib::captions: === LOAD CAPTIONS START ===
+2026-11-07T16:04:22.996342Z  INFO load_captions: cap_desktop_lib::captions: Successfully loaded 2 caption segments
+2026-11-07T16:04:22.996345Z  INFO load_captions: cap_desktop_lib::captions: === LOAD CAPTIONS END (success) ===

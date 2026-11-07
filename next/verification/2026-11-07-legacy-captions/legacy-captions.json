@@ -1,0 +1,41 @@
+{
+  "segments": [
+    {
+      "id": "legacy-1",
+      "start": 0.5,
+      "end": 1.5,
+      "text": "旧外置字幕一",
+      "words": [
+        {
+          "text": "旧外置字幕一",
+          "start": 0.5,
+          "end": 1.5
+        }
+      ]
+    },
+    {
+      "id": "legacy-2",
+      "start": 3.0,
+      "end": 4.0,
+      "text": "legacy two",
+      "words": [
+        {
+          "text": "legacy",
+          "start": 3.0,
+          "end": 3.5
+        },
+        {
+          "text": "two",
+          "start": 3.5,
+          "end": 4.0
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "enabled": true,
+    "font": "System Sans-Serif",
+    "size": 40,
+    "color": "#FFFFFF"
+  }
+}
