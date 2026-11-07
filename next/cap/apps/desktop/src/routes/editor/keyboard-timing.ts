@@ -1,4 +1,8 @@
-import type { KeyboardTrackSegment, MainTrackGaps } from "~/utils/tauri";
+import type {
+	KeyboardTrackSegment,
+	KeyPressDisplay,
+	MainTrackGaps,
+} from "~/utils/tauri";
 import { clipGapBefore } from "./clip-transitions";
 
 type TimelineSignatureInput = {
@@ -123,6 +127,39 @@ export function rippleDeleteKeyboardTrack(
 			segments.splice(segmentIndex, 1);
 		}
 	}
+}
+
+export function rebaseKeyboardSegmentAfterTrim(
+	segment: KeyboardTrackSegment,
+	originalStart: number,
+): { keys: KeyPressDisplay[]; displayText: string } | null {
+	const keys = segment.keys ?? [];
+	if (keys.length === 0) return null;
+	const chars = Array.from(segment.displayText);
+	const aligned = chars.length === keys.length;
+	const kept: KeyPressDisplay[] = [];
+	let display = "";
+	for (let index = 0; index < keys.length; index++) {
+		const absolute = originalStart + keys[index].timeOffset / 1000;
+		if (absolute < segment.start - 1e-6 || absolute > segment.end + 1e-6)
+			continue;
+		kept.push({
+			...keys[index],
+			timeOffset: Math.max(
+				0,
+				Math.round((absolute - segment.start) * 1_000_000) / 1000,
+			),
+		});
+		if (aligned) display += chars[index];
+	}
+	const unchanged =
+		kept.length === keys.length &&
+		kept.every(
+			(key, index) => Math.abs(key.timeOffset - keys[index].timeOffset) < 1e-6,
+		) &&
+		(!aligned || display === segment.displayText);
+	if (unchanged) return null;
+	return { keys: kept, displayText: aligned ? display : segment.displayText };
 }
 
 export function splitKeyboardSegment(

@@ -5,6 +5,7 @@ import { timelineShiftAfterClipDurationChange } from "./clip-transitions";
 import {
 	generateForStableKeyboardTimeline,
 	mapKeyboardTrackTimes,
+	rebaseKeyboardSegmentAfterTrim,
 	rippleDeleteKeyboardTrack,
 	rippleKeyboardTrack,
 	splitKeyboardSegment,
@@ -330,5 +331,56 @@ describe("keyboard output timing", () => {
 				[hold],
 			),
 		).toBe(3);
+	});
+});
+describe("keyboard trim key rebasing", () => {
+	it("drops keys before the new start and rebases retained offsets", () => {
+		const segment = keyboardSegment(1, 3, "abcd", [0, 500, 1200, 1800]);
+		segment.start = 1.4;
+		const rebased = rebaseKeyboardSegmentAfterTrim(segment, 1);
+		expect(rebased?.displayText).toBe("bcd");
+		expect(rebased?.keys).toEqual([
+			{ key: "b", timeOffset: 100 },
+			{ key: "c", timeOffset: 800 },
+			{ key: "d", timeOffset: 1400 },
+		]);
+	});
+
+	it("drops keys after the new end and keeps earlier offsets", () => {
+		const segment = keyboardSegment(1, 3, "abcd", [0, 500, 1200, 1800]);
+		segment.end = 2.5;
+		const rebased = rebaseKeyboardSegmentAfterTrim(segment, 1);
+		expect(rebased?.displayText).toBe("abc");
+		expect(rebased?.keys).toEqual([
+			{ key: "a", timeOffset: 0 },
+			{ key: "b", timeOffset: 500 },
+			{ key: "c", timeOffset: 1200 },
+		]);
+	});
+
+	it("keeps a manual display text when it is not one character per key", () => {
+		const segment: KeyboardTrackSegment = {
+			id: "kb-edit-custom",
+			start: 1,
+			end: 3,
+			displayText: "Custom",
+			keys: [{ key: "a", timeOffset: 0 }],
+		};
+		segment.start = 1.5;
+		const rebased = rebaseKeyboardSegmentAfterTrim(segment, 1);
+		expect(rebased?.keys).toEqual([]);
+		expect(rebased?.displayText).toBe("Custom");
+	});
+
+	it("does nothing for segments without key data", () => {
+		const segment: KeyboardTrackSegment = {
+			id: "kb-edit-manual",
+			start: 1,
+			end: 3,
+			displayText: "Custom",
+			keys: [],
+		};
+		segment.start = 1.5;
+		expect(rebaseKeyboardSegmentAfterTrim(segment, 1)).toBeNull();
 	});
 });

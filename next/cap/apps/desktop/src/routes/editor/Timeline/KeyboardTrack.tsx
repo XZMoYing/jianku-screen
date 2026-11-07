@@ -2,6 +2,7 @@ import { createMemo, For } from "solid-js";
 import { t as localize } from "~/utils/i18n";
 
 import { useEditorContext } from "../context";
+import { rebaseKeyboardSegmentAfterTrim } from "../keyboard-timing";
 import { useTimelineContext } from "./context";
 import {
 	createTimelineMouseDrag,
@@ -119,6 +120,22 @@ export function KeyboardTrack(props: {
 							segmentIndex(),
 							drag.original,
 						);
+					if (
+						(reason === "release" || reason === "history") &&
+						ownsRange() &&
+						!sameTimelineRange(segment, drag.original) &&
+						(edge === "start" || edge === "end")
+					) {
+						const rebased = rebaseKeyboardSegmentAfterTrim(
+							segment,
+							drag.original.start,
+						);
+						if (rebased)
+							setProject("timeline", "keyboardSegments", segmentIndex(), {
+								...segment,
+								...rebased,
+							});
+					}
 					resumeHistory?.();
 					if (!moved && event) {
 						event.stopPropagation();
