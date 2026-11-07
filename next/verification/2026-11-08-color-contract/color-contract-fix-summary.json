@@ -1,0 +1,65 @@
+{
+  "sourceCommit": "待提交（BT.709 limited shader/CPU coefficients）",
+  "change": [
+    "rgba_to_nv12.wgsl 由 BT.601 limited 改为 BT.709 limited",
+    "nv12_to_rgba.wgsl 改为 BT.709 limited 解码",
+    "cpu_yuv.rs nv12_to_rgba 标量/SIMD 行系数改为 BT.709 limited",
+    "新增 CPU 解码 BT.709 主色单测（nv12 8 项测试通过）"
+  ],
+  "measured": {
+    "sourceRGB": {
+      "red": [
+        252,
+        0,
+        0
+      ],
+      "gray": [
+        125,
+        127,
+        127
+      ],
+      "blue": [
+        0,
+        0,
+        251
+      ]
+    },
+    "hardwareExportAfterFix": {
+      "red": [
+        225,
+        0,
+        3
+      ],
+      "gray": [
+        113,
+        116,
+        115
+      ],
+      "blue": [
+        0,
+        0,
+        239
+      ]
+    },
+    "softwareExportAfterFix": {
+      "red": [
+        252,
+        0,
+        0
+      ],
+      "gray": [
+        124,
+        126,
+        126
+      ],
+      "blue": [
+        0,
+        0,
+        251
+      ]
+    }
+  },
+  "conclusion": "软件/CPU 导出路径（--optimize-filesize）修复后与源一致：red 252,0,0、gray 124,126,126、blue 0,0,251（误差≤1-2）；默认硬件导出仍为 red 225,0,3/gray 113,116,115/blue 0,0,239，未受本次着色器修复影响，说明硬件零拷贝路径在 VideoToolbox/编码器输入端另做 BGRA→NV12 转换且未按 BT.709 处理。",
+  "next": "U11a2b：硬件零拷贝导出路径的 RGB(IOSurface)→NV12 转换矩阵/附件（或改为使用已修复的 NV12 着色器输出），使硬件与软件导出、预览一致；随后整包验证。",
+  "hardwarePathEvidence": "export 代码在 hw 输入时 wrap_videotoolbox_pixel_buffer(surface) 直接交给编码器；软件路径经 fill_nv12_frame/着色器输出。"
+}

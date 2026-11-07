@@ -26,9 +26,23 @@
 - `crates/enc-ffmpeg/src/video/{h264,hevc}.rs`：显式设置 `color_space=BT709`、`color_range=MPEG`、`color_primaries/color_trc=BT709`；导出的纯色视频通常也带 BT.709 标签，但被固定 601 着色器解码。
 - 结论：**着色器系数/解码矩阵与码流标签不一致**；灰阶整体变暗提示除矩阵外还可能有 gamma/纹理格式或范围处理问题，需单元级验证分离。
 
-## 下一步（U11a2）
+## 修复与复测（aac8fff）
 
-1. 对 `RgbaToNv12Converter` 增加已知 RGBA（黑/白/红/绿/蓝/灰）→ YUV 的单元断言，明确当前是 601 还是 709 limited；
+- 已改为 BT.709 limited：`rgba_to_nv12.wgsl` 编码系数、`nv12_to_rgba.wgsl` 解码系数、`cpu_yuv.rs` 标量/SIMD 行系数；新增 CPU 解码 BT.709 主色单测（rendering crate nv12 相关 8 项测试通过）。
+- 复测（同一批纯色工程，cap-cli 重新构建）：
+
+| 路径 | red | gray | blue |
+| --- | --- | --- | --- |
+| 源 | 252,0,0 | 125,127,127 | 0,0,251 |
+| 软件导出 `--optimize-filesize`（修复后） | **252,0,0** | **124,126,126** | **0,0,251** |
+| 默认硬件导出（修复后） | 225,0,3 | 113,116,115 | 0,0,239 |
+
+- 软件/CPU 路径已与源一致（≤2/255）；默认硬件零拷贝导出未变化，说明硬件路径在编码器/VT 输入端另有 BGRA→NV12 转换并按非 709 处理，需 U11a2b 单独修。
+
+## 下一步（U11a2 剩余 / U11a2b）
+
+1. 硬件零拷贝导出路径：查 `wrap_videotoolbox_pixel_buffer`/AVFoundation 输入端 BGRA→NV12 矩阵与附件，或改为使用已修复 NV12 输出，使硬件导出与软件一致。
+2. 对 `RgbaToNv12Converter` 增加已知 RGBA（黑/白/红/绿/蓝/灰）→ YUV 的单元断言，明确当前是 601 还是 709 limited；
 2. 统一到与编码器标签一致的 BT.709 limited（同时输入解码按流标签或统一 709），并处理 gamma/范围；
 3. 用本轮纯色夹具回归导出 RGB（目标与源误差 ≤2/255）、预览与导出一致、CPU/GPU 路径一致；未修复前 U11a 不关闭。
 

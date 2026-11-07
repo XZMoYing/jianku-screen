@@ -32,7 +32,7 @@
 
 2026-11-08 alpha.97 按键段分割/失焦/预览/选择删除：分割工具在播放头处正确分区 keys/displayText；失焦中断拖动无错误写入；空格播放推进；单击选中后 ⌫、Cmd+单击多选后 ⌫ 均删除成功且一次撤销恢复。过滤与导出逐键仍缺，U22c2b5p 保持开放。证据 next/verification/2026-11-08-keyboard-split。
 
-2026-11-08 U11a 色彩契约实测：纯色导出相对源 red 252→225、gray ~127→114、blue 251→237，码流标 bt709/tv；着色器为 BT.601 limited 而编码器标 BT.709，确认不一致；灰阶变暗提示 gamma/格式风险。新增 U11a2 修复项，未修前 U11a 不关闭。证据 next/verification/2026-11-08-color-contract。
+2026-11-08 色彩契约：aac8fff 把 rgba/nv12 着色器与 cpu_yuv 解码统一为 BT.709 limited（加单测），软件/CPU 导出复测与源一致（red 252、gray 124,126,126、blue 251）；默认硬件零拷贝导出仍 red 225/gray 113/blue 239，新增 U11a2b 处理硬件转换矩阵，修后整包验证。证据 next/verification/2026-11-08-color-contract。
 
 2026-11-07 alpha.89 已安装，88 回滚（诊断报告改用安装包版本，实际报告 app.version=0.2.0-alpha.89）。证据 next/verification/2026-11-07-alpha89。缩放轨、按键轨、3D 轨、样式轨、图片轨、文字轨、遮罩轨与音频轨原生交互在 alpha.89 实际包通过（创建／移动／两端裁剪／撤销／取消／保存重开／播放；文字遮罩起点裁剪受 1s 最小时长钳制，先拉长后可缩），证据 next/verification/2026-11-07-zoom-native、2026-11-07-keyboard-native、2026-11-07-3d-native、2026-11-07-style-image-native、2026-11-07-text-mask-native、2026-11-07-audio-native。U22c2b4a 已定位为左缘 1px 边界命中、非缺陷（text-start-handle-probe）。
 
@@ -481,8 +481,9 @@
 - [x] U10b4 alpha.86 空光标图集实际打开光标样式、显示内置样式并保存通过。
 - [x] U10b3d 诊断报告使用安装包版本而非 CARGO_PKG_VERSION（当前报告 app.version 为 0.6.0，无法区分简库构建）；改为实际 packaging 版本并加回归，下一次完整包实测。结果：28254a9 改用 app.package_info().version，窄检查通过；alpha.89（fe73a74）三处验签/六 hash 与回滚 88 核对后安装，实际诊断报告 app.version=0.2.0-alpha.89，隐私字段与中文权限提示复验通过。证据 next/verification/2026-11-07-alpha89。
 - [ ] U11 修复审计发现并做对应回归。验收：每个发现都有结论与复测；已知解码严格色度差异及播放时序缺陷单独跟踪，不能静默豁免。
-- [ ] U11a 核对并统一实际预览/导出色彩契约：GPU rgba_to_nv12.wgsl 数值系数与硬件编码上下文标签疑似不一致，用标准色块实测RGBA、GPU/CPU NV12与最终视频后决定修复，不把它与U19d2运行间差异混为一谈。alpha.97 端到端实测：纯色 red 252,0,0→225,0,0；gray ~127→113,116,113；blue 0,0,251→1,0,237，导出码流标签 bt709/tv；源码中 rgba_to_nv12/nv12_to_rgba 均为 BT.601 limited 系数，而 enc-ffmpeg h264/hevc 显式 BT709 limited/primaries/trc，源视频通常也标 BT709 却被 601 解码——确认契约不一致；灰阶整体变暗提示还可能有 gamma/格式/范围问题。修复与逐通道单元回归见 U11a2，U11a 不关闭。证据 next/verification/2026-11-08-color-contract。
-- [ ] U11a2 修复并统一预览/导出色彩契约：为 RgbaToNv12Converter/NV12ToRGBA 增加已知 RGBA（黑/白/红/绿/蓝/灰）→YUV 断言确认当前矩阵；统一到与编码器标签一致的 BT.709 limited（输入解码按流标签或统一 709），处理可能的 gamma/纹理格式/范围问题；用纯色夹具回归导出 RGB 目标与源误差 ≤2/255、预览与导出一致、CPU/GPU 路径一致；实际包与 CLI 双验证。未修复前 U11a 不关闭。
+- [ ] U11a 核对并统一实际预览/导出色彩契约：GPU rgba_to_nv12.wgsl 数值系数与硬件编码上下文标签疑似不一致，用标准色块实测RGBA、GPU/CPU NV12与最终视频后决定修复，不把它与U19d2运行间差异混为一谈。alpha.97 端到端实测：纯色 red 252,0,0→225,0,0；gray ~127→113,116,113；blue 0,0,251→1,0,237，导出码流标签 bt709/tv；源码中 rgba_to_nv12/nv12_to_rgba 均为 BT.601 limited 系数，而 enc-ffmpeg h264/hevc 显式 BT709 limited/primaries/trc，源视频通常也标 BT709 却被 601 解码——确认契约不一致；灰阶整体变暗提示还可能有 gamma/格式/范围问题。修复与逐通道单元回归见 U11a2，U11a 不关闭。证据 next/verification/2026-11-08-color-contract。aac8fff 已把 rgba/nv12 着色器与 cpu_yuv 解码统一为 BT.709 limited 并加单测：软件/CPU 导出（--optimize-filesize）复测与源一致（red 252/gray 124,126,126/blue 251，≤2）；默认硬件零拷贝导出仍 red 225/gray 113/blue 239 未变，说明硬件路径另做 BGCT→NV12 转换需单独修（U11a2b）。
+- [ ] U11a2 修复并统一预览/导出色彩契约：为 RgbaToNv12Converter/NV12ToRGBA 增加已知 RGBA（黑/白/红/绿/蓝/灰）→YUV 断言确认当前矩阵；统一到与编码器标签一致的 BT.709 limited（输入解码按流标签或统一 709），处理可能的 gamma/纹理格式/范围问题；用纯色夹具回归导出 RGB 目标与源误差 ≤2/255、预览与导出一致、CPU/GPU 路径一致；实际包与 CLI 双验证。未修复前 U11a 不关闭。aac8fff 已统一 rgba_to_nv12/nv12_to_rgba/cpu_yuv 为 BT.709 limited 并加 CPU 主色单测（nv12 相关 8 项通过）；软件/CPU 导出现在与源一致（red 252、gray 124,126,126、blue 251，≤2）。默认硬件零拷贝导出仍为 red 225/gray 113/blue 239，需 U11a2b。
+- [ ] U11a2b 修复硬件零拷贝导出色彩：默认 hardware 导出（wrap_videotoolbox_pixel_buffer/AVFoundation 输入端）在 BGRA→NV12 转换中未按 BT.709 处理，导致 red 252→225、gray 127→113、blue 251→239，与软件路径和预览不一致。核对编码器输入像素缓冲的 color attachments（YCbCrMatrix/primaries/transfer）或改为复用已修复的 NV12 着色器输出；用纯色夹具验证硬件导出与源 ≤2/255、与软件导出一致，再整包 alpha 安装验证。证据 next/verification/2026-11-08-color-contract。
 - [ ] U12 跨平台能力/依赖/打包差距审计。验收：逐项列出 Mac 专属、新增功能、Cap 已有 Windows/Linux 路径、条件编译缺口和目标环境要求，形成实施矩阵。
 - [ ] U13 抽离新增功能的平台边界并修复 Windows 编译路径。验收：平台无关逻辑回归，目标环境可用时实际构建；没有目标平台时明确待验证，不伪称支持。
 - [ ] U14 完善 Windows 录制/渲染/演示/快捷键/资源与分发适配。验收：Windows 本机或授权环境构建/运行记录；不可用时保存具体阻塞和可运行步骤，继续其他独立任务。
