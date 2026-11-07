@@ -1,0 +1,15 @@
+{
+  "appVersion": "0.2.0-alpha.104 / 2026.104.0（冻结 3e66b22）",
+  "chineseTitles": {
+    "captionSegment": "字幕 1",
+    "textSegment": "文本 1 + 样式",
+    "maskSegment": "遮罩 1"
+  },
+  "englishAttempt": "英文界面选中字幕段企图复验 Caption 1，但本次点击未选中片段（未取到标题）；源码 localize 在英文下回退原文，理论上仍为 Caption 1，未以此当作英文已验证。",
+  "conclusion": "alpha.104 实包验证中文片段标题模板已本地化（字幕/文本/样式/遮罩），与源码修复一致；英文回退未重新捕获，记为未覆盖。",
+  "notCovered": [
+    "英文 Caption/Text/Mask 标题实包捕获",
+    "按键/缩放/片段/编辑样式标题实包选择（夹具无对应段或未选中）",
+    "深层折叠面板"
+  ]
+}
