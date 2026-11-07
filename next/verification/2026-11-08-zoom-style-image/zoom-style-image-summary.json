@@ -1,0 +1,87 @@
+{
+  "appVersion": "0.2.0-alpha.104",
+  "tooling": "ui-drive drag-path 增加 ensureFrontmost（activate + AXFrontmost + 前台校验重试），修复此前拖动多数不生效问题；本轮所有拖动均在确认前台为应用后执行。",
+  "zoomTrack": {
+    "fixture": "缩放轨道验收.jks（alpha.89 复验夹具，缩放段 2.476–4.578）",
+    "move": {
+      "before": [
+        2.476,
+        4.578
+      ],
+      "after": [
+        2.712,
+        4.815
+      ],
+      "undo": "恢复 2.476–4.578"
+    },
+    "rightTrim": {
+      "before": [
+        2.476,
+        4.578
+      ],
+      "after": [
+        2.476,
+        4.342
+      ],
+      "undo": "恢复"
+    },
+    "leftTrim": {
+      "before": [
+        2.476,
+        4.578
+      ],
+      "after": [
+        2.66,
+        4.578
+      ],
+      "undo": "恢复"
+    },
+    "saveReopen": {
+      "beforeQuit": [
+        2.712,
+        4.815
+      ],
+      "afterReopen": [
+        2.712,
+        4.815
+      ],
+      "handles": "605/992 → 650/1037（+45px 与移动一致）"
+    }
+  },
+  "styleTrack": {
+    "fixture": "样式图片轨道验收.jks",
+    "move": {
+      "before": [
+        1.526,
+        3.026
+      ],
+      "after": [
+        1.763,
+        3.263
+      ],
+      "undo": "恢复；第二条 4.0–5.5 未受影响"
+    }
+  },
+  "imageTrack": {
+    "fixture": "样式图片轨道验收.jks",
+    "move": {
+      "before": [
+        2.263,
+        3.263
+      ],
+      "after": [
+        2.499,
+        3.499
+      ],
+      "undo": "恢复；第二条 5.0–6.0 未受影响"
+    }
+  },
+  "conclusion": "alpha.104 原生：缩放轨普通移动/两端裁剪/撤销/保存重开通过；样式与图片轨普通移动/撤销通过，非目标段不受影响。U22c2b4 的 Zoom/Style/Image 主体覆盖推进；Clip 段与滑块/分隔条仍未覆盖。",
+  "notCovered": [
+    "Clip 段",
+    "滑块/分隔条",
+    "样式/图片两端裁剪与保存重开",
+    "连续画面闪屏和混合负载",
+    "真实用户工程"
+  ]
+}
