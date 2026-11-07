@@ -1,0 +1,22 @@
+{
+  "appVersion": "0.2.0-alpha.99 / 2026.99.0（含 8eccfbb yuv420p 解码改 709）",
+  "installedExport": {
+    "red": "源 252,0,0 → 安装包 cap-cli 硬件导出 251,0,0（正确）"
+  },
+  "previewProbe": {
+    "source": "red 工程（H.264 yuv420p 源，8s）",
+    "observedPreviewCenterRGB": [
+      232,
+      0,
+      2
+    ],
+    "conclusion": "alpha.99 预览仍为 601 解码结果 232，未随 yuv420p_to_rgba 着色器修改而变化"
+  },
+  "shaderPresence": "安装包主程序二进制包含 1.7926 两份（nv12_to_rgba + yuv420p_to_rgba 新系数），确认修改已编入；因此预览路径未使用这两个 shader（候选：decoder/frame_converter.rs 的 ffmpeg sws RGBA 转换默认 601、平台硬件解码输出 BGRA、或另一处 CPU yuv 转 RGBA 未更新）。",
+  "next": "U11a2c：定位预览实际解码→RGBA 路径（给 decoder 增加格式/路径日志或按格式分支测试），统一到 BT.709 limited 后验证预览≈252、与导出 251 一致。",
+  "notCovered": [
+    "预览路径定位与修复",
+    "10bit/透明窗/HDR/广色域",
+    "旧录像观感"
+  ]
+}

@@ -94,3 +94,10 @@
 - 原因：预览的软件解码帧走 `yuv420p_to_rgba.wgsl`，该着色器仍是 BT.601 解码；导出路径解码为 709/nv12 或软件路径所以已正确。
 - 已修 8eccfbb：`yuv420p_to_rgba.wgsl` 改为 BT.709 limited（1.7926/0.2132/0.5328/2.1124），与 nv12_to_rgba、cpu_yuv 及编码器标签一致。
 - 下一步：构建 alpha.99 安装后复测预览红色应≈252、导出≈251、软件路径一致；通过后关闭 U11a2/U11a2b。预览探针证据 `preview-color-probe.json`、`preview-red.mov`。
+
+## alpha.99 安装包与预览路径（U11a2c）
+
+- 安装 alpha.99（含 8eccfbb），安装包内 cap-cli 硬件导出 red 252→**251**（导出正确）。
+- 预览探针：打开 red 工程，编辑器预览画面中心仍为 **(232,0,2)**，与 alpha.98 相同，**未随 yuv420p_to_rgba 着色器修改而变化**。
+- 安装包主程序二进制包含两份新系数 `1.7926`（nv12_to_rgba 与 yuv420p_to_rgba），确认修改已编入；因此预览路径**没有使用这两个 shader**（候选：`decoder/frame_converter.rs` 的 ffmpeg sws RGBA 转换默认 BT.601、平台硬件解码输出 BGRA、或另一处 CPU yuv→RGBA 未更新）。
+- 新增 U11a2c：定位预览实际解码→RGBA 路径并统一到 BT.709 limited，验证预览≈252、与导出 251 一致；U11a2b（硬件导出）已关闭，U11a2/U11a 保持开放。
