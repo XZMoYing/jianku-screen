@@ -1,6 +1,6 @@
 import { DropdownMenu } from "@kobalte/core/dropdown-menu";
 import { createEventListener } from "@solid-primitives/event-listener";
-import { save } from "@tauri-apps/plugin-dialog";
+import { ask, save } from "@tauri-apps/plugin-dialog";
 import { revealItemInDir } from "@tauri-apps/plugin-opener";
 import { createResource, createSignal, For, Show } from "solid-js";
 import toast from "solid-toast";
@@ -10,6 +10,7 @@ import { commands } from "~/utils/tauri";
 import { isModalDialog, useEditorContext } from "./context";
 import { registerEditorResource } from "./editor-fallback-diagnostics";
 import { savePortableCopy } from "./project-copy";
+import { collectExternalProjectAssets } from "./project-copy-assets";
 import { EditorButton, MenuItem, MenuItemList, PopperContent } from "./ui";
 
 export function ProjectMenu(props: {
@@ -24,6 +25,7 @@ export function ProjectMenu(props: {
 		editorState,
 		setEditorState,
 		exportState,
+		project,
 	} = useEditorContext();
 	const [busy, setBusy] = createSignal(false);
 	const [recent, { refetch }] = createResource(() =>
@@ -73,8 +75,22 @@ export function ProjectMenu(props: {
 			toast.success(localize("工程已保存"));
 		});
 	const copy = () =>
-		action(() =>
-			savePortableCopy({
+		action(async () => {
+			const externalAssets = collectExternalProjectAssets(project);
+			if (externalAssets.length > 0) {
+				const confirmed = await ask(
+					localize(
+						"便携副本将复制工程引用的外部素材（共 {count} 个文件）：\n{paths}\n请确认其中没有敏感文件，再继续保存。",
+						{
+							count: externalAssets.length,
+							paths: externalAssets.slice(0, 6).join("\n"),
+						},
+					),
+					{ title: localize("包含外部素材"), kind: "warning" },
+				);
+				if (!confirmed) return;
+			}
+			await savePortableCopy({
 				flush: props.flush,
 				pickDestination: () =>
 					save({
@@ -86,8 +102,8 @@ export function ProjectMenu(props: {
 				open: (path) => commands.openLocalProject(path),
 				onSaved: (path) =>
 					toast.success(localize("工程副本已保存：{path}", { path })),
-			}),
-		);
+			});
+		});
 	createEventListener(window, "keydown", (event) => {
 		if (!(event.metaKey || event.ctrlKey) || event.altKey || unavailable())
 			return;
