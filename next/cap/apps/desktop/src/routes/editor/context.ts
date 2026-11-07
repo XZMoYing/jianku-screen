@@ -2682,6 +2682,8 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				if (project.captions) setProject("captions", "sourceTimed", true);
 			}
 
+			let applyDerivedWrite: (write: () => void) => void = (write) => write();
+
 			// Keep the rendered caption track (output time) projected from the
 			// source-time caption master through the current edit list, so captions
 			// follow clip trims/deletes/reorders/inserts 1:1 with no re-transcription.
@@ -2760,10 +2762,12 @@ export const [EditorContextProvider, useBaseEditorContext] =
 								);
 							});
 						if (!unchanged)
-							setProject(
-								"timeline",
-								"captionSegments",
-								reconcile(derived, { key: "id" }),
+							applyDerivedWrite(() =>
+								setProject(
+									"timeline",
+									"captionSegments",
+									reconcile(derived, { key: "id" }),
+								),
 							);
 
 						// Push the refreshed caption track to the renderer immediately.
@@ -3035,6 +3039,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				historyShortcut,
 				({ hiddenTextSegments: _, ...snapshot }) => snapshot,
 			);
+			applyDerivedWrite = (write) => projectHistory.applyDerived(write);
 
 			const trackSegments = (type: TimelineTrackType) => {
 				const timeline = project.timeline;
