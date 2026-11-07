@@ -1,0 +1,15 @@
+1
+00:00:00,000 --> 00:00:01,790
+Synthetic Cobalt Lantern
+
+2
+00:00:02,090 --> 00:00:04,920
+This is an offline diagnostic test.
+
+3
+00:00:05,157 --> 00:00:06,747
+Synthetic Cobalt Lantern
+
+4
+00:00:07,370 --> 00:00:08,000
+BLANK_AUDIO

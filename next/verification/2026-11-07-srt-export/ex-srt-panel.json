@@ -1,0 +1,22 @@
+{
+  "srtButton": [
+    {
+      "title": "SRT",
+      "value": null,
+      "position": {
+        "x": 1496,
+        "y": 95
+      },
+      "enabled": "1"
+    },
+    {
+      "title": "VTT",
+      "value": null,
+      "position": {
+        "x": 1555,
+        "y": 95
+      },
+      "enabled": "1"
+    }
+  ]
+}

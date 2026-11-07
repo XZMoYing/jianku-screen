@@ -1,0 +1,93 @@
+{
+  "sheetCount": 1,
+  "dialogNodes": [
+    {
+      "role": "AXSheet",
+      "title": null,
+      "value": null,
+      "description": "save file",
+      "position": {
+        "x": 625,
+        "y": 418
+      },
+      "enabled": null
+    },
+    {
+      "role": "AXStaticText",
+      "title": null,
+      "value": "Save As:",
+      "description": null,
+      "position": {
+        "x": 694,
+        "y": 433
+      },
+      "enabled": "1"
+    },
+    {
+      "role": "AXTextField",
+      "title": null,
+      "value": "字幕导出验收.srt",
+      "description": null,
+      "position": {
+        "x": 749,
+        "y": 428
+      },
+      "enabled": "1"
+    },
+    {
+      "role": "AXStaticText",
+      "title": null,
+      "value": "Tags:",
+      "description": null,
+      "position": {
+        "x": 694,
+        "y": 465
+      },
+      "enabled": "1"
+    },
+    {
+      "role": "AXTextField",
+      "title": null,
+      "value": null,
+      "description": "tag editor",
+      "position": {
+        "x": 749,
+        "y": 460
+      },
+      "enabled": "1"
+    },
+    {
+      "role": "AXStaticText",
+      "title": null,
+      "value": "Where:",
+      "description": null,
+      "position": {
+        "x": 694,
+        "y": 506
+      },
+      "enabled": "1"
+    },
+    {
+      "role": "AXButton",
+      "title": "Cancel",
+      "value": null,
+      "description": null,
+      "position": {
+        "x": 876,
+        "y": 540
+      },
+      "enabled": "1"
+    },
+    {
+      "role": "AXButton",
+      "title": "Save",
+      "value": null,
+      "description": null,
+      "position": {
+        "x": 956,
+        "y": 540
+      },
+      "enabled": "1"
+    }
+  ]
+}
