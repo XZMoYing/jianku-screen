@@ -482,6 +482,74 @@ export function mapEditedTimeToSource(
 	return fallback;
 }
 
+/**
+ * Writes an edited output-time caption range back onto the source-time caption
+ * master so timeline drags survive re-derivation (the render track is projected
+ * from the master on load). Returns `null` when either boundary cannot be mapped.
+ */
+export function applyEditedCaptionTimingToMaster(
+	sourceSegments: CaptionSegment[],
+	editedSegmentId: string,
+	editedStart: number,
+	editedEnd: number,
+	timelineSegments: TimelineSegment[],
+	recordingSegments: SegmentRecordings[],
+	transitions: ClipTransition[] = [],
+	textSegments?: readonly TextSegment[],
+	gaps?: MainTrackGaps,
+): CaptionSegment[] | null {
+	const index = sourceSegments.findIndex(
+		(segment) => segment.id === sourceCaptionId(editedSegmentId),
+	);
+	if (index === -1 || !(editedEnd > editedStart)) return null;
+	const segment = sourceSegments[index];
+	if (!segment) return null;
+	const sourceRange = { start: segment.start, end: segment.end };
+	const start = mapEditedTimeToSource(
+		editedStart,
+		timelineSegments,
+		recordingSegments,
+		transitions,
+		sourceRange,
+		"incoming",
+		textSegments,
+		gaps,
+	);
+	const end = mapEditedTimeToSource(
+		editedEnd,
+		timelineSegments,
+		recordingSegments,
+		transitions,
+		sourceRange,
+		"outgoing",
+		textSegments,
+		gaps,
+	);
+	if (start === null || end === null || !(end > start)) return null;
+	const startDelta = start - segment.start;
+	const endDelta = end - segment.end;
+	const moved = Math.abs(startDelta - endDelta) < 1e-3;
+	const words = (segment.words ?? []).flatMap((word) => {
+		if (moved) {
+			return [
+				{
+					...word,
+					start: word.start + startDelta,
+					end: word.end + startDelta,
+				},
+			];
+		}
+		const wordStart = Math.max(word.start, start);
+		const wordEnd = Math.min(word.end, end);
+		return wordEnd > wordStart
+			? [{ ...word, start: wordStart, end: wordEnd }]
+			: [];
+	});
+	const next = sourceSegments.slice();
+	next[index] = { ...segment, start, end, words };
+	return next;
+}
+
 export function applyCaptionResultToProject<
 	T extends {
 		captions?:
@@ -1047,6 +1115,109 @@ if (import.meta.vitest) {
 					end: 6,
 				}),
 			).toBeCloseTo(5.75);
+		});
+	});
+
+	describe("applyEditedCaptionTimingToMaster", () => {
+		const recordings = [{ display: { duration: 10 } } as SegmentRecordings];
+
+		it("moves the source range and words by the same delta", () => {
+			const master: CaptionSegment[] = [
+				{
+					id: "cap",
+					start: 2,
+					end: 2.6,
+					text: "hello world",
+					words: [
+						{ text: "hello", start: 2, end: 2.3 },
+						{ text: "world", start: 2.3, end: 2.6 },
+					],
+				},
+			];
+			const next = applyEditedCaptionTimingToMaster(
+				master,
+				"cap",
+				3,
+				3.6,
+				[{ start: 0, end: 8, timescale: 1, recordingSegment: 0 }],
+				recordings,
+			);
+			expect(next?.[0]).toMatchObject({ start: 3, end: 3.6 });
+			expect(next?.[0]?.words?.map((word) => word.start)).toEqual([3, 3.3]);
+		});
+
+		it("maps through a non-1x clip timescale", () => {
+			const master: CaptionSegment[] = [
+				{ id: "cap", start: 4, end: 5, text: "fast" },
+			];
+			const next = applyEditedCaptionTimingToMaster(
+				master,
+				"cap",
+				2.5,
+				3,
+				[{ start: 0, end: 8, timescale: 2, recordingSegment: 0 }],
+				recordings,
+			);
+			expect(next?.[0]?.start).toBeCloseTo(5);
+			expect(next?.[0]?.end).toBeCloseTo(6);
+		});
+
+		it("clamps words when the range is trimmed instead of moved", () => {
+			const master: CaptionSegment[] = [
+				{
+					id: "cap",
+					start: 2,
+					end: 4,
+					text: "early later",
+					words: [
+						{ text: "early", start: 2, end: 2.5 },
+						{ text: "later", start: 3.5, end: 3.8 },
+					],
+				},
+			];
+			const next = applyEditedCaptionTimingToMaster(
+				master,
+				"cap",
+				2.6,
+				4,
+				[{ start: 0, end: 8, timescale: 1, recordingSegment: 0 }],
+				recordings,
+			);
+			expect(next?.[0]).toMatchObject({ start: 2.6, end: 4 });
+			expect(next?.[0]?.words).toEqual([
+				{ text: "later", start: 3.5, end: 3.8 },
+			]);
+		});
+
+		it("accounts for fullscreen hold windows when mapping back", () => {
+			const master: CaptionSegment[] = [
+				{ id: "cap", start: 2.5, end: 3, text: "hold" },
+			];
+			const next = applyEditedCaptionTimingToMaster(
+				master,
+				"cap",
+				4.5,
+				5,
+				[{ start: 0, end: 10, timescale: 1, recordingSegment: 0 }],
+				recordings,
+				[],
+				[{ layout: "fullscreen", start: 1, end: 2 } as TextSegment],
+			);
+			expect(next?.[0]?.start).toBeCloseTo(3.5);
+			expect(next?.[0]?.end).toBeCloseTo(4);
+		});
+
+		it("returns null when an edited boundary is outside the timeline", () => {
+			expect(
+				applyEditedCaptionTimingToMaster(
+					[{ id: "cap", start: 2, end: 3, text: "gone" }],
+					"cap",
+					2,
+					9,
+					[{ start: 0, end: 4, timescale: 1, recordingSegment: 0 }],
+					recordings,
+				),
+			).toBeNull();
 		});
 	});
 }

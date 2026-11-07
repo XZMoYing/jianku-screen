@@ -1,6 +1,6 @@
 import { createMemo, For } from "solid-js";
 import { t as localize } from "~/utils/i18n";
-
+import { applyEditedCaptionTimingToMaster } from "../captions";
 import { useEditorContext } from "../context";
 import { useTimelineContext } from "./context";
 import {
@@ -42,6 +42,7 @@ export function CaptionsTrack(props: {
 		totalDuration,
 		projectHistory,
 		projectActions,
+		editorInstance,
 	} = useEditorContext();
 	const { secsPerPixel, snapping } = useTimelineContext();
 
@@ -113,6 +114,28 @@ export function CaptionsTrack(props: {
 							segmentIndex(),
 							drag.original,
 						);
+					if (
+						(reason === "release" || reason === "history") &&
+						ownsRange() &&
+						!sameTimelineRange(segment, drag.original)
+					) {
+						const timeline = project.timeline;
+						const sourceSegments = project.captions?.segments;
+						if (timeline && sourceSegments) {
+							const updated = applyEditedCaptionTimingToMaster(
+								sourceSegments,
+								segment.id,
+								segment.start,
+								segment.end,
+								timeline.segments,
+								editorInstance.recordings.segments,
+								timeline.transitions ?? [],
+								timeline.textSegments ?? [],
+								timeline.mainTrackGaps,
+							);
+							if (updated) setProject("captions", "segments", updated);
+						}
+					}
 					resumeHistory?.();
 					if (initialMouseX === null && event) {
 						event.stopPropagation();
