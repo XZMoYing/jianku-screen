@@ -1,0 +1,45 @@
+{
+  "appVersion": "0.2.0-alpha.96 / 2026.96.0",
+  "window": "主窗口普通窗口 1120x800 @ (250,98)，AXSubrole AXStandardWindow",
+  "cases": [
+    {
+      "case": "默认置顶状态",
+      "result": "置顶复选框值 0；CGWindow layer 0（普通层）"
+    },
+    {
+      "case": "开启置顶",
+      "result": "控件文案变「取消主窗口置顶」、值 1；CGWindow layer 0→5（浮层）"
+    },
+    {
+      "case": "置顶跨重启",
+      "result": "正常退出并重开应用：值 1、layer 5 保持"
+    },
+    {
+      "case": "关闭置顶",
+      "result": "控件文案变「主窗口置顶」、值 0；layer 5→0"
+    },
+    {
+      "case": "最小化",
+      "result": "AXMinimized true、AXMain false；恢复后 minimized false、尺寸/位置 1120x800@(250,98) 复原"
+    },
+    {
+      "case": "全屏",
+      "result": "AXFullScreen true、尺寸 1680x1050@(0,0)；退出全屏后 false、尺寸/位置恢复 1120x800@(250,98)"
+    },
+    {
+      "case": "关闭主窗口（红钮）",
+      "result": "窗口关闭、应用进程仍在；open -a 重开主窗口于 1120x800@(250,98)"
+    },
+    {
+      "case": "置顶跨关闭重开",
+      "result": "开启置顶→关闭窗口→open -a 重开：值 1、layer 5 保持；随后关闭置顶恢复 layer 0"
+    }
+  ],
+  "conclusion": "主窗口普通窗口行为、置顶开关与跨重启/关闭重开的偏好保持、最小化/恢复、全屏进入退出均已实际通过；默认非置顶。",
+  "notCovered": [
+    "录制中控制浮窗实际置顶（U21b2b，需录制流程/权限）",
+    "权限引导返回/重开/显示恢复不覆盖置顶偏好",
+    "多显示器/不同缩放/全屏 Space 切换",
+    "真实用户工程"
+  ]
+}
