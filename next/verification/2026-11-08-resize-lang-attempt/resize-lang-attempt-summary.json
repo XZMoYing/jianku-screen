@@ -1,0 +1,21 @@
+{
+  "appVersion": "0.2.0-alpha.104",
+  "windowResizeAttempt": {
+    "goal": "窗口缩放触发整窗骨架/闪屏检测",
+    "tool": "新增 ui-drive resize-window（AXSize/AXPosition 设置）",
+    "result": "resize-window 返回 resized=false：编辑器窗口 AXSize/AXPosition 设置均失败（各种尺寸 1200x800/1500x900/1600x900/1440x900 均失败）；窗口未实际缩放，取帧 luma 恒为 213.3、diff 0，不能作为闪屏结论。",
+    "conclusion": "当前自动化无法缩放编辑器窗口（可能为 AX 不可设或窗口类型限制），resize 触发闪屏未验证。"
+  },
+  "languageSwitchAttempt": {
+    "goal": "编辑器打开时切换界面语言触发重载/闪屏",
+    "method": "设置-通用-界面语言（ChoiceSelect 自定义下拉）：点击弹层→Down→Return（英文）→再 Up→Return（中文）；capture 编辑器窗口 10s/449 帧。",
+    "result": "键盘操作未改变自定义下拉值；语言 store 最终仍为 zh-CN；编辑器取帧 diff 0/luma 213.3 恒定 → 语言实际未切换，截图不能作为“语言切换无闪屏”结论。",
+    "conclusion": "自定义 ChoiceSelect 需点击具体选项（English 项未在 AX 可见区列出/被弹层遮挡）才能切换；语言切换闪屏触发未验证。"
+  },
+  "notCovered": [
+    "窗口缩放触发闪屏",
+    "语言切换触发闪屏/重载",
+    "自定义 ChoiceSelect 选项点击",
+    "其它触发（bookmarks 等）"
+  ]
+}

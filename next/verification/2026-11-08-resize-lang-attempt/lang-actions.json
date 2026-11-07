@@ -1,0 +1,26 @@
+[
+  {
+    "action": "open-language",
+    "at": 1794092075.030828
+  },
+  {
+    "action": "choose-english",
+    "at": 1794092075.902727
+  },
+  {
+    "action": "confirm",
+    "at": 1794092076.563974
+  },
+  {
+    "action": "open-language2",
+    "at": 1794092079.540766
+  },
+  {
+    "action": "choose-chinese",
+    "at": 1794092080.416202
+  },
+  {
+    "action": "confirm2",
+    "at": 1794092081.074133
+  }
+]

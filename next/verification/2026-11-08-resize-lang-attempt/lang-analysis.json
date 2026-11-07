@@ -1,0 +1,96 @@
+{
+  "frames": 449,
+  "duration": 9.97,
+  "maxGapMs": 50.0,
+  "quietMedianLuma": 213.3,
+  "suspiciousFrames": 0,
+  "runs": [],
+  "actions": [
+    {
+      "action": "open-language",
+      "rel": 0.97
+    },
+    {
+      "action": "choose-english",
+      "rel": 1.84
+    },
+    {
+      "action": "confirm",
+      "rel": 2.5
+    },
+    {
+      "action": "open-language2",
+      "rel": 5.48
+    },
+    {
+      "action": "choose-chinese",
+      "rel": 6.35
+    },
+    {
+      "action": "confirm2",
+      "rel": 7.01
+    }
+  ],
+  "top": [
+    {
+      "t": 1.31,
+      "diff": 0.1,
+      "luma": 213.3,
+      "light": 0.43
+    },
+    {
+      "t": 0.02,
+      "diff": 0.1,
+      "luma": 213.3,
+      "light": 0.43
+    },
+    {
+      "t": 2.71,
+      "diff": 0.0,
+      "luma": 213.3,
+      "light": 0.43
+    },
+    {
+      "t": 0.06,
+      "diff": 0.0,
+      "luma": 213.3,
+      "light": 0.43
+    },
+    {
+      "t": 0.04,
+      "diff": 0.0,
+      "luma": 213.3,
+      "light": 0.43
+    },
+    {
+      "t": 1.35,
+      "diff": 0.0,
+      "luma": 213.3,
+      "light": 0.43
+    },
+    {
+      "t": 4.01,
+      "diff": 0.0,
+      "luma": 213.3,
+      "light": 0.43
+    },
+    {
+      "t": 0.08,
+      "diff": 0.0,
+      "luma": 213.3,
+      "light": 0.43
+    },
+    {
+      "t": 1.17,
+      "diff": 0.0,
+      "luma": 213.3,
+      "light": 0.43
+    },
+    {
+      "t": 2.13,
+      "diff": 0.0,
+      "luma": 213.3,
+      "light": 0.43
+    }
+  ]
+}

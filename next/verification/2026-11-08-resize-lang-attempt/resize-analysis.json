@@ -1,0 +1,76 @@
+{
+  "frames": 504,
+  "duration": 9.98,
+  "maxGapMs": 26.7,
+  "quietMedianLuma": 213.3,
+  "suspiciousFrames": 0,
+  "runs": [],
+  "actions": [
+    {
+      "action": "shrink",
+      "rel": 0.93
+    },
+    {
+      "action": "restore",
+      "rel": 2.18
+    },
+    {
+      "action": "wide",
+      "rel": 3.43
+    },
+    {
+      "action": "restore2",
+      "rel": 4.68
+    }
+  ],
+  "top": [
+    {
+      "t": 1.22,
+      "diff": 0.1,
+      "luma": 213.3,
+      "light": 0.43
+    },
+    {
+      "t": 0.02,
+      "diff": 0.1,
+      "luma": 213.3,
+      "light": 0.43
+    },
+    {
+      "t": 2.41,
+      "diff": 0.0,
+      "luma": 213.3,
+      "light": 0.43
+    },
+    {
+      "t": 0.06,
+      "diff": 0.0,
+      "luma": 213.3,
+      "light": 0.43
+    },
+    {
+      "t": 0.04,
+      "diff": 0.0,
+      "luma": 213.3,
+      "light": 0.43
+    },
+    {
+      "t": 1.24,
+      "diff": 0.0,
+      "luma": 213.3,
+      "light": 0.43
+    },
+    {
+      "t": 1.1,
+      "diff": 0.0,
+      "luma": 213.3,
+      "light": 0.43
+    },
+    {
+      "t": 3.57,
+      "diff": 0.0,
+      "luma": 213.2,
+      "light": 0.43
+    }
+  ]
+}
