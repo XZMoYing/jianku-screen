@@ -1,0 +1,28 @@
+{
+  "appVersion": "0.2.0-alpha.102 / 2026.102.0（冻结 5d57d0e）",
+  "closeWindow": {
+    "english": "Main window when recording starts Close window",
+    "chinese": "开始录制时的主窗口 关闭"
+  },
+  "homeEnglishScan": {
+    "cjkFound": [
+      "视频/截图 模式标签（AXLink/StaticText）",
+      "窗口/区域 捕获来源（AXCheckBox）"
+    ],
+    "note": "英文首页仍显示这些中文；已源码把 Mode.tsx 的 label/description、new-main 的 name=\"窗口\"/\"区域\" 改走 localize，并补 en 词典（Mode 两条描述、录制模式等），未包含在 alpha.102，待 alpha.103 复验。"
+  },
+  "settingsPopupsChinese": [
+    "界面语言 简体中文",
+    "录制倒计时 3 秒",
+    "开始录制时的主窗口 关闭",
+    "录制完成后 打开编辑器",
+    "删除录制后 不执行操作",
+    "捕获帧率上限 60 帧/秒（推荐）"
+  ],
+  "conclusion": "alpha.102 实包 Close window 语义修正生效（英文 Close window、中文 关闭）；英文首页扫描发现模式标签/捕获来源仍中文，已源码修复待 alpha.103。",
+  "notCovered": [
+    "alpha.103 首页英文复验",
+    "首页/库/设备/演示/截图其余英文页面扫描",
+    "自定义下拉逐项展开"
+  ]
+}

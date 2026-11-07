@@ -2898,7 +2898,7 @@ function Page() {
 								onClick={() => {
 									toggleTargetMode("window");
 								}}
-								name="窗口"
+								name={localize("窗口")}
 								class="flex-1 rounded-none border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 pl-5"
 							/>
 							<TargetDropdownButton
@@ -2931,7 +2931,7 @@ function Page() {
 							onClick={() => {
 								toggleTargetMode("area");
 							}}
-							name="区域"
+							name={localize("区域")}
 							class="flex-1"
 						/>
 						<TargetTypeButton

@@ -50,7 +50,9 @@
 
 2026-11-08 alpha.100 已安装（99 回滚）并核验中英文案：通用 3 描述/录制倒计时 3 seconds/反馈 Test duration 20 seconds 正确；发现 After recording/After deleting/Main window 三组下拉选项仍中文，已源码补 localize+词典待 alpha.101。证据 next/verification/2026-11-08-alpha100-localization2。
 
-2026-11-08 alpha.101 已安装，100 回滚。下拉选项中英显示通过（Open editor/Do nothing/关闭/打开编辑器/不执行操作）；英文设置 11 页扫描无 UI 残留（仅用户工程名）。英文 “Off” 应为 Close window，源码已改待 alpha.102。证据 next/verification/2026-11-08-alpha101-localization。alpha.101 实际包：三组下拉选项英文显示 Open editor/Do nothing/Off（英文主窗口语义应为 Close window，已源码 localize("Close window")+zh 词典，待 alpha.102）、中文显示 关闭/打开编辑器/不执行操作；英文设置各页扫描仅用户工程名含中文，无 UI 残留。证据 next/verification/2026-11-08-alpha101-localization。
+2026-11-08 alpha.101 已安装，100 回滚。下拉选项中英显示通过（Open editor/Do nothing/关闭/打开编辑器/不执行操作）；英文设置 11 页扫描无 UI 残留（仅用户工程名）。英文 “Off” 应为 Close window，源码已改待 alpha.102。证据 next/verification/2026-11-08-alpha101-localization。
+
+2026-11-08 alpha.102 已安装，101 回滚。Close window 语义生效（Close window/关闭）；英文首页发现模式标签 视频/截图 与捕获来源 窗口/区域 仍中文，已源码 localize+词典，待 alpha.103。证据 next/verification/2026-11-08-alpha102-close-window。alpha.101 实际包：三组下拉选项英文显示 Open editor/Do nothing/Off（英文主窗口语义应为 Close window，已源码 localize("Close window")+zh 词典，待 alpha.102）、中文显示 关闭/打开编辑器/不执行操作；英文设置各页扫描仅用户工程名含中文，无 UI 残留。证据 next/verification/2026-11-08-alpha101-localization。
 
 2026-11-07 alpha.89 已安装，88 回滚（诊断报告改用安装包版本，实际报告 app.version=0.2.0-alpha.89）。证据 next/verification/2026-11-07-alpha89。缩放轨、按键轨、3D 轨、样式轨、图片轨、文字轨、遮罩轨与音频轨原生交互在 alpha.89 实际包通过（创建／移动／两端裁剪／撤销／取消／保存重开／播放；文字遮罩起点裁剪受 1s 最小时长钳制，先拉长后可缩），证据 next/verification/2026-11-07-zoom-native、2026-11-07-keyboard-native、2026-11-07-3d-native、2026-11-07-style-image-native、2026-11-07-text-mask-native、2026-11-07-audio-native。U22c2b4a 已定位为左缘 1px 边界命中、非缺陷（text-start-handle-probe）。
 
@@ -384,7 +386,7 @@
 - [x] U07a 源码修复L01-L04：六类多选完整句子与按当前语言格式化、裁剪吸附提示、3D按钮、图轨导入/空态；新增15中文键。6项格式+3项i18n、类型/完整前端构建/局部Biome和复扫通过。安装仍45，实际新版UI/中英切换待阶段包，不关闭U07父项；证据 `next/verification/2026-10-29-editor-localization/`。alpha.100 实际包验证设置/反馈本地化主项；alpha.101 验证三组下拉选项中英显示，设置页英文扫描无 UI 残留；Close window 语义修正待 alpha.102。
 - [x] U07b 核对安装45只读控件树新发现的无障碍文案：ClipTrack添加转场的动态aria-label、Timeline删除全部3D镜头的deleteTitle，连同共享轨道标题的其他调用逐项修复；不执行删除动作验证，不把本轮未覆盖项当已完成。结果：添加转场使用完整插值、TrackRow统一翻译三种删除标题，未执行删除；实际包待U20a2。
 - [ ] U08 修复 U06 发现的首页/设置/权限/库/设备/演示/截图遗漏。验收：同上，账户入口仅本地敬请期待，不跳上游服务器。2026-11-07 源码批次：Google Drive/S3 集成状态与按钮、集成总览 Managed/Configure、反馈 Supported/Not Supported、更新日志失败提示改为中英词典；捕获外观 5 条、首页系统声音/打开工程、权限引导、快捷键标题等中文硬编码改走 localize；词典 zh +14／en +12，i18n/tsc/Biome/审计通过。实际页面中英切换与权限页实测待 alpha.92，父项不关闭。第二批源码同 U07：设置通用/反馈时长选项、Google Drive 按钮状态、编辑器音频标题本地化；en 词典残留修正；审计候选 64→53。实际页面待 alpha.100。alpha.92 实际包已核对 Home/快捷键/反馈的中英文案（见 U07）；Google Drive/S3 状态与 Configure 等因 Pro 门控未显现，权限页/不支持分支等保留复核。证据同 U07(next/verification/2026-11-08-alpha92-localization)。
-- [ ] U07c/U08c 本地化后续验证：alpha.101 实包三组下拉中英显示通过（Open editor/Do nothing/关闭／打开编辑器／不执行操作），英文设置 11 页扫描除用户工程名外无中文 UI 残留；英文主窗口选项 “Off” 语义应改 Close window（源码已改，待 alpha.102）；剩余首页/库/设备/演示/截图与编辑器/时间线/导出逐面英文扫描未完成。证据 next/verification/2026-11-08-alpha101-localization。
+- [ ] U07c/U08c 本地化后续验证：alpha.102 已验证 Close window（英）/关闭（中）；英文首页扫描发现模式标签「视频/截图」与捕获来源「窗口/区域」仍中文，已源码改 Mode.tsx label/description、new-main name 走 localize 并补 en 词典，待 alpha.103 复验。alpha.101 实包三组下拉中英显示通过（Open editor/Do nothing/关闭／打开编辑器／不执行操作），英文设置 11 页扫描除用户工程名外无中文 UI 残留；英文主窗口选项 “Off” 语义应改 Close window（源码已改，待 alpha.102）；剩余首页/库/设备/演示/截图与编辑器/时间线/导出逐面英文扫描未完成。证据 next/verification/2026-11-08-alpha101-localization。
 - [x] U08a 修复常用非编辑器显示调用L05-L09/L11：首页设备/目标空态、片段数/失败分支、隐藏录制快捷键提示、恢复数量与托盘最近项目；仅翻译默认文案和完整句子，不改设备/文件名和内部枚举。类型/词典/原生局部检查通过后合并阶段包；自动化/其他设置继续U08父项。结果：15新中文键、3项i18n、类型/release原生check/格式/占位符检查通过；仍45，运行待包，证据next/verification/2026-10-29-home-localization/。
 - [ ] U20 用户新增：统一首页/编辑器/设置/截图/演示的控件、菜单、选项卡和文字过渡，以新版DogSC交互为参考，保留产品差异和直接响应的预览/时间线。逐项盘点实现/实测，不以只改全局CSS宣称全部完成。
 - [ ] U20a 共用菜单、选择器、文字过渡与面板切换基础，修复快速反向/取消状态；首页与编辑器共用设置接入同一控件。验收：键盘/取消/滚动/禁用/连续切换、减少动态效果、实际包页面核对；设备与其他低频页面继续U20父项。

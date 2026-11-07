@@ -124,15 +124,17 @@ const Mode = (props: ModeProps) => {
 							)}
 						>
 							<button.icon class={button.iconClass} />
-							<span>{button.label}</span>
+							<span>{localize(button.label)}</span>
 						</HoverCard.Trigger>
 						<HoverCard.Portal>
 							<HoverCard.Content class="z-50 outline-none animate-in fade-in slide-in-from-top-1 duration-100">
 								<div class="flex flex-col gap-2 px-3 py-2.5 rounded-lg border shadow-lg bg-gray-12 text-gray-1 border-gray-3 min-w-[12rem] max-w-[15rem]">
 									<div class="flex flex-col gap-0.5">
-										<span class="text-xs font-medium">{button.label}</span>
+										<span class="text-xs font-medium">
+											{localize(button.label)}
+										</span>
 										<span class="text-[10px] text-gray-4 leading-snug">
-											{button.description}
+											{localize(button.description)}
 										</span>
 									</div>
 									<Show when={button.settingsSection}>
