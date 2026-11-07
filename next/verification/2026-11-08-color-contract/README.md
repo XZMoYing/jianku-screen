@@ -86,3 +86,11 @@
 - 残余：gray 的 B 通道仍差约 4/255（其余 ≤1），接近中性灰、无明显偏色；未达“全通道 ≤2”目标，保留观察。
 - 软件/CPU 测试：rendering crate nv12 相关 8 项、GPU surface BT.709 单测均通过。
 - 待实际安装包验证（alpha.98 构建中）：安装后 GUI 导出与预览一致性、硬件/软件导出一致性。
+
+## alpha.98 安装包验证与预览路径发现
+
+- 安装 alpha.98（含 4ccdc4a 附件修复），用**安装包内** `/Applications/Jianku Screen Next.app/Contents/MacOS/cap-cli` 重新导出纯色工程：red 源 252→**251**、blue 251→**251**、gray 125,127,127→**124,126,123（B 残余 -4）**——安装包硬件导出偏色已消除。
+- 打开 red 工程用单窗口取帧检查**预览画面**中心像素：**(232,0,2)**，而源/导出约 252 → 预览仍偏暗。
+- 原因：预览的软件解码帧走 `yuv420p_to_rgba.wgsl`，该着色器仍是 BT.601 解码；导出路径解码为 709/nv12 或软件路径所以已正确。
+- 已修 8eccfbb：`yuv420p_to_rgba.wgsl` 改为 BT.709 limited（1.7926/0.2132/0.5328/2.1124），与 nv12_to_rgba、cpu_yuv 及编码器标签一致。
+- 下一步：构建 alpha.99 安装后复测预览红色应≈252、导出≈251、软件路径一致；通过后关闭 U11a2/U11a2b。预览探针证据 `preview-color-probe.json`、`preview-red.mov`。

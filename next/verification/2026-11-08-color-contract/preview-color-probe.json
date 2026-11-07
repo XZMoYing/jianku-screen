@@ -1,0 +1,25 @@
+{
+  "appVersion": "0.2.0-alpha.98（硬件色彩附件已随包）",
+  "installedPackageExport": {
+    "method": "用安装包内 /Applications/Jianku Screen Next.app/Contents/MacOS/cap-cli 导出纯色工程（640x360/30fps/maximum，硬件零拷贝）",
+    "red": "源 252,0,0 → 251,0,0",
+    "gray": "源 125,127,127 → 124,126,123（B -4）",
+    "blue": "源 0,0,251 → 0,0,251"
+  },
+  "previewProbe": {
+    "method": "打开 red 工程，CGWindowListCreateImage 单窗口取帧（编辑器预览画面区域）中心像素",
+    "observedRGB": [
+      232,
+      0,
+      2
+    ],
+    "conclusion": "预览仍走 yuv420p_to_rgba 着色器（BT.601 解码），红色 232 而非源 252；导出已正确 251 → 预览与导出仍不一致。"
+  },
+  "sourceFix": "yuv420p_to_rgba.wgsl 已改为 BT.709 limited 解码（1.7926/0.2132/0.5328/2.1124），与 nv12_to_rgba、cpu_yuv、编码器标签一致。",
+  "next": "构建 alpha.99 安装后复测：预览红色应≈252、导出≈251、软件路径一致；再关闭 U11a2/U11a2b。",
+  "notCovered": [
+    "alpha.99 安装包预览验证",
+    "10bit/透明窗/HDR/广色域",
+    "旧录像（601 内容按 709 解码）观感"
+  ]
+}
