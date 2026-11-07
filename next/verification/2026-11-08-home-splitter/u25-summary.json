@@ -1,0 +1,240 @@
+{
+  "appVersion": "0.2.0-alpha.92 / 2026.92.0",
+  "windowDefault": {
+    "x": 250,
+    "y": 98,
+    "width": 1120,
+    "height": 800
+  },
+  "steps": {
+    "before": [
+      {
+        "label": "调整首页预览与控制区高度",
+        "position": {
+          "x": 269,
+          "y": 573
+        },
+        "size": {
+          "height": 12,
+          "width": 682
+        }
+      },
+      {
+        "label": "调整首页画面设置宽度",
+        "position": {
+          "x": 951,
+          "y": 197
+        },
+        "size": {
+          "height": 682,
+          "width": 12
+        }
+      }
+    ],
+    "afterWidthDrag": [
+      {
+        "label": "调整首页预览与控制区高度",
+        "position": {
+          "x": 269,
+          "y": 573
+        },
+        "size": {
+          "height": 12,
+          "width": 762
+        }
+      },
+      {
+        "label": "调整首页画面设置宽度",
+        "position": {
+          "x": 1031,
+          "y": 197
+        },
+        "size": {
+          "height": 682,
+          "width": 12
+        }
+      }
+    ],
+    "afterHeightDrag": [
+      {
+        "label": "调整首页预览与控制区高度",
+        "position": {
+          "x": 269,
+          "y": 513
+        },
+        "size": {
+          "height": 12,
+          "width": 762
+        }
+      },
+      {
+        "label": "调整首页画面设置宽度",
+        "position": {
+          "x": 1031,
+          "y": 197
+        },
+        "size": {
+          "height": 682,
+          "width": 12
+        }
+      }
+    ],
+    "narrowWindow900x700": [
+      {
+        "label": "调整首页预览与控制区高度",
+        "position": {
+          "x": 269,
+          "y": 413
+        },
+        "size": {
+          "height": 12,
+          "width": 542
+        }
+      },
+      {
+        "label": "调整首页画面设置宽度",
+        "position": {
+          "x": 811,
+          "y": 197
+        },
+        "size": {
+          "height": 582,
+          "width": 12
+        }
+      }
+    ],
+    "widthMinClamp": [
+      {
+        "label": "调整首页预览与控制区高度",
+        "position": {
+          "x": 269,
+          "y": 513
+        },
+        "size": {
+          "height": 12,
+          "width": 450
+        }
+      },
+      {
+        "label": "调整首页画面设置宽度",
+        "position": {
+          "x": 719,
+          "y": 197
+        },
+        "size": {
+          "height": 682,
+          "width": 12
+        }
+      }
+    ],
+    "widthMaxClamp": [
+      {
+        "label": "调整首页预览与控制区高度",
+        "position": {
+          "x": 269,
+          "y": 377
+        },
+        "size": {
+          "height": 12,
+          "width": 778
+        }
+      },
+      {
+        "label": "调整首页画面设置宽度",
+        "position": {
+          "x": 1047,
+          "y": 197
+        },
+        "size": {
+          "height": 682,
+          "width": 12
+        }
+      }
+    ],
+    "afterDownDrag": [
+      {
+        "label": "调整首页预览与控制区高度",
+        "position": {
+          "x": 269,
+          "y": 567
+        },
+        "size": {
+          "height": 12,
+          "width": 778
+        }
+      },
+      {
+        "label": "调整首页画面设置宽度",
+        "position": {
+          "x": 1047,
+          "y": 197
+        },
+        "size": {
+          "height": 682,
+          "width": 12
+        }
+      }
+    ],
+    "demoModeAfterSplitterDrag": {
+      "splitter": [
+        {
+          "label": "调整首页预览与控制区高度",
+          "position": {
+            "x": 269,
+            "y": 573
+          },
+          "size": {
+            "height": 12,
+            "width": 778
+          }
+        },
+        {
+          "label": "调整首页画面设置宽度",
+          "position": {
+            "x": 1047,
+            "y": 197
+          },
+          "size": {
+            "height": 682,
+            "width": 12
+          }
+        }
+      ]
+    },
+    "defaultRestored": [
+      {
+        "label": "调整首页预览与控制区高度",
+        "position": {
+          "x": 269,
+          "y": 573
+        },
+        "size": {
+          "height": 12,
+          "width": 682
+        }
+      },
+      {
+        "label": "调整首页画面设置宽度",
+        "position": {
+          "x": 951,
+          "y": 197
+        },
+        "size": {
+          "height": 682,
+          "width": 12
+        }
+      }
+    ]
+  },
+  "modeCheck": {
+    "beforeToggle": "录屏=1,演示=0",
+    "afterToggleAndDrag": "录屏=0,演示=1（切换演示后拖分隔条，模式保持）",
+    "restored": "录屏=1,演示=0"
+  },
+  "persistence": "拖动后退出并重开应用，分隔条仍在 1047/377（布局持久化通过）",
+  "gaps": [
+    "首页未发现布局「重置」控件或菜单项（源码与 AX 均未找到 resetLayout/重置布局）",
+    "未发现分隔条键盘调整支持；AXSplitter 无 key 调整入口，未实测",
+    "宽/高最小/最大限制只验证了左侧最小 450、右侧最大 778、上侧最小 y377；其余方向边界未逐一枚举"
+  ]
+}
