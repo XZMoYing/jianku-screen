@@ -165,7 +165,7 @@ export function FrameOptions(props: {
 							</KTabs>
 						</SettingRow>
 						<Show when={frame().style === "browser"}>
-							<SettingRow name="URL">
+							<SettingRow name={localize("URL")}>
 								<div class="w-40">
 									<Input
 										value={frame().url}

@@ -794,7 +794,7 @@ export function Camera3DShotPanel(props: {
 				</div>
 			</div>
 			<PanelGroup
-				name="Look"
+				name={localize("Look")}
 				action={
 					<MiniSegmented
 						value={lookTab()}
@@ -913,7 +913,7 @@ export function Camera3DShotPanel(props: {
 			</PanelGroup>
 
 			<PanelGroup
-				name="Depth blur"
+				name={localize("Depth blur")}
 				action={
 					<Toggle size="sm" checked={blurOn()} onChange={setBlurEnabled} />
 				}
@@ -926,7 +926,11 @@ export function Camera3DShotPanel(props: {
 						</p>
 					}
 				>
-					<Field inline name="Amount" value={`${Math.round(blur().strength)}`}>
+					<Field
+						inline
+						name={localize("Amount")}
+						value={`${Math.round(blur().strength)}`}
+					>
 						<Slider
 							value={[blur().strength]}
 							onChange={(v) => setBlurValue("strength", v[0])}
@@ -935,7 +939,7 @@ export function Camera3DShotPanel(props: {
 							step={camera3dBlurLimit("strength", blur()).step}
 						/>
 					</Field>
-					<Field inline name="Focus">
+					<Field inline name={localize("Focus")}>
 						<MiniSegmented
 							class="flex-1"
 							value={activeBlurMode()}
@@ -973,7 +977,7 @@ export function Camera3DShotPanel(props: {
 								);
 							}}
 						</For>
-						<Subfield name="Bokeh">
+						<Subfield name={localize("Bokeh")}>
 							<Toggle size="sm" checked={blur().bokeh} onChange={setBokeh} />
 						</Subfield>
 					</DrillSection>
@@ -981,12 +985,12 @@ export function Camera3DShotPanel(props: {
 			</PanelGroup>
 
 			<DrillSection
-				name="Timing & advanced"
+				name={localize("Timing & advanced")}
 				summary={`${localize(motionEasing().label)} · ${localize("视角")} ${Math.round(selectedPose().fov)}°`}
 				open={advancedOpen()}
 				onOpenChange={setAdvancedOpen}
 			>
-				<Field inline name="Motion style" disabled={isStill()}>
+				<Field inline name={localize("Motion style")} disabled={isStill()}>
 					<div class="w-40">
 						<KSelect<Camera3DMotionEasing>
 							options={MOTION_EASINGS}

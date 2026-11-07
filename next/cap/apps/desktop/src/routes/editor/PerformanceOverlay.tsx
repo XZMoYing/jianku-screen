@@ -241,7 +241,10 @@ export function PerformanceOverlay(_props: PerformanceOverlayProps) {
 							<span style={{ color: "#93c5fd" }}>
 								{formatMs(stats().avgFrameMs)}ms
 							</span>
-							<span style={{ color: "rgba(255, 255, 255, 0.4)" }}> {localize("avg")}</span>
+							<span style={{ color: "rgba(255, 255, 255, 0.4)" }}>
+								{" "}
+								{localize("avg")}
+							</span>
 						</div>
 						<div style={{ color: "rgba(255, 255, 255, 0.7)" }}>
 							<span>{localize("Range:")} </span>

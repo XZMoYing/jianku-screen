@@ -1088,9 +1088,9 @@ export function CaptionsTab(props: {
 
 				<div class="w-full border-t border-ed-line" />
 
-				<Section name="Font settings">
+				<Section name={localize("Font settings")}>
 					<div class="flex flex-col gap-2">
-						<Field name="Font Family" inline>
+						<Field name={localize("Font Family")} inline>
 							<KSelect<string>
 								options={FONT_OPTIONS.map((f) => f.value)}
 								value={getSetting("font")}
@@ -1167,7 +1167,7 @@ export function CaptionsTab(props: {
 							/>
 						</Field>
 
-						<Field name="Active Word Highlight" inline>
+						<Field name={localize("Active Word Highlight")} inline>
 							<Toggle
 								checked={getSetting("activeWordHighlight")}
 								onChange={(checked) =>
@@ -1183,7 +1183,7 @@ export function CaptionsTab(props: {
 						</p>
 
 						<Show when={getSetting("activeWordHighlight")}>
-							<Field name="Highlight Style" inline>
+							<Field name={localize("Highlight Style")} inline>
 								<KSelect<string>
 									options={CAPTION_HIGHLIGHT_STYLE_OPTIONS.map((o) => o.value)}
 									value={getSetting("highlightStyle")}
@@ -1242,7 +1242,7 @@ export function CaptionsTab(props: {
 							</Field>
 						</Show>
 
-						<Field name="Text Color">
+						<Field name={localize("Text Color")}>
 							<HexColorInput
 								value={getSetting("color")}
 								brandColorSwatches={props.brandColorSwatches}
@@ -1254,9 +1254,9 @@ export function CaptionsTab(props: {
 
 				<div class="w-full border-t border-ed-line" />
 
-				<Section name="Background settings">
+				<Section name={localize("Background settings")}>
 					<div class="flex flex-col gap-2">
-						<Field name="Background Color">
+						<Field name={localize("Background Color")}>
 							<HexColorInput
 								value={getSetting("backgroundColor")}
 								brandColorSwatches={props.brandColorSwatches}
@@ -1266,7 +1266,7 @@ export function CaptionsTab(props: {
 							/>
 						</Field>
 
-						<Field name="Background Opacity" inline>
+						<Field name={localize("Background Opacity")} inline>
 							<Slider
 								value={[getSetting("backgroundOpacity")]}
 								onChange={(v) =>
@@ -1339,7 +1339,7 @@ export function CaptionsTab(props: {
 						</KSelect>
 					</Field>
 
-					<Field name="Font Weight" inline>
+					<Field name={localize("Font Weight")} inline>
 						<KSelect
 							options={TEXT_WEIGHT_OPTIONS}
 							optionValue="value"
@@ -1400,9 +1400,9 @@ export function CaptionsTab(props: {
 
 				<div class="w-full border-t border-ed-line" />
 
-				<Section name="Animation">
+				<Section name={localize("Animation")}>
 					<div class="flex flex-col gap-2">
-						<Field name="Animation Style" inline>
+						<Field name={localize("Animation Style")} inline>
 							<KSelect<string>
 								options={CAPTION_ANIMATION_OPTIONS.map((o) => o.value)}
 								value={getSetting("animation")}
@@ -1453,7 +1453,7 @@ export function CaptionsTab(props: {
 							</KSelect>
 						</Field>
 
-						<Field name="Highlight Color">
+						<Field name={localize("Highlight Color")}>
 							<HexColorInput
 								value={getSetting("highlightColor")}
 								brandColorSwatches={props.brandColorSwatches}
@@ -1464,7 +1464,7 @@ export function CaptionsTab(props: {
 						</Field>
 
 						<Field
-							name="Fade Duration"
+							name={localize("Fade Duration")}
 							inline
 							value={`${(getSetting("fadeDuration") * 1000).toFixed(0)}ms`}
 						>
@@ -1484,8 +1484,8 @@ export function CaptionsTab(props: {
 
 				<div class="w-full border-t border-ed-line" />
 
-				<Section name="Export options">
-					<Field name="Export with Subtitles" inline>
+				<Section name={localize("Export options")}>
+					<Field name={localize("Export with Subtitles")} inline>
 						<Toggle
 							checked={getSetting("exportWithSubtitles")}
 							onChange={(checked) =>
@@ -1504,11 +1504,11 @@ export function CaptionsTab(props: {
 				}
 			>
 				<div class="w-full border-t border-ed-line" />
-				<Section name="Selected caption override">
+				<Section name={localize("Selected caption override")}>
 					<Show when={selectedCaptionSegment()}>
 						{(seg) => (
 							<div class="flex flex-col gap-1">
-								<Subfield name="Start Time">
+								<Subfield name={localize("Start Time")}>
 									<Input
 										type="number"
 										value={seg().start.toFixed(2)}
@@ -1521,7 +1521,7 @@ export function CaptionsTab(props: {
 										}
 									/>
 								</Subfield>
-								<Subfield name="End Time">
+								<Subfield name={localize("End Time")}>
 									<Input
 										type="number"
 										value={seg().end.toFixed(2)}
@@ -1534,7 +1534,7 @@ export function CaptionsTab(props: {
 										}
 									/>
 								</Subfield>
-								<Subfield name="Caption Text">
+								<Subfield name={localize("Caption Text")}>
 									<Input
 										type="text"
 										value={seg().text}
@@ -1551,7 +1551,7 @@ export function CaptionsTab(props: {
 										}
 									/>
 								</Subfield>
-								<Subfield name="Fade Duration Override">
+								<Subfield name={localize("Fade Duration Override")}>
 									<Slider
 										class="flex-1"
 										value={[

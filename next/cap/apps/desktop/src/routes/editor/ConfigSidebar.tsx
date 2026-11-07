@@ -633,9 +633,9 @@ function ConfigSidebarContent() {
 								value="hotkeys"
 								class="flex flex-1 pt-3.5 px-4 pb-4 min-h-0"
 							>
-								<Section name="Hotkeys">
+								<Section name={localize("Hotkeys")}>
 									<ComingSoonTooltip>
-										<Subfield name="Show hotkeys">
+										<Subfield name={localize("Show hotkeys")}>
 											<Toggle disabled />
 										</Subfield>
 									</ComingSoonTooltip>
@@ -1410,7 +1410,7 @@ function BackgroundConfig(props: {
 					}
 					onMotionBlur={(amount) => setProject("screenMotionBlur", amount)}
 				/>
-				<Field inline name="MacBook notch">
+				<Field inline name={localize("MacBook notch")}>
 					<Toggle
 						checked={project.background.notch?.enabled ?? false}
 						onChange={(enabled) =>
@@ -1503,7 +1503,7 @@ function BackgroundConfig(props: {
 					<ColorCorrectionSection target="screen" scrollRef={props.scrollRef} />
 				</Show>
 				{/* <ComingSoonTooltip>
-            <Field name="Inset" icon={<IconCapInset />}>
+            <Field name={localize("Inset")} icon={<IconCapInset />}>
               <Slider
                 disabled
                 value={[project.background.inset]}
@@ -1652,7 +1652,7 @@ function AudioSegmentConfig(props: {
 			</Field>
 			<Field
 				inline
-				name="Fade In"
+				name={localize("Fade In")}
 				value={`${clampNumber(props.segment.fadeIn, 0, fadeMax()).toFixed(2)}s`}
 			>
 				<Slider
@@ -1670,7 +1670,7 @@ function AudioSegmentConfig(props: {
 			</Field>
 			<Field
 				inline
-				name="Fade Out"
+				name={localize("Fade Out")}
 				value={`${clampNumber(props.segment.fadeOut, 0, fadeMax()).toFixed(2)}s`}
 			>
 				<Slider
@@ -1721,7 +1721,7 @@ function KeyboardSegmentConfig(props: {
 					}
 				/>
 			</Section>
-			<Field name="Timing">
+			<Field name={localize("Timing")}>
 				<div class="rounded-xl bg-ed-card-2 p-3 space-y-3">
 					<div class="grid grid-cols-[1fr_auto_1fr] gap-2 items-start">
 						<div class="rounded-lg bg-ed-card p-2.5 space-y-2">
@@ -1772,7 +1772,7 @@ function KeyboardSegmentConfig(props: {
 			</Field>
 			<Field
 				inline
-				name="Fade Duration"
+				name={localize("Fade Duration")}
 				value={Math.round((props.segment.fadeDurationOverride ?? 0.15) * 100)}
 			>
 				<Slider
@@ -1838,7 +1838,7 @@ function CaptionSegmentConfig(props: {
 					}
 				/>
 			</Section>
-			<Field name="Timing">
+			<Field name={localize("Timing")}>
 				<div class="rounded-xl bg-ed-card-2 p-3 space-y-3">
 					<div class="grid grid-cols-[1fr_auto_1fr] gap-2 items-start">
 						<div class="rounded-lg bg-ed-card p-2.5 space-y-2">
@@ -2006,7 +2006,7 @@ function MaskSegmentConfig(props: {
 				</div>
 			</Section>
 			<Show when={props.segment.maskType === "sensitive"}>
-				<Field name="Effect">
+				<Field name={localize("Effect")}>
 					<RadioGroup
 						class="grid grid-cols-2 gap-2"
 						value={maskEffect()}
@@ -2053,7 +2053,7 @@ function MaskSegmentConfig(props: {
 			<Show when={props.segment.maskType === "highlight"}>
 				<Field
 					inline
-					name="Outside Darkness"
+					name={localize("Outside Darkness")}
 					value={`${Math.round(props.segment.darkness * 100)}%`}
 				>
 					<Slider
@@ -2072,7 +2072,7 @@ function MaskSegmentConfig(props: {
 			<Show when={props.segment.maskType === "highlight"}>
 				<Field
 					inline
-					name="Fade Duration"
+					name={localize("Fade Duration")}
 					value={`${(props.segment.fadeDuration ?? 0.15).toFixed(2)}s`}
 				>
 					<Slider
@@ -2295,7 +2295,7 @@ function ZoomSegmentConfig(props: {
 					formatTooltip="x"
 				/>
 			</Field>
-			<Field name="Zoom Mode">
+			<Field name={localize("Zoom Mode")}>
 				<KTabs
 					class="space-y-6"
 					value={props.segment.mode === "auto" ? "auto" : "manual"}
@@ -2799,7 +2799,7 @@ function SyncOffsetsConfig() {
 	return (
 		<Show when={hasAnySource()}>
 			<div class="flex flex-col gap-3.5">
-				<Section name="Sync">
+				<Section name={localize("Sync")}>
 					<p class="text-[11px] text-ed-text-3">
 						{localize(
 							"Fine-tune source offsets if audio or camera drifts out of sync with the screen recording.",
@@ -2822,7 +2822,7 @@ function SyncOffsetsConfig() {
 							</Show>
 							{meta().hasSystemAudio && (
 								<SourceOffsetField
-									name="System Audio Offset"
+									name={localize("System Audio Offset")}
 									value={clipConfig(index())?.offsets.system_audio}
 									autoCalculated={
 										clipConfig(index())?.offsetsAutoCalculated === true
@@ -2834,7 +2834,7 @@ function SyncOffsetsConfig() {
 							)}
 							{meta().hasMicrophone && (
 								<SourceOffsetField
-									name="Microphone Offset"
+									name={localize("Microphone Offset")}
 									value={clipConfig(index())?.offsets.mic}
 									autoCalculated={
 										clipConfig(index())?.offsetsAutoCalculated === true
@@ -2846,7 +2846,7 @@ function SyncOffsetsConfig() {
 							)}
 							{meta().hasCamera && (
 								<SourceOffsetField
-									name="Camera Offset"
+									name={localize("Camera Offset")}
 									value={clipConfig(index())?.offsets.camera}
 									autoCalculated={
 										clipConfig(index())?.offsetsAutoCalculated === true
@@ -3031,7 +3031,7 @@ function SceneSegmentConfig(props: {
 					{localize("Delete")}
 				</EditorButton>
 			</div>
-			<Field name="Camera Layout">
+			<Field name={localize("Camera Layout")}>
 				<KTabs
 					class="space-y-3"
 					value={props.segment.mode || "default"}
@@ -3099,11 +3099,11 @@ function SceneSegmentConfig(props: {
 				</KTabs>
 			</Field>
 
-			<Field name="Transition">
+			<Field name={localize("Transition")}>
 				<div class="flex flex-col">
 					<Field
 						inline
-						name="In"
+						name={localize("In")}
 						value={`${(
 							props.segment.transitionIn ?? DEFAULT_SCENE_TRANSITION
 						).toFixed(2)}s`}
@@ -3127,7 +3127,7 @@ function SceneSegmentConfig(props: {
 					</Field>
 					<Field
 						inline
-						name="Out"
+						name={localize("Out")}
 						value={`${(
 							props.segment.transitionOut ?? DEFAULT_SCENE_TRANSITION
 						).toFixed(2)}s`}
@@ -3161,7 +3161,7 @@ function SceneSegmentConfig(props: {
 				<div class="w-full border-t border-ed-line" />
 				<Field
 					inline
-					name="Screen Zoom"
+					name={localize("Screen Zoom")}
 					value={`${Math.round(split().screenZoom * 100)}%`}
 				>
 					<Slider
@@ -3173,7 +3173,7 @@ function SceneSegmentConfig(props: {
 						formatTooltip="%"
 					/>
 				</Field>
-				<Field name="Screen Position">
+				<Field name={localize("Screen Position")}>
 					<PositionPad
 						value={() => split().screenPosition}
 						onChange={(pos) => updateSplit({ screenPosition: pos })}
@@ -3182,7 +3182,7 @@ function SceneSegmentConfig(props: {
 				<div class="w-full border-t border-ed-line" />
 				<Field
 					inline
-					name="Camera Zoom"
+					name={localize("Camera Zoom")}
 					value={`${Math.round(split().cameraZoom * 100)}%`}
 				>
 					<Slider
@@ -3194,7 +3194,7 @@ function SceneSegmentConfig(props: {
 						formatTooltip="%"
 					/>
 				</Field>
-				<Field name="Camera Position">
+				<Field name={localize("Camera Position")}>
 					<PositionPad
 						value={() => split().cameraPosition}
 						onChange={(pos) => updateSplit({ cameraPosition: pos })}

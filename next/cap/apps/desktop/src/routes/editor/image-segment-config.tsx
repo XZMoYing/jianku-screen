@@ -80,9 +80,9 @@ export function ImageSegmentConfig(props: { index: number }) {
 								)
 							}
 						>
-					{editorState.importingImage
-						? localize("正在导入…")
-						: localize("替换图片")}
+							{editorState.importingImage
+								? localize("正在导入…")
+								: localize("替换图片")}
 						</EditorButton>
 						<EditorButton
 							variant="danger"
@@ -94,7 +94,7 @@ export function ImageSegmentConfig(props: { index: number }) {
 						</EditorButton>
 					</div>
 					<div class="flex flex-col gap-2.5 rounded-lg bg-ed-card-2 p-3">
-						<SectionLabel name="Arrange on canvas" />
+						<SectionLabel name={localize("Arrange on canvas")} />
 						<p class="text-[11px] leading-relaxed text-ed-text-3">
 							{localize(
 								"Drag the image to move it. Pull a corner to resize, or use the rotation handle to turn it. Arrow keys nudge it into place.",
@@ -136,7 +136,11 @@ export function ImageSegmentConfig(props: { index: number }) {
 								}
 							/>
 						</Field>
-						<Field inline name="Rotation" value={`${image().rotation}°`}>
+						<Field
+							inline
+							name={localize("Rotation")}
+							value={`${image().rotation}°`}
+						>
 							<Slider
 								value={[image().rotation]}
 								minValue={-180}
@@ -156,7 +160,7 @@ export function ImageSegmentConfig(props: { index: number }) {
 						</Field>
 						<Field
 							inline
-							name="Rounded corners"
+							name={localize("Rounded corners")}
 							value={`${image().rounding.toFixed(1)}%`}
 						>
 							<Slider
@@ -176,7 +180,7 @@ export function ImageSegmentConfig(props: { index: number }) {
 								}
 							/>
 						</Field>
-						<Field inline name="Lock aspect ratio">
+						<Field inline name={localize("Lock aspect ratio")}>
 							<Toggle
 								checked={image().lockAspect}
 								onChange={(value) =>
@@ -190,7 +194,7 @@ export function ImageSegmentConfig(props: { index: number }) {
 								}
 							/>
 						</Field>
-						<Field inline name="Flip horizontally">
+						<Field inline name={localize("Flip horizontally")}>
 							<Toggle
 								checked={image().flipX}
 								onChange={(value) =>
@@ -204,7 +208,7 @@ export function ImageSegmentConfig(props: { index: number }) {
 								}
 							/>
 						</Field>
-						<Field inline name="Flip vertically">
+						<Field inline name={localize("Flip vertically")}>
 							<Toggle
 								checked={image().flipY}
 								onChange={(value) =>

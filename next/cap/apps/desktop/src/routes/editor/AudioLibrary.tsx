@@ -308,9 +308,11 @@ export function AudioLibraryPanel(props: {
 										<button
 											type="button"
 											class="absolute inset-0 w-full h-full"
-							aria-label={
-								isPreviewing() ? localize("暂停试听") : localize("播放试听")
-							}
+											aria-label={
+												isPreviewing()
+													? localize("暂停试听")
+													: localize("播放试听")
+											}
 											onClick={() => togglePreview(track.id)}
 										>
 											<Show when={!isPreviewing()}>
@@ -347,7 +349,11 @@ export function AudioLibraryPanel(props: {
 
 										<button
 											type="button"
-							aria-label={isReplace() ? localize("使用此音轨") : localize("添加到时间线")}
+											aria-label={
+												isReplace()
+													? localize("使用此音轨")
+													: localize("添加到时间线")
+											}
 											class={cx(
 												"flex absolute top-1 right-1 justify-center items-center rounded-full border backdrop-blur-sm transition-all size-5",
 												"opacity-0 group-hover/tile:opacity-100",

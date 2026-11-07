@@ -1041,7 +1041,7 @@ export function ExportPage() {
 				<div class="w-[400px] shrink-0 border-l border-ed-line flex flex-col bg-ed-card">
 					<div class="custom-scroll flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 flex flex-col gap-5">
 						<ExportSection
-							name="Destination"
+							name={localize("Destination")}
 							icon={<IconCapUpload class="size-3.5" />}
 						>
 							<ExportSegmented

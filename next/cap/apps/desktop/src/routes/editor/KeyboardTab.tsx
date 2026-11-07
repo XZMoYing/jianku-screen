@@ -131,9 +131,7 @@ export function KeyboardTab(props: {
 			);
 
 			if (!segments) {
-				toast.error(
-					localize("生成按键事件时，时间线发生了变化，请重试。"),
-				);
+				toast.error(localize("生成按键事件时，时间线发生了变化，请重试。"));
 				return;
 			}
 			batch(() => {
@@ -170,7 +168,7 @@ export function KeyboardTab(props: {
 	return (
 		<div class="flex flex-col gap-3.5">
 			<div class="flex flex-row gap-2 items-center min-h-[22px]">
-				<SectionLabel name="Show keyboard" />
+				<SectionLabel name={localize("Show keyboard")} />
 				<span class="px-1.5 py-0.5 text-[10px] font-medium rounded-full bg-ed-ctl text-ed-text-2">
 					{localize("Beta")}
 				</span>
@@ -187,9 +185,9 @@ export function KeyboardTab(props: {
 					!getSetting("enabled") && "opacity-50 pointer-events-none",
 				)}
 			>
-				<Section name="Font settings">
+				<Section name={localize("Font settings")}>
 					<div class="flex flex-col gap-2">
-						<Field name="Font Family" inline>
+						<Field name={localize("Font Family")} inline>
 							<KSelect<string>
 								options={FONT_OPTIONS.map((f) => f.value)}
 								value={getSetting("font")}
@@ -203,24 +201,28 @@ export function KeyboardTab(props: {
 										item={props.item}
 									>
 										<KSelect.ItemLabel class="flex-1">
-										{localize(
-											localize(FONT_OPTIONS.find(
-												(f) => f.value === props.item.rawValue,
-											)?.label ?? "") ?? "",
-										)}
+											{localize(
+												localize(
+													FONT_OPTIONS.find(
+														(f) => f.value === props.item.rawValue,
+													)?.label ?? "",
+												) ?? "",
+											)}
 										</KSelect.ItemLabel>
 									</MenuItem>
 								)}
 							>
 								<KSelect.Trigger class={selectTriggerClass}>
 									<KSelect.Value<string> class="truncate">
-						{(state) =>
-							localize(
-								localize(FONT_OPTIONS.find(
-									(f) => f.value === state.selectedOption(),
-								)?.label ?? "") ?? "",
-							)
-						}
+										{(state) =>
+											localize(
+												localize(
+													FONT_OPTIONS.find(
+														(f) => f.value === state.selectedOption(),
+													)?.label ?? "",
+												) ?? "",
+											)
+										}
 									</KSelect.Value>
 									<KSelect.Icon>
 										<IconCapChevronDown class="shrink-0 size-3.5 text-ed-text-3" />
@@ -250,7 +252,7 @@ export function KeyboardTab(props: {
 							/>
 						</Field>
 
-						<Field name="Text Color">
+						<Field name={localize("Text Color")}>
 							<HexColorInput
 								value={getSetting("color")}
 								brandColorSwatches={props.brandColorSwatches}
@@ -262,9 +264,9 @@ export function KeyboardTab(props: {
 
 				<div class="w-full border-t border-ed-line" />
 
-				<Section name="Background settings">
+				<Section name={localize("Background settings")}>
 					<div class="flex flex-col gap-2">
-						<Field name="Background Color">
+						<Field name={localize("Background Color")}>
 							<HexColorInput
 								value={getSetting("backgroundColor")}
 								brandColorSwatches={props.brandColorSwatches}
@@ -272,7 +274,7 @@ export function KeyboardTab(props: {
 							/>
 						</Field>
 
-						<Field name="Background Opacity" inline>
+						<Field name={localize("Background Opacity")} inline>
 							<Slider
 								value={[getSetting("backgroundOpacity")]}
 								onChange={(v) => updateSetting("backgroundOpacity", v[0])}
@@ -302,9 +304,11 @@ export function KeyboardTab(props: {
 								>
 									<KSelect.ItemLabel class="flex-1">
 										{localize(
-											localize(KEYBOARD_POSITION_OPTIONS.find(
-												(p) => p.value === props.item.rawValue,
-											)?.label ?? "") ?? "",
+											localize(
+												KEYBOARD_POSITION_OPTIONS.find(
+													(p) => p.value === props.item.rawValue,
+												)?.label ?? "",
+											) ?? "",
 										)}
 									</KSelect.ItemLabel>
 								</MenuItem>
@@ -314,11 +318,13 @@ export function KeyboardTab(props: {
 								<KSelect.Value<string> class="truncate">
 									{(state) => (
 										<span>
-							{localize(
-								localize(KEYBOARD_POSITION_OPTIONS.find(
-									(p) => p.value === state.selectedOption(),
-								)?.label ?? "") ?? "",
-							)}
+											{localize(
+												localize(
+													KEYBOARD_POSITION_OPTIONS.find(
+														(p) => p.value === state.selectedOption(),
+													)?.label ?? "",
+												) ?? "",
+											)}
 										</span>
 									)}
 								</KSelect.Value>
@@ -337,7 +343,7 @@ export function KeyboardTab(props: {
 						</KSelect>
 					</Field>
 
-					<Field name="Font Weight" inline>
+					<Field name={localize("Font Weight")} inline>
 						<KSelect
 							options={TEXT_WEIGHT_OPTIONS}
 							optionValue="value"
@@ -356,7 +362,7 @@ export function KeyboardTab(props: {
 									item={selectItemProps.item}
 								>
 									<KSelect.ItemLabel class="flex-1">
-						{localize(selectItemProps.item.rawValue.label)}
+										{localize(selectItemProps.item.rawValue.label)}
 									</KSelect.ItemLabel>
 									<KSelect.ItemIndicator class="ml-auto text-ed-accent">
 										<IconCapCircleCheck />
@@ -370,11 +376,13 @@ export function KeyboardTab(props: {
 									value: number;
 								}> class="truncate">
 									{(state) =>
-									localize(
-										localize(state.selectedOption()?.label ??
-										getTextWeightLabel(getSetting("fontWeight"))),
-									)
-								}
+										localize(
+											localize(
+												state.selectedOption()?.label ??
+													getTextWeightLabel(getSetting("fontWeight")),
+											),
+										)
+									}
 								</KSelect.Value>
 								<KSelect.Icon>
 									<IconCapChevronDown class="shrink-0 size-3.5 transition-transform transform text-ed-text-3 data-expanded:rotate-180" />
@@ -397,10 +405,10 @@ export function KeyboardTab(props: {
 
 				<div class="w-full border-t border-ed-line" />
 
-				<Section name="Animation">
+				<Section name={localize("Animation")}>
 					<div class="flex flex-col gap-2">
 						<Field
-							name="Fade Duration"
+							name={localize("Fade Duration")}
 							inline
 							value={`${(getSetting("fadeDuration") * 1000).toFixed(0)}ms`}
 						>
@@ -414,7 +422,7 @@ export function KeyboardTab(props: {
 						</Field>
 
 						<Field
-							name="Linger Duration"
+							name={localize("Linger Duration")}
 							inline
 							value={`${(getSetting("lingerDuration") * 1000).toFixed(0)}ms`}
 						>
@@ -428,7 +436,7 @@ export function KeyboardTab(props: {
 						</Field>
 
 						<Field
-							name="Grouping Threshold"
+							name={localize("Grouping Threshold")}
 							inline
 							value={`${getSetting("groupingThresholdMs").toFixed(0)}ms`}
 						>
@@ -445,16 +453,16 @@ export function KeyboardTab(props: {
 
 				<div class="w-full border-t border-ed-line" />
 
-				<Section name="Behavior">
+				<Section name={localize("Behavior")}>
 					<div class="flex flex-col gap-2">
-						<Field name="Show Modifier Keys" inline>
+						<Field name={localize("Show Modifier Keys")} inline>
 							<Toggle
 								checked={getSetting("showModifiers")}
 								onChange={(checked) => updateSetting("showModifiers", checked)}
 							/>
 						</Field>
 
-						<Field name="Show Special Keys" inline>
+						<Field name={localize("Show Special Keys")} inline>
 							<Toggle
 								checked={getSetting("showSpecialKeys")}
 								onChange={(checked) =>
@@ -488,9 +496,9 @@ export function KeyboardTab(props: {
 					{(seg) => (
 						<>
 							<div class="w-full border-t border-ed-line" />
-							<Section name="Selected segment override">
+							<Section name={localize("Selected segment override")}>
 								<div class="flex flex-col gap-1">
-									<Subfield name="Start Time">
+									<Subfield name={localize("Start Time")}>
 										<Input
 											type="number"
 											value={seg().start.toFixed(2)}
@@ -507,7 +515,7 @@ export function KeyboardTab(props: {
 											}
 										/>
 									</Subfield>
-									<Subfield name="End Time">
+									<Subfield name={localize("End Time")}>
 										<Input
 											type="number"
 											value={seg().end.toFixed(2)}
@@ -524,7 +532,7 @@ export function KeyboardTab(props: {
 											}
 										/>
 									</Subfield>
-									<Subfield name="Display Text">
+									<Subfield name={localize("Display Text")}>
 										<Input
 											type="text"
 											value={seg().displayText}
@@ -539,7 +547,7 @@ export function KeyboardTab(props: {
 											}
 										/>
 									</Subfield>
-									<Subfield name="Fade Duration Override">
+									<Subfield name={localize("Fade Duration Override")}>
 										<Slider
 											class="flex-1"
 											value={[

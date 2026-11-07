@@ -121,7 +121,7 @@ export function ColorCorrectionSection(props: {
 
 	return (
 		<>
-			<Section name="Color correction">
+			<Section name={localize("Color correction")}>
 				<div class="grid grid-cols-3 gap-2">
 					<For each={COLOR_CORRECTION_PRESETS}>
 						{(preset) => (
@@ -145,7 +145,11 @@ export function ColorCorrectionSection(props: {
 					</For>
 				</div>
 			</Section>
-			<Field inline name="Grain" value={`${(grade().grain * 100).toFixed(1)}%`}>
+			<Field
+				inline
+				name={localize("Grain")}
+				value={`${(grade().grain * 100).toFixed(1)}%`}
+			>
 				<Slider
 					value={[grade().grain * 100]}
 					onChange={(v) => setValue("grain", v[0] / 100, true)}
@@ -156,7 +160,7 @@ export function ColorCorrectionSection(props: {
 				/>
 			</Field>
 			<Show when={props.target === "screen"}>
-				<Field inline name="Apply to cursor">
+				<Field inline name={localize("Apply to cursor")}>
 					<Toggle
 						checked={project.colorCorrection.gradeCursor}
 						onChange={(gradeCursor) =>

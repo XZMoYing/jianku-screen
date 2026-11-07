@@ -207,7 +207,7 @@ export function GradientEditor(props: {
 						<Show when={noiseIntensity() > 0}>
 							<Field
 								inline
-								name="Grain Scale"
+								name={localize("Grain Scale")}
 								value={`${noiseScale().toFixed(1)}%`}
 							>
 								<Slider

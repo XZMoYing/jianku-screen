@@ -523,7 +523,7 @@ export function AnimatedGradientEditor(props: {
 					<div class="w-full border-t border-ed-line" />
 
 					<Section
-						name="Colours"
+						name={localize("Colours")}
 						action={
 							<EditorButton
 								size="sm"
@@ -680,7 +680,7 @@ export function AnimatedGradientEditor(props: {
 						{(control) => (
 							<Field
 								inline
-								name="Motion"
+								name={localize("Motion")}
 								value={controlValue(control(), current()[MOTION_KEY])}
 							>
 								<Slider

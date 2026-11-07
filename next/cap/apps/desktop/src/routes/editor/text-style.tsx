@@ -3,12 +3,12 @@ import {
 	getHexColorDigitCount,
 	normalizeOpaqueHexColor,
 } from "~/utils/hex-color";
+import { t as localize } from "~/utils/i18n";
 import type { OrganizationBrandColorSwatch } from "~/utils/organization-branding";
 import { BrandColorsDropdown } from "./BrandColorsDropdown";
 import { getColorPreviewBorderColor } from "./color-utils";
 import { TextInput } from "./TextInput";
 import type { TextAnimation, TextBackgroundStyle } from "./text";
-import { t as localize } from "~/utils/i18n";
 
 export const FONT_OPTIONS = [
 	{ value: "System Sans-Serif", label: "System Sans-Serif" },

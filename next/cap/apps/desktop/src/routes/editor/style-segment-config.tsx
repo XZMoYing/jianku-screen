@@ -89,7 +89,7 @@ export function StyleSegmentConfig() {
 								/>
 							</div>
 							<Field
-								name="Override camera-only padding"
+								name={localize("Override camera-only padding")}
 								value={
 									<Toggle
 										checked={style().overrides.cameraOnlyPadding != null}

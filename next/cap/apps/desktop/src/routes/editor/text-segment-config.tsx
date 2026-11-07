@@ -186,7 +186,9 @@ function TextStyleSelect<T extends string | number>(props: {
 		>
 			<KSelect.Trigger class="flex justify-between items-center px-2.5 w-full h-[30px] text-[12px] rounded-[7px] border-0 transition-colors duration-150 bg-ed-ctl text-ed-text-1 hover:bg-ed-ctl-hover focus:outline-hidden focus:ring-1 focus:ring-ed-accent">
 				<KSelect.Value<{ label: string; value: T }> class="truncate">
-					{(state) => localize(state.selectedOption()?.label ?? selected().label)}
+					{(state) =>
+						localize(state.selectedOption()?.label ?? selected().label)
+					}
 				</KSelect.Value>
 				<KSelect.Icon>
 					<IconCapChevronDown class="transition-transform transform size-3.5 shrink-0 data-expanded:rotate-180 text-ed-text-3" />
@@ -621,7 +623,7 @@ export function TextSegmentConfig(props: {
 				</div>
 			</Section>
 
-			<Section name="Font">
+			<Section name={localize("Font")}>
 				<FontPicker
 					value={props.segment.fontFamily ?? "sans-serif"}
 					onChange={(family) =>
@@ -691,7 +693,7 @@ export function TextSegmentConfig(props: {
 					</Field>
 					<Field
 						inline
-						name="Line height"
+						name={localize("Line height")}
 						value={clampNumber(props.segment.lineHeight ?? 1.2, 0.8, 2).toFixed(
 							2,
 						)}
@@ -710,7 +712,7 @@ export function TextSegmentConfig(props: {
 					</Field>
 					<Field
 						inline
-						name="Letter spacing"
+						name={localize("Letter spacing")}
 						value={`${clampNumber(
 							props.segment.letterSpacing ?? 0,
 							-2,
@@ -733,7 +735,7 @@ export function TextSegmentConfig(props: {
 				</div>
 			</Section>
 
-			<Section name="Look">
+			<Section name={localize("Look")}>
 				<Field name={localize("Color")}>
 					<HexColorInput
 						value={props.segment.color}
@@ -802,7 +804,7 @@ export function TextSegmentConfig(props: {
 				<div class="flex flex-col">
 					<Field
 						inline
-						name="Outline"
+						name={localize("Outline")}
 						value={`${clampNumber(
 							props.segment.strokeWidth ?? 0,
 							0,
@@ -852,7 +854,7 @@ export function TextSegmentConfig(props: {
 					</Field>
 					<Field
 						inline
-						name="Glow"
+						name={localize("Glow")}
 						value={`${Math.round(clampNumber(props.segment.glow ?? 0, 0, 1) * 100)}%`}
 					>
 						<Slider
@@ -888,7 +890,7 @@ export function TextSegmentConfig(props: {
 			</Section>
 
 			<Section
-				name="Animation"
+				name={localize("Animation")}
 				action={
 					<Segmented
 						ariaLabel="Animation edge"
@@ -903,7 +905,7 @@ export function TextSegmentConfig(props: {
 						{(option) => (
 							<AnimationTile
 								value={option.value}
-									label={localize(option.label)}
+								label={localize(option.label)}
 								active={edgeAnimation() === option.value}
 								onSelect={() => setEdgeAnimation(option.value)}
 							/>
@@ -956,7 +958,7 @@ export function TextSegmentConfig(props: {
 				<Show when={layout() !== "overlay"}>
 					<Field
 						inline
-						name="Screen transition"
+						name={localize("Screen transition")}
 						value={`${clampNumber(
 							props.segment.layoutTransition ?? 0.5,
 							0.1,
