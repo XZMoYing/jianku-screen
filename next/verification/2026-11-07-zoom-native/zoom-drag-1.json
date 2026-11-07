@@ -1,0 +1,19 @@
+{
+  "before": [],
+  "after": [
+    {
+      "start": 1.4244561479154476,
+      "end": 3.5269744474216433,
+      "attachment": {
+        "kind": "timeline",
+        "id": "overlay-66344653-0108-4e18-892b-5f7acd0cfb5f"
+      },
+      "amount": 1.5,
+      "mode": "auto",
+      "glideDirection": "none",
+      "glideSpeed": 0.5,
+      "instantAnimation": false,
+      "edgeSnapRatio": 0.25
+    }
+  ]
+}

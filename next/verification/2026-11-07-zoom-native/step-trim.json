@@ -1,0 +1,15 @@
+{
+  "step": "trim",
+  "count": 1,
+  "segments": [
+    {
+      "start": 1.95,
+      "end": 4.326,
+      "amount": 1.5,
+      "attachment": {
+        "kind": "timeline",
+        "id": "overlay-66344653-0108-4e18-892b-5f7acd0cfb5f"
+      }
+    }
+  ]
+}

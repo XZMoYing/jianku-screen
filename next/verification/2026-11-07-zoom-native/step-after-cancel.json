@@ -1,0 +1,14 @@
+{
+  "step": "after-cancel",
+  "count": 2,
+  "segments": [
+    {
+      "start": 2.476,
+      "end": 4.578
+    },
+    {
+      "start": 5.104,
+      "end": 6.104
+    }
+  ]
+}
