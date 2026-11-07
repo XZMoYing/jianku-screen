@@ -101,3 +101,16 @@
 - 预览探针：打开 red 工程，编辑器预览画面中心仍为 **(232,0,2)**，与 alpha.98 相同，**未随 yuv420p_to_rgba 着色器修改而变化**。
 - 安装包主程序二进制包含两份新系数 `1.7926`（nv12_to_rgba 与 yuv420p_to_rgba），确认修改已编入；因此预览路径**没有使用这两个 shader**（候选：`decoder/frame_converter.rs` 的 ffmpeg sws RGBA 转换默认 BT.601、平台硬件解码输出 BGRA、或另一处 CPU yuv→RGBA 未更新）。
 - 新增 U11a2c：定位预览实际解码→RGBA 路径并统一到 BT.709 limited，验证预览≈252、与导出 251 一致；U11a2b（硬件导出）已关闭，U11a2/U11a 保持开放。
+
+## 结论更正：预览颜色测量方法（U11a2c 关闭）
+
+- 此前用自建 `CGWindowListCreateImage` 工具读到的预览红 **232** 是**颜色空间误读**：系统截图为 **Display P3**（`sips -g profile` 确认），自建工具把 P3 数值当 sRGB 比较。
+- 改用 `screencapture -l <window> -x` + `sips --matchTo "sRGB Profile.icc"` 转 sRGB 后重测：
+
+| 内容 | 源 sRGB | 预览 sRGB（alpha.99） | 安装包导出 sRGB |
+| --- | --- | --- | --- |
+| red（BT.709 源） | 252,0,0 | **253,2,0** | **251,0,0** |
+| red（BT.601 标记源） | 252,0,0 | 255,24,0 | — |
+
+- 结论：alpha.99 对标准 BT.709 内容**预览与导出、源三者一致**（≤2/255）；此前“预览 232/色偏”判断撤回，不是产品缺陷。601 标记内容按固定 709 解码（非 709 导入限制，记入 U11a3）。
+- U11a/U11a2/U11a2b/U11a2c 关闭；残余（gray B -4、非 709 导入、10bit/HDR/透明窗/广色域）转入 U11a3。证据 `syscap-red709-srgb.png`、`syscap601-srgb.png`、`preview-color-corrected.json`。

@@ -1,0 +1,42 @@
+{
+  "appVersion": "0.2.0-alpha.99",
+  "correction": "此前用自建 CGWindowListCreateImage 工具测得预览红 232 是颜色空间误读：系统截图为 Display P3（profile=Display P3），自建工具未做 P3→sRGB 转换。改用 screencapture -l + sips --matchTo sRGB 后重测。",
+  "measurements": {
+    "red709-source": {
+      "sourceRGB": [
+        252,
+        0,
+        0
+      ],
+      "previewSRGB": [
+        253,
+        2,
+        0
+      ],
+      "installedExportRGB": [
+        251,
+        0,
+        0
+      ]
+    },
+    "red601-source": {
+      "sourceRGB": [
+        252,
+        0,
+        0
+      ],
+      "previewSRGB": [
+        255,
+        24,
+        0
+      ],
+      "note": "601-tag 内容按固定 709 解码，预览略有色偏（非 709 导入限制）"
+    }
+  },
+  "conclusion": "alpha.99 对标准 BT.709 内容：预览 sRGB (253,2,0) ≈ 源 252,0,0 ≈ 安装包导出 251,0,0，预览与导出一致；U11a2c 的白屏(色偏)判断撤回，属于测量方法错误，不是产品缺陷。非 709（601 标记）导入内容仍按 709 解码，属已知固定矩阵限制。",
+  "residual": [
+    "gray 导出 B 通道约 -4/255（导出路径色度舍入）",
+    "非 709 导入内容与外部播放器矩阵不同",
+    "10bit/HDR/透明窗/广色域未覆盖"
+  ]
+}
