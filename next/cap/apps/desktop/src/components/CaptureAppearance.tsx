@@ -108,7 +108,7 @@ export default function CaptureAppearance(props: {
 		} catch (e) {
 			if (!disposed) {
 				setError(String(e));
-				toast.error("画面设置未保存，请重试");
+				toast.error(localize("画面设置未保存，请重试"));
 			}
 		} finally {
 			writing = false;
@@ -164,7 +164,7 @@ export default function CaptureAppearance(props: {
 				when={style()}
 				fallback={
 					<div class="jk-appearance-controls">
-						{error() || "正在载入画面设置…"}
+						{error() || localize("正在载入画面设置…")}
 					</div>
 				}
 			>
@@ -353,10 +353,10 @@ export default function CaptureAppearance(props: {
 						<div class="jk-appearance-state" role="status">
 							<span>
 								{error()
-									? "保存失败"
+									? localize("保存失败")
 									: saving()
-										? "正在保存…"
-										: "新捕获使用此设置"}
+										? localize("正在保存…")
+										: localize("新捕获使用此设置")}
 							</span>
 							<span>{localize("录后仍可修改")}</span>
 						</div>

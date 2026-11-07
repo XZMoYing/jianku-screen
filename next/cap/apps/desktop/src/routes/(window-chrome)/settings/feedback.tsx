@@ -430,7 +430,9 @@ export default function FeedbackTab() {
 												}`}
 											>
 												{localize("Screen Capture:")}{" "}
-												{captureSupported ? "Supported" : "Not Supported"}
+												{captureSupported
+													? localize("Supported")
+													: localize("Not Supported")}
 											</span>
 										</div>
 									</div>

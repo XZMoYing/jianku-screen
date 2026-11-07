@@ -1,0 +1,62 @@
+{
+  "before": {
+    "candidates": 2432,
+    "actionableCallsiteReview": 99,
+    "dictionaryKeys": {
+      "zh-CN": 1679,
+      "en": 1733
+    },
+    "placeholderMismatches": 0
+  },
+  "after": {
+    "candidates": 2431,
+    "actionableCallsiteReview": 64,
+    "dictionaryKeys": {
+      "zh-CN": 1693,
+      "en": 1745
+    },
+    "placeholderMismatches": 0
+  },
+  "localizedThisBatch": [
+    "components/CaptureAppearance.tsx：画面设置未保存，请重试／正在载入画面设置…／保存失败／正在保存…／新捕获使用此设置",
+    "new-main/SystemAudio.tsx：系统声音／已开启／已关闭",
+    "new-main/index.tsx：正在打开…／打开工程",
+    "onboarding.tsx：已开启／开启／系统权限未授权的整句提示",
+    "settings/EditorShortcutSettings.tsx：编辑器快捷键标题与说明",
+    "settings/changelog.tsx：Failed to fetch changelog",
+    "settings/feedback.tsx：Supported／Not Supported",
+    "settings/integrations/index.tsx：Managed by your organization／Configure",
+    "settings/integrations/google-drive-config.tsx：Active for new uploads／Connected but not active／Not connected／Refreshing...／Refresh",
+    "settings/integrations/s3-config.tsx：Removing...／Remove Config／Testing...／Test Connection",
+    "settings/transcription.tsx：item／items",
+    "routes/editor/CaptionsRegenerateBadge.tsx 与 Timeline/index.tsx：No captions were generated... 统一走 localize",
+    "routes/editor/Editor.tsx：工程正在保存，请稍后再关闭窗口"
+  ],
+  "dictionaryAdded": {
+    "zh-CN": 14,
+    "en": 12,
+    "existingSkipped": {
+      "zh-CN": [
+        "Not connected",
+        "Removing...",
+        "No captions were generated..."
+      ],
+      "en": [
+        "正在保存…",
+        "编辑器快捷键",
+        "仅在编辑器内生效..."
+      ]
+    }
+  },
+  "verification": {
+    "i18nTests": "3 passed",
+    "tsc": "exit 0",
+    "biome": "15 files, fixed 4",
+    "auditRerun": "exit 0"
+  },
+  "notCovered": [
+    "运行包实际页面中英切换与视觉核对（需下一阶段包 alpha.92）",
+    "剩余 64 条 actionable 候选中多为技术格式/占位符/品牌名，需逐条语义复核",
+    "原生菜单与动态字符串不在本审计范围"
+  ]
+}

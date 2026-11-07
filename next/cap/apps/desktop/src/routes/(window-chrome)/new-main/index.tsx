@@ -3093,7 +3093,7 @@ function Page() {
 						onClick={() => void openProjectPicker()}
 					>
 						<IconLucideFolderOpen />
-						{openingProject() ? "正在打开…" : "打开工程"}
+						{openingProject() ? localize("正在打开…") : localize("打开工程")}
 					</button>
 					<button
 						type="button"

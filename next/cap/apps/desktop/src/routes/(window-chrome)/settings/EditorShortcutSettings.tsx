@@ -116,8 +116,8 @@ export function EditorShortcutSettings(props: { globalBindings: Hotkey[] }) {
 
 	return (
 		<Section
-			title="编辑器快捷键"
-			description="仅在编辑器内生效。每套预设分别保留你的改键。"
+			title={localize("编辑器快捷键")}
+			description={localize("仅在编辑器内生效。每套预设分别保留你的改键。")}
 		>
 			<Show when={settings.data && bindings()}>
 				{(keys) => (

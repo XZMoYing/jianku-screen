@@ -147,14 +147,18 @@ export default function OnboardingPage() {
 									<Show when={permitted(permission.key)}>
 										<IconCheck class="size-4" />
 									</Show>
-									{permitted(permission.key) ? "已开启" : "开启"}
+									{permitted(permission.key)
+										? localize("已开启")
+										: localize("开启")}
 								</Button>
 							</div>
 						)}
 					</For>
 				</div>
 				<div class="jk-guide-hint">
-					若系统中已开启但仍提示未授权，请在系统设置中关闭再开启该权限，然后重新启动应用。
+					{localize(
+						"若系统中已开启但仍提示未授权，请在系统设置中关闭再开启该权限，然后重新启动应用。",
+					)}
 				</div>
 				<Show when={error()}>
 					<p role="alert" class="jk-guide-error">

@@ -1677,5 +1677,19 @@
 	"Not enough room to change this transition": "空隙不足，无法调整这个转场。",
 	"Could not cut this range without moving other clips": "无法在保持其他片段位置的情况下剪除这段画面。",
 	"Remove the transition before merging these clips": "请先移除两个片段之间的转场，再合并。",
-	"Match the clip speeds first": "请先统一片段速度"
+	"Match the clip speeds first": "请先统一片段速度",
+	"Active for new uploads": "新上传生效",
+	"Connected but not active": "已连接但未启用",
+	"Refreshing...": "正在刷新…",
+	"Refresh": "刷新",
+	"Remove Config": "移除配置",
+	"Testing...": "正在测试…",
+	"Test Connection": "测试连接",
+	"Supported": "支持",
+	"Not Supported": "不支持",
+	"Managed by your organization": "由你的组织管理",
+	"Configure": "配置",
+	"Failed to fetch changelog": "无法获取更新日志",
+	"item": "项",
+	"items": "项"
 }

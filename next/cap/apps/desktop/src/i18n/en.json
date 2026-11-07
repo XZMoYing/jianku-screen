@@ -1731,5 +1731,17 @@
 	"预览画面": "Preview canvas",
 	"删除此片段": "Delete this segment",
 	"时间线吸附": "Timeline snapping",
-	"按住 Alt 临时绕过": "Hold Alt to temporarily bypass"
+	"按住 Alt 临时绕过": "Hold Alt to temporarily bypass",
+	"画面设置未保存，请重试": "Screen settings weren't saved. Try again.",
+	"正在载入画面设置…": "Loading screen settings...",
+	"保存失败": "Save failed",
+	"新捕获使用此设置": "New captures use this setting",
+	"系统声音": "System audio",
+	"已开启": "On",
+	"已关闭": "Off",
+	"正在打开…": "Opening...",
+	"打开工程": "Open project",
+	"开启": "Enable",
+	"若系统中已开启但仍提示未授权，请在系统设置中关闭再开启该权限，然后重新启动应用。": "If the permission already looks enabled in System Settings but the app still reports it as unauthorized, turn it off and on again there, then restart the app.",
+	"工程正在保存，请稍后再关闭窗口": "The project is still saving; wait a moment before closing the window."
 }

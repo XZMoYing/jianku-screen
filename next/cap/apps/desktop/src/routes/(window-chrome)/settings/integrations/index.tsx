@@ -139,10 +139,10 @@ export default function AppsTab() {
 											onClick={() => handleAppClick(app)}
 										>
 											{managedByOrganization()
-												? "Managed by your organization"
+												? localize("Managed by your organization")
 												: app.pro && !isPro()
 													? localize("Upgrade to Pro")
-													: "Configure"}
+													: localize("Configure")}
 										</Button>
 									</div>
 									<p class="text-xs leading-snug text-gray-10">

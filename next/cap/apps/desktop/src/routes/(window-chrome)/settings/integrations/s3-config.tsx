@@ -252,14 +252,18 @@ export default function S3ConfigPage() {
 									variant="destructive"
 									onClick={() => deleteConfig.mutate()}
 								>
-									{deleteConfig.isPending ? "Removing..." : "Remove Config"}
+									{deleteConfig.isPending
+										? localize("Removing...")
+										: localize("Remove Config")}
 								</Button>
 							)}
 							<Button
 								variant="gray"
 								onClick={() => testConfig.mutate(s3Config())}
 							>
-								{testConfig.isPending ? "Testing..." : "Test Connection"}
+								{testConfig.isPending
+									? localize("Testing...")
+									: localize("Test Connection")}
 							</Button>
 						</div>
 						<Button

@@ -33,7 +33,9 @@ export function CaptionsRegenerateBadge(props: { class?: string }) {
 			);
 			if (result.segments.length < 1) {
 				toast.error(
-					"No captions were generated. The audio might be too quiet or unclear.",
+					localize(
+						"No captions were generated. The audio might be too quiet or unclear.",
+					),
 				);
 				return;
 			}

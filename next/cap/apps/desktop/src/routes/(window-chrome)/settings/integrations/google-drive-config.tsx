@@ -314,9 +314,9 @@ export default function GoogleDriveConfigPage() {
 											<p class="text-xs leading-snug text-gray-10">
 												{isConnected()
 													? isActive()
-														? "Active for new uploads"
-														: "Connected but not active"
-													: "Not connected"}
+														? localize("Active for new uploads")
+														: localize("Connected but not active")
+													: localize("Not connected")}
 											</p>
 										</div>
 										<Button
@@ -324,7 +324,9 @@ export default function GoogleDriveConfigPage() {
 											disabled={busy()}
 											onClick={() => refetch()}
 										>
-											{isRefreshing() ? "Refreshing..." : "Refresh"}
+											{isRefreshing()
+												? localize("Refreshing...")
+												: localize("Refresh")}
 										</Button>
 									</div>
 

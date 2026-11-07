@@ -530,7 +530,7 @@ function Inner(props: {
 			if (allowExportClose) return;
 			if (projectBusy()) {
 				event.preventDefault();
-				toast.error("工程正在保存，请稍后再关闭窗口");
+				toast.error(localize("工程正在保存，请稍后再关闭窗口"));
 				return;
 			}
 

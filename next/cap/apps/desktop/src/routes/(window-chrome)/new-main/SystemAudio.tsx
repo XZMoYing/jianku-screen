@@ -3,6 +3,7 @@ import { cx } from "cva";
 import type { Component, ComponentProps, JSX } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
+import { t as localize } from "~/utils/i18n";
 import {
 	createCurrentRecordingQuery,
 	isSystemAudioSupported,
@@ -64,15 +65,15 @@ export function SystemAudioToggleRoot(
 			aria-pressed={rawOptions.captureSystemAudio ? "true" : "false"}
 		>
 			{props.icon}
-			<p class={DEVICE_ROW_LABEL_CLASS}>
-				{rawOptions.captureSystemAudio ? "系统声音" : "系统声音"}
-			</p>
+			<p class={DEVICE_ROW_LABEL_CLASS}>{localize("系统声音")}</p>
 			<div class={DEVICE_ROW_TRAILING_CLASS}>
 				<Dynamic
 					component={props.PillComponent}
 					variant={rawOptions.captureSystemAudio ? "blue" : "gray"}
 				>
-					{rawOptions.captureSystemAudio ? "已开启" : "已关闭"}
+					{rawOptions.captureSystemAudio
+						? localize("已开启")
+						: localize("已关闭")}
 				</Dynamic>
 			</div>
 		</button>

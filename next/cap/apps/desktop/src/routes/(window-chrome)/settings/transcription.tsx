@@ -179,7 +179,8 @@ function Inner(props: { initialStore: GeneralSettingsStore | null }) {
 						title={localize("Active hints")}
 						right={
 							<span class="text-xs text-gray-10">
-								{hints().length} {hints().length === 1 ? "item" : "items"}
+								{hints().length}{" "}
+								{hints().length === 1 ? localize("item") : localize("items")}
 							</span>
 						}
 					>

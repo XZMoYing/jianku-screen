@@ -34,7 +34,7 @@ export default function Page() {
 								<div class="text-(--text-primary) font-medium">
 									{changelog.error instanceof Error
 										? changelog.error.message
-										: "Failed to fetch changelog"}
+										: localize("Failed to fetch changelog")}
 								</div>
 							}
 						>
