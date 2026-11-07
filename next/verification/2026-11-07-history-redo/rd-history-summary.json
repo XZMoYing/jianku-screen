@@ -1,0 +1,84 @@
+{
+  "headerButtons": {
+    "undo": {
+      "x": 1031,
+      "y": 37
+    },
+    "redo": {
+      "x": 1063,
+      "y": 37
+    }
+  },
+  "observations": [
+    {
+      "step": "baseline",
+      "undoEnabled": true,
+      "redoEnabled": false,
+      "note": "打开工程后历史为空也应禁用；实测 undo=1，可能加载/迁移产生初始历史"
+    },
+    {
+      "step": "trim-right",
+      "segments": [
+        [
+          0.0,
+          7.264
+        ]
+      ],
+      "undoEnabled": true,
+      "redoEnabled": true
+    },
+    {
+      "step": "ax-press-undo",
+      "segments": [
+        [
+          0.0,
+          8.0
+        ]
+      ],
+      "note": "AXPress 头部撤销按钮后配置回退"
+    },
+    {
+      "step": "ax-press-redo",
+      "segments": [
+        [
+          0.0,
+          7.264
+        ]
+      ],
+      "note": "AXPress 头部重做按钮恢复裁剪"
+    },
+    {
+      "step": "ax-press-redo-again",
+      "segments": [
+        [
+          0.0,
+          7.264
+        ]
+      ],
+      "redoEnabled": false,
+      "note": "无可重做步骤时不变化"
+    },
+    {
+      "step": "shortcut-redo-with-timeline-focus",
+      "segments": [
+        [
+          0.0,
+          7.264
+        ]
+      ],
+      "note": "从 8.0 出发，Cmd+Shift+Z 在点击时间线后恢复裁剪"
+    },
+    {
+      "step": "shortcut-undo-after-redo",
+      "segments": [
+        [
+          0.0,
+          7.264
+        ]
+      ],
+      "note": "随后 Cmd+Z 未回退；焦点/处理器差异未定位"
+    }
+  ],
+  "setup": "alpha.91 安装版；夹具 主轨重做验收.jks；主轨右手柄 (1643,701)->(1503,701) 裁剪后保存",
+  "windowId": 25609
+}
