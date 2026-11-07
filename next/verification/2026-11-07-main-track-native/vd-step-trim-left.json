@@ -1,0 +1,12 @@
+{
+  "step": "trim-left",
+  "count": 1,
+  "segments": [
+    {
+      "start": 0.499,
+      "end": 7.264,
+      "timescale": 1.0,
+      "clip": 0
+    }
+  ]
+}

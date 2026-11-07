@@ -1,0 +1,10 @@
+{
+  "step": "trim-left-2",
+  "count": 1,
+  "segments": [
+    {
+      "start": 0.499,
+      "end": 7.264
+    }
+  ]
+}

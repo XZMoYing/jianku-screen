@@ -1,0 +1,18 @@
+{
+  "step": "undo-split",
+  "count": 2,
+  "segments": [
+    {
+      "start": 0.499,
+      "end": 2.483,
+      "timescale": 1.0,
+      "clip": 0
+    },
+    {
+      "start": 2.483,
+      "end": 7.264,
+      "timescale": 1.0,
+      "clip": 0
+    }
+  ]
+}
