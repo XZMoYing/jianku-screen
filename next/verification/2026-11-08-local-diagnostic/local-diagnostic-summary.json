@@ -1,0 +1,50 @@
+{
+  "appVersion": "0.2.0-alpha.99",
+  "flow": "设置→反馈→开始诊断（确认对话框）→等待报告→显示文件",
+  "report": {
+    "file": "cap-diagnostic-20261108-044242.json",
+    "bytes": 4263,
+    "generatedAt": "2026-11-07T20:42:42.446642+00:00",
+    "keys": [
+      "app",
+      "audioDeviceProbe",
+      "audioOutputs",
+      "cameras",
+      "displays",
+      "generatedAt",
+      "hardware",
+      "matrixHints",
+      "microphones",
+      "permissions",
+      "recentRecordings",
+      "reportId",
+      "schemaVersion",
+      "settings",
+      "storage",
+      "syncTestError",
+      "system"
+    ]
+  },
+  "fields": {
+    "audioDeviceProbe": "timed_out",
+    "permissions": {
+      "accessibility": "denied",
+      "camera": "not_requested",
+      "microphone": "not_requested",
+      "screenRecording": "denied"
+    },
+    "syncTestError": "Screen recording permission is required to run the sync test.",
+    "cameraCount": 1,
+    "microphoneCount": 0,
+    "audioOutputCount": 0
+  },
+  "timing": "点击开始诊断后约 5 秒内生成报告（含 4 秒音频探测超时），UI 显示同步测试因屏幕录制权限缺失而跳过并提示“报告中仍包含系统信息”，未观察到界面卡死。",
+  "reveal": "「显示文件」AXPress 成功；随后前台应用为 Jianku/通知中心，未能在应用窗口工具中确认 Finder 定位结果（未截屏核验），记为未完全验证。",
+  "conclusion": "U10b3b 的“本地报告设备探测卡住”已由隔离线程+4s 超时控制：本环境下 audioDeviceProbe=timed_out（CoreAudio 枚举仍可能卡住），但报告在约 5 秒内正常生成、UI 不阻塞；麦克风/音频输出列表为空、摄像头 1 项，同步测试因屏幕权限拒绝被安全跳过。",
+  "notCovered": [
+    "屏幕录制权限授予后的同步数值（U10b3b3，TCC 无条目）",
+    "报告“显示文件”在 Finder 的最终定位（未截屏核验）",
+    "历史文件读取/上传边界（U10b3/U10b）",
+    "不同硬件/权限组合"
+  ]
+}

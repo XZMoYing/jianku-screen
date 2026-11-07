@@ -44,6 +44,8 @@
 
 2026-11-08 色彩附件变体：仅 YCbCrMatrix 709 会让 gray 变暗（112,115,112）；完整 matrix+primaries+transfer 最优（gray 124,126,123，B 残余 -4）。已回退仅矩阵实验；gray B -4/非 709/10bit/HDR/透明窗仍归 U11a3。证据 next/verification/2026-11-08-color-contract/attachment-variant-summary.json。
 
+2026-11-08 alpha.99 本地诊断报告：开始诊断约 5 秒生成报告，audioDeviceProbe timed_out 但被 4s 超时隔离、UI 不阻塞；权限 denied 时同步测试跳过并提示。U10b3b 关闭，同步数值仍待屏幕权限（U10b3b3）。证据 next/verification/2026-11-08-local-diagnostic。
+
 2026-11-07 alpha.89 已安装，88 回滚（诊断报告改用安装包版本，实际报告 app.version=0.2.0-alpha.89）。证据 next/verification/2026-11-07-alpha89。缩放轨、按键轨、3D 轨、样式轨、图片轨、文字轨、遮罩轨与音频轨原生交互在 alpha.89 实际包通过（创建／移动／两端裁剪／撤销／取消／保存重开／播放；文字遮罩起点裁剪受 1s 最小时长钳制，先拉长后可缩），证据 next/verification/2026-11-07-zoom-native、2026-11-07-keyboard-native、2026-11-07-3d-native、2026-11-07-style-image-native、2026-11-07-text-mask-native、2026-11-07-audio-native。U22c2b4a 已定位为左缘 1px 边界命中、非缺陷（text-start-handle-probe）。
 
 2026-11-07 alpha.88 已安装，87 回滚。同步诊断权限预检实机通过：录屏权限 denied 时报告正常生成、记录安全失败原因，界面显示中文提示；数值同步仍因本应用未获屏幕录制权限而阻塞（未改系统隐私设置）。另发现诊断报告 app.version 仍是 0.6.0，列 U10b3d。证据 next/verification/2026-11-07-alpha88。冷启动／运行中携带 .jks 四条入口在 alpha.88 通过（含默认处理器与双文件），证据 next/verification/2026-11-07-cold-open。
@@ -482,7 +484,7 @@
 - [x] U10b2 本地报告按设备编号、路径汇总和同步测试结构化测量生成，原始子进程错误和 stderr 不进入应用报告。合成测试与编译通过。
 - [ ] U10b3 在包含 U10a/U10b 的实际包使用合成语音和同步测试核对日志、报告和窗口；历史文件不读取、不上传。
 - [x] U10b3a alpha.86 合成语音 4 段，新增 42 条字幕日志无短句或源路径。
-- [ ] U10b3b 本地报告设备探测卡住。alpha.86 实际同步诊断进入系统信息收集后无报告，采样阻在 CPAL/CoreAudio 麦克风能力；隔离或限制探测后重验。
+- [x] U10b3b 本地报告设备探测卡住。alpha.86 实际同步诊断进入系统信息收集后无报告，采样阻在 CPAL/CoreAudio 麦克风能力；隔离或限制探测后重验。alpha.99 实包：设置→反馈→开始诊断→确认；约 5 秒生成报告（4263B），audioDeviceProbe=timed_out（隔离线程+4s 超时生效，报告不再阻塞），permissions screenRecording=denied，syncTestError 指明需屏幕权限，同步测试安全跳过；microphones/audioOutputs 空、cameras 1；UI 无卡死。显示文件 AXPress 成功但 Finder 定位未截屏核验。关闭 U10b3b；同步数值仍归 U10b3b3（TCC 无条目）。证据 next/verification/2026-11-08-local-diagnostic。
 - [x] U10b3b1 Tauri 音频设备探测限时与防积累，报告继续并标状态。合成阻塞、恢复与编译通过。
 - [x] U10b3b2 alpha.87 实际音频探测超时，报告继续生成并标明状态，设备与路径字段脱敏通过。
 - [ ] U10b3b3 alpha.87 同步两类录制均 inconclusive，无偏移数值。区分失败阶段并在可用捕获环境重验数值，同时保留隐私保护。alpha.88 实测：权限不足路径通过（报告生成、同步被安全跳过、中文提示），但 TCC 无本应用 ScreenCapture 条目，数值未取得；需用户授予屏幕录制权限后（ad-hoc 重打包可能需重新授权）再验，未改系统权限。alpha.89 复测仍 denied；本轮 audioDeviceProbe 为 timed_out（88 曾 complete），探测状态有运行间差异。
