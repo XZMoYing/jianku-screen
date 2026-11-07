@@ -1,0 +1,4 @@
+7d40312545f103af55699220c65d090e46960bafa290460fe8d7742be8c9c5f1  字幕导出验收.jks/content/display.mp4
+7d40312545f103af55699220c65d090e46960bafa290460fe8d7742be8c9c5f1  /private/tmp/便携副本验收.jks/content/display.mp4
+a2299e048f004fa84ac3602d5b6aa680baecff30200d269550da02539f52ddae  字幕导出验收.jks/content/speech.wav
+a2299e048f004fa84ac3602d5b6aa680baecff30200d269550da02539f52ddae  /private/tmp/便携副本验收.jks/content/speech.wav

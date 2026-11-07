@@ -4,6 +4,8 @@
 
 2026-11-07 alpha.91 实际包 SRT 导出通过（含编辑后计时），证据 next/verification/2026-11-07-srt-export。
 
+2026-11-07 alpha.91 实际包项目便携副本通过（自包含、无绝对路径、源工程未变、副本可打开），证据 next/verification/2026-11-07-portable-copy。
+
 2026-11-07 alpha.89 已安装，88 回滚（诊断报告改用安装包版本，实际报告 app.version=0.2.0-alpha.89）。证据 next/verification/2026-11-07-alpha89。缩放轨、按键轨、3D 轨、样式轨、图片轨、文字轨、遮罩轨与音频轨原生交互在 alpha.89 实际包通过（创建／移动／两端裁剪／撤销／取消／保存重开／播放；文字遮罩起点裁剪受 1s 最小时长钳制，先拉长后可缩），证据 next/verification/2026-11-07-zoom-native、2026-11-07-keyboard-native、2026-11-07-3d-native、2026-11-07-style-image-native、2026-11-07-text-mask-native、2026-11-07-audio-native。U22c2b4a 已定位为左缘 1px 边界命中、非缺陷（text-start-handle-probe）。
 
 2026-11-07 alpha.88 已安装，87 回滚。同步诊断权限预检实机通过：录屏权限 denied 时报告正常生成、记录安全失败原因，界面显示中文提示；数值同步仍因本应用未获屏幕录制权限而阻塞（未改系统隐私设置）。另发现诊断报告 app.version 仍是 0.6.0，列 U10b3d。证据 next/verification/2026-11-07-alpha88。冷启动／运行中携带 .jks 四条入口在 alpha.88 通过（含默认处理器与双文件），证据 next/verification/2026-11-07-cold-open。
@@ -460,7 +462,7 @@
 每项可按实际差距拆分，仍须保留原验收要求。当前待验证台账见 `docs/待验证项目交接.md`；正式发布门槛见 `docs/首个正式版发布计划.md`。用户没有授权降低视觉效果、跳过未知风险或将未测平台写成稳定支持。
 
 - [x] U25a 字幕工程路径源码：共享后缀处理本平台尾分隔符；本地.jks/.cap标准字幕入工程，旧去后缀/点/部分后缀路径只读兼容，普通ID缓存保持；save/load/SRT同路由。7新/166模型、fmt、两相关crate release check通过，不改Tauri绑定签名。
-- [ ] U25b 后续合包验实际字幕保存重开、旧外置字幕兼容、SRT和项目便携复制；冻结56不含U25a，模型文件路由不等于字幕GUI/时间轴/导出内容全部通过。alpha.89 实际包发现：字幕轨计时拖动／裁剪在会话内生效、保存后文件也保留，但工程重开即回退——captionSegments 是 captions.segments 源时间母版的派生投影（synchronize_captions／deriveCaptionTrackSegments），拖动只写 timeline.captionSegments 未回写母版；alpha.91 已修复并通过实际包重开验收（U25b1）。alpha.91 实际包 SRT 导出一致性通过：字幕面板「SRT」→原生保存面板保存两份，基线 4 条 cue 的时间/文本正确；真实拖动第 3 条字幕到 5.157–6.747 后再导出，SRT 第 3 条同步为 00:00:05,157 --> 00:00:06,747（使用编辑后计时），证据 next/verification/2026-11-07-srt-export。剩余：VTT、旧外置字幕兼容、项目便携复制及真实工程转场/变速/空隙组合。
+- [ ] U25b 后续合包验实际字幕保存重开、旧外置字幕兼容、SRT和项目便携复制；冻结56不含U25a，模型文件路由不等于字幕GUI/时间轴/导出内容全部通过。alpha.89 实际包发现：字幕轨计时拖动／裁剪在会话内生效、保存后文件也保留，但工程重开即回退——captionSegments 是 captions.segments 源时间母版的派生投影（synchronize_captions／deriveCaptionTrackSegments），拖动只写 timeline.captionSegments 未回写母版；alpha.91 已修复并通过实际包重开验收（U25b1）。alpha.91 实际包 SRT 导出一致性通过：字幕面板「SRT」→原生保存面板保存两份，基线 4 条 cue 的时间/文本正确；真实拖动第 3 条字幕到 5.157–6.747 后再导出，SRT 第 3 条同步为 00:00:05,157 --> 00:00:06,747（使用编辑后计时），证据 next/verification/2026-11-07-srt-export。剩余：VTT、旧外置字幕兼容、含外置素材的便携副本路径重写及真实工程转场/变速/空隙组合。alpha.91 实际包便携副本通过：Cmd+Shift+S→保存面板改名保存，副本自包含 content/assets/screenshots、无绝对路径、时间线与字幕（含编辑后 5.157–6.747）一致、两份媒体 SHA-256 相同、源工程配置未变，副本可在应用中打开（便携副本验收窗口），证据 next/verification/2026-11-07-portable-copy。
 - [x] U25b1 字幕轨计时编辑持久化：拖动／两端裁剪后用现有映射把输出时间反算回源时间并写回 captions.segments（含 words 起点重基），或提供明确「脱离源计时」动作后置 sourceTimed=false；覆盖转场／变速／空隙／全屏文字暂停窗，回归移动与裁剪保存重开后保持且不破坏文本、words、override。修复后需完整包复验，不能只靠组件测试。结果：34e62e5 新增 applyEditedCaptionTimingToMaster（mapEditedTimeToSource 反算、移动平移 words、裁剪夹取、hold 窗处理，无法映射返回 null），CaptionsTrack 在 release/history 内回写母版；183d3c5 补齐词边界一致（外扩时同步首末词，裁剪后无词时补覆盖词）。captions.ts 18 项单测、tsc、Biome 通过。alpha.91（d0a628c）三处验签/六 hash 并安装：移动 4.92–6.51→5.157–6.747、末尾裁剪 6.888、起点裁剪 5.298，轨道与母版始终一致，关闭重开后全部保留、文本与其他字幕不变。未覆盖：真实工程转场/变速/空隙/暂停窗与拆分子幕的原生组合，SRT/便携/旧外置字幕仍属 U25b。证据 next/verification/2026-11-07-alpha91-caption-persistence。
 
 - [x] U22c2b9c 56原生停止条件取证：raw/clean两次buttons1且对象/模式/时长/焦点正常，首move后比例非有限触发invalid；已保存数字证据、还原示例、退出并清除本轮标记。

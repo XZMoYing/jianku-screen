@@ -1,0 +1,11 @@
+assets/current-desktop-background-2e6e852a-fd4e-4253-a593-cb05181e0982.jpg
+assets/current-desktop-background-891c7c34-f6c2-4685-b201-b22917f04eff.jpg
+assets/current-desktop-background-a88b14c6-8276-4978-8f06-5a81f429ec87.jpg
+assets/current-desktop-background-a9abd2bf-838b-4b28-9c85-84f6cd037a08.jpg
+assets/current-desktop-background-ca60354a-8bc5-460d-9b84-9df84e9aeef0.jpg
+content/display.mp4
+content/speech.wav
+project-config.json
+recording-meta.json
+screenshots/preview-config.json
+screenshots/preview.jpg

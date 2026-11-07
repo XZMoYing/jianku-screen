@@ -1,0 +1,83 @@
+{
+  "source": {
+    "captions": [
+      [
+        0.0,
+        1.79
+      ],
+      [
+        2.09,
+        4.92
+      ],
+      [
+        5.157,
+        6.747
+      ],
+      [
+        7.37,
+        8.0
+      ]
+    ],
+    "segments": [
+      [
+        0.0,
+        8.0
+      ]
+    ]
+  },
+  "copy": {
+    "captions": [
+      [
+        0.0,
+        1.79
+      ],
+      [
+        2.09,
+        4.92
+      ],
+      [
+        5.157,
+        6.747
+      ],
+      [
+        7.37,
+        8.0
+      ]
+    ],
+    "segments": [
+      [
+        0.0,
+        8.0
+      ]
+    ]
+  },
+  "timelineEqual": true,
+  "absolutePathRefsInCopyConfigs": [],
+  "copyFolder": "/private/tmp/便携副本验收.jks",
+  "copyFileTree": [
+    "assets/current-desktop-background-2e6e852a-fd4e-4253-a593-cb05181e0982.jpg",
+    "assets/current-desktop-background-891c7c34-f6c2-4685-b201-b22917f04eff.jpg",
+    "assets/current-desktop-background-a88b14c6-8276-4978-8f06-5a81f429ec87.jpg",
+    "assets/current-desktop-background-a9abd2bf-838b-4b28-9c85-84f6cd037a08.jpg",
+    "assets/current-desktop-background-ca60354a-8bc5-460d-9b84-9df84e9aeef0.jpg",
+    "content/display.mp4",
+    "content/speech.wav",
+    "project-config.json",
+    "recording-meta.json",
+    "screenshots/preview-config.json",
+    "screenshots/preview.jpg"
+  ],
+  "mediaHashes": [
+    "7d40312545f103af55699220c65d090e46960bafa290460fe8d7742be8c9c5f1  字幕导出验收.jks/content/display.mp4",
+    "7d40312545f103af55699220c65d090e46960bafa290460fe8d7742be8c9c5f1  /private/tmp/便携副本验收.jks/content/display.mp4",
+    "a2299e048f004fa84ac3602d5b6aa680baecff30200d269550da02539f52ddae  字幕导出验收.jks/content/speech.wav",
+    "a2299e048f004fa84ac3602d5b6aa680baecff30200d269550da02539f52ddae  /private/tmp/便携副本验收.jks/content/speech.wav"
+  ],
+  "sorry": null,
+  "openWindowsProjectFields": {
+    "简库镜传 · 视频编辑": [
+      "字幕导出验收"
+    ]
+  },
+  "sourceConfigIdenticalBeforeAfter": true
+}
