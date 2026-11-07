@@ -9,16 +9,18 @@ struct Params {
 @group(0) @binding(1) var<storage, read_write> nv12_output: array<u32>;
 @group(0) @binding(2) var<uniform> params: Params;
 
+// BT.709 limited-range coefficients; the FFmpeg encoder tags streams as
+// BT709/MPEG, so encoding with BT.601 here shifted exported colors.
 fn rgb_to_y(r: f32, g: f32, b: f32) -> u32 {
-    return u32(clamp(16.0 + 65.481 * r + 128.553 * g + 24.966 * b, 0.0, 255.0));
+    return u32(clamp(16.0 + 46.559 * r + 156.629 * g + 15.812 * b, 0.0, 255.0));
 }
 
 fn rgb_to_u(r: f32, g: f32, b: f32) -> u32 {
-    return u32(clamp(128.0 - 37.797 * r - 74.203 * g + 112.0 * b, 0.0, 255.0));
+    return u32(clamp(128.0 - 25.673 * r - 86.332 * g + 112.0 * b, 0.0, 255.0));
 }
 
 fn rgb_to_v(r: f32, g: f32, b: f32) -> u32 {
-    return u32(clamp(128.0 + 112.0 * r - 93.786 * g - 18.214 * b, 0.0, 255.0));
+    return u32(clamp(128.0 + 112.0 * r - 101.727 * g - 10.273 * b, 0.0, 255.0));
 }
 
 fn safe_load(coord: vec2<u32>, dims: vec2<u32>) -> vec4<f32> {

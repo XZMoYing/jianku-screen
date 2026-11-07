@@ -32,6 +32,7 @@ impl ConversionProgress {
     }
 }
 
+// BT.709 limited-range decode, matching the encoder's BT709/MPEG tags.
 pub fn nv12_to_rgba(
     y_data: &[u8],
     uv_data: &[u8],
@@ -63,9 +64,9 @@ pub fn nv12_to_rgba(
             let d = u - 128;
             let e = v - 128;
 
-            let r = clamp_u8((298 * c + 409 * e + 128) >> 8);
-            let g = clamp_u8((298 * c - 100 * d - 208 * e + 128) >> 8);
-            let b = clamp_u8((298 * c + 516 * d + 128) >> 8);
+            let r = clamp_u8((298 * c + 459 * e + 128) >> 8);
+            let g = clamp_u8((298 * c - 55 * d - 136 * e + 128) >> 8);
+            let b = clamp_u8((298 * c + 541 * d + 128) >> 8);
 
             let out_idx = out_row_start + col * 4;
             if out_idx + 3 < output.len() {
@@ -111,9 +112,9 @@ pub fn yuv420p_to_rgba(
             let d = u - 128;
             let e = v - 128;
 
-            let r = clamp_u8((298 * c + 409 * e + 128) >> 8);
-            let g = clamp_u8((298 * c - 100 * d - 208 * e + 128) >> 8);
-            let b = clamp_u8((298 * c + 516 * d + 128) >> 8);
+            let r = clamp_u8((298 * c + 459 * e + 128) >> 8);
+            let g = clamp_u8((298 * c - 55 * d - 136 * e + 128) >> 8);
+            let b = clamp_u8((298 * c + 541 * d + 128) >> 8);
 
             let out_idx = out_row_start + col * 4;
             if out_idx + 3 < output.len() {
@@ -480,9 +481,9 @@ fn nv12_convert_row_scalar(
         let d = u - 128;
         let e = v - 128;
 
-        let r = clamp_u8((298 * c + 409 * e + 128) >> 8);
-        let g = clamp_u8((298 * c - 100 * d - 208 * e + 128) >> 8);
-        let b = clamp_u8((298 * c + 516 * d + 128) >> 8);
+        let r = clamp_u8((298 * c + 459 * e + 128) >> 8);
+        let g = clamp_u8((298 * c - 55 * d - 136 * e + 128) >> 8);
+        let b = clamp_u8((298 * c + 541 * d + 128) >> 8);
 
         let out_idx = out_row_start + col * 4;
         if out_idx + 3 < output.len() {
@@ -862,9 +863,9 @@ fn yuv420p_convert_row_scalar(
         let d = u - 128;
         let e = v - 128;
 
-        let r = clamp_u8((298 * c + 409 * e + 128) >> 8);
-        let g = clamp_u8((298 * c - 100 * d - 208 * e + 128) >> 8);
-        let b = clamp_u8((298 * c + 516 * d + 128) >> 8);
+        let r = clamp_u8((298 * c + 459 * e + 128) >> 8);
+        let g = clamp_u8((298 * c - 55 * d - 136 * e + 128) >> 8);
+        let b = clamp_u8((298 * c + 541 * d + 128) >> 8);
 
         let out_idx = out_row_start + col * 4;
         if out_idx + 3 < output.len() {
@@ -919,6 +920,32 @@ fn clamp_u8(val: i32) -> u8 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_nv12_bt709_limited_decode_primary_colors() {
+        let width = 2u32;
+        let height = 2u32;
+        let y_red = vec![62u8; 4];
+        let uv_red = vec![103u8, 239u8];
+        let mut output = vec![0u8; (width * height * 4) as usize];
+        nv12_to_rgba(&y_red, &uv_red, width, height, width, 2, &mut output);
+        let red = &output[0..4];
+        assert!((red[0] as i32 - 252).abs() <= 4, "red channel {}", red[0]);
+        assert!(
+            red[1] <= 6 && red[2] <= 6,
+            "green/blue {} {}",
+            red[1],
+            red[2]
+        );
+
+        let y_gray = vec![126u8; 4];
+        let uv_gray = vec![128u8, 128u8];
+        nv12_to_rgba(&y_gray, &uv_gray, width, height, width, 2, &mut output);
+        let gray = &output[0..4];
+        for channel in &gray[0..3] {
+            assert!((*channel as i32 - 128).abs() <= 3, "gray channel {channel}");
+        }
+    }
 
     #[test]
     fn test_nv12_basic_conversion() {

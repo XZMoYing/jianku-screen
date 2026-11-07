@@ -2,6 +2,9 @@
 @group(0) @binding(1) var uv_plane: texture_2d<f32>;
 @group(0) @binding(2) var output: texture_storage_2d<rgba8unorm, write>;
 
+// BT.709 limited-range decode, matching the BT709/MPEG stream tags written by
+// the encoder and the coefficients used by the CPU conversion path.
+
 @compute @workgroup_size(8, 8)
 fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
     let coords = global_id.xy;
@@ -22,9 +25,9 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
     let u = uv_raw.r - 0.5;
     let v = uv_raw.g - 0.5;
 
-    let r = y + 1.596 * v;
-    let g = y - 0.391 * u - 0.813 * v;
-    let b = y + 2.018 * u;
+    let r = y + 1.7926 * v;
+    let g = y - 0.2132 * u - 0.5328 * v;
+    let b = y + 2.1124 * u;
 
     let color = vec4<f32>(
         clamp(r, 0.0, 1.0),
