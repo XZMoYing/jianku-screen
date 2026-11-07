@@ -1710,7 +1710,7 @@ function KeyboardSegmentConfig(props: {
 
 	return (
 		<div class="space-y-4">
-			<Section name={`Keyboard ${props.segmentIndex + 1}`}>
+			<Section name={`${localize("Keyboard")} ${props.segmentIndex + 1}`}>
 				<Input
 					type="text"
 					value={props.segment.displayText}
@@ -1821,7 +1821,7 @@ function CaptionSegmentConfig(props: {
 
 	return (
 		<div class="space-y-4">
-			<Section name={`Caption ${props.segmentIndex + 1}`}>
+			<Section name={`${localize("Caption")} ${props.segmentIndex + 1}`}>
 				<textarea
 					class="flex-1 px-3 py-2 rounded-lg border border-gray-3 bg-gray-2 text-gray-12 resize-none min-h-[96px] w-full"
 					value={props.segment.text}
@@ -1956,7 +1956,7 @@ function MaskSegmentConfig(props: {
 
 	return (
 		<div class="space-y-4">
-			<Section name={`Mask ${props.segmentIndex + 1}`}>
+			<Section name={`${localize("Mask")} ${props.segmentIndex + 1}`}>
 				<div class="flex items-center justify-between gap-4">
 					<RadioGroup
 						class="grid grid-cols-2 gap-2"
@@ -2275,7 +2275,7 @@ function ZoomSegmentConfig(props: {
 		<>
 			<Field
 				inline
-				name={`Zoom ${props.segmentIndex + 1}`}
+				name={`${localize("Zoom")} ${props.segmentIndex + 1}`}
 				value={`${props.segment.amount.toFixed(2)}x`}
 			>
 				<Slider
@@ -2811,7 +2811,7 @@ function SyncOffsetsConfig() {
 					{(_, index) => (
 						<div class="flex flex-col gap-3.5">
 							<Show when={editorInstance.recordings.segments.length > 1}>
-								<SectionLabel name={`Clip ${index()}`} />
+								<SectionLabel name={`${localize("Clip")} ${index()}`} />
 							</Show>
 							<Show when={clipConfig(index())?.offsetsAutoCalculated === true}>
 								<p class="text-[11px] text-ed-text-3">

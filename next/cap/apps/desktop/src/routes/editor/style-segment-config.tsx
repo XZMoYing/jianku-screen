@@ -48,7 +48,7 @@ export function StyleSegmentConfig() {
 					data-style-scope
 				>
 					<Section
-						name={`Editing style · ${style().start.toFixed(2)}–${style().end.toFixed(2)}s`}
+						name={`${localize("Editing style")} · ${style().start.toFixed(2)}–${style().end.toFixed(2)}s`}
 						action={
 							<EditorButton size="sm" onClick={exitStyleScope}>
 								{localize("Global settings")}

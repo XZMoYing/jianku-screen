@@ -521,7 +521,7 @@ export function TextSegmentConfig(props: {
 	return (
 		<div class="flex flex-col gap-4">
 			<Section
-				name={`Text ${props.segmentIndex + 1}`}
+				name={`${localize("Text")} ${props.segmentIndex + 1}`}
 				action={
 					<div class="flex gap-2 items-center">
 						<span class="text-[11px] text-ed-text-3">
