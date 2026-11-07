@@ -1,0 +1,50 @@
+{
+  "before": {
+    "timecode": [
+      "0:02.00",
+      "0:08.00"
+    ],
+    "labels": [
+      "场景",
+      "Default",
+      "场景",
+      "Camera Only"
+    ]
+  },
+  "1": {
+    "timecode": [
+      "0:03.24",
+      "0:08.00"
+    ],
+    "labels": [
+      "场景",
+      "Default",
+      "场景",
+      "Camera Only"
+    ]
+  },
+  "2": {
+    "timecode": [
+      "0:04.33",
+      "0:08.00"
+    ],
+    "labels": [
+      "场景",
+      "Default",
+      "场景",
+      "Camera Only"
+    ]
+  },
+  "paused": {
+    "timecode": [
+      "0:05.02",
+      "0:08.00"
+    ],
+    "labels": [
+      "场景",
+      "Default",
+      "场景",
+      "Camera Only"
+    ]
+  }
+}

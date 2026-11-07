@@ -1,0 +1,15 @@
+{
+  "step": "trim-right",
+  "scenes": [
+    {
+      "start": 1.0,
+      "end": 2.642,
+      "mode": "default"
+    },
+    {
+      "start": 4.5,
+      "end": 6.0,
+      "mode": "cameraOnly"
+    }
+  ]
+}

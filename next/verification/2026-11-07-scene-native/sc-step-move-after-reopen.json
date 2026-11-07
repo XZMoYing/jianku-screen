@@ -1,0 +1,15 @@
+{
+  "step": "move-after-reopen",
+  "scenes": [
+    {
+      "start": 1.473,
+      "end": 2.973,
+      "mode": "default"
+    },
+    {
+      "start": 4.5,
+      "end": 6.0,
+      "mode": "cameraOnly"
+    }
+  ]
+}

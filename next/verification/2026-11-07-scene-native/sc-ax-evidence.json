@@ -1,0 +1,182 @@
+[
+  {
+    "role": "AXButton",
+    "AXValue": null,
+    "position": {
+      "x": 1197,
+      "y": 921
+    },
+    "size": {
+      "height": 36,
+      "width": 449
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 1576,
+      "y": 951
+    },
+    "size": {
+      "height": 4,
+      "width": 79
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 1576,
+      "y": 951
+    },
+    "size": {
+      "height": 4,
+      "width": 79
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 1576,
+      "y": 951
+    },
+    "size": {
+      "height": 4,
+      "width": 9
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 1646,
+      "y": 951
+    },
+    "size": {
+      "height": 4,
+      "width": 9
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 364,
+      "y": 904
+    },
+    "size": {
+      "height": 44,
+      "width": 521
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 369,
+      "y": 918
+    },
+    "size": {
+      "height": 16,
+      "width": 4
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "场景",
+    "position": {
+      "x": 377,
+      "y": 919
+    },
+    "size": {
+      "height": 14,
+      "width": 25
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "Default",
+    "position": {
+      "x": 409,
+      "y": 919
+    },
+    "size": {
+      "height": 13,
+      "width": 39
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 641,
+      "y": 918
+    },
+    "size": {
+      "height": 16,
+      "width": 4
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 985,
+      "y": 904
+    },
+    "size": {
+      "height": 44,
+      "width": 1142
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 990,
+      "y": 918
+    },
+    "size": {
+      "height": 16,
+      "width": 4
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "场景",
+    "position": {
+      "x": 998,
+      "y": 919
+    },
+    "size": {
+      "height": 14,
+      "width": 25
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "Camera Only",
+    "position": {
+      "x": 1030,
+      "y": 919
+    },
+    "size": {
+      "height": 13,
+      "width": 68
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 1262,
+      "y": 918
+    },
+    "size": {
+      "height": 16,
+      "width": 4
+    }
+  }
+]

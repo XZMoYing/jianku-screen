@@ -1,0 +1,15 @@
+{
+  "step": "move",
+  "scenes": [
+    {
+      "start": 1.237,
+      "end": 2.737,
+      "mode": "default"
+    },
+    {
+      "start": 4.5,
+      "end": 6.0,
+      "mode": "cameraOnly"
+    }
+  ]
+}
