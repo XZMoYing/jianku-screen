@@ -1,0 +1,96 @@
+{
+  "appVersion": "0.2.0-alpha.97 / 2026.97.0（CLI 同一源码）",
+  "method": "cap-cli --json export 合成工程（display.mp4 替换为 640x360 纯色 8s，清除字幕/文本/样式/图片/缩放/遮罩/按键/音频/3D/场景，仅主轨 0–8）→ 解码导出一帧测中心像素与 YUV",
+  "sources": {
+    "red": [
+      252,
+      0,
+      0
+    ],
+    "gray": [
+      125,
+      127,
+      127
+    ],
+    "blue": [
+      0,
+      0,
+      251
+    ]
+  },
+  "exports": {
+    "red": [
+      225,
+      0,
+      0
+    ],
+    "gray": [
+      113,
+      116,
+      113
+    ],
+    "blue": [
+      1,
+      0,
+      237
+    ]
+  },
+  "sourceYuv": {
+    "red": [
+      62,
+      102,
+      239
+    ],
+    "gray": [
+      125,
+      128,
+      127
+    ],
+    "blue": [
+      31,
+      239,
+      117
+    ]
+  },
+  "exportYuv": {
+    "red": [
+      57,
+      105,
+      227
+    ],
+    "gray": [
+      115,
+      127,
+      127
+    ],
+    "blue": [
+      31,
+      232,
+      119
+    ]
+  },
+  "exportTags": {
+    "pix_fmt": "yuv420p",
+    "color_range": "tv",
+    "color_space": "bt709",
+    "color_transfer": "bt709",
+    "color_primaries": "bt709"
+  },
+  "audit": {
+    "rgba_to_nv12.wgsl": "BT.601 limited 系数（Y=16+65.481R+128.553G+24.966B; U/V 601）",
+    "nv12_to_rgba.wgsl": "BT.601 limited 解码（y=(y-16/255)*1.164; 1.596/0.391/0.813/2.018）",
+    "enc-ffmpeg h264/hevc": "显式设置 color_space=BT709、color_range=MPEG、primaries/trc=BT709",
+    "mismatch": "GPU 着色器按 BT.601 处理，编码器把码流标记为 BT.709；源视频通常标记 BT.709 但被 601 解码，进一步引入颜色误差。"
+  },
+  "conclusion": "实测同一纯色内容导出后明显变暗/降饱和：red 252→225、gray ~127→114、blue 251→237；码流标签为 bt709/tv。确认存在预览/解码/编码色彩契约不一致，符合 U11a 怀疑。",
+  "rootCauseCandidates": [
+    "GPU 着色器系数与编码器标签不一致（601 vs 709）",
+    "源解码未按流标签选择矩阵，固定 601",
+    "灰阶整体变暗提示还可能有 gamma/格式（rgba8unorm vs srgb）或范围处理问题；需 RgbaToNv12Converter 单元级已知 RGBA→YUV 验证分离"
+  ],
+  "notCovered": [
+    "GPU/CPU 转换单元级逐通道对比",
+    "预览画面与导出差异、不同 encoder/quality/10bit、alpha/透明窗、HDR/广色域显示器",
+    "修复与回归"
+  ]
+}
