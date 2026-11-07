@@ -1,0 +1,64 @@
+[
+  {
+    "start": 1.0,
+    "end": 3.0,
+    "enabled": true,
+    "properties": {
+      "tiltX": 0.0,
+      "tiltY": 0.0,
+      "roll": 0.0,
+      "rotateX": 0.0,
+      "rotateY": 0.0,
+      "fov": 45.0,
+      "zoom": 2.0,
+      "panX": 0.0,
+      "panY": 0.0
+    },
+    "blur": {
+      "mode": "none",
+      "strength": 0.0,
+      "falloff": 0.0,
+      "focusX": 0.37,
+      "focusY": 0.5,
+      "focusSize": 0.5,
+      "angle": 0.0,
+      "dirPosition": 0.5,
+      "bokeh": false
+    },
+    "tracks": {},
+    "transitionIn": 0.0,
+    "transitionOut": 0.0,
+    "joinDuration": 0.75
+  },
+  {
+    "start": 5.0,
+    "end": 7.0,
+    "enabled": true,
+    "properties": {
+      "tiltX": 0.0,
+      "tiltY": 0.0,
+      "roll": 0.0,
+      "rotateX": 0.0,
+      "rotateY": 0.0,
+      "fov": 45.0,
+      "zoom": 2.0,
+      "panX": 0.0,
+      "panY": 0.0
+    },
+    "blur": {
+      "mode": "none",
+      "strength": 0.0,
+      "falloff": 0.0,
+      "focusX": 0.37,
+      "focusY": 0.5,
+      "focusSize": 0.5,
+      "angle": 0.0,
+      "dirPosition": 0.5,
+      "bokeh": false
+    },
+    "tracks": {},
+    "transitionIn": 0.0,
+    "transitionOut": 0.0,
+    "joinDuration": 0.75
+  }
+]

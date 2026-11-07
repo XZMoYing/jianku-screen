@@ -1,0 +1,13 @@
+{
+  "step": "before-cancel",
+  "segments": [
+    {
+      "start": 1.526,
+      "end": 3.526
+    },
+    {
+      "start": 5.0,
+      "end": 7.0
+    }
+  ]
+}

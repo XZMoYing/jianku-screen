@@ -1,0 +1,17 @@
+{
+  "step": "trim-right",
+  "segments": [
+    {
+      "start": 1.158,
+      "end": 3.158,
+      "enabled": true,
+      "joinDuration": 0.75
+    },
+    {
+      "start": 5.0,
+      "end": 7.0,
+      "enabled": true,
+      "joinDuration": 0.75
+    }
+  ]
+}
