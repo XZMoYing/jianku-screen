@@ -1,0 +1,40 @@
+{
+  "appVersion": "0.2.0-alpha.93 / 2026.93.0（含第一版修复：无变化时跳过投影写入）",
+  "verified": [
+    {
+      "case": "打开工程后的初始历史",
+      "result": "undo/redo 按钮 enabled=0（打开时已禁用），第一版修复生效"
+    },
+    {
+      "case": "主轨右端裁剪 8.0→7.527",
+      "result": "undo enabled/redo enabled 均=1"
+    },
+    {
+      "case": "第一次 Cmd+Z",
+      "result": "主轨 7.527 未回退；captionSegments[3].end 由 7.527 回 8.0（时间线变化引起的字幕投影夹取被单独记入历史），即仍有额外派生步骤"
+    },
+    {
+      "case": "Cmd+Shift+Z",
+      "result": "字幕 end 再夹到 7.527，回到裁剪后状态"
+    },
+    {
+      "case": "第二次 Cmd+Z",
+      "result": "与第一次相同：只回退派生步骤，主轨仍未回退"
+    },
+    {
+      "case": "字幕拖动（第 3 条 4.92–6.51→5.157–6.747）",
+      "result": "一次 Cmd+Z 即回退字幕到 4.92–6.51（字幕母版写入 + 投影变化一步撤销，符合预期）"
+    }
+  ],
+  "conclusion": "第一版修复解决了初始历史污染；但时间线变化引起的字幕投影夹取仍作为独立派生步骤进入历史，裁剪的第一次撤销仍先吃掉该步骤。",
+  "secondFix": {
+    "source": "053eec5：context.ts 增加 applyDerivedWrite 迟绑定（projectHistory 创建后赋值为 projectHistory.applyDerived），字幕投影写入在存在语义变化时也通过 applyDerived 执行，派生写入不再进入撤销栈。",
+    "checks": "tsc --noEmit、Biome、captions 18+i18n 3 共 21 项单测通过",
+    "pending": "alpha.94（f8ab452 冻结）构建中，下一轮安装后验证：裁剪一次撤销一次即回退、无额外步骤、字幕拖动撤销/重做正常、输入框焦点仍被拦截。"
+  },
+  "notCovered": [
+    "AXSlider 焦点场景",
+    "重做在各种焦点下的稳定性",
+    "alpha.94 实际包验证"
+  ]
+}
