@@ -1,0 +1,31 @@
+{
+  "appVersion": "0.2.0-alpha.94 / 2026.94.0",
+  "fixture": "自有合成工程 + timeline.textSegments 两条（1–2「吸附甲」、4–5「吸附乙」）",
+  "snappingToggle": {
+    "baseline": "aria-pressed/AXValue=1（默认开启）",
+    "afterPress": "0（关闭）",
+    "repress": "1（恢复）",
+    "method": "AXPress on 时间线吸附复选框"
+  },
+  "cases": [
+    {
+      "case": "开启吸附：拖文本 1–2 的起点边缘到接近时间线 0 点（目标 x=136，距 0 约 6px，半径 7px）",
+      "result": "start 精确变为 0.0（吸附到播放头/时间线起点），end 保持 2.0"
+    },
+    {
+      "case": "关闭吸附：同一拖动路径",
+      "result": "start 为 0.032842（未吸附），end 保持 2.0"
+    },
+    {
+      "case": "错误目标（x=151，距 0 约 21px）",
+      "result": "开/关均不吸附（超出 7px 吸附半径），说明前一次无差异是目标过远而非开关失效"
+    }
+  ],
+  "conclusion": "文本轨起点边缘吸附按开关生效；时间线吸附复选框可 AX 切换且状态可读；吸附半径为 7px（SPLIT_SNAP_PX），目标需落在半径内。",
+  "notCovered": [
+    "其他 overlay 轨道（缩放/场景/3D/遮罩/样式/图片/音频/按键）逐轨吸附",
+    "裁剪/移动中吸附到其他片段边界与书签",
+    "吸附辅助线视觉与取消（Esc）",
+    "多片段相邻边界组合"
+  ]
+}
