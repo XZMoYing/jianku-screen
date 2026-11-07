@@ -1,0 +1,37 @@
+{
+  "appVersionForNativeTests": "0.2.0-alpha.92 / 2026.92.0",
+  "initialHistory": {
+    "baselineUndoEnabled": true,
+    "firstUndoChangedConfigHash": "a403b9a5 → a0a2f0a0",
+    "visibleStateAfterFirstUndo": "主轨 0–8、字幕 4 条、缩放 0 均未变",
+    "diffVersusSourceConfig": [
+      "timeline.captionSegments[*].start/end 由 1.79/2.09 等变成 float32 精度值 1.7899999618… 等（6 处，均为字幕派生轨道）"
+    ],
+    "conclusion": "打开工程后历史里存在一条由字幕派生投影写入产生的条目，撤销只回退 float32 精度抖动，看似空撤销。"
+  },
+  "focusMatrix": [
+    {
+      "focus": "AXWebArea（点击时间线/刚启动）",
+      "shortcutUndo": "生效（撤销主轨裁剪）"
+    },
+    {
+      "focus": "AXTextField（工程名称）",
+      "shortcutUndo": "不生效（被 editorShortcutBlocked 拦截，符合设计）"
+    },
+    {
+      "focus": "AXButton（点击头部按钮后的实测焦点仍是 AXWebArea）",
+      "shortcutUndo": "生效（撤销从 7.527 收紧回 8.0）"
+    },
+    {
+      "focus": "AXSlider（点击坐标偏差，未真正获得焦点）",
+      "shortcutUndo": "inconclusive（焦点仍为 AXWebArea）"
+    }
+  ],
+  "rootCauseCandidate": "context.ts 字幕投影 effect 无条件 setProject(timeline.captionSegments) 产生被历史追踪的派生写入（含 float32 抖动），使初始历史与每次投影都产生空撤销步骤。",
+  "sourceFix": "2026-11-08 源码：投影前比较 derived 与当前 captionSegments（id/text/start/end/words 1e-6 容差），仅在实际变化时 setProject；tsc/Biome/21 项相关单测通过。",
+  "pending": "alpha.93 实际包验证：打开后 undo 初始禁用、裁剪一次撤销一次回退、字幕拖动撤销仍正常。",
+  "inconclusive": [
+    "AXSlider 焦点场景（点击坐标未命中）",
+    "重做在部分焦点下的表现"
+  ]
+}

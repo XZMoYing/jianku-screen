@@ -2731,11 +2731,40 @@ export const [EditorContextProvider, useBaseEditorContext] =
 							timeline.textSegments,
 							timeline.mainTrackGaps,
 						);
-						setProject(
-							"timeline",
-							"captionSegments",
-							reconcile(derived, { key: "id" }),
-						);
+						const current = timeline.captionSegments ?? [];
+						const unchanged =
+							current.length === derived.length &&
+							derived.every((next, index) => {
+								const previous = current[index];
+								if (!previous) return false;
+								if (
+									previous.id !== next.id ||
+									previous.text !== next.text ||
+									Math.abs(previous.start - next.start) > 1e-6 ||
+									Math.abs(previous.end - next.end) > 1e-6
+								)
+									return false;
+								const previousWords = previous.words ?? [];
+								const nextWords = next.words ?? [];
+								return (
+									previousWords.length === nextWords.length &&
+									nextWords.every((word, wordIndex) => {
+										const prior = previousWords[wordIndex];
+										return (
+											!!prior &&
+											prior.text === word.text &&
+											Math.abs(prior.start - word.start) <= 1e-6 &&
+											Math.abs(prior.end - word.end) <= 1e-6
+										);
+									})
+								);
+							});
+						if (!unchanged)
+							setProject(
+								"timeline",
+								"captionSegments",
+								reconcile(derived, { key: "id" }),
+							);
 
 						// Push the refreshed caption track to the renderer immediately.
 						// The store (and timeline strip) update reactively, but the
