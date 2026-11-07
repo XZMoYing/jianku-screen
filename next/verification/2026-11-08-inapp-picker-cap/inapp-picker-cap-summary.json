@@ -1,0 +1,19 @@
+{
+  "appVersion": "0.2.0-alpha.99",
+  "flow": "启动应用→首页点击「打开工程」→原生 NSOpenPanel→Cmd+Shift+G 前往文件夹→粘贴绝对路径→Return→再次 Return 打开",
+  "fixture": "/private/tmp/jianku-alpha99-20261108/点cap选择器验收.cap（自有工程复制并改 pretty_name，.cap 后缀）",
+  "result": {
+    "editorWindows": 1,
+    "projectName": [
+      "点cap选择器验收"
+    ],
+    "nodes": 313
+  },
+  "sourceAudit": "pick_local_project 使用 NSOpenPanel，canChooseDirectories/canChooseFiles=true，无扩展名 filter，panel message 明确“选择 .jks 工程，也可以打开历史 .cap 工程。”",
+  "conclusion": "应用内「打开工程」选择器可以直接打开历史 .cap 工程（实际点击流程成功，工程名命中）。自动化通过 System Events 键盘/粘贴完成，非产品行为差异。",
+  "notCovered": [
+    "Dock 拖放到应用图标",
+    "Finder「打开方式」菜单（等价默认处理器，已测 .cap 未注册）",
+    "真实用户工程/权限错误"
+  ]
+}
