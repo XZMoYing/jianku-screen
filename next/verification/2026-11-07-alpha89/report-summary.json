@@ -1,0 +1,16 @@
+{
+  "reportFile": "cap-diagnostic-20261107-201505.json",
+  "generatedAt": "2026-11-07T12:15:05.031339+00:00",
+  "appVersionField": "0.2.0-alpha.89",
+  "permissions": {
+    "accessibility": "denied",
+    "camera": "not_requested",
+    "microphone": "not_requested",
+    "screenRecording": "denied"
+  },
+  "audioDeviceProbe": "timed_out",
+  "syncTest": null,
+  "syncTestError": "Screen recording permission is required to run the sync test.",
+  "storagePathOmitted": "[omitted]",
+  "settingsSensitiveKeysPresent": []
+}

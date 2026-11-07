@@ -1,0 +1,11 @@
+{
+  "reportFile": "cap-diagnostic-20261107-201505.json",
+  "appVersion": null,
+  "audioDeviceProbe": "timed_out",
+  "screenRecording": "denied",
+  "newLocalReport": true,
+  "deviceLabelsAndStorageMinimized": true,
+  "syncVerdict": null,
+  "numericSyncMeasurementPresent": false,
+  "syncErrorRecorded": true
+}
