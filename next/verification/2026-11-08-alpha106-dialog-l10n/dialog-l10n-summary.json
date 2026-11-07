@@ -1,0 +1,26 @@
+{
+  "appVersion": "0.2.0-alpha.106 / 2026.106.0（冻结 5efd979）",
+  "zhDialog": {
+    "title": "包含外部素材",
+    "buttons": [
+      "取消",
+      "继续保存"
+    ],
+    "cancelResult": "按取消后无副本生成"
+  },
+  "enDialog": {
+    "title": "Includes external assets",
+    "buttons": [
+      "Cancel",
+      "Continue"
+    ],
+    "messageSample": "The portable copy will include external assets referenced by the project (1 files): …"
+  },
+  "conclusion": "alpha.106 实包：外置素材确认对话框按钮已本地化（中文 取消/继续保存、英文 Cancel/Continue），取消路径仍无副本生成。U09b3 的三路径与按钮本地化通过；残余：英文文案 “1 files” 单复数、Windows/Linux 路径语义、符号链接攻击面，U09 不关闭。",
+  "notCovered": [
+    "英文单复数 polish",
+    "Windows/Linux 路径语义",
+    "符号链接/异常路径攻击面",
+    "其它外部路径入口（recording-meta segments/cursors）"
+  ]
+}
