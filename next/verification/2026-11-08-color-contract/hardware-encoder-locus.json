@@ -1,0 +1,10 @@
+{
+  "decisiveEvidence": "在 nv12_from_rendered_frame 采样（debug 日志）显示：硬件导出每一帧进入编码器的 NV12 surface 中心 YUV 都是 [62,102,239]（BT.709 limited，与源一致，frame 0..N 全部相同）；而同一导出文件的码流解码后中心 YUV 为 [42,115,237]，RGB 225,0,3。",
+  "conclusion": "偏色不在渲染/着色器/surface 转换，也不在导出帧数据；发生在 VideoToolbox 硬件编码输入/编码阶段（wrap 的 CVPixelBuffer 未带 color attachments、VT 会话对 range/matrix 的默认处理，或 ffmpeg h264_videotoolbox hw 输入路径的转换）。",
+  "fixCandidates": [
+    "在 wrap_videotoolbox_pixel_buffer 前给 CVPixelBuffer 设置 attachments：kCVImageBufferYCbCrMatrixKey=ITU_R_709_2、kCVImageBufferColorPrimariesKey=ITU_R_709_2、kCVImageBufferTransferFunctionKey=ITU_R_709_2、kCVImageBufferChromaLocation、并确保 420v（video range）",
+    "或在 h264_videotoolbox 会话/AVFrame 上设置 color range/matrix（h264.rs 已给 encoder ctx 设置 BT709/MPEG，但 hw 输入 buffer 可能未被 VT 采用）",
+    "临时保底：硬件零拷贝输入路径在色彩正确性未解决前可回退到软件帧路径（sws BT.709，实测正确），但需评估性能"
+  ],
+  "next": "下一轮实现 attachments（或等价方式）并在同一纯色夹具上验证硬件导出 YUV 回到 [62,102,239]；随后整包 alpha 安装 + 预览/导出一致性回归。"
+}

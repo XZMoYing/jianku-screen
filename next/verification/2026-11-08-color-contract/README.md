@@ -63,3 +63,10 @@
 - 对比同一帧的 YUV：源 [62,102,239]；软件导出 [62,102,239]（一致）；**硬件零拷贝导出 [42,115,237]**（Y 偏低 20、U/V 变化，换算红色强度约 0.5）。
 - 结论：偏色发生在“正确的 NV12 surface → 硬件编码码流”之间（VideoToolbox 硬件输入 wrap 的 color attachments/range 解释、surface ring 复用或 wrap 时 plane/stride 绑定），不是着色器或软件编码路径。
 - 下一步（U11a2b）：在 `wrap_videotoolbox_pixel_buffer` 前后锁定并采样 CVPixelBuffer 的 Y/U/V，与同一帧 NV12 surface 对比；若 buffer 正确则查 VT/色彩附件，若已错则查 ring/format。修复后用纯色夹具验证硬件导出与源 ≤2/255、软硬一致，再整包 alpha 验证。
+
+## 决定性定位（dfa9496）
+
+- 在 `nv12_from_rendered_frame` 采样（debug 日志）显示：硬件导出**每一帧进入编码器的 NV12 surface 中心 YUV 均为 [62,102,239]**（BT.709 limited，与源一致）。
+- 同一导出文件码流解码后中心 YUV 为 **[42,115,237]**（RGB 225,0,3）。
+- 结论：偏色不在渲染/着色器/surface 转换，也不在导出帧数据，而发生在 **VideoToolbox 硬件编码输入/编码阶段**（wrap 的 CVPixelBuffer 未带 color attachments、VT 对 range/matrix 的默认处理，或 ffmpeg h264_videotoolbox hw 输入路径转换）。
+- 下一轮修复候选：给 wrap 前的 CVPixelBuffer 设置 `kCVImageBufferYCbCrMatrixKey=ITU_R_709_2`、`ColorPrimaries`、`TransferFunction`（并确保 420v video range）；或改 VT 会话/AVFrame 的 matrix/range；临时保底可回退软件帧路径（sws BT.709，实测正确）但需评估性能。
