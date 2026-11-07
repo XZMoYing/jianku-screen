@@ -456,7 +456,7 @@
 
 - [x] U25a 字幕工程路径源码：共享后缀处理本平台尾分隔符；本地.jks/.cap标准字幕入工程，旧去后缀/点/部分后缀路径只读兼容，普通ID缓存保持；save/load/SRT同路由。7新/166模型、fmt、两相关crate release check通过，不改Tauri绑定签名。
 - [ ] U25b 后续合包验实际字幕保存重开、旧外置字幕兼容、SRT和项目便携复制；冻结56不含U25a，模型文件路由不等于字幕GUI/时间轴/导出内容全部通过。alpha.89 实际包发现：字幕轨计时拖动／裁剪在会话内生效、保存后文件也保留，但工程重开即回退——captionSegments 是 captions.segments 源时间母版的派生投影（synchronize_captions／deriveCaptionTrackSegments），拖动只写 timeline.captionSegments 未回写母版也未置 sourceTimed=false。证据 next/verification/2026-11-07-captions-native；修复项 U25b1。
-- [ ] U25b1 字幕轨计时编辑持久化：拖动／两端裁剪后用现有映射把输出时间反算回源时间并写回 captions.segments（含 words 起点重基），或提供明确「脱离源计时」动作后置 sourceTimed=false；覆盖转场／变速／空隙／全屏文字暂停窗，回归移动与裁剪保存重开后保持且不破坏文本、words、override。修复后需完整包复验，不能只靠组件测试。
+- [ ] U25b1 字幕轨计时编辑持久化：拖动／两端裁剪后用现有映射把输出时间反算回源时间并写回 captions.segments（含 words 起点重基），或提供明确「脱离源计时」动作后置 sourceTimed=false；覆盖转场／变速／空隙／全屏文字暂停窗，回归移动与裁剪保存重开后保持且不破坏文本、words、override。修复后需完整包复验，不能只靠组件测试。源码 34e62e5：新增 applyEditedCaptionTimingToMaster（mapEditedTimeToSource 反算、移动平移 words／裁剪夹取、hold 窗处理），CaptionsTrack 在 release/history 结束时回写 captions.segments；5 项新单测＋原 11 项共 16 项通过，tsc／Biome 通过。alpha.90 候选已冻结并开始构建，实际包重开持久化验收待下一轮。
 
 - [x] U22c2b9c 56原生停止条件取证：raw/clean两次buttons1且对象/模式/时长/焦点正常，首move后比例非有限触发invalid；已保存数字证据、还原示例、退出并清除本轮标记。
 - [x] U22c2b9d 无效比例隔离源码：主时间线/两Context保留最近有效正比例，真实比例变化仍按原逻辑结束，9新/305界面、类型/前端通过；原曲线/渲染不变，仅源码。
