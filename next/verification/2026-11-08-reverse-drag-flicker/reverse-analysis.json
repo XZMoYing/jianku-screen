@@ -1,0 +1,48 @@
+{
+  "frames": 490,
+  "duration": 11.97,
+  "quietMedianLuma": 207.6,
+  "quietMedianLight": 0.331,
+  "activeFrames": 282,
+  "suspiciousWholeWindowFrames": 0,
+  "suspicious": [],
+  "topDiffs": [
+    {
+      "t": 7.74,
+      "diff": 0.1
+    },
+    {
+      "t": 2.24,
+      "diff": 0.1
+    },
+    {
+      "t": 2.28,
+      "diff": 0.1
+    },
+    {
+      "t": 5.04,
+      "diff": 0.1
+    },
+    {
+      "t": 7.81,
+      "diff": 0.1
+    },
+    {
+      "t": 4.99,
+      "diff": 0.1
+    },
+    {
+      "t": 7.9,
+      "diff": 0.1
+    },
+    {
+      "t": 7.86,
+      "diff": 0.1
+    }
+  ],
+  "activeGapMs": {
+    "max": 66.7,
+    "over80": 0,
+    "over100": 0
+  }
+}
