@@ -1,0 +1,30 @@
+[
+  {
+    "action": "open-material",
+    "eventStartUnix": 1794082633.186507
+  },
+  {
+    "action": "open-transcript",
+    "eventStartUnix": 1794082634.664544
+  },
+  {
+    "action": "back-to-editor",
+    "eventStartUnix": 1794082636.141803
+  },
+  {
+    "action": "split-tool-on",
+    "eventStartUnix": 1794082637.6173959
+  },
+  {
+    "action": "split-tool-off",
+    "eventStartUnix": 1794082639.096373
+  },
+  {
+    "action": "play",
+    "eventStartUnix": 1794082640.5540202
+  },
+  {
+    "action": "pause",
+    "eventStartUnix": 1794082642.059654
+  }
+]

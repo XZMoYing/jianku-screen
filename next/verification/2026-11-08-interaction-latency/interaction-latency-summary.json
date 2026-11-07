@@ -1,0 +1,60 @@
+{
+  "appVersion": "0.2.0-alpha.99",
+  "method": "CGWindowListCreateImage 单窗口取帧（~40fps，仅自有编辑器），ui-drive 在真实鼠标事件前记录 eventStartUnix；逐帧 96x54 平均差检测动作后首帧可见变化，计算毫秒级延迟；窗口采集期间执行 7 个操作（1s 间隔）。",
+  "results": [
+    {
+      "action": "open-material",
+      "latencyMs": null,
+      "note": "no visible change within 0.8s (threshold 0.08)"
+    },
+    {
+      "action": "open-transcript",
+      "diff": 1.16,
+      "latencyMs": 4.1
+    },
+    {
+      "action": "back-to-editor",
+      "diff": 36.89,
+      "latencyMs": 13.5
+    },
+    {
+      "action": "split-tool-on",
+      "diff": 0.14,
+      "latencyMs": 136.3
+    },
+    {
+      "action": "split-tool-off",
+      "latencyMs": null,
+      "note": "no visible change within 0.8s (threshold 0.08)"
+    },
+    {
+      "action": "play",
+      "diff": 0.13,
+      "latencyMs": 224.7
+    },
+    {
+      "action": "pause",
+      "diff": 0.11,
+      "latencyMs": 35.7
+    }
+  ],
+  "interactionWindow": {
+    "start": 1.3,
+    "end": 10.17,
+    "maxGapMs": 83.3,
+    "gapsOver80ms": 1,
+    "gapsOver100ms": 0
+  },
+  "notes": [
+    "open-material 首次点击未检测到可见变化（面板初始状态/坐标命中不确定，不作为延迟结论）",
+    "split-tool 两次点击后 AX 状态为关闭（两次切换均生效；第二次颜色变化低于阈值未检出）",
+    "play 的首帧变化为 224.7ms 且像素差仅 0.13，受静帧内容影响，不能当作播放启动延迟"
+  ],
+  "conclusion": "主要切换（回到编辑器/打开字幕面板）首帧可见变化 4–14ms；分割工具强调色约 136ms；暂停约 36ms；交互窗口内取帧最大间隔 83ms、无 >100ms 间隔，本轮未观察到主线程卡顿迹象。单次采样与阈值检测，不据此关闭 U26/U22 性能项。",
+  "notCovered": [
+    "多轮采样与帧率/CPU/GPU 指标",
+    "真实用户工程、长录制、拖动/滚动混合负载",
+    "其他页面/设置/权限页切换",
+    "精确刷新率与动画节奏"
+  ]
+}
