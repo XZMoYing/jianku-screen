@@ -1,0 +1,26 @@
+{
+  "appVersion": "0.2.0-alpha.92 / 2026.92.0",
+  "fixture": "/private/tmp/jianku-alpha92-20261107/旧cap验收.cap（自有合成工程复制并改 pretty_name，保留旧 .cap 后缀）",
+  "results": [
+    {
+      "case": "冷启动 open -a 应用 旧.cap",
+      "result": "通过：编辑器打开，工程名「旧cap验收」，1 个编辑器窗口"
+    },
+    {
+      "case": "运行中再次 open 同一 .cap",
+      "result": "通过/无副作用：仍 1 个编辑器窗口、工程名不变，工程配置哈希未变（a403b9a5…98981）"
+    },
+    {
+      "case": "冷启动默认处理器 open 旧.cap",
+      "result": "未启动本应用（无 app 进程，ui-drive running=false）；说明 .cap 未注册到本应用默认打开方式，仅有 .jks 关联"
+    }
+  ],
+  "hash": "a403b9a5d1f21295c0db1a6d481ec04960438af8e4ad9070fa12759c06898981",
+  "notCovered": [
+    "Finder 拖到 Dock 图标",
+    "命令行 --args 传工程",
+    "失败路径（不存在/损坏 .cap）",
+    "“打开方式”菜单交互（等价默认处理器，已按默认处理器测试）",
+    "应用内「打开工程」选择器的 .cap 过滤与打开（本轮未点击）"
+  ]
+}
