@@ -1,0 +1,81 @@
+{
+  "change": "nv12 surface ring 在获取 CVPixelBuffer 后设置 kCVImageBufferYCbCrMatrixKey=ITU_R_709_2 / ColorPrimaries=ITU_R_709_2 / TransferFunction=ITU_R_709_2（ShouldPropagate），使 VideoToolbox 硬件输入按 BT.709 limited 编码，不再自行重解释矩阵/范围。",
+  "measured": {
+    "source": {
+      "red": [
+        252.0,
+        0.0,
+        0.0
+      ],
+      "gray": [
+        125.0,
+        127.0,
+        127.0
+      ],
+      "blue": [
+        0.0,
+        0.0,
+        251.0
+      ]
+    },
+    "hardwareExportBeforeFix": {
+      "red": [
+        225.0,
+        0.0,
+        3.0
+      ],
+      "gray": [
+        113.0,
+        116.0,
+        115.0
+      ],
+      "blue": [
+        0.0,
+        0.0,
+        239.0
+      ]
+    },
+    "hardwareExportAfterAttachments": {
+      "red": [
+        251.0,
+        0.0,
+        0.0
+      ],
+      "gray": [
+        124.0,
+        126.0,
+        123.0
+      ],
+      "blue": [
+        0.0,
+        0.0,
+        251.0
+      ]
+    },
+    "softwareExport": {
+      "red": [
+        252.0,
+        0.0,
+        0.0
+      ],
+      "gray": [
+        124.0,
+        126.0,
+        126.0
+      ],
+      "blue": [
+        0.0,
+        0.0,
+        251.0
+      ]
+    }
+  },
+  "conclusion": "补上 709 附件后硬件零拷贝导出与源一致：red 252→251、blue 251→251；gray 125,127,127→124,126,123（蓝通道残余 -4，其余 ≤1）。此前 red 225/gray 113/blue 239 的偏色消除。",
+  "residual": "gray 的 B 通道仍有约 4/255 差异（可能为色度子采样/矩阵舍入或 primaries 转换），肉眼接近中性灰；未达“全通道 ≤2”目标，保留观察但不再造成明显偏色。",
+  "notCovered": [
+    "实际安装包 GUI 导出与预览一致性",
+    "10bit/透明窗/HDR/广色域",
+    "不同编码器/quality",
+    "旧录像（历史 601 内容按 709 解码）观感"
+  ]
+}

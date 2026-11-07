@@ -1,0 +1,25 @@
+[2m2026-11-07T19:35:18.440843Z[0m [32m INFO[0m [2mcap_rendering[0m[2m:[0m Using hardware GPU adapter [3madapter_name[0m[2m=[0m"Apple M1" [3madapter_backend[0m[2m=[0mMetal [3madapter_device_type[0m[2m=[0mIntegratedGpu
+[2m2026-11-07T19:35:18.443797Z[0m [32m INFO[0m [2mcap_video_decode::avassetreader[0m[2m:[0m Built keyframe index [3mpath[0m[2m=[0m/private/tmp/jianku-color-20261108/blue.jks/content/display.mp4 [3mkeyframe_count[0m[2m=[0m1 [3mfps[0m[2m=[0m30.0 [3mduration_secs[0m[2m=[0m8.0 [3mbuild_ms[0m[2m=[0m0
+[2m2026-11-07T19:35:18.443824Z[0m [32m INFO[0m [2mcap_rendering::decoder::multi_position[0m[2m:[0m Configured decoder pool for video duration [3mduration_secs[0m[2m=[0m8.0 [3moptimal_pool_size[0m[2m=[0m5 [3mreposition_threshold[0m[2m=[0m5.0
+[2m2026-11-07T19:35:18.527784Z[0m [32m INFO[0m [2mcap_rendering::decoder::avassetreader[0m[2m:[0m Initialized multi-position decoder pool [3mdecoder_count[0m[2m=[0m1 [3moptimal_pool_size[0m[2m=[0m5 [3mreposition_threshold[0m[2m=[0m5.0 [3mfps[0m[2m=[0m30 [3mduration_secs[0m[2m=[0m8.0 [3mtotal_frames_estimate[0m[2m=[0m240
+[2m2026-11-07T19:35:18.527865Z[0m [32m INFO[0m [2mcap_rendering::decoder[0m[2m:[0m Video 'screen' using AVAssetReader (hardware) decoder (640x360)
+[2m2026-11-07T19:35:18.527914Z[0m [32m INFO[0m [2mcap_export::mp4[0m[2m:[0m Exporting mp4 with settings: Mp4ExportSettings { fps: 30, resolution_base: XY { x: 640, y: 360 }, compression: Maximum, custom_bpp: None, force_ffmpeg_decoder: false, optimize_filesize: false }
+[2m2026-11-07T19:35:18.527924Z[0m [32m INFO[0m [2mcap_export::mp4[0m[2m:[0m Expected to render 240 frames
+[2m2026-11-07T19:35:18.527929Z[0m [32m INFO[0m [2mcap_export::mp4[0m[2m:[0m Exporting with NV12 pipeline (GPU when possible, CPU fallback otherwise) [3mwidth[0m[2m=[0m640 [3mheight[0m[2m=[0m360
+[2m2026-11-07T19:35:18.527995Z[0m [32m INFO[0m [2mcap_rendering::yuv_converter[0m[2m:[0m Creating shared YUV converter pipelines (shader compilation)
+[2m2026-11-07T19:35:18.528580Z[0m [32m INFO[0m [2mcap_rendering::yuv_converter[0m[2m:[0m Shared YUV converter pipelines created successfully
+[2m2026-11-07T19:35:18.533481Z[0m [32m INFO[0m [2mcap_rendering::yuv_converter[0m[2m:[0m Initializing YUV converter textures (using shared pipelines) [3mgpu_max_texture_size[0m[2m=[0m8192
+[2m2026-11-07T19:35:18.535305Z[0m [32m INFO[0m [2mcap_rendering::yuv_converter[0m[2m:[0m Initializing YUV converter textures (using shared pipelines) [3mgpu_max_texture_size[0m[2m=[0m8192
+[2m2026-11-07T19:35:18.535580Z[0m [32m INFO[0m [2mcap_rendering::yuv_converter[0m[2m:[0m Initializing YUV converter textures (using shared pipelines) [3mgpu_max_texture_size[0m[2m=[0m8192
+[2m2026-11-07T19:35:18.551512Z[0m [32m INFO[0m [2mcap_rendering[0m[2m:[0m Pre-allocating YUV converter textures for video dimensions [3mscreen_width[0m[2m=[0m640 [3mscreen_height[0m[2m=[0m360
+[2m2026-11-07T19:35:18.624404Z[0m [32m INFO[0m [2mcap_enc_ffmpeg::video::h264[0m[2m:[0m Selected hardware H264 encoder with zero-copy VideoToolbox input [3mwidth[0m[2m=[0m640 [3mheight[0m[2m=[0m360 [3mfps[0m[2m=[0m30.0
+[2m2026-11-07T19:35:18.624618Z[0m [32m INFO[0m [2mcap_enc_ffmpeg::mux::mp4[0m[2m:[0m Prepared encoders for mp4 file
+[2m2026-11-07T19:35:18.624676Z[0m [32m INFO[0m [2mcap_export::mp4[0m[2m:[0m Created MP4File encoder (NV12, export settings) [3mzero_copy_input[0m[2m=[0mtrue
+[2m2026-11-07T19:35:19.376003Z[0m [32m INFO[0m [2mcap_rendering[0m[2m:[0m NV12 render complete [3mframes[0m[2m=[0m240 [3melapsed_secs[0m[2m=[0m"0.85"
+[2m2026-11-07T19:35:19.377858Z[0m [32m INFO[0m [2mcap_export::mp4[0m[2m:[0m Encoder thread finished [3mencoded_frames[0m[2m=[0m240 [3melapsed_secs[0m[2m=[0m"0.75" [3mencode_fps[0m[2m=[0m"318.6"
+[2m2026-11-07T19:35:19.377886Z[0m [32m INFO[0m [2mcap_enc_ffmpeg::mux::mp4[0m[2m:[0m MP4Encoder: Finishing encoding
+[2m2026-11-07T19:35:19.379554Z[0m [32m INFO[0m [2mcap_enc_ffmpeg::mux::mp4[0m[2m:[0m MP4Encoder: Flushing audio encoder
+[2m2026-11-07T19:35:19.379760Z[0m [32m INFO[0m [2mcap_enc_ffmpeg::mux::mp4[0m[2m:[0m MP4Encoder: Writing trailer
+[aac @ 0x12b644a20] Qavg: 64413.602
+Exported video to /private/tmp/jianku-color-20261108/blue-attach.mp4
+[2m2026-11-07T19:35:19.383530Z[0m [32m INFO[0m [2mcap::export[0m[2m:[0m Exported video to '/private/tmp/jianku-color-20261108/blue-attach.mp4'
