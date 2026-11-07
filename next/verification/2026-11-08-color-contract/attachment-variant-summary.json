@@ -1,0 +1,58 @@
+{
+  "experiment": "VT NV12 附件变体对比（alpha.99 源码，重建 CLI）",
+  "variants": {
+    "fullAttachments (matrix+primaries+transfer 709)": {
+      "red": [
+        251.0,
+        0.0,
+        0.0
+      ],
+      "gray": [
+        124.0,
+        126.0,
+        123.0
+      ],
+      "blue": [
+        0.0,
+        0.0,
+        251.0
+      ]
+    },
+    "matrixOnly (仅 YCbCrMatrix 709)": {
+      "red": [
+        252.0,
+        0.0,
+        1.0
+      ],
+      "gray": [
+        112.0,
+        115.0,
+        112.0
+      ],
+      "blue": [
+        0.0,
+        0.0,
+        249.0
+      ]
+    },
+    "source": {
+      "red": [
+        252.0,
+        0.0,
+        0.0
+      ],
+      "gray": [
+        125.0,
+        127.0,
+        127.0
+      ],
+      "blue": [
+        0.0,
+        0.0,
+        251.0
+      ]
+    }
+  },
+  "conclusion": "仅矩阵附件时 red 252/blue 249 正确但 gray 明显变暗（112,115,112），说明 primaries/transfer 附件对 VT 的 gray/transfer 处理必要；完整三附件最优（gray 124,126,123，仅 B -4）。已回退矩阵-only 实验，保留完整附件实现。",
+  "next": "gray B -4 残余仍开放（U11a3），可尝试 chroma location/sRGB transfer 变体或接受为 VT 舍入；非 709 导入、10bit/HDR/透明窗仍未覆盖。"
+}
