@@ -1,0 +1,19 @@
+{
+  "appVersion": "0.2.0-alpha.104",
+  "fixture": "外置素材便携验收.jks：复制复验夹具并注入 imageSegments[0].path=/private/tmp/jianku-alpha104-20261108/external-asset.png（64x64 PNG）",
+  "portableCopy": {
+    "method": "编辑器 Cmd+Shift+S（save-copy）→ 保存面板设名「便携副本.jks」→ AXPress Save",
+    "copyPath": "/private/tmp/jianku-alpha104-20261108/便携副本.jks",
+    "externalAssetCopied": "assets/portable/2cfc5eb3-d1f8-44de-805a-c63a839736e3/external-asset.png，SHA-256 与源一致 ca96adb5…90157",
+    "configRewrite": "copy imageSegments[0].path → assets/portable/…/external-asset.png（相对路径）；config 中无 /private/tmp 绝对路径",
+    "sourceUnchanged": "源工程 imageSegments path 仍为绝对路径 /private/tmp/…/external-asset.png",
+    "mediaHashes": "content/display.mp4 与 speech.wav 源/副本 SHA-256 相同",
+    "openCopy": "副本自动打开为编辑器工程「便携副本」，轨道含 图片 1，两个编辑器窗口同时存在"
+  },
+  "conclusion": "含外置素材的便携副本通过：外置图片被复制进副本 assets/portable/<uuid>/，配置路径重写为相对路径、无绝对路径残留；媒体与源一致；副本可在应用内打开。关闭 U25b 的“外置素材便携副本路径重写”未覆盖。",
+  "notCovered": [
+    "外部 SRT 导入往返",
+    "真实工程转场/变速/空隙其它组合",
+    "Windows/Linux 便携副本"
+  ]
+}
