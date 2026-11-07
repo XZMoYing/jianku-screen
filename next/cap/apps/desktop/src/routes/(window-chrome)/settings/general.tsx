@@ -466,7 +466,9 @@ function Inner(props: {
 							/>
 							<ToggleSettingItem
 								label={localize("系统通知")}
-								description="复制、保存等操作完成时显示通知；需在系统设置中允许通知。"
+								description={localize(
+									"复制、保存等操作完成时显示通知；需在系统设置中允许通知。",
+								)}
 								value={!!settings.enableNotifications}
 								onChange={async (value) => {
 									if (value) {
@@ -494,21 +496,25 @@ function Inner(props: {
 							value={settings.recordingCountdown ?? 0}
 							onChange={(value) => handleChange("recordingCountdown", value)}
 							options={[
-								{ text: "关闭", value: 0 },
-								{ text: "3 秒", value: 3 },
-								{ text: "5 秒", value: 5 },
-								{ text: "10 秒", value: 10 },
+								{ text: localize("关闭"), value: 0 },
+								{ text: localize("3 秒"), value: 3 },
+								{ text: localize("5 秒"), value: 5 },
+								{ text: localize("10 秒"), value: 10 },
 							]}
 						/>
 						<ToggleSettingItem
 							label={localize("未选择麦克风时确认")}
-							description="未选择麦克风或麦克风不可用时，开始录制前提醒。"
+							description={localize(
+								"未选择麦克风或麦克风不可用时，开始录制前提醒。",
+							)}
 							value={confirmBeforeRecordingWithoutMicrophone()}
 							onChange={handleRecordingStartSafetyChange}
 						/>
 						<ToggleSettingItem
 							label={localize("新录制默认增强声音")}
-							description="自动处理麦克风声音，之后仍可在编辑器关闭。"
+							description={localize(
+								"自动处理麦克风声音，之后仍可在编辑器关闭。",
+							)}
 							value={studioSoundByDefault()}
 							onChange={handleStudioSoundByDefaultChange}
 						/>

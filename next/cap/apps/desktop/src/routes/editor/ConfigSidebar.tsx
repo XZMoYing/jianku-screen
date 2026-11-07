@@ -1567,7 +1567,7 @@ function AudioSegmentConfig(props: {
 
 	return (
 		<div class="space-y-4">
-			<Section name={`Audio ${props.segmentIndex + 1}`}>
+			<Section name={`${localize("Audio")} ${props.segmentIndex + 1}`}>
 				<div class="flex flex-col gap-3">
 					<button
 						type="button"
@@ -1584,7 +1584,7 @@ function AudioSegmentConfig(props: {
 						/>
 						<div class="flex flex-col flex-1 min-w-0">
 							<span class="text-sm font-medium truncate text-gray-12">
-								{props.segment.name || "Audio"}
+								{props.segment.name || localize("Audio")}
 							</span>
 							<span class="text-xs text-gray-10">
 								{localize("Tap to change track")}

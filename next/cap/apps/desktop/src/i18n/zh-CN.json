@@ -1691,5 +1691,11 @@
 	"Configure": "配置",
 	"Failed to fetch changelog": "无法获取更新日志",
 	"item": "项",
-	"items": "项"
+	"items": "项",
+	"Waiting...": "等待中…",
+	"Opening...": "正在打开…",
+	"Connect Google Drive": "连接 Google Drive",
+	"Active": "已启用",
+	"Use Google Drive": "使用 Google Drive",
+	"Test": "测试"
 }

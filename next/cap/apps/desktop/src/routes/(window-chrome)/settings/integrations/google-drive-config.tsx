@@ -339,10 +339,10 @@ export default function GoogleDriveConfigPage() {
 												onClick={() => connect.mutate()}
 											>
 												{isWaitingForConnection()
-													? "Waiting..."
+													? localize("Waiting...")
 													: connect.isPending
-														? "Opening..."
-														: "Connect Google Drive"}
+														? localize("Opening...")
+														: localize("Connect Google Drive")}
 											</Button>
 										}
 									>
@@ -429,7 +429,9 @@ export default function GoogleDriveConfigPage() {
 												disabled={busy() || isActive()}
 												onClick={() => setActive.mutate("googleDrive")}
 											>
-												{isActive() ? "Active" : "Use Google Drive"}
+												{isActive()
+													? localize("Active")
+													: localize("Use Google Drive")}
 											</Button>
 											<Show when={hasS3Config()}>
 												<Button
@@ -445,7 +447,9 @@ export default function GoogleDriveConfigPage() {
 												disabled={busy()}
 												onClick={() => testConnection.mutate()}
 											>
-												{testConnection.isPending ? "Testing..." : "Test"}
+												{testConnection.isPending
+													? localize("Testing...")
+													: localize("Test")}
 											</Button>
 											<Button
 												variant="destructive"

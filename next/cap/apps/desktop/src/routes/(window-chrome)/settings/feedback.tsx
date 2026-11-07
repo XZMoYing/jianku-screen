@@ -44,9 +44,9 @@ const DIAGNOSTIC_MODES = [
 ];
 
 const DIAGNOSTIC_DURATIONS = [
-	{ text: "20 秒", value: 20 },
-	{ text: "40 秒", value: 40 },
-	{ text: "60 秒", value: 60 },
+	{ text: localize("20 秒"), value: 20 },
+	{ text: localize("40 秒"), value: 40 },
+	{ text: localize("60 秒"), value: 60 },
 ];
 
 /** Stage names come from the CLI verbatim; unknown ones are shown as-is. */
