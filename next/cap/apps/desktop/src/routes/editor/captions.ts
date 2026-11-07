@@ -545,6 +545,17 @@ export function applyEditedCaptionTimingToMaster(
 			? [{ ...word, start: wordStart, end: wordEnd }]
 			: [];
 	});
+	if ((segment.words ?? []).length > 0) {
+		if (words.length === 0) {
+			words.push({ text: segment.text, start, end });
+		} else {
+			const first = words[0];
+			const last = words[words.length - 1];
+			if (start < segment.start && first && first.start > start)
+				first.start = start;
+			if (end > segment.end && last && last.end < end) last.end = end;
+		}
+	}
 	const next = sourceSegments.slice();
 	next[index] = { ...segment, start, end, words };
 	return next;
@@ -1205,6 +1216,64 @@ if (import.meta.vitest) {
 			);
 			expect(next?.[0]?.start).toBeCloseTo(3.5);
 			expect(next?.[0]?.end).toBeCloseTo(4);
+		});
+
+		it("extends the edge words when the range grows so the track keeps the new bounds", () => {
+			const master: CaptionSegment[] = [
+				{
+					id: "cap",
+					start: 2,
+					end: 4,
+					text: "early later",
+					words: [
+						{ text: "early", start: 2, end: 2.5 },
+						{ text: "later", start: 3.5, end: 3.8 },
+					],
+				},
+			];
+			const next = applyEditedCaptionTimingToMaster(
+				master,
+				"cap",
+				2,
+				4.5,
+				[{ start: 0, end: 8, timescale: 1, recordingSegment: 0 }],
+				recordings,
+			);
+			expect(next?.[0]?.end).toBeCloseTo(4.5);
+			expect(next?.[0]?.words?.at(-1)).toEqual({
+				text: "later",
+				start: 3.5,
+				end: 4.5,
+			});
+			expect(next?.[0]?.words?.[0]).toEqual({
+				text: "early",
+				start: 2,
+				end: 2.5,
+			});
+		});
+
+		it("adds a spanning word when a trim leaves no existing word inside the range", () => {
+			const master: CaptionSegment[] = [
+				{
+					id: "cap",
+					start: 2,
+					end: 4,
+					text: "gap",
+					words: [
+						{ text: "a", start: 2, end: 2.2 },
+						{ text: "b", start: 3.8, end: 4 },
+					],
+				},
+			];
+			const next = applyEditedCaptionTimingToMaster(
+				master,
+				"cap",
+				2.6,
+				3.4,
+				[{ start: 0, end: 8, timescale: 1, recordingSegment: 0 }],
+				recordings,
+			);
+			expect(next?.[0]?.words).toEqual([{ text: "gap", start: 2.6, end: 3.4 }]);
 		});
 
 		it("returns null when an edited boundary is outside the timeline", () => {
