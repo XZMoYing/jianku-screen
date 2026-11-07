@@ -1,0 +1,46 @@
+{
+  "before": {
+    "timecode": [
+      "0:01.25",
+      "0:08.00"
+    ],
+    "keyboardLabels": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  "playing1": {
+    "timecode": [
+      "0:02.50",
+      "0:08.00"
+    ],
+    "keyboardLabels": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  "playing2": {
+    "timecode": [
+      "0:04.03",
+      "0:08.00"
+    ],
+    "keyboardLabels": [
+      "A",
+      "B",
+      "C"
+    ]
+  },
+  "paused": {
+    "timecode": [
+      "0:04.35",
+      "0:08.00"
+    ],
+    "keyboardLabels": [
+      "A",
+      "B",
+      "C"
+    ]
+  }
+}

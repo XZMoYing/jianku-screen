@@ -1,0 +1,23 @@
+{
+  "step": "trim-right",
+  "segments": [
+    {
+      "id": "kb-edit-fixture-1",
+      "start": 1.0,
+      "end": 1.758,
+      "text": "A"
+    },
+    {
+      "id": "kb-edit-fixture-2",
+      "start": 3.0,
+      "end": 3.7,
+      "text": "B"
+    },
+    {
+      "id": "kb-edit-fixture-3",
+      "start": 5.2,
+      "end": 6.1,
+      "text": "C"
+    }
+  ]
+}

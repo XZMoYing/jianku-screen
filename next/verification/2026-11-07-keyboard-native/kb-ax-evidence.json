@@ -1,0 +1,74 @@
+[
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 369,
+      "y": 804
+    },
+    "size": {
+      "height": 44,
+      "width": 355
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "A",
+    "position": {
+      "x": 382,
+      "y": 818
+    },
+    "size": {
+      "height": 15,
+      "width": 8
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 699,
+      "y": 804
+    },
+    "size": {
+      "height": 44,
+      "width": 705
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "B",
+    "position": {
+      "x": 712,
+      "y": 818
+    },
+    "size": {
+      "height": 15,
+      "width": 9
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 1118,
+      "y": 804
+    },
+    "size": {
+      "height": 44,
+      "width": 1161
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "C",
+    "position": {
+      "x": 1131,
+      "y": 818
+    },
+    "size": {
+      "height": 15,
+      "width": 8
+    }
+  }
+]

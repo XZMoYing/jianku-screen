@@ -1,0 +1,56 @@
+[
+  {
+    "id": "kb-edit-fixture-1",
+    "start": 1.0,
+    "end": 1.6,
+    "displayText": "A",
+    "keys": [
+      {
+        "key": "A",
+        "timeOffset": 0.0
+      }
+    ],
+    "fadeDurationOverride": null,
+    "positionOverride": null,
+    "colorOverride": null,
+    "backgroundColorOverride": null,
+    "fontSizeOverride": null,
+    "uppercaseOverride": null
+  },
+  {
+    "id": "kb-edit-fixture-2",
+    "start": 3.0,
+    "end": 3.7,
+    "displayText": "B",
+    "keys": [
+      {
+        "key": "B",
+        "timeOffset": 0.0
+      }
+    ],
+    "fadeDurationOverride": null,
+    "positionOverride": null,
+    "colorOverride": null,
+    "backgroundColorOverride": null,
+    "fontSizeOverride": null,
+    "uppercaseOverride": null
+  },
+  {
+    "id": "kb-edit-fixture-3",
+    "start": 5.2,
+    "end": 6.1,
+    "displayText": "C",
+    "keys": [
+      {
+        "key": "C",
+        "timeOffset": 0.0
+      }
+    ],
+    "fadeDurationOverride": null,
+    "positionOverride": null,
+    "colorOverride": null,
+    "backgroundColorOverride": null,
+    "fontSizeOverride": null,
+    "uppercaseOverride": null
+  }
+]
