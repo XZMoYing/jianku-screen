@@ -3472,16 +3472,17 @@ impl ShowCapWindow {
             );
             builder = builder.initialization_script(&init_script);
 
-            // Native backing color so the window is themed before the webview's
-            // first paint, allowing windows to be shown immediately without a
-            // white/black flash. Skipped when the user has window transparency
-            // enabled: an opaque native background would sit behind the
-            // translucent webview content and defeat the effect.
+            // Native backing color matches the webview background so the window
+            // surface does not flash a different shade before the webview's first
+            // paint (a pure white backing reads as a bright flash in the light
+            // theme). Skipped when the user has window transparency enabled: an
+            // opaque native background would sit behind the translucent webview
+            // content and defeat the effect.
             if !window_transparency_enabled {
                 let native_bg = if is_dark {
-                    tauri::window::Color(0x14, 0x14, 0x14, 0xff)
+                    tauri::window::Color(0x11, 0x12, 0x0f, 0xff)
                 } else {
-                    tauri::window::Color(0xff, 0xff, 0xff, 0xff)
+                    tauri::window::Color(0xfa, 0xfa, 0xf5, 0xff)
                 };
                 builder = builder.background_color(native_bg);
             }
