@@ -1,0 +1,58 @@
+{
+  "editedTimingInFileAfterSave": [
+    [
+      0.0,
+      1.79
+    ],
+    [
+      2.09,
+      4.92
+    ],
+    [
+      5.157,
+      6.747
+    ],
+    [
+      7.37,
+      8.0
+    ]
+  ],
+  "timingInFileAfterEditorClose": [
+    [
+      0.0,
+      1.79
+    ],
+    [
+      2.09,
+      4.92
+    ],
+    [
+      5.157,
+      6.747
+    ],
+    [
+      7.37,
+      8.0
+    ]
+  ],
+  "timingAfterProjectReopen": [
+    [
+      0.0,
+      1.79
+    ],
+    [
+      2.09,
+      4.92
+    ],
+    [
+      4.92,
+      6.51
+    ],
+    [
+      7.37,
+      8.0
+    ]
+  ],
+  "sourceTimed": true,
+  "note": "caption track is derived from captions.segments (source time); drag wrote only timeline.captionSegments"
+}

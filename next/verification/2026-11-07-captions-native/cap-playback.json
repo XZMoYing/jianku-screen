@@ -1,0 +1,50 @@
+{
+  "before": {
+    "timecode": [
+      "0:05.57",
+      "0:08.00"
+    ],
+    "captionLabels": [
+      "Synthetic Cobalt Lantern",
+      "This is an offline diagnos",
+      "Synthetic Cobalt Lantern",
+      "BLANK_AUDIO"
+    ]
+  },
+  "1": {
+    "timecode": [
+      "0:07.23",
+      "0:08.00"
+    ],
+    "captionLabels": [
+      "Synthetic Cobalt Lantern",
+      "This is an offline diagnos",
+      "Synthetic Cobalt Lantern",
+      "BLANK_AUDIO"
+    ]
+  },
+  "2": {
+    "timecode": [
+      "0:07.54",
+      "0:08.00"
+    ],
+    "captionLabels": [
+      "Synthetic Cobalt Lantern",
+      "This is an offline diagnos",
+      "Synthetic Cobalt Lantern",
+      "BLANK_AUDIO"
+    ]
+  },
+  "paused": {
+    "timecode": [
+      "0:00.33",
+      "0:08.00"
+    ],
+    "captionLabels": [
+      "Synthetic Cobalt Lantern",
+      "This is an offline diagnos",
+      "Synthetic Cobalt Lantern",
+      "BLANK_AUDIO"
+    ]
+  }
+}
