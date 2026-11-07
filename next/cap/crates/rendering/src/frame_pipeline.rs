@@ -2480,6 +2480,66 @@ mod surface_output_tests {
         );
     }
 
+    fn fill_rgba(
+        queue: &wgpu::Queue,
+        texture: &wgpu::Texture,
+        width: u32,
+        height: u32,
+        color: [u8; 4],
+    ) {
+        let data = color.repeat((width * height) as usize);
+        queue.write_texture(
+            texture.as_image_copy(),
+            &data,
+            wgpu::TexelCopyBufferLayout {
+                offset: 0,
+                bytes_per_row: Some(width * 4),
+                rows_per_image: None,
+            },
+            wgpu::Extent3d {
+                width,
+                height,
+                depth_or_array_layers: 1,
+            },
+        );
+    }
+
+    #[tokio::test]
+    async fn bt709_limited_surface_conversion_for_primary_colors() {
+        let Some((device, queue)) = device() else {
+            eprintln!("no GPU adapter available, skipping");
+            return;
+        };
+        let width = 64u32;
+        let height = 32u32;
+        let source = gradient_texture(&device, &queue, width, height);
+        let mut converter = RgbaToNv12Converter::new(&device);
+        converter.enable_surface_output();
+        for (color, expected) in [
+            ([252u8, 0, 0, 255], [62i32, 103, 239]),
+            ([128, 128, 128, 255], [126, 128, 128]),
+            ([0, 0, 251, 255], [31, 239, 117]),
+        ] {
+            fill_rgba(&queue, &source, width, height, color);
+            let frame = convert(&device, &queue, &mut converter, &source, width, height).await;
+            let surface = frame.surface.as_ref().expect("surface output");
+            let actual = surface
+                .with_locked_planes(|y, y_stride, uv, uv_stride| {
+                    let y_value = y[(height as usize / 2) * y_stride + width as usize / 2];
+                    let uv_index = (height as usize / 4) * uv_stride + (width as usize / 2);
+                    [y_value, uv[uv_index], uv[uv_index + 1]]
+                })
+                .expect("lock planes");
+            for (index, (actual, expected)) in actual.iter().zip(expected.iter()).enumerate() {
+                assert!(
+                    (*actual as i32 - *expected).abs() <= 2,
+                    "channel {index} for {:?}: {actual} vs {expected}",
+                    color
+                );
+            }
+        }
+    }
+
     fn nv12_first_y(frame: &Nv12RenderedFrame) -> u8 {
         match frame.surface.as_ref() {
             Some(surface) => surface
