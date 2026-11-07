@@ -3,7 +3,7 @@
 	"productName": "Jianku Screen Next",
 	"mainBinaryName": "Jianku Screen Next",
 	"identifier": "com.jianku.screen.next",
-	"version": "0.2.0-alpha.104",
+	"version": "0.2.0-alpha.105",
 	"build": {
 		"beforeBuildCommand": "bun run build"
 	},
@@ -43,7 +43,7 @@
 		},
 		"macOS": {
 			"bundleName": "简库镜传 Next",
-			"bundleVersion": "2026.104.0",
+			"bundleVersion": "2026.105.0",
 			"entitlements": "Entitlements.plist"
 		},
 		"externalBin": [
