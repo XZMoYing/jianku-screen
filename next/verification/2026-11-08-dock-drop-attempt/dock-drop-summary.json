@@ -1,0 +1,55 @@
+{
+  "appVersion": "0.2.0-alpha.104",
+  "goal": "U24 Dock 拖放（Finder 文件拖到运行中应用的 Dock 图标应打开工程）",
+  "attempts": [
+    {
+      "start": [
+        1140,
+        280
+      ],
+      "end": [
+        1476,
+        1013
+      ],
+      "steps": 25,
+      "result": "未打开工程（仍仅首页窗口）"
+    },
+    {
+      "start": [
+        1200,
+        280
+      ],
+      "end": [
+        1476,
+        1013
+      ],
+      "steps": 30,
+      "result": "未打开工程"
+    },
+    {
+      "start": [
+        1152,
+        281
+      ],
+      "end": [
+        1476,
+        995
+      ],
+      "steps": 30,
+      "dwellMs": 700,
+      "result": "未打开工程"
+    }
+  ],
+  "coordinates": {
+    "dockItem": "Jianku Screen Next position (1449.97,980.96) size (53.04,64.04) → 中心约 (1476.5,1013)",
+    "finderFileText": "复验（87诊断）.jks AXTextField (1179,272) 115x16",
+    "finderWindow": "jianku-alpha104-20261108 (467,211) 920x436"
+  },
+  "conclusion": "通过 CGEvent 从 Finder 文件行拖到运行中应用 Dock 图标，3 次尝试均未打开工程；可能为自动化起点/拖拽事件或 Dock spring-loading 参数问题，也可能是产品未处理该入口。未做人工确认，不能据此判定产品失败；Dock 拖放仍未验证，U24 保持开放。",
+  "tools": "新增 drag-screen（绝对坐标拖拽，支持 dwell）与 ax-app（任意 App AX 树导出）用于本次尝试。",
+  "notCovered": [
+    "人工/Dock 真实拖放确认",
+    "冷启动（未运行）Dock 拖放",
+    "Finder 其他视图"
+  ]
+}
