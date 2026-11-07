@@ -1,0 +1,27 @@
+{
+  "step": "style-trim-left",
+  "style": [
+    {
+      "name": "样式A",
+      "start": 1.158,
+      "end": 2.5
+    },
+    {
+      "name": "样式B",
+      "start": 4.0,
+      "end": 5.5
+    }
+  ],
+  "image": [
+    {
+      "name": "图片A",
+      "start": 2.0,
+      "end": 3.0
+    },
+    {
+      "name": "图片B",
+      "start": 5.0,
+      "end": 6.0
+    }
+  ]
+}

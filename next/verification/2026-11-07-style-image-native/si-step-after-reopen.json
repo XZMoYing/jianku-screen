@@ -1,0 +1,27 @@
+{
+  "step": "after-reopen",
+  "style": [
+    {
+      "name": "样式A",
+      "start": 1.263,
+      "end": 2.763
+    },
+    {
+      "name": "样式B",
+      "start": 4.0,
+      "end": 5.5
+    }
+  ],
+  "image": [
+    {
+      "name": "图片A",
+      "start": 2.263,
+      "end": 3.263
+    },
+    {
+      "name": "图片B",
+      "start": 5.0,
+      "end": 6.0
+    }
+  ]
+}

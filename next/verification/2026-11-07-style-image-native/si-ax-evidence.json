@@ -1,0 +1,242 @@
+[
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 369,
+      "y": 854
+    },
+    "size": {
+      "height": 44,
+      "width": 526
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 374,
+      "y": 868
+    },
+    "size": {
+      "height": 16,
+      "width": 4
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "样式A",
+    "position": {
+      "x": 382,
+      "y": 869
+    },
+    "size": {
+      "height": 14,
+      "width": 33
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "1.5s",
+    "position": {
+      "x": 422,
+      "y": 869
+    },
+    "size": {
+      "height": 13,
+      "width": 23
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 646,
+      "y": 868
+    },
+    "size": {
+      "height": 16,
+      "width": 4
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 889,
+      "y": 854
+    },
+    "size": {
+      "height": 44,
+      "width": 1048
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 894,
+      "y": 868
+    },
+    "size": {
+      "height": 16,
+      "width": 4
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "样式B",
+    "position": {
+      "x": 902,
+      "y": 869
+    },
+    "size": {
+      "height": 14,
+      "width": 34
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "1.5s",
+    "position": {
+      "x": 943,
+      "y": 869
+    },
+    "size": {
+      "height": 13,
+      "width": 23
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 1167,
+      "y": 868
+    },
+    "size": {
+      "height": 16,
+      "width": 4
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 559,
+      "y": 904
+    },
+    "size": {
+      "height": 44,
+      "width": 621
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 564,
+      "y": 918
+    },
+    "size": {
+      "height": 16,
+      "width": 4
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "图片A",
+    "position": {
+      "x": 572,
+      "y": 919
+    },
+    "size": {
+      "height": 14,
+      "width": 33
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "1.0s",
+    "position": {
+      "x": 612,
+      "y": 919
+    },
+    "size": {
+      "height": 13,
+      "width": 23
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 741,
+      "y": 918
+    },
+    "size": {
+      "height": 16,
+      "width": 4
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 1080,
+      "y": 904
+    },
+    "size": {
+      "height": 44,
+      "width": 1142
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 1085,
+      "y": 918
+    },
+    "size": {
+      "height": 16,
+      "width": 4
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "图片B",
+    "position": {
+      "x": 1093,
+      "y": 919
+    },
+    "size": {
+      "height": 14,
+      "width": 33
+    }
+  },
+  {
+    "role": "AXStaticText",
+    "AXValue": "1.0s",
+    "position": {
+      "x": 1133,
+      "y": 919
+    },
+    "size": {
+      "height": 13,
+      "width": 23
+    }
+  },
+  {
+    "role": "AXGroup",
+    "AXValue": null,
+    "position": {
+      "x": 1262,
+      "y": 918
+    },
+    "size": {
+      "height": 16,
+      "width": 4
+    }
+  }
+]

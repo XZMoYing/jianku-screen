@@ -1,0 +1,66 @@
+{
+  "styleSegments": [
+    {
+      "start": 1.0,
+      "end": 2.5,
+      "track": 0,
+      "enabled": true,
+      "name": "样式A",
+      "overrides": {}
+    },
+    {
+      "start": 4.0,
+      "end": 5.5,
+      "track": 0,
+      "enabled": true,
+      "name": "样式B",
+      "overrides": {}
+    }
+  ],
+  "imageSegments": [
+    {
+      "start": 2.0,
+      "end": 3.0,
+      "track": 0,
+      "enabled": true,
+      "path": "content/image.png",
+      "name": "图片A",
+      "center": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "size": {
+        "x": 0.3,
+        "y": 0.3
+      },
+      "opacity": 1.0,
+      "rotation": 0.0,
+      "rounding": 0.0,
+      "flipX": false,
+      "flipY": false,
+      "lockAspect": true
+    },
+    {
+      "start": 5.0,
+      "end": 6.0,
+      "track": 0,
+      "enabled": true,
+      "path": "content/image.png",
+      "name": "图片B",
+      "center": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "size": {
+        "x": 0.3,
+        "y": 0.3
+      },
+      "opacity": 1.0,
+      "rotation": 0.0,
+      "rounding": 0.0,
+      "flipX": false,
+      "flipY": false,
+      "lockAspect": true
+    }
+  ]
+}
