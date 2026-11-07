@@ -1,0 +1,386 @@
+{
+  "before": {
+    "splitters": [
+      {
+        "label": "调整预览和编辑栏宽度",
+        "position": {
+          "x": 1168,
+          "y": 87
+        }
+      },
+      {
+        "label": "调整时间线高度",
+        "position": {
+          "x": 8,
+          "y": 648
+        }
+      }
+    ],
+    "trackHeads": [
+      {
+        "label": "选择轨道：视频",
+        "position": {
+          "x": 25,
+          "y": 704
+        }
+      },
+      {
+        "label": "选择轨道：字幕",
+        "position": {
+          "x": 25,
+          "y": 754
+        }
+      },
+      {
+        "label": "选择轨道：按键",
+        "position": {
+          "x": 25,
+          "y": 804
+        }
+      },
+      {
+        "label": "选择轨道：缩放",
+        "position": {
+          "x": 25,
+          "y": 854
+        }
+      }
+    ]
+  },
+  "after-timeline-up": {
+    "splitters": [
+      {
+        "label": "调整预览和编辑栏宽度",
+        "position": {
+          "x": 1168,
+          "y": 87
+        }
+      },
+      {
+        "label": "调整时间线高度",
+        "position": {
+          "x": 8,
+          "y": 588
+        }
+      }
+    ],
+    "trackHeads": [
+      {
+        "label": "选择轨道：视频",
+        "position": {
+          "x": 25,
+          "y": 644
+        }
+      },
+      {
+        "label": "选择轨道：字幕",
+        "position": {
+          "x": 25,
+          "y": 694
+        }
+      },
+      {
+        "label": "选择轨道：按键",
+        "position": {
+          "x": 25,
+          "y": 744
+        }
+      },
+      {
+        "label": "选择轨道：缩放",
+        "position": {
+          "x": 25,
+          "y": 794
+        }
+      }
+    ]
+  },
+  "after-timeline-down": {
+    "splitters": [
+      {
+        "label": "调整预览和编辑栏宽度",
+        "position": {
+          "x": 1168,
+          "y": 87
+        }
+      },
+      {
+        "label": "调整时间线高度",
+        "position": {
+          "x": 8,
+          "y": 688
+        }
+      }
+    ],
+    "trackHeads": [
+      {
+        "label": "选择轨道：视频",
+        "position": {
+          "x": 25,
+          "y": 744
+        }
+      },
+      {
+        "label": "选择轨道：字幕",
+        "position": {
+          "x": 25,
+          "y": 794
+        }
+      },
+      {
+        "label": "选择轨道：按键",
+        "position": {
+          "x": 25,
+          "y": 844
+        }
+      },
+      {
+        "label": "选择轨道：缩放",
+        "position": {
+          "x": 25,
+          "y": 894
+        }
+      }
+    ]
+  },
+  "after-width-right": {
+    "splitters": [
+      {
+        "label": "调整预览和编辑栏宽度",
+        "position": {
+          "x": 1228,
+          "y": 87
+        }
+      },
+      {
+        "label": "调整时间线高度",
+        "position": {
+          "x": 8,
+          "y": 688
+        }
+      }
+    ],
+    "trackHeads": [
+      {
+        "label": "选择轨道：视频",
+        "position": {
+          "x": 25,
+          "y": 744
+        }
+      },
+      {
+        "label": "选择轨道：字幕",
+        "position": {
+          "x": 25,
+          "y": 794
+        }
+      },
+      {
+        "label": "选择轨道：按键",
+        "position": {
+          "x": 25,
+          "y": 844
+        }
+      },
+      {
+        "label": "选择轨道：缩放",
+        "position": {
+          "x": 25,
+          "y": 894
+        }
+      }
+    ]
+  },
+  "after-width-back": {
+    "splitters": [
+      {
+        "label": "调整预览和编辑栏宽度",
+        "position": {
+          "x": 1168,
+          "y": 87
+        }
+      },
+      {
+        "label": "调整时间线高度",
+        "position": {
+          "x": 8,
+          "y": 688
+        }
+      }
+    ],
+    "trackHeads": [
+      {
+        "label": "选择轨道：视频",
+        "position": {
+          "x": 25,
+          "y": 744
+        }
+      },
+      {
+        "label": "选择轨道：字幕",
+        "position": {
+          "x": 25,
+          "y": 794
+        }
+      },
+      {
+        "label": "选择轨道：按键",
+        "position": {
+          "x": 25,
+          "y": 844
+        }
+      },
+      {
+        "label": "选择轨道：缩放",
+        "position": {
+          "x": 25,
+          "y": 894
+        }
+      }
+    ]
+  },
+  "layout-set": {
+    "splitters": [
+      {
+        "label": "调整预览和编辑栏宽度",
+        "position": {
+          "x": 1208,
+          "y": 87
+        }
+      },
+      {
+        "label": "调整时间线高度",
+        "position": {
+          "x": 8,
+          "y": 608
+        }
+      }
+    ],
+    "trackHeads": [
+      {
+        "label": "选择轨道：视频",
+        "position": {
+          "x": 25,
+          "y": 664
+        }
+      },
+      {
+        "label": "选择轨道：字幕",
+        "position": {
+          "x": 25,
+          "y": 714
+        }
+      },
+      {
+        "label": "选择轨道：按键",
+        "position": {
+          "x": 25,
+          "y": 764
+        }
+      },
+      {
+        "label": "选择轨道：缩放",
+        "position": {
+          "x": 25,
+          "y": 814
+        }
+      }
+    ]
+  },
+  "after-reopen": {
+    "splitters": [
+      {
+        "label": "调整预览和编辑栏宽度",
+        "position": {
+          "x": 1208,
+          "y": 87
+        }
+      },
+      {
+        "label": "调整时间线高度",
+        "position": {
+          "x": 8,
+          "y": 608
+        }
+      }
+    ],
+    "trackHeads": [
+      {
+        "label": "选择轨道：视频",
+        "position": {
+          "x": 25,
+          "y": 664
+        }
+      },
+      {
+        "label": "选择轨道：字幕",
+        "position": {
+          "x": 25,
+          "y": 714
+        }
+      },
+      {
+        "label": "选择轨道：按键",
+        "position": {
+          "x": 25,
+          "y": 764
+        }
+      },
+      {
+        "label": "选择轨道：缩放",
+        "position": {
+          "x": 25,
+          "y": 814
+        }
+      }
+    ]
+  },
+  "restored": {
+    "splitters": [
+      {
+        "label": "调整预览和编辑栏宽度",
+        "position": {
+          "x": 1168,
+          "y": 87
+        }
+      },
+      {
+        "label": "调整时间线高度",
+        "position": {
+          "x": 8,
+          "y": 648
+        }
+      }
+    ],
+    "trackHeads": [
+      {
+        "label": "选择轨道：视频",
+        "position": {
+          "x": 25,
+          "y": 704
+        }
+      },
+      {
+        "label": "选择轨道：字幕",
+        "position": {
+          "x": 25,
+          "y": 754
+        }
+      },
+      {
+        "label": "选择轨道：按键",
+        "position": {
+          "x": 25,
+          "y": 804
+        }
+      },
+      {
+        "label": "选择轨道：缩放",
+        "position": {
+          "x": 25,
+          "y": 854
+        }
+      }
+    ]
+  }
+}
