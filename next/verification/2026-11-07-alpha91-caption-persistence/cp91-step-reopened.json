@@ -1,0 +1,62 @@
+{
+  "step": "reopened",
+  "track": [
+    [
+      0.0,
+      1.79
+    ],
+    [
+      2.09,
+      4.92
+    ],
+    [
+      5.157,
+      6.888
+    ],
+    [
+      7.37,
+      8.0
+    ]
+  ],
+  "master": [
+    [
+      0.0,
+      1.79
+    ],
+    [
+      2.09,
+      4.92
+    ],
+    [
+      5.157,
+      6.888
+    ],
+    [
+      7.37,
+      8.0
+    ]
+  ],
+  "words3": [
+    [
+      "Synthetic",
+      5.157,
+      5.827
+    ],
+    [
+      "Cobalt",
+      5.827,
+      6.267
+    ],
+    [
+      "Lantern",
+      6.267,
+      6.888
+    ]
+  ],
+  "texts": [
+    "Synthetic Cobalt Lantern",
+    "This is an offline diagnostic test.",
+    "Synthetic Cobalt Lantern",
+    "BLANK_AUDIO"
+  ]
+}

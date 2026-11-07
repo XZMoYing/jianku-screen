@@ -1,0 +1,45 @@
+{
+  "step": "before",
+  "track": [
+    [
+      0.0,
+      1.79
+    ],
+    [
+      2.09,
+      4.92
+    ],
+    [
+      4.92,
+      6.51
+    ],
+    [
+      7.37,
+      8.0
+    ]
+  ],
+  "master": [
+    [
+      0.0,
+      1.79
+    ],
+    [
+      2.09,
+      4.92
+    ],
+    [
+      4.92,
+      6.51
+    ],
+    [
+      7.37,
+      8.0
+    ]
+  ],
+  "text": [
+    "Synthetic Cobalt Lantern",
+    "This is an offline diagnostic test.",
+    "Synthetic Cobalt Lantern",
+    "BLANK_AUDIO"
+  ]
+}
