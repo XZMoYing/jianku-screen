@@ -1,0 +1,32 @@
+{
+  "appVersion": "0.2.0-alpha.104",
+  "finding": "timescale=1.5 时，缩放/3D 等效果轨道在时间线上的位置被按 timescale 放大（×1.5），而视频/字幕轨保持源时间；导出按原始配置时间渲染。时间线显示与成片时间存在系统性偏移。",
+  "measurements": {
+    "baselineTimescale1": "缩放 2.476–4.578 段手柄 x605/992，按 188.5px/s 推得 2.499–4.55s ≈ 配置值",
+    "timescale1.5": {
+      "zoomConfig": [
+        2.4757,
+        4.5782
+      ],
+      "zoomHandlesX": [
+        840,
+        1427
+      ],
+      "impliedTimesAt188_5": [
+        3.745,
+        6.86
+      ],
+      "conclusion": "恰为配置×1.5"
+    },
+    "videoCaptionHandles": "视频 0–8 段与字幕母版时间（1.79/2.09/4.92/6.51/7.37/8）在 188.5px/s 下与手柄一致，未见 ×1.5",
+    "exportZoomWindow": "导出 5.333s；大幅帧差出现在输出 2.50–2.97s 与 4.60–5.10s（缩放进/出过渡），与配置 2.476–4.578（输出时间基）一致，而非 ×1.5 后的 3.71–6.87",
+    "threeDragUnderSpeed": "timescale=1.5 下 3D 段拖 +45px，配置 1.263→1.4205（+0.1575s）= 45px/(188.5×1.5)，说明拖动也按被放大的时间线映射写回"
+  },
+  "hypothesis": "效果轨（缩放/3D，可能含样式/图片）的时间线布局与命中映射误乘 timescale；成片按配置时间渲染，导致时间线位置相对成片偏移、拖动后时间也不符预期。可能是用户“偶发偏移”线索之一。",
+  "notCovered": [
+    "源码定位根因（timeline layout / effect track mapping 使用 timescale 的位置）",
+    "样式/图片轨同场景",
+    "timescale<1、转场组合",
+    "修复与回归"
+  ]
+}
