@@ -86,7 +86,12 @@ export function ProjectMenu(props: {
 							paths: externalAssets.slice(0, 6).join("\n"),
 						},
 					),
-					{ title: localize("包含外部素材"), kind: "warning" },
+					{
+						cancelLabel: localize("取消"),
+						kind: "warning",
+						okLabel: localize("继续保存"),
+						title: localize("包含外部素材"),
+					},
 				);
 				if (!confirmed) return;
 			}

@@ -1750,5 +1750,6 @@
 	"不执行操作": "Do nothing",
 	"重新打开录制窗口": "Reopen recording window",
 	"包含外部素材": "Includes external assets",
-	"便携副本将复制工程引用的外部素材（共 {count} 个文件）：\n{paths}\n请确认其中没有敏感文件，再继续保存。": "The portable copy will include external assets referenced by the project ({count} files):\n{paths}\nConfirm none are sensitive before saving."
+	"便携副本将复制工程引用的外部素材（共 {count} 个文件）：\n{paths}\n请确认其中没有敏感文件，再继续保存。": "The portable copy will include external assets referenced by the project ({count} files):\n{paths}\nConfirm none are sensitive before saving.",
+	"继续保存": "Continue"
 }

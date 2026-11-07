@@ -1,0 +1,17 @@
+{
+  "appVersion": "0.2.0-alpha.105 / 2026.105.0（冻结 54ebb59）",
+  "fix": "便携副本保存前扫描工程外部素材（background/image/audio/style overrides；绝对/盘符/..），有则 ask 警告列出前 6 个文件。",
+  "verifiedPaths": {
+    "cancel": "外置素材夹具 Cmd+Shift+S → 警告「包含外部素材」（列出 /private/tmp/jianku-alpha104-20261108/external-asset.png）→ 按 No → 无副本生成。",
+    "confirm": "再次 Cmd+Shift+S → Yes → 原生保存面板 → 保存为「警告确认副本.jks」：副本含 assets/portable/<uuid>/external-asset.png，配置 path 为相对路径、资产存在。",
+    "internalOnly": "内建素材夹具（复验）Cmd+Shift+S → 无警告、直接保存面板。"
+  },
+  "residual": "警告对话框按钮显示英文 No/Yes（中文界面下）；已源码传 okLabel/cancelLabel（继续保存/取消）+词典，待 alpha.106 实包复验。",
+  "conclusion": "alpha.105 实包验证 U09b3 三条路径（取消/确认/无外置素材）均符合预期；按钮本地化待下一包。U09 仍不关闭（Python/Windows/Linux 语义与符号链接待验）。",
+  "notCovered": [
+    "对话框按钮中文化实包复验（alpha.106）",
+    "Windows/Linux 路径语义",
+    "符号链接/异常路径攻击面",
+    "外部 SRT 往返等其它 U25b 项"
+  ]
+}
