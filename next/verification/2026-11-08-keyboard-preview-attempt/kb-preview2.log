@@ -1,0 +1,2 @@
+OWNED_WINDOW_CAPTURE_READY 26733 1680x954
+{"captureStartedAtUnix":1794099206.134902,"droppedByWriter":0,"durationRequested":6,"firstSampleAtUnix":1794099206.1564403,"frames":169,"height":954,"maximumSampleGapMs":141.88133331481367,"samples":169,"scope":"CGWindowListCreateImage optionIncludingWindow for one verified owned editor; no display capture","width":1680,"windowID":26733}
