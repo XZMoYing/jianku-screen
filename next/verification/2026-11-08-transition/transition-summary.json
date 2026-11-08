@@ -1,0 +1,47 @@
+{
+  "appVersion": "0.2.0-alpha.108",
+  "fixture": "复验工程改造：主轨拆为 A(0–4) / B(4–8)，同源 recordingSegment0；timeline.transitions=[{segmentIndex:1,type:cross-fade,duration:0.5}]",
+  "export": {
+    "transitionOn": {
+      "frames": 225,
+      "durationSec": 7.5,
+      "exportOk": true
+    },
+    "transitionOff": {
+      "frames": 240,
+      "durationSec": 8.0,
+      "exportOk": true
+    },
+    "note": "开启 cross-fade 后输出时长由 8.0s 缩短为 7.5s（与 0.5s 重叠一致）；因两段引用同源画面，边界帧差仅 0.008–0.009，无法从像素判断交叉淡化观感。"
+  },
+  "uiLoad": {
+    "editorLoaded": true,
+    "nodes": 338,
+    "segments": [
+      [
+        0.0,
+        4.0,
+        "A"
+      ],
+      [
+        4.0,
+        8.0,
+        "B"
+      ]
+    ],
+    "transitionsPreserved": [
+      {
+        "segmentIndex": 1,
+        "type": "cross-fade",
+        "duration": 0.5
+      }
+    ]
+  },
+  "conclusion": "转场工程可加载（2 片段+转场）、打开后配置保留、导出成功且时长按转场重叠缩短；U25b“真实工程转场组合”部分验证。同源素材无法视觉验证交叉淡化，字幕/变速/空隙与转场叠加未覆盖。",
+  "notCovered": [
+    "不同源片段的 cross-fade/fade-through-black 视觉",
+    "转场+字幕/变速/空隙组合映射",
+    "原生 UI 增删转场操作",
+    "其它转场类型与时长边界"
+  ]
+}
