@@ -1,0 +1,13 @@
+{
+  "appVersion": "0.2.0-alpha.108",
+  "scenario": "应用运行于首页；Finder 以图标视图打开 /private/tmp/jianku-alpha108-20261108；从工程图标拖到运行中应用 Dock 图标（图标中心约 1476,1013）。",
+  "method": "ax-app 导出 Finder 图标位置（转场验收.jks AXImage (1206,447) 64x64 → 中心 1238,479）与 Dock 项位置（Jianku Screen Next (1449.97,980.96) 53x64 → 中心 1476,1013）；CGEvent drag-screen 30 步 + 1200ms hover。",
+  "result": "拖放后编辑器窗口打开，工程名 **转场验收**（与拖动文件一致）。此前列表视图多次失败、图标视图+悬停成功。",
+  "conclusion": "U24 Dock 拖放（运行中应用）**通过**：从 Finder 图标拖到运行中应用 Dock 图标可打开对应工程。未覆盖：应用未运行时的冷启动 Dock 拖放（需把应用固定到 Dock，未修改用户 Dock）、其它 Finder 视图/多文件/异常文件。",
+  "notCovered": [
+    "冷启动（应用未运行、固定 Dock 图标）拖放",
+    "列表视图拖放（此前失败）",
+    "多文件/异常文件/权限错误",
+    "Dock 顺序/用户自定义布局"
+  ]
+}
