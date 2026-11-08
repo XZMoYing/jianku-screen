@@ -645,3 +645,5 @@
 5. 真实素材/会议/副屏/真机验收按用户要求延期。
 
 其余可独立验证项已逐步完成并记录在 next/verification 与各轮 session 日志；本阶段候选状态见 docs/U17-可试用候选状态-2026-11-08.md。
+
+2026-11-08 最终状态：在 alpha.108 源码执行 node scripts/jianku-unattended-check.mjs 通过（EXIT 0，前端构建/服务端函数/预渲染完成，输出“无人值守局部基线检查通过；不代表完整发布审计或实机验收通过”）。证据 next/verification/2026-11-08-unattended-check。
