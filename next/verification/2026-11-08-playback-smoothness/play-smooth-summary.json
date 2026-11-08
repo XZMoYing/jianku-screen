@@ -1,0 +1,27 @@
+{
+  "appVersion": "0.2.0-alpha.108",
+  "fixture": "复验夹具替换 content/display.mp4 为 8s testsrc2 30fps 移动画面（jks 其余不变）",
+  "method": "单窗口取帧 6s/162 帧（cap mean 37ms、p95 68ms、max 82ms），播放约 4.09s；预览区域连续帧差阈值 0.3 计为一次更新。",
+  "results": {
+    "playWindow": [
+      1.17,
+      5.26
+    ],
+    "activeFrames": 80,
+    "changedFrames": 72,
+    "previewUpdatesPerSec": 17.61,
+    "capturedFramesPerSec": 19.56,
+    "maxGapBetweenUpdatesMs": 82,
+    "gapsOver100ms": 0,
+    "gapsOver200ms": 0,
+    "activeDiffMean": 3.54,
+    "activeDiffMax": 10.22
+  },
+  "conclusion": "移动画面播放 4.09s 内预览更新 72/80 个采集帧（≈17.6 次/s，受单窗口采集 ~27fps 上限限制），更新最大间隔 82ms（与采集最大间隔 81.7ms 一致），无 >100ms 停顿。**在采集精度内未发现播放卡顿**；无法验证 60fps 实际刷新与 GPU 掉帧计数。",
+  "notCovered": [
+    "高于采集帧率的刷新/掉帧计数",
+    "长时播放/多轨混合/导出同时进行",
+    "GPU/CPU 指标",
+    "真实用户工程与副屏"
+  ]
+}
