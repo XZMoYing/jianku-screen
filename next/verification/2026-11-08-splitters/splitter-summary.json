@@ -1,0 +1,33 @@
+{
+  "appVersion": "0.2.0-alpha.108",
+  "widthSplitter": {
+    "beforeX": 1168,
+    "afterDragRight60": 1233,
+    "restoredX": 1163,
+    "note": "预览/编辑栏宽度分隔条右移约 60px（1168→1233），拖回后 1163；轨道头 y 不变"
+  },
+  "heightSplitter": {
+    "beforeY": 648,
+    "afterDragUp60": 583,
+    "restoredY": 653,
+    "note": "时间线高度分隔条上移约 65px，四个轨道头 y 704→639 同步 -65（1:1）"
+  },
+  "persistence": {
+    "afterReopenX": 1163,
+    "afterReopenY": 654,
+    "headsAfterReopen": [
+      710,
+      760,
+      810,
+      860
+    ],
+    "note": "退出重开后分隔条位置保持（1163/654），布局持久化生效"
+  },
+  "conclusion": "alpha.108 原生：预览/编辑栏宽度与时间线高度分隔条拖动 1:1 生效、拖回可复位、退出重开布局保持。U22c2b4 的“分隔条”覆盖补齐；其它滑块（如时间线缩放/参数滑块）与 Clip 段仍未覆盖。",
+  "notCovered": [
+    "其它滑块（时间线缩放、参数滑块）",
+    "Clip 段",
+    "连续闪屏与混合负载",
+    "极端窗口尺寸/多显示器布局"
+  ]
+}
