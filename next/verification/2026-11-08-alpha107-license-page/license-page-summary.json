@@ -1,0 +1,20 @@
+{
+  "appVersion": "0.2.0-alpha.107 / 2026.107.0（冻结 98bb31a）",
+  "licensePage": {
+    "verified": true,
+    "observed": [
+      "标题 开源许可",
+      "简库镜传 Next / AGPLv3",
+      "本项目基于 简库镜传 Next 0.6.0 修改…",
+      "按钮 查看随包许可文件"
+    ]
+  },
+  "issueFound": "中文界面把许可文案中的 “Cap” 全局替换为“简库镜传 Next”（utils/i18n.ts translate 的 \bCap\b 品牌替换），导致上游许可归属显示错误：“本项目基于 简库镜传 Next 0.6.0 修改”。",
+  "fix": "已新增 tUnbranded（不执行品牌替换，仍走词典/插值），许可页标题与描述改用 tUnbranded，英文词典补对应翻译；tsc/Biome/i18n 测试通过。未包含在 alpha.107，待 alpha.108 实包复验。",
+  "conclusion": "alpha.107 实包许可页结构与按钮可用，但发现品牌替换污染许可归属文字；源码已修复待 alpha.108。U10 F6 的“用户可见许可入口”已补，但归属显示需下一包验证。",
+  "notCovered": [
+    "alpha.108 实包复验 tUnbranded 许可文案",
+    "点击“查看随包许可文件”的 Finder 展开结果未核验",
+    "其它含 Cap 的归属/说明文案影响面（品牌替换策略需设计复核）"
+  ]
+}

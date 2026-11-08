@@ -3,7 +3,7 @@ import { resolveResource } from "@tauri-apps/api/path";
 import { revealItemInDir } from "@tauri-apps/plugin-opener";
 import toast from "solid-toast";
 import { showAccountComingSoon } from "~/utils/auth";
-import { t } from "~/utils/i18n";
+import { t, tUnbranded } from "~/utils/i18n";
 import { Section, SectionCard, SettingsPageContent } from "./Setting";
 
 export default function Page() {
@@ -34,9 +34,9 @@ export default function Page() {
 				</Section>
 				<Section title={t("开源许可")}>
 					<SectionCard padded>
-						<p class="text-sm text-gray-12">{t("Cap / AGPLv3")}</p>
+						<p class="text-sm text-gray-12">{tUnbranded("Cap / AGPLv3")}</p>
 						<p class="mt-2 text-xs leading-relaxed text-gray-10">
-							{t(
+							{tUnbranded(
 								"本项目基于 Cap 0.6.0 修改，遵循 AGPLv3；源代码与构建说明见项目仓库。第三方组件许可随应用提供。",
 							)}
 						</p>

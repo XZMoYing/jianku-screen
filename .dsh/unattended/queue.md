@@ -518,7 +518,7 @@
 - [x] U09b2b alpha.85 实际 Mac 追加、只读失败重试、保存重开和中断恢复通过。
 - [ ] U09b2c 外部进程及旧版同时写入、Windows/Linux 与实际断电继续按发布审计记录。
 
-- [x] U10 完成权限、网络、日志、隐私和依赖/许可内部审计。验收：实际打包内容与请求核对，敏感信息不写入证据，保留必要来源归属，不宣称第三方认证。2026-11-08 源码+安装包审计完成（docs/审计-U10-权限网络日志隐私与依赖许可.md）：F1 网络收敛（VITE_SERVER_URL=127.0.0.1:9、删除 OpenPanel/Sentry env、updater inactive/空 endpoints、二进制无 sentry.io、账号入口敬请期待）；F2 诊断报告本机文件不上传、UI 提示可先查看；F3 TCC 权限无静默修改；F4 依赖固定 rev 运行时无下载；F5 许可（Cap AGPLv3、cap-camera*/scap-* MIT、第三方 NOTICE 与 Resources/licenses、Spacedrive 内 50 个许可含 FFmpeg GPL/LGPL）；F6 发布合规待办（用户可见许可清单/源码获取入口缺失、GPL+AGPL 组合需法律复核）。内部技术审计，不构成法律意见或第三方认证。未覆盖：运行时抓包、日志逐项脱敏、Win/Linux 许可、FFmpeg flags 法律级核对。
+- [x] U10 完成权限、网络、日志、隐私和依赖/许可内部审计。验收：实际打包内容与请求核对，敏感信息不写入证据，保留必要来源归属，不宣称第三方认证。2026-11-08 源码+安装包审计完成（docs/审计-U10-权限网络日志隐私与依赖许可.md）：F1 网络收敛（VITE_SERVER_URL=127.0.0.1:9、删除 OpenPanel/Sentry env、updater inactive/空 endpoints、二进制无 sentry.io、账号入口敬请期待）；F2 诊断报告本机文件不上传、UI 提示可先查看；F3 TCC 权限无静默修改；F4 依赖固定 rev 运行时无下载；F5 许可（Cap AGPLv3、cap-camera*/scap-* MIT、第三方 NOTICE 与 Resources/licenses、Spacedrive 内 50 个许可含 FFmpeg GPL/LGPL）；F6 发布合规待办（用户可见许可清单/源码获取入口缺失、GPL+AGPL 组合需法律复核）。内部技术审计，不构成法律意见或第三方认证。未覆盖：运行时抓包、日志逐项脱敏、Win/Linux 许可、FFmpeg flags 法律级核对。alpha.107 补（用户可见许可入口）：设置-许可 新增「开源许可」区块+「查看随包许可文件」按钮（实包可见）；但发现品牌替换污染归属文案（中文把 “Cap” 全局替换为“简库镜传 Next”，显示“本项目基于 简库镜传 Next 0.6.0 修改”）。已源码新增 tUnbranded（跳过品牌替换）并用于许可标题/描述+英文翻译，待 alpha.108 实包复验；另遗留品牌替换策略影响面需设计复核。证据 next/verification/2026-11-08-alpha107-license-page。
 - [x] U10a 转写应用日志移除正文、词元、路径和命令入参，保留诊断计数。静态审计、类型和 macOS 编译通过，整包用合成语音复验。
 - [ ] U10b 诊断导出和反馈上传的日志边界，覆盖旧版本文件与引擎输出。不读取用户真实录制，不以实际上传为验证。
 - [x] U10b1 Tauri 两个在线反馈命令在文件读取前返回敬请期待，移除旧出站路径，本地报告不含服务器地址和实例标识。源码及离线验证通过。

@@ -30,6 +30,20 @@ export function translate(text: string, language: "zh-CN" | "en") {
 		language === "en" ? "Jianku Screen Next" : "简库镜传 Next",
 	);
 }
+export function tUnbranded(
+	text: string,
+	values?: Record<string, string | number>,
+) {
+	const dictionary: Record<string, string> =
+		activeLanguage() === "en" ? en : zh;
+	const translated =
+		typeof dictionary[text] === "string" ? dictionary[text] : text;
+	return values
+		? translated.replace(/\{(\w+)\}/g, (match, key: string) =>
+				values[key] === undefined ? match : String(values[key]),
+			)
+		: translated;
+}
 export function t(text: string, values?: Record<string, string | number>) {
 	const translated = translate(text, activeLanguage());
 	return values
