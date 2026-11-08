@@ -1750,6 +1750,11 @@
 	"不执行操作": "Do nothing",
 	"重新打开录制窗口": "Reopen recording window",
 	"包含外部素材": "Includes external assets",
-	"便携副本将复制工程引用的外部素材（共 {count} 个文件）：\n{paths}\n请确认其中没有敏感文件，再继续保存。": "The portable copy will include external assets referenced by the project ({count} files):\n{paths}\nConfirm none are sensitive before saving.",
-	"继续保存": "Continue"
+	"便携副本将复制工程引用的外部素材（共 {count} 个文件）：\n{paths}\n请确认其中没有敏感文件，再继续保存。": "The portable copy will include external assets referenced by the project. External files: {count}\n{paths}\nConfirm none are sensitive before saving.",
+	"继续保存": "Continue",
+	"开源许可": "Open source licenses",
+	"Cap / AGPLv3": "Cap / AGPLv3",
+	"本项目基于 Cap 0.6.0 修改，遵循 AGPLv3；源代码与构建说明见项目仓库。第三方组件许可随应用提供。": "This project is based on Cap 0.6.0 and modified under AGPLv3. Source code and build instructions are available in the project repository. Third-party licenses are bundled with the app.",
+	"查看随包许可文件": "Show bundled license files",
+	"无法打开许可目录。": "Could not open the licenses folder."
 }
