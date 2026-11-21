@@ -8,19 +8,27 @@ import {
 	colorSchemeDefaults,
 	colorTokens,
 	colorVariants,
+	leicaPresets,
+	leicaPresetTokens,
 	normalizeColorSettings,
+	resolveColorTokens,
 	selectedSeed,
 	wallpaperSeeds,
 } from "./color-scheme";
 
 describe("dynamic UI colors", () => {
-	it("defaults to wallpaper and safely falls back without Google Blue", () => {
+	it("defaults to Leica black-red preset (graphite-vermilion) without residual blue", () => {
 		const settings = normalizeColorSettings();
-		expect(settings.source).toBe("wallpaper");
-		expect(selectedSeed(settings)).toBe(colorSchemeDefaults.seed);
+		expect(settings.source).toBe("preset");
+		expect(settings.preset).toBe("graphite-vermilion");
+		expect(selectedSeed(settings)).toBe("#e23c1b");
 		expect(wallpaperSeeds(new Uint8ClampedArray())).toEqual([
 			colorSchemeDefaults.seed,
 		]);
+		const light = resolveColorTokens(settings, false);
+		const dark = resolveColorTokens(settings, true);
+		expect(light["--jk-needle"]).toBe("#e23c1b");
+		expect(dark["--jk-needle"]).toBe("#ff5733");
 	});
 	it("extracts distinct wallpaper colors and ignores transparent pixels", () => {
 		const bytes = new Uint8ClampedArray(160 * 4);
@@ -59,10 +67,33 @@ describe("dynamic UI colors", () => {
 			wallpaperSeeds: ["bad", "#337469"],
 		});
 		expect(settings.seed).toBe(colorSchemeDefaults.seed);
+		expect(settings.preset).toBe("graphite-vermilion");
 		expect(settings.contrast).toBe(0);
 		expect(settings.wallpaperSeeds).toEqual(["#337469"]);
 	});
-	it("keeps primary and surface text readable for every scheme in both modes", () => {
+	it("keeps every Leica preset readable with >= 4.5 contrast in both modes", () => {
+		for (const preset of leicaPresets) {
+			for (const dark of [false, true]) {
+				const colors = leicaPresetTokens(preset.id, dark);
+				for (const [foreground, background] of [
+					["ink", "surface"],
+					["ink", "paper"],
+					["on-primary", "primary"],
+					["on-primary-container", "primary-container"],
+				]) {
+					const contrast = Contrast.ratioOfTones(
+						lstarFromArgb(argbFromHex(colors[`--jk-${foreground}`])),
+						lstarFromArgb(argbFromHex(colors[`--jk-${background}`])),
+					);
+					expect(
+						contrast,
+						`${preset.id}/${dark}/${foreground}`,
+					).toBeGreaterThanOrEqual(4.5);
+				}
+			}
+		}
+	});
+	it("keeps primary and surface text readable for every dynamic scheme in both modes", () => {
 		for (const seed of ["#337469", "#b66e4c", "#aa7900", "#646765"]) {
 			for (const variant of colorVariants) {
 				for (const dark of [false, true]) {

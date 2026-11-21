@@ -61,7 +61,7 @@ export function Subfield(
 			<span class="font-medium text-gray-12">
 				{localize(props.name)}
 				{props.required && (
-					<span class="ml-[2px] text-xs text-blue-500">*</span>
+					<span class="ml-[2px] text-xs text-[var(--jk-primary)]">*</span>
 				)}
 			</span>
 			{props.children}
@@ -96,7 +96,7 @@ const editorButtonStyles = cva(
 		variants: {
 			variant: {
 				primary:
-					"text-gray-12 enabled:hover:not-data-pressed:bg-gray-3 data-expanded:bg-gray-3 outline-blue-300 focus:bg-transparent",
+					"text-gray-12 enabled:hover:not-data-pressed:bg-gray-3 data-expanded:bg-gray-3 outline-[var(--jk-focus)] focus:bg-transparent",
 				danger:
 					"text-gray-12 enabled:hover:not-data-pressed:bg-gray-3 data-expanded:bg-red-300 data-pressed:bg-red-300 data-expanded:text-gray-1 data-pressed:text-gray-1 outline-red-300",
 			},

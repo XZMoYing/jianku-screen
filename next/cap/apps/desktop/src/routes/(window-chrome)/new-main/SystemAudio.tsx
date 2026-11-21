@@ -63,6 +63,7 @@ export function SystemAudioToggleRoot(
 			}}
 			disabled={isDisabled()}
 			aria-pressed={rawOptions.captureSystemAudio ? "true" : "false"}
+			data-active={rawOptions.captureSystemAudio ? "true" : "false"}
 		>
 			{props.icon}
 			<p class={DEVICE_ROW_LABEL_CLASS}>{localize("系统声音")}</p>

@@ -18,7 +18,7 @@ export default createHandler(() => (
 									(theme === 'system' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
 								if (isDark) document.documentElement.classList.add('dark');
 								try {
-									var palette = JSON.parse(localStorage.getItem('jianku-color-css') || 'null');
+									var palette = JSON.parse(localStorage.getItem('jianku-color-css-v2') || 'null');
 									var colors = palette && palette[isDark ? 'dark' : 'light'];
 									if (colors) Object.entries(colors).forEach(function(entry) {
 										if (/^--jk-[a-z-]+$/.test(entry[0]) && /^#[0-9a-f]{6}$/i.test(entry[1])) {

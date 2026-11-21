@@ -110,7 +110,12 @@ export function Field(
 				</div>
 			}
 		>
-			<div class={cx("flex flex-row gap-2 items-center h-[34px]", props.class)}>
+			<div
+				class={cx(
+					"jk-field-inline flex flex-row gap-2 items-center h-[34px]",
+					props.class,
+				)}
+			>
 				<FieldLabel
 					name={localize(props.name)}
 					badge={props.badge}
@@ -121,7 +126,7 @@ export function Field(
 					{props.children}
 				</div>
 				<Show when={props.value}>
-					<div class="shrink-0 min-w-9 text-[11px] text-right tabular-nums text-ed-text-3">
+					<div class="jk-field-val shrink-0 min-w-9 text-[11px] text-right tabular-nums text-ed-text-3">
 						{props.value}
 					</div>
 				</Show>
@@ -143,7 +148,7 @@ export function Subfield(
 			<span class="text-[13px] font-normal text-ed-text-1">
 				{localize(props.name)}
 				{props.required && (
-					<span class="ml-[2px] text-xs text-blue-500">*</span>
+					<span class="ml-[2px] text-xs text-[var(--jk-primary)]">*</span>
 				)}
 			</span>
 			{props.children}
@@ -193,6 +198,7 @@ export function Slider(
 	return (
 		<KSlider
 			{...props}
+			data-lifted={dragging() ? "true" : undefined}
 			class={cx(
 				"ed-slider relative px-1 h-8 flex flex-row justify-stretch items-center",
 				props.class,

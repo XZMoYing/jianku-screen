@@ -12,6 +12,7 @@ import {
 	Show,
 } from "solid-js";
 import toast from "solid-toast";
+import { MotionText } from "~/components/MotionText";
 import Tooltip from "~/components/Tooltip";
 import CaptionControlsMacOS from "~/components/titlebar/controls/CaptionControlsMacOS";
 import CaptionControlsWindows11 from "~/components/titlebar/controls/CaptionControlsWindows11";
@@ -240,7 +241,11 @@ export function Header(props: {
 						}}
 					>
 						<span class="max-[1200px]:hidden">
-							{isTranscriptOpen() ? localize("Back") : localize("Captions")}
+							<MotionText
+								text={
+									isTranscriptOpen() ? localize("Back") : localize("Captions")
+								}
+							/>
 						</span>
 					</EditorButton>
 				</Show>
@@ -248,11 +253,11 @@ export function Header(props: {
 				<button
 					type="button"
 					class={cx(
-						"flex shrink-0 gap-[7px] justify-center items-center pl-3 pr-3.5 ml-1.5 h-[30px] text-[13px] font-medium text-white rounded-lg outline-hidden",
-						"bg-linear-to-b from-ed-accent-2 to-ed-accent",
-						"shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_1px_2px_rgba(0,0,0,0.2)]",
-						"transition-[filter] duration-150 ease-out",
-						"hover:brightness-[1.06] active:brightness-[0.96]",
+						"jk-export-cta flex shrink-0 gap-[7px] justify-center items-center pl-3.5 pr-4 ml-1.5 h-[31px] text-[12.5px] font-semibold rounded-[9.5px] outline-hidden",
+						"bg-[var(--jk-graphite)] text-[var(--jk-on-graphite)]",
+						"shadow-[inset_0_1px_0.5px_rgba(255,255,255,0.22),0_2px_8px_rgba(0,0,0,0.2)]",
+						"transition-[filter,transform] duration-150 ease-out",
+						"hover:brightness-[1.08] active:scale-[0.97]",
 					)}
 					onClick={() => {
 						clearTimelineSelection();

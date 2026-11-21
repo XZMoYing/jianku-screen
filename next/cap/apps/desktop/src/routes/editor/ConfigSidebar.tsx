@@ -29,6 +29,7 @@ import { CameraSettings } from "~/components/CameraSettings";
 import { CursorSettings } from "~/components/CursorSettings";
 import { MotionGroup, MotionSwitch } from "~/components/InterfaceMotion";
 import { LayoutSettings } from "~/components/LayoutSettings";
+import { MotionText } from "~/components/MotionText";
 import { Toggle } from "~/components/Toggle";
 import { audioEnhancementStore, generalSettingsStore } from "~/store";
 import { t as localize } from "~/utils/i18n";
@@ -153,6 +154,16 @@ const TAB_IDS = {
 	hotkeys: "hotkeys",
 	captions: "captions",
 } as const;
+
+const INSPECTOR_TAB_META: Record<string, { title: string; sub: string }> = {
+	background: { title: "画面与背景", sub: "壁纸、留白、圆角与阴影" },
+	camera: { title: "摄像头画中画", sub: "独立分轨，录后可任意移位" },
+	audio: { title: "声音与增强", sub: "麦克风与系统声音独立增益" },
+	cursor: { title: "光标与点击", sub: "矢量重绘、平滑与点击涟漪" },
+	keyboard: { title: "快捷键显示", sub: "自动识别组合键并轻盈浮现" },
+	captions: { title: "智能字幕", sub: "离线转写与 SRT / VTT 导出" },
+	hotkeys: { title: "快捷键", sub: "录制与编辑快捷操作" },
+};
 
 export function ConfigSidebar() {
 	const context = useEditorContext();
@@ -687,6 +698,29 @@ function ConfigSidebarContent() {
 					</For>
 				</MotionGroup>
 			</KTabs.List>
+			<Show
+				when={
+					!sidebarSelection() &&
+					editorState.timeline.audioPicker === null &&
+					editorState.timeline.audioReplace === null
+				}
+			>
+				<div class="jk-insp-title-row jk-editor-insp-title-row">
+					<MotionText
+						class="jk-insp-title"
+						text={localize(
+							INSPECTOR_TAB_META[state.selectedTab]?.title ?? "画面与背景",
+						)}
+					/>
+					<MotionText
+						class="jk-insp-sub"
+						text={localize(
+							INSPECTOR_TAB_META[state.selectedTab]?.sub ??
+								"壁纸、留白、圆角与阴影",
+						)}
+					/>
+				</div>
+			</Show>
 			<div
 				ref={scrollRef}
 				style={{

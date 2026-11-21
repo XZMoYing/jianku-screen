@@ -6,7 +6,7 @@ export function installExpressiveMotion() {
 	if (CSS.supports("transition-timing-function", "linear(0, 1)")) {
 		document.documentElement.style.setProperty(
 			"--jk-spatial",
-			`linear(${springFrames(0.38, 1)
+			`linear(${springFrames(0.44, 0.84, 0.56)
 				.map((frame) => frame.progress.toFixed(5))
 				.join(",")})`,
 		);
@@ -57,8 +57,8 @@ export function installExpressiveMotion() {
 		motion.spring.retarget(
 			pressed ? 0.96 : 1,
 			performance.now(),
-			pressed ? 0.26 : 0.3,
-			pressed ? 0.86 : 1,
+			pressed ? 0.28 : 0.34,
+			pressed ? 0.84 : 0.76,
 		);
 		frame ||= requestAnimationFrame(tick);
 	};
@@ -70,6 +70,20 @@ export function installExpressiveMotion() {
 		return element && !element.matches(":disabled, [aria-disabled=true]")
 			? element
 			: null;
+	};
+	const trackGlow = (event: PointerEvent) => {
+		if (reduced.matches) return;
+		const target =
+			event.target instanceof Element
+				? event.target.closest<HTMLElement>(
+						".jk-button, .studio-primary, .jk-capture-targets button, .jk-device-row, .jk-stage-footer button",
+					)
+				: null;
+		if (!target) return;
+		const rect = target.getBoundingClientRect();
+		if (rect.width <= 0 || rect.height <= 0) return;
+		target.style.setProperty("--gx", `${event.clientX - rect.left}px`);
+		target.style.setProperty("--gy", `${event.clientY - rect.top}px`);
 	};
 	const releasePointer = (event: PointerEvent) => {
 		const element = pointers.get(event.pointerId);
@@ -115,6 +129,7 @@ export function installExpressiveMotion() {
 			element.style.setProperty("scale", motion.previousScale);
 		active.clear();
 	};
+	document.addEventListener("pointermove", trackGlow, { passive: true });
 	document.addEventListener("pointerdown", pressPointer);
 	document.addEventListener("pointerup", releasePointer);
 	document.addEventListener("pointercancel", releasePointer);
@@ -125,6 +140,7 @@ export function installExpressiveMotion() {
 	reduced.addEventListener("change", clear);
 	return () => {
 		clear();
+		document.removeEventListener("pointermove", trackGlow);
 		document.removeEventListener("pointerdown", pressPointer);
 		document.removeEventListener("pointerup", releasePointer);
 		document.removeEventListener("pointercancel", releasePointer);

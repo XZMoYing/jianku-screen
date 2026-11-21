@@ -1,5 +1,6 @@
 import { Select as KSelect } from "@kobalte/core/select";
 import { createSignal, Show } from "solid-js";
+import { MotionText } from "~/components/MotionText";
 import Tooltip from "~/components/Tooltip";
 import { t as localize } from "~/utils/i18n";
 import type { AspectRatio } from "~/utils/tauri";
@@ -79,7 +80,11 @@ function AspectRatioSelect() {
 									? localize("适合屏幕")
 									: localize(ASPECT_RATIOS[option].name);
 							};
-							return <span class="max-[1200px]:hidden">{text()}</span>;
+							return (
+								<span class="max-[1200px]:hidden">
+									<MotionText text={text()} />
+								</span>
+							);
 						}}
 					</KSelect.Value>
 				</EditorButton>

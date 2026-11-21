@@ -1,9 +1,10 @@
 import { Switch as KSwitch } from "@kobalte/core/switch";
 import { cva } from "cva";
 import { type ComponentProps, splitProps } from "solid-js";
+import { StatusLed } from "./StatusLed";
 
 const toggleControlStyles = cva(
-	"cap-toggle rounded-full bg-ed-ctl-active data-disabled:bg-ed-ctl data-checked:bg-ed-accent transition-[background-color,box-shadow]",
+	"cap-toggle rounded-full bg-ed-ctl-active data-disabled:bg-ed-ctl data-checked:bg-ed-accent transition-[background-color,border-color,box-shadow]",
 	{
 		variants: {
 			size: {
@@ -19,7 +20,7 @@ const toggleControlStyles = cva(
 );
 
 const toggleThumbStyles = cva(
-	"cap-toggle-thumb bg-white rounded-full shadow-[0_1px_3px_rgba(0,0,0,0.22)] transition-transform data-checked:translate-x-[calc(100%)]",
+	"cap-toggle-thumb grid place-items-center bg-white rounded-full shadow-[0_1px_3px_rgba(0,0,0,0.22)] transition-transform data-checked:translate-x-[calc(100%)]",
 	{
 		variants: {
 			size: {
@@ -40,10 +41,12 @@ export function Toggle(
 	const [local, others] = splitProps(props, ["size"]);
 
 	return (
-		<KSwitch class="relative" {...others}>
+		<KSwitch class="relative jk-toggle-shell" {...others}>
 			<KSwitch.Input class="peer absolute inset-0 opacity-0" />
 			<KSwitch.Control class={toggleControlStyles({ size: local.size })}>
-				<KSwitch.Thumb class={toggleThumbStyles({ size: local.size })} />
+				<KSwitch.Thumb class={toggleThumbStyles({ size: local.size })}>
+					<StatusLed active={Boolean(others.checked)} class="jk-sw-led" />
+				</KSwitch.Thumb>
 			</KSwitch.Control>
 		</KSwitch>
 	);

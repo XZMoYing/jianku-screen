@@ -1,22 +1,38 @@
 import { cx } from "cva";
-import type { ComponentProps } from "solid-js";
+import { type ComponentProps, splitProps } from "solid-js";
+import { MotionText } from "~/components/MotionText";
+import { StatusLed } from "~/components/StatusLed";
 
 export type InfoPillVariant = "blue" | "red" | "gray";
 
 export default function InfoPill(
 	props: ComponentProps<"button"> & { variant: InfoPillVariant },
 ) {
+	const [local, rest] = splitProps(props, ["variant", "class", "children"]);
+	const isActive = () => local.variant === "blue";
+	const textChild = () =>
+		typeof local.children === "string" ? local.children : null;
+
 	return (
 		<button
-			{...props}
+			{...rest}
 			type="button"
+			aria-label={rest["aria-label"] ?? textChild() ?? undefined}
+			data-pill-variant={local.variant}
 			class={cx(
-				"inline-flex items-center justify-center min-w-[40px] h-[24px] px-2.5 rounded-full text-[11px] font-medium leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-9 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-1",
-				props.variant === "blue" && "bg-blue-9 text-white hover:bg-blue-10",
-				props.variant === "red" && "bg-red-9 text-white hover:bg-red-10",
-				props.variant === "gray" &&
-					"bg-gray-5 text-gray-11 hover:bg-gray-6 hover:text-gray-12",
+				"jk-dev-state inline-flex items-center justify-center gap-1.5 min-w-[40px] h-[24px] px-2.5 rounded-full text-[11px] font-medium leading-none transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-9 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-1",
+				local.variant === "blue" && "is-on",
+				local.variant === "red" && "is-warn",
+				local.variant === "gray" && "is-off",
+				local.class,
 			)}
-		/>
+		>
+			<StatusLed active={isActive()} class="jk-dev-led" />
+			{textChild() !== null ? (
+				<MotionText text={textChild() ?? ""} />
+			) : (
+				local.children
+			)}
+		</button>
 	);
 }

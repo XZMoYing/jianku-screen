@@ -1,12 +1,14 @@
-import { createMemo, createSignal, For, Show } from "solid-js";
+import { createMemo, createSignal, For, Match, Show, Switch } from "solid-js";
 import toast from "solid-toast";
 import { ChoiceSelect } from "~/components/ChoiceSelect";
+import { MotionGroup } from "~/components/InterfaceMotion";
 import { colorSchemeStore } from "~/store";
 import {
 	basicColors,
 	type ColorSchemeSettings,
 	colorTokens,
 	colorVariants,
+	leicaPresets,
 	normalizeColorSettings,
 	selectedSeed,
 } from "~/utils/color-scheme";
@@ -54,12 +56,13 @@ export default function ColorSchemeOptions() {
 	};
 	return (
 		<fieldset class="jk-color-settings" disabled={busy()}>
-			<div class="jk-color-sources" aria-label={localize("配色来源")}>
+			<MotionGroup class="jk-color-sources" label={localize("配色来源")}>
 				<For
 					each={
 						[
+							{ id: "preset", name: "精调配色" },
 							{ id: "wallpaper", name: "壁纸配色" },
-							{ id: "custom", name: "基本配色" },
+							{ id: "custom", name: "自选配色" },
 						] as const
 					}
 				>
@@ -80,10 +83,82 @@ export default function ColorSchemeOptions() {
 						</button>
 					)}
 				</For>
-			</div>
-			<Show
-				when={settings().source === "wallpaper"}
-				fallback={
+			</MotionGroup>
+			<Switch>
+				<Match when={settings().source === "preset"}>
+					<div
+						class="jk-color-grid jk-preset-grid"
+						role="radiogroup"
+						aria-label={localize("精调配色")}
+					>
+						<For each={leicaPresets}>
+							{(preset) => (
+								<button
+									type="button"
+									role="radio"
+									aria-checked={settings().preset === preset.id}
+									onClick={() =>
+										void save({
+											source: "preset",
+											preset: preset.id,
+											seed: preset.accentHex,
+										})
+									}
+								>
+									<span
+										class="jk-color-orb"
+										style={{ background: preset.swatch }}
+									/>
+									<span class="jk-preset-name">{localize(preset.name)}</span>
+									<small class="jk-preset-sub">
+										{localize(preset.subtitle)}
+									</small>
+								</button>
+							)}
+						</For>
+					</div>
+				</Match>
+				<Match when={settings().source === "wallpaper"}>
+					<div
+						class="jk-color-grid"
+						role="radiogroup"
+						aria-label={localize("壁纸配色")}
+					>
+						<For each={settings().wallpaperSeeds}>
+							{(seed, index) => (
+								<button
+									type="button"
+									role="radio"
+									aria-checked={selectedSeed(settings()) === seed}
+									onClick={() => void save({ wallpaperIndex: index() })}
+								>
+									<span
+										class="jk-color-orb"
+										style={{ background: swatches(seed) }}
+									/>
+									<span>
+										{localize("配色")} {index() + 1}
+									</span>
+								</button>
+							)}
+						</For>
+					</div>
+					<div class="jk-color-info">
+						<span>
+							{settings().wallpaperSeeds.length
+								? localize("取自当前壁纸")
+								: localize("等待壁纸取色，暂用中性色")}
+						</span>
+						<button
+							type="button"
+							class="jk-tonal-button"
+							onClick={() => void refresh()}
+						>
+							{busy() ? localize("正在取色…") : localize("重新取色")}
+						</button>
+					</div>
+				</Match>
+				<Match when={settings().source === "custom"}>
 					<div
 						class="jk-color-grid"
 						role="radiogroup"
@@ -106,93 +181,56 @@ export default function ColorSchemeOptions() {
 							)}
 						</For>
 					</div>
-				}
-			>
-				<div
-					class="jk-color-grid"
-					role="radiogroup"
-					aria-label={localize("壁纸配色")}
-				>
-					<For each={settings().wallpaperSeeds}>
-						{(seed, index) => (
+				</Match>
+			</Switch>
+			<Show when={settings().source !== "preset"}>
+				<div class="jk-color-variants" aria-label={localize("配色风格")}>
+					<For each={colorVariants}>
+						{(variant) => (
 							<button
 								type="button"
-								role="radio"
-								aria-checked={selectedSeed(settings()) === seed}
-								onClick={() => void save({ wallpaperIndex: index() })}
+								aria-pressed={settings().variant === variant.id}
+								onClick={() => void save({ variant: variant.id })}
 							>
-								<span
-									class="jk-color-orb"
-									style={{ background: swatches(seed) }}
-								/>
-								<span>
-									{localize("配色")} {index() + 1}
-								</span>
+								{localize(variant.name)}
 							</button>
 						)}
 					</For>
 				</div>
 				<div class="jk-color-info">
-					<span>
-						{settings().wallpaperSeeds.length
-							? localize("取自当前壁纸")
-							: localize("等待壁纸取色，暂用中性色")}
-					</span>
-					<button
-						type="button"
-						class="jk-tonal-button"
-						onClick={() => void refresh()}
-					>
-						{busy() ? localize("正在取色…") : localize("重新取色")}
-					</button>
-				</div>
-			</Show>
-			<div class="jk-color-variants" aria-label={localize("配色风格")}>
-				<For each={colorVariants}>
-					{(variant) => (
-						<button
-							type="button"
-							aria-pressed={settings().variant === variant.id}
-							onClick={() => void save({ variant: variant.id })}
-						>
-							{localize(variant.name)}
-						</button>
-					)}
-				</For>
-			</div>
-			<div class="jk-color-info">
-				<label>
-					{localize("对比度")}{" "}
-					<ChoiceSelect
-						value={settings().contrast}
-						onChange={(choiceValue) =>
-							void save({ contrast: Number(choiceValue) })
-						}
-						options={[
-							{ value: 0, label: localize("标准") },
-							{ value: 0.5, label: localize("中") },
-							{ value: 1, label: localize("高") },
-						]}
-					/>
-				</label>
-				<Show when={settings().source === "custom"}>
 					<label>
-						{localize("自选种子色")}{" "}
-						<input
-							type="color"
-							value={settings().seed}
-							onChange={(event) =>
-								void save({ seed: event.currentTarget.value })
+						{localize("对比度")}{" "}
+						<ChoiceSelect
+							value={settings().contrast}
+							onChange={(choiceValue) =>
+								void save({ contrast: Number(choiceValue) })
 							}
+							options={[
+								{ value: 0, label: localize("标准") },
+								{ value: 0.5, label: localize("中") },
+								{ value: 1, label: localize("高") },
+							]}
 						/>
 					</label>
-				</Show>
-				<Show when={settings().source === "wallpaper"}>
-					<span class="jk-color-seed">
-						{selectedSeed(settings()).toUpperCase()}
-					</span>
-				</Show>
-			</div>
+					<Show when={settings().source === "custom"}>
+						<label>
+							{localize("自选种子色")}{" "}
+							<input
+								type="color"
+								value={settings().seed}
+								onChange={(event) =>
+									void save({ seed: event.currentTarget.value })
+								}
+							/>
+						</label>
+					</Show>
+					<Show when={settings().source === "wallpaper"}>
+						<span class="jk-color-seed">
+							{selectedSeed(settings()).toUpperCase()}
+						</span>
+					</Show>
+				</div>
+			</Show>
 			<Show when={error()}>
 				<p class="jk-color-error">{error()}</p>
 			</Show>

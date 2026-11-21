@@ -377,7 +377,9 @@ function RecordingItem(props: {
 						<div
 							class={cx(
 								"px-2 py-0.5 flex items-center gap-1.5 font-medium text-[11px] text-gray-12 rounded-full w-fit",
-								mode() === "instant" ? "bg-blue-100" : "bg-gray-4",
+								mode() === "instant"
+									? "bg-[var(--jk-primary-container)] text-[var(--jk-on-primary-container)]"
+									: "bg-gray-4",
 							)}
 						>
 							{mode() === "instant" ? (
@@ -405,7 +407,7 @@ function RecordingItem(props: {
 						<Show when={props.recording.meta.status.status === "InProgress"}>
 							<div
 								class={cx(
-									"px-2 py-0.5 flex items-center gap-1.5 font-medium text-[11px] text-gray-12 rounded-full w-fit bg-blue-500 leading-none text-center",
+									"px-2 py-0.5 flex items-center gap-1.5 font-medium text-[11px] rounded-full w-fit bg-[var(--jk-rec)] text-white leading-none text-center",
 								)}
 							>
 								<IconPhRecordFill class="invert size-2.5 dark:invert-0" />

@@ -5,8 +5,8 @@ import { colorSchemeStore } from "~/store";
 import { commands } from "~/utils/tauri";
 import {
 	colorSchemeDefaults,
-	colorTokens,
 	normalizeColorSettings,
+	resolveColorTokens,
 	selectedSeed,
 	wallpaperSeeds,
 } from "./color-scheme";
@@ -73,22 +73,23 @@ export function installDynamicTheme(currentWindow: WebviewWindow) {
 	const apply = () => {
 		const dark = document.documentElement.classList.contains("dark");
 		const seed = selectedSeed(settings);
-		const key = `${settings.source}:${seed}:${settings.variant}:${settings.contrast}:${dark}`;
+		const key = `${settings.source}:${settings.preset}:${seed}:${settings.variant}:${settings.contrast}:${dark}`;
 		if (key === lastTheme || disposed) return;
 		lastTheme = key;
 		for (const [property, value] of Object.entries(
-			colorTokens(seed, settings.variant, dark, settings.contrast),
+			resolveColorTokens(settings, dark),
 		)) {
 			document.documentElement.style.setProperty(property, value);
 		}
 		document.documentElement.dataset.jkColorSource = settings.source;
+		document.documentElement.dataset.jkColorPreset = settings.preset;
 		document.documentElement.dataset.jkColorSeed = seed;
 		try {
 			localStorage.setItem(
-				"jianku-color-css",
+				"jianku-color-css-v2",
 				JSON.stringify({
-					light: colorTokens(seed, settings.variant, false, settings.contrast),
-					dark: colorTokens(seed, settings.variant, true, settings.contrast),
+					light: resolveColorTokens(settings, false),
+					dark: resolveColorTokens(settings, true),
 				}),
 			);
 		} catch {}

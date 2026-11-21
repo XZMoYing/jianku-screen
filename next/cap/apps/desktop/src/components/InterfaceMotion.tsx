@@ -16,14 +16,15 @@ const arrivalFrames = (kind: "page" | "subpage", direction: number) =>
 	springFrames(
 		interfaceMotion[kind].response,
 		interfaceMotion[kind].damping,
-		0.7,
+		interfaceMotion[kind].duration / 1000,
 	).map(({ offset, progress }) => ({
 		offset,
-		opacity: Math.min(1, Math.max(0, progress)),
+		opacity: Math.min(1, Math.max(0, progress * 1.9)),
 		transform:
 			kind === "page"
-				? `translateY(${14 * (1 - progress)}px)`
-				: `translateX(${direction * 26 * (1 - progress)}px) scale(${0.985 + 0.015 * progress})`,
+				? `translate3d(0, ${(interfaceMotion.page.travel * (1 - progress)).toFixed(2)}px, 0) scale(${(0.985 + 0.015 * progress).toFixed(4)})`
+				: `translate3d(${(direction * interfaceMotion.subpage.travel * (1 - progress)).toFixed(2)}px, ${(6 * (1 - progress)).toFixed(2)}px, 0) scale(${(0.985 + 0.015 * progress).toFixed(4)})`,
+		filter: `blur(${(2.2 * Math.max(0, 1 - progress * 1.4)).toFixed(2)}px)`,
 	}));
 const enterFrames = arrivalFrames("page", 1);
 const pageArrivals = {
@@ -31,19 +32,125 @@ const pageArrivals = {
 	forward: arrivalFrames("subpage", 1),
 	backward: arrivalFrames("subpage", -1),
 };
-const sectionFrames = springFrames(0.62, 0.82, 0.85).map(
-	({ offset, progress }) => ({
-		offset,
-		opacity: Math.min(1, Math.max(0, progress)),
-		transform: `translateY(${40 * (1 - progress)}px) scale(${0.96 + 0.04 * progress})`,
-	}),
-);
+const sectionFrames = springFrames(
+	interfaceMotion.section.response,
+	interfaceMotion.section.damping,
+	interfaceMotion.section.duration / 1000,
+).map(({ offset, progress }) => ({
+	offset,
+	opacity: Math.min(1, Math.max(0, progress * 1.7)),
+	transform: `translate3d(0, ${(interfaceMotion.section.travel * (1 - progress)).toFixed(2)}px, 0) scale(${(0.975 + 0.025 * progress).toFixed(4)})`,
+}));
 const reducedMotion = () =>
 	document.visibilityState !== "visible" ||
 	window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const MotionInteractionContext = createContext<Accessor<boolean>>(() => true);
 export const useMotionInteraction = () => useContext(MotionInteractionContext);
+
+const ACTIVE_TAB_SELECTOR =
+	"button[aria-pressed=true], button[aria-selected=true], button[data-selected], a[aria-current=page]";
+const TAB_ITEM_SELECTOR = "button, a";
+
+/**
+ * Predicts the final post-transition rect of `selected` inside a horizontal
+ * MotionGroup whose buttons have collapsible `.jk-tab-label` spans. Reading
+ * live `offsetLeft`/`offsetWidth` while CSS `max-width` is still transitioning
+ * causes asymmetric left-vs-right overshoot (collapsing a left sibling pulls
+ * `offsetLeft` backward mid-flight while expanding a left target does not).
+ * Computing the settled target on frame 0 gives symmetric spring rebound in
+ * both directions without cancelling the live CSS label reveal.
+ */
+function measureSettledTarget(root: HTMLElement, selected: HTMLElement) {
+	const buttons = Array.from(
+		root.querySelectorAll<HTMLElement>(TAB_ITEM_SELECTOR),
+	).filter(
+		(el) =>
+			el.closest(".jk-motion-group") === root &&
+			el.offsetWidth > 0 &&
+			el.offsetHeight > 0,
+	);
+	const hasCollapsibleLabels = buttons.some(
+		(button) => button.querySelector(".jk-tab-label") !== null,
+	);
+	if (!hasCollapsibleLabels || buttons.length === 0) {
+		return {
+			x: selected.offsetLeft,
+			y: selected.offsetTop,
+			width: selected.offsetWidth,
+			height: selected.offsetHeight,
+			collapsible: false,
+		};
+	}
+
+	const rootStyle = getComputedStyle(root);
+	if (rootStyle.flexDirection.startsWith("column")) {
+		return {
+			x: selected.offsetLeft,
+			y: selected.offsetTop,
+			width: selected.offsetWidth,
+			height: selected.offsetHeight,
+			collapsible: false,
+		};
+	}
+
+	const gap = Number.parseFloat(rootStyle.columnGap || rootStyle.gap) || 0;
+	const padLeft = Number.parseFloat(rootStyle.paddingLeft) || 0;
+	const padRight = Number.parseFloat(rootStyle.paddingRight) || 0;
+
+	const settledWidths = buttons.map((button) => {
+		const style = getComputedStyle(button);
+		const btnPadX =
+			(Number.parseFloat(style.paddingLeft) || 0) +
+			(Number.parseFloat(style.paddingRight) || 0);
+		const minW = Number.parseFloat(style.minWidth) || 0;
+		const icon = button.querySelector<SVGElement>(":scope > svg");
+		const iconW = icon ? icon.getBoundingClientRect().width || 16 : 0;
+		const label = button.querySelector<HTMLElement>(":scope > .jk-tab-label");
+		const isSelected = button === selected;
+		if (!isSelected || !label) {
+			return Math.max(minW, Math.ceil(btnPadX + iconW));
+		}
+		const labelStyle = getComputedStyle(label);
+		const labelGap =
+			(Number.parseFloat(style.columnGap || style.gap) || 0) +
+			(Number.parseFloat(labelStyle.marginLeft) || 0) +
+			(Number.parseFloat(labelStyle.marginRight) || 0);
+		const activeMargin = labelGap > 0 ? labelGap : 6;
+		const labelNaturalW = Math.min(Math.ceil(label.scrollWidth), 88);
+		return Math.max(
+			minW,
+			Math.ceil(btnPadX + iconW + activeMargin + labelNaturalW),
+		);
+	});
+
+	const totalSettledW =
+		settledWidths.reduce((sum, w) => sum + w, 0) +
+		gap * Math.max(0, buttons.length - 1);
+	const currentTotalW =
+		buttons.reduce((sum, b) => sum + b.offsetWidth, 0) +
+		gap * Math.max(0, buttons.length - 1);
+	const isFitContent =
+		Math.abs(root.clientWidth - (currentTotalW + padLeft + padRight)) < 3;
+	const isCentered = rootStyle.justifyContent === "center";
+	const startX =
+		isCentered && !isFitContent
+			? Math.max(padLeft, (root.clientWidth - totalSettledW) / 2)
+			: padLeft;
+
+	const selectedIndex = buttons.indexOf(selected);
+	let offsetX = startX;
+	for (let i = 0; i < selectedIndex; i++) {
+		offsetX += settledWidths[i] + gap;
+	}
+	return {
+		x: offsetX,
+		y: selected.offsetTop,
+		width: settledWidths[selectedIndex] ?? selected.offsetWidth,
+		height: selected.offsetHeight,
+		collapsible: true,
+	};
+}
 
 export function MotionGroup(props: {
 	class: string;
@@ -57,6 +164,11 @@ export function MotionGroup(props: {
 	let width: InterfaceSpring | undefined;
 	let y: InterfaceSpring | undefined;
 	let height: InterfaceSpring | undefined;
+	let lastSelected: HTMLElement | undefined;
+	let lastRootWidth = 0;
+	let tabTransitionUntil = 0;
+	let settleTimer: ReturnType<typeof setTimeout> | undefined;
+
 	const tick = (time: number) => {
 		frame = 0;
 		if (!x || !width || !y || !height) return;
@@ -64,57 +176,178 @@ export function MotionGroup(props: {
 		const size = width.read(time);
 		const vertical = y.read(time);
 		const tall = height.read(time);
-		pill.style.transform = `translate(${position.value}px, ${vertical.value}px)`;
-		pill.style.height = `${tall.value}px`;
-		pill.style.width = `${size.value}px`;
-		if (
+
+		const velocity = Math.hypot(position.velocity, vertical.velocity);
+		const stretch = reducedMotion() ? 0 : Math.min(velocity / 1350, 0.075);
+		const sx = 1 + stretch;
+		const sy = 1 - stretch * 0.42;
+
+		const settled =
 			Math.abs(position.value - x.target) +
 				Math.abs(size.value - width.target) +
 				Math.abs(vertical.value - y.target) +
-				Math.abs(tall.value - height.target) >
-				0.01 ||
+				Math.abs(tall.value - height.target) <=
+				0.08 &&
 			Math.abs(position.velocity) +
 				Math.abs(size.velocity) +
 				Math.abs(vertical.velocity) +
-				Math.abs(tall.velocity) >
-				0.05
-		)
-			frame = requestAnimationFrame(tick);
-	};
-	const update = () => {
-		const selected = Array.from(
-			root.querySelectorAll<HTMLElement>(
-				"button[aria-pressed=true], button[aria-selected=true], a[aria-current=page]",
-			),
-		).find((button) => button.closest(".jk-motion-group") === root);
-		if (!selected || !selected.offsetWidth) return;
-		if (!x || !width || reducedMotion()) {
-			x = new InterfaceSpring(selected.offsetLeft);
-			width = new InterfaceSpring(selected.offsetWidth);
-			y = new InterfaceSpring(selected.offsetTop);
-			height = new InterfaceSpring(selected.offsetHeight);
-			tick(performance.now());
+				Math.abs(tall.velocity) <=
+				0.35;
+
+		if (settled) {
+			pill.style.transform = `translate3d(${x.target.toFixed(2)}px, ${y.target.toFixed(2)}px, 0)`;
+			pill.style.width = `${width.target.toFixed(2)}px`;
+			pill.style.height = `${height.target.toFixed(2)}px`;
+			pill.classList.remove("is-moving");
 		} else {
-			x.retarget(selected.offsetLeft, performance.now());
-			width.retarget(selected.offsetWidth, performance.now());
-			y?.retarget(selected.offsetTop, performance.now());
-			height?.retarget(selected.offsetHeight, performance.now());
+			pill.style.transform = `translate3d(${position.value.toFixed(2)}px, ${vertical.value.toFixed(2)}px, 0) scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`;
+			pill.style.width = `${Math.max(0, size.value).toFixed(2)}px`;
+			pill.style.height = `${Math.max(0, tall.value).toFixed(2)}px`;
+			pill.classList.add("is-moving");
+			frame = requestAnimationFrame(tick);
 		}
+	};
+
+	const findSelected = () =>
+		Array.from(root.querySelectorAll<HTMLElement>(ACTIVE_TAB_SELECTOR)).find(
+			(button) => button.closest(".jk-motion-group") === root,
+		);
+
+	const retargetTo = (
+		tx: number,
+		ty: number,
+		tw: number,
+		th: number,
+		instant: boolean,
+	) => {
+		const { response, damping } = interfaceMotion.selection;
+		const now = performance.now();
+		if (!x || !width || !y || !height || instant || reducedMotion()) {
+			x = new InterfaceSpring(tx);
+			width = new InterfaceSpring(tw);
+			y = new InterfaceSpring(ty);
+			height = new InterfaceSpring(th);
+			pill.style.opacity = "1";
+			pill.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0)`;
+			pill.style.width = `${tw.toFixed(2)}px`;
+			pill.style.height = `${th.toFixed(2)}px`;
+			pill.classList.remove("is-moving");
+			return;
+		}
+		x.retarget(tx, now, response, damping);
+		width.retarget(tw, now, response, damping);
+		y.retarget(ty, now, response, damping);
+		height.retarget(th, now, response, damping);
 		pill.style.opacity = "1";
 		frame ||= requestAnimationFrame(tick);
 	};
+
+	const update = (fromResize = false) => {
+		const selected = findSelected();
+		if (!selected || !selected.offsetWidth) return;
+		const now = performance.now();
+		const selectionChanged = selected !== lastSelected;
+		const rootResized =
+			lastRootWidth > 0 && Math.abs(root.clientWidth - lastRootWidth) > 2;
+
+		// Ignore intermediate ResizeObserver frames fired while collapsible
+		// `.jk-tab-label` widths are transitioning; only retarget on actual
+		// selection changes or genuine container width changes.
+		if (
+			fromResize &&
+			!selectionChanged &&
+			!rootResized &&
+			now < tabTransitionUntil
+		) {
+			return;
+		}
+
+		lastRootWidth = root.clientWidth;
+
+		if (!x || !width || !lastSelected) {
+			lastSelected = selected;
+			retargetTo(
+				selected.offsetLeft,
+				selected.offsetTop,
+				selected.offsetWidth,
+				selected.offsetHeight,
+				true,
+			);
+			return;
+		}
+
+		if (selectionChanged) {
+			lastSelected = selected;
+			const predicted = measureSettledTarget(root, selected);
+			if (predicted.collapsible) {
+				tabTransitionUntil = now + 620;
+				if (settleTimer) clearTimeout(settleTimer);
+				settleTimer = setTimeout(() => {
+					settleTimer = undefined;
+					const current = findSelected();
+					if (!current || current !== lastSelected || !current.offsetWidth)
+						return;
+					if (
+						!x ||
+						!width ||
+						Math.abs(current.offsetLeft - x.target) > 0.75 ||
+						Math.abs(current.offsetWidth - width.target) > 0.75
+					) {
+						retargetTo(
+							current.offsetLeft,
+							current.offsetTop,
+							current.offsetWidth,
+							current.offsetHeight,
+							false,
+						);
+					}
+				}, 640);
+			}
+			retargetTo(
+				predicted.x,
+				predicted.y,
+				predicted.width,
+				predicted.height,
+				false,
+			);
+			return;
+		}
+
+		if (
+			Math.abs(selected.offsetLeft - x.target) > 0.5 ||
+			Math.abs(selected.offsetTop - (y?.target ?? 0)) > 0.5 ||
+			Math.abs(selected.offsetWidth - width.target) > 0.5 ||
+			Math.abs(selected.offsetHeight - (height?.target ?? 0)) > 0.5
+		) {
+			retargetTo(
+				selected.offsetLeft,
+				selected.offsetTop,
+				selected.offsetWidth,
+				selected.offsetHeight,
+				false,
+			);
+		}
+	};
+
 	onMount(() => {
-		const changes = new MutationObserver(update);
+		const changes = new MutationObserver(() => update(false));
 		changes.observe(root, {
 			subtree: true,
 			attributes: true,
-			attributeFilter: ["aria-pressed", "aria-selected", "aria-current"],
+			attributeFilter: [
+				"aria-pressed",
+				"aria-selected",
+				"aria-current",
+				"data-selected",
+			],
 		});
-		const size = new ResizeObserver(update);
+		const size = new ResizeObserver(() => update(true));
 		size.observe(root);
-		for (const button of root.querySelectorAll("button")) size.observe(button);
-		update();
+		for (const button of root.querySelectorAll(TAB_ITEM_SELECTOR))
+			size.observe(button);
+		update(false);
 		onCleanup(() => {
+			if (settleTimer) clearTimeout(settleTimer);
 			changes.disconnect();
 			size.disconnect();
 			cancelAnimationFrame(frame);
@@ -183,13 +416,14 @@ export function MotionSwitch<T>(props: {
 				if (!reducedMotion()) {
 					const exit = root.animate(
 						[
-							{ opacity, transform },
+							{ opacity, transform, filter: "blur(0px)" },
 							{
 								opacity: 0,
 								transform:
 									kind === "page"
-										? "translateY(26px) scale(.985)"
-										: `translateX(${-direction * 18}px) scale(.985)`,
+										? "translate3d(0, 12px, 0) scale(.986)"
+										: `translate3d(${-direction * 16}px, 4px, 0) scale(.986)`,
+								filter: "blur(2.5px)",
 							},
 						],
 						{
@@ -233,7 +467,7 @@ export function MotionSwitch<T>(props: {
 						sections.push({
 							element,
 							delay:
-								(Math.min(900, Math.max(0, rect.top - bounds.top)) / 900) * 300,
+								(Math.min(720, Math.max(0, rect.top - bounds.top)) / 720) * 180,
 						});
 					}
 				}
@@ -249,7 +483,7 @@ export function MotionSwitch<T>(props: {
 								? pageArrivals.forward
 								: pageArrivals.backward,
 						{
-							duration: 700,
+							duration: interfaceMotion[kind].duration,
 							easing: "linear",
 						},
 					),
@@ -258,7 +492,7 @@ export function MotionSwitch<T>(props: {
 					for (const { element, delay } of sections) {
 						animations.push(
 							element.animate(sectionFrames, {
-								duration: 850,
+								duration: interfaceMotion.section.duration,
 								delay,
 								easing: "linear",
 								fill: "backwards",
@@ -353,8 +587,8 @@ export function MotionPresence(props: {
 					setShown(true);
 					if (!reducedMotion())
 						animation = root.animate(enterFrames, {
-							duration: 700,
-							delay: 120,
+							duration: interfaceMotion.page.duration,
+							delay: 90,
 							fill: "backwards",
 							easing: "linear",
 						});
@@ -362,8 +596,12 @@ export function MotionPresence(props: {
 					if (!reducedMotion()) {
 						animation = root.animate(
 							[
-								{ opacity },
-								{ opacity: 0, transform: "translateY(26px) scale(.985)" },
+								{ opacity, filter: "blur(0px)" },
+								{
+									opacity: 0,
+									transform: "translate3d(0, 12px, 0) scale(.986)",
+									filter: "blur(2.5px)",
+								},
 							],
 							{
 								duration: interfaceMotion.outgoing.duration,
@@ -418,16 +656,19 @@ export async function transitionContent(
 	const previous = pageChanges.get(root);
 	const revision = (previous?.revision ?? 0) + 1;
 	previous?.animation?.cancel();
-	const state: { revision: number; animation?: Animation } = { revision };
-	pageChanges.set(root, state);
 	if (reducedMotion()) {
+		pageChanges.set(root, { revision });
 		change();
 		return;
 	}
-	state.animation = root.animate(
+	const exit = root.animate(
 		[
-			{ opacity, transform },
-			{ opacity: 0, transform: `translateX(${-18 * direction}px) scale(.985)` },
+			{ opacity, transform, filter: "blur(0px)" },
+			{
+				opacity: 0,
+				transform: `translate3d(${-direction * 16}px, 4px, 0) scale(.986)`,
+				filter: "blur(2.5px)",
+			},
 		],
 		{
 			duration: interfaceMotion.outgoing.duration,
@@ -435,14 +676,17 @@ export async function transitionContent(
 			fill: "forwards",
 		},
 	);
-	await state.animation.finished.catch(() => {});
-	if (pageChanges.get(root) !== state) return;
+	pageChanges.set(root, { revision, animation: exit });
+	await exit.finished.catch(() => {});
+	if (pageChanges.get(root)?.revision !== revision) return;
+	exit.cancel();
 	change();
-	await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-	if (pageChanges.get(root) !== state) return;
-	state.animation.cancel();
-	state.animation = root.animate(arrivalFrames("subpage", direction), {
-		duration: 700,
-		easing: "linear",
-	});
+	const enter = root.animate(
+		direction > 0 ? pageArrivals.forward : pageArrivals.backward,
+		{
+			duration: interfaceMotion.subpage.duration,
+			easing: "linear",
+		},
+	);
+	pageChanges.set(root, { revision, animation: enter });
 }

@@ -24,7 +24,15 @@ import { CursorSettings } from "./CursorSettings";
 import { Disclosure } from "./Disclosure";
 import { MotionGroup, MotionPanel, MotionSwitch } from "./InterfaceMotion";
 import { LayoutSettings } from "./LayoutSettings";
+import { MotionText } from "./MotionText";
 import { Toggle } from "./Toggle";
+
+const APPEARANCE_TAB_META: Record<string, { title: string; sub: string }> = {
+	background: { title: "画面与背景", sub: "壁纸、留白、圆角与阴影" },
+	camera: { title: "摄像头画中画", sub: "独立分轨，录后可任意移位" },
+	audio: { title: "声音与增强", sub: "麦克风与系统声音独立增益" },
+	cursor: { title: "光标与点击", sub: "矢量重绘、平滑与点击涟漪" },
+};
 
 const rgb = (v: readonly number[]) => `rgb(${v.join(",")})`;
 export function appearanceBackground(source: BackgroundSource): string {
@@ -197,6 +205,20 @@ export default function CaptureAppearance(props: {
 									)}
 								</For>
 							</MotionGroup>
+							<div class="jk-insp-title-row">
+								<MotionText
+									class="jk-insp-title"
+									text={localize(
+										APPEARANCE_TAB_META[tab()]?.title ?? "画面与背景",
+									)}
+								/>
+								<MotionText
+									class="jk-insp-sub"
+									text={localize(
+										APPEARANCE_TAB_META[tab()]?.sub ?? "壁纸、留白、圆角与阴影",
+									)}
+								/>
+							</div>
 							<MotionSwitch
 								value={tab()}
 								order={["background", "camera", "audio", "cursor"]}

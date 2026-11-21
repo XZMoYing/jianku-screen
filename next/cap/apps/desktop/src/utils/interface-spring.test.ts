@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { interfaceMotion } from "./interface-motion-tokens";
 import { InterfaceSpring, sampleSpring } from "./interface-spring";
 
 describe("interface selection motion", () => {
@@ -11,6 +12,32 @@ describe("interface selection motion", () => {
 			previous = current.value;
 		}
 		expect(previous).toBeCloseTo(100, 2);
+	});
+	it("produces symmetric underdamped rebound for selection pills in both directions", () => {
+		const { response, damping } = interfaceMotion.selection;
+		let maxForwardOvershoot = 0;
+		let maxReverseOvershoot = 0;
+		for (let t = 0; t <= 1.4; t += 1 / 240) {
+			const fwd = sampleSpring(
+				{ value: 0, velocity: 0 },
+				200,
+				t,
+				response,
+				damping,
+			).value;
+			const rev = sampleSpring(
+				{ value: 200, velocity: 0 },
+				0,
+				t,
+				response,
+				damping,
+			).value;
+			maxForwardOvershoot = Math.max(maxForwardOvershoot, fwd - 200);
+			maxReverseOvershoot = Math.max(maxReverseOvershoot, -rev);
+			expect(fwd + rev).toBeCloseTo(200, 6);
+		}
+		expect(maxForwardOvershoot).toBeGreaterThan(2);
+		expect(maxReverseOvershoot).toBeCloseTo(maxForwardOvershoot, 6);
 	});
 	it("keeps position and velocity continuous when another tab interrupts", () => {
 		const spring = new InterfaceSpring(0);

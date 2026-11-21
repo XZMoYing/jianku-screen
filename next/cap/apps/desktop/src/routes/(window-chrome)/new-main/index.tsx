@@ -41,6 +41,7 @@ import {
 	MotionPresence,
 	MotionSwitch,
 } from "~/components/InterfaceMotion";
+import { LeicaSeedDots } from "~/components/LeicaSeedDots";
 import { MainWindowPinButton } from "~/components/MainWindowPinButton";
 import MobileRecorder from "~/components/MobileRecorder";
 import Mode from "~/components/Mode";
@@ -456,7 +457,7 @@ function CameraListItem(props: {
 			class={cx(
 				"group flex items-stretch rounded-lg text-sm outline-hidden overflow-hidden transition-colors",
 				props.isSelected
-					? "bg-blue-500 text-white"
+					? "bg-[var(--jk-graphite)] text-[var(--jk-on-graphite)]"
 					: props.isFocused
 						? "bg-gray-5 text-gray-12"
 						: "hover:bg-gray-4 text-gray-12",
@@ -542,7 +543,7 @@ function MicrophoneListItem(props: {
 			class={cx(
 				"relative overflow-hidden flex items-stretch rounded-lg text-sm outline-hidden",
 				props.isSelected
-					? "bg-blue-500 text-white"
+					? "bg-[var(--jk-graphite)] text-[var(--jk-on-graphite)]"
 					: props.isFocused
 						? "bg-gray-5 text-gray-12"
 						: "hover:bg-gray-4 text-gray-12",
@@ -669,7 +670,7 @@ function CameraSettingsPanel(props: {
 				class={cx(
 					"flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-sm outline-none transition-colors",
 					isDefaultSelected()
-						? "bg-blue-500 text-white"
+						? "bg-[var(--jk-graphite)] text-[var(--jk-on-graphite)]"
 						: "text-gray-12 hover:bg-gray-4",
 				)}
 			>
@@ -708,7 +709,7 @@ function CameraSettingsPanel(props: {
 								class={cx(
 									"flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-sm outline-none transition-colors",
 									isSelected(setting())
-										? "bg-blue-500 text-white"
+										? "bg-[var(--jk-graphite)] text-[var(--jk-on-graphite)]"
 										: "text-gray-12 hover:bg-gray-4",
 								)}
 							>
@@ -796,7 +797,7 @@ function MicrophoneSettingsPanel(props: {
 				class={cx(
 					"flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-sm outline-none transition-colors",
 					isDefaultSelected()
-						? "bg-blue-500 text-white"
+						? "bg-[var(--jk-graphite)] text-[var(--jk-on-graphite)]"
 						: "text-gray-12 hover:bg-gray-4",
 				)}
 			>
@@ -834,7 +835,7 @@ function MicrophoneSettingsPanel(props: {
 								class={cx(
 									"flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-sm outline-none transition-colors",
 									isSelected(setting())
-										? "bg-blue-500 text-white"
+										? "bg-[var(--jk-graphite)] text-[var(--jk-on-graphite)]"
 										: "text-gray-12 hover:bg-gray-4",
 								)}
 							>
@@ -1048,7 +1049,7 @@ function DeviceListPanel(props: DeviceListPanelProps) {
 					class={cx(
 						"flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-left outline-hidden transition-colors",
 						isNoneSelected()
-							? "bg-blue-500 text-white"
+							? "bg-[var(--jk-graphite)] text-[var(--jk-on-graphite)]"
 							: focusedIndex() === 0
 								? "bg-gray-5 text-gray-12"
 								: "hover:bg-gray-4 text-gray-12",
@@ -3020,6 +3021,7 @@ function Page() {
 					data-tauri-drag-region
 				>
 					<span class="flex-1" data-tauri-drag-region />
+					<LeicaSeedDots />
 					<MainWindowPinButton />
 					<EditorButton
 						type="button"

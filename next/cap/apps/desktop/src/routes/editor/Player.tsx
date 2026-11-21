@@ -16,6 +16,7 @@ import {
 	untrack,
 	type ValidComponent,
 } from "solid-js";
+import { MotionText } from "~/components/MotionText";
 import Tooltip from "~/components/Tooltip";
 import { captionsStore } from "~/store/captions";
 import { createTauriEventListener } from "~/utils/createEventListener";
@@ -475,9 +476,11 @@ export function PlayerContent(props: {
 							class="flex flex-row gap-2 items-center px-3 h-8 min-w-24 max-w-40 rounded-full bg-ed-ctl text-xs text-ed-text-1 outline-hidden focus-visible:ring-2 focus-visible:ring-ed-accent"
 						>
 							<KSelect.Value<PreviewResolutionOption> class="flex-1 text-left truncate">
-								{(state) =>
-									localize(previewQualityLabel(state.selectedOption()))
-								}
+								{(state) => (
+									<MotionText
+										text={localize(previewQualityLabel(state.selectedOption()))}
+									/>
+								)}
 							</KSelect.Value>
 							<KSelect.Icon<ValidComponent>
 								as={(iconProps) => (
@@ -644,7 +647,11 @@ export function PlayerContent(props: {
 								)}
 							>
 								<KSelect.Value<number>>
-									{(state) => formatPreviewSpeed(state.selectedOption())}
+									{(state) => (
+										<MotionText
+											text={formatPreviewSpeed(state.selectedOption())}
+										/>
+									)}
 								</KSelect.Value>
 							</KSelect.Trigger>
 						</Tooltip>
