@@ -36,6 +36,7 @@ export type ResolutionOption = {
 };
 
 export const RESOLUTION_OPTIONS = {
+	_480p: { label: "480p", value: "480p", width: 854, height: 480 },
 	_720p: { label: "720p", value: "720p", width: 1280, height: 720 },
 	_1080p: { label: "1080p", value: "1080p", width: 1920, height: 1080 },
 	_4k: { label: "4K", value: "4k", width: 3840, height: 2160 },

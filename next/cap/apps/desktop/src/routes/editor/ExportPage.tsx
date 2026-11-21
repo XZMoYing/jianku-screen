@@ -78,12 +78,26 @@ export const FPS_OPTIONS = [
 ] satisfies Array<{ label: string; value: number }>;
 
 export const GIF_FPS_OPTIONS = [
+	{ label: "5 FPS", value: 5 },
 	{ label: "10 FPS", value: 10 },
 	{ label: "15 FPS", value: 15 },
 	{ label: "20 FPS", value: 20 },
 	{ label: "25 FPS", value: 25 },
 	{ label: "30 FPS", value: 30 },
 ] satisfies Array<{ label: string; value: number }>;
+
+type GifQualityPreset = "low" | "medium" | "high";
+
+const GIF_QUALITY_OPTIONS: Array<{
+	label: string;
+	value: GifQualityPreset;
+	quality: number;
+	fast: boolean;
+}> = [
+	{ label: "低画质", value: "low", quality: 45, fast: true },
+	{ label: "均衡", value: "medium", quality: 75, fast: false },
+	{ label: "高画质", value: "high", quality: 90, fast: false },
+];
 
 export const EXPORT_TO_OPTIONS = [
 	{
@@ -106,22 +120,27 @@ export const EXPORT_TO_OPTIONS = [
 	},
 ] as const;
 
-type ExportFormat = ExportSettings["format"];
+type ExportUiFormat = "Mp4" | "Gif" | "Mp3" | "Wav";
 
 const FORMAT_OPTIONS = [
 	{ label: "MP4", value: "Mp4" },
 	{ label: "GIF", value: "Gif" },
-] as { label: string; value: ExportFormat; disabled?: boolean }[];
+	{ label: "MP3", value: "Mp3" },
+	{ label: "WAV", value: "Wav" },
+] as { label: string; value: ExportUiFormat; disabled?: boolean }[];
 
 type ExportToOption = (typeof EXPORT_TO_OPTIONS)[number]["value"];
 
 interface Settings {
-	format: ExportFormat;
+	format: ExportUiFormat;
 	fps: number;
 	exportTo: ExportToOption;
 	resolution: { label: string; value: string; width: number; height: number };
 	compression: ExportCompression;
 	optimizeFilesize: boolean;
+	turbo: boolean;
+	screenEnhancement: boolean;
+	gifQuality: GifQualityPreset;
 }
 
 function buildExportSettings(
@@ -130,6 +149,13 @@ function buildExportSettings(
 	compressionBpp: number | null,
 	forceFfmpegDecoder: boolean,
 ): ExportSettings {
+	if (settings.format === "Mp3" || settings.format === "Wav") {
+		return {
+			format: "Audio",
+			codec: settings.format === "Mp3" ? "mp3" : "wav",
+		};
+	}
+
 	const resolutionBase = {
 		x: settings.resolution.width,
 		y: settings.resolution.height,
@@ -141,6 +167,7 @@ function buildExportSettings(
 			fps: settings.fps,
 			resolution_base: resolutionBase,
 			cursor_only: true,
+			screen_enhancement: settings.screenEnhancement,
 		};
 	}
 
@@ -153,14 +180,21 @@ function buildExportSettings(
 			custom_bpp: compressionBpp,
 			force_ffmpeg_decoder: forceFfmpegDecoder,
 			optimize_filesize: settings.optimizeFilesize,
+			turbo: settings.turbo,
+			screen_enhancement: settings.screenEnhancement,
 		};
 	}
+
+	const gifPreset =
+		GIF_QUALITY_OPTIONS.find((opt) => opt.value === settings.gifQuality) ??
+		GIF_QUALITY_OPTIONS[2];
 
 	return {
 		format: "Gif",
 		fps: settings.fps,
 		resolution_base: resolutionBase,
-		quality: null,
+		quality: { quality: gifPreset.quality, fast: gifPreset.fast },
+		screen_enhancement: settings.screenEnhancement,
 	};
 }
 
@@ -198,14 +232,23 @@ export function ExportPage() {
 			(error.message === "Export cancelled" ||
 				error.message === "Save dialog cancelled"));
 
+	const capturedDisplayFps = Math.max(
+		0,
+		...editorInstance.recordings.segments.map((s) => s.display.fps ?? 0),
+	);
+	const defaultCaptureFps = capturedDisplayFps >= 50 ? 60 : 30;
+
 	const [_settings, setSettings] = makePersisted(
 		createStore<Settings>({
 			format: "Mp4",
-			fps: 30,
+			fps: defaultCaptureFps,
 			exportTo: "file",
-			resolution: { label: "720p", value: "720p", width: 1280, height: 720 },
+			resolution: { label: "1080p", value: "1080p", width: 1920, height: 1080 },
 			compression: "Maximum",
 			optimizeFilesize: false,
+			turbo: false,
+			screenEnhancement: false,
+			gifQuality: "high",
 		}),
 		{ name: "export_settings" },
 	);
@@ -227,10 +270,15 @@ export function ExportPage() {
 	];
 	const [cursorOnly, setCursorOnly] = createSignal(false);
 
-	const requiresTransparentExport = () => hasTransparentBackground();
-	const disablesLinkExport = () => hasTransparentBackground() || cursorOnly();
+	const isAudioOnlyFormat = () =>
+		!cursorOnly() && (_settings.format === "Mp3" || _settings.format === "Wav");
+	const requiresTransparentExport = () =>
+		!isAudioOnlyFormat() && hasTransparentBackground();
+	const disablesLinkExport = () =>
+		hasTransparentBackground() || cursorOnly() || isAudioOnlyFormat();
 	const shouldUseGifMode = () =>
 		!cursorOnly() &&
+		!isAudioOnlyFormat() &&
 		(hasTransparentBackground() ||
 			(_settings.format === "Gif" && _settings.exportTo !== "link"));
 	const isMovCursorOnlyExport = () => cursorOnly();
@@ -244,7 +292,8 @@ export function ExportPage() {
 
 	const settings = mergeProps(_settings, () => {
 		const ret: Partial<Settings> = {};
-		if (!["Mp4", "Gif"].includes(_settings.format)) ret.format = "Mp4";
+		if (!["Mp4", "Gif", "Mp3", "Wav"].includes(_settings.format))
+			ret.format = "Mp4";
 		else if (!cursorOnly()) {
 			if (requiresTransparentExport() && _settings.format === "Mp4")
 				ret.format = "Gif";
@@ -257,19 +306,29 @@ export function ExportPage() {
 		}
 
 		if (shouldUseGifMode()) {
-			if (!["720p", "1080p"].includes(_settings.resolution.value)) {
+			if (!["480p", "720p", "1080p"].includes(_settings.resolution.value)) {
 				ret.resolution = { ...RESOLUTION_OPTIONS._720p };
 			}
 			if (GIF_FPS_OPTIONS.every((option) => option.value !== _settings.fps)) {
 				ret.fps = 15;
 			}
-		} else if (FPS_OPTIONS.every((option) => option.value !== _settings.fps)) {
-			ret.fps = 30;
+		} else if (
+			!isAudioOnlyFormat() &&
+			FPS_OPTIONS.every((option) => option.value !== _settings.fps)
+		) {
+			ret.fps = defaultCaptureFps;
 		}
 
 		if (!VALID_COMPRESSIONS.includes(_settings.compression))
 			ret.compression = "Maximum";
 		if (_settings.exportTo === "link") ret.exportTo = "file";
+		if (isAudioOnlyFormat() && _settings.exportTo === "clipboard")
+			ret.exportTo = "file";
+		if (typeof _settings.turbo !== "boolean") ret.turbo = false;
+		if (typeof _settings.screenEnhancement !== "boolean")
+			ret.screenEnhancement = false;
+		if (!["low", "medium", "high"].includes(_settings.gifQuality))
+			ret.gifQuality = "high";
 
 		return ret;
 	});
@@ -388,6 +447,11 @@ export function ExportPage() {
 	const outputDimensions = () =>
 		currentPreviewDimensions() ?? settings.resolution;
 	const outputDescription = () => {
+		if (isAudioOnlyFormat()) {
+			return settings.format === "Mp3"
+				? "MP3 · 192 kbps · 48 kHz"
+				: "WAV · 16-bit PCM · 48 kHz";
+		}
 		const dimensions = currentPreviewDimensions();
 		return dimensions
 			? `${dimensions.width}×${dimensions.height} · ${settings.fps} fps`
@@ -599,6 +663,9 @@ export function ExportPage() {
 				compressionBpp,
 				projectRevision,
 				() => settings.optimizeFilesize,
+				() => settings.turbo,
+				() => settings.screenEnhancement,
+				() => settings.gifQuality,
 				() => settings.compression,
 				forceFfmpegDecoder,
 				advancedMode,
@@ -665,19 +732,31 @@ export function ExportPage() {
 	const [outputPath, setOutputPath] = createSignal<string | null>(null);
 	const [isCancelled, setIsCancelled] = createSignal(false);
 	const exportFileExtension = () =>
-		isMovCursorOnlyExport() ? "mov" : settings.format === "Gif" ? "gif" : "mp4";
+		isMovCursorOnlyExport()
+			? "mov"
+			: settings.format === "Gif"
+				? "gif"
+				: settings.format === "Mp3"
+					? "mp3"
+					: settings.format === "Wav"
+						? "wav"
+						: "mp4";
 	const exportedAssetLabel = () =>
 		isMovCursorOnlyExport()
 			? localize("Cursor track")
 			: settings.format === "Gif"
 				? "GIF"
-				: localize("Recording");
+				: settings.format === "Mp3" || settings.format === "Wav"
+					? localize("Audio")
+					: localize("Recording");
 	const exportMediumLabel = () =>
 		isMovCursorOnlyExport()
 			? localize("cursor track")
 			: settings.format === "Gif"
 				? "GIF"
-				: localize("video");
+				: settings.format === "Mp3" || settings.format === "Wav"
+					? localize("音频")
+					: localize("video");
 
 	const handleCancel = async () => {
 		if (
@@ -836,15 +915,19 @@ export function ExportPage() {
 			value: option.value,
 			label: option.label,
 			icon: option.icon,
-			disabled: option.value === "link",
+			disabled:
+				option.value === "link" ||
+				(option.value === "clipboard" && isAudioOnlyFormat()),
 			disabledReason:
 				option.value === "link"
 					? "在线分享功能敬请期待"
-					: disablesLinkExport()
-						? cursorOnly()
-							? "仅光标导出目前只能保存为文件或复制到剪贴板"
-							: "透明背景导出目前只能保存为文件或复制到剪贴板"
-						: undefined,
+					: option.value === "clipboard" && isAudioOnlyFormat()
+						? "仅音频导出只支持保存为本地文件"
+						: disablesLinkExport()
+							? cursorOnly()
+								? "仅光标导出目前只能保存为文件或复制到剪贴板"
+								: "透明背景导出目前只能保存为文件或复制到剪贴板"
+							: undefined,
 		}));
 
 	const formatOptions = () =>
@@ -869,7 +952,11 @@ export function ExportPage() {
 
 	const resolutionOptions = () =>
 		(shouldUseGifMode()
-			? [RESOLUTION_OPTIONS._720p, RESOLUTION_OPTIONS._1080p]
+			? [
+					RESOLUTION_OPTIONS._480p,
+					RESOLUTION_OPTIONS._720p,
+					RESOLUTION_OPTIONS._1080p,
+				]
 			: [
 					RESOLUTION_OPTIONS._720p,
 					RESOLUTION_OPTIONS._1080p,
@@ -1081,9 +1168,14 @@ export function ExportPage() {
 									updateSettings(
 										produce((newSettings) => {
 											newSettings.format = value;
+											if (value === "Mp3" || value === "Wav") {
+												newSettings.exportTo = "file";
+												return;
+											}
 											if (
 												value === "Gif" &&
 												!(
+													settings.resolution.value === "480p" ||
 													settings.resolution.value === "720p" ||
 													settings.resolution.value === "1080p"
 												)
@@ -1100,42 +1192,72 @@ export function ExportPage() {
 												value === "Mp4" &&
 												FPS_OPTIONS.every((v) => v.value !== settings.fps)
 											)
-												newSettings.fps = 30;
+												newSettings.fps = defaultCaptureFps;
 										}),
 									);
 								}}
 							/>
 						</ExportSection>
 
-						<ExportSection
-							name={localize("Resolution")}
-							icon={<IconLucideMonitor class="size-3.5" />}
-						>
-							<ExportSegmented
-								options={resolutionOptions()}
-								value={settings.resolution.value}
-								onChange={(value) => {
-									const option = Object.values(RESOLUTION_OPTIONS).find(
-										(candidate) => candidate.value === value,
-									);
-									if (option) updateSettings("resolution", { ...option });
-								}}
-							/>
-						</ExportSection>
+						<Show when={isAudioOnlyFormat()}>
+							<div class="p-3 rounded-[10px] bg-ed-card-2 text-[11.5px] leading-[16px] text-ed-text-2">
+								{settings.format === "Mp3"
+									? localize(
+											"仅导出完整混音后的 192 kbps MP3 音频，保留人声增强、均衡器与音乐轨。",
+										)
+									: localize(
+											"仅导出完整混音后的 16-bit 48 kHz 无损 WAV 音频，保留人声增强、均衡器与音乐轨。",
+										)}
+							</div>
+						</Show>
 
-						<ExportSection
-							name={localize("Frame rate")}
-							icon={<IconLucideGauge class="size-3.5" />}
-						>
-							<ExportSegmented
-								options={fpsOptions()}
-								value={settings.fps}
-								onChange={(value) => {
-									trackEvent("export_fps_changed", { fps: value });
-									updateSettings("fps", value);
-								}}
-							/>
-						</ExportSection>
+						<Show when={!isAudioOnlyFormat()}>
+							<ExportSection
+								name={localize("Resolution")}
+								icon={<IconLucideMonitor class="size-3.5" />}
+							>
+								<ExportSegmented
+									options={resolutionOptions()}
+									value={settings.resolution.value}
+									onChange={(value) => {
+										const option = Object.values(RESOLUTION_OPTIONS).find(
+											(candidate) => candidate.value === value,
+										);
+										if (option) updateSettings("resolution", { ...option });
+									}}
+								/>
+							</ExportSection>
+
+							<ExportSection
+								name={localize("Frame rate")}
+								icon={<IconLucideGauge class="size-3.5" />}
+							>
+								<ExportSegmented
+									options={fpsOptions()}
+									value={settings.fps}
+									onChange={(value) => {
+										trackEvent("export_fps_changed", { fps: value });
+										updateSettings("fps", value);
+									}}
+								/>
+							</ExportSection>
+						</Show>
+
+						<Show when={shouldUseGifMode()}>
+							<ExportSection
+								name={localize("GIF 画质")}
+								icon={<IconLucideGem class="size-3.5" />}
+							>
+								<ExportSegmented
+									options={GIF_QUALITY_OPTIONS.map((opt) => ({
+										value: opt.value,
+										label: opt.label,
+									}))}
+									value={settings.gifQuality}
+									onChange={(value) => updateSettings("gifQuality", value)}
+								/>
+							</ExportSection>
+						</Show>
 
 						<Show when={showBitrateControls()}>
 							<ExportSection
@@ -1160,6 +1282,14 @@ export function ExportPage() {
 									<span>{localize("Larger file")}</span>
 								</div>
 								<ExportToggleRow
+									title={localize("极速并行导出")}
+									description={localize(
+										"多核并行分段渲染与编码，长视频导出可提速 2-3 倍",
+									)}
+									checked={settings.turbo}
+									onChange={(value) => updateSettings("turbo", value)}
+								/>
+								<ExportToggleRow
 									title={localize("Optimize file size")}
 									description={localize(
 										"Re-encodes with software for much smaller files (slower)",
@@ -1170,6 +1300,17 @@ export function ExportPage() {
 									}
 								/>
 							</ExportSection>
+						</Show>
+
+						<Show when={!isAudioOnlyFormat() && !cursorOnly()}>
+							<ExportToggleRow
+								title={localize("画面清晰度增强")}
+								description={localize(
+									"放大或缩小录屏时启用 GPU 神经超分与文字锐化细节滤波",
+								)}
+								checked={settings.screenEnhancement}
+								onChange={(value) => updateSettings("screenEnhancement", value)}
+							/>
 						</Show>
 
 						<div class="h-px shrink-0 bg-ed-line" />

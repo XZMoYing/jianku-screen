@@ -1,3 +1,4 @@
+pub mod audio;
 pub mod estimates;
 pub mod gif;
 pub mod mov;
@@ -170,6 +171,7 @@ impl ExporterBuilder {
             .map_err(Error::RendererSetup)?,
         );
 
+        let user_cancellation = cancellation.clone();
         let audio_cancellation = if stream_audio {
             cancellation.map(ExportAudioCancellation::new)
         } else {
@@ -224,6 +226,7 @@ impl ExporterBuilder {
             streaming_audio,
             streaming_output,
             audio_cancellation,
+            user_cancellation,
             sample_windows: None,
             sample_timing: None,
         })
@@ -408,6 +411,7 @@ pub struct ExporterBase {
     streaming_audio: Option<ExportAudioRenderer>,
     streaming_output: Option<mp4::TemporaryMp4Output>,
     audio_cancellation: Option<ExportAudioCancellation>,
+    user_cancellation: Option<Arc<AtomicBool>>,
     sample_windows: Option<cap_rendering::FrameWindows>,
     sample_timing: Option<Arc<estimates::SampleTiming>>,
 }

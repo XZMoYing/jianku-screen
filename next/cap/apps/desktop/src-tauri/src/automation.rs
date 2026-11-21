@@ -205,6 +205,7 @@ impl AutomationHost for DesktopAutomationHost {
             crate::export::ExportSettings::Mp4(s) => s.export(base, |_| true).await,
             crate::export::ExportSettings::Gif(s) => s.export(base, |_| true).await,
             crate::export::ExportSettings::Mov(s) => s.export(base, |_| true).await,
+            crate::export::ExportSettings::Audio(s) => s.export(base, |_| true).await,
         }
         .map_err(|e| format!("Export failed: {e}"))?;
 
@@ -611,6 +612,8 @@ fn build_desktop_export_settings(profile: &ExportProfile) -> crate::export::Expo
                 custom_bpp: None,
                 force_ffmpeg_decoder: false,
                 optimize_filesize: false,
+                turbo: false,
+                screen_enhancement: false,
             })
         }
         ExportFormat::Gif => {
@@ -618,6 +621,7 @@ fn build_desktop_export_settings(profile: &ExportProfile) -> crate::export::Expo
                 fps: profile.fps,
                 resolution_base: profile.resolution_base,
                 quality: None,
+                screen_enhancement: false,
             })
         }
         ExportFormat::Mov => {
@@ -625,6 +629,7 @@ fn build_desktop_export_settings(profile: &ExportProfile) -> crate::export::Expo
                 fps: profile.fps,
                 resolution_base: profile.resolution_base,
                 cursor_only: false,
+                screen_enhancement: false,
             })
         }
     }

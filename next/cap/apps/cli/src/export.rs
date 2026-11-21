@@ -18,6 +18,8 @@ pub enum ExportFormat {
     Mp4,
     Gif,
     Mov,
+    Mp3,
+    Wav,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, ValueEnum)]
@@ -72,6 +74,12 @@ pub struct Export {
     /// Optimise for smaller files using CRF (mp4 only)
     #[arg(long)]
     optimize_filesize: bool,
+    /// Use multi-core parallel chunk MP4 export (mp4 only)
+    #[arg(long)]
+    turbo: bool,
+    /// Enable GPU screen quality enhancement during export
+    #[arg(long)]
+    screen_enhance: bool,
     /// Full export settings as JSON, e.g. {"format":"Mp4","fps":60,"resolution_base":{"x":1920,"y":1080},"compression":"Maximum","custom_bpp":null} (mutually exclusive with the flags above)
     #[arg(long)]
     settings_json: Option<String>,
@@ -93,6 +101,8 @@ pub struct ExportFlags {
     pub resolution: Option<String>,
     pub quality: Option<QualityArg>,
     pub optimize_filesize: bool,
+    pub turbo: bool,
+    pub screen_enhance: bool,
     pub force_ffmpeg_decoder: bool,
 }
 
@@ -103,6 +113,8 @@ impl ExportFlags {
             || self.resolution.is_some()
             || self.quality.is_some()
             || self.optimize_filesize
+            || self.turbo
+            || self.screen_enhance
     }
 }
 
@@ -115,6 +127,8 @@ pub enum CliExportSettings {
     Gif(cap_export::gif::GifExportSettings),
     #[serde(alias = "mov")]
     Mov(cap_export::mov::MovExportSettings),
+    #[serde(alias = "audio")]
+    Audio(cap_export::audio::AudioExportSettings),
 }
 
 impl CliExportSettings {
@@ -123,20 +137,30 @@ impl CliExportSettings {
             Self::Mp4(settings) => settings.fps,
             Self::Gif(settings) => settings.fps,
             Self::Mov(settings) => settings.fps,
+            Self::Audio(_) => cap_export::audio::AudioExportSettings::PROGRESS_FPS,
         }
     }
 
     fn force_ffmpeg_decoder(&self) -> bool {
         match self {
             Self::Mp4(settings) => settings.force_ffmpeg_decoder,
-            Self::Gif(_) | Self::Mov(_) => false,
+            Self::Gif(_) | Self::Mov(_) | Self::Audio(_) => false,
         }
     }
 
     fn cursor_only(&self) -> bool {
         match self {
             Self::Mov(settings) => settings.cursor_only,
-            Self::Mp4(_) | Self::Gif(_) => false,
+            Self::Mp4(_) | Self::Gif(_) | Self::Audio(_) => false,
+        }
+    }
+
+    fn screen_enhancement(&self) -> bool {
+        match self {
+            Self::Mp4(settings) => settings.screen_enhancement,
+            Self::Gif(settings) => settings.screen_enhancement,
+            Self::Mov(settings) => settings.screen_enhancement,
+            Self::Audio(_) => false,
         }
     }
 }
@@ -144,7 +168,7 @@ impl CliExportSettings {
 fn default_fps(format: ExportFormat) -> u32 {
     match format {
         ExportFormat::Mp4 | ExportFormat::Mov => 60,
-        ExportFormat::Gif => 30,
+        ExportFormat::Gif | ExportFormat::Mp3 | ExportFormat::Wav => 30,
     }
 }
 
@@ -188,6 +212,8 @@ pub fn settings_from_flags(flags: &ExportFlags) -> Result<CliExportSettings, Str
             custom_bpp: None,
             force_ffmpeg_decoder: flags.force_ffmpeg_decoder,
             optimize_filesize: flags.optimize_filesize,
+            turbo: flags.turbo,
+            screen_enhancement: flags.screen_enhance,
         })),
         ExportFormat::Gif => {
             if flags.quality.is_some() {
@@ -203,6 +229,7 @@ pub fn settings_from_flags(flags: &ExportFlags) -> Result<CliExportSettings, Str
                 fps,
                 resolution_base,
                 quality: None,
+                screen_enhancement: flags.screen_enhance,
             }))
         }
         ExportFormat::Mov => {
@@ -216,8 +243,19 @@ pub fn settings_from_flags(flags: &ExportFlags) -> Result<CliExportSettings, Str
                 fps,
                 resolution_base,
                 cursor_only: false,
+                screen_enhancement: flags.screen_enhance,
             }))
         }
+        ExportFormat::Mp3 => Ok(CliExportSettings::Audio(
+            cap_export::audio::AudioExportSettings {
+                codec: cap_export::audio::AudioExportFormat::Mp3,
+            },
+        )),
+        ExportFormat::Wav => Ok(CliExportSettings::Audio(
+            cap_export::audio::AudioExportSettings {
+                codec: cap_export::audio::AudioExportFormat::Wav,
+            },
+        )),
     }
 }
 
@@ -258,6 +296,8 @@ impl Export {
             resolution: self.resolution.clone(),
             quality: self.quality,
             optimize_filesize: self.optimize_filesize,
+            turbo: self.turbo,
+            screen_enhance: self.screen_enhance,
             force_ffmpeg_decoder: self.force_ffmpeg_decoder,
         };
 
@@ -329,7 +369,8 @@ impl Export {
 
         let force_ffmpeg_decoder = self.force_ffmpeg_decoder || settings.force_ffmpeg_decoder();
         let mut builder = ExporterBase::builder(self.project_path.clone())
-            .with_force_ffmpeg_decoder(force_ffmpeg_decoder);
+            .with_force_ffmpeg_decoder(force_ffmpeg_decoder)
+            .with_screen_enhancement(settings.screen_enhancement());
 
         if let Some(output_path) = output {
             builder = builder.with_output_path(output_path);
@@ -342,50 +383,104 @@ impl Export {
             builder = builder.with_config(make_cursor_only_project(project));
         }
 
-        let exporter_base = builder
-            .build()
-            .await
-            .map_err(|v| format!("Exporter build error: {v}"))?;
-
-        let total_frames = exporter_base.total_frames(settings.fps());
-
-        if progress_json {
-            emit_export_message(
-                stdout,
-                &ExportProgressMessage::Progress {
-                    rendered_count: 0,
-                    total_frames,
-                },
-            )?;
-        }
-
-        let rendered = Arc::new(AtomicU32::new(0));
-        let progress_stdout = Arc::clone(stdout);
-        let progress_rendered = Arc::clone(&rendered);
-        let on_progress = move |frame_index: u32| {
-            let count = (frame_index + 1).min(total_frames);
-            progress_rendered.store(count, Ordering::Relaxed);
-            if progress_json {
-                // Progress I/O must never cancel the render. Every exporter treats a `false`
-                // return as cancellation, so a transient stdout failure (closed pipe, poisoned
-                // lock) is swallowed here rather than aborting the export.
-                let _ = emit_export_message(
-                    &progress_stdout,
-                    &ExportProgressMessage::Progress {
-                        rendered_count: count,
-                        total_frames,
-                    },
-                );
+        let (total_frames, rendered, output_path) = match settings {
+            CliExportSettings::Mp4(mp4_settings) if mp4_settings.turbo => {
+                let cancellation = Arc::new(std::sync::atomic::AtomicBool::new(false));
+                let mp4_base = builder
+                    .build_for_mp4(cancellation)
+                    .await
+                    .map_err(|v| format!("Exporter build error: {v}"))?;
+                let total_frames = mp4_base.total_frames(mp4_settings.fps);
+                if progress_json {
+                    emit_export_message(
+                        stdout,
+                        &ExportProgressMessage::Progress {
+                            rendered_count: 0,
+                            total_frames,
+                        },
+                    )?;
+                }
+                let rendered = Arc::new(AtomicU32::new(0));
+                let progress_stdout = Arc::clone(stdout);
+                let progress_rendered = Arc::clone(&rendered);
+                let on_progress = move |frame_index: u32| {
+                    let count = (frame_index + 1).min(total_frames);
+                    progress_rendered.store(count, Ordering::Relaxed);
+                    if progress_json {
+                        let _ = emit_export_message(
+                            &progress_stdout,
+                            &ExportProgressMessage::Progress {
+                                rendered_count: count,
+                                total_frames,
+                            },
+                        );
+                    }
+                    true
+                };
+                let path = mp4_settings
+                    .export_prepared_turbo(
+                        mp4_base,
+                        cap_export::mp4::turbo::TurboOptions::default(),
+                        on_progress,
+                    )
+                    .await
+                    .map_err(|v| format!("Exporter error: {v}"))?;
+                (total_frames, rendered, path)
             }
-            true
-        };
+            other => {
+                let exporter_base = builder
+                    .build()
+                    .await
+                    .map_err(|v| format!("Exporter build error: {v}"))?;
 
-        let output_path = match settings {
-            CliExportSettings::Mp4(settings) => settings.export(exporter_base, on_progress).await,
-            CliExportSettings::Gif(settings) => settings.export(exporter_base, on_progress).await,
-            CliExportSettings::Mov(settings) => settings.export(exporter_base, on_progress).await,
-        }
-        .map_err(|v| format!("Exporter error: {v}"))?;
+                let total_frames = exporter_base.total_frames(other.fps());
+
+                if progress_json {
+                    emit_export_message(
+                        stdout,
+                        &ExportProgressMessage::Progress {
+                            rendered_count: 0,
+                            total_frames,
+                        },
+                    )?;
+                }
+
+                let rendered = Arc::new(AtomicU32::new(0));
+                let progress_stdout = Arc::clone(stdout);
+                let progress_rendered = Arc::clone(&rendered);
+                let on_progress = move |frame_index: u32| {
+                    let count = (frame_index + 1).min(total_frames);
+                    progress_rendered.store(count, Ordering::Relaxed);
+                    if progress_json {
+                        let _ = emit_export_message(
+                            &progress_stdout,
+                            &ExportProgressMessage::Progress {
+                                rendered_count: count,
+                                total_frames,
+                            },
+                        );
+                    }
+                    true
+                };
+
+                let path = match other {
+                    CliExportSettings::Mp4(settings) => {
+                        settings.export(exporter_base, on_progress).await
+                    }
+                    CliExportSettings::Gif(settings) => {
+                        settings.export(exporter_base, on_progress).await
+                    }
+                    CliExportSettings::Mov(settings) => {
+                        settings.export(exporter_base, on_progress).await
+                    }
+                    CliExportSettings::Audio(settings) => {
+                        settings.export(exporter_base, on_progress).await
+                    }
+                }
+                .map_err(|v| format!("Exporter error: {v}"))?;
+                (total_frames, rendered, path)
+            }
+        };
 
         // Defense in depth: an export that renders no frames writes an empty (~few hundred byte) file
         // but otherwise "succeeds". An agent must never silently get/upload that, so fail loudly and
@@ -571,7 +666,9 @@ fn instant_export_settings_supported(settings: &CliExportSettings) -> bool {
                 && settings.custom_bpp.is_none()
                 && !settings.optimize_filesize
         }
-        CliExportSettings::Gif(_) | CliExportSettings::Mov(_) => false,
+        CliExportSettings::Gif(_) | CliExportSettings::Mov(_) | CliExportSettings::Audio(_) => {
+            false
+        }
     }
 }
 
@@ -704,6 +801,7 @@ pub async fn export_project_default(project_path: PathBuf) -> Result<PathBuf, St
         CliExportSettings::Mp4(settings) => settings.export(exporter_base, on_progress).await,
         CliExportSettings::Gif(settings) => settings.export(exporter_base, on_progress).await,
         CliExportSettings::Mov(settings) => settings.export(exporter_base, on_progress).await,
+        CliExportSettings::Audio(settings) => settings.export(exporter_base, on_progress).await,
     }
     .map_err(|v| format!("Exporter error: {v}"))?;
 

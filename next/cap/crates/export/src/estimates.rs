@@ -134,10 +134,33 @@ pub async fn estimate_export(
     if settings.fps() == 0 || settings.fps() > 120 {
         return Err("Invalid export frame rate".into());
     }
+    if let ExportSettings::Audio(audio_settings) = settings {
+        let mut project = prepare_project_for_export(project);
+        synthesize_default_timeline(&mut project, &editor.recordings);
+        let duration_seconds = project
+            .timeline
+            .as_ref()
+            .map(|timeline| timeline.duration())
+            .filter(|d| d.is_finite() && *d > 0.0)
+            .unwrap_or(0.0);
+        let size_mb =
+            audio_settings.codec.estimated_bytes(duration_seconds) as f64 / (1024.0 * 1024.0);
+        let time_secs = (duration_seconds / 40.0).max(0.25);
+        let estimate = ExportEstimates {
+            duration_seconds,
+            estimated_time_seconds: time_secs,
+            estimated_size_mb: size_mb,
+            size_range_mb: [size_mb * 0.9, size_mb * 1.1],
+            time_range_seconds: [time_secs * 0.8, time_secs * 1.4],
+        };
+        on_estimate(estimate.clone());
+        return Ok(estimate);
+    }
     let resolution = match settings {
         ExportSettings::Mp4(settings) => settings.resolution_base,
         ExportSettings::Gif(settings) => settings.resolution_base,
         ExportSettings::Mov(settings) => settings.resolution_base,
+        ExportSettings::Audio(_) => unreachable!(),
     };
     if resolution.x == 0 || resolution.y == 0 {
         return Err("Invalid export resolution".into());
@@ -288,6 +311,7 @@ pub async fn estimate_export(
         streaming_audio: None,
         streaming_output: None,
         audio_cancellation: None,
+        user_cancellation: None,
         sample_windows: Some(windows.clone()),
         sample_timing: Some(timing.clone()),
     };
@@ -301,9 +325,13 @@ pub async fn estimate_export(
     let started = Instant::now();
     let export = async {
         match settings {
+            ExportSettings::Mp4(settings) if settings.turbo => {
+                crate::mp4::turbo::export_sampled(settings, base, on_progress).await
+            }
             ExportSettings::Mp4(settings) => settings.export(base, on_progress).await,
             ExportSettings::Gif(settings) => settings.export(base, on_progress).await,
             ExportSettings::Mov(settings) => settings.export(base, on_progress).await,
+            ExportSettings::Audio(settings) => settings.export(base, on_progress).await,
         }
     };
     tokio::pin!(export);
@@ -436,7 +464,7 @@ fn sample_plan(settings: ExportSettings) -> SamplePlan {
             timing: FrameTiming::GopAmortized,
             keyframe_interval,
         },
-        ExportSettings::Mp4(_) | ExportSettings::Mov(_) => SamplePlan {
+        ExportSettings::Mp4(_) | ExportSettings::Mov(_) | ExportSettings::Audio(_) => SamplePlan {
             windows: 4,
             window_frames: (fps / 2).max(32),
             leading_window: true,
@@ -454,7 +482,7 @@ fn keyframe_interval_frames(settings: ExportSettings) -> Option<u32> {
             .round()
             .max(1.0) as u32,
         ),
-        ExportSettings::Gif(_) | ExportSettings::Mov(_) => None,
+        ExportSettings::Gif(_) | ExportSettings::Mov(_) | ExportSettings::Audio(_) => None,
     }
 }
 
@@ -913,6 +941,8 @@ mod tests {
             custom_bpp: None,
             force_ffmpeg_decoder: false,
             optimize_filesize: false,
+            turbo: false,
+            screen_enhancement: false,
         }));
         assert_eq!((hardware.windows, hardware.window_frames), (4, 32));
         assert_eq!(hardware.timing, FrameTiming::Steady);
@@ -924,6 +954,8 @@ mod tests {
             custom_bpp: None,
             force_ffmpeg_decoder: false,
             optimize_filesize: true,
+            turbo: false,
+            screen_enhancement: false,
         }));
         assert_eq!((x264.windows, x264.window_frames), (3, 90));
         assert!(!x264.leading_window && hardware.leading_window);

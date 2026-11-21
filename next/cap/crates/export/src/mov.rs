@@ -15,6 +15,8 @@ pub struct MovExportSettings {
     pub resolution_base: XY<u32>,
     #[serde(default)]
     pub cursor_only: bool,
+    #[serde(default)]
+    pub screen_enhancement: bool,
 }
 
 impl MovExportSettings {

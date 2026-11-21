@@ -21,6 +21,8 @@ pub struct GifExportSettings {
     pub fps: u32,
     pub resolution_base: XY<u32>,
     pub quality: Option<GifQuality>,
+    #[serde(default)]
+    pub screen_enhancement: bool,
 }
 
 impl Default for GifExportSettings {
@@ -29,6 +31,7 @@ impl Default for GifExportSettings {
             fps: 30,
             resolution_base: XY { x: 1920, y: 1080 },
             quality: None,
+            screen_enhancement: false,
         }
     }
 }

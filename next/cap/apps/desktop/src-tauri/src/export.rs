@@ -1007,6 +1007,7 @@ pub enum ExportSettings {
     Mp4(cap_export::mp4::Mp4ExportSettings),
     Gif(cap_export::gif::GifExportSettings),
     Mov(cap_export::mov::MovExportSettings),
+    Audio(cap_export::audio::AudioExportSettings),
 }
 
 impl ExportSettings {
@@ -1015,13 +1016,14 @@ impl ExportSettings {
             ExportSettings::Mp4(settings) => settings.fps,
             ExportSettings::Gif(settings) => settings.fps,
             ExportSettings::Mov(settings) => settings.fps,
+            ExportSettings::Audio(_) => cap_export::audio::AudioExportSettings::PROGRESS_FPS,
         }
     }
 
     fn force_ffmpeg_decoder(&self) -> bool {
         match self {
             ExportSettings::Mp4(settings) => settings.force_ffmpeg_decoder,
-            ExportSettings::Gif(_) | ExportSettings::Mov(_) => false,
+            ExportSettings::Gif(_) | ExportSettings::Mov(_) | ExportSettings::Audio(_) => false,
         }
     }
 
@@ -1029,6 +1031,15 @@ impl ExportSettings {
         match self {
             ExportSettings::Mov(settings) => settings.cursor_only,
             _ => false,
+        }
+    }
+
+    fn screen_enhancement(&self) -> bool {
+        match self {
+            ExportSettings::Mp4(settings) => settings.screen_enhancement,
+            ExportSettings::Gif(settings) => settings.screen_enhancement,
+            ExportSettings::Mov(settings) => settings.screen_enhancement,
+            ExportSettings::Audio(_) => false,
         }
     }
 }
@@ -1055,8 +1066,9 @@ async fn do_export(
         return Err("Export cancelled".to_string());
     }
 
-    let mut exporter_builder =
-        ExporterBase::builder(project_path.to_path_buf()).with_force_ffmpeg_decoder(force_ffmpeg);
+    let mut exporter_builder = ExporterBase::builder(project_path.to_path_buf())
+        .with_force_ffmpeg_decoder(force_ffmpeg)
+        .with_screen_enhancement(settings.screen_enhancement());
 
     if settings.cursor_only() {
         let meta = RecordingMeta::load_for_project(project_path).map_err(|e| e.to_string())?;
@@ -1064,6 +1076,50 @@ async fn do_export(
             .project_config()
             .map_err(|error| format!("Could not read project-config.json: {error}"))?;
         exporter_builder = exporter_builder.with_config(export_project_config(project, true));
+    }
+
+    if let ExportSettings::Mp4(mp4_settings) = settings
+        && mp4_settings.turbo
+    {
+        let cancel_flag = Arc::new(AtomicBool::new(false));
+        let cancel_flag_watcher = cancel_flag.clone();
+        let watcher_token = cancel_token.clone();
+        let watcher = tokio::spawn(async move {
+            watcher_token.cancelled().await;
+            cancel_flag_watcher.store(true, Ordering::Release);
+        });
+        let mp4_base = exporter_builder
+            .build_for_mp4(cancel_flag.clone())
+            .await
+            .map_err(|e| e.to_string())?;
+        let total_frames = mp4_base.total_frames(mp4_settings.fps);
+        if !progress.send(FramesRendered {
+            rendered_count: 0,
+            total_frames,
+        }) {
+            watcher.abort();
+            return Err("Export cancelled".to_string());
+        }
+        let progress = progress.clone();
+        let cancel_token = cancel_token.clone();
+        let result = mp4_settings
+            .export_prepared_turbo(
+                mp4_base,
+                cap_export::mp4::turbo::TurboOptions::default(),
+                move |frame_index| {
+                    if cancel_token.is_cancelled() {
+                        cancel_flag.store(true, Ordering::Release);
+                        return false;
+                    }
+                    progress.send(FramesRendered {
+                        rendered_count: (frame_index + 1).min(total_frames),
+                        total_frames,
+                    })
+                },
+            )
+            .await;
+        watcher.abort();
+        return result;
     }
 
     let exporter_base = exporter_builder.build().await.map_err(|e| e.to_string())?;
@@ -1114,6 +1170,22 @@ async fn do_export(
             let progress = progress.clone();
             let cancel_token = cancel_token.clone();
             mov_settings
+                .export(exporter_base, move |frame_index| {
+                    if cancel_token.is_cancelled() {
+                        return false;
+                    }
+
+                    progress.send(FramesRendered {
+                        rendered_count: (frame_index + 1).min(total_frames),
+                        total_frames,
+                    })
+                })
+                .await
+        }
+        ExportSettings::Audio(audio_settings) => {
+            let progress = progress.clone();
+            let cancel_token = cancel_token.clone();
+            audio_settings
                 .export(exporter_base, move |frame_index| {
                     if cancel_token.is_cancelled() {
                         return false;
@@ -1529,6 +1601,8 @@ async fn show_export_save_dialog(
         "mp4" => ("MP4 Video", "mp4"),
         "gif" => ("GIF Image", "gif"),
         "mov" => ("MOV Video", "mov"),
+        "mp3" => ("MP3 Audio", "mp3"),
+        "wav" => ("WAV Audio", "wav"),
         _ => {
             warn!(file_type, "Invalid export save file dialog type");
             return Err("Invalid file type".to_string());
@@ -1769,6 +1843,9 @@ pub async fn get_export_estimates(
             ExportSettings::Mp4(settings) => cap_export::settings::ExportSettings::Mp4(settings),
             ExportSettings::Gif(settings) => cap_export::settings::ExportSettings::Gif(settings),
             ExportSettings::Mov(settings) => cap_export::settings::ExportSettings::Mov(settings),
+            ExportSettings::Audio(settings) => {
+                cap_export::settings::ExportSettings::Audio(settings)
+            }
         };
         cap_export::estimates::estimate_export(
             (**editor).clone(),
@@ -1796,10 +1873,22 @@ fn export_estimates_for_duration(
     settings: &ExportSettings,
     duration_seconds: f64,
 ) -> ExportEstimates {
+    if let ExportSettings::Audio(audio_settings) = settings {
+        let estimated_size_mb =
+            audio_settings.codec.estimated_bytes(duration_seconds) as f64 / (1024.0 * 1024.0);
+        let estimated_time_seconds = (duration_seconds / 40.0).max(0.25);
+        return ExportEstimates {
+            duration_seconds,
+            estimated_time_seconds,
+            estimated_size_mb,
+        };
+    }
+
     let (resolution, fps) = match settings {
         ExportSettings::Mp4(s) => (s.resolution_base, s.fps),
         ExportSettings::Gif(s) => (s.resolution_base, s.fps),
         ExportSettings::Mov(s) => (s.resolution_base, s.fps),
+        ExportSettings::Audio(_) => unreachable!(),
     };
 
     let (width, height) = (resolution.x, resolution.y);
@@ -1850,6 +1939,7 @@ fn export_estimates_for_duration(
 
             (size_mb, time_estimate)
         }
+        ExportSettings::Audio(_) => unreachable!(),
     };
 
     ExportEstimates {
@@ -2549,11 +2639,14 @@ mod tests {
             custom_bpp: None,
             force_ffmpeg_decoder: true,
             optimize_filesize: false,
+            turbo: false,
+            screen_enhancement: false,
         });
         let gif_settings = ExportSettings::Gif(cap_export::gif::GifExportSettings {
             fps: 15,
             resolution_base: XY { x: 1280, y: 720 },
             quality: None,
+            screen_enhancement: false,
         });
 
         assert!(mp4_settings.force_ffmpeg_decoder());
@@ -2582,6 +2675,7 @@ mod tests {
             fps: 15,
             resolution_base: XY { x: 1280, y: 720 },
             quality: None,
+            screen_enhancement: false,
         });
 
         assert!(!should_force_ffmpeg_export(dir.path(), &gif_settings));
@@ -2595,6 +2689,7 @@ mod tests {
             fps: 15,
             resolution_base: XY { x: 1280, y: 720 },
             quality: None,
+            screen_enhancement: false,
         });
 
         assert!(!should_force_ffmpeg_export(dir.path(), &gif_settings));

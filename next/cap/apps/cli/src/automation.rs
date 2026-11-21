@@ -143,6 +143,8 @@ impl AutomationHost for CliAutomationHost {
                     custom_bpp: None,
                     force_ffmpeg_decoder: false,
                     optimize_filesize: false,
+                    turbo: false,
+                    screen_enhancement: false,
                 }
                 .export(base, |_| true)
                 .await
@@ -152,6 +154,7 @@ impl AutomationHost for CliAutomationHost {
                     fps: profile.fps,
                     resolution_base: profile.resolution_base,
                     quality: None,
+                    screen_enhancement: false,
                 }
                 .export(base, |_| true)
                 .await
@@ -161,6 +164,7 @@ impl AutomationHost for CliAutomationHost {
                     fps: profile.fps,
                     resolution_base: profile.resolution_base,
                     cursor_only: false,
+                    screen_enhancement: false,
                 }
                 .export(base, |_| true)
                 .await
