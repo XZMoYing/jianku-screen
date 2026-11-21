@@ -274,13 +274,14 @@
 }
 
 .custom-scroll::-webkit-scrollbar {
-	width: 7px;
+	width: 4px;
+	height: 4px;
 	background-color: transparent;
 }
 
 .custom-scroll::-webkit-scrollbar-thumb {
 	background-color: var(--gray-300);
-	width: 7px;
+	width: 4px;
 	border-radius: 500px;
 }
 
@@ -288,12 +289,6 @@
 .dark [data-transparent-window],
 .dark [data-transparent-window] body {
 	background: transparent;
-}
-
-.custom-scroll::-webkit-scrollbar {
-	width: 4px;
-	height: 4px;
-	background-color: transparent;
 }
 
 .hide-scroll::-webkit-scrollbar {
@@ -1081,12 +1076,6 @@
 	[data-macos-native-material="settings"] .cap-settings-profile-skeleton {
 		animation: none;
 	}
-}
-
-.custom-scroll::-webkit-scrollbar-thumb {
-	background-color: var(--gray-300);
-	width: 4px;
-	border-radius: 500px;
 }
 
 @keyframes bounce {

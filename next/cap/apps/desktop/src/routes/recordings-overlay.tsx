@@ -502,16 +502,7 @@ const TooltipIconButton = (
 				{props.children}
 			</Tooltip.Trigger>
 			<Tooltip.Portal>
-				<Tooltip.Content
-					class="py-1.5 px-2 font-medium"
-					style={{
-						"background-color": "rgba(255, 255, 255, 0.85)",
-						color: "black",
-						"border-radius": "8px",
-						"font-size": "12px",
-						"z-index": "15",
-					}}
-				>
+				<Tooltip.Content class="py-1.5 px-2 font-medium bg-gray-2 text-gray-12 border border-gray-3 text-xs rounded-lg shadow-md z-15">
 					{props.tooltipText}
 				</Tooltip.Content>
 			</Tooltip.Portal>

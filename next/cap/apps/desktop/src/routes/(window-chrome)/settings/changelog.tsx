@@ -51,10 +51,8 @@ export default function Page() {
 											<li class="border-b-2 border-(--gray-200) pb-8 last:border-b-0">
 												<div class="flex mb-2">
 													<Show when={i() === 0}>
-														<div class="bg-(--blue-400) text-(--text-primary) px-2 py-1 rounded-md uppercase font-bold">
-															<span style="color: #fff" class="text-xs">
-																{localize("New")}
-															</span>
+														<div class="bg-(--blue-400) text-(--jk-on-primary) px-2 py-1 rounded-md uppercase font-bold">
+															<span class="text-xs">{localize("New")}</span>
 														</div>
 													</Show>
 												</div>

@@ -10,7 +10,7 @@ export default function PresentationOutput() {
 	const [options, setOptions] = createSignal<PresentationOptions>();
 	const background = () => {
 		const source = options()?.project.background.source;
-		if (!source) return "#eeeaf6";
+		if (!source) return "var(--jk-surface, #f6f6f4)";
 		const rgb = (value: number[]) => `rgb(${value.join(",")})`;
 		if (source.type === "color") return rgb(source.value);
 		if (source.type === "gradient")
@@ -20,7 +20,7 @@ export default function PresentationOutput() {
 			source.path?.startsWith("/")
 		)
 			return `url("${convertFileSrc(source.path)}") center / cover`;
-		return "#eeeaf6";
+		return "var(--jk-surface, #f6f6f4)";
 	};
 	const [error, setError] = createSignal("");
 	const [curtain, setCurtain] = createSignal(false);
@@ -123,7 +123,10 @@ export default function PresentationOutput() {
 				<div
 					data-testid="presentation-curtain"
 					class="absolute inset-0 flex flex-col items-center justify-center gap-3"
-					style={{ background: "rgb(242, 241, 237)", color: "#4f5048" }}
+					style={{
+						background: "var(--jk-container, #f2f1ed)",
+						color: "var(--jk-ink, #4f5048)",
+					}}
 				>
 					<svg
 						viewBox="0 0 32 32"

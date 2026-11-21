@@ -249,7 +249,7 @@ export function Header(props: {
 					class={cx(
 						"flex shrink-0 gap-[7px] justify-center items-center pl-3 pr-3.5 ml-1.5 h-[30px] text-[13px] font-medium text-white rounded-lg outline-hidden",
 						"bg-linear-to-b from-ed-accent-2 to-ed-accent",
-						"shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_1px_2px_rgba(0,60,160,0.25)]",
+						"shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_1px_2px_rgba(0,0,0,0.2)]",
 						"transition-[filter] duration-150 ease-out",
 						"hover:brightness-[1.06] active:brightness-[0.96]",
 					)}

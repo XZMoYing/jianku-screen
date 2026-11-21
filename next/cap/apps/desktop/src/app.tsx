@@ -23,9 +23,8 @@ import { installLanguage } from "~/utils/i18n";
 import "@cap/ui-solid/main.css";
 import "unfonts.css";
 import "./styles/theme.css";
-import "./styles/workspace.css";
 import "./styles/expressive.css";
-import "./styles/workspace-polish.css";
+import "./styles/workspace.css";
 
 import { CapErrorBoundary } from "./components/CapErrorBoundary";
 import WindowChromeLayout from "./routes/(window-chrome)";

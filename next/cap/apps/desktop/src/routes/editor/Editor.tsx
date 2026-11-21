@@ -1913,7 +1913,7 @@ function Dialogs() {
 													class={cx(
 														"flex h-[30px] shrink-0 items-center justify-center rounded-lg px-3.5 text-[13px] font-medium text-white outline-hidden",
 														"bg-linear-to-b from-ed-accent-2 to-ed-accent",
-														"shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_1px_2px_rgba(0,60,160,0.25)]",
+														"shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_1px_2px_rgba(0,0,0,0.2)]",
 														"transition-[filter,opacity] duration-150 ease-out",
 														"enabled:hover:brightness-[1.06] enabled:active:brightness-[0.96] disabled:opacity-45",
 													)}

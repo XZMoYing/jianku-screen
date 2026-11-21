@@ -315,7 +315,7 @@ button.cap-empty-lane-action:hover:not(:disabled) {
 
 .cap-shot-pill[data-selected="true"] {
 	background-color: var(--ed-accent);
-	color: #ffffff;
+	color: var(--jk-on-primary, #ffffff);
 }
 
 .cap-shot-pill:disabled {
