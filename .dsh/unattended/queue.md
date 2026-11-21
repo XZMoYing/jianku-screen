@@ -1,5 +1,7 @@
 # 2026-10-27：完整中文与跨平台无人值守队列
 
+2026-11-21 alpha.109（`2026.109.0`，冻结 `640aab6`，标签 `next-v0.2.0-alpha.109-candidate`）已打包安装，alpha.108 保留为回滚（`/Applications/.jianku-next-update-Gs4h7w/previous.app`）。本版全量集成 Cap `0.6.1–0.6.3`/`main`（录制防掉帧链路、光标拖动平滑对齐、坏配置备份、缩略滤波、GPU 屏幕超分增强、12 转场、保音高预览变速 `0.5x–3x`、Voice EQ + 去咔嗒声 + 硬切淡化、Turbo 并行 MP4 / GIF 画质与 5fps 480p / MP3 & WAV 音频导出、转写语气词与停顿一键清理、6 种图形/步骤标注轨道）与 DogSC `v0.2.0` 设计能力（BS.1770-4 自动响度平衡、GPU 摄像头美颜、时间线框选多段、时间尺保留选中）。8 crate `clippy -D warnings` 0 警告、`tsc` 0 错误、`jianku-unattended-check.mjs` 与安装版 5 组端到端合成导出（Turbo+增强 MP4 / 标准 MP4 / GIF / MP3 / WAV）全部通过；实机录屏掉帧复测、TCC 同步与视觉对照仍待实机验收。证据 `next/verification/2026-11-21-alpha109-upstream-sync/`。
+
 2026-11-07 alpha.91 已安装，90 回滚。U25b1 字幕计时持久化修复（34e62e5/183d3c5）实际包重开通过：移动／两端裁剪后轨道与源母版一致并保留。证据 next/verification/2026-11-07-alpha91-caption-persistence。
 
 2026-11-07 alpha.91 实际包 SRT 导出通过（含编辑后计时），证据 next/verification/2026-11-07-srt-export。
