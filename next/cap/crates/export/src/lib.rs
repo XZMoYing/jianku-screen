@@ -399,6 +399,34 @@ pub struct ExporterBase {
 }
 
 impl ExporterBase {
+    pub(crate) async fn reopen_streaming(
+        &mut self,
+        user_cancellation: Option<Arc<AtomicBool>>,
+    ) -> Result<(), String> {
+        let Some(user) = user_cancellation else {
+            return Ok(());
+        };
+        let control = ExportAudioCancellation::new(user);
+        let recording = self.recording_meta.clone();
+        let studio = self.studio_meta.clone();
+        let cancellation = control.user.clone();
+        let abort = control.stop.clone();
+        let preparation = tokio::task::spawn_blocking(move || {
+            ExportAudioPreparation::open(&recording, &studio, cancellation, abort)
+        })
+        .await
+        .map_err(|error| error.to_string())?
+        .map_err(|error| error.to_string())?;
+        self.streaming_audio = Some(
+            preparation
+                .finish(&self.segments)
+                .map_err(|error| error.to_string())?,
+        );
+        self.streaming_output = prepare_streaming_output(&self.output_path, true);
+        self.audio_cancellation = Some(control);
+        Ok(())
+    }
+
     pub fn total_frames(&self, fps: u32) -> u32 {
         let duration = cap_rendering::get_duration(
             &self.recordings,

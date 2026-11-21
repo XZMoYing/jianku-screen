@@ -907,6 +907,12 @@ impl H264Encoder {
             .map_err(|e| H264EncoderError::VideoToolboxHwInput(e.to_string()))
     }
 
+    pub fn is_hardware(&self) -> bool {
+        self.encoder
+            .codec()
+            .is_some_and(|codec| is_hardware_h264(codec.name()))
+    }
+
     pub fn conversion_requirements(&self) -> ConversionRequirements {
         let needs_conversion = self.input_format != self.output_format
             || self.input_width != self.output_width

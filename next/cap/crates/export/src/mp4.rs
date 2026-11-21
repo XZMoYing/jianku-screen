@@ -13,7 +13,7 @@ use specta::Type;
 use std::{
     path::PathBuf,
     sync::{
-        Arc, Mutex,
+        Arc, Mutex, PoisonError,
         atomic::{AtomicBool, AtomicU64, Ordering},
     },
     time::Duration,
@@ -166,6 +166,7 @@ impl ExportCompression {
 #[derive(Clone, Default)]
 struct ExportNv12Mode {
     stop_after_frames_sent: Option<u32>,
+    software_encoder: bool,
     record_first_queued_ms_since_pipeline: Option<Arc<AtomicU64>>,
     nv12_render_startup_breakdown_ms:
         Option<Arc<Mutex<Option<cap_rendering::Nv12RenderStartupBreakdownMs>>>>,
@@ -291,6 +292,7 @@ impl Mp4ExportSettings {
             |_| true,
             ExportNv12Mode {
                 stop_after_frames_sent: Some(1),
+                software_encoder: false,
                 record_first_queued_ms_since_pipeline: Some(first_ms_enc),
                 nv12_render_startup_breakdown_ms: Some(breakdown_enc),
             },
@@ -323,7 +325,59 @@ impl Mp4ExportSettings {
         output_size: (u32, u32),
         fps: u32,
         on_progress: impl FnMut(u32) -> bool + Send + 'static,
+        mut mode: ExportNv12Mode,
+    ) -> Result<PathBuf, String> {
+        let on_progress = Arc::new(Mutex::new(on_progress));
+        let user_cancellation = base
+            .audio_cancellation
+            .as_ref()
+            .map(|control| control.user.clone());
+        loop {
+            let progress = on_progress.clone();
+            let hardware_encoder_failed = Arc::new(AtomicBool::new(false));
+            let result = self
+                .export_nv12_attempt(
+                    &mut base,
+                    output_size,
+                    fps,
+                    move |frame| {
+                        let mut on_progress =
+                            progress.lock().unwrap_or_else(PoisonError::into_inner);
+                        (*on_progress)(frame)
+                    },
+                    mode.clone(),
+                    hardware_encoder_failed.clone(),
+                )
+                .await;
+            match result {
+                Err(error)
+                    if !mode.software_encoder
+                        && base.sample_timing.is_none()
+                        && hardware_encoder_failed.load(Ordering::Relaxed)
+                        && !user_cancellation
+                            .as_ref()
+                            .is_some_and(|cancel| cancel.load(Ordering::Relaxed)) =>
+                {
+                    warn!(
+                        %error,
+                        "Hardware video encoder failed during export, restarting with the software encoder"
+                    );
+                    base.reopen_streaming(user_cancellation.clone()).await?;
+                    mode.software_encoder = true;
+                }
+                result => return result,
+            }
+        }
+    }
+
+    async fn export_nv12_attempt(
+        self,
+        base: &mut ExporterBase,
+        output_size: (u32, u32),
+        fps: u32,
+        on_progress: impl FnMut(u32) -> bool + Send + 'static,
         mode: ExportNv12Mode,
+        hardware_encoder_failed: Arc<AtomicBool>,
     ) -> Result<PathBuf, String> {
         let pipeline_start = std::time::Instant::now();
         let sample_timing = base.sample_timing.clone();
@@ -376,6 +430,7 @@ impl Mp4ExportSettings {
         let has_audio = has_recording_audio || !music.is_empty();
 
         let record_first_queued_ms = mode.record_first_queued_ms_since_pipeline;
+        let software_encoder = mode.software_encoder;
         let nv12_render_startup_breakdown_ms = mode.nv12_render_startup_breakdown_ms;
 
         let project_for_audio = base.project_config.clone();
@@ -398,6 +453,7 @@ impl Mp4ExportSettings {
             }
             #[cfg(target_os = "macos")]
             let want_hw_input = !self.optimize_filesize
+                && !software_encoder
                 && matches!(
                     first_frame.as_ref().map(|frame| &frame.payload),
                     Some(ExportFramePayload::Surface(_))
@@ -438,6 +494,8 @@ impl Mp4ExportSettings {
                         .with_external_conversion();
                     let builder = if self.optimize_filesize {
                         builder.with_crf(self.compression.crf_value())
+                    } else if software_encoder {
+                        builder.with_encoder_priority_override(&["libx264"])
                     } else {
                         builder
                     };
@@ -456,8 +514,17 @@ impl Mp4ExportSettings {
                 encoder.video_mut().set_packet_stats(timing.packet_stats());
             }
 
+            let hardware_video = encoder.video().is_hardware();
+            let video_failure = |error: String| {
+                if hardware_video {
+                    hardware_encoder_failed.store(true, Ordering::Relaxed);
+                }
+                Mp4PipelineError::Failure(error)
+            };
+
             info!(
                 zero_copy_input = encoder_is_hw,
+                hardware_video,
                 "Created MP4File encoder (NV12, export settings)"
             );
 
@@ -534,7 +601,7 @@ impl Mp4ExportSettings {
                                 &mut converted_frame,
                                 Duration::MAX,
                             )
-                            .map_err(|err| err.to_string())?;
+                            .map_err(|err| video_failure(err.to_string()))?;
                     }
                     #[cfg(target_os = "macos")]
                     ExportFramePayload::Surface(surface) => {
@@ -544,7 +611,7 @@ impl Mp4ExportSettings {
                                     .video_encoder()
                                     .wrap_videotoolbox_pixel_buffer(surface.as_pixel_buffer_ptr())
                             }
-                            .map_err(|err| err.to_string())?;
+                            .map_err(|err| video_failure(err.to_string()))?;
                             frame.set_pts(Some(input.frame_number as i64));
                             encoder
                                 .queue_video_frame_reusable(
@@ -552,7 +619,7 @@ impl Mp4ExportSettings {
                                     &mut converted_frame,
                                     Duration::MAX,
                                 )
-                                .map_err(|err| err.to_string())?;
+                                .map_err(|err| video_failure(err.to_string()))?;
                         } else {
                             fill_nv12_frame_from_surface(
                                 &mut reusable_frame,
@@ -570,7 +637,7 @@ impl Mp4ExportSettings {
                                     &mut converted_frame,
                                     Duration::MAX,
                                 )
-                                .map_err(|err| err.to_string())?;
+                                .map_err(|err| video_failure(err.to_string()))?;
                         }
                     }
                 }
@@ -637,7 +704,7 @@ impl Mp4ExportSettings {
                 .map_err(|e| format!("Failed to finish encoding: {e}"))?;
 
             if let Err(e) = res.video_finish {
-                return Err(Mp4PipelineError::Failure(format!("Video encoding failed: {e}")));
+                return Err(video_failure(format!("Video encoding failed: {e}")));
             }
             if let Err(e) = res.audio_finish {
                 return Err(Mp4PipelineError::Failure(format!("Audio encoding failed: {e}")));
@@ -987,8 +1054,58 @@ impl TemporaryMp4Output {
                 path: self.path,
             });
         }
-        self.path.persist_noclobber(output)
+        persist_without_replacing(self.path, output)
     }
+}
+
+#[cfg(unix)]
+fn persist_without_replacing(
+    path: tempfile::TempPath,
+    output: &std::path::Path,
+) -> Result<(), tempfile::PathPersistError> {
+    match path.persist_noclobber(output) {
+        Err(error) if error.error.kind() == std::io::ErrorKind::Unsupported => {
+            persist_into_reserved_name(error.path, output)
+        }
+        result => result,
+    }
+}
+
+#[cfg(not(unix))]
+fn persist_without_replacing(
+    path: tempfile::TempPath,
+    output: &std::path::Path,
+) -> Result<(), tempfile::PathPersistError> {
+    path.persist_noclobber(output)
+}
+
+// exFAT on macOS and some network volumes reject exclusive rename and hard
+// links with ENOTSUP, so reserve the destination via O_EXCL before renaming.
+#[cfg(unix)]
+fn persist_into_reserved_name(
+    path: tempfile::TempPath,
+    output: &std::path::Path,
+) -> Result<(), tempfile::PathPersistError> {
+    use std::os::unix::fs::MetadataExt;
+    let reservation = match std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(output)
+    {
+        Ok(file) => file,
+        Err(error) => return Err(tempfile::PathPersistError { error, path }),
+    };
+    let error = match path.persist(output) {
+        Ok(()) => return Ok(()),
+        Err(error) => error,
+    };
+    if let (Ok(reserved), Ok(current)) = (reservation.metadata(), std::fs::symlink_metadata(output))
+        && reserved.dev() == current.dev()
+        && reserved.ino() == current.ino()
+    {
+        let _ = std::fs::remove_file(output);
+    }
+    Err(error)
 }
 
 pub(crate) fn temporary_mp4_output(output: &std::path::Path) -> Result<TemporaryMp4Output, String> {
@@ -1617,6 +1734,42 @@ mod tests {
             std::fs::metadata(private).unwrap().permissions().mode() & 0o777,
             0o600
         );
+    }
+
+    #[cfg(unix)]
+    fn leftover_temporary_outputs(directory: &std::path::Path) -> Vec<std::ffi::OsString> {
+        std::fs::read_dir(directory)
+            .unwrap()
+            .map(|entry| entry.unwrap().file_name())
+            .filter(|name| name.to_string_lossy().contains(".cap-export-"))
+            .collect()
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn reserved_name_fallback_publishes_without_replacing_or_leaking() {
+        let directory = tempfile::tempdir().unwrap();
+        let output = directory.path().join("export.mp4");
+
+        let temporary = temporary_mp4_output(&output).unwrap();
+        std::fs::write(&temporary, b"completed").unwrap();
+        persist_into_reserved_name(temporary.path, &output).unwrap();
+        assert_eq!(std::fs::read(&output).unwrap(), b"completed");
+
+        let temporary = temporary_mp4_output(&output).unwrap();
+        std::fs::write(&temporary, b"replacement").unwrap();
+        let error = persist_into_reserved_name(temporary.path, &output).unwrap_err();
+        assert_eq!(error.error.kind(), std::io::ErrorKind::AlreadyExists);
+        drop(error);
+        assert_eq!(std::fs::read(&output).unwrap(), b"completed");
+        assert!(leftover_temporary_outputs(directory.path()).is_empty());
+
+        let missing = directory.path().join("missing.mp4");
+        let temporary = temporary_mp4_output(&missing).unwrap();
+        std::fs::remove_file(&temporary).unwrap();
+        drop(persist_into_reserved_name(temporary.path, &missing).unwrap_err());
+        assert!(!missing.exists());
+        assert!(leftover_temporary_outputs(directory.path()).is_empty());
     }
 
     #[test]
