@@ -11,10 +11,11 @@ use crate::{
     spring_mass_damper::{SpringMassDamperSimulation, SpringMassDamperSimulationConfig},
 };
 
-/// Click anticipation windows: the spring target snaps to the click position
-/// once the next click is <=500ms away, and the spring
-/// profile stiffens 175ms before the click. The early snap relies on the
-/// spring gliding there; no extra heuristics.
+/// Click anticipation windows: the spring target snaps to the press position
+/// once the next button press is <=500ms away, and the spring profile stiffens
+/// 175ms before the press. Only presses are anticipated: a release ends a drag,
+/// and aiming at it would pull the cursor to the drag's end while the pointer
+/// is still travelling there.
 const CLICK_LOOKAHEAD_TARGET_MS: f64 = 500.0;
 const CLICK_SPRING_WINDOW_MS: f64 = 175.0;
 const SHAKE_THRESHOLD_UV: f64 = 0.015;
@@ -78,6 +79,12 @@ impl CursorSpringPresets {
     }
 }
 
+// The recorder stores device_query's 1-based button indices (left button = 1);
+// 0 is also accepted so legacy hand-written events and tests keep working.
+fn is_primary_button(cursor_num: u8) -> bool {
+    cursor_num <= 1
+}
+
 struct CursorSpringContext<'a> {
     clicks: &'a [CursorClickEvent],
     next_click_index: usize,
@@ -97,7 +104,7 @@ impl<'a> CursorSpringContext<'a> {
         while let Some(click) = self.clicks.get(self.next_click_index)
             && click.time_ms <= time_ms
         {
-            if click.cursor_num == 0 {
+            if is_primary_button(click.cursor_num) {
                 self.primary_button_down = click.down;
             }
             self.next_click_index += 1;
@@ -105,30 +112,147 @@ impl<'a> CursorSpringContext<'a> {
     }
 
     fn profile(&self, time_ms: f64) -> SpringProfile {
-        if self.has_imminent_click(time_ms) {
-            SpringProfile::Snappy
-        } else if self.primary_button_down {
+        if self.primary_button_down {
             SpringProfile::Drag
+        } else if self.has_imminent_press(time_ms) {
+            SpringProfile::Snappy
         } else {
             SpringProfile::Default
         }
     }
 
-    fn has_imminent_click(&self, time_ms: f64) -> bool {
-        let idx = self.clicks[self.next_click_index..].partition_point(|c| c.time_ms <= time_ms);
-        self.clicks
-            .get(self.next_click_index + idx)
-            .is_some_and(|c| c.time_ms - time_ms <= CLICK_SPRING_WINDOW_MS)
+    fn has_imminent_press(&self, time_ms: f64) -> bool {
+        next_press_within(
+            &self.clicks[self.next_click_index..],
+            time_ms,
+            CLICK_SPRING_WINDOW_MS,
+        )
+        .is_some()
+    }
+
+    fn anticipated_press(&self, time_ms: f64) -> Option<&'a CursorClickEvent> {
+        if self.primary_button_down {
+            return None;
+        }
+        next_press_within(self.clicks, time_ms, CLICK_LOOKAHEAD_TARGET_MS)
     }
 }
 
-fn next_click_within(
+fn next_press_within(
     clicks: &[CursorClickEvent],
     time_ms: f64,
     window_ms: f64,
 ) -> Option<&CursorClickEvent> {
     let idx = clicks.partition_point(|c| c.time_ms <= time_ms);
-    clicks.get(idx).filter(|c| c.time_ms - time_ms <= window_ms)
+    clicks[idx..]
+        .iter()
+        .take_while(|c| c.time_ms - time_ms <= window_ms)
+        .find(|c| c.down)
+}
+
+fn primary_drags(clicks: &[CursorClickEvent]) -> Vec<(f64, f64)> {
+    let mut clicks: Vec<&CursorClickEvent> = clicks
+        .iter()
+        .filter(|click| is_primary_button(click.cursor_num))
+        .collect();
+    clicks.sort_by(|a, b| a.time_ms.total_cmp(&b.time_ms));
+    let mut drags = Vec::new();
+    let mut drag_start = None;
+    for click in clicks {
+        match (click.down, drag_start) {
+            (true, None) => drag_start = Some(click.time_ms),
+            (false, Some(start)) => {
+                drags.push((start, click.time_ms));
+                drag_start = None;
+            }
+            _ => {}
+        }
+    }
+    if let Some(start) = drag_start {
+        drags.push((start, f64::INFINITY));
+    }
+    drags
+}
+
+fn drag_at(drags: &[(f64, f64)], time_ms: f64) -> Option<usize> {
+    let next = drags.partition_point(|&(start, _)| start <= time_ms);
+    next.checked_sub(1)
+        .filter(|&index| time_ms < drags[index].1)
+}
+
+// Fill mid-drag sample gaps linearly only when the pointer kept moving across
+// the gap; genuine mid-drag pauses move far slower and keep the idle hold.
+fn fill_drag_gaps<'a>(
+    moves: &'a [CursorMoveEvent],
+    clicks: &[CursorClickEvent],
+) -> Cow<'a, [CursorMoveEvent]> {
+    const MIN_SPEED_RATIO: f64 = 0.5;
+    let drags = primary_drags(clicks);
+    if drags.is_empty() {
+        return Cow::Borrowed(moves);
+    }
+    let speed = |from: &CursorMoveEvent, to: &CursorMoveEvent| {
+        let dt = to.time_ms - from.time_ms;
+        if dt <= 0.0 {
+            0.0
+        } else {
+            ((to.x - from.x).hypot(to.y - from.y) / dt).max(0.0)
+        }
+    };
+    let missed_samples = |index: usize| {
+        let (Some(previous), Some(from), Some(to)) = (
+            index.checked_sub(1).and_then(|i| moves.get(i)),
+            moves.get(index),
+            moves.get(index + 1),
+        ) else {
+            return false;
+        };
+        let drag = drag_at(&drags, from.time_ms);
+        let lead_in = from.time_ms - previous.time_ms;
+        drag.is_some()
+            && drag_at(&drags, previous.time_ms) == drag
+            && drag_at(&drags, to.time_ms) == drag
+            && to.time_ms - from.time_ms > IDLE_GAP_THRESHOLD_MS
+            && lead_in > 0.0
+            && lead_in <= IDLE_GAP_THRESHOLD_MS
+            && speed(from, to) >= MIN_SPEED_RATIO * speed(previous, from)
+            && speed(previous, from) > 0.0
+    };
+    if !(0..moves.len()).any(missed_samples) {
+        return Cow::Borrowed(moves);
+    }
+
+    let mut filled = Vec::with_capacity(moves.len());
+    for (index, from) in moves.iter().enumerate() {
+        filled.push(from.clone());
+        if missed_samples(index) {
+            let to = &moves[index + 1];
+            let gap = to.time_ms - from.time_ms;
+            let steps = (gap / SIMULATION_STEP_MS).ceil() as usize;
+            for step in 1..steps {
+                let u = step as f64 / steps as f64;
+                filled.push(CursorMoveEvent {
+                    time_ms: from.time_ms + gap * u,
+                    x: from.x + (to.x - from.x) * u,
+                    y: from.y + (to.y - from.y) * u,
+                    ..from.clone()
+                });
+            }
+        }
+    }
+    Cow::Owned(filled)
+}
+
+fn prepare_smoothed_moves<'a>(cursor: &'a CursorEvents) -> Cow<'a, [CursorMoveEvent]> {
+    let filtered = filter_cursor_shake(&cursor.moves);
+    let decimated = match filtered {
+        Cow::Borrowed(moves) => decimate_cursor_moves(moves),
+        Cow::Owned(moves) => Cow::Owned(decimate_cursor_moves(&moves).into_owned()),
+    };
+    match decimated {
+        Cow::Borrowed(moves) => fill_drag_gaps(moves, &cursor.clicks),
+        Cow::Owned(moves) => Cow::Owned(fill_drag_gaps(&moves, &cursor.clicks).into_owned()),
+    }
 }
 
 fn position_at_time(
@@ -248,8 +372,7 @@ pub fn interpolate_cursor_with_click_spring(
     let time_ms = (time_secs * 1000.0) as f64;
 
     if let Some(smoothing_config) = smoothing {
-        let filtered_moves = filter_cursor_shake(&cursor.moves);
-        let prepared_moves = decimate_cursor_moves(filtered_moves.as_ref());
+        let prepared_moves = prepare_smoothed_moves(cursor);
         let timeline = build_smoothed_timeline(
             cursor,
             prepared_moves.as_ref(),
@@ -376,8 +499,8 @@ impl CursorPoseTimeline {
         let base = smoothing.unwrap_or(DEFAULT_CLICK_SPRING);
         let presets = CursorSpringPresets::new(base, Some(click_spring));
         let mut context = CursorSpringContext::new(&cursor.clicks);
-        let filtered = filter_cursor_shake(&cursor.moves);
-        let moves = decimate_cursor_moves(filtered.as_ref());
+        let drags = primary_drags(&cursor.clicks);
+        let moves = prepare_smoothed_moves(cursor);
         let end_ms = cursor
             .moves
             .last()
@@ -405,10 +528,13 @@ impl CursorPoseTimeline {
                 next_click_index += 1;
             }
 
-            let target_at = |time_ms: f64| {
-                let target_time =
-                    next_click_within(&cursor.clicks, time_ms, CLICK_LOOKAHEAD_TARGET_MS)
-                        .map_or(time_ms, |click| click.time_ms);
+            let target_at = |q_ms: f64| {
+                let target_time = if drag_at(&drags, q_ms).is_some() {
+                    q_ms
+                } else {
+                    next_press_within(&cursor.clicks, q_ms, CLICK_LOOKAHEAD_TARGET_MS)
+                        .map_or(q_ms, |click| click.time_ms)
+                };
                 position_at_time(&moves, target_time, true).0
             };
             let tilt = if smoothing.is_some() && degrees_per_uv != 0.0 {
@@ -477,8 +603,7 @@ impl PrecomputedCursorTimeline {
         }
 
         let smoothing_config = smoothing.unwrap();
-        let filtered_moves = filter_cursor_shake(&cursor.moves);
-        let prepared_moves = decimate_cursor_moves(filtered_moves.as_ref());
+        let prepared_moves = prepare_smoothed_moves(cursor);
         let timeline = build_smoothed_timeline(
             cursor,
             prepared_moves.as_ref(),
@@ -647,7 +772,8 @@ fn build_smoothed_timeline_with_click_positions(
 
     context.advance_to(0.0);
     sim.set_config(presets.config(context.profile(0.0)));
-    let initial_target = next_click_within(&cursor.clicks, 0.0, CLICK_LOOKAHEAD_TARGET_MS)
+    let initial_target = context
+        .anticipated_press(0.0)
         .map_or((f64::from(start_pos.x), f64::from(start_pos.y)), |click| {
             click_position(click.time_ms.min(end_time_ms))
         });
@@ -666,9 +792,8 @@ fn build_smoothed_timeline_with_click_positions(
         let _ = position_at_time_hinted(moves, clamped_t, &mut cid_hint);
         let cid = cursor_id_at_time(moves, clamped_t, cid_hint).to_string();
 
-        let target = if let Some(click) =
-            next_click_within(&cursor.clicks, t_ms, CLICK_LOOKAHEAD_TARGET_MS)
-        {
+        context.advance_to(t_ms);
+        let target = if let Some(click) = context.anticipated_press(t_ms) {
             let (tx, ty) = click_position(click.time_ms.min(end_time_ms));
             XY::new(tx as f32, ty as f32)
         } else {
@@ -676,7 +801,6 @@ fn build_smoothed_timeline_with_click_positions(
         };
 
         sim.set_target_position(target);
-        context.advance_to(t_ms);
         sim.set_config(presets.config(context.profile(t_ms)));
 
         events.push(SmoothedCursorEvent {
@@ -956,9 +1080,16 @@ mod tests {
         CursorClickEvent {
             active_modifiers: vec![],
             cursor_id: "primary".into(),
-            cursor_num: 0,
+            cursor_num: 1,
             time_ms,
             down,
+        }
+    }
+
+    fn secondary_click_event(time_ms: f64, down: bool) -> CursorClickEvent {
+        CursorClickEvent {
+            cursor_num: 2,
+            ..click_event(time_ms, down)
         }
     }
 
@@ -1017,16 +1148,14 @@ mod tests {
 
     #[test]
     fn repeated_clicks_and_overlapping_buttons_keep_scale_continuous() {
-        let mut clicks = vec![
+        let clicks = vec![
             click_event(500.0, true),
-            click_event(520.0, true),
+            secondary_click_event(520.0, true),
             click_event(600.0, false),
-            click_event(800.0, false),
+            secondary_click_event(800.0, false),
             click_event(850.0, true),
             click_event(900.0, false),
         ];
-        clicks[1].cursor_num = 1;
-        clicks[3].cursor_num = 1;
         let cursor = CursorEvents {
             moves: vec![cursor_move(0.0, 0.5, 0.5)],
             clicks,
@@ -1160,10 +1289,175 @@ mod tests {
         assert_eq!(context.profile(280.0), SpringProfile::Drag);
 
         context.advance_to(450.0);
-        assert_eq!(context.profile(450.0), SpringProfile::Snappy);
+        assert_eq!(context.profile(450.0), SpringProfile::Drag);
+        assert!(context.anticipated_press(450.0).is_none());
 
         context.advance_to(620.0);
         assert_eq!(context.profile(620.0), SpringProfile::Default);
+    }
+
+    #[test]
+    fn recorded_and_zero_based_primary_buttons_both_start_a_drag() {
+        for cursor_num in [0, 1] {
+            let clicks = vec![
+                CursorClickEvent {
+                    cursor_num,
+                    ..click_event(100.0, true)
+                },
+                CursorClickEvent {
+                    cursor_num,
+                    ..click_event(900.0, false)
+                },
+            ];
+            let mut context = CursorSpringContext::new(&clicks);
+            context.advance_to(300.0);
+            assert_eq!(context.profile(300.0), SpringProfile::Drag, "{cursor_num}");
+        }
+
+        let clicks = vec![secondary_click_event(100.0, true)];
+        let mut context = CursorSpringContext::new(&clicks);
+        context.advance_to(300.0);
+        assert_eq!(context.profile(300.0), SpringProfile::Default);
+    }
+
+    #[test]
+    fn drag_does_not_aim_at_release_or_following_press() {
+        let clicks = vec![
+            click_event(300.0, true),
+            click_event(1200.0, false),
+            click_event(1400.0, true),
+        ];
+        let mut context = CursorSpringContext::new(&clicks);
+        context.advance_to(1000.0);
+        assert!(context.anticipated_press(1000.0).is_none());
+        assert_eq!(context.profile(1000.0), SpringProfile::Drag);
+
+        context.advance_to(1250.0);
+        assert_eq!(
+            context.anticipated_press(1250.0).map(|click| click.time_ms),
+            Some(1400.0)
+        );
+    }
+
+    #[test]
+    fn spring_context_keeps_drag_spring_when_another_button_is_pressed() {
+        let clicks = vec![
+            click_event(100.0, true),
+            secondary_click_event(400.0, true),
+            secondary_click_event(450.0, false),
+            click_event(900.0, false),
+        ];
+        let mut context = CursorSpringContext::new(&clicks);
+
+        context.advance_to(300.0);
+        assert_eq!(context.profile(300.0), SpringProfile::Drag);
+        assert!(context.anticipated_press(300.0).is_none());
+    }
+
+    #[test]
+    fn recorded_drag_tracks_pointer_and_matches_live_presentation() {
+        use crate::live::{LiveFocusMode, LiveMotion, LivePointerInput};
+        use cap_project::{CursorConfiguration, ScreenMovementSpring};
+
+        let pointer_x = |t_ms: f64| {
+            let u = ((t_ms - 400.0) / 800.0).clamp(0.0, 1.0);
+            0.15 + 0.6 * u * u * (3.0 - 2.0 * u)
+        };
+        let moves: Vec<_> = (0..=180)
+            .map(|i| {
+                let t = f64::from(i) * SIMULATION_STEP_MS;
+                cursor_move(t, pointer_x(t), 0.5)
+            })
+            .collect();
+        let cursor = CursorEvents {
+            moves,
+            clicks: vec![click_event(300.0, true), click_event(1200.0, false)],
+        };
+
+        let mut cursor_cfg = CursorConfiguration::default();
+        cursor_cfg.tension = 470.0;
+        cursor_cfg.friction = 70.0;
+        cursor_cfg.mass = 3.0;
+        cursor_cfg.raw = false;
+        let smoothing = SpringMassDamperSimulationConfig {
+            tension: cursor_cfg.tension,
+            friction: cursor_cfg.friction,
+            mass: cursor_cfg.mass,
+        };
+
+        let recorded = PrecomputedCursorTimeline::new(&cursor, Some(smoothing), None);
+        let mut live = LiveMotion::new(
+            XY::new(1920, 1080),
+            &cursor_cfg,
+            ScreenMovementSpring::default(),
+        );
+
+        let mut max_live_diff = 0.0f64;
+        for step in 0..=120 {
+            let t_ms = f64::from(step) * SIMULATION_STEP_MS;
+            let live_frame = live.advance(
+                t_ms,
+                LivePointerInput {
+                    position: XY::new(pointer_x(t_ms), 0.5),
+                    pressed: (300.0..1200.0).contains(&t_ms),
+                    keyboard_active: false,
+                    visible: true,
+                },
+                LiveFocusMode::Off,
+                &cursor_cfg,
+                1.0,
+                5.0,
+            );
+            if (400.0..=1250.0).contains(&t_ms) {
+                let rec_x = recorded
+                    .interpolate((t_ms / 1000.0) as f32)
+                    .unwrap()
+                    .position
+                    .coord
+                    .x;
+                let live_x = live_frame.position.x;
+                max_live_diff = max_live_diff.max((rec_x - live_x).abs());
+                assert!(
+                    rec_x <= pointer_x(t_ms) + 0.01,
+                    "cursor jumped ahead of dragged pointer at {t_ms:.1}ms: rec={rec_x:.4} pointer={:.4}",
+                    pointer_x(t_ms)
+                );
+            }
+        }
+        assert!(
+            max_live_diff < 0.002,
+            "recorded drag diverged from live presentation by {max_live_diff:.6} UV"
+        );
+    }
+
+    #[test]
+    fn fill_drag_gaps_interpolates_missed_samples_but_preserves_mid_drag_pauses() {
+        let mut moving_moves: Vec<_> = (0..=40)
+            .map(|i| {
+                let t = f64::from(i) * 16.0;
+                cursor_move(t, 0.1 + t * 0.0005, 0.5)
+            })
+            .collect();
+        moving_moves.retain(|m| !(240.0 < m.time_ms && m.time_ms < 360.0));
+        let moving_clicks = vec![click_event(0.0, true), click_event(600.0, false)];
+        let filled = fill_drag_gaps(&moving_moves, &moving_clicks);
+        assert!(filled.len() > moving_moves.len());
+
+        let mut paused_moves: Vec<_> = (0..=20)
+            .map(|i| {
+                let t = f64::from(i) * 16.0;
+                cursor_move(t, 0.1 + t * 0.0005, 0.5)
+            })
+            .collect();
+        paused_moves.extend((0..=20).map(|i| {
+            let t = 2400.0 + f64::from(i) * 16.0;
+            cursor_move(t, 0.26 + (t - 2400.0) * 0.0005, 0.5)
+        }));
+        let paused_clicks = vec![click_event(0.0, true), click_event(2800.0, false)];
+        assert_eq!(
+            fill_drag_gaps(&paused_moves, &paused_clicks).len(),
+            paused_moves.len()
+        );
     }
 
     #[test]
