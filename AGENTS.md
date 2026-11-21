@@ -4,6 +4,7 @@
 - 当前产品源码在 `next/cap/`，先遵守该目录的 `AGENTS.md`；旧 Qt 构建记录仅作历史资料。
 - 当前无人值守队列唯一真源：`.dsh/unattended/queue.md`。每个任务必须实现、验证、提交并记账；大任务拆成可独立验证的步骤。
 - 验证入口：在 `next/cap/` 执行 `node scripts/jianku-unattended-check.mjs`。长任务用当前工具的可恢复进程运行，不启动额外开发服务器。
+- 桌面端前端样式固定三层（`styles/theme.css` → `expressive.css` → `workspace.css`），新增界面优先复用共用组件与 `--jk-*` / `--ed-*` 语义变量，不在样式表或界面壳层硬编码旧紫色或未定义变量；静态卫生守卫（`scripts/jianku-hygiene.test.mjs`）已接入 `jianku-unattended-check.mjs`。
 - 运行日志：`.dsh/unattended/session-*.md`；恢复时先读最新日志、队列与 Git 状态。
 - 用户已持续授权 GitHub 备份、版本控制和生成可试用版本；可以向已有 `origin` 推送普通提交与回滚标签。不得改写远端历史、擅自公开发布或新增收费资源。
 - 可修改产品、测试和文档；可运行本机合成素材检查。设备、副屏、会议共享的实机验收按用户要求延期，不把编译或合成检查标为实机通过。

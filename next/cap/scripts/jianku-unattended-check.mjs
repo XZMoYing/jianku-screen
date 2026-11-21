@@ -28,6 +28,7 @@ if (process.platform === "darwin") {
 
 const checks = [
 	["node", ["--test", "scripts/jianku-config.test.mjs"]],
+	["node", ["--test", "scripts/jianku-hygiene.test.mjs"]],
 	["cargo", ["fmt", "--all", "--", "--check"]],
 	["cargo", ["check", "--locked", "--release", "-p", "cap-desktop"]],
 	[

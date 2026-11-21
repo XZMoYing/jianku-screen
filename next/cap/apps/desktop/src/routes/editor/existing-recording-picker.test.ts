@@ -20,7 +20,7 @@ describe("existing recording picker", () => {
 				getExistingRecordingPickerOptions(platform, "/Cap/recordings"),
 			).toEqual({
 				defaultPath: "/Cap/recordings",
-				filters: [{ name: "Cap Recording", extensions: ["cap"] }],
+				filters: [{ name: "简库录制工程", extensions: ["jks", "cap"] }],
 				multiple: false,
 			});
 		},
