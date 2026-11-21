@@ -1,60 +1,39 @@
-# 简库镜传新版
+# 简库镜传 Next（`next/` 目录说明）
 
-当前阶段包 **0.2.0-alpha.50 / 2026.50.0** 已安装并实际测试，回滚保留alpha.49。首页默认普通窗口、可选置顶；修复置顶后绿色按钮不能进入系统全屏的问题，13项实际窗口检查及三轮合成工程暂停/回零重播通过。包含最新首页模式/来源切换源码，实际切换观感仍待验收。见[本阶段证据](verification/2026-10-31-main-fullscreen/README.md)。
+本目录承载 **简库镜传 Next** 的当前产品源码（`next/cap/`）与分阶段实测证据（`next/verification/`）。
 
-当前产品源码为`next/cap`，使用Rust / wgpu / Tauri / Solid；完整中文、界面统一、内部审计、严格解码及成片差异和Windows/Linux目标验证继续，尚非正式发布候选版。下一步为录制选择菜单Esc所有权及统一。下方为历史阶段记录，旧Qt说明不代表当前新版架构。
-
-## 历史阶段记录
-
-当前阶段包 **0.2.0-alpha.44** 已安装打开：全屏预览的提示气泡Escape冲突已修复，单次退出保留原系统全屏、菜单优先处理和暂停像素一致性实测通过；U05已完成。见 [验收证据](verification/2026-10-28-fullscreen-escape/README.md)。新账号额度重新读取并继续目标，下一项按用户最新要求重绘浏览器外框、补齐3D透视阴影，随后完整中文与本土化/内部审计、Windows/Linux；完整目标未完成。以下为历史记录。
-
-当前阶段包 **0.2.0-alpha.43** 已安装打开：同一画布全屏预览、播放与定位、清晰度菜单已实测，普通Escape返回恢复窗口；窗口原本已系统全屏时的Escape边界仍待核对，U05总项保留。见 [全屏交付与证据](verification/2026-10-28-preview-fullscreen/README.md)。当前/回滚应用为 **alpha.43/alpha.41**，旧39/中间42及重复安装副本已清理，全部工程/媒体保留。共享额度到本轮上限后按既有授权暂停；恢复先全屏边界，再完整中文与本土化审计、内部发布审计和Windows/Linux目标环境验证。既有严格解码问题仍阻塞发布。以下为历史阶段记录。
-
-3D 运镜阶段包 **0.2.0-alpha.39** 已安装打开：新建镜头默认自然曲线，补齐透视运动模糊及连续分割的曝光历史，保留普通缩放和旧项目的明确曲线。实际界面切换/保存重开/回零重播与完整导出通过，整体舒适度仍待用户确认。见 [集成交付](verification/2026-10-28-3d-integration/README.md)。
-
-当前/上一版应用为 **alpha.39/alpha.38**，源码已备份 GitHub，旧 alpha.37 应用和重复临时成片已清理，工程与原生依赖保留。下一步推进预览具体分辨率/全屏，再继续完整中文、内部审计和 Windows/Linux；下方旧版本说明为历史记录，不能视为正式发布审计已完成。
-
-新版在 `rewrite/cap-foundation` 分支开发，源代码位于 `next/cap/`，当前工作目录为 `Jianku Screen Next`。旧版目录仍保留共用的 Git 仓库及历史源码；旧版应用与构建已经清理。
-
-当前阶段为 `0.2.0-alpha.37`：补齐动态轨道、3D 镜头与加载界面的中文，修正构建链路由解析错误，并区分准备预览测试的解码配置。保留全部视觉效果，实际中文界面、完整导出及当前/上一版回滚已核对；另有两项 AVAssetReader 画面差异继续待办。见 [alpha.37 记录](verification/2026-10-26-alpha37-localization-preview/README.md)。2026-10-27 已用独立程序进一步定位到内置 FFmpeg VideoToolbox 解码的色度差异，严格失败仍保留；应用继续 alpha.37，见 [解码调查](verification/2026-10-27-decoder-parity/README.md)。另新增 [10/30/60 分钟工程抽样检查](verification/2026-10-27-long-playback/README.md)，操作通过，偶发时序离群点继续跟踪。后续发现并修正 headless 主线程循环遗漏，旧壁纸时序证据范围已更正；新的 [播放分段计时](verification/2026-10-27-playback-timing/README.md)已完成，仍有读回等待与严格色度差异待跟踪。下方早期说明保留作历史参考。
+- **当前本机可试用候选**：`0.2.0-alpha.108 / 2026.108.0`（安装于 `/Applications/Jianku Screen Next.app`，冻结提交 `c505d99`，回滚保留 `alpha.107`）。
+- **状态总览与下一步**：见 [`docs/开发交接.md`](../docs/开发交接.md) 与 [`docs/U17-可试用候选状态-2026-11-08.md`](../docs/U17-可试用候选状态-2026-11-08.md)。
+- **任务唯一真源**：[`.dsh/unattended/queue.md`](../.dsh/unattended/queue.md)。
+- **历史阶段流水（alpha.50 / alpha.66 及之前）**：已归档至 [`docs/archive/`](../docs/archive/README.md)。
 
 ## 版本与来源
 
-- 旧版备份：`backup-qt-0.1.6-20261011`，提交 `df7dd69d8b209f1f21a641a1b4d9236476e5c028`。
-- 新版上游：Cap `cap-v0.6.0`，提交 `6cfdd172cd53b1d6861852288c2192a8ab743687`。
-- 原始导入提交：`44e5cf40a1dfa526399835345bdf4ebcf0556f08`；导入目录的 Git tree 与上游一致。
-- 开发应用标识：`com.jianku.screen.next`；默认设置、录制目录和日志指向独立位置；实际启动已观察到新版数据及日志目录，不接管 Cap 或旧版的工程文件关联。未适配的 GPUI 交接已禁用。
-- 上游核心采用 AGPLv3，例外与第三方授权见 [原始许可证](cap/LICENSE)。发布新版时提供对应源码和许可声明。
+- **旧版备份**：`backup-qt-0.1.6-20261011`（提交 `df7dd69d8b209f1f21a641a1b4d9236476e5c028`）。
+- **新版上游**：Cap `cap-v0.6.0`（提交 `6cfdd172cd53b1d6861852288c2192a8ab743687`），原始导入提交 `44e5cf40a1dfa526399835345bdf4ebcf0556f08`。
+- **应用标识**：`com.jianku.screen.next`，工程扩展名 `.jks`（兼容读取 `.cap`）；默认录制保存在 `~/Library/Application Support/com.jianku.screen.next/recordings/`。
+- **许可与归属**：核心沿用 AGPLv3 及原始例外，详见 [`cap/LICENSE`](cap/LICENSE) 与 [`cap/JIANKU-NOTICE.md`](cap/JIANKU-NOTICE.md)。
 
-功能范围和验收顺序见 [新版重构路线](../docs/新版重构路线.md)。未完成事项统一记录在 [待验证项目交接](../docs/待验证项目交接.md)，避免出现多份验收清单。
+## 构建、签名与验证
 
-## 开发与构建
-
-在 `next/cap` 目录执行：
+在 `next/cap/` 目录执行：
 
 ```sh
-bun run jianku:setup
-bun run jianku:frontend
-bun run jianku:check
-bun run jianku:build
+bun run jianku:setup                        # 锁定依赖、原生媒体库与 Android 组件
+bun run jianku:frontend                     # 构建桌面端前端资源
+bun run jianku:check                        # cargo fmt --check + cargo check -p cap-desktop
+bun run jianku:build                        # 构建调试应用（仅用于功能调试，不代表发布性能）
+node scripts/jianku.mjs release             # 构建并重签发布候选包
+node scripts/jianku.mjs sign                # 对已编译 bundle 补签并严格验证
+node scripts/jianku-unattended-check.mjs    # 无人值守局部基线检查
+node scripts/jianku-localization-audit.mjs  # 桌面文案本地化扫描
+node scripts/jianku.mjs config darwin       # 查看当前平台打包覆盖配置
 ```
 
-`setup` 安装锁定依赖和原生媒体库；`frontend` 单独构建界面；`check` 检查原生代码；`build` 打包调试应用；`bun run tauri:build` 打包发布应用。已完成编译的调试包可用 `node scripts/jianku.mjs sign` 单独补签并严格验证。构建入口为本地开发设置独立服务地址，不启动数据库、云服务或额外开发服务器，不使用上游的更新发布配置。
+### 环境与签名要点
 
-macOS 的安卓组件构建还需要 `meson`、`ninja`、`pkg-config` 与 `sdl3`。构建脚本下载并核验固定 scrcpy 4.1 客户端源码与匹配服务端，保存源码补丁，复用已有 FFmpeg 并将运行库装入应用。使用者仍需本机 `adb`，不再依赖另外安装的 scrcpy；原有系统 scrcpy 不被修改。
-
-本机已安装 Bun 1.4.0、Rust 1.88.0、rustfmt 和 clippy，保留原有 Node 和 Qt 环境。macOS 原生构建需要完整 Xcode；本机 macOS 14.7.4 可使用 Xcode 16.2。将其放入 `/Applications/Xcode.app` 后，构建入口会自行选择，不更改系统全局开发目录。非标准目录可通过 `DEVELOPER_DIR` 指定。
-
-macOS 打包完成后会重签并严格验证整个应用，避免调试包残留缺少资源封印的链接器签名。本机复用已有 JiankuDev 开发证书及其独立钥匙串；其他机器可设置 `APPLE_SIGNING_IDENTITY` 和 `JIANKU_SIGNING_KEYCHAIN`，没有证书时使用临时签名。开发签名不等于 Developer ID 公证。
-
-首次启动需为「简库镜传 Next」重新授予屏幕录制和辅助功能权限；麦克风和摄像头按需开启。默认选择本地录制，主界面与模式说明仅提供录制和截图，首次引导缩短为权限与本地功能两步。其他继承的云分享、账户、授权与语言入口仍待整理，不表示自身云服务已接入。
-
-默认录制保存在 `~/Library/Application Support/com.jianku.screen.next/recordings/`；可在设置修改录制路径。调试包只用于功能验收，不能据其性能评估正式发布版。所有实测结果继续记录在统一交接文档与本阶段验证目录。
-
-2026-10-12 已确认 Xcode 16.2 初始化完成，原生构建障碍已解除。系统光标兼容证据见 [系统光标验证](verification/2026-10-12-system-cursor/verification.json)；位置时间与收尾证据见 [光标时间验证](verification/2026-10-12-cursor-timing/verification.json)；模糊阶段证据见 [动态模糊验证](verification/2026-10-12-motion-blur/verification.json)；光标阶段证据见 [姿态验证](verification/2026-10-12-cursor-pose/verification.json)；底座证据见 [原生底座验证](verification/2026-10-12-native-foundation/verification.json)；[前期接入记录](verification/2026-10-11-foundation/verification.json)保留当时的失败与等待状态，用于追溯。
-
-2026-10-13 历史试用记录（该旧包已清理，当前应用统一安装在 `/Applications/Jianku Screen Next.app`）：`0.2.0-alpha.8`（相对项目工作目录）；当前实时演示的启动、显示及重启记录见 [实时演示验证](verification/2026-10-13-live-presentation/verification.json)；前一阶段工程管理记录见 [工程管理验证](verification/2026-10-12-project-files/verification.json)。试用工程在 `~/Movies/Jianku Screen Next/试用 0.2.0-alpha.6/移动后/可携带工程.cap`，含自建背景、贴图、音频与缩放；为验证便携性，测试源工程和外部测试素材已移除，副本和三份对照视频保留。软件内可用主界面“打开工程”或编辑器“工程”菜单选择本地 `.cap` 文件夹/文件包；保存副本时选择新名称，不覆盖已有工程。系统光标仍保持用户当前约 1.4 倍设置，真实录制偏移仍待试录确认。旧应用和用户原工程保留；调试包性能不代表发布版表现。
-
-2026-10-13 接入实时演示首版。主界面“实时演示”打开控制页，开始后出现“简库演示输出”共享窗口；焦点可选自动、手动或关闭，快捷键默认 ⌘/Ctrl+Shift+空格，外观可实时调整。选择副屏时不覆盖主屏或来源屏；物理多屏和会议共享仍需实机验收。实时来源目前限 macOS 显示器，Windows 适配及完整参考效果对照保留待办。验证见 [实时演示证据](verification/2026-10-13-live-presentation/verification.json)。
-
-2026-10-13 主界面整理为录屏/演示双模式工作台。演示控制直接嵌入主窗口，按来源与输出、焦点、画面外观分组；固定操作栏与独立滚动区支持较小窗口。工程和素材库保留在共同工具栏，录制设置及提词器归入更多工具。主窗口可调整大小，切换模式保留设置，运行中的录制/演示不允许误切换到另一模式。证据见 [双模式工作台验证](verification/2026-10-13-dual-mode-workspace/verification.json)。
+- macOS 原生构建需要完整 Xcode（`/Applications/Xcode.app` 或通过 `DEVELOPER_DIR` 指定）、Bun 1.4.0、Rust 1.88+（含 `rustfmt`/`clippy`）、Node 20+。
+- macOS 安卓移动录制组件额外依赖 `meson`、`ninja`、`pkg-config`、`sdl3` 与运行期本机 `adb`。
+- `next/cap/target/native-deps` 与 `next/cap/target/Frameworks` 存放原生媒体依赖，**请勿误删**。
+- 打包后会自动重签并严格验证应用；本机可使用 `JiankuDev` 开发证书与独立钥匙串（或通过 `APPLE_SIGNING_IDENTITY=-` 显式 ad-hoc 签名）。开发签名不等于 Developer ID 公证。
+- Windows / Linux 打包配置已按平台拆分（见 [`docs/跨平台构建入口.md`](../docs/跨平台构建入口.md) 与 [`docs/审计-U12-跨平台实现矩阵.md`](../docs/审计-U12-跨平台实现矩阵.md)），目前尚未在目标平台完成实际编译与运行验收。
