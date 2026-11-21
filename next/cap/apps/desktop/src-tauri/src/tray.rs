@@ -247,7 +247,7 @@ fn load_single_item(
     }
 
     let meta = RecordingMeta::load_for_project(path).ok()?;
-    let is_screenshot = cap_project::is_project_path(&path)
+    let is_screenshot = cap_project::is_project_path(path)
         && path.parent().map(|p| p == screenshots_dir).unwrap_or(false);
 
     let (thumbnail_path, item_type) = if is_screenshot {

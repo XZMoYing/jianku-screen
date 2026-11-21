@@ -69,7 +69,7 @@ impl PresentationOptions {
                 .find(|display| display.id().to_string() == self.source_id)
                 .ok_or("来源显示器已断开")?;
             let size = source.physical_size().ok_or("无法读取来源屏幕尺寸")?;
-            f64::from(size.width()) / f64::from(size.height())
+            size.width() / size.height()
         };
         (self.output_width, self.output_height) = output_size(self.output_resolution, ratio);
         Ok(())
@@ -694,6 +694,7 @@ mod macos {
         fn CGEventSourceCounterForEventType(state: i32, event: u32) -> u32;
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub async fn run(
         app: AppHandle,
         source: scap_targets::Display,

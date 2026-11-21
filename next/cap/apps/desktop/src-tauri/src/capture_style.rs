@@ -88,13 +88,12 @@ pub async fn get_current_wallpaper_preview(app: AppHandle) -> Result<String, Str
     let dir = cache.join("appearance");
     std::fs::create_dir_all(&dir).map_err(|error| error.to_string())?;
     let output = dir.join(format!("wallpaper-{}.jpg", uuid::Uuid::new_v4()));
-    let result = tokio::task::spawn_blocking(move || {
+    tokio::task::spawn_blocking(move || {
         crate::recording::write_current_wallpaper_preview(&output)?;
         Ok::<_, String>(output.to_string_lossy().into_owned())
     })
     .await
-    .map_err(|error| error.to_string())?;
-    result
+    .map_err(|error| error.to_string())?
 }
 
 pub async fn snapshot(

@@ -486,10 +486,8 @@ fn project_frame_rate(
     }
     [nominal, average]
         .into_iter()
-        .filter_map(|rate| {
-            (rate.denominator() > 0)
-                .then(|| f64::from(rate.numerator()) / f64::from(rate.denominator()))
-        })
+        .filter(|rate| rate.denominator() > 0)
+        .map(|rate| f64::from(rate.numerator()) / f64::from(rate.denominator()))
         .filter(|rate| (1.0..=240.0).contains(rate))
         .reduce(f64::max)
         .map_or(60, |rate| rate.ceil() as u32)

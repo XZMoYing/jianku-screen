@@ -54,7 +54,6 @@ async fn resources(app: &AppHandle) -> Result<&'static PreviewResources, String>
                 cap_project::CursorMoveEvent { time_ms: t*1000.0, x: 0.57 + 0.18*(t*std::f64::consts::TAU/6.0).sin(), y: 0.55 + 0.13*(t*std::f64::consts::TAU/3.0).cos(), cursor_id: "MacOS|Arrow".into(), active_modifiers: Vec::new() }
             }).collect(),
             clicks: [1.0,3.0,5.0].into_iter().flat_map(|t| [true,false].map(move |down| cap_project::CursorClickEvent { time_ms: (t + if down {0.0} else {0.12})*1000.0, down, cursor_num:0, active_modifiers:Vec::new(),cursor_id:"MacOS|Arrow".into() })).collect(),
-            ..Default::default()
         };
         let camera = image::load_from_memory(include_bytes!("../assets/capture-camera-preview.png")).map_err(|e|e.to_string())?.to_rgba8().into_raw();
         Ok(PreviewResources { constants, layers, source: Arc::new(source), camera: Arc::new(camera), events })

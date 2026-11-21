@@ -3461,12 +3461,12 @@ impl ProjectConfiguration {
             keep_unreadable_config(&config_path, error.as_bytes());
             std::io::Error::new(std::io::ErrorKind::InvalidData, error.utf8_error())
         })?;
-        let (config, needs_migration) = Self::parse_and_migrate(&config_str).map_err(|error| {
-            if error.kind() == std::io::ErrorKind::InvalidData {
-                keep_unreadable_config(&config_path, config_str.as_bytes());
-            }
-            error
-        })?;
+        let (config, needs_migration) =
+            Self::parse_and_migrate(&config_str).inspect_err(|error| {
+                if error.kind() == std::io::ErrorKind::InvalidData {
+                    keep_unreadable_config(&config_path, config_str.as_bytes());
+                }
+            })?;
         if needs_migration {
             let result = (|| -> std::io::Result<()> {
                 let _guard = crate::append_publication::project_write_guard(project_path)?;
