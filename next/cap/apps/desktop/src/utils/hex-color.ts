@@ -48,3 +48,10 @@ export function hexToRgb(hex: string): [number, number, number, number] | null {
 
 	return [r, g, b, a];
 }
+
+export function rgbToHex(rgb: readonly [number, number, number]) {
+	return `#${rgb
+		.map((c) => c.toString(16).padStart(2, "0"))
+		.join("")
+		.toUpperCase()}`;
+}

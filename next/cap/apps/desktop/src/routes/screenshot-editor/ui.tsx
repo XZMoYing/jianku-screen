@@ -1,27 +1,33 @@
-import { Button } from "@cap/ui-solid";
-import { Dialog as KDialog } from "@kobalte/core/dialog";
-import { DropdownMenu } from "@kobalte/core/dropdown-menu";
 import { Polymorphic, type PolymorphicProps } from "@kobalte/core/polymorphic";
-import { Slider as KSlider } from "@kobalte/core/slider";
-import { Tooltip as KTooltip } from "@kobalte/core/tooltip";
-import { createElementBounds } from "@solid-primitives/bounds";
-import { createEventListener } from "@solid-primitives/event-listener";
 import { cva, cx, type VariantProps } from "cva";
 import {
 	type ComponentProps,
-	createRoot,
-	createSignal,
 	type JSX,
 	mergeProps,
-	onCleanup,
 	type ParentProps,
 	splitProps,
 	type ValidComponent,
 } from "solid-js";
 import Tooltip from "~/components/Tooltip";
 import { t as localize } from "~/utils/i18n";
+import { Slider as EditorSlider } from "../editor/ui";
 import { useScreenshotEditorContext } from "./context";
 import { TextInput } from "./TextInput";
+
+export {
+	ComingSoonTooltip,
+	Dialog,
+	DialogContent,
+	DropdownItem,
+	dropdownContainerClasses,
+	MenuItem,
+	MenuItemList,
+	PopperContent,
+	topCenterAnimateClasses,
+	topLeftAnimateClasses,
+	topRightAnimateClasses,
+	topSlideAnimateClasses,
+} from "../editor/ui";
 
 export function Field(
 	props: ParentProps<{
@@ -63,101 +69,9 @@ export function Subfield(
 	);
 }
 
-export function Slider(
-	props: ComponentProps<typeof KSlider> & {
-		formatTooltip?: string | ((v: number) => string);
-	},
-) {
-	const { projectHistory: history } = useScreenshotEditorContext();
-
-	// Pause history when slider is being dragged
-	let resumeHistory: (() => void) | null = null;
-	const finishHistory = () => {
-		resumeHistory?.();
-		resumeHistory = null;
-	};
-	onCleanup(finishHistory);
-
-	const [thumbRef, setThumbRef] = createSignal<HTMLDivElement>();
-
-	const thumbBounds = createElementBounds(thumbRef);
-
-	const [dragging, setDragging] = createSignal(false);
-
-	return (
-		<KSlider
-			{...props}
-			class={cx(
-				"ed-slider relative px-1 h-8 flex flex-row justify-stretch items-center",
-				props.class,
-			)}
-			onChange={(v) => {
-				if (!resumeHistory) resumeHistory = history.pause();
-				props.onChange?.(v);
-			}}
-			onChangeEnd={(e) => {
-				finishHistory();
-				props.onChangeEnd?.(e);
-			}}
-		>
-			<KSlider.Track
-				class="jk-slider-track h-[0.3rem] transition-[height] relative mx-1 bg-gray-4 rounded-full w-full before:content-[''] before:absolute before:inset-0 before:-top-3 before:-bottom-3"
-				onPointerDown={() => {
-					setDragging(true);
-					createRoot((dispose) => {
-						createEventListener(window, "mouseup", () => {
-							setDragging(false);
-							dispose();
-						});
-					});
-				}}
-			>
-				<KSlider.Fill class="jk-slider-fill absolute h-full rounded-full bg-blue-9 data-disabled:bg-gray-8" />
-				<Tooltip
-					open={dragging() ? true : undefined}
-					getAnchorRect={() => {
-						return {
-							x: thumbBounds.left ?? undefined,
-							y: thumbBounds.top ?? undefined,
-							width: thumbBounds.width ?? undefined,
-							height: thumbBounds.height ?? undefined,
-						};
-					}}
-					content={
-						props.value?.[0] !== undefined
-							? typeof props.formatTooltip === "string"
-								? `${props.value[0].toFixed(1)}${props.formatTooltip}`
-								: props.formatTooltip
-									? props.formatTooltip(props.value[0])
-									: props.value[0].toFixed(1)
-							: undefined
-					}
-				>
-					<KSlider.Thumb
-						ref={setThumbRef}
-						onBlur={finishHistory}
-						onKeyDown={(event) => {
-							if (
-								(event.metaKey || event.ctrlKey) &&
-								event.key.toLowerCase() === "z"
-							) {
-								finishHistory();
-							}
-						}}
-						onPointerDown={() => {
-							setDragging(true);
-						}}
-						onPointerUp={() => {
-							setDragging(false);
-						}}
-						class={cx(
-							"jk-slider-thumb bg-gray-1 dark:bg-gray-12 rounded-full outline-hidden size-4 -top-[6.3px] data-disabled:bg-gray-9 after:content-[''] after:absolute after:inset-0 after:-m-3",
-						)}
-					/>
-				</Tooltip>
-			</KSlider.Track>
-		</KSlider>
-	);
+export function Slider(props: ComponentProps<typeof EditorSlider>) {
+	const { projectHistory } = useScreenshotEditorContext();
+	return <EditorSlider {...props} history={props.history ?? projectHistory} />;
 }
 
 export function Input(props: ComponentProps<"input">) {
@@ -167,154 +81,6 @@ export function Input(props: ComponentProps<"input">) {
 			class={cx(
 				"rounded-lg bg-gray-2 hover:ring-1 py-[18px] hover:ring-gray-5 h-8 font-normal placeholder:text-black-transparent-40 text-xs caret-gray-500 transition-shadow duration-200 focus:ring-offset-1 focus:bg-gray-3 focus:ring-offset-gray-100 focus:ring-1 focus:ring-gray-10 px-2 w-full outline-hidden text-gray-12",
 				props.class,
-			)}
-		/>
-	);
-}
-
-export const Dialog = {
-	Root(
-		props: ComponentProps<typeof KDialog> & {
-			hideOverlay?: boolean;
-			size?: "sm" | "lg";
-			contentClass?: string;
-		},
-	) {
-		return (
-			<KDialog {...props}>
-				<KDialog.Portal>
-					{!props.hideOverlay && (
-						<KDialog.Overlay class="fixed inset-0 z-50 bg-black/80 data-expanded:animate-in data-expanded:fade-in data-closed:animate-out data-closed:fade-out" />
-					)}
-					<div class="flex fixed inset-0 z-50 justify-center items-center">
-						<KDialog.Content
-							class={cx(
-								props.contentClass,
-								"z-50 text-sm rounded-[1.25rem] overflow-hidden border border-gray-3 bg-gray-1 min-w-88 data-expanded:animate-in data-expanded:fade-in data-expanded:zoom-in-95 origin-top data-closed:animate-out data-closed:fade-out data-closed:zoom-out-95",
-								(props.size ?? "sm") === "sm" ? "max-w-96" : "max-w-3xl",
-							)}
-						>
-							{props.children}
-						</KDialog.Content>
-					</div>
-				</KDialog.Portal>
-			</KDialog>
-		);
-	},
-	CloseButton() {
-		return (
-			<KDialog.CloseButton as={Button} variant="gray">
-				{localize("Cancel")}
-			</KDialog.CloseButton>
-		);
-	},
-	ConfirmButton(_props: ComponentProps<typeof Button>) {
-		const props = mergeProps(
-			{ variant: "primary" } as ComponentProps<typeof Button>,
-			_props,
-		);
-		return <Button {...props} />;
-	},
-	Footer(
-		props: ComponentProps<"div"> & {
-			close?: JSX.Element;
-			leftFooterContent?: JSX.Element;
-		},
-	) {
-		return (
-			<div
-				class={cx(
-					"h-16 px-4 gap-3 flex flex-row items-center",
-					props.leftFooterContent ? "justify-between" : "justify-center",
-					props.class,
-				)}
-				{...props}
-			>
-				{props.leftFooterContent}
-				<div class="flex flex-row gap-3 items-center">{props.children}</div>
-			</div>
-		);
-	},
-	Header(props: ComponentProps<"div">) {
-		return <div {...props} class="h-14 px-4 flex flex-row items-center" />;
-	},
-	Content(props: ComponentProps<"div">) {
-		return (
-			<div
-				{...props}
-				class={cx("p-4 flex flex-col border-y border-gray-3", props.class)}
-			/>
-		);
-	},
-};
-
-export function DialogContent(
-	props: ParentProps<{
-		title: string;
-		confirm: JSX.Element;
-		class?: string;
-		close?: JSX.Element;
-		leftFooterContent?: JSX.Element;
-	}>,
-) {
-	return (
-		<>
-			<Dialog.Header>
-				<KDialog.Title class="text-gray-12">{props.title}</KDialog.Title>
-			</Dialog.Header>
-			<Dialog.Content class={props.class}>{props.children}</Dialog.Content>
-			<Dialog.Footer
-				close={props.close}
-				leftFooterContent={props.leftFooterContent}
-			>
-				{props.confirm}
-			</Dialog.Footer>
-		</>
-	);
-}
-
-export function MenuItem<T extends ValidComponent = "button">(
-	_props: ComponentProps<T>,
-) {
-	const props = mergeProps({ as: "div" } as ComponentProps<T>, _props);
-
-	return (
-		<Polymorphic
-			{...props}
-			class={cx(
-				props.class,
-				"flex flex-row shrink-0 items-center gap-1.5 px-[0.675rem] py-1.5 rounded-lg outline-hidden text-nowrap overflow-hidden text-ellipsis w-full max-w-full",
-				"text-[0.875rem] text-gray-10 disabled:text-gray-10 data-highlighted:bg-gray-3 data-highlighted:text-gray-12",
-			)}
-		/>
-	);
-}
-
-export function DropdownItem(props: ComponentProps<typeof DropdownMenu.Item>) {
-	return (
-		<MenuItem<typeof DropdownMenu.Item> as={DropdownMenu.Item} {...props} />
-	);
-}
-
-export function PopperContent<T extends ValidComponent = "div">(
-	props: ComponentProps<T>,
-) {
-	return (
-		<Polymorphic {...props} class={cx(dropdownContainerClasses, props.class)} />
-	);
-}
-
-export function MenuItemList<T extends ValidComponent = "div">(
-	_props: ComponentProps<T>,
-) {
-	const props = mergeProps({ as: "div" } as ComponentProps<T>, _props);
-
-	return (
-		<Polymorphic
-			{...props}
-			class={cx(
-				props.class,
-				"space-y-1.5 p-1.5 overflow-y-auto outline-hidden",
 			)}
 		/>
 	);
@@ -428,38 +194,5 @@ export function EditorButton<T extends ValidComponent = "button">(
 				</Polymorphic>
 			)}
 		</>
-	);
-}
-
-export const dropdownContainerClasses =
-	"jk-menu-surface z-10 flex flex-col rounded-xl border border-gray-3 bg-gray-1 shadow-s overflow-y-hidden outline-hidden";
-
-export const topLeftAnimateClasses =
-	"data-expanded:animate-in data-expanded:fade-in data-expanded:zoom-in-95 data-closed:animate-out data-closed:fade-out data-closed:zoom-out-95 origin-top-left";
-
-export const topCenterAnimateClasses =
-	"data-expanded:animate-in data-expanded:fade-in data-expanded:zoom-in-95 data-closed:animate-out data-closed:fade-out data-closed:zoom-out-95 origin-top-center";
-
-export const topRightAnimateClasses =
-	"data-expanded:animate-in data-expanded:fade-in data-expanded:zoom-in-95 data-closed:animate-out data-closed:fade-out data-closed:zoom-out-95 origin-top-right";
-
-export const topSlideAnimateClasses =
-	"data-expanded:animate-in data-expanded:fade-in data-expanded:slide-in-from-top-1 data-closed:animate-out data-closed:fade-out data-closed:slide-out-to-top-1 origin-top-center";
-
-export function ComingSoonTooltip(
-	props: ComponentProps<typeof KTooltip> & { as?: ValidComponent },
-) {
-	const [trigger, root] = splitProps(props, ["children", "as"]);
-	return (
-		<KTooltip placement="top" openDelay={0} closeDelay={0} {...root}>
-			<KTooltip.Trigger as={trigger.as ?? "div"}>
-				{trigger.children}
-			</KTooltip.Trigger>
-			<KTooltip.Portal>
-				<KTooltip.Content class="p-2 font-medium bg-gray-12 text-gray-1 data-expanded:animate-in data-expanded:slide-in-from-bottom-1 data-expanded:fade-in data-closed:animate-out data-closed:slide-out-to-bottom-1 data-closed:fade-out rounded-lg text-xs z-1000">
-					{localize("Coming Soon")}
-				</KTooltip.Content>
-			</KTooltip.Portal>
-		</KTooltip>
 	);
 }

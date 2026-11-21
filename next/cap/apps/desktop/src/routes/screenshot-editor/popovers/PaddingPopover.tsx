@@ -3,22 +3,8 @@ import { batch } from "solid-js";
 import { InsetSettings } from "~/components/InsetSettings";
 import { t as localize } from "~/utils/i18n";
 import IconCapPadding from "~icons/cap/padding";
-import { useScreenshotEditorContext } from "../context";
+import { hasNoVisibleBackground, useScreenshotEditorContext } from "../context";
 import { EditorButton, Slider } from "../ui";
-
-function hasNoVisibleBackground(source: {
-	type: string;
-	path?: string | null;
-	alpha?: number;
-}): boolean {
-	if (source.type === "color") {
-		return (source.alpha ?? 255) === 0;
-	}
-	if (source.type === "wallpaper" || source.type === "image") {
-		return !source.path;
-	}
-	return false;
-}
 
 export function PaddingPopover() {
 	const {

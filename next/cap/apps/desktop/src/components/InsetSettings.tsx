@@ -1,5 +1,5 @@
 import { Show } from "solid-js";
-import { RgbInput } from "~/routes/editor/color-utils";
+import { RgbInput } from "~/components/RgbInput";
 import { Field, Slider } from "~/routes/editor/ui";
 import { t as localize } from "~/utils/i18n";
 import type { BackgroundConfiguration } from "~/utils/tauri";

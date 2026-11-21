@@ -1,6 +1,6 @@
 import { For, Show } from "solid-js";
 import { ChoiceSelect } from "~/components/ChoiceSelect";
-import { RgbInput } from "~/routes/editor/color-utils";
+import { RgbInput } from "~/components/RgbInput";
 import {
 	ASPECT_RATIO_OPTIONS,
 	ASPECT_RATIOS,

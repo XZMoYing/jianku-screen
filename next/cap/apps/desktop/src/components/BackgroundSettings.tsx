@@ -14,9 +14,9 @@ import {
 } from "solid-js";
 import { unwrap } from "solid-js/store";
 import toast from "solid-toast";
+import { RgbInput } from "~/components/RgbInput";
 import { AnimatedGradientEditor } from "~/routes/editor/AnimatedGradientEditor";
 import { BrandColorsDropdown } from "~/routes/editor/BrandColorsDropdown";
-import { hexToRgb, RgbInput } from "~/routes/editor/color-utils";
 import { GradientEditor } from "~/routes/editor/GradientEditor";
 import {
 	DEFAULT_BACKGROUND_PADDING,
@@ -29,6 +29,7 @@ import {
 	type BackgroundCategory,
 	backgroundCategory,
 } from "~/utils/background-selection";
+import { hexToRgb } from "~/utils/hex-color";
 import { t } from "~/utils/i18n";
 import type { OrganizationBrandColorSwatch } from "~/utils/organization-branding";
 import { projectAssetPath } from "~/utils/project-files";

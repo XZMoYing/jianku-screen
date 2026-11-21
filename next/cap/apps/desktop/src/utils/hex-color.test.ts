@@ -4,6 +4,7 @@ import {
 	hexToRgb,
 	normalizeHexColor,
 	normalizeOpaqueHexColor,
+	rgbToHex,
 } from "./hex-color";
 
 describe("hex-color", () => {
@@ -30,6 +31,11 @@ describe("hex-color", () => {
 		expect(hexToRgb("fff")).toEqual([255, 255, 255, 255]);
 		expect(hexToRgb("#1234")).toEqual([17, 34, 51, 68]);
 		expect(hexToRgb("#12345678")).toEqual([18, 52, 86, 120]);
+	});
+
+	it("formats rgb tuples into uppercase hex strings", () => {
+		expect(rgbToHex([0, 0, 0])).toBe("#000000");
+		expect(rgbToHex([255, 16, 171])).toBe("#FF10AB");
 	});
 
 	it("rejects invalid values", () => {
