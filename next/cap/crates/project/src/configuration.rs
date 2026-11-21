@@ -611,6 +611,10 @@ pub struct Camera {
     pub scale_during_zoom: f32,
     #[serde(default)]
     pub background_blur: BackgroundBlurConfig,
+    #[serde(default)]
+    pub beauty_smoothing: f32,
+    #[serde(default)]
+    pub beauty_whitening: f32,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, Type, Default)]
@@ -655,6 +659,8 @@ impl Default for Camera {
             rounding_type: CornerStyle::default(),
             scale_during_zoom: Self::default_scale_during_zoom(),
             background_blur: BackgroundBlurConfig::default(),
+            beauty_smoothing: 0.0,
+            beauty_whitening: 0.0,
         }
     }
 }

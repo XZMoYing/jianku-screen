@@ -151,6 +151,40 @@ export function CameraSettings(props: {
 					/>
 				</label>
 				{range("阴影", "shadow", 0, 100)}
+				<Disclosure class="jk-appearance-details" title={localize("美颜")}>
+					<div>
+						<Field
+							inline
+							name={localize("磨皮")}
+							value={`${Math.round((props.camera.beautySmoothing ?? 0) * 100)}%`}
+						>
+							<Slider
+								value={[Math.round((props.camera.beautySmoothing ?? 0) * 100)]}
+								minValue={0}
+								maxValue={100}
+								step={1}
+								onChange={([value]) =>
+									props.onChange({ beautySmoothing: value / 100 })
+								}
+							/>
+						</Field>
+						<Field
+							inline
+							name={localize("美白提亮")}
+							value={`${Math.round((props.camera.beautyWhitening ?? 0) * 100)}%`}
+						>
+							<Slider
+								value={[Math.round((props.camera.beautyWhitening ?? 0) * 100)]}
+								minValue={0}
+								maxValue={100}
+								step={1}
+								onChange={([value]) =>
+									props.onChange({ beautyWhitening: value / 100 })
+								}
+							/>
+						</Field>
+					</div>
+				</Disclosure>
 				<Disclosure class="jk-appearance-details" title={localize("阴影细节")}>
 					<div>
 						<For

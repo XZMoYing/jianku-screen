@@ -20,8 +20,8 @@ struct Uniforms {
     border_enabled: f32,
     border_width: f32,
     preserve_source_alpha: f32,
-    _padding1a: f32,
-    _padding1b: f32,
+    beauty_smoothing: f32,
+    beauty_whitening: f32,
     _padding1c: f32,
     border_color: vec4<f32>,
     // Per-corner multipliers on rounding_px: (tl, tr, bl, br). All 1s keeps
@@ -458,8 +458,81 @@ fn compose_frame(frag_coord: vec4<f32>) -> vec4<f32> {
     );
 }
 
+fn apply_camera_beauty(base: vec4<f32>, uv: vec2<f32>, crop_bounds_uv: vec4<f32>) -> vec4<f32> {
+    let smoothing = clamp(uniforms.beauty_smoothing, 0.0, 1.0);
+    let whitening = clamp(uniforms.beauty_whitening, 0.0, 1.0);
+    if smoothing <= 0.001 && whitening <= 0.001 {
+        return base;
+    }
+    if uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0 {
+        return base;
+    }
+    var sample_uv = uv;
+    if uniforms.mirror_x != 0.0 {
+        sample_uv.x = 1.0 - sample_uv.x;
+    }
+    let crop_size = crop_bounds_uv.zw - crop_bounds_uv.xy;
+    let texel = 1.0 / uniforms.frame_size;
+    let safe_min = crop_bounds_uv.xy + texel;
+    let safe_max = crop_bounds_uv.zw - texel;
+    let center = clamp(sample_uv * crop_size + crop_bounds_uv.xy, safe_min, safe_max);
+
+    let rgb = clamp(base.rgb, vec3<f32>(0.0), vec3<f32>(1.0));
+    let y_luma = dot(rgb, vec3<f32>(0.299, 0.587, 0.114));
+    let cb = 0.5 - 0.168736 * rgb.r - 0.331264 * rgb.g + 0.5 * rgb.b;
+    let cr = 0.5 + 0.5 * rgb.r - 0.418688 * rgb.g - 0.081312 * rgb.b;
+    let cb_mask = smoothstep(0.28, 0.34, cb) * (1.0 - smoothstep(0.47, 0.53, cb));
+    let cr_mask = smoothstep(0.51, 0.55, cr) * (1.0 - smoothstep(0.68, 0.74, cr));
+    let luma_mask = smoothstep(0.12, 0.24, y_luma) * (1.0 - smoothstep(0.92, 0.98, y_luma));
+    let skin = cb_mask * cr_mask * luma_mask;
+
+    var out_rgb = rgb;
+    if smoothing > 0.001 && skin > 0.001 {
+        let radius = mix(1.5, 4.5, smoothing) * texel;
+        let sigma2 = mix(0.012, 0.036, smoothing);
+        var sum = rgb * 2.0;
+        var weight_sum = 2.0;
+        let offsets = array<vec2<f32>, 8>(
+            vec2<f32>(1.0, 0.0),
+            vec2<f32>(-1.0, 0.0),
+            vec2<f32>(0.0, 1.0),
+            vec2<f32>(0.0, -1.0),
+            vec2<f32>(0.707, 0.707),
+            vec2<f32>(-0.707, 0.707),
+            vec2<f32>(0.707, -0.707),
+            vec2<f32>(-0.707, -0.707),
+        );
+        for (var i = 0; i < 8; i = i + 1) {
+            let tap = textureSampleLevel(
+                frame_texture,
+                frame_sampler,
+                clamp(center + offsets[i] * radius, safe_min, safe_max),
+                0.0
+            ).rgb;
+            let diff = tap - rgb;
+            let w = exp(-dot(diff, diff) / sigma2);
+            sum += tap * w;
+            weight_sum += w;
+        }
+        let bilateral = sum / max(weight_sum, 0.0001);
+        out_rgb = mix(out_rgb, bilateral, skin * smoothing * 0.75);
+    }
+
+    if whitening > 0.001 && skin > 0.001 {
+        let lifted = out_rgb + (vec3<f32>(1.0) - out_rgb) * out_rgb * (0.42 * whitening);
+        let warm_tint = vec3<f32>(1.015, 1.005, 0.995);
+        out_rgb = mix(
+            out_rgb,
+            clamp(lifted * warm_tint, vec3<f32>(0.0), vec3<f32>(1.0)),
+            skin * (0.4 + 0.6 * whitening)
+        );
+    }
+
+    return vec4<f32>(clamp(out_rgb, vec3<f32>(0.0), vec3<f32>(1.0)), base.a);
+}
+
 fn sample_texture(uv: vec2<f32>, crop_bounds_uv: vec4<f32>) -> vec4<f32> {
-    let plain = sample_frame(uv, crop_bounds_uv);
+    let plain = apply_camera_beauty(sample_frame(uv, crop_bounds_uv), uv, crop_bounds_uv);
     let mix_amount = uniforms.enhance_params.x;
     if mix_amount <= 0.0 {
         return plain;

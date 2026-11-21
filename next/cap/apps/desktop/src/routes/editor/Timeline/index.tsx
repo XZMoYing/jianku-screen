@@ -50,7 +50,12 @@ import {
 	clipGapAfter,
 	clipTimelineOffsets,
 } from "../clip-transitions";
-import { FPS, type TimelineTrackType, useEditorContext } from "../context";
+import {
+	type EditorProjectConfiguration,
+	FPS,
+	type TimelineTrackType,
+	useEditorContext,
+} from "../context";
 import {
 	createEditorContextMenu,
 	isContextMenuKey,
@@ -1358,6 +1363,104 @@ export function Timeline(props: {
 	});
 
 	const split = () => editorState.timeline.interactMode === "split";
+	const [marqueeBox, setMarqueeBox] = createSignal<{
+		left: number;
+		top: number;
+		width: number;
+		height: number;
+	} | null>(null);
+
+	const isAnyTrackDragging = () =>
+		styleSegmentDragState.type !== "idle" ||
+		imageSegmentDragState.type !== "idle" ||
+		zoomSegmentDragState.type !== "idle" ||
+		sceneSegmentDragState.type !== "idle" ||
+		maskSegmentDragState.type !== "idle" ||
+		textSegmentDragState.type !== "idle" ||
+		audioSegmentDragState.type !== "idle" ||
+		captionSegmentDragState.type !== "idle" ||
+		keyboardSegmentDragState.type !== "idle" ||
+		threeDSegmentDragState.type !== "idle";
+
+	const selectMarqueeRange = (
+		minX: number,
+		maxX: number,
+		minY: number,
+		maxY: number,
+		anchorY: number,
+	) => {
+		const scrollEl = timelineScrollRef();
+		const metrics = getTimelineContentMetrics();
+		if (!scrollEl || !metrics || metrics.width <= 0) return;
+
+		const rawStart =
+			transform().position + (minX - metrics.left) * secsPerPixel();
+		const rawEnd =
+			transform().position + (maxX - metrics.left) * secsPerPixel();
+		const rangeStart = Math.max(0, Math.min(rawStart, rawEnd));
+		const rangeEnd = Math.max(rangeStart, rawEnd);
+
+		const rows = Array.from(
+			scrollEl.querySelectorAll<HTMLElement>("[data-track-type]"),
+		);
+		const hitsByType = new Map<TimelineTrackType, Set<number>>();
+		let anchorType: TimelineTrackType | null = null;
+
+		for (const row of rows) {
+			const rect = row.getBoundingClientRect();
+			if (rect.bottom < minY || rect.top > maxY) continue;
+			const trackType = row.dataset.trackType as TimelineTrackType | undefined;
+			if (!trackType) continue;
+			if (anchorY >= rect.top && anchorY <= rect.bottom) {
+				anchorType = trackType;
+			}
+			const laneAttr = row.dataset.trackLane;
+			const laneIndex =
+				laneAttr !== undefined && laneAttr !== ""
+					? Number(laneAttr)
+					: undefined;
+			const segments = getTrackSegments(project.timeline, trackType);
+			for (let idx = 0; idx < segments.length; idx++) {
+				const seg = segments[idx];
+				if (laneIndex !== undefined && getSegmentTrack(seg) !== laneIndex)
+					continue;
+				if (seg.end > rangeStart && seg.start < rangeEnd) {
+					let set = hitsByType.get(trackType);
+					if (!set) {
+						set = new Set<number>();
+						hitsByType.set(trackType, set);
+					}
+					set.add(idx);
+				}
+			}
+		}
+
+		let chosenType: TimelineTrackType | null = null;
+		if (anchorType && (hitsByType.get(anchorType)?.size ?? 0) > 0) {
+			chosenType = anchorType;
+		} else {
+			let bestCount = 0;
+			for (const [type, set] of hitsByType) {
+				if (set.size > bestCount) {
+					bestCount = set.size;
+					chosenType = type;
+				}
+			}
+		}
+
+		if (chosenType) {
+			const indices = Array.from(hitsByType.get(chosenType) ?? []).sort(
+				(a, b) => a - b,
+			);
+			setEditorState("timeline", "selection", {
+				type: chosenType,
+				indices,
+			});
+			setEditorState("timeline", "audioPicker", null);
+		} else {
+			setEditorState("timeline", "selection", null);
+		}
+	};
 
 	return (
 		<TimelineContextProvider
@@ -1383,16 +1486,79 @@ export function Timeline(props: {
 				}}
 				onMouseDown={(e) => {
 					if (e.button !== 0) return;
+					const container = e.currentTarget;
+					const target = e.target;
+					const containerRect = container.getBoundingClientRect();
+					const canMarquee =
+						!split() &&
+						!isAnyTrackDragging() &&
+						!(
+							target instanceof Element &&
+							target.closest(
+								"[data-timeline-segment], button, input, [role='menu'], [role='dialog']",
+							)
+						) &&
+						e.clientX >= containerRect.left + TRACK_GUTTER &&
+						e.clientY >= containerRect.top + TIMELINE_HEADER_HEIGHT;
+					const startX = e.clientX;
+					const startY = e.clientY;
+					let didMarquee = false;
+
 					createRoot((dispose) => {
-						createEventListener(e.currentTarget, "mouseup", () => {
-							handleUpdatePlayhead(e);
-							if (zoomSegmentDragState.type === "idle") {
-								setEditorState("timeline", "selection", null);
-								setEditorState("timeline", "audioPicker", null);
-							}
-						});
-						createEventListener(window, "mouseup", () => {
-							dispose();
+						onCleanup(() => setMarqueeBox(null));
+						createEventListenerMap(window, {
+							mousemove: (moveEvent) => {
+								if (!canMarquee || isAnyTrackDragging()) return;
+								if (
+									!didMarquee &&
+									Math.hypot(
+										moveEvent.clientX - startX,
+										moveEvent.clientY - startY,
+									) < 6
+								) {
+									return;
+								}
+								didMarquee = true;
+								moveEvent.preventDefault();
+								const rect = container.getBoundingClientRect();
+								const minX = Math.min(startX, moveEvent.clientX);
+								const maxX = Math.max(startX, moveEvent.clientX);
+								const minY = Math.min(startY, moveEvent.clientY);
+								const maxY = Math.max(startY, moveEvent.clientY);
+								const clampedLeft = Math.max(TRACK_GUTTER, minX - rect.left);
+								const clampedRight = Math.min(rect.width, maxX - rect.left);
+								const clampedTop = Math.max(
+									TIMELINE_HEADER_HEIGHT,
+									minY - rect.top,
+								);
+								const clampedBottom = Math.min(rect.height, maxY - rect.top);
+								setMarqueeBox({
+									left: clampedLeft,
+									top: clampedTop,
+									width: Math.max(0, clampedRight - clampedLeft),
+									height: Math.max(0, clampedBottom - clampedTop),
+								});
+								selectMarqueeRange(minX, maxX, minY, maxY, startY);
+							},
+							mouseup: (upEvent) => {
+								setMarqueeBox(null);
+								if (
+									!didMarquee &&
+									upEvent.target instanceof Node &&
+									container.contains(upEvent.target)
+								) {
+									handleUpdatePlayhead(e);
+									if (zoomSegmentDragState.type === "idle") {
+										setEditorState("timeline", "selection", null);
+										setEditorState("timeline", "audioPicker", null);
+									}
+								}
+								dispose();
+							},
+							blur: () => {
+								setMarqueeBox(null);
+								dispose();
+							},
 						});
 					});
 				}}
@@ -1781,9 +1947,71 @@ export function Timeline(props: {
 						</div>
 					</div>
 				</div>
+				<Show when={marqueeBox()}>
+					{(box) => (
+						<div
+							aria-hidden="true"
+							data-timeline-marquee=""
+							class="pointer-events-none absolute z-40 rounded-sm border border-ed-accent bg-ed-accent/15"
+							style={{
+								left: `${box().left}px`,
+								top: `${box().top}px`,
+								width: `${box().width}px`,
+								height: `${box().height}px`,
+							}}
+						/>
+					)}
+				</Show>
 			</div>
 		</TimelineContextProvider>
 	);
+}
+
+function getTrackSegments(
+	timeline: EditorProjectConfiguration["timeline"],
+	type: TimelineTrackType,
+): Array<{
+	start: number;
+	end: number;
+	track?: number;
+}> {
+	switch (type) {
+		case "style":
+			return timeline?.styleSegments ?? [];
+		case "image":
+			return timeline?.imageSegments ?? [];
+		case "text":
+			return timeline?.textSegments ?? [];
+		case "mask":
+			return timeline?.maskSegments ?? [];
+		case "audio":
+			return timeline?.audioSegments ?? [];
+		case "caption":
+			return timeline?.captionSegments ?? [];
+		case "keyboard":
+			return timeline?.keyboardSegments ?? [];
+		case "zoom":
+			return timeline?.zoomSegments ?? [];
+		case "3d":
+			return timeline?.camera3dSegments ?? [];
+		case "scene":
+			return timeline?.sceneSegments ?? [];
+		case "clip": {
+			const segments = timeline?.segments ?? [];
+			const offsets = clipTimelineOffsets(
+				segments,
+				timeline?.transitions ?? [],
+				timeline?.mainTrackGaps,
+			);
+			const holds = holdWindows(timeline?.textSegments);
+			return segments.map((segment, index) => ({
+				start: effectiveToOutput(holds, offsets[index]),
+				end: (clipGapAfter(segments, index, timeline?.mainTrackGaps) > 0
+					? effectiveToOutputEnd
+					: effectiveToOutput)(holds, offsets[index] + clipDuration(segment)),
+			}));
+		}
+	}
 }
 
 function TrackRow(props: {
@@ -1828,50 +2056,7 @@ function TrackRow(props: {
 			}),
 		);
 	};
-	const trackSegments = (): Array<{
-		start: number;
-		end: number;
-		track?: number;
-	}> => {
-		const timeline = project.timeline;
-		switch (props.type) {
-			case "style":
-				return timeline?.styleSegments ?? [];
-			case "image":
-				return timeline?.imageSegments ?? [];
-			case "text":
-				return timeline?.textSegments ?? [];
-			case "mask":
-				return timeline?.maskSegments ?? [];
-			case "audio":
-				return timeline?.audioSegments ?? [];
-			case "caption":
-				return timeline?.captionSegments ?? [];
-			case "keyboard":
-				return timeline?.keyboardSegments ?? [];
-			case "zoom":
-				return timeline?.zoomSegments ?? [];
-			case "3d":
-				return timeline?.camera3dSegments ?? [];
-			case "scene":
-				return timeline?.sceneSegments ?? [];
-			case "clip": {
-				const segments = timeline?.segments ?? [];
-				const offsets = clipTimelineOffsets(
-					segments,
-					timeline?.transitions ?? [],
-					timeline?.mainTrackGaps,
-				);
-				const holds = holdWindows(timeline?.textSegments);
-				return segments.map((segment, index) => ({
-					start: effectiveToOutput(holds, offsets[index]),
-					end: (clipGapAfter(segments, index, timeline?.mainTrackGaps) > 0
-						? effectiveToOutputEnd
-						: effectiveToOutput)(holds, offsets[index] + clipDuration(segment)),
-				}));
-			}
-		}
-	};
+	const trackSegments = () => getTrackSegments(project.timeline, props.type);
 	const laneCount = () => {
 		const count = editorState.timeline.tracks[props.type];
 		return Math.max(

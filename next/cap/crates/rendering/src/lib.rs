@@ -4848,7 +4848,19 @@ impl ProjectUniforms {
                     border_enabled: 0.0,
                     border_width: 0.0,
                     preserve_source_alpha: 0.0,
-                    _padding1: [0.0; 3],
+                    _padding1: [
+                        if project.camera.beauty_smoothing.is_finite() {
+                            project.camera.beauty_smoothing.clamp(0.0, 1.0)
+                        } else {
+                            0.0
+                        },
+                        if project.camera.beauty_whitening.is_finite() {
+                            project.camera.beauty_whitening.clamp(0.0, 1.0)
+                        } else {
+                            0.0
+                        },
+                        0.0,
+                    ],
                     border_color: [0.0, 0.0, 0.0, 0.0],
                     corner_radii: [1.0; 4],
                     color_adjust_a: camera_color_grade.color_adjust_a,
@@ -4977,7 +4989,19 @@ impl ProjectUniforms {
                     border_enabled: 0.0,
                     border_width: 0.0,
                     preserve_source_alpha: 0.0,
-                    _padding1: [0.0; 3],
+                    _padding1: [
+                        if project.camera.beauty_smoothing.is_finite() {
+                            project.camera.beauty_smoothing.clamp(0.0, 1.0)
+                        } else {
+                            0.0
+                        },
+                        if project.camera.beauty_whitening.is_finite() {
+                            project.camera.beauty_whitening.clamp(0.0, 1.0)
+                        } else {
+                            0.0
+                        },
+                        0.0,
+                    ],
                     border_color: [0.0, 0.0, 0.0, 0.0],
                     corner_radii: [1.0; 4],
                     color_adjust_a: camera_color_grade.color_adjust_a,
