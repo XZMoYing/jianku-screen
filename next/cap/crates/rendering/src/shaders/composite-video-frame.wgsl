@@ -34,11 +34,14 @@ struct Uniforms {
     color_adjust_b: vec4<f32>,
     // (grain amount, grain seed, grade-active flag, full-frame vignette flag).
     grain_params: vec4<f32>,
+    enhance_region: vec4<f32>,
+    enhance_params: vec4<f32>,
 };
 
 @group(0) @binding(0) var<uniform> uniforms: Uniforms;
 @group(0) @binding(1) var frame_texture: texture_2d<f32>;
 @group(0) @binding(2) var frame_sampler: sampler;
+@group(0) @binding(3) var enhanced_texture: texture_2d<f32>;
 
 struct VertexOutput {
     @builtin(position) position: vec4<f32>,
@@ -338,8 +341,15 @@ fn compose_frame(frag_coord: vec4<f32>) -> vec4<f32> {
         return shadow_color;
     }
 
+    let shrink = shrink_ring(crop_bounds_uv);
+    let detail = detail_amount(crop_bounds_uv);
     let sample_target_uv = clamp(target_uv, vec2<f32>(0.0), vec2<f32>(1.0));
-    var base_color = sample_texture(sample_target_uv, crop_bounds_uv);
+    var base_color: vec4<f32>;
+    if detail > 0.0 {
+        base_color = sample_detail(sample_target_uv, crop_bounds_uv, shrink, detail);
+    } else {
+        base_color = sample_layer(sample_target_uv, crop_bounds_uv, shrink);
+    }
     base_color.a = base_color.a * shape_coverage * uniforms.opacity;
 
     let zoom_amount = uniforms.motion_blur_params.z;
@@ -364,7 +374,7 @@ fn compose_frame(frag_coord: vec4<f32>) -> vec4<f32> {
 
         // The reference kernel repeats its center before offsets 0..19/20.
         // Sample the unclamped UV so the repeated tap also preserves the apron alpha.
-        var center_tap = sample_texture(target_uv, crop_bounds_uv);
+        var center_tap = sample_layer(target_uv, crop_bounds_uv, shrink);
         center_tap = apply_rounded_corners(center_tap, target_uv);
         var accum = center_tap.rgb * center_tap.a;
         var alpha_sum = center_tap.a;
@@ -372,7 +382,7 @@ fn compose_frame(frag_coord: vec4<f32>) -> vec4<f32> {
 
         for (var i = 0; i < 20; i = i + 1) {
             let sample_uv = target_uv + velocity_uv * (f32(i) / k);
-            var tap = sample_texture(sample_uv, crop_bounds_uv);
+            var tap = sample_layer(sample_uv, crop_bounds_uv, shrink);
             tap = apply_rounded_corners(tap, sample_uv);
             accum += tap.rgb * tap.a;
             alpha_sum += tap.a;
@@ -382,8 +392,16 @@ fn compose_frame(frag_coord: vec4<f32>) -> vec4<f32> {
         if out_alpha <= 0.0001 || alpha_sum <= 0.0001 {
             return shadow_color;
         }
+        var smeared = vec4(accum / alpha_sum, out_alpha);
+        if detail > 0.0 {
+            smeared = settle_into_detail(
+                smeared,
+                base_color.rgb - sample_layer(sample_target_uv, crop_bounds_uv, shrink).rgb,
+                velocity_uv,
+            );
+        }
         return composite_source_over(
-            apply_color_grade(vec4(accum / alpha_sum, out_alpha), target_uv, p),
+            apply_color_grade(smeared, target_uv, p),
             shadow_color
         );
     }
@@ -412,7 +430,7 @@ fn compose_frame(frag_coord: vec4<f32>) -> vec4<f32> {
         let weight = 4.0 * (percent - percent * percent);
         let sample_uv = target_uv + scaled_dir * percent;
 
-        var tap = sample_texture(sample_uv, crop_bounds_uv);
+        var tap = sample_layer(sample_uv, crop_bounds_uv, shrink);
         tap = apply_rounded_corners(tap, sample_uv);
         accum += tap.rgb * tap.a * weight;
         alpha_sum += tap.a * weight;
@@ -426,13 +444,46 @@ fn compose_frame(frag_coord: vec4<f32>) -> vec4<f32> {
     if out_alpha <= 0.0001 {
         return shadow_color;
     }
+    var smeared = vec4(accum / alpha_sum, out_alpha);
+    if detail > 0.0 {
+        smeared = settle_into_detail(
+            smeared,
+            base_color.rgb - sample_layer(sample_target_uv, crop_bounds_uv, shrink).rgb,
+            scaled_dir,
+        );
+    }
     return composite_source_over(
-        apply_color_grade(vec4(accum / alpha_sum, out_alpha), target_uv, p),
+        apply_color_grade(smeared, target_uv, p),
         shadow_color
     );
 }
 
 fn sample_texture(uv: vec2<f32>, crop_bounds_uv: vec4<f32>) -> vec4<f32> {
+    let plain = sample_frame(uv, crop_bounds_uv);
+    let mix_amount = uniforms.enhance_params.x;
+    if mix_amount <= 0.0 {
+        return plain;
+    }
+    if uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0 {
+        return plain;
+    }
+    let region_px = uniforms.target_bounds.xy + uv * uniforms.target_size
+        - uniforms.enhance_region.xy;
+    let region_size = uniforms.enhance_region.zw;
+    if any(region_px < vec2<f32>(0.0)) || any(region_px > region_size) {
+        return plain;
+    }
+    let texel = clamp(region_px, vec2<f32>(0.5), max(region_size - vec2<f32>(0.5), vec2<f32>(0.5)));
+    let enhanced = textureSampleLevel(
+        enhanced_texture,
+        frame_sampler,
+        texel / vec2<f32>(textureDimensions(enhanced_texture)),
+        0.0
+    );
+    return vec4<f32>(mix(plain.rgb, enhanced.rgb, mix_amount), plain.a);
+}
+
+fn sample_frame(uv: vec2<f32>, crop_bounds_uv: vec4<f32>) -> vec4<f32> {
     if uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0 {
         var sample_uv = uv;
         if uniforms.mirror_x != 0.0 {
@@ -559,6 +610,120 @@ fn sample_texture(uv: vec2<f32>, crop_bounds_uv: vec4<f32>) -> vec4<f32> {
     }
 
     return vec4(0.0);
+}
+
+struct ShrinkRing {
+    enabled: bool,
+    near: vec2<f32>,
+    far: vec2<f32>,
+    center_weight: f32,
+};
+
+fn shrink_ring(crop_bounds_uv: vec4<f32>) -> ShrinkRing {
+    let crop_size = crop_bounds_uv.zw - crop_bounds_uv.xy;
+    let scale_ratio = uniforms.frame_size * crop_size / uniforms.target_size;
+    let ratio = max(scale_ratio.x, scale_ratio.y);
+    if ratio <= 2.2 || uniforms.preserve_source_alpha > 0.5 {
+        return ShrinkRing(false, vec2<f32>(0.0), vec2<f32>(0.0), 0.0);
+    }
+    let blend = smoothstep(2.2, 2.8, ratio);
+    let angle = radians(45.0 - 23.0 * blend);
+    let radius = 0.35355 + 0.09645 * blend;
+    let footprint = scale_ratio / uniforms.frame_size;
+    return ShrinkRing(
+        true,
+        footprint * (radius * sin(angle)),
+        footprint * (radius * cos(angle)),
+        0.15 * blend,
+    );
+}
+
+fn sample_layer(uv: vec2<f32>, crop_bounds_uv: vec4<f32>, ring: ShrinkRing) -> vec4<f32> {
+    if !ring.enabled || uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0 {
+        return sample_texture(uv, crop_bounds_uv);
+    }
+
+    var sample_uv = uv;
+    if uniforms.mirror_x != 0.0 {
+        sample_uv.x = 1.0 - sample_uv.x;
+    }
+    let crop_size = crop_bounds_uv.zw - crop_bounds_uv.xy;
+    let texel_offset = 1.0 / uniforms.frame_size;
+    let safe_min = crop_bounds_uv.xy + texel_offset;
+    let safe_max = crop_bounds_uv.zw - texel_offset;
+    let center = clamp(sample_uv * crop_size + crop_bounds_uv.xy, safe_min, safe_max);
+    let near = ring.near;
+    let far = ring.far;
+    let taps = sample_clamped(center + vec2<f32>(near.x, far.y), safe_min, safe_max)
+        + sample_clamped(center + vec2<f32>(-far.x, near.y), safe_min, safe_max)
+        + sample_clamped(center - vec2<f32>(near.x, far.y), safe_min, safe_max)
+        + sample_clamped(center + vec2<f32>(far.x, -near.y), safe_min, safe_max);
+    let color = mix(taps * 0.25, sample_clamped(center, safe_min, safe_max), ring.center_weight);
+    return vec4(color, 1.0);
+}
+
+fn detail_amount(crop_bounds_uv: vec4<f32>) -> f32 {
+    if uniforms.enhance_params.y < 0.5 || uniforms.preserve_source_alpha > 0.5 {
+        return 0.0;
+    }
+    let crop_size = crop_bounds_uv.zw - crop_bounds_uv.xy;
+    let scale_ratio = uniforms.frame_size * crop_size / uniforms.target_size;
+    let ratio = max(scale_ratio.x, scale_ratio.y);
+    return smoothstep(1.0, 1.05, ratio) * (1.0 - smoothstep(2.2, 2.8, ratio));
+}
+
+fn sample_detail(
+    uv: vec2<f32>,
+    crop_bounds_uv: vec4<f32>,
+    ring: ShrinkRing,
+    amount: f32,
+) -> vec4<f32> {
+    if uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0 {
+        return sample_layer(uv, crop_bounds_uv, ring);
+    }
+
+    var sample_uv = uv;
+    if uniforms.mirror_x != 0.0 {
+        sample_uv.x = 1.0 - sample_uv.x;
+    }
+    let crop_size = crop_bounds_uv.zw - crop_bounds_uv.xy;
+    let scale_ratio = uniforms.frame_size * crop_size / uniforms.target_size;
+    let ratio = max(scale_ratio.x, scale_ratio.y);
+    let texel_offset = 1.0 / uniforms.frame_size;
+    let safe_min = crop_bounds_uv.xy + texel_offset;
+    let safe_max = crop_bounds_uv.zw - texel_offset;
+    let center = clamp(sample_uv * crop_size + crop_bounds_uv.xy, safe_min, safe_max);
+
+    let footprint = scale_ratio / uniforms.frame_size;
+    let radius = clamp(0.27 + 0.6 * (ratio - 1.0), 0.27, 0.4);
+    let near = footprint * (radius * 0.34202);
+    let far = footprint * (radius * 0.93969);
+    let average = (sample_clamped(center + vec2<f32>(near.x, far.y), safe_min, safe_max)
+        + sample_clamped(center + vec2<f32>(-far.x, near.y), safe_min, safe_max)
+        + sample_clamped(center - vec2<f32>(near.x, far.y), safe_min, safe_max)
+        + sample_clamped(center + vec2<f32>(far.x, -near.y), safe_min, safe_max)) * 0.25;
+
+    let sharpen = clamp(0.52 - 0.15 * ratio, 0.0, 0.36);
+    let reach = footprint * 1.35;
+    let cross = sample_clamped(center + vec2<f32>(reach.x, 0.0), safe_min, safe_max)
+        + sample_clamped(center - vec2<f32>(reach.x, 0.0), safe_min, safe_max)
+        + sample_clamped(center + vec2<f32>(0.0, reach.y), safe_min, safe_max)
+        + sample_clamped(center - vec2<f32>(0.0, reach.y), safe_min, safe_max);
+    let detail = clamp(average + (average - cross * 0.25) * sharpen, vec3<f32>(0.0), vec3<f32>(1.0));
+    if amount >= 1.0 {
+        return vec4(detail, 1.0);
+    }
+    return vec4(mix(sample_layer(uv, crop_bounds_uv, ring).rgb, detail, amount), 1.0);
+}
+
+fn settle_into_detail(smeared: vec4<f32>, detail: vec3<f32>, smear_uv: vec2<f32>) -> vec4<f32> {
+    let smear_px = length(smear_uv * uniforms.target_size);
+    let settled = smeared.rgb + detail * (1.0 - smoothstep(0.5, 2.0, smear_px));
+    return vec4(clamp(settled, vec3<f32>(0.0), vec3<f32>(1.0)), smeared.a);
+}
+
+fn sample_clamped(uv: vec2<f32>, safe_min: vec2<f32>, safe_max: vec2<f32>) -> vec3<f32> {
+    return textureSampleLevel(frame_texture, frame_sampler, clamp(uv, safe_min, safe_max), 0.0).rgb;
 }
 
 fn apply_rounded_corners(current_color: vec4<f32>, target_uv: vec2<f32>) -> vec4<f32> {

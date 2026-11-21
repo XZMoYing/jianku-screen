@@ -2864,6 +2864,8 @@ pub struct ProjectConfiguration {
     pub screen_motion_blur: f32,
     #[serde(default)]
     pub screen_movement_spring: ScreenMovementSpring,
+    #[serde(skip)]
+    pub screen_enhancement: ScreenEnhancement,
     /// Per-layer cinematic color grades. Field-level default keeps old
     /// project files (and old saved presets) deserializing to the identity
     /// grade.
@@ -2899,6 +2901,40 @@ fn camera_config_needs_migration(value: &Value) -> bool {
         })
 }
 
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ScreenEnhancement {
+    pub enabled: bool,
+    pub strength: f32,
+}
+
+impl ScreenEnhancement {
+    pub const DEFAULT_STRENGTH: f32 = 0.5;
+
+    pub const fn on() -> Self {
+        Self {
+            enabled: true,
+            strength: Self::DEFAULT_STRENGTH,
+        }
+    }
+
+    pub fn effective_strength(&self) -> f32 {
+        if self.enabled && self.strength.is_finite() {
+            self.strength.clamp(0.0, 1.0)
+        } else {
+            0.0
+        }
+    }
+}
+
+impl Default for ScreenEnhancement {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            strength: Self::DEFAULT_STRENGTH,
+        }
+    }
+}
+
 impl Default for ProjectConfiguration {
     fn default() -> Self {
         Self {
@@ -2917,6 +2953,7 @@ impl Default for ProjectConfiguration {
             hidden_text_segments: Default::default(),
             screen_motion_blur: Self::default_screen_motion_blur(),
             screen_movement_spring: Default::default(),
+            screen_enhancement: Default::default(),
             color_correction: Default::default(),
             text_size_version: TEXT_SIZE_VERSION,
             text_anim_version: TEXT_ANIM_VERSION,
@@ -3093,13 +3130,21 @@ impl ProjectConfiguration {
     pub fn load(project_path: impl AsRef<Path>) -> Result<Self, std::io::Error> {
         let project_path = project_path.as_ref();
         crate::append_publication::ensure_no_pending_append(project_path)?;
-        let config_str = std::fs::read_to_string(project_path.join("project-config.json"))?;
-        let (config, needs_migration) = Self::parse_and_migrate(&config_str)?;
+        let config_path = project_path.join("project-config.json");
+        let config_str = String::from_utf8(std::fs::read(&config_path)?).map_err(|error| {
+            keep_unreadable_config(&config_path, error.as_bytes());
+            std::io::Error::new(std::io::ErrorKind::InvalidData, error.utf8_error())
+        })?;
+        let (config, needs_migration) = Self::parse_and_migrate(&config_str).map_err(|error| {
+            if error.kind() == std::io::ErrorKind::InvalidData {
+                keep_unreadable_config(&config_path, config_str.as_bytes());
+            }
+            error
+        })?;
         if needs_migration {
             let result = (|| -> std::io::Result<()> {
                 let _guard = crate::append_publication::project_write_guard(project_path)?;
-                if std::fs::read_to_string(project_path.join("project-config.json"))? == config_str
-                {
+                if std::fs::read_to_string(&config_path)? == config_str {
                     config.write_with(project_path, |file, bytes| {
                         file.write_all(bytes)?;
                         file.sync_all()
@@ -3291,6 +3336,90 @@ pub const FAST_SMOOTHING_SAMPLES: usize = 10;
 pub const SLOW_VELOCITY_THRESHOLD: f64 = 0.003;
 pub const REGULAR_VELOCITY_THRESHOLD: f64 = 0.008;
 pub const FAST_VELOCITY_THRESHOLD: f64 = 0.015;
+
+fn write_new_file(path: &Path, contents: &[u8]) -> std::io::Result<()> {
+    let mut file = std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(path)?;
+    file.write_all(contents)
+        .and_then(|()| file.sync_all())
+        .inspect_err(|_| {
+            let _ = std::fs::remove_file(path);
+        })
+}
+
+fn keep_unreadable_config(config_path: &Path, contents: &[u8]) {
+    use std::hash::{Hash, Hasher};
+
+    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+    contents.hash(&mut hasher);
+    let backup = config_path.with_file_name(format!(
+        "project-config.json.unreadable-{:016x}",
+        hasher.finish()
+    ));
+    if backup.symlink_metadata().is_ok() {
+        return;
+    }
+    let result = config_path
+        .parent()
+        .ok_or_else(|| std::io::Error::other("project config has no folder"))
+        .and_then(tempfile::NamedTempFile::new_in)
+        .and_then(|mut staged| {
+            staged.write_all(contents)?;
+            match staged.persist_noclobber(&backup) {
+                Ok(_) => Ok(()),
+                Err(error) if error.error.kind() == std::io::ErrorKind::AlreadyExists => {
+                    Err(error.error)
+                }
+                Err(_) => write_new_file(&backup, contents),
+            }
+        });
+    if let Err(error) = result {
+        tracing::warn!(path = %backup.display(), %error, "could not keep a copy of an unreadable project config");
+    }
+}
+
+#[cfg(test)]
+mod unreadable_config_tests {
+    use super::*;
+
+    #[test]
+    fn unreadable_config_is_backed_up_once_without_replacing_existing() {
+        let project = tempfile::tempdir().unwrap();
+        let config_path = project.path().join("project-config.json");
+        let unreadable = r#"{"aspectRatio":"ultrawide","timeline":{"segments":[]}}"#;
+        std::fs::write(&config_path, unreadable).unwrap();
+        for _ in 0..2 {
+            let err = ProjectConfiguration::load(project.path()).unwrap_err();
+            assert_eq!(err.kind(), std::io::ErrorKind::InvalidData);
+        }
+        let backups: Vec<_> = std::fs::read_dir(project.path())
+            .unwrap()
+            .map(|e| e.unwrap().file_name().into_string().unwrap())
+            .filter(|n| n.starts_with("project-config.json.unreadable-"))
+            .collect();
+        assert_eq!(backups.len(), 1);
+        assert_eq!(
+            std::fs::read_to_string(project.path().join(&backups[0])).unwrap(),
+            unreadable
+        );
+    }
+
+    #[test]
+    fn screen_enhancement_is_never_persisted_in_project_config() {
+        let config = ProjectConfiguration {
+            screen_enhancement: ScreenEnhancement::on(),
+            ..ProjectConfiguration::default()
+        };
+        let written = serde_json::to_value(&config).unwrap();
+        assert!(written.get("screenEnhancement").is_none());
+        let mut saved = written;
+        saved["screenEnhancement"] = serde_json::json!({"enabled": true, "strength": 1.0});
+        let loaded: ProjectConfiguration = serde_json::from_value(saved).unwrap();
+        assert_eq!(loaded.screen_enhancement, ScreenEnhancement::default());
+    }
+}
 
 #[cfg(test)]
 mod notch_tests {

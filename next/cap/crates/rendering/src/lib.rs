@@ -60,6 +60,8 @@ mod project_recordings;
 mod readiness;
 mod recorded_cursor_assets;
 mod scene;
+pub mod screen_enhance;
+mod screen_upscale_net;
 mod segment_timing;
 pub mod spring_mass_damper;
 mod takeover;
@@ -88,6 +90,7 @@ pub use managed_segment::{
 use overlay_layers::OverlayLayers;
 pub use project_recordings::{ProjectRecordingsMeta, SegmentRecordings, Video};
 pub use recorded_cursor_assets::{FrozenCursorAssetError, FrozenRecordedCursorAssets};
+pub use screen_enhance::{RenderQuality, ScreenEnhanceFrame};
 use transition::{TransitionCompositor, TransitionParameters};
 
 /// Warms the process-wide system-font scan used by the text/captions/keyboard
@@ -854,6 +857,7 @@ pub async fn render_video_to_channel(
                     &zoom_timelines[segment_clip_index],
                     &precomputed_cursor_timelines[segment_clip_index],
                 )
+                .with_quality(RenderQuality::Export)
             } else {
                 ProjectUniforms::for_main_track_gap(
                     constants,
@@ -1357,6 +1361,7 @@ pub async fn render_video_to_channel_nv12(
                     &zoom_timelines[segment_clip_index],
                     &precomputed_cursor_timelines[segment_clip_index],
                 )
+                .with_quality(RenderQuality::Export)
             } else {
                 ProjectUniforms::for_main_track_gap(
                     constants,
@@ -1826,7 +1831,8 @@ async fn render_transition_rgba(
         context.duration,
         &context.outgoing_zoom_timelines[outgoing_clip_index],
         &context.precomputed_cursor_timelines[outgoing_clip_index],
-    );
+    )
+    .with_quality(RenderQuality::Export);
 
     frame_renderer
         .render_transition(
@@ -1885,7 +1891,8 @@ async fn render_transition_nv12_export(
         context.duration,
         &context.outgoing_zoom_timelines[outgoing_clip_index],
         &context.precomputed_cursor_timelines[outgoing_clip_index],
-    );
+    )
+    .with_quality(RenderQuality::Export);
 
     frame_renderer
         .render_transition_nv12(
@@ -2540,6 +2547,8 @@ pub struct ProjectUniforms {
     /// pose is active (the display itself renders unzoomed into the card).
     pub camera3d_zoom: Option<camera3d::Camera3DScreenZoom>,
     pub camera3d_motion: Option<camera3d::Camera3DMotion>,
+    pub screen_enhance: ScreenEnhanceFrame,
+    pub quality: RenderQuality,
 }
 
 fn cursor_time_for_interpolation(time: f32, stop_time: Option<f32>) -> f32 {
@@ -3051,6 +3060,15 @@ pub(crate) struct DisplayLayout {
 }
 
 impl ProjectUniforms {
+    pub fn with_quality(mut self, quality: RenderQuality) -> Self {
+        self.quality = quality;
+        self
+    }
+
+    pub(crate) fn display_enhancement(&self, software_adapter: bool) -> Option<ScreenEnhanceFrame> {
+        (self.quality.enhances() && !software_adapter).then_some(self.screen_enhance)
+    }
+
     pub fn for_main_track_gap(
         constants: &RenderVideoConstants,
         project: &ProjectConfiguration,
@@ -4067,6 +4085,7 @@ impl ProjectUniforms {
         let (
             display,
             display_motion_parent,
+            display_slowest_motion_px,
             mut frame_chrome,
             mut inset,
             display_outer_bounds,
@@ -4153,6 +4172,19 @@ impl ProjectUniforms {
             };
             let descriptor = display_motion.descriptor;
             let display_parent_motion_px = display_motion.parent_movement_px;
+            let display_slowest_motion_px = if has_previous && !zoom_snapped_in_window {
+                screen_enhance::slowest_pixel_motion(
+                    [start.x as f32, start.y as f32, end.x as f32, end.y as f32],
+                    [
+                        prev_start.x as f32,
+                        prev_start.y as f32,
+                        prev_end.x as f32,
+                        prev_end.y as f32,
+                    ],
+                ) / motion_frame_span
+            } else {
+                0.0
+            };
 
             // Morph the screen toward its split-screen half (and its
             // aspect-matched crop) by the scene's split factor; the normal
@@ -4358,6 +4390,8 @@ impl ProjectUniforms {
                         color_adjust_a: [0.0; 4],
                         color_adjust_b: [0.0; 4],
                         grain_params: [0.0; 4],
+                        enhance_region: [0.0; 4],
+                        enhance_params: [0.0; 4],
                     },
                     style: frame.style,
                     theme: frame.theme,
@@ -4508,6 +4542,8 @@ impl ProjectUniforms {
                             color_adjust_a: [0.0; 4],
                             color_adjust_b: [0.0; 4],
                             grain_params: [0.0; 4],
+                            enhance_region: [0.0; 4],
+                            enhance_params: [0.0; 4],
                         },
                         raster_size: [unzoomed.full_size[0] as f64, unzoomed.full_size[1] as f64],
                         source_crop: placement.source_crop,
@@ -4570,8 +4606,11 @@ impl ProjectUniforms {
                     color_adjust_a: screen_color_grade.color_adjust_a,
                     color_adjust_b: screen_color_grade.color_adjust_b,
                     grain_params: screen_color_grade.grain_params,
+                    enhance_region: [0.0; 4],
+                    enhance_params: [0.0; 4],
                 },
                 display_parent_motion_px,
+                display_slowest_motion_px,
                 frame_chrome,
                 inset,
                 display_outer_bounds,
@@ -4594,6 +4633,16 @@ impl ProjectUniforms {
                 XY::new(frame.width(), frame.height())
             });
         let mut display = display.for_source_frame(source_size);
+        let screen_enhance = if options.preserve_screen_alpha {
+            ScreenEnhanceFrame::NONE
+        } else {
+            ScreenEnhanceFrame::resolve(
+                project.screen_enhancement.effective_strength(),
+                display_slowest_motion_px,
+                screen_motion_blur,
+                screen_enhance::magnification(&display),
+            )
+        };
         let display_outer_bounds = if frame_chrome.is_none() && inset.is_none() {
             display.target_bounds
         } else {
@@ -4802,6 +4851,8 @@ impl ProjectUniforms {
                     color_adjust_a: camera_color_grade.color_adjust_a,
                     color_adjust_b: camera_color_grade.color_adjust_b,
                     grain_params: camera_color_grade.grain_params,
+                    enhance_region: [0.0; 4],
+                    enhance_params: [0.0; 4],
                 }
             });
 
@@ -4929,6 +4980,8 @@ impl ProjectUniforms {
                     color_adjust_a: camera_color_grade.color_adjust_a,
                     color_adjust_b: camera_color_grade.color_adjust_b,
                     grain_params: camera_color_grade.grain_params,
+                    enhance_region: [0.0; 4],
+                    enhance_params: [0.0; 4],
                 }
             });
         let cutout_uniforms = |mut uniforms: CompositeVideoFrameUniforms| {
@@ -5037,6 +5090,8 @@ impl ProjectUniforms {
             camera3d_zoom,
             camera3d_motion,
             screen_color_grade,
+            screen_enhance,
+            quality: RenderQuality::Playback,
         }
     }
 }
@@ -8062,6 +8117,8 @@ impl RendererLayers {
             self.frame.prepare(constants, uniforms);
             self.notch
                 .prepare(&constants.device, &constants.queue, uniforms.notch);
+            self.display
+                .set_enhancement(uniforms.display_enhancement(constants.is_software_adapter));
             self.display.prepare(
                 &constants.device,
                 &constants.queue,
@@ -8222,6 +8279,8 @@ impl RendererLayers {
             self.frame.prepare(constants, uniforms);
             self.notch
                 .prepare(&constants.device, &constants.queue, uniforms.notch);
+            self.display
+                .set_enhancement(uniforms.display_enhancement(constants.is_software_adapter));
             let display_ready = self.display.prepare_with_encoder(
                 &constants.device,
                 &constants.queue,
@@ -8433,6 +8492,7 @@ impl RendererLayers {
 
         if render_display {
             self.display.copy_to_texture(encoder);
+            self.display.encode_enhancement(device, queue, encoder);
         }
         self.camera.copy_to_texture(encoder);
         self.camera_only.copy_to_texture(encoder);

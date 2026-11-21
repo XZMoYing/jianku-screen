@@ -6,6 +6,7 @@ use crate::{
     DecodedSegmentFrames, PixelFormat,
     composite_frame::{CompositeVideoFramePipeline, CompositeVideoFrameUniforms},
     decoder::DecodedFrameStorageIdentity,
+    screen_enhance::{self, ScreenEnhanceFrame, ScreenEnhancer},
     yuv_converter::{YuvConverterPipelines, YuvToRgbaConverter},
 };
 
@@ -13,6 +14,13 @@ struct PendingTextureCopy {
     width: u32,
     height: u32,
     dst_texture_index: usize,
+}
+
+#[derive(Clone, Copy)]
+struct PendingEnhancement {
+    frame: ScreenEnhanceFrame,
+    uniforms: CompositeVideoFrameUniforms,
+    region: Option<[u32; 4]>,
 }
 
 pub struct DisplayLayer {
@@ -28,6 +36,10 @@ pub struct DisplayLayer {
     pending_copy: Option<PendingTextureCopy>,
     prefer_cpu_conversion: bool,
     has_valid_frame: bool,
+    enhancer: Option<ScreenEnhancer>,
+    pending_enhancement: Option<PendingEnhancement>,
+    enhanced_bind_group: Option<wgpu::BindGroup>,
+    frame_id: u64,
 }
 
 impl DisplayLayer {
@@ -81,7 +93,109 @@ impl DisplayLayer {
             pending_copy: None,
             prefer_cpu_conversion,
             has_valid_frame: false,
+            enhancer: None,
+            pending_enhancement: None,
+            enhanced_bind_group: None,
+            frame_id: 0,
         }
+    }
+
+    pub fn set_enhancement(&mut self, frame: Option<ScreenEnhanceFrame>) {
+        self.pending_enhancement =
+            frame
+                .filter(ScreenEnhanceFrame::is_active)
+                .map(|frame| PendingEnhancement {
+                    frame,
+                    uniforms: CompositeVideoFrameUniforms::default(),
+                    region: None,
+                });
+    }
+
+    fn resolve_enhancement(
+        &mut self,
+        device: &wgpu::Device,
+        mut uniforms: CompositeVideoFrameUniforms,
+    ) -> CompositeVideoFrameUniforms {
+        self.enhanced_bind_group = None;
+        let Some(pending) = self.pending_enhancement.as_mut() else {
+            return uniforms;
+        };
+        uniforms.enhance_params = pending.frame.shader_params(0.0);
+        pending.uniforms = uniforms;
+        pending.region = if pending.frame.upscales() {
+            screen_enhance::upscale_region(&uniforms, device.limits().max_texture_dimension_2d)
+        } else {
+            None
+        };
+        if let Some(region) = pending.region {
+            uniforms.enhance_region = [
+                region[0] as f32,
+                region[1] as f32,
+                (region[2] - region[0]) as f32,
+                (region[3] - region[1]) as f32,
+            ];
+            uniforms.enhance_params = pending.frame.shader_params(pending.frame.upscale_strength);
+        }
+        uniforms
+    }
+
+    pub fn encode_enhancement(
+        &mut self,
+        device: &wgpu::Device,
+        queue: &wgpu::Queue,
+        encoder: &mut wgpu::CommandEncoder,
+    ) {
+        self.enhanced_bind_group = None;
+        let Some(pending) = self.pending_enhancement else {
+            return;
+        };
+        if !self.has_valid_frame || !(pending.frame.debands() || pending.frame.upscales()) {
+            return;
+        }
+        let frame_texture = &self.frame_textures[self.current_texture];
+        let source_size = [frame_texture.width(), frame_texture.height()];
+        let mut frame = pending.frame;
+        if pending.region.is_none() {
+            frame.upscale_strength = 0.0;
+        }
+        let enhancer = self
+            .enhancer
+            .get_or_insert_with(|| ScreenEnhancer::new(device));
+        let produced = enhancer.encode(
+            device,
+            encoder,
+            screen_enhance::EnhanceInput {
+                view: &self.frame_texture_views[self.current_texture],
+                size: source_size,
+                frame_id: self.frame_id,
+            },
+            &pending.uniforms,
+            &frame,
+        );
+        let views = enhancer.views();
+        let upscaled = views
+            .upscaled
+            .filter(|(_, region)| Some(*region) == pending.region)
+            .map(|(view, _)| view);
+        if pending.region.is_some() && upscaled.is_none() {
+            let mut uniforms = pending.uniforms;
+            uniforms.enhance_region = [0.0; 4];
+            uniforms.enhance_params = pending.frame.shader_params(0.0);
+            uniforms.write_to_buffer(queue, &self.uniforms_buffer);
+        }
+        if !produced {
+            return;
+        }
+        self.enhanced_bind_group = Some(
+            self.pipeline.bind_group_with_enhancement(
+                device,
+                &self.uniforms_buffer,
+                views
+                    .source
+                    .unwrap_or(&self.frame_texture_views[self.current_texture]),
+                upscaled,
+            ),
+        );
     }
 
     #[cfg(target_os = "windows")]
@@ -147,6 +261,7 @@ impl DisplayLayer {
             tracing::debug!(
                 "DisplayLayer::prepare - screen_frame is None, skipping display rendering"
             );
+            self.pending_enhancement = None;
             uniforms.write_to_buffer(queue, &self.uniforms_buffer);
             return (false, frame_size.x, frame_size.y);
         };
@@ -502,6 +617,7 @@ impl DisplayLayer {
                 self.last_frame_storage = Some(frame_storage);
                 self.current_texture = next_texture;
                 self.has_valid_frame = true;
+                self.frame_id = self.frame_id.wrapping_add(1);
             } else {
                 tracing::warn!(
                     recording_time = current_recording_time,
@@ -513,6 +629,7 @@ impl DisplayLayer {
             }
         }
 
+        let uniforms = self.resolve_enhancement(device, uniforms);
         uniforms.write_to_buffer(queue, &self.uniforms_buffer);
         (
             (skipped && self.has_valid_frame) || frame_uploaded,
@@ -535,6 +652,7 @@ impl DisplayLayer {
             tracing::debug!(
                 "DisplayLayer::prepare_with_encoder - screen_frame is None, skipping display rendering"
             );
+            self.pending_enhancement = None;
             uniforms.write_to_buffer(queue, &self.uniforms_buffer);
             return false;
         };
@@ -879,6 +997,7 @@ impl DisplayLayer {
                 self.last_frame_storage = Some(frame_storage);
                 self.current_texture = next_texture;
                 self.has_valid_frame = true;
+                self.frame_id = self.frame_id.wrapping_add(1);
             } else {
                 tracing::warn!(
                     recording_time = current_recording_time,
@@ -890,6 +1009,7 @@ impl DisplayLayer {
             }
         }
 
+        let uniforms = self.resolve_enhancement(device, uniforms);
         uniforms.write_to_buffer(queue, &self.uniforms_buffer);
         (skipped && self.has_valid_frame) || frame_uploaded
     }
@@ -942,7 +1062,11 @@ impl DisplayLayer {
             return;
         }
 
-        if let Some(bind_group) = &self.bind_groups[self.current_texture] {
+        if let Some(bind_group) = self
+            .enhanced_bind_group
+            .as_ref()
+            .or(self.bind_groups[self.current_texture].as_ref())
+        {
             pass.set_pipeline(pipeline);
             pass.set_bind_group(0, bind_group, &[]);
             pass.draw(0..3, 0..1);
