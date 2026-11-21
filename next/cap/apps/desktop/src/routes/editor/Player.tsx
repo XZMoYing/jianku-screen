@@ -57,8 +57,19 @@ import {
 	Slider,
 	topSlideAnimateClasses,
 } from "./ui";
-import { useEditorShortcuts } from "./useEditorShortcuts";
+import {
+	editorShortcutBlocked,
+	useEditorShortcuts,
+} from "./useEditorShortcuts";
 import { formatTime } from "./utils";
+
+const PREVIEW_SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 3] as const;
+
+function formatPreviewSpeed(speed: number) {
+	if (Number.isInteger(speed)) return `${speed.toFixed(0)}x`;
+	if (Number.isInteger(speed * 2)) return `${speed.toFixed(1)}x`;
+	return `${speed.toFixed(2)}x`;
+}
 
 export function PlayerContent(props: {
 	compactness?: number;
@@ -95,6 +106,41 @@ export function PlayerContent(props: {
 	const [panelHovered, setPanelHovered] = createSignal(false);
 	const [previewPointerDown, setPreviewPointerDown] = createSignal(false);
 	const [seekDraft, setSeekDraft] = createSignal<number>();
+	const [previewSpeed, setPreviewSpeedSignal] = createSignal<number>(1);
+	const applyPreviewSpeed = (nextSpeed: number) => {
+		setPreviewSpeedSignal(nextSpeed);
+		void commands.setPlaybackSpeed(nextSpeed).catch(console.error);
+	};
+	const stepPreviewSpeed = (direction: -1 | 1) => {
+		const idx = PREVIEW_SPEED_OPTIONS.indexOf(
+			previewSpeed() as (typeof PREVIEW_SPEED_OPTIONS)[number],
+		);
+		const nextIdx = Math.max(
+			0,
+			Math.min(
+				PREVIEW_SPEED_OPTIONS.length - 1,
+				(idx === -1 ? 2 : idx) + direction,
+			),
+		);
+		const next = PREVIEW_SPEED_OPTIONS[nextIdx];
+		if (next !== previewSpeed()) applyPreviewSpeed(next);
+	};
+	createEventListener(window, "keydown", (event) => {
+		if (
+			event.metaKey ||
+			event.ctrlKey ||
+			event.altKey ||
+			editorShortcutBlocked(event)
+		)
+			return;
+		if (event.key === ">") {
+			event.preventDefault();
+			stepPreviewSpeed(1);
+		} else if (event.key === "<") {
+			event.preventDefault();
+			stepPreviewSpeed(-1);
+		}
+	});
 	let seekRevision = 0;
 	onCleanup(() => seekRevision++);
 	const seekPreview = async (seconds: number) => {
@@ -566,6 +612,53 @@ export function PlayerContent(props: {
 					>
 						<IconCapNext class="size-3.5" />
 					</button>
+					<KSelect<number>
+						options={[...PREVIEW_SPEED_OPTIONS]}
+						value={previewSpeed()}
+						onChange={(value) => {
+							if (value != null) applyPreviewSpeed(value);
+						}}
+						disallowEmptySelection
+						placement="top"
+						itemComponent={(itemProps) => (
+							<MenuItem<typeof KSelect.Item>
+								as={KSelect.Item}
+								item={itemProps.item}
+								class="min-w-[4.5rem] justify-between"
+							>
+								<KSelect.ItemLabel class="tabular-nums">
+									{formatPreviewSpeed(itemProps.item.rawValue)}
+								</KSelect.ItemLabel>
+							</MenuItem>
+						)}
+					>
+						<Tooltip kbd={["<", ">"]} content={localize("预览倍速")}>
+							<KSelect.Trigger
+								aria-label={localize("预览倍速")}
+								class={cx(
+									"flex h-6 min-w-[2.6rem] items-center justify-center rounded-md border px-1.5 text-[11px] font-medium tabular-nums transition-colors",
+									previewSpeed() === 1
+										? "border-ed-line bg-ed-card text-ed-text-2 hover:text-ed-text-1"
+										: "border-ed-line-strong bg-ed-fill text-ed-text-1",
+								)}
+							>
+								<KSelect.Value<number>>
+									{(state) => formatPreviewSpeed(state.selectedOption())}
+								</KSelect.Value>
+							</KSelect.Trigger>
+						</Tooltip>
+						<KSelect.Portal>
+							<PopperContent<typeof KSelect.Content>
+								as={KSelect.Content}
+								class={cx("z-50", topSlideAnimateClasses)}
+							>
+								<MenuItemList<typeof KSelect.Listbox>
+									as={KSelect.Listbox}
+									class="w-24"
+								/>
+							</PopperContent>
+						</KSelect.Portal>
+					</KSelect>
 				</div>
 				<div class="flex flex-row flex-1 gap-0.5 justify-end items-center min-w-fit">
 					<EditorButton<typeof KToggleButton>

@@ -4782,6 +4782,19 @@ async fn stop_playback(editor_instance: WindowEditorInstance) -> Result<(), Stri
 
 #[tauri::command]
 #[specta::specta]
+#[instrument(skip(editor_instance))]
+async fn set_playback_speed(
+    editor_instance: WindowEditorInstance,
+    speed: f64,
+) -> Result<f64, String> {
+    let parsed = cap_editor::PreviewSpeed::from_f64(speed)
+        .ok_or_else(|| format!("Unsupported preview playback speed: {speed}"))?;
+    editor_instance.set_preview_speed(parsed);
+    Ok(parsed.as_f64())
+}
+
+#[tauri::command]
+#[specta::specta]
 async fn commit_editor_preparing_frame(
     editor_instance: WindowEditorInstance,
     instance_id: String,
@@ -7023,6 +7036,7 @@ fn specta_builder() -> tauri_specta::Builder {
             get_editor_preview_resolutions,
             set_editor_preview_resolution,
             stop_playback,
+            set_playback_speed,
             commit_editor_preparing_frame,
             start_editor_handoff_playback,
             stop_editor_handoff_playback,

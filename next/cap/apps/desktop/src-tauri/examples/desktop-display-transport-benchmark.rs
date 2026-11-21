@@ -343,6 +343,7 @@ async fn main() {
         music: cap_editor::MusicTracks::new(),
         audio_output,
         telemetry: Some(telemetry),
+        preview_speed: cap_editor::PreviewSpeedHandle::default(),
     };
 
     let playback_handle = match playback.start(fps, resolution_base).await {

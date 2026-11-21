@@ -189,6 +189,7 @@ pub struct EditorInstance {
     runtime_handle: tokio::runtime::Handle,
     audio_output: Arc<crate::AudioOutput>,
     playback_telemetry: Option<crate::PlaybackTelemetry>,
+    preview_speed: crate::PreviewSpeedHandle,
 }
 
 impl EditorInstance {
@@ -598,6 +599,7 @@ impl EditorInstance {
             runtime_handle: tokio::runtime::Handle::current(),
             audio_output,
             playback_telemetry,
+            preview_speed: crate::PreviewSpeedHandle::default(),
         });
 
         this.state.lock().await.preview_task =
@@ -725,6 +727,7 @@ impl EditorInstance {
             runtime_handle: self.runtime_handle.clone(),
             audio_output: self.audio_output.clone(),
             playback_telemetry: self.playback_telemetry.clone(),
+            preview_speed: self.preview_speed.clone(),
         });
         next.state.lock().await.preview_task =
             Some(next.clone().spawn_preview_renderer(preview_rx));
@@ -883,6 +886,7 @@ impl EditorInstance {
                 project: self.project_config.0.subscribe(),
                 audio_output: self.audio_output.clone(),
                 telemetry: self.playback_telemetry.clone(),
+                preview_speed: self.preview_speed.clone(),
             };
             let playback_handle = if let Some(adoption) = adoption {
                 playback
@@ -944,6 +948,16 @@ impl EditorInstance {
             prev.stop();
         }
         Ok(owned_handle)
+    }
+
+    /// Sets how fast the preview plays. A running playback picks it up on its
+    /// next frame without restarting; export and the project never see it.
+    pub fn set_preview_speed(&self, speed: crate::PreviewSpeed) {
+        self.preview_speed.set(speed);
+    }
+
+    pub fn preview_speed(&self) -> crate::PreviewSpeed {
+        self.preview_speed.get()
     }
 
     /// True while a playback engine is live. Epoch-guarded against restart
