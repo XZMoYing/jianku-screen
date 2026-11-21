@@ -1054,6 +1054,7 @@ mod tests {
                 speed_audio_mode: None,
                 hide_cursor: None,
                 volume: None,
+                voice_eq: None,
             }],
             transitions: Vec::new(),
             zoom_segments: vec![ZoomSegment {
@@ -1116,6 +1117,7 @@ mod tests {
                 speed_audio_mode: None,
                 hide_cursor: None,
                 volume: None,
+                voice_eq: None,
             }],
             transitions: Vec::new(),
             zoom_segments: vec![],
@@ -1200,6 +1202,7 @@ mod tests {
                     speed_audio_mode: None,
                     hide_cursor: None,
                     volume: None,
+                    voice_eq: None,
                 },
                 TimelineSegment {
                     id: None,
@@ -1211,6 +1214,7 @@ mod tests {
                     speed_audio_mode: None,
                     hide_cursor: None,
                     volume: None,
+                    voice_eq: None,
                 },
             ],
             transitions: Vec::new(),

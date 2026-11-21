@@ -281,6 +281,7 @@ async fn load_recording(
                     speed_audio_mode: None,
                     hide_cursor: None,
                     volume: None,
+                    voice_eq: None,
                 }]
             }
             StudioRecordingMeta::MultipleSegments { inner } => inner
@@ -306,6 +307,7 @@ async fn load_recording(
                         speed_audio_mode: None,
                         hide_cursor: None,
                         volume: None,
+                        voice_eq: None,
                     })
                 })
                 .collect(),

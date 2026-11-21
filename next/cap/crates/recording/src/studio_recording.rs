@@ -2814,6 +2814,7 @@ async fn stop_recording(
                 speed_audio_mode: None,
                 hide_cursor: None,
                 volume: None,
+                voice_eq: None,
             })
         })
         .collect();

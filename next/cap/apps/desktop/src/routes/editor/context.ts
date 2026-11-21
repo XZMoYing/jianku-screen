@@ -2028,6 +2028,19 @@ export const [EditorContextProvider, useBaseEditorContext] =
 						hidden ? true : undefined,
 					);
 				},
+				setClipSegmentVoiceEq: (
+					index: number,
+					voiceEq: TimelineSegment["voiceEq"],
+				) => {
+					if (!project.timeline?.segments[index]) return;
+					setProject(
+						"timeline",
+						"segments",
+						index,
+						"voiceEq",
+						voiceEq ?? undefined,
+					);
+				},
 				setClipSegmentName: (index: number, name: string | null) => {
 					if (!project.timeline?.segments[index]) return;
 					const trimmed = name?.trim();

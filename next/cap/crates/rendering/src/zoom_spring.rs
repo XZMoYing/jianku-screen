@@ -2488,6 +2488,7 @@ mod tests {
                 speed_audio_mode: None,
                 hide_cursor: None,
                 volume: None,
+                voice_eq: None,
             },
             TimelineSegment {
                 id: None,
@@ -2499,6 +2500,7 @@ mod tests {
                 speed_audio_mode: None,
                 hide_cursor: None,
                 volume: None,
+                voice_eq: None,
             },
         ];
         config.transitions = vec![ClipTransition {
@@ -3269,6 +3271,7 @@ mod tests {
                 speed_audio_mode: None,
                 hide_cursor: None,
                 volume: None,
+                voice_eq: None,
             }],
             transitions: vec![],
             zoom_segments: vec![],
@@ -3332,6 +3335,7 @@ mod tests {
                     speed_audio_mode: None,
                     hide_cursor: None,
                     volume: None,
+                    voice_eq: None,
                 },
                 TimelineSegment {
                     id: None,
@@ -3343,6 +3347,7 @@ mod tests {
                     speed_audio_mode: None,
                     hide_cursor: None,
                     volume: None,
+                    voice_eq: None,
                 },
             ],
             transitions: vec![ClipTransition {

@@ -114,6 +114,7 @@ fn playback_audio_changed(previous: &ProjectConfiguration, next: &ProjectConfigu
             segment.timescale,
             segment.speed_audio_mode,
             segment.volume(),
+            segment.active_voice_eq(),
         )
     };
     let offsets = |clip: &cap_project::ClipConfiguration| {

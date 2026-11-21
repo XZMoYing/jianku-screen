@@ -1,8 +1,9 @@
 use crate::{AudioRenderer, SegmentMedia};
 use cap_audio::{
     AudioData, AudioRendererTrack, AudioSampleSource, AudioStream, AudioStreamError, ChunkRead,
-    StereoMode, VOICE_PREROLL_SAMPLES, VOICE_PROFILE_SAMPLES, VOICE_WINDOW_PADDING_SAMPLES,
-    VoiceAudio, VoiceEnhancer, VoiceProfile, VoiceSource,
+    StereoMode, VOICE_PREROLL_SAMPLES, VOICE_PROFILE_SAMPLES, VOICE_TONE_LOOKAHEAD_SAMPLES,
+    VOICE_TONE_LOOKBEHIND_SAMPLES, VOICE_WINDOW_PADDING_SAMPLES, VoiceAudio, VoiceEnhancer,
+    VoiceProfile, VoiceSource, VoiceTone, VoiceToneSettings, analyze_source_loudness,
 };
 use cap_project::{ClipOffsets, ProjectConfiguration, RecordingMeta, StudioRecordingMeta};
 use std::{
@@ -17,8 +18,12 @@ use std::{
 
 pub(crate) const EXPORT_AUDIO_BLOCK_SAMPLES: usize = 4_096;
 const MAX_PARALLEL_AUDIO_SOURCES: usize = 4;
-const MAX_ENHANCED_WINDOW_SAMPLES: usize =
-    EXPORT_AUDIO_BLOCK_SAMPLES + VOICE_PREROLL_SAMPLES + VOICE_WINDOW_PADDING_SAMPLES;
+const MAX_ENHANCED_WINDOW_SAMPLES: usize = EXPORT_AUDIO_BLOCK_SAMPLES
+    + VOICE_PREROLL_SAMPLES
+    + VOICE_WINDOW_PADDING_SAMPLES
+    + VOICE_TONE_LOOKBEHIND_SAMPLES
+    + VOICE_TONE_LOOKAHEAD_SAMPLES;
+const STUDIO_SOUND_HISTORY_SAMPLES: usize = VOICE_PREROLL_SAMPLES + VOICE_WINDOW_PADDING_SAMPLES;
 
 #[derive(Clone, Debug)]
 pub enum ExportAudioError {
@@ -454,6 +459,7 @@ impl ExportAudioSources {
         &mut self,
         project: &ProjectConfiguration,
         clip_index: u32,
+        voice_tone: Option<VoiceToneSettings>,
         cursor: usize,
         samples: usize,
         output: &mut [f32],
@@ -468,51 +474,42 @@ impl ExportAudioSources {
             .find(|clip| clip.index == clip_index)
             .map(|clip| clip.offsets)
             .unwrap_or_default();
+        let clip_has_tone = project.timeline.as_ref().is_some_and(|timeline| {
+            timeline.segments.iter().any(|segment| {
+                segment.recording_clip == clip_index
+                    && crate::audio::segment_voice_tone(segment).is_some()
+            })
+        });
         for track in tracks.iter_mut() {
             let start = cursor as i128 + track.offset(&offsets) as i128;
             let end = start + samples as i128;
-            let improve = track.mic
-                && project.audio.improve
+            let processable = track.mic
                 && !project.audio.mute
                 && project.audio.mic_volume_db > -30.0
                 && (1..=2).contains(&track.source.channels());
-            if improve {
-                let start =
-                    usize::try_from(start.max(0)).map_err(|_| ExportAudioError::InvalidWindow)?;
-                let end =
-                    usize::try_from(end.max(0)).map_err(|_| ExportAudioError::InvalidWindow)?;
-                if track.eof.is_some_and(|eof| start >= eof) {
-                    track.enhanced = None;
-                    continue;
-                }
-                if track.isolation != project.audio.isolation {
-                    track.enhancer = None;
-                    track.isolation = project.audio.isolation;
-                }
-                let profile = *track.voice_profile.get_or_insert_with(|| {
-                    AudioData::from_file_range(&track.path, 0, VOICE_PROFILE_SAMPLES)
-                        .map(|audio| VoiceProfile::analyze(&audio))
-                        .unwrap_or_else(|error| {
-                            tracing::warn!(%error, "Could not estimate export voice level");
-                            VoiceProfile::default()
-                        })
-                });
-                let mut enhancer = track.enhancer.take().unwrap_or_else(|| {
-                    VoiceEnhancer::with_settings(
-                        track.source.channels(),
-                        project.audio.isolation.strength(),
-                        profile,
-                    )
-                });
-                let range = enhancer.source_range(start, end.saturating_sub(start));
-                track.prepare(range.start as i128, range.end as i128)?;
-                track.enhanced =
-                    Some(enhancer.render(&track.view(), start, end.saturating_sub(start)));
-                track.enhancer = Some(enhancer);
+            let improve = processable && project.audio.improve;
+            let voice_tone = voice_tone.filter(|_| processable);
+            let history = if clip_has_tone && track.mic {
+                VOICE_TONE_LOOKBEHIND_SAMPLES
             } else {
-                track.prepare(start, end)?;
-                track.enhanced = None;
+                0
+            };
+            if track.tone.as_ref().map(VoiceTone::settings) != voice_tone {
+                track.tone =
+                    voice_tone.map(|settings| VoiceTone::new(track.source.channels(), settings));
                 track.enhancer = None;
+            }
+            let mut tone = track.tone.take();
+            let enhanced = track.render_voice(project, improve, tone.as_mut(), start, end, history);
+            track.tone = tone;
+            track.enhanced = enhanced?;
+            if project.audio.auto_level && track.mic && !project.audio.mute {
+                let path = &track.path;
+                track.loudness_boost_db.get_or_insert_with(|| {
+                    AudioData::from_file_range(path, 0, AudioData::SAMPLE_RATE as usize * 600)
+                        .map(|audio| analyze_source_loudness(&audio).boost_db())
+                        .unwrap_or(0.0)
+                });
             }
         }
         let views = tracks.iter().map(|track| track.view()).collect::<Vec<_>>();
@@ -538,18 +535,21 @@ impl ExportAudioSources {
             .iter()
             .zip(&sources)
             .map(|(track, view)| {
-                let gain = if track.mic {
+                let base_gain = if track.mic {
                     project.audio.mic_volume_db
                 } else {
                     project.audio.system_volume_db
                 };
+                let gain = if project.audio.mute || base_gain < -30.0 {
+                    f32::NEG_INFINITY
+                } else if project.audio.auto_level && track.mic {
+                    base_gain + track.loudness_boost_db.unwrap_or(0.0)
+                } else {
+                    base_gain
+                };
                 AudioRendererTrack {
                     data: view,
-                    gain: if project.audio.mute || gain < -30.0 {
-                        f32::NEG_INFINITY
-                    } else {
-                        gain
-                    },
+                    gain,
                     stereo_mode: if !track.mic {
                         StereoMode::Stereo
                     } else {
@@ -587,6 +587,8 @@ struct ExportAudioTrack {
     enhanced: Option<VoiceAudio>,
     voice_profile: Option<VoiceProfile>,
     isolation: cap_project::VoiceIsolation,
+    tone: Option<VoiceTone>,
+    loudness_boost_db: Option<f32>,
 }
 
 impl ExportAudioTrack {
@@ -618,7 +620,82 @@ impl ExportAudioTrack {
             enhanced: None,
             voice_profile: None,
             isolation: cap_project::VoiceIsolation::default(),
+            tone: None,
+            loudness_boost_db: None,
         })
+    }
+
+    /// Voice EQ and Studio Sound run in the order and with the windows the
+    /// playback renderer uses, so preview and export produce the same samples.
+    fn render_voice(
+        &mut self,
+        project: &ProjectConfiguration,
+        improve: bool,
+        tone: Option<&mut VoiceTone>,
+        start: i128,
+        end: i128,
+        history: usize,
+    ) -> Result<Option<VoiceAudio>, ExportAudioError> {
+        if !improve && tone.is_none() {
+            self.prepare(start, end, history)?;
+            self.enhancer = None;
+            return Ok(None);
+        }
+        let start = usize::try_from(start.max(0)).map_err(|_| ExportAudioError::InvalidWindow)?;
+        let end = usize::try_from(end.max(0)).map_err(|_| ExportAudioError::InvalidWindow)?;
+        if self.eof.is_some_and(|eof| start >= eof) {
+            return Ok(None);
+        }
+        let count = end.saturating_sub(start);
+        match tone {
+            Some(tone) if !improve => {
+                self.enhancer = None;
+                let window = tone.source_range(start, count);
+                self.prepare(window.start as i128, window.end as i128, history)?;
+                Ok(Some(tone.render(&self.view(), start, count)))
+            }
+            mut tone => {
+                if self.isolation != project.audio.isolation {
+                    self.enhancer = None;
+                    self.isolation = project.audio.isolation;
+                }
+                let path = &self.path;
+                let profile = *self.voice_profile.get_or_insert_with(|| {
+                    AudioData::from_file_range(path, 0, VOICE_PROFILE_SAMPLES)
+                        .map(|audio| VoiceProfile::analyze(&audio))
+                        .unwrap_or_else(|error| {
+                            tracing::warn!(%error, "Could not estimate export voice level");
+                            VoiceProfile::default()
+                        })
+                });
+                let mut enhancer = self.enhancer.take().unwrap_or_else(|| {
+                    VoiceEnhancer::with_settings(
+                        self.source.channels(),
+                        project.audio.isolation.strength(),
+                        profile,
+                    )
+                });
+                let range = enhancer.source_range(start, count);
+                let window = tone.as_ref().map_or(range.clone(), |tone| {
+                    tone.source_range(range.start, range.len())
+                });
+                self.prepare(
+                    window.start as i128,
+                    window.end as i128,
+                    STUDIO_SOUND_HISTORY_SAMPLES + history,
+                )?;
+                let view = self.view();
+                let audio = match tone.as_mut() {
+                    Some(tone) => {
+                        let toned = tone.render(&view, range.start, range.len());
+                        enhancer.render(&toned, start, count)
+                    }
+                    None => enhancer.render(&view, start, count),
+                };
+                self.enhancer = Some(enhancer);
+                Ok(Some(audio))
+            }
+        }
     }
 
     fn offset(&self, offsets: &ClipOffsets) -> isize {
@@ -630,20 +707,24 @@ impl ExportAudioTrack {
         ((offset + self.timing_offset_secs) * AudioRenderer::SAMPLE_RATE as f32).round() as isize
     }
 
-    fn prepare(&mut self, start: i128, end: i128) -> Result<(), ExportAudioError> {
+    fn prepare(&mut self, start: i128, end: i128, history: usize) -> Result<(), ExportAudioError> {
         let start = usize::try_from(start.max(0)).map_err(|_| ExportAudioError::InvalidWindow)?;
         let end = usize::try_from(end.max(0)).map_err(|_| ExportAudioError::InvalidWindow)?;
         if end < start || end - start > MAX_ENHANCED_WINDOW_SAMPLES || start < self.source_start {
             return Err(ExportAudioError::InvalidWindow);
         }
         let channels = self.source.channels() as usize;
-        let discard = start
+        let retain_start = start
+            .saturating_sub(history)
+            .max(self.source_start)
+            .max(end.saturating_sub(MAX_ENHANCED_WINDOW_SAMPLES));
+        let discard = retain_start
             .saturating_sub(self.source_start)
             .min(self.samples.len() / channels)
             * channels;
         self.samples.copy_within(discard.., 0);
         self.samples.truncate(self.samples.len() - discard);
-        self.source_start = start;
+        self.source_start = retain_start;
         while self.eof.is_none() && self.source.position() < end as u64 {
             let wanted = (end as u64 - self.source.position()).min(12_000) as usize;
             match self
@@ -657,7 +738,7 @@ impl ExportAudioTrack {
                 ChunkRead::Chunk(chunk) => {
                     let chunk_start = usize::try_from(chunk.source_start_sample)
                         .map_err(|_| ExportAudioError::InvalidWindow)?;
-                    let discard = start
+                    let discard = retain_start
                         .saturating_sub(chunk_start)
                         .min(chunk.samples.len() / channels)
                         * channels;
@@ -1079,6 +1160,7 @@ mod tests {
             speed_audio_mode: None,
             hide_cursor: None,
             volume: None,
+            voice_eq: None,
         }
     }
 
@@ -1210,7 +1292,7 @@ mod tests {
                 .unwrap(),
             );
             for track in candidate.sources.tracks.iter_mut().flatten() {
-                track.prepare(10, 100).unwrap();
+                track.prepare(10, 100, 0).unwrap();
             }
             let identity = |track: &ExportAudioTrack| {
                 (
@@ -1415,6 +1497,7 @@ mod tests {
                         .render(
                             &project,
                             clip as u32,
+                            None,
                             cursor,
                             EXPORT_AUDIO_BLOCK_SAMPLES,
                             &mut output,
@@ -1706,12 +1789,12 @@ mod tests {
         let cancellation = Arc::new(AtomicBool::new(false));
         let mut track =
             ExportAudioTrack::open(&path, 0, true, 0.0, &cancellation, &cancellation).unwrap();
-        track.prepare(8_000, 9_000).unwrap();
-        track.prepare(8_500, 9_501).unwrap();
+        track.prepare(8_000, 9_000, 0).unwrap();
+        track.prepare(8_500, 9_501, 0).unwrap();
         let full = AudioData::from_file(&path).unwrap();
         assert_eq!(track.samples, full.samples()[8_500 * 2..9_501 * 2]);
         assert!(matches!(
-            track.prepare(0, 1),
+            track.prepare(0, 1, 0),
             Err(ExportAudioError::InvalidWindow)
         ));
         let mut candidate = ExportAudioRenderer {

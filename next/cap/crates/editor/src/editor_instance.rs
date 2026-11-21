@@ -372,6 +372,7 @@ impl EditorInstance {
                             speed_audio_mode: None,
                             hide_cursor: None,
                             volume: None,
+                            voice_eq: None,
                         }],
                         _ => {
                             warn!(
@@ -408,6 +409,7 @@ impl EditorInstance {
                             speed_audio_mode: None,
                             hide_cursor: None,
                             volume: None,
+                            voice_eq: None,
                         })
                     })
                     .collect(),

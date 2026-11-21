@@ -107,6 +107,11 @@ import {
 	topSlideAnimateClasses,
 } from "./ui";
 import { formatTime } from "./utils";
+import {
+	VOICE_DECLICK_OPTIONS,
+	VOICE_EQ_PRESET_OPTIONS,
+	voiceEqFromPreset,
+} from "./voice-eq";
 import { ZoomModeHelper } from "./ZoomModeHelper";
 
 // Split out of the sidebar chunk: the captions tab is not visible at first
@@ -285,6 +290,218 @@ function StudioSoundCard() {
 				/>
 			</div>
 		</div>
+	);
+}
+
+function AutoLoudnessCard() {
+	const { project, setProject } = useEditorContext();
+	const enabled = () => project.audio.autoLevel === true;
+
+	return (
+		<div class="flex flex-col p-3.5 rounded-xl bg-ed-card-2">
+			<div class="flex flex-row gap-2.5 items-center">
+				<div class="flex flex-col flex-1 gap-0.5 min-w-0">
+					<span class="text-[13px] font-medium text-ed-text-1">
+						{localize("自动响度均衡")}
+					</span>
+					<span class="text-xs leading-4 text-ed-text-3">
+						{localize(
+							"按 BS.1770-4 将偏轻人声校准到 -16 LUFS，预览与导出一致。",
+						)}
+					</span>
+				</div>
+				<Toggle
+					checked={enabled()}
+					disabled={project.audio.mute}
+					onChange={(value) => setProject("audio", "autoLevel", value)}
+				/>
+			</div>
+		</div>
+	);
+}
+
+function VoiceEqCard() {
+	const { project, editorState, projectActions } = useEditorContext();
+	const targetClipIndices = createMemo(() => {
+		const segments = project.timeline?.segments ?? [];
+		if (segments.length === 0) return [];
+		if (
+			editorState.timeline.selection?.type === "clip" &&
+			editorState.timeline.selection.indices.length > 0
+		) {
+			return editorState.timeline.selection.indices.filter(
+				(idx) => idx >= 0 && idx < segments.length,
+			);
+		}
+		return segments.map((_, idx) => idx);
+	});
+
+	const currentVoiceEq = createMemo(() => {
+		const segments = project.timeline?.segments ?? [];
+		const first = targetClipIndices()[0];
+		return first != null ? (segments[first]?.voiceEq ?? null) : null;
+	});
+
+	const eqEnabled = () => currentVoiceEq()?.enabled === true;
+	const declick = () => currentVoiceEq()?.declick ?? "off";
+	const activeEq = () => currentVoiceEq() ?? voiceEqFromPreset("natural");
+
+	const applyVoiceEq = (next: ReturnType<typeof voiceEqFromPreset>) => {
+		for (const idx of targetClipIndices()) {
+			projectActions.setClipSegmentVoiceEq(idx, next);
+		}
+	};
+
+	const updateBandGain = (
+		band: "low" | "lowMid" | "highMid" | "high",
+		gainDb: number,
+	) => {
+		const base = activeEq();
+		applyVoiceEq({
+			...base,
+			enabled: true,
+			preset: "custom",
+			[band]: { ...base[band], gainDb },
+		});
+	};
+
+	return (
+		<Show when={targetClipIndices().length > 0}>
+			<div class="flex flex-col gap-3 p-3.5 rounded-xl bg-ed-card-2">
+				<div class="flex flex-row gap-2.5 items-center">
+					<div class="flex flex-col flex-1 gap-0.5 min-w-0">
+						<span class="text-[13px] font-medium text-ed-text-1">
+							{localize("人声均衡与去杂音")}
+						</span>
+						<span class="text-xs leading-4 text-ed-text-3">
+							{editorState.timeline.selection?.type === "clip"
+								? localize("作用于当前选中片段")
+								: localize("作用于时间线全部片段")}
+						</span>
+					</div>
+					<Toggle
+						checked={eqEnabled()}
+						disabled={project.audio.mute}
+						onChange={(value) => {
+							const base = currentVoiceEq();
+							applyVoiceEq(
+								base
+									? { ...base, enabled: value }
+									: voiceEqFromPreset("natural", { enabled: value }),
+							);
+						}}
+					/>
+				</div>
+
+				<Show when={eqEnabled()}>
+					<div class="flex flex-wrap gap-1 rounded-lg bg-ed-ctl p-1">
+						<For each={VOICE_EQ_PRESET_OPTIONS}>
+							{([preset, label]) => (
+								<button
+									type="button"
+									aria-pressed={activeEq().preset === preset}
+									class={cx(
+										"flex-1 min-w-[3.2rem] rounded-md px-2 py-1 text-xs font-medium transition-colors",
+										activeEq().preset === preset
+											? "bg-ed-card text-ed-text-1"
+											: "text-ed-text-2 hover:text-ed-text-1",
+									)}
+									onClick={() =>
+										applyVoiceEq(
+											voiceEqFromPreset(preset, {
+												enabled: true,
+												declick: declick(),
+											}),
+										)
+									}
+								>
+									{localize(label)}
+								</button>
+							)}
+						</For>
+					</div>
+
+					<div class="flex flex-row justify-between items-center">
+						<span class="text-xs text-ed-text-2">
+							{localize("低切滤波")} ({Math.round(activeEq().highPassHz)} Hz)
+						</span>
+						<Toggle
+							size="sm"
+							checked={activeEq().highPass}
+							onChange={(value) =>
+								applyVoiceEq({ ...activeEq(), highPass: value })
+							}
+						/>
+					</div>
+
+					<div class="flex flex-col gap-2">
+						{(
+							[
+								["low", "低频"],
+								["lowMid", "中低频"],
+								["highMid", "中高频"],
+								["high", "高频"],
+							] as const
+						).map(([band, label]) => (
+							<div class="flex items-center gap-2 text-xs">
+								<span class="w-12 shrink-0 text-ed-text-2">
+									{localize(label)}
+								</span>
+								<Slider
+									class="min-w-0 flex-1"
+									aria-label={localize(label)}
+									value={[activeEq()[band].gainDb]}
+									minValue={-12}
+									maxValue={12}
+									step={0.5}
+									onChange={([value]) => updateBandGain(band, value)}
+									formatTooltip={(value) =>
+										`${value > 0 ? "+" : ""}${value.toFixed(1)} dB`
+									}
+								/>
+								<span class="w-12 shrink-0 text-right tabular-nums text-ed-text-3">
+									{activeEq()[band].gainDb > 0 ? "+" : ""}
+									{activeEq()[band].gainDb.toFixed(1)}
+								</span>
+							</div>
+						))}
+					</div>
+				</Show>
+
+				<div class="flex flex-col gap-1.5 pt-2.5 border-t border-ed-line">
+					<span class="text-xs text-ed-text-2">{localize("消除口水音")}</span>
+					<div class="flex gap-1 rounded-lg bg-ed-ctl p-0.5">
+						<For each={VOICE_DECLICK_OPTIONS}>
+							{([mode, label]) => (
+								<button
+									type="button"
+									aria-pressed={declick() === mode}
+									class={cx(
+										"flex-1 rounded-md py-1 text-xs font-medium transition-colors",
+										declick() === mode
+											? "bg-ed-card text-ed-text-1"
+											: "text-ed-text-2 hover:text-ed-text-1",
+									)}
+									onClick={() => {
+										const base = currentVoiceEq();
+										applyVoiceEq(
+											base
+												? { ...base, declick: mode }
+												: voiceEqFromPreset("natural", {
+														enabled: false,
+														declick: mode,
+													}),
+										);
+									}}
+								>
+									{localize(label)}
+								</button>
+							)}
+						</For>
+					</div>
+				</div>
+			</div>
+		</Show>
 	);
 }
 
@@ -563,6 +780,8 @@ function ConfigSidebarContent() {
 
 									<Show when={meta().hasMicrophone}>
 										<StudioSoundCard />
+										<AutoLoudnessCard />
+										<VoiceEqCard />
 									</Show>
 								</Section>
 								{meta().hasMicrophone && (

@@ -4,6 +4,7 @@ mod completed_audio;
 mod editor;
 mod editor_instance;
 mod export_audio;
+mod join_fade;
 mod playback;
 mod preparing_audio;
 mod preparing_editor;
@@ -16,7 +17,7 @@ mod segments;
 mod telemetry;
 mod thumbnail;
 
-pub use audio::{AudioRenderer, AudioSegment, MusicTracks};
+pub use audio::{AudioRenderer, AudioSegment, MusicTracks, voice_eq_filters};
 pub use audio_output::{
     AudioOutput, HEADLESS_BLOCK_FRAMES, HEADLESS_CHANNELS, HEADLESS_SAMPLE_RATE, HeadlessAudioTap,
 };
