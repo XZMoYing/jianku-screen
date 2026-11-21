@@ -59,6 +59,8 @@ import {
 	type RecordingMeta,
 	type SceneSegment,
 	type SerializedEditorInstance,
+	type ShapeKind,
+	type ShapeSegment,
 	type SingleSegment,
 	type TimelineConfiguration,
 	type TimelineSegment,
@@ -147,6 +149,7 @@ import {
 import { createProjectConfigSave } from "./project-config-save";
 import { createStoreHistory } from "./project-history";
 import { createRecordingBookmarks } from "./recording-bookmarks";
+import { defaultShapeSegment } from "./shapes";
 import type { SnapGuide } from "./snapping";
 import {
 	defaultStyleSegment,
@@ -244,6 +247,7 @@ export const OUTPUT_SIZE = {
 export type TimelineTrackType =
 	| "style"
 	| "image"
+	| "shape"
 	| "clip"
 	| "caption"
 	| "keyboard"
@@ -289,6 +293,7 @@ type EditorTimelineConfiguration = Omit<
 	textSegments: TextSegment[];
 	styleSegments: StyleSegment[];
 	imageSegments: ImageSegment[];
+	shapeSegments: ShapeSegment[];
 	audioSegments?: AudioTrackSegment[];
 	camera3dSegments: Camera3DSegment[];
 };
@@ -346,6 +351,9 @@ export function normalizeProject(
 				imageSegments: (config.overlayOrder?.length
 					? sortTrackSegments
 					: normalizeTrackSegments)(config.timeline.imageSegments ?? []),
+				shapeSegments: (config.overlayOrder?.length
+					? sortTrackSegments
+					: normalizeTrackSegments)(config.timeline.shapeSegments ?? []),
 				transitions:
 					(
 						config.timeline as TimelineConfiguration & {
@@ -418,6 +426,7 @@ export function serializeProjectConfiguration(
 				transitions: project.timeline.transitions ?? [],
 				styleSegments: project.timeline.styleSegments ?? [],
 				imageSegments: project.timeline.imageSegments ?? [],
+				shapeSegments: project.timeline.shapeSegments ?? [],
 				captionSegments: project.timeline.captionSegments ?? [],
 				keyboardSegments: project.timeline.keyboardSegments ?? [],
 				maskSegments: project.timeline.maskSegments ?? [],
@@ -564,6 +573,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					const tracks: AttachmentSpan[][] = [
 						timeline.styleSegments,
 						timeline.imageSegments,
+						timeline.shapeSegments,
 						timeline.zoomSegments,
 						timeline.sceneSegments ?? [],
 						timeline.maskSegments,
@@ -676,14 +686,16 @@ export const [EditorContextProvider, useBaseEditorContext] =
 			};
 
 			const overlayPlacement = (
-				type: "style" | "image",
+				type: "style" | "image" | "shape",
 				lane: number,
 				time: number,
 			) => {
 				const segments =
 					(type === "style"
 						? project.timeline?.styleSegments
-						: project.timeline?.imageSegments) ?? [];
+						: type === "image"
+							? project.timeline?.imageSegments
+							: project.timeline?.shapeSegments) ?? [];
 				const length = Math.min(3, totalDuration());
 				if (length <= 0) return null;
 				const requested = placeSegmentAtTime(
@@ -709,14 +721,16 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					: null;
 			};
 			const selectAddedOverlay = (
-				type: "style" | "image",
+				type: "style" | "image" | "shape",
 				lane: number,
 				start: number,
 			) => {
 				const segments =
 					(type === "style"
 						? project.timeline?.styleSegments
-						: project.timeline?.imageSegments) ?? [];
+						: type === "image"
+							? project.timeline?.imageSegments
+							: project.timeline?.shapeSegments) ?? [];
 				const index = segments.findIndex(
 					(segment) => segment.track === lane && segment.start === start,
 				);
@@ -938,6 +952,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 									zoomSegments: [],
 									styleSegments: [],
 									imageSegments: [],
+									shapeSegments: [],
 									maskSegments: [],
 									textSegments: [],
 									camera3dSegments: [],
@@ -1341,11 +1356,16 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					}
 				},
 				splitOverlaySegment: (
-					type: "style" | "image",
+					type: "style" | "image" | "shape",
 					index: number,
 					time: number,
 				) => {
-					const key = type === "style" ? "styleSegments" : "imageSegments";
+					const key =
+						type === "style"
+							? "styleSegments"
+							: type === "image"
+								? "imageSegments"
+								: "shapeSegments";
 					setProject(
 						produce((value) => {
 							const timeline = value.timeline;
@@ -1362,6 +1382,13 @@ export const [EditorContextProvider, useBaseEditorContext] =
 										parts[0],
 										overlayPartAfterSplit(parts[1], attachmentLayout()),
 									);
+							} else if (type === "shape") {
+								const parts = splitOverlaySegment(
+									structuredClone(unwrap(timeline.shapeSegments[index])),
+									time,
+								);
+								if (parts)
+									timeline.shapeSegments.splice(index, 1, parts[0], parts[1]);
 							} else {
 								const parts = splitOverlaySegment(
 									structuredClone(unwrap(timeline.imageSegments[index])),
@@ -1380,7 +1407,10 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					setEditorState("timeline", "selection", { type, indices: [index] });
 					if (type === "style") enterStyleScope(index);
 				},
-				deleteOverlaySegments: (type: "style" | "image", indices: number[]) => {
+				deleteOverlaySegments: (
+					type: "style" | "image" | "shape",
+					indices: number[],
+				) => {
 					const remove = new Set(indices);
 					batch(() => {
 						setProject(
@@ -1389,6 +1419,11 @@ export const [EditorContextProvider, useBaseEditorContext] =
 								if (type === "style")
 									value.timeline.styleSegments =
 										value.timeline.styleSegments.filter(
+											(_, index) => !remove.has(index),
+										);
+								else if (type === "shape")
+									value.timeline.shapeSegments =
+										value.timeline.shapeSegments.filter(
 											(_, index) => !remove.has(index),
 										);
 								else
@@ -1401,6 +1436,37 @@ export const [EditorContextProvider, useBaseEditorContext] =
 						if (type === "style") setEditorState("styleEditIndex", null);
 						setEditorState("timeline", "selection", null);
 					});
+				},
+				addShapeSegment: (
+					lane: number,
+					time = editorState.playbackTime,
+					kind: ShapeKind = "arrow",
+				) => {
+					const placement = overlayPlacement("shape", lane, time);
+					if (!placement || !project.timeline) return;
+					const layout = editorInstanceContext.latestFrameLayout();
+					const aspect =
+						layout && layout.output_height > 0
+							? layout.output_width / layout.output_height
+							: 16 / 9;
+					setProject(
+						"timeline",
+						"shapeSegments",
+						produce((segments) => {
+							segments.push(
+								defaultShapeSegment(
+									placement.start,
+									placement.end,
+									placement.lane,
+									kind,
+									aspect,
+									segments,
+								),
+							);
+							sortTrackSegments(segments);
+						}),
+					);
+					selectAddedOverlay("shape", placement.lane, placement.start);
 				},
 				addStyleSegment: (lane: number, time = editorState.playbackTime) => {
 					const placement = overlayPlacement("style", lane, time);
@@ -1942,6 +2008,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 						const rippleTracks: AttachmentSpan[][] = [
 							timeline.styleSegments,
 							timeline.imageSegments,
+							timeline.shapeSegments,
 							timeline.zoomSegments,
 							timeline.sceneSegments ?? [],
 							timeline.maskSegments,
@@ -2337,6 +2404,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 						| null
 						| { type: "style"; indices: number[] }
 						| { type: "image"; indices: number[] }
+						| { type: "shape"; indices: number[] }
 						| { type: "zoom"; indices: number[] }
 						| { type: "clip"; indices: number[] }
 						| { type: "transition"; index: number }
@@ -2386,6 +2454,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					tracks: {
 						style: getUsedTrackCount(project.timeline?.styleSegments ?? []),
 						image: getUsedTrackCount(project.timeline?.imageSegments ?? []),
+						shape: getUsedTrackCount(project.timeline?.shapeSegments ?? []),
 						clip: true,
 						caption: initialCaptionTrackVisible,
 						keyboard: initialKeyboardTrackVisible,
@@ -3059,6 +3128,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				return {
 					style: timeline?.styleSegments,
 					image: timeline?.imageSegments,
+					shape: timeline?.shapeSegments,
 					clip: timeline?.segments,
 					zoom: timeline?.zoomSegments,
 					scene: timeline?.sceneSegments,
@@ -3167,7 +3237,11 @@ export const [EditorContextProvider, useBaseEditorContext] =
 						return;
 					}
 					const selection = editorState.timeline.selection;
-					if (selection?.type === "style" || selection?.type === "image") {
+					if (
+						selection?.type === "style" ||
+						selection?.type === "image" ||
+						selection?.type === "shape"
+					) {
 						const type = selection.type;
 						const resumeHistory = projectHistory.pause();
 						for (const index of [...selection.indices].sort((a, b) => b - a))
@@ -3198,7 +3272,11 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					if (!selection) return false;
 					const resumeHistory = projectHistory.pause();
 					try {
-						if (selection.type === "style" || selection.type === "image") {
+						if (
+							selection.type === "style" ||
+							selection.type === "image" ||
+							selection.type === "shape"
+						) {
 							projectActions.deleteOverlaySegments(
 								selection.type,
 								selection.indices,

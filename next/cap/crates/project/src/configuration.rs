@@ -2269,6 +2269,8 @@ pub struct TimelineConfiguration {
     pub style_segments: Vec<StyleSegment>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub image_segments: Vec<ImageSegment>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub shape_segments: Vec<crate::ShapeSegment>,
     // Explicit rename: the digit boundary makes rename_all's camelCase output
     // easy to second-guess, and the editor TypeScript hardcodes this name.
     #[serde(default, rename = "camera3dSegments")]
@@ -3148,6 +3150,7 @@ pub enum OverlayTrackKind {
     Mask,
     Image,
     Text,
+    Shape,
 }
 
 #[derive(Type, Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -3302,6 +3305,14 @@ impl ProjectConfiguration {
                 OverlayTrackKind::Text,
                 timeline
                     .text_segments
+                    .iter()
+                    .map(|segment| segment.track)
+                    .collect::<Vec<_>>(),
+            ),
+            (
+                OverlayTrackKind::Shape,
+                timeline
+                    .shape_segments
                     .iter()
                     .map(|segment| segment.track)
                     .collect::<Vec<_>>(),
@@ -4008,6 +4019,7 @@ mod tests {
             audio_segments: Vec::new(),
             style_segments: Vec::new(),
             image_segments: Vec::new(),
+            shape_segments: Vec::new(),
             camera3d_segments: Vec::new(),
         }
     }
@@ -5346,6 +5358,7 @@ mod tests {
                 audio_segments: Vec::new(),
                 style_segments: Vec::new(),
                 image_segments: Vec::new(),
+                shape_segments: Vec::new(),
                 camera3d_segments: Vec::new(),
             }),
             ..Default::default()
@@ -5457,6 +5470,7 @@ mod tests {
                 audio_segments: Vec::new(),
                 style_segments: Vec::new(),
                 image_segments: Vec::new(),
+                shape_segments: Vec::new(),
                 camera3d_segments: Vec::new(),
             }),
             ..Default::default()

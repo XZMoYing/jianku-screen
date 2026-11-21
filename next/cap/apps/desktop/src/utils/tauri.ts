@@ -364,6 +364,12 @@ async setEditorPreviewResolution(resolutionBase: XY<number>, quality: EditorPrev
 async stopPlayback() : Promise<null> {
     return await TAURI_INVOKE("stop_playback");
 },
+async setPlaybackSpeed(speed: number) : Promise<number> {
+    return await TAURI_INVOKE("set_playback_speed", { speed });
+},
+async detectTranscriptDisfluencies(words: TranscriptWordInput[]) : Promise<DetectedDisfluency[]> {
+    return await TAURI_INVOKE("detect_transcript_disfluencies", { words });
+},
 async commitEditorPreparingFrame(instanceId: string, frameNumber: number, fps: number) : Promise<boolean> {
     return await TAURI_INVOKE("commit_editor_preparing_frame", { instanceId, frameNumber, fps });
 },
@@ -786,7 +792,9 @@ export type AnnotationType = "arrow" | "circle" | "rectangle" | "text" | "mask" 
 export type AppTheme = "system" | "light" | "dark"
 export type AspectRatio = "wide" | "vertical" | "square" | "classic" | "tall" | "wideScreen" | "tallScreen" | "landscape" | "portrait" | "photo" | "social" | "ultrawide" | "cinema"
 export type Audio = { duration: number; sample_rate: number; channels: number; start_time: number }
-export type AudioConfiguration = { mute: boolean; improve: boolean; isolation: VoiceIsolation; micVolumeDb: number; micStereoMode: StereoMode; systemVolumeDb: number }
+export type AudioConfiguration = { mute: boolean; improve: boolean; isolation: VoiceIsolation; autoLevel: boolean; micVolumeDb: number; micStereoMode: StereoMode; systemVolumeDb: number }
+export type AudioExportFormat = "mp3" | "wav"
+export type AudioExportSettings = { codec: AudioExportFormat }
 /**
  * Overlap-trim accounting captured by the recorder's audio gap tracker, persisted so the
  * editor can compensate for stale-startup audio drift from typed data instead of scraping
@@ -868,7 +876,7 @@ export type Camera = { hide: boolean; mirror: boolean; position: CameraPosition;
  * Normalized (0-1) center of the camera rect in output-frame space.
  * Overrides `position` when set.
  */
-manualPosition: XY<number> | null; size: number; zoomSize: number | null; rounding: number; shadow: number; advancedShadow: ShadowConfiguration | null; shape: CameraShape; roundingType: CornerStyle; scaleDuringZoom?: number; backgroundBlur?: BackgroundBlurConfig }
+manualPosition: XY<number> | null; size: number; zoomSize: number | null; rounding: number; shadow: number; advancedShadow: ShadowConfiguration | null; shape: CameraShape; roundingType: CornerStyle; scaleDuringZoom?: number; backgroundBlur?: BackgroundBlurConfig; beautySmoothing?: number; beautyWhitening?: number }
 /**
  * Screen-space focus blur applied over the composed frame while a 3d segment
  * is active (a UV-mask variable blur, not a depth-of-field). `strength` is a
@@ -1029,7 +1037,7 @@ offsetsAutoCalculated?: boolean }
 export type ClipOffsets = { camera?: number; mic?: number; system_audio?: number }
 export type ClipSpeedAudioMode = "mute" | "maintainPitch" | "matchSpeed"
 export type ClipTransition = { segmentIndex: number; type: ClipTransitionType; duration: number }
-export type ClipTransitionType = "cross-fade" | "fade-through-black"
+export type ClipTransitionType = "cross-fade" | "fade-through-black" | "fade-through-white" | "push-left" | "push-right" | "push-up" | "push-down" | "wipe-left" | "wipe-right" | "wipe-up" | "wipe-down" | "zoom"
 export type ClipboardSource = "raw" | "rendered"
 /**
  * Parametric color grade for a single layer (screen or camera). Every field
@@ -1106,6 +1114,7 @@ export type CursorType = "auto" | "pointer" | "circle" | "macos" | "tahoe" | "wi
 export type Cursors = { [key in string]: string } | { [key in string]: CursorMeta }
 export type DeletedRecordingBookmark = { bookmark: RecordingBookmark; index: number }
 export type DesktopWallpaper = { path: string; previewPath: string; animated: boolean }
+export type DetectedDisfluency = { kind: string; startWord: number; endWord: number; phrase: string }
 export type DeviceOrModelID = { DeviceID: string } | { ModelID: ModelIDType }
 export type DevicesUpdated = { cameras: CameraInfo[]; microphones: string[]; permissions: OSPermissionsCheck }
 export type DiagnosticOptions = { includeSyncTest: boolean;
@@ -1147,7 +1156,7 @@ export type ExportFormat = "mp4" | "gif" | "mov"
 export type ExportPreviewResult = { jpeg_base64: string; estimated_size_mb: number; actual_width: number; actual_height: number; frame_render_time_ms: number; total_frames: number }
 export type ExportPreviewSettings = { fps: number; resolution_base: XY<number>; compression_bpp: number; cursor_only?: boolean }
 export type ExportProfile = { format: ExportFormat; fps?: number; resolutionBase?: XY<number>; compression?: AutomationExportCompression | null; presetName?: string | null }
-export type ExportSettings = ({ format: "Mp4" } & Mp4ExportSettings) | ({ format: "Gif" } & GifExportSettings) | ({ format: "Mov" } & MovExportSettings)
+export type ExportSettings = ({ format: "Mp4" } & Mp4ExportSettings) | ({ format: "Gif" } & GifExportSettings) | ({ format: "Mov" } & MovExportSettings) | ({ format: "Audio" } & AudioExportSettings)
 export type FileType = "recording" | "screenshot"
 export type Flags = { captions: boolean }
 export type FrameConfiguration = { style: FrameStyle; theme: FrameTheme;
@@ -1218,7 +1227,7 @@ cameraBlurDisabledByCrash?: string | null; updateChannel?: UpdateChannel;
  * own Experimental page hands back. See `gpui_app.rs`.
  */
 enableGpuiApp?: boolean }
-export type GifExportSettings = { fps: number; resolution_base: XY<number>; quality: GifQuality | null }
+export type GifExportSettings = { fps: number; resolution_base: XY<number>; quality: GifQuality | null; screen_enhancement?: boolean }
 export type GifQuality = {
 /**
  * Encoding quality from 1-100 (default: 90)
@@ -1280,8 +1289,8 @@ export type MobileStatus = { phase: MobilePhase; active: boolean; elapsedSeconds
 export type ModelDownloadState = "downloading" | "completed" | "failed"
 export type ModelDownloadStatus = { state: ModelDownloadState; progress: number; message: string }
 export type ModelIDType = string
-export type MovExportSettings = { fps: number; resolution_base: XY<number>; cursor_only?: boolean }
-export type Mp4ExportSettings = { fps: number; resolution_base: XY<number>; compression: ExportCompression; custom_bpp: number | null; force_ffmpeg_decoder?: boolean; optimize_filesize?: boolean }
+export type MovExportSettings = { fps: number; resolution_base: XY<number>; cursor_only?: boolean; screen_enhancement?: boolean }
+export type Mp4ExportSettings = { fps: number; resolution_base: XY<number>; compression: ExportCompression; custom_bpp: number | null; force_ffmpeg_decoder?: boolean; optimize_filesize?: boolean; turbo?: boolean; screen_enhancement?: boolean }
 export type MultipleSegment = { display: VideoMeta; camera?: VideoMeta | null; mic?: AudioMeta | null; system_audio?: AudioMeta | null; cursor?: string | null; keyboard?: string | null; display_notch?: DisplayNotch | null }
 export type MultipleSegments = { segments: MultipleSegment[]; cursors: Cursors; status?: StudioRecordingStatus | null }
 export type NewNotification = { title: string; body: string; is_error: boolean }
@@ -1305,7 +1314,7 @@ export type Organization = { id: string; name: string; ownerId: string; role?: s
 export type OrganizationBrandColors = { primary: string | null; secondary: string | null; accent: string | null; background: string | null }
 export type OverlayAttachment = { kind: "timeline"; id: string } | { kind: "clip"; id: string; clipId: string; sourceTime: number; timing?: ClipAttachmentTiming }
 export type OverlayTrack = { kind: OverlayTrackKind; track: number }
-export type OverlayTrackKind = "mask" | "image" | "text"
+export type OverlayTrackKind = "mask" | "image" | "text" | "shape"
 export type Phase = "awaitingShortcut" | "starting" | "recording" | "pausing" | "paused" | "resuming" | "resumeFailed" | "restarting" | "stopping" | "restoring"
 export type PhysicalSize = { width: number; height: number }
 export type Plan = { upgraded: boolean; manual: boolean; last_checked: number }
@@ -1402,6 +1411,10 @@ notchBase: DisplayNotch }
 export type SerializedScreenshotEditorInstance = { framesSocketUrl: string; path: string; config: ProjectConfiguration | null; prettyName: string; imageWidth: number; imageHeight: number }
 export type SetCaptureAreaPending = boolean
 export type ShadowConfiguration = { size: number; opacity: number; blur: number }
+export type ShapeAnimation = "none" | "fade" | "scale" | "draw"
+export type ShapeArrowHead = "filled" | "open" | "double"
+export type ShapeKind = "arrow" | "line" | "rectangle" | "ellipse" | "highlight" | "badge"
+export type ShapeSegment = { start: number; end: number; track: number; enabled: boolean; kind: ShapeKind; from: XY<number>; to: XY<number>; strokeColor: string; strokeWidth: number; fill: boolean; fillColor: string; fillOpacity: number; cornerRadius: number; arrowHead: ShapeArrowHead; shadow: number; opacity: number; animationIn: ShapeAnimation; animationOut: ShapeAnimation; animationInDuration: number; animationOutDuration: number; number: number }
 export type SharingMeta = { id: string; link: string; content_hash?: string | null }
 export type ShowCapWindow = { Main: { init_target_mode: RecordingTargetMode | null } } | { Settings: { page: string | null } } | { Editor: { project_path: string } } | "RecordingsOverlay" | { WindowCaptureOccluder: { screen_id: DisplayId } } | { TargetSelectOverlay: { display_id: DisplayId; target_mode: RecordingTargetMode | null } } | { CaptureArea: { screen_id: DisplayId } } | { Camera: { centered: boolean } } | { InProgressRecording: { countdown: number | null; capture_target?: ScreenCaptureTarget | null } } | "Upgrade" | "ModeSelect" | { ScreenshotEditor: { path: string } } | "Onboarding"
 export type SingleSegment = { display: VideoMeta; camera?: VideoMeta | null; audio?: AudioMeta | null; cursor?: string | null }
@@ -1483,8 +1496,9 @@ letterSpacing?: number; lineHeight?: number; opacity?: number; shadow?: number; 
  * segment edges when `layout` is not `Overlay`.
  */
 layoutTransition?: number }
-export type TimelineConfiguration = { segments: TimelineSegment[]; mainTrackGaps?: MainTrackGaps; transitions: ClipTransition[]; zoomSegments: ZoomSegment[]; sceneSegments?: SceneSegment[]; maskSegments?: MaskSegment[]; textSegments?: TextSegment[]; captionSegments?: CaptionTrackSegment[]; keyboardSegments?: KeyboardTrackSegment[]; audioSegments?: AudioTrackSegment[]; styleSegments: StyleSegment[]; imageSegments: ImageSegment[]; camera3dSegments?: Camera3DSegment[] }
-export type TimelineSegment = { id?: string | null; recordingSegment?: number; timescale: number; start: number; end: number; name?: string | null; speedAudioMode?: ClipSpeedAudioMode | null; volume?: number | null; hideCursor?: boolean | null }
+export type TimelineConfiguration = { segments: TimelineSegment[]; mainTrackGaps?: MainTrackGaps; transitions: ClipTransition[]; zoomSegments: ZoomSegment[]; sceneSegments?: SceneSegment[]; maskSegments?: MaskSegment[]; textSegments?: TextSegment[]; captionSegments?: CaptionTrackSegment[]; keyboardSegments?: KeyboardTrackSegment[]; audioSegments?: AudioTrackSegment[]; styleSegments: StyleSegment[]; imageSegments: ImageSegment[]; shapeSegments: ShapeSegment[]; camera3dSegments?: Camera3DSegment[] }
+export type TimelineSegment = { id?: string | null; recordingSegment?: number; timescale: number; start: number; end: number; name?: string | null; speedAudioMode?: ClipSpeedAudioMode | null; volume?: number | null; hideCursor?: boolean | null; voiceEq?: VoiceEq | null }
+export type TranscriptWordInput = { text: string; start: number; end: number }
 export type TranscriptionEngine = "Whisper" | "Parakeet"
 export type Trigger = "screenshotTaken" | "studioRecordingFinished" | "instantRecordingFinished" | "recordingStarted" | "uploadCompleted" | "videoImported" | "recordingDeleted"
 export type UpdateChannel = "stable" | "nightly"
@@ -1501,6 +1515,14 @@ export type VideoImportProgress = { project_path: string; stage: ImportStage; pr
 export type VideoMeta = { path: string; fps?: number; start_time?: number | null; device_id?: string | null }
 export type VideoRecordingMetadata = { duration: number; size: number }
 export type VideoUploadInfo = { id: string; link: string; config: S3UploadMeta }
+export type VoiceDeclick = "off" | "light" | "strong"
+/**
+ * `enabled` bypasses the EQ without losing it; de-click runs on its own
+ * switch.
+ */
+export type VoiceEq = { enabled: boolean; preset: VoiceEqPreset; highPass: boolean; highPassHz: number; low: VoiceEqBand; lowMid: VoiceEqBand; highMid: VoiceEqBand; high: VoiceEqBand; declick: VoiceDeclick }
+export type VoiceEqBand = { hz: number; gainDb: number; q?: number }
+export type VoiceEqPreset = "natural" | "clear" | "warm" | "bright" | "broadcast" | "custom"
 export type VoiceIsolation = "light" | "balanced" | "strong"
 export type WindowExclusion = { bundleIdentifier?: string | null; ownerName?: string | null; windowTitle?: string | null }
 export type WindowId = string

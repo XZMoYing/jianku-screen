@@ -63,6 +63,7 @@ mod scene;
 pub mod screen_enhance;
 mod screen_upscale_net;
 mod segment_timing;
+pub mod shape;
 pub mod spring_mass_damper;
 mod takeover;
 mod text;
@@ -141,6 +142,7 @@ use camera3d::{Camera3DFrame, interpolate_camera3d};
 pub use cursor_interpolation::PrecomputedCursorTimeline;
 use mask::interpolate_masks;
 use scene::*;
+use shape::{PreparedShape, prepare_shapes};
 use takeover::InterpolatedTakeover;
 pub use takeover::TakeoverDisplayMorph;
 use text::{PreparedText, prepare_texts};
@@ -2543,6 +2545,7 @@ pub struct ProjectUniforms {
     pub motion_blur_amount: f32,
     pub masks: Vec<PreparedMask>,
     pub texts: Vec<PreparedText>,
+    pub shapes: Vec<PreparedShape>,
     /// Effective 3D camera state for this frame; `None` when the frame is
     /// outside every 3d segment (the warp and blur passes are skipped).
     pub camera3d: Option<Camera3DFrame>,
@@ -5048,6 +5051,18 @@ impl ProjectUniforms {
             })
             .unwrap_or_default();
 
+        let shapes = project
+            .timeline
+            .as_ref()
+            .map(|timeline| {
+                prepare_shapes(
+                    XY::new(output_size.0, output_size.1),
+                    timeline_time,
+                    &timeline.shape_segments,
+                )
+            })
+            .unwrap_or_default();
+
         let screen_shadow_sources = [
             Some(ProjectedShadowSource::from_composite(&display)),
             frame_chrome
@@ -5113,6 +5128,7 @@ impl ProjectUniforms {
             motion_blur_amount: cursor_motion_blur,
             masks,
             texts,
+            shapes,
             camera3d,
             camera3d_zoom,
             camera3d_motion,
@@ -7953,7 +7969,10 @@ impl RendererLayers {
 
     fn validate_overlay_uniforms(&self, uniforms: &ProjectUniforms) -> Result<(), RenderingError> {
         if self.overlays.is_none() {
-            OverlayLayers::validate_omission(&uniforms.project, !uniforms.texts.is_empty())?;
+            OverlayLayers::validate_omission(
+                &uniforms.project,
+                !uniforms.texts.is_empty() || !uniforms.shapes.is_empty(),
+            )?;
         }
         Ok(())
     }
@@ -8224,6 +8243,13 @@ impl RendererLayers {
                 );
             }
 
+            overlays.shapes.prepare(
+                &constants.device,
+                &constants.queue,
+                uniforms.output_size,
+                &uniforms.shapes,
+            );
+
             overlays.captions.prepare(
                 uniforms,
                 segment_frames,
@@ -8407,6 +8433,13 @@ impl RendererLayers {
                     &uniforms.texts,
                 );
             }
+
+            overlays.shapes.prepare(
+                &constants.device,
+                &constants.queue,
+                uniforms.output_size,
+                &uniforms.shapes,
+            );
             timings.text_prepare_duration = start.elapsed();
 
             let start = Instant::now();
@@ -8800,6 +8833,11 @@ impl RendererLayers {
                     overlays.images.render(&mut pass);
                 }
 
+                if overlays.shapes.has_content() {
+                    let mut pass = render_pass!(session.current_texture_view(), wgpu::LoadOp::Load);
+                    overlays.shapes.render(&mut pass);
+                }
+
                 if !uniforms.texts.is_empty() {
                     let mut pass = render_pass!(session.current_texture_view(), wgpu::LoadOp::Load);
                     overlays.text.render(&mut pass);
@@ -8824,12 +8862,17 @@ impl RendererLayers {
                             render_pass!(session.current_texture_view(), wgpu::LoadOp::Load);
                         overlays.images.render_track(&mut pass, overlay.track);
                     }
+                    OverlayTrackKind::Shape if overlays.shapes.has_track(overlay.track) => {
+                        let mut pass =
+                            render_pass!(session.current_texture_view(), wgpu::LoadOp::Load);
+                        overlays.shapes.render_track(&mut pass, overlay.track);
+                    }
                     OverlayTrackKind::Text if overlays.text.has_track(overlay.track) => {
                         let mut pass =
                             render_pass!(session.current_texture_view(), wgpu::LoadOp::Load);
                         overlays.text.render_track(&mut pass, overlay.track);
                     }
-                    OverlayTrackKind::Text | OverlayTrackKind::Image => {}
+                    OverlayTrackKind::Text | OverlayTrackKind::Image | OverlayTrackKind::Shape => {}
                 }
             }
         }

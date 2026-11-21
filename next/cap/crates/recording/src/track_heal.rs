@@ -1077,6 +1077,7 @@ mod tests {
             caption_segments: vec![],
             keyboard_segments: vec![],
             audio_segments: vec![],
+            shape_segments: Vec::new(),
             camera3d_segments: Vec::new(),
         };
         let config = ProjectConfiguration {
@@ -1129,6 +1130,7 @@ mod tests {
             caption_segments: vec![],
             keyboard_segments: vec![],
             audio_segments: vec![],
+            shape_segments: Vec::new(),
             camera3d_segments: vec![Camera3DSegment {
                 attachment: None,
                 start: 100.0,
@@ -1238,6 +1240,7 @@ mod tests {
             caption_segments: vec![],
             keyboard_segments: vec![],
             audio_segments: vec![],
+            shape_segments: Vec::new(),
             camera3d_segments: Vec::new(),
         };
         let config = ProjectConfiguration {

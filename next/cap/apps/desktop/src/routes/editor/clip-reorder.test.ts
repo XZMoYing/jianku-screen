@@ -21,6 +21,7 @@ function timeline() {
 		transitions: [] as ClipTransition[],
 		styleSegments: [],
 		imageSegments: [],
+		shapeSegments: [],
 		zoomSegments: [],
 		sceneSegments: [],
 		maskSegments: [],

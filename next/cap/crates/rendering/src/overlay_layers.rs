@@ -1,11 +1,12 @@
 use crate::{
     ProjectConfiguration, RenderingError,
-    layers::{CaptionsLayer, ImageLayer, KeyboardLayer, TextLayer},
+    layers::{CaptionsLayer, ImageLayer, KeyboardLayer, ShapeLayer, TextLayer},
     readiness,
 };
 
 pub(super) struct OverlayLayers {
     pub(super) text: TextLayer,
+    pub(super) shapes: ShapeLayer,
     pub(super) images: ImageLayer,
     pub(super) captions: CaptionsLayer,
     pub(super) keyboard: KeyboardLayer,
@@ -15,6 +16,7 @@ impl OverlayLayers {
     pub(super) fn new(device: &wgpu::Device, queue: &wgpu::Queue) -> Self {
         Self {
             text: readiness::measure("layers.text", || TextLayer::new(device, queue)),
+            shapes: readiness::measure("layers.shapes", || ShapeLayer::new(device)),
             images: readiness::measure("layers.images", || ImageLayer::new(device)),
             captions: readiness::measure("layers.captions", || CaptionsLayer::new(device, queue)),
             keyboard: readiness::measure("layers.keyboard", || KeyboardLayer::new(device, queue)),
@@ -33,6 +35,7 @@ impl OverlayLayers {
             || !project.overlay_order.is_empty()
             || project.timeline.as_ref().is_some_and(|timeline| {
                 !timeline.text_segments.is_empty()
+                    || !timeline.shape_segments.is_empty()
                     || !timeline.image_segments.is_empty()
                     || !timeline.caption_segments.is_empty()
                     || !timeline.keyboard_segments.is_empty()
@@ -81,7 +84,7 @@ mod tests {
 
     #[test]
     fn every_declared_overlay_source_requires_the_bundle() {
-        let mutations: [fn(&mut ProjectConfiguration); 9] =
+        let mutations: [fn(&mut ProjectConfiguration); 10] =
             [
                 |project| project.captions = Some(Default::default()),
                 |project| project.keyboard = Some(Default::default()),
@@ -134,6 +137,16 @@ mod tests {
                             "id": "keys", "start": 0.0, "end": 1.0, "displayText": "A"
                         }))
                         .unwrap(),
+                    );
+                },
+                |project| {
+                    project.timeline.as_mut().unwrap().shape_segments.push(
+                        cap_project::ShapeSegment {
+                            start: 0.0,
+                            end: 1.0,
+                            enabled: false,
+                            ..Default::default()
+                        },
                     );
                 },
             ];

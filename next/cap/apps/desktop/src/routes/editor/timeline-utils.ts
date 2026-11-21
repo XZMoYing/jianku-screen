@@ -377,6 +377,7 @@ export function rippleDeleteAllTracks(
 		mainTrackGaps?: MainTrackGaps;
 		styleSegments?: AttachmentSpan[] | null;
 		imageSegments?: AttachmentSpan[] | null;
+		shapeSegments?: AttachmentSpan[] | null;
 		zoomSegments?: AttachmentSpan[] | null;
 		sceneSegments?: AttachmentSpan[] | null;
 		maskSegments?: RippleMaskSegment[] | null;
@@ -479,7 +480,11 @@ export function rippleDeleteAllTracks(
 		shiftDuration +
 		heldTimeInCut -
 		Math.min(Math.max(heldTimeInCut, 0), retainedTimeInCut);
-	for (const track of [timeline.styleSegments, timeline.imageSegments]) {
+	for (const track of [
+		timeline.styleSegments,
+		timeline.imageSegments,
+		timeline.shapeSegments,
+	]) {
 		if (track)
 			rippleDeleteFromTrack(
 				track,

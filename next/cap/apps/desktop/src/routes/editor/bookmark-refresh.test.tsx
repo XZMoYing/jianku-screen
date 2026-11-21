@@ -58,6 +58,7 @@ function fixture(): TimelineConfiguration {
 		zoomSegments: [],
 		styleSegments: [],
 		imageSegments: [],
+		shapeSegments: [],
 		camera3dSegments: [newCamera3DShot(2, 6)],
 		textSegments: [],
 	};

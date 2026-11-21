@@ -129,6 +129,7 @@ const DEFAULT_AUDIO: AudioConfiguration = {
 	mute: false,
 	improve: false,
 	isolation: "balanced",
+	autoLevel: false,
 	micVolumeDb: 0,
 	micStereoMode: "stereo",
 	systemVolumeDb: 0,

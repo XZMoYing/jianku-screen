@@ -1,7 +1,8 @@
 import { batch, For, Show } from "solid-js";
 import { t as localize } from "~/utils/i18n";
-import type { ImageSegment, StyleSegment } from "~/utils/tauri";
+import type { ImageSegment, ShapeSegment, StyleSegment } from "~/utils/tauri";
 import { useEditorContext } from "../context";
+import { shapeDisplayName } from "../shapes";
 import { editOverlayInterval } from "../style";
 import { useTimelineContext } from "./context";
 import { createTimelineMouseDrag } from "./mouse-drag";
@@ -26,7 +27,7 @@ export function StyleTrack(props: OverlayTrackProps) {
 }
 
 export function OverlayTrack(
-	props: OverlayTrackProps & { type: "style" | "image" },
+	props: OverlayTrackProps & { type: "style" | "image" | "shape" },
 ) {
 	const {
 		project,
@@ -38,12 +39,16 @@ export function OverlayTrack(
 		totalDuration,
 	} = useEditorContext();
 	const { secsPerPixel, timelineBounds, snapping } = useTimelineContext();
-	const allSegments = (): (StyleSegment | ImageSegment)[] =>
+	const allSegments = (): (StyleSegment | ImageSegment | ShapeSegment)[] =>
 		(props.type === "style"
 			? project.timeline?.styleSegments
-			: project.timeline?.imageSegments) ?? [];
+			: props.type === "image"
+				? project.timeline?.imageSegments
+				: project.timeline?.shapeSegments) ?? [];
 	const segments = () =>
 		allSegments().filter((segment) => segment.track === props.laneIndex);
+	const segmentName = (segment: StyleSegment | ImageSegment | ShapeSegment) =>
+		"name" in segment ? segment.name : shapeDisplayName(segment);
 	const selected = (index: number) =>
 		editorState.timeline.selection?.type === props.type &&
 		editorState.timeline.selection.indices.includes(index);
@@ -61,6 +66,8 @@ export function OverlayTrack(
 	const add = (time: number) => {
 		if (props.type === "style")
 			projectActions.addStyleSegment(props.laneIndex, time);
+		else if (props.type === "shape")
+			projectActions.addShapeSegment(props.laneIndex, time);
 		else void projectActions.importImageSegment(props.laneIndex, time);
 	};
 	function select(index: number, event: MouseEvent) {
@@ -101,7 +108,7 @@ export function OverlayTrack(
 	}
 	function drag(
 		event: MouseEvent,
-		segment: StyleSegment | ImageSegment,
+		segment: StyleSegment | ImageSegment | ShapeSegment,
 		edge: "start" | "move" | "end",
 	) {
 		event.stopPropagation();
@@ -161,6 +168,8 @@ export function OverlayTrack(
 				expected = interval;
 				if (type === "style")
 					setProject("timeline", "styleSegments", currentIndex, interval);
+				else if (type === "shape")
+					setProject("timeline", "shapeSegments", currentIndex, interval);
 				else setProject("timeline", "imageSegments", currentIndex, interval);
 			};
 			const sameNeighbours = () => {
@@ -234,7 +243,8 @@ export function OverlayTrack(
 					if (
 						(reason === "release" || reason === "history") &&
 						sameRange() &&
-						segment.start !== initial.start
+						segment.start !== initial.start &&
+						type !== "shape"
 					)
 						projectActions.reanchorOverlay?.(type, segment);
 					resume?.();
@@ -271,16 +281,30 @@ export function OverlayTrack(
 					<Show
 						when={props.type === "image"}
 						fallback={
-							<>
+							<Show
+								when={props.type === "shape"}
+								fallback={
+									<>
+										<span>
+											{localize(
+												"Change background, camera and cursor for part of your video",
+											)}
+										</span>
+										<span class="cap-empty-lane-action">
+											{localize("· Add style")}
+										</span>
+									</>
+								}
+							>
 								<span>
 									{localize(
-										"Change background, camera and cursor for part of your video",
+										"Add arrows, highlights, rectangles, or step badges",
 									)}
 								</span>
 								<span class="cap-empty-lane-action">
-									{localize("· Add style")}
+									{localize("· Add shape")}
 								</span>
-							</>
+							</Show>
 						}
 					>
 						<span>{localize("Place images and logos on your video")}</span>
@@ -295,6 +319,7 @@ export function OverlayTrack(
 			<For each={segments()}>
 				{(segment) => {
 					const index = () => allSegments().indexOf(segment);
+					const label = () => segmentName(segment);
 					return (
 						<SegmentRoot
 							menuTarget={{ type: props.type, index: index() }}
@@ -305,7 +330,7 @@ export function OverlayTrack(
 							class="group"
 							selected={selected(index())}
 							muted={!segment.enabled}
-							title={`${segment.name} · ${(segment.end - segment.start).toFixed(2)}s`}
+							title={`${label()} · ${(segment.end - segment.start).toFixed(2)}s`}
 						>
 							<SegmentHandle
 								position="start"
@@ -318,14 +343,14 @@ export function OverlayTrack(
 								<SegmentLabel
 									full={() => (
 										<div class="cap-seg-labels">
-											<span class="cap-seg-label truncate">{segment.name}</span>
+											<span class="cap-seg-label truncate">{label()}</span>
 											<span class="cap-seg-sublabel">
 												{`${(segment.end - segment.start).toFixed(1)}s`}
 											</span>
 										</div>
 									)}
 									compact={() => (
-										<span class="cap-seg-label truncate">{segment.name}</span>
+										<span class="cap-seg-label truncate">{label()}</span>
 									)}
 								/>
 							</SegmentContent>

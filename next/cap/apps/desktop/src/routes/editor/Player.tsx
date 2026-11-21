@@ -240,6 +240,7 @@ export function PlayerContent(props: {
 							textSegments: [],
 							styleSegments: [],
 							imageSegments: [],
+							shapeSegments: [],
 							camera3dSegments: [],
 							transitions: [],
 						}),

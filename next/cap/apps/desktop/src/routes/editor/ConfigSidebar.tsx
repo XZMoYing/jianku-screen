@@ -86,6 +86,7 @@ import {
 	DEFAULT_SPLIT_LAYOUT,
 } from "./projectConfig";
 import { selectedSegmentLabel } from "./selection-label";
+import { ShapeSegmentConfig } from "./shape-segment-config";
 import { StyleGroupToggle, StyleSegmentConfig } from "./style-segment-config";
 import type { TextSegment } from "./text";
 import { TextSegmentConfig } from "./text-segment-config";
@@ -956,6 +957,18 @@ function ConfigSidebarContent() {
 									}
 								>
 									{(index) => <ImageSegmentConfig index={index} />}
+								</For>
+							</Show>
+							<Show when={selection().type === "shape"}>
+								<For
+									each={
+										selection().type === "shape"
+											? (selection() as { type: "shape"; indices: number[] })
+													.indices
+											: []
+									}
+								>
+									{(index) => <ShapeSegmentConfig index={index} />}
 								</For>
 							</Show>
 							<Show

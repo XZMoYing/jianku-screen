@@ -11,6 +11,7 @@ pub mod keyboard;
 mod meta;
 mod overlay_attachment;
 mod portable;
+mod shapes;
 
 pub use animated_gradient::*;
 pub use append_publication::{ProjectAppendSnapshot, recover_interrupted_project_append};
@@ -24,6 +25,7 @@ pub use keyboard::*;
 pub use meta::*;
 pub use overlay_attachment::*;
 pub use portable::*;
+pub use shapes::*;
 
 use serde::{Deserialize, Serialize};
 use specta::Type;

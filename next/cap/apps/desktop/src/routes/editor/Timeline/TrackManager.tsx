@@ -30,6 +30,10 @@ const TRACK_META: Record<TimelineTrackType, TrackMeta> = {
 		description: "Place images and logos on your video.",
 		unavailableHint: "",
 	},
+	shape: {
+		description: "Add arrows, highlights, rectangles, and step badges.",
+		unavailableHint: "",
+	},
 	clip: {
 		description: "Your recorded screen footage.",
 		unavailableHint: "",

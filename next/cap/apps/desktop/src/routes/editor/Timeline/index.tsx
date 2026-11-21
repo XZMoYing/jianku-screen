@@ -28,9 +28,11 @@ import { t as localize } from "~/utils/i18n";
 import IconLucideAlignHorizontalDistributeCenter from "~icons/lucide/align-horizontal-distribute-center";
 import IconLucideMagnet from "~icons/lucide/magnet";
 import IconLucidePalette from "~icons/lucide/palette";
+import IconLucidePencil from "~icons/lucide/pencil";
 import { newClipInstance } from "../clip-identity";
 import { stylesRevealCamera } from "../style";
 import { ImageTrack } from "./image-track";
+import { ShapeTrack } from "./shape-track";
 import { type OverlayDragState, StyleTrack } from "./style-track";
 
 import "./styles.css";
@@ -125,6 +127,7 @@ const RULER_SCRUB_OVERHANG_PX = 4;
 const trackIcons: Record<TimelineTrackType, () => JSX.Element> = {
 	style: () => <IconLucidePalette class="size-3" />,
 	image: () => <IconCapImage class="size-3" />,
+	shape: () => <IconLucidePencil class="size-3" />,
 	clip: () => <IconLucideClapperboard class="size-3" />,
 	caption: () => <IconCapCaptions class="size-3" />,
 	keyboard: () => <IconLucideKeyboard class="size-3" />,
@@ -146,6 +149,7 @@ type TrackDefinition = {
 const trackDefinitions: TrackDefinition[] = [
 	{ type: "style", label: "Style", icon: trackIcons.style, locked: false },
 	{ type: "image", label: "Image", icon: trackIcons.image, locked: false },
+	{ type: "shape", label: "Shape", icon: trackIcons.shape, locked: false },
 	{
 		type: "clip",
 		label: "Clip",
@@ -403,7 +407,9 @@ export function Timeline(props: {
 		trackDefinitions.map((definition) => ({
 			...definition,
 			active:
-				definition.type === "style" || definition.type === "image"
+				definition.type === "style" ||
+				definition.type === "image" ||
+				definition.type === "shape"
 					? trackState()[definition.type] > 0
 					: definition.type === "caption"
 						? trackState().caption
@@ -424,11 +430,14 @@ export function Timeline(props: {
 			supportsMultiple:
 				definition.type === "style" ||
 				definition.type === "image" ||
+				definition.type === "shape" ||
 				definition.type === "mask" ||
 				definition.type === "text" ||
 				definition.type === "audio",
 			count:
-				definition.type === "style" || definition.type === "image"
+				definition.type === "style" ||
+				definition.type === "image" ||
+				definition.type === "shape"
 					? trackState()[definition.type]
 					: definition.type === "mask"
 						? trackState().mask
@@ -594,11 +603,13 @@ export function Timeline(props: {
 	// existing lane with room at the playhead is reused, otherwise a new lane
 	// is stacked on. Same 1s / 80px sizing as the tracks' click-to-add.
 	function handleAddTrack(type: TimelineTrackType) {
-		if (type === "style" || type === "image") {
+		if (type === "style" || type === "image" || type === "shape") {
 			const segments =
 				(type === "style"
 					? project.timeline?.styleSegments
-					: project.timeline?.imageSegments) ?? [];
+					: type === "image"
+						? project.timeline?.imageSegments
+						: project.timeline?.shapeSegments) ?? [];
 			const lane = Math.max(
 				getUsedTrackCount<{ start: number; end: number; track?: number }>(
 					segments,
@@ -606,6 +617,7 @@ export function Timeline(props: {
 				trackState()[type],
 			);
 			if (type === "style") projectActions.addStyleSegment(lane);
+			else if (type === "shape") projectActions.addShapeSegment(lane);
 			else void projectActions.importImageSegment(lane);
 			return;
 		}
@@ -738,15 +750,17 @@ export function Timeline(props: {
 	}
 
 	function handleDeleteTrackLane(
-		type: "text" | "mask" | "audio" | "style" | "image",
+		type: "text" | "mask" | "audio" | "style" | "image" | "shape",
 		laneIndex: number,
 	) {
-		if (type === "style" || type === "image") {
+		if (type === "style" || type === "image" || type === "shape") {
 			const resumeHistory = projectHistory.pause();
 			const segments =
 				(type === "style"
 					? project.timeline?.styleSegments
-					: project.timeline?.imageSegments) ?? [];
+					: type === "image"
+						? project.timeline?.imageSegments
+						: project.timeline?.shapeSegments) ?? [];
 			projectActions.deleteOverlaySegments(
 				type,
 				segments.flatMap((segment, index) =>
@@ -758,10 +772,12 @@ export function Timeline(props: {
 					const remaining =
 						type === "style"
 							? project.timeline?.styleSegments
-							: project.timeline?.imageSegments;
+							: type === "image"
+								? project.timeline?.imageSegments
+								: project.timeline?.shapeSegments;
 					for (const segment of remaining ?? [])
 						if (segment.track > laneIndex) segment.track -= 1;
-					if (type === "image")
+					if (type === "image" || type === "shape")
 						project.overlayOrder = removeOverlayTrack(
 							project.overlayOrder,
 							type,
@@ -869,6 +885,7 @@ export function Timeline(props: {
 							textSegments: [],
 							styleSegments: [],
 							imageSegments: [],
+							shapeSegments: [],
 							captionSegments: [],
 							keyboardSegments: [],
 							camera3dSegments: [],
@@ -898,6 +915,7 @@ export function Timeline(props: {
 							textSegments: [],
 							styleSegments: [],
 							imageSegments: [],
+							shapeSegments: [],
 							captionSegments: [],
 							keyboardSegments: [],
 							camera3dSegments: [],
@@ -954,6 +972,7 @@ export function Timeline(props: {
 				textSegments: [],
 				styleSegments: [],
 				imageSegments: [],
+				shapeSegments: [],
 				captionSegments: [],
 				keyboardSegments: [],
 				camera3dSegments: [],
@@ -1002,6 +1021,7 @@ export function Timeline(props: {
 					textSegments: [],
 					styleSegments: [],
 					imageSegments: [],
+					shapeSegments: [],
 					captionSegments: [],
 					keyboardSegments: [],
 					camera3dSegments: [],
@@ -1016,12 +1036,14 @@ export function Timeline(props: {
 				project.timeline.camera3dSegments ??= [];
 				project.timeline.styleSegments ??= [];
 				project.timeline.imageSegments ??= [];
+				project.timeline.shapeSegments ??= [];
 			}),
 		);
 	}
 
 	let styleSegmentDragState: OverlayDragState = { type: "idle" };
 	let imageSegmentDragState: OverlayDragState = { type: "idle" };
+	let shapeSegmentDragState: OverlayDragState = { type: "idle" };
 	let zoomSegmentDragState = { type: "idle" } as ZoomSegmentDragState;
 	let sceneSegmentDragState = { type: "idle" } as SceneSegmentDragState;
 	let maskSegmentDragState = { type: "idle" } as MaskSegmentDragState;
@@ -1197,6 +1219,7 @@ export function Timeline(props: {
 		if (
 			styleSegmentDragState.type !== "moving" &&
 			imageSegmentDragState.type !== "moving" &&
+			shapeSegmentDragState.type !== "moving" &&
 			zoomSegmentDragState.type !== "moving" &&
 			sceneSegmentDragState.type !== "moving" &&
 			maskSegmentDragState.type !== "moving" &&
@@ -1373,6 +1396,7 @@ export function Timeline(props: {
 	const isAnyTrackDragging = () =>
 		styleSegmentDragState.type !== "idle" ||
 		imageSegmentDragState.type !== "idle" ||
+		shapeSegmentDragState.type !== "idle" ||
 		zoomSegmentDragState.type !== "idle" ||
 		sceneSegmentDragState.type !== "idle" ||
 		maskSegmentDragState.type !== "idle" ||
@@ -1824,9 +1848,11 @@ export function Timeline(props: {
 											type: localize(
 												row.kind === "image"
 													? "Image"
-													: row.kind === "text"
-														? "Text"
-														: "Mask",
+													: row.kind === "shape"
+														? "Shape"
+														: row.kind === "text"
+															? "Text"
+															: "Mask",
 											),
 											number: row.track + 1,
 										})}
@@ -1840,6 +1866,15 @@ export function Timeline(props: {
 													laneIndex={row.track}
 													onDragStateChanged={(value) => {
 														imageSegmentDragState = value;
+													}}
+													handleUpdatePlayhead={handleUpdatePlayhead}
+												/>
+											</Match>
+											<Match when={row.kind === "shape"}>
+												<ShapeTrack
+													laneIndex={row.track}
+													onDragStateChanged={(value) => {
+														shapeSegmentDragState = value;
 													}}
 													handleUpdatePlayhead={handleUpdatePlayhead}
 												/>
@@ -1980,6 +2015,8 @@ function getTrackSegments(
 			return timeline?.styleSegments ?? [];
 		case "image":
 			return timeline?.imageSegments ?? [];
+		case "shape":
+			return timeline?.shapeSegments ?? [];
 		case "text":
 			return timeline?.textSegments ?? [];
 		case "mask":
