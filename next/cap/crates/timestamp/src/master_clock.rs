@@ -12,6 +12,7 @@ pub const AUDIO_OUTPUT_FRAMES: u64 = 1024;
 pub const DEFAULT_SAMPLE_RATE: u32 = 48_000;
 pub const TS_SMOOTHING_THRESHOLD_NS: u64 = 70_000_000;
 pub const MAX_TS_VAR_NS: u64 = 2_000_000_000;
+const OFF_SOURCE_TIME_NS: u64 = 4_000_000;
 
 #[derive(Debug)]
 pub struct MasterClock {
@@ -170,6 +171,11 @@ pub struct SourceClockState {
     timing_adjust: i64,
     next_expected_ns: Option<i64>,
     last_cadence_output_ns: Option<u64>,
+    detect_skipped_frames: bool,
+    pending_lag_ns: Option<i64>,
+    skip_confirmed: bool,
+    off_source_time: bool,
+    skip_count: u64,
     snap_count: u64,
     hard_reset_count: u64,
     resync_count: u64,
@@ -185,12 +191,22 @@ impl SourceClockState {
             timing_adjust: 0,
             next_expected_ns: None,
             last_cadence_output_ns: None,
+            detect_skipped_frames: false,
+            pending_lag_ns: None,
+            skip_confirmed: false,
+            off_source_time: false,
+            skip_count: 0,
             snap_count: 0,
             hard_reset_count: 0,
             resync_count: 0,
             trusted_count: 0,
             frame_count: 0,
         }
+    }
+
+    pub fn detecting_skipped_frames(mut self) -> Self {
+        self.detect_skipped_frames = true;
+        self
     }
 
     pub fn name(&self) -> &'static str {
@@ -207,6 +223,18 @@ impl SourceClockState {
 
     pub fn next_expected_ns(&self) -> Option<i64> {
         self.next_expected_ns
+    }
+
+    pub fn skip_count(&self) -> u64 {
+        self.skip_count
+    }
+
+    pub fn lag_pending(&self) -> bool {
+        self.pending_lag_ns.is_some()
+    }
+
+    pub fn off_source_time(&self) -> bool {
+        self.off_source_time
     }
 
     pub fn snap_count(&self) -> u64 {
@@ -278,6 +306,8 @@ impl SourceClockState {
 
         let mut ts_ns = raw_ns;
         let duration_ns = frame_duration_ns.min(i64::MAX as u64) as i64;
+        let pending_lag_ns = self.pending_lag_ns.take();
+        let skip_confirmed = std::mem::take(&mut self.skip_confirmed);
 
         if !self.timing_set {
             self.timing_adjust = now_ns.saturating_sub(raw_ns);
@@ -291,6 +321,17 @@ impl SourceClockState {
                 self.hard_reset_count = self.hard_reset_count.saturating_add(1);
                 self.resync_count = self.resync_count.saturating_add(1);
                 outcome = SourceClockOutcome::HardReset;
+            } else if smooth
+                && diff < TS_SMOOTHING_THRESHOLD_NS
+                && self.skipped_frames(
+                    raw_ns - expected,
+                    duration_ns,
+                    pending_lag_ns,
+                    skip_confirmed,
+                )
+            {
+                self.skip_confirmed = true;
+                self.skip_count = self.skip_count.saturating_add(1);
             } else if smooth && diff < TS_SMOOTHING_THRESHOLD_NS {
                 // Snap jitter onto the expected cadence, but cap how far the
                 // ladder may lead the source clock. Each snap re-anchors
@@ -316,6 +357,8 @@ impl SourceClockState {
             outcome = SourceClockOutcome::FirstFrame;
         }
         self.next_expected_ns = Some(ts_ns.saturating_add(duration_ns));
+        self.off_source_time =
+            self.detect_skipped_frames && abs_diff_u64(ts_ns, raw_ns) >= OFF_SOURCE_TIME_NS;
 
         let mut output_ns = ts_ns.saturating_add(self.timing_adjust).max(0) as u64;
         if smooth {
@@ -338,11 +381,36 @@ impl SourceClockState {
         }
     }
 
+    fn skipped_frames(
+        &mut self,
+        lag_ns: i64,
+        duration_ns: i64,
+        pending_lag_ns: Option<i64>,
+        skip_confirmed: bool,
+    ) -> bool {
+        // Half a frame less a 32nd avoids mach-tick rounding flipping the decision
+        // when delivery shifts by one refresh (e.g. 60fps on a 120Hz display).
+        let min_lag_ns = duration_ns / 2 - duration_ns / 32;
+        if !self.detect_skipped_frames || min_lag_ns <= 0 || lag_ns < min_lag_ns {
+            return false;
+        }
+        if skip_confirmed
+            || pending_lag_ns.is_some_and(|previous| lag_ns >= previous - duration_ns / 8)
+        {
+            return true;
+        }
+        self.pending_lag_ns = Some(lag_ns);
+        false
+    }
+
     pub fn reset(&mut self) {
         self.timing_set = false;
         self.timing_adjust = 0;
         self.next_expected_ns = None;
         self.last_cadence_output_ns = None;
+        self.pending_lag_ns = None;
+        self.skip_confirmed = false;
+        self.off_source_time = false;
     }
 }
 
@@ -897,5 +965,83 @@ mod tests {
             33_333_333,
         );
         assert_eq!(second.master_ns - first.master_ns, 47_000_000);
+    }
+
+    #[test]
+    fn slow_source_tracks_source_time_without_sawtooth_jumps() {
+        let frame_60_ns = 16_666_666u64;
+        let raws: Vec<i64> = (0..60).map(|frame| frame * 33_333_333).collect();
+        let mut state = SourceClockState::new("video").detecting_skipped_frames();
+        let output: Vec<u64> = raws
+            .iter()
+            .map(|&raw| {
+                state
+                    .remap_ns(raw, raw + 10_000_000, frame_60_ns, true)
+                    .master_ns
+            })
+            .collect();
+
+        for (index, pair) in output.windows(2).enumerate().skip(2) {
+            let dt = pair[1].saturating_sub(pair[0]);
+            assert!(
+                dt.abs_diff(33_333_333) < 1_000_000,
+                "frame {index} sawtooth gap: dt={}ms",
+                dt as f64 / 1e6
+            );
+        }
+        assert!(state.skip_count() > 0);
+    }
+
+    #[test]
+    fn delivery_backlog_draining_stays_smoothed() {
+        let frame_ns = 16_666_666u64;
+        let resume = 30 * frame_ns as i64 + 40_000_000;
+        let raws: Vec<i64> = (0..180)
+            .map(|frame| {
+                let raw = frame * frame_ns as i64;
+                if frame >= 30 {
+                    raw.max(resume + (frame - 30) * 5_000_000)
+                } else {
+                    raw
+                }
+            })
+            .collect();
+        let mut tracked = SourceClockState::new("tracked").detecting_skipped_frames();
+        let mut legacy = SourceClockState::new("legacy");
+        let tracked_out: Vec<u64> = raws
+            .iter()
+            .map(|&raw| {
+                tracked
+                    .remap_ns(raw, raw + 20_000_000, frame_ns, true)
+                    .master_ns
+            })
+            .collect();
+        let legacy_out: Vec<u64> = raws
+            .iter()
+            .map(|&raw| {
+                legacy
+                    .remap_ns(raw, raw + 20_000_000, frame_ns, true)
+                    .master_ns
+            })
+            .collect();
+        assert_eq!(tracked_out, legacy_out);
+        assert_eq!(tracked.skip_count(), 0);
+    }
+
+    #[test]
+    fn refresh_slip_flags_off_source_time() {
+        let frame_ns = 33_333_333u64;
+        let mut state = SourceClockState::new("video").detecting_skipped_frames();
+        for frame in 0..8i64 {
+            let raw = frame * frame_ns as i64 + if frame >= 5 { 16_666_000 } else { 0 };
+            state.remap_ns(raw, raw + 10_000_000, frame_ns, true);
+            if frame < 5 {
+                assert!(!state.off_source_time(), "frame {frame}");
+            } else if frame == 5 {
+                assert!(state.off_source_time(), "frame 5 should flag off-source");
+            } else {
+                assert!(!state.off_source_time(), "frame {frame} should recover");
+            }
+        }
     }
 }

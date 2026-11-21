@@ -1,8 +1,8 @@
 use crate::{
     output_pipeline::{
         AudioFrame, AudioMuxer, BlockingThreadFinish, DiskSpaceMonitor, DiskSpacePollResult,
-        HealthSender, Muxer, PipelineHealthEvent, SharedHealthSender, TaskPool, VideoFrame,
-        VideoMuxer, emit_health, wait_for_blocking_thread_finish,
+        HealthSender, Muxer, NoVideoFramesCaptured, PipelineHealthEvent, SharedHealthSender,
+        TaskPool, VideoFrame, VideoMuxer, emit_health, wait_for_blocking_thread_finish,
     },
     sources::screen_capture,
 };
@@ -31,7 +31,7 @@ const DEFAULT_MP4_AUDIO_FINISH_TIMEOUT_INSTANT: Duration = Duration::from_secs(8
 
 const DISK_SPACE_MIN_START_BYTES: u64 = 500 * 1024 * 1024;
 
-fn boost_encoder_thread_qos() {
+pub(crate) fn boost_encoder_thread_qos() {
     let result = set_current_thread_qos(MacOsQosClass::UserInitiated);
     if result != 0 {
         warn!(result, "pthread_set_qos_class_self_np failed");
@@ -196,6 +196,22 @@ impl FrameDropTracker {
     fn record_drop(&mut self) {
         self.drops_in_window += 1;
         self.total_drops += 1;
+        if self.total_drops == 1 {
+            warn!(
+                source = self.source,
+                total_frames = self.total_frames,
+                "MP4 muxer encoder queue full, first frame dropped"
+            );
+            if let Some(tx) = &self.health_tx {
+                emit_health(
+                    tx,
+                    PipelineHealthEvent::FrameDropRateHigh {
+                        source: self.source.to_string(),
+                        rate_pct: 100.0 / (self.total_frames + 1) as f64,
+                    },
+                );
+            }
+        }
         self.check_drop_rate();
     }
 
@@ -285,6 +301,7 @@ pub struct AVFoundationMp4Muxer {
     channel_pressure: Option<ChannelPressureTracker>,
     audio_channel_pressure: Option<ChannelPressureTracker>,
     was_paused: bool,
+    frame_copier: Option<FrameCopier>,
     fatal_error: SharedFatalError,
     health_tx: SharedHealthSender,
 }
@@ -660,6 +677,7 @@ impl Muxer for AVFoundationMp4Muxer {
             channel_pressure,
             audio_channel_pressure,
             was_paused: false,
+            frame_copier: None,
             fatal_error,
             health_tx,
         })
@@ -768,7 +786,16 @@ impl Muxer for AVFoundationMp4Muxer {
             match state.encoder.lock() {
                 Ok(mut encoder) => {
                     if let Err(e) = encoder.finish(Some(timestamp)) {
-                        if video_thread_timed_out && video_frames > 0 {
+                        if matches!(e, cap_enc_avfoundation::FinishError::NoFrames) {
+                            warn!(
+                                video_frames,
+                                audio_frames,
+                                "MP4 encoder wrote no video frames; the output is empty"
+                            );
+                            if finish_error.is_none() {
+                                finish_error = Some(anyhow::Error::new(NoVideoFramesCaptured));
+                            }
+                        } else if video_thread_timed_out && video_frames > 0 {
                             warn!(
                                 video_frames,
                                 "Best-effort encoder finalize failed after thread timeout, \
@@ -807,6 +834,54 @@ impl Muxer for AVFoundationMp4Muxer {
     }
 }
 
+// ScreenCaptureKit gives each stream a small IOSurface pool and stops
+// delivering frames while the app retains them in encoder/muxer queues.
+// Copying into a process-owned pool returns capture surfaces immediately.
+pub(crate) struct FrameCopier {
+    size: (usize, usize),
+    scaler: Option<screen_capture::FrameScaler>,
+    set_up_at: std::time::Instant,
+}
+
+const FRAME_COPIER_RETRY: Duration = Duration::from_secs(1);
+
+impl FrameCopier {
+    pub(crate) fn copy(
+        copier: &mut Option<Self>,
+        sample_buf: arc::R<cidre::cm::SampleBuf>,
+    ) -> arc::R<cidre::cm::SampleBuf> {
+        let Some(size) = sample_buf
+            .image_buf()
+            .map(|image| (image.width(), image.height()))
+        else {
+            return sample_buf;
+        };
+        let set_up = copier.as_ref().is_none_or(|c| {
+            c.size != size || (c.scaler.is_none() && c.set_up_at.elapsed() >= FRAME_COPIER_RETRY)
+        });
+        if set_up {
+            let scaler = screen_capture::FrameScaler::copier(size.0, size.1);
+            if scaler.is_none() {
+                warn!(
+                    width = size.0,
+                    height = size.1,
+                    "Could not set up the screen frame copy; recording capture frames directly"
+                );
+            }
+            *copier = Some(Self {
+                size,
+                scaler,
+                set_up_at: std::time::Instant::now(),
+            });
+        }
+        copier
+            .as_ref()
+            .and_then(|c| c.scaler.as_ref())
+            .and_then(|scaler| scaler.scale_frame(&sample_buf))
+            .unwrap_or(sample_buf)
+    }
+}
+
 impl VideoMuxer for AVFoundationMp4Muxer {
     type VideoFrame = screen_capture::VideoFrame;
 
@@ -839,9 +914,10 @@ impl VideoMuxer for AVFoundationMp4Muxer {
                 pressure.on_send();
             }
 
+            let sample_buf = FrameCopier::copy(&mut self.frame_copier, frame.sample_buf);
             let send_result = state
                 .video_tx
-                .try_send(Some(VideoFrameMessage::Frame(frame.sample_buf, timestamp)));
+                .try_send(Some(VideoFrameMessage::Frame(sample_buf, timestamp)));
 
             match send_result {
                 Ok(()) => {
@@ -1367,7 +1443,12 @@ impl Muxer for AVFoundationCameraMuxer {
                 match state.encoder.lock() {
                     Ok(mut encoder) => {
                         if let Err(e) = encoder.finish(Some(timestamp)) {
-                            let err = anyhow!("Failed to finish camera MP4 encoder: {e}");
+                            let err = if matches!(e, cap_enc_avfoundation::FinishError::NoFrames) {
+                                anyhow::Error::new(NoVideoFramesCaptured)
+                                    .context("Camera MP4 encoder wrote no video frames")
+                            } else {
+                                anyhow!("Failed to finish camera MP4 encoder: {e}")
+                            };
                             warn!("{err:#}");
                             if finish_error.is_none() {
                                 finish_error = Some(err);
@@ -1594,5 +1675,57 @@ mod tests {
                 DEFAULT_MP4_AUDIO_FINISH_TIMEOUT_INSTANT
             );
         }
+    }
+
+    fn screen_frame(width: usize, height: usize, index: i64) -> arc::R<cidre::cm::SampleBuf> {
+        use cidre::{cm, cv};
+        let buf = cv::PixelBuf::new(width, height, cv::PixelFormat::_420V, None).unwrap();
+        let desc = cm::VideoFormatDesc::with_image_buf(&buf).unwrap();
+        let timing = cm::SampleTimingInfo {
+            duration: cm::Time::new(1, 30),
+            pts: cm::Time::new(index, 30),
+            dts: cm::Time::invalid(),
+        };
+        cm::SampleBuf::with_image_buf(&buf, true, None, std::ptr::null(), &desc, &timing).unwrap()
+    }
+
+    #[test]
+    fn writer_gets_a_copy_of_each_screen_frame() {
+        let mut copier = None;
+        for (index, (width, height)) in [(64, 48), (64, 48), (32, 16)].into_iter().enumerate() {
+            let source = screen_frame(width, height, index as i64);
+            let copy = FrameCopier::copy(&mut copier, source.clone());
+            let (from, to) = (source.image_buf().unwrap(), copy.image_buf().unwrap());
+            assert!(!std::ptr::eq(from, to), "frame {index} was not copied");
+            assert_eq!((to.width(), to.height()), (width, height));
+            assert_eq!(copy.pts(), source.pts());
+        }
+    }
+
+    #[test]
+    fn failed_copier_setup_is_retried() {
+        let failed = |since: Duration| {
+            Some(FrameCopier {
+                size: (64, 48),
+                scaler: None,
+                set_up_at: std::time::Instant::now().checked_sub(since).unwrap(),
+            })
+        };
+        let source = screen_frame(64, 48, 0);
+
+        let mut copier = failed(Duration::ZERO);
+        let frame = FrameCopier::copy(&mut copier, source.clone());
+        assert!(std::ptr::eq(
+            source.image_buf().unwrap(),
+            frame.image_buf().unwrap()
+        ));
+
+        let mut copier = failed(FRAME_COPIER_RETRY);
+        let frame = FrameCopier::copy(&mut copier, source.clone());
+        assert!(!std::ptr::eq(
+            source.image_buf().unwrap(),
+            frame.image_buf().unwrap()
+        ));
+        assert!(copier.unwrap().scaler.is_some());
     }
 }

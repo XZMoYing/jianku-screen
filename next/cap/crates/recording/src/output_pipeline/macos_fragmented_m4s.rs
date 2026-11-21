@@ -2,6 +2,7 @@ use super::core::{
     BlockingThreadFinish, DiskSpaceMonitor, HealthSender, PipelineHealthEvent, SharedHealthSender,
     combine_finish_errors, frame_timing_log_threshold_ms, wait_for_blocking_thread_finish,
 };
+use super::macos::{FrameCopier, boost_encoder_thread_qos};
 use super::macos_frame_convert::{FramePool, fill_frame_from_sample_buf};
 use crate::{
     AudioFrame, AudioMuxer, Muxer, SharedPauseState, TaskPool, VideoMuxer,
@@ -154,6 +155,7 @@ struct EncoderState {
 }
 
 pub struct MacOSFragmentedM4SMuxer {
+    timed_fragments: bool,
     base_path: PathBuf,
     video_config: VideoInfo,
     segment_duration: Duration,
@@ -163,6 +165,7 @@ pub struct MacOSFragmentedM4SMuxer {
     state: Option<EncoderState>,
     pause: SharedPauseState,
     frame_drops: FrameDropTracker,
+    frame_copier: Option<FrameCopier>,
     started: bool,
     disk_space_callback: Option<DiskSpaceCallback>,
     segment_tx: Option<std::sync::mpsc::Sender<SegmentCompletedEvent>>,
@@ -170,6 +173,7 @@ pub struct MacOSFragmentedM4SMuxer {
 }
 
 pub struct MacOSFragmentedM4SMuxerConfig {
+    pub timed_fragments: bool,
     pub segment_duration: Duration,
     pub preset: H264Preset,
     pub bpp: f32,
@@ -182,6 +186,7 @@ pub struct MacOSFragmentedM4SMuxerConfig {
 impl Default for MacOSFragmentedM4SMuxerConfig {
     fn default() -> Self {
         Self {
+            timed_fragments: false,
             segment_duration: Duration::from_secs(2),
             preset: H264Preset::Ultrafast,
             bpp: H264EncoderBuilder::QUALITY_BPP,
@@ -218,6 +223,7 @@ impl Muxer for MacOSFragmentedM4SMuxer {
             .unwrap_or_else(|| SharedPauseState::new(pause_flag));
 
         Ok(Self {
+            timed_fragments: config.timed_fragments,
             base_path: output_path,
             video_config,
             segment_duration: config.segment_duration,
@@ -227,6 +233,7 @@ impl Muxer for MacOSFragmentedM4SMuxer {
             state: None,
             pause,
             frame_drops: FrameDropTracker::new(SharedHealthSender::new(), "muxer:macos-fragmented"),
+            frame_copier: None,
             started: false,
             disk_space_callback: config.disk_space_callback,
             segment_tx: config.segment_tx,
@@ -295,8 +302,12 @@ impl MacOSFragmentedM4SMuxer {
             prefer_videotoolbox_hw_input: true,
         };
 
-        let mut encoder =
-            SegmentedVideoEncoder::init(self.base_path.clone(), self.video_config, encoder_config)?;
+        let mut encoder = SegmentedVideoEncoder::init_with_timed_fragments(
+            self.base_path.clone(),
+            self.video_config,
+            encoder_config,
+            self.timed_fragments,
+        )?;
         if let Some(callback) = &self.disk_space_callback {
             encoder.set_disk_space_callback(callback.clone());
         }
@@ -313,6 +324,7 @@ impl MacOSFragmentedM4SMuxer {
         let encoder_handle = std::thread::Builder::new()
             .name("m4s-segment-encoder".to_string())
             .spawn(move || {
+                boost_encoder_thread_qos();
                 let pixel_format = match video_config.pixel_format {
                     cap_media_info::Pixel::NV12 => ffmpeg::format::Pixel::NV12,
                     cap_media_info::Pixel::BGRA => ffmpeg::format::Pixel::BGRA,
@@ -506,9 +518,12 @@ impl VideoMuxer for MacOSFragmentedM4SMuxer {
         }
 
         if let Some(state) = &self.state {
+            // Return ScreenCaptureKit's IOSurface immediately so video_tx and
+            // VideoToolbox's async queue cannot exhaust SCK's surface pool.
+            let sample_buf = FrameCopier::copy(&mut self.frame_copier, frame.sample_buf);
             match state
                 .video_tx
-                .try_send(Some((frame.sample_buf, adjusted_timestamp)))
+                .try_send(Some((sample_buf, adjusted_timestamp)))
             {
                 Ok(()) => {
                     self.frame_drops.record_frame();
@@ -682,8 +697,12 @@ impl MacOSFragmentedM4SCameraMuxer {
             prefer_videotoolbox_hw_input: false,
         };
 
-        let mut encoder =
-            SegmentedVideoEncoder::init(self.base_path.clone(), self.video_config, encoder_config)?;
+        let mut encoder = SegmentedVideoEncoder::init_with_timed_fragments(
+            self.base_path.clone(),
+            self.video_config,
+            encoder_config,
+            true,
+        )?;
         if let Some(callback) = &self.disk_space_callback {
             encoder.set_disk_space_callback(callback.clone());
         }
@@ -699,6 +718,7 @@ impl MacOSFragmentedM4SCameraMuxer {
         let encoder_handle = std::thread::Builder::new()
             .name("m4s-camera-segment-encoder".to_string())
             .spawn(move || {
+                boost_encoder_thread_qos();
                 let pixel_format = match video_config.pixel_format {
                     cap_media_info::Pixel::NV12 => ffmpeg::format::Pixel::NV12,
                     cap_media_info::Pixel::BGRA => ffmpeg::format::Pixel::BGRA,

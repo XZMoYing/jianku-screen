@@ -295,6 +295,37 @@ fn keycode_to_string(key: &device_query::Keycode) -> (String, String) {
     (display.to_string(), code.to_string())
 }
 
+fn push_key_changes(
+    previous: &[device_query::Keycode],
+    current: &[device_query::Keycode],
+    time_ms: f64,
+    presses: &mut Vec<KeyPressEvent>,
+) {
+    for key in current {
+        if !previous.contains(key) {
+            let (display, code) = keycode_to_string(key);
+            presses.push(KeyPressEvent {
+                key: display,
+                key_code: code,
+                time_ms,
+                down: true,
+            });
+        }
+    }
+
+    for key in previous {
+        if !current.contains(key) {
+            let (display, code) = keycode_to_string(key);
+            presses.push(KeyPressEvent {
+                key: display,
+                key_code: code,
+                time_ms,
+                down: false,
+            });
+        }
+    }
+}
+
 /// Time zero for cursor, click and key events: the start gate's arm point
 /// when the pipeline was primed ahead of the recording, else the pipeline
 /// epoch. `None` while a primed recording is still waiting for its cue.
@@ -308,6 +339,7 @@ fn input_epoch(start_gate: Option<&RecordingStartGate>, start_time: Timestamps) 
 }
 
 #[tracing::instrument(name = "cursor", skip_all)]
+#[allow(clippy::too_many_arguments)]
 pub fn spawn_cursor_recorder(
     target: CursorCaptureTarget,
     cursors_dir: PathBuf,
@@ -316,6 +348,7 @@ pub fn spawn_cursor_recorder(
     start_time: Timestamps,
     start_gate: Option<RecordingStartGate>,
     incremental_outputs: IncrementalCaptureOutputs,
+    keyboard_capture: bool,
 ) -> CursorActor {
     #[cfg(target_os = "linux")]
     if prefers_wayland_portal_cursor() {
@@ -361,9 +394,21 @@ pub fn spawn_cursor_recorder(
         });
         #[cfg(any(target_os = "linux", target_os = "macos"))]
         let mut last_window_position = None;
+        // `DeviceState::new()` asserts Accessibility trust on macOS; mouse state
+        // reads without it and avoids prompting during screen recording.
+        #[cfg(target_os = "macos")]
+        let device_state = DeviceState;
+        #[cfg(not(target_os = "macos"))]
         let device_state = DeviceState::new();
+        let held_keys = || {
+            if keyboard_capture {
+                device_state.get_keys()
+            } else {
+                Vec::new()
+            }
+        };
         let mut last_mouse_state = device_state.get_mouse();
-        let mut last_keys: Vec<device_query::Keycode> = device_state.get_keys();
+        let mut last_keys: Vec<device_query::Keycode> = held_keys();
 
         let mut last_position = cap_cursor_capture::RawCursorPosition::get();
 
@@ -380,6 +425,7 @@ pub fn spawn_cursor_recorder(
         let mut last_flush = Instant::now();
         let flush_interval = Duration::from_secs(CURSOR_FLUSH_INTERVAL_SECS);
         let mut last_cursor_id: Option<String> = None;
+        let mut last_cursor_fingerprint: Option<CursorFingerprint> = None;
         let mut awaiting_start = start_gate.is_some();
 
         loop {
@@ -397,7 +443,7 @@ pub fn spawn_cursor_recorder(
             let Some(epoch) = input_epoch(start_gate.as_ref(), start_time) else {
                 last_position = cap_cursor_capture::RawCursorPosition::get();
                 last_mouse_state = device_state.get_mouse();
-                last_keys = device_state.get_keys();
+                last_keys = held_keys();
                 continue;
             };
             let elapsed = epoch.elapsed().as_secs_f64() * 1000.0;
@@ -435,7 +481,15 @@ pub fn spawn_cursor_recorder(
             }
 
             let previous_cursor_id = last_cursor_id.clone();
-            let cursor_id = if let Some(data) = get_cursor_data() {
+            // Compare raw cursor pixels before TIFF-encoding + hashing; unchanged
+            // shapes skip encoding while still catching stationary shape transitions.
+            let fingerprint = current_cursor_fingerprint();
+            let cursor_id = if fingerprint.is_some()
+                && fingerprint == last_cursor_fingerprint
+                && last_cursor_id.is_some()
+            {
+                last_cursor_id.clone()
+            } else if let Some(data) = get_cursor_data() {
                 let id = cursor_identity(&data);
 
                 let cursor_id = if let Some(existing_id) = response.cursors.get(&id) {
@@ -468,6 +522,7 @@ pub fn spawn_cursor_recorder(
                     cursor_id
                 };
                 last_cursor_id = Some(cursor_id.clone());
+                last_cursor_fingerprint = fingerprint;
                 Some(cursor_id)
             } else {
                 last_cursor_id.clone()
@@ -529,32 +584,13 @@ pub fn spawn_cursor_recorder(
 
             last_mouse_state = mouse_state;
 
-            let current_keys = device_state.get_keys();
-
-            for key in &current_keys {
-                if !last_keys.contains(key) {
-                    let (display, code) = keycode_to_string(key);
-                    response.keyboard_presses.push(KeyPressEvent {
-                        key: display,
-                        key_code: code,
-                        time_ms: elapsed,
-                        down: true,
-                    });
-                }
-            }
-
-            for key in &last_keys {
-                if !current_keys.contains(key) {
-                    let (display, code) = keycode_to_string(key);
-                    response.keyboard_presses.push(KeyPressEvent {
-                        key: display,
-                        key_code: code,
-                        time_ms: elapsed,
-                        down: false,
-                    });
-                }
-            }
-
+            let current_keys = held_keys();
+            push_key_changes(
+                &last_keys,
+                &current_keys,
+                elapsed,
+                &mut response.keyboard_presses,
+            );
             last_keys = current_keys;
 
             if last_flush.elapsed() >= flush_interval {
@@ -663,6 +699,80 @@ fn get_cursor_data() -> Option<CursorData> {
 }
 
 #[cfg(target_os = "macos")]
+#[derive(PartialEq)]
+struct CursorFingerprint {
+    pixels: Vec<u8>,
+    bitmap: (usize, usize, usize),
+    size: (u64, u64),
+    hotspot: (u64, u64),
+}
+
+#[cfg(not(target_os = "macos"))]
+#[derive(PartialEq)]
+struct CursorFingerprint;
+
+#[cfg(not(target_os = "macos"))]
+fn current_cursor_fingerprint() -> Option<CursorFingerprint> {
+    None
+}
+
+#[cfg(target_os = "macos")]
+fn current_cursor_fingerprint() -> Option<CursorFingerprint> {
+    use objc::rc::autoreleasepool;
+    use objc2::{ClassType, msg_send, rc::Retained};
+    use objc2_app_kit::NSCursor;
+
+    autoreleasepool(|| unsafe {
+        #[allow(deprecated)]
+        let cursor = NSCursor::currentSystemCursor().or_else(|| {
+            let cursor: Option<Retained<NSCursor>> = msg_send![NSCursor::class(), currentCursor];
+            cursor
+        })?;
+        macos_cursor_fingerprint(&cursor)
+    })
+}
+
+#[cfg(target_os = "macos")]
+fn macos_cursor_fingerprint(cursor: &objc2_app_kit::NSCursor) -> Option<CursorFingerprint> {
+    use core_graphics::image::CGImageRef;
+    use foreign_types_shared::ForeignTypeRef;
+    use objc::{sel, sel_impl};
+    use objc2::{msg_send, rc::Retained};
+    use objc2_app_kit::NSImage;
+
+    unsafe {
+        let image: Option<Retained<NSImage>> = msg_send![cursor, image];
+        let image = image?;
+        let size = image.size();
+        let hotspot = cursor.hotSpot();
+        let image_ptr = Retained::as_ptr(&image) as *mut objc::runtime::Object;
+        let nil = std::ptr::null_mut::<objc::runtime::Object>();
+        // `CGImageForProposedRect:context:hints:` returns an autoreleased
+        // CGImageRef valid for the caller's autorelease pool.
+        let cg_image: *mut std::ffi::c_void = objc::msg_send![
+            image_ptr,
+            CGImageForProposedRect: std::ptr::null_mut::<std::ffi::c_void>()
+            context: nil
+            hints: nil
+        ];
+        if cg_image.is_null() {
+            return None;
+        }
+        let cg_image = CGImageRef::from_ptr(cg_image.cast());
+        Some(CursorFingerprint {
+            pixels: cg_image.data().bytes().to_vec(),
+            bitmap: (
+                cg_image.width(),
+                cg_image.height(),
+                cg_image.bytes_per_row(),
+            ),
+            size: (size.width.to_bits(), size.height.to_bits()),
+            hotspot: (hotspot.x.to_bits(), hotspot.y.to_bits()),
+        })
+    }
+}
+
+#[cfg(target_os = "macos")]
 fn macos_cursor_data(cursor: &objc2_app_kit::NSCursor) -> Option<CursorData> {
     use objc2::{msg_send, rc::Retained};
     use objc2_app_kit::NSImage;
@@ -697,7 +807,7 @@ fn macos_cursor_data(cursor: &objc2_app_kit::NSCursor) -> Option<CursorData> {
 
 #[cfg(all(test, target_os = "macos"))]
 mod macos_cursor_tests {
-    use super::macos_cursor_data;
+    use super::{macos_cursor_data, macos_cursor_fingerprint};
     use objc2::{AllocAnyThread, class, msg_send, rc::Retained, runtime::AnyObject};
     use objc2_app_kit::{NSCursor, NSImage};
 
@@ -705,6 +815,35 @@ mod macos_cursor_tests {
     fn cursor_without_image_is_skipped() {
         let cursor = unsafe { NSCursor::new() };
         assert!(macos_cursor_data(&cursor).is_none());
+    }
+
+    fn cursor_with(color: [u8; 4]) -> Retained<NSCursor> {
+        let mut png = std::io::Cursor::new(Vec::new());
+        image::RgbaImage::from_pixel(8, 8, image::Rgba(color))
+            .write_to(&mut png, image::ImageFormat::Png)
+            .unwrap();
+        let png = png.into_inner();
+        let data: Retained<AnyObject> = unsafe {
+            msg_send![class!(NSData), dataWithBytes: png.as_ptr().cast::<std::ffi::c_void>(), length: png.len()]
+        };
+        let image: Retained<NSImage> = unsafe { msg_send![NSImage::alloc(), initWithData: &*data] };
+        NSCursor::initWithImage_hotSpot(NSCursor::alloc(), &image, Default::default())
+    }
+
+    #[test]
+    fn the_fingerprint_tells_cursor_shapes_apart_without_encoding_them() {
+        let arrow = macos_cursor_fingerprint(&cursor_with([20, 40, 80, 255])).unwrap();
+        let same = macos_cursor_fingerprint(&cursor_with([20, 40, 80, 255])).unwrap();
+        let recolored = macos_cursor_fingerprint(&cursor_with([200, 40, 80, 255])).unwrap();
+        assert!(arrow == same);
+        assert!(arrow != recolored);
+        assert!(!arrow.pixels.is_empty());
+    }
+
+    #[test]
+    fn a_cursor_without_an_image_has_no_fingerprint() {
+        let cursor = unsafe { NSCursor::new() };
+        assert!(macos_cursor_fingerprint(&cursor).is_none());
     }
 
     #[test]
@@ -1167,6 +1306,53 @@ fn get_cursor_data() -> Option<CursorData> {
             hotspot: XY::new(hotspot_x, hotspot_y),
             shape: CursorShape::try_from(&cursor_info.hCursor).ok(),
         })
+    }
+}
+
+#[cfg(test)]
+mod key_change_tests {
+    use super::*;
+    use device_query::Keycode;
+
+    fn press(key: &str, key_code: &str, down: bool) -> KeyPressEvent {
+        KeyPressEvent {
+            key: key.to_string(),
+            key_code: key_code.to_string(),
+            time_ms: 32.0,
+            down,
+        }
+    }
+
+    #[test]
+    fn new_keys_go_down_in_held_order_before_released_keys_go_up() {
+        let mut presses = vec![];
+        push_key_changes(
+            &[Keycode::A, Keycode::LShift],
+            &[Keycode::LShift, Keycode::Space, Keycode::B],
+            32.0,
+            &mut presses,
+        );
+        assert_eq!(
+            presses,
+            vec![
+                press("Space", "Space", true),
+                press("b", "B", true),
+                press("a", "A", false),
+            ]
+        );
+    }
+
+    #[test]
+    fn held_or_absent_keys_record_nothing() {
+        let mut presses = vec![];
+        push_key_changes(
+            &[Keycode::LMeta, Keycode::A],
+            &[Keycode::LMeta, Keycode::A],
+            32.0,
+            &mut presses,
+        );
+        push_key_changes(&[], &[], 48.0, &mut presses);
+        assert!(presses.is_empty());
     }
 }
 

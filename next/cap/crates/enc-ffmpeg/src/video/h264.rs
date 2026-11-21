@@ -1261,6 +1261,7 @@ fn get_codec_and_options(
                     options.set("realtime", "false");
                     options.set("profile", "main");
                     options.set("allow_sw", "0");
+                    options.set("g", &keyframe_interval_str);
                 } else {
                     options.set("realtime", "true");
                     options.set("prio_speed", "true");

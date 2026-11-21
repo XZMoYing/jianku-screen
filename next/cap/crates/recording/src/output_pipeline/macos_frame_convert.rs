@@ -9,16 +9,26 @@ pub(crate) fn copy_plane_data(
     dest_stride: usize,
 ) {
     if src_stride == row_width && dest_stride == row_width {
-        let total_bytes = height * row_width;
+        let total_bytes = height
+            .saturating_mul(row_width)
+            .min(src.len())
+            .min(dest.len());
         dest[..total_bytes].copy_from_slice(&src[..total_bytes]);
     } else if src_stride == dest_stride {
-        let total_bytes = height * src_stride;
+        let total_bytes = height
+            .saturating_mul(src_stride)
+            .min(src.len())
+            .min(dest.len());
         dest[..total_bytes].copy_from_slice(&src[..total_bytes]);
     } else {
-        for y in 0..height {
-            let src_row = &src[y * src_stride..y * src_stride + row_width];
-            let dest_row = &mut dest[y * dest_stride..y * dest_stride + row_width];
-            dest_row.copy_from_slice(src_row);
+        let row_width = row_width.min(src_stride).min(dest_stride);
+        for (src_row, dest_row) in src
+            .chunks(src_stride.max(1))
+            .zip(dest.chunks_mut(dest_stride.max(1)))
+            .take(height)
+        {
+            let len = row_width.min(src_row.len()).min(dest_row.len());
+            dest_row[..len].copy_from_slice(&src_row[..len]);
         }
     }
 }
@@ -64,6 +74,10 @@ pub(crate) enum SampleBufConversionError {
     UnsupportedFormat(cv::PixelFormat),
     BaseAddrLock(cidre::os::Error),
     NoImageBuffer,
+    FormatMismatch {
+        source: cv::PixelFormat,
+        frame: ffmpeg::format::Pixel,
+    },
 }
 
 struct BaseAddrLockGuard<'a>(&'a mut cv::ImageBuf, LockFlags);
@@ -101,6 +115,19 @@ pub(crate) fn fill_frame_from_sample_buf(
     let pixel_format = image_buf.pixel_format();
     let plane0_stride = image_buf.plane_bytes_per_row(0);
     let plane1_stride = image_buf.plane_bytes_per_row(1);
+
+    let expected_format = match pixel_format {
+        cv::PixelFormat::_420V => ffmpeg::format::Pixel::NV12,
+        cv::PixelFormat::_32_BGRA => ffmpeg::format::Pixel::BGRA,
+        cv::PixelFormat::_2VUY => ffmpeg::format::Pixel::UYVY422,
+        format => return Err(SampleBufConversionError::UnsupportedFormat(format)),
+    };
+    if frame.format() != expected_format {
+        return Err(SampleBufConversionError::FormatMismatch {
+            source: pixel_format,
+            frame: frame.format(),
+        });
+    }
 
     let bytes_lock = BaseAddrLockGuard::lock(image_buf.as_mut(), LockFlags::READ_ONLY)
         .map_err(SampleBufConversionError::BaseAddrLock)?;

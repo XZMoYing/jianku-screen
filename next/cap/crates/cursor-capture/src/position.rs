@@ -14,6 +14,9 @@ impl RawCursorPosition {
         if let Some(position) = macos_cursor_position() {
             return position;
         }
+        #[cfg(target_os = "macos")]
+        let device_state = DeviceState;
+        #[cfg(not(target_os = "macos"))]
         let device_state = DeviceState::new();
         let position = device_state.get_mouse().coords;
 
