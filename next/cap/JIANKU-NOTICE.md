@@ -37,3 +37,12 @@ Copyright (c) 2023-present Cap Software, Inc.
 ## 2026-10-25 Android 捕获组件
 
 自 0.2.0-alpha.28 起，macOS 构建捆绑固定版本 scrcpy 4.1 客户端与匹配的设备服务端，并提供源码补丁和校验哈希。补丁记录首个视频包到达与正常停止的单调时间，为最后视频样本补足静止保持时长；原有包内容、PTS/DTS 与音频保持。客户端复用应用 FFmpeg 并捆绑 SDL3；对应 Apache-2.0 和 SDL 许可随应用提供。adb 仍使用本机安装，MI6 兼容启动仅用于明确识别的特殊设备。旧录制原片不在升级时改写。
+
+## 2026-11-21 上游修复移植与光标拖动平滑对齐
+
+- 移植 Cap 上游（https://github.com/CapSoftware/Cap `0.6.1–0.6.3` 及 `main`）多项 macOS 录制、光标与导出可靠性修复，遵循原始 AGPLv3 许可：
+  - 录制采集时钟与丢帧修复：`SourceClockState` 跳帧检测（`f7479b10`、`e91f15e0`、`697b9253`、`9465f82c`）、`CaptureInstantTimeline` 与 `CaptureClockDrift` 保持 ScreenCaptureKit 硬件时间戳节奏（`89818bc9..de3be28f`、`1ed734db`）、`FrameCopier` 与编码线程 `UserInitiated` QoS 防止 ScreenCaptureKit IOSurface 池枯竭（`0a9a4318`、`c5f93cfd`、`ba977222`，同时覆盖非分片 `AVFoundationMp4Muxer` 与默认分片 `MacOSFragmentedM4SMuxer`）、分片定时写入（`d345a9b1`）、偶数像素裁剪与平面边界检查（`84f41152`、`5a4feff0`）、AVFoundation 空录制错误码与摄像头中途分辨率变化缩放（`5493f6b2`、`f550a39e`），以及 macOS 光标免辅助功能断言、按需键盘轮询与原始位图指纹去重（`1fd4d5ee`、`a41df509`、`4dc50f3b`，保留静止时外形变化记录）。
+  - 光标拖动平滑与静止淡入修复：兼容 1-based 主键编号与按住拖动期间禁用提前抬起前瞻，并补充拖动期采样缺口线性补帧（参考 `839288fd`、`345dd70d`、`ca96ebe5`、`74465f58`，保持与实时演示一致的 `1000/40/1` 拖动弹簧）；引入静止隐藏光标平滑淡入（`0d4754a9`、`9a140e69`）。
+  - 导出可靠性修复：exFAT / 网络卷不覆盖已有文件的安全发布（`0c84bd62`），以及 MP4 导出硬件编码器中途失败自动切 `libx264` 重试一次（`8c1fca23`）。
+- 编辑器时间尺点击/拖动交互参考 Dog SC `v0.2.0` 的设计思路（保留既有选中片段，仅点击轨道空白区域清空选中），不链接其代码。
+- 以上改动已完成无头编译、单元测试与前端检查；实机录屏掉帧复测、完整应用视觉对照及安装包构建待后续打包验收。

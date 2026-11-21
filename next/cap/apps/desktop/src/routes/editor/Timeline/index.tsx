@@ -1285,10 +1285,7 @@ export function Timeline(props: {
 					ensureEdgePan();
 				},
 				mouseup: () => {
-					batch(() => {
-						setEditorState("timeline", "selection", null);
-						setEditorState("timeline", "audioPicker", null);
-					});
+					setEditorState("timeline", "audioPicker", null);
 					dispose();
 				},
 				blur: () => dispose(),
