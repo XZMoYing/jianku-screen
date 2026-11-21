@@ -5,6 +5,7 @@ mod caption_storage;
 mod caption_timing;
 mod configuration;
 pub mod cursor;
+pub mod disfluency;
 mod format;
 pub mod keyboard;
 mod meta;

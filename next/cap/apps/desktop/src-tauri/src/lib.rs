@@ -4780,6 +4780,77 @@ async fn stop_playback(editor_instance: WindowEditorInstance) -> Result<(), Stri
     Ok(())
 }
 
+#[derive(Serialize, Deserialize, Type, Debug)]
+#[serde(rename_all = "camelCase")]
+struct TranscriptWordInput {
+    text: String,
+    start: f64,
+    end: f64,
+}
+
+#[derive(Serialize, Deserialize, Type, Debug)]
+#[serde(rename_all = "camelCase")]
+struct DetectedDisfluency {
+    kind: String,
+    start_word: u32,
+    end_word: u32,
+    phrase: String,
+}
+
+const CJK_FILLERS: &[&str] = &["嗯", "呃", "额", "唔", "啊", "那个", "就是说"];
+
+#[tauri::command]
+#[specta::specta]
+fn detect_transcript_disfluencies(words: Vec<TranscriptWordInput>) -> Vec<DetectedDisfluency> {
+    let tokens: Vec<cap_project::disfluency::DisfluencyToken<'_>> = words
+        .iter()
+        .map(|w| cap_project::disfluency::DisfluencyToken {
+            text: w.text.as_str(),
+            start: w.start,
+            end: w.end,
+        })
+        .collect();
+    let mut detected: Vec<DetectedDisfluency> =
+        cap_project::disfluency::detect_disfluencies(&tokens)
+            .into_iter()
+            .map(|d| DetectedDisfluency {
+                kind: match d.kind {
+                    cap_project::disfluency::DisfluencyKind::Hesitation => "hesitation",
+                    cap_project::disfluency::DisfluencyKind::Repetition => "repetition",
+                    cap_project::disfluency::DisfluencyKind::FalseStart => "falseStart",
+                    cap_project::disfluency::DisfluencyKind::Discourse => "discourse",
+                }
+                .to_string(),
+                start_word: d.words.start as u32,
+                end_word: d.words.end as u32,
+                phrase: d.phrase,
+            })
+            .collect();
+    let covered: std::collections::HashSet<u32> = detected
+        .iter()
+        .flat_map(|d| d.start_word..d.end_word)
+        .collect();
+    for (idx, word) in words.iter().enumerate() {
+        let i = idx as u32;
+        if covered.contains(&i) {
+            continue;
+        }
+        let trimmed = word
+            .text
+            .trim_matches(|c: char| c.is_whitespace() || "，。！？、,.!?…".contains(c));
+        if CJK_FILLERS.contains(&trimmed) {
+            detected.push(DetectedDisfluency {
+                kind: "hesitation".to_string(),
+                start_word: i,
+                end_word: i + 1,
+                phrase: trimmed.to_string(),
+            });
+        }
+    }
+    detected.sort_by_key(|d| d.start_word);
+    detected
+}
+
 #[tauri::command]
 #[specta::specta]
 #[instrument(skip(editor_instance))]
@@ -7037,6 +7108,7 @@ fn specta_builder() -> tauri_specta::Builder {
             set_editor_preview_resolution,
             stop_playback,
             set_playback_speed,
+            detect_transcript_disfluencies,
             commit_editor_preparing_frame,
             start_editor_handoff_playback,
             stop_editor_handoff_playback,

@@ -529,6 +529,179 @@ export function TranscriptPanel() {
 		applyWordDeletions(flatIndices);
 	};
 
+	const MIN_PAUSE_SECS = 0.8;
+	const KEEP_PAUSE_SECS = 0.25;
+
+	const longPauseSourceRanges = createMemo(() => {
+		const words = allWords();
+		const ranges: { start: number; end: number }[] = [];
+		for (let i = 0; i + 1 < words.length; i++) {
+			const gap = words[i + 1].start - words[i].end;
+			if (gap >= MIN_PAUSE_SECS) {
+				const cutStart = words[i].end + KEEP_PAUSE_SECS / 2;
+				const cutEnd = words[i + 1].start - KEEP_PAUSE_SECS / 2;
+				if (cutEnd - cutStart > 0.05) {
+					ranges.push({ start: cutStart, end: cutEnd });
+				}
+			}
+		}
+		return ranges;
+	});
+
+	const [cleaningFillers, setCleaningFillers] = createSignal(false);
+
+	const handleRemoveFillers = async () => {
+		const words = allWords();
+		if (words.length === 0 || cleaningFillers()) return;
+		setCleaningFillers(true);
+		try {
+			const detected = await commands.detectTranscriptDisfluencies(
+				words.map((w) => ({ text: w.text, start: w.start, end: w.end })),
+			);
+			const indices = Array.from(
+				new Set(
+					detected.flatMap((item) => {
+						const out: number[] = [];
+						for (let idx = item.startWord; idx < item.endWord; idx++) {
+							out.push(idx);
+						}
+						return out;
+					}),
+				),
+			);
+			if (indices.length === 0) {
+				toast(localize("未检测到需要清理的语气词或重复表达"));
+				return;
+			}
+			applyWordDeletions(indices);
+			toast.success(
+				localize("已清理 {count} 处语气词与重复词", {
+					count: detected.length,
+				}),
+			);
+		} catch (error) {
+			console.error("Failed to detect disfluencies:", error);
+			toast.error(localize("语气词检测失败"));
+		} finally {
+			setCleaningFillers(false);
+		}
+	};
+
+	const handleRemoveLongPauses = () => {
+		const pauseRanges = longPauseSourceRanges();
+		if (pauseRanges.length === 0) {
+			toast(localize("未检测到长停顿"));
+			return;
+		}
+		const timeline = project.timeline;
+		if (!timeline) return;
+
+		const outputRanges = pauseRanges
+			.flatMap((range) =>
+				mapSourceRangeToEdited(
+					range.start,
+					range.end,
+					timeline.segments,
+					recordingSegments(),
+					timeline.transitions ?? [],
+					timeline.mainTrackGaps,
+				),
+			)
+			.sort((a, b) => a.start - b.start || a.segmentIndex - b.segmentIndex);
+
+		const safeCuts = outputRanges
+			.filter(
+				(range) =>
+					range.end - range.start > 0.05 &&
+					!rangeIntersectsClipTransition(
+						timeline.segments,
+						timeline.transitions ?? [],
+						range.start,
+						range.end,
+						timeline.mainTrackGaps,
+					) &&
+					clipCutPreservesTransitionGeometry(
+						timeline.segments,
+						timeline.transitions ?? [],
+						range.segmentIndex,
+						range.start,
+						range.end,
+						timeline.mainTrackGaps,
+					),
+			)
+			.reverse();
+
+		if (safeCuts.length === 0) {
+			toast(localize("停顿位置靠近转场，已自动跳过"));
+			return;
+		}
+
+		const positioned = !mainTrackMagnetic()
+			? {
+					segments: timeline.segments.slice(),
+					transitions: timeline.transitions,
+					mainTrackGaps: timeline.mainTrackGaps,
+				}
+			: null;
+		const positionedReplacements: ClipReplacements = new Map();
+		if (
+			positioned &&
+			safeCuts.some(
+				(range) =>
+					!cutPositionedMainTrackRange(
+						positioned,
+						range.segmentIndex,
+						range.start,
+						range.end,
+						positionedReplacements,
+					),
+			)
+		) {
+			toast.error(
+				localize("Could not cut this range without moving other clips"),
+			);
+			return;
+		}
+
+		setProject(
+			produce((p) => {
+				const tl = p.timeline;
+				if (!tl) return;
+				editClipsWithOverlayAttachments(tl, (replacements) => {
+					if (positioned) {
+						tl.segments = positioned.segments;
+						tl.transitions = positioned.transitions;
+						tl.mainTrackGaps = positioned.mainTrackGaps;
+						for (const [id, children] of positionedReplacements)
+							replacements.set(id, children);
+						return true;
+					}
+					let edited = false;
+					for (const range of safeCuts) {
+						edited =
+							rippleDeleteAllTracks(
+								tl,
+								range.start,
+								range.end,
+								range.segmentIndex,
+								undefined,
+								replacements,
+							) || edited;
+					}
+					return edited;
+				});
+			}),
+		);
+		setEditorState("timeline", "selection", null);
+		const newDuration = totalDuration();
+		if (editorState.playbackTime > newDuration) {
+			setEditorState("playbackTime", Math.max(newDuration - 0.01, 0));
+		}
+		toast.success(
+			localize("已剪除 {count} 处长停顿", { count: safeCuts.length }),
+		);
+	};
+
 	const isAtEnd = () => {
 		const total = totalDuration();
 		return total > 0 && total - editorState.playbackTime <= 0.1;
@@ -652,6 +825,31 @@ export function TranscriptPanel() {
 					</button>
 				</div>
 			</div>
+			<Show when={allWords().length > 0}>
+				<div class="px-3 py-1.5 border-b border-ed-line flex items-center gap-1.5 bg-ed-card-2/50 shrink-0">
+					<button
+						type="button"
+						disabled={cleaningFillers()}
+						onClick={() => void handleRemoveFillers()}
+						class="flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium bg-ed-ctl text-ed-text-1 hover:bg-ed-ctl-hover transition-colors disabled:opacity-50"
+					>
+						{localize("一键清理语气词")}
+					</button>
+					<button
+						type="button"
+						disabled={longPauseSourceRanges().length === 0}
+						onClick={handleRemoveLongPauses}
+						class="flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium bg-ed-ctl text-ed-text-1 hover:bg-ed-ctl-hover transition-colors disabled:opacity-40"
+					>
+						{localize("剪除长停顿")}
+						<Show when={longPauseSourceRanges().length > 0}>
+							<span class="tabular-nums text-ed-text-3">
+								({longPauseSourceRanges().length})
+							</span>
+						</Show>
+					</button>
+				</div>
+			</Show>
 			<TranscriptEditor
 				segmentGroups={segmentGroups()}
 				allWords={allWords()}
