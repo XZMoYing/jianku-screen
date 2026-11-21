@@ -33,7 +33,7 @@ import {
 	clipMergeBlockerHint,
 } from "../clip-merge";
 import {
-	type ClipTransitionKind,
+	CLIP_TRANSITION_OPTIONS,
 	clampTransitionDuration,
 	clipDuration,
 	clipGapAfter,
@@ -740,10 +740,7 @@ export function ClipTrack(
 				? target
 				: -1;
 		};
-		const types = [
-			["cross-fade", "交叉淡化"],
-			["fade-through-black", "黑场淡化"],
-		] as const satisfies ReadonlyArray<readonly [ClipTransitionKind, string]>;
+		const types = CLIP_TRANSITION_OPTIONS;
 		transitionMenu.show(event, localize("Clip transition"), [
 			...(current
 				? [
@@ -1828,12 +1825,7 @@ export function ClipTrack(
 														</span>
 													</div>
 													<div class="grid grid-cols-2 gap-1 rounded-lg bg-gray-2 p-1">
-														{(
-															[
-																["cross-fade", "交叉淡化"],
-																["fade-through-black", "黑场淡化"],
-															] as const
-														).map(([type, label]) => (
+														{CLIP_TRANSITION_OPTIONS.map(([type, label]) => (
 															<button
 																type="button"
 																aria-pressed={transition().type === type}

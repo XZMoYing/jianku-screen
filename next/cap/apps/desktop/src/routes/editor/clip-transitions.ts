@@ -3,7 +3,34 @@ import type { MainTrackGaps, TimelineSegment } from "~/utils/tauri";
 export const DEFAULT_CLIP_TRANSITION_DURATION = 0.5;
 export const MIN_CLIP_TRANSITION_DURATION = 0.05;
 
-export type ClipTransitionKind = "cross-fade" | "fade-through-black";
+export type ClipTransitionKind =
+	| "cross-fade"
+	| "fade-through-black"
+	| "fade-through-white"
+	| "push-left"
+	| "push-right"
+	| "push-up"
+	| "push-down"
+	| "wipe-left"
+	| "wipe-right"
+	| "wipe-up"
+	| "wipe-down"
+	| "zoom";
+
+export const CLIP_TRANSITION_OPTIONS = [
+	["cross-fade", "交叉淡化"],
+	["fade-through-black", "黑场淡化"],
+	["fade-through-white", "白场淡化"],
+	["push-left", "向左推入"],
+	["push-right", "向右推入"],
+	["push-up", "向上推入"],
+	["push-down", "向下推入"],
+	["wipe-left", "向左擦除"],
+	["wipe-right", "向右擦除"],
+	["wipe-up", "向上擦除"],
+	["wipe-down", "向下擦除"],
+	["zoom", "缩放转场"],
+] as const satisfies ReadonlyArray<readonly [ClipTransitionKind, string]>;
 
 export type ClipTransition = {
 	segmentIndex: number;

@@ -91,6 +91,9 @@ use overlay_layers::OverlayLayers;
 pub use project_recordings::{ProjectRecordingsMeta, SegmentRecordings, Video};
 pub use recorded_cursor_assets::{FrozenCursorAssetError, FrozenRecordedCursorAssets};
 pub use screen_enhance::{RenderQuality, ScreenEnhanceFrame};
+pub use transition::{
+    TransitionComposite, TransitionDip, TransitionLayer, TransitionWipe, ease_in_out_cubic,
+};
 use transition::{TransitionCompositor, TransitionParameters};
 
 /// Warms the process-wide system-font scan used by the text/captions/keyboard
