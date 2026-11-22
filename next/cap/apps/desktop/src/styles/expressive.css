@@ -146,8 +146,11 @@
 	--color-blue-400: var(--jk-primary);
 	--color-blue-500: var(--jk-primary);
 	--color-blue-600: var(--jk-primary);
-	--track-clip: var(--jk-primary);
+	--track-clip: var(--jk-graphite);
+	--track-zoom: var(--jk-primary);
+	--track-keyboard: var(--jk-needle);
 	--track-caption: var(--jk-led);
+	--track-audio: var(--jk-led);
 	--track-scene: var(--jk-tertiary);
 	--track-3d: var(--jk-secondary);
 	--ed-window: var(--jk-surface);
@@ -240,14 +243,22 @@
 :root .jk-button {
 	position: relative;
 	overflow: hidden;
-	border-radius: 9px;
-	box-shadow: var(--jk-rim);
+	border-radius: 8px;
 	transition:
 		transform 280ms var(--jk-spring),
 		background-color 200ms var(--jk-effects),
 		color 200ms var(--jk-effects),
 		filter 200ms var(--jk-effects),
-		box-shadow 220ms var(--jk-effects);
+		box-shadow 200ms var(--jk-effects);
+}
+:root .jk-button:not([data-variant]) {
+	box-shadow: none;
+}
+:root .jk-button:not([data-variant]):hover:not(:disabled),
+:root .jk-button:not([data-variant])[data-expanded] {
+	background: var(--jk-glass-hi);
+	color: var(--jk-ink);
+	box-shadow: var(--jk-rim);
 }
 :root .jk-button::before {
 	content: "";
@@ -265,14 +276,12 @@
 :root .jk-button:hover::before {
 	opacity: 1;
 }
-:root .jk-button:active:not(:disabled) {
-	border-radius: 8px;
-}
 :root .jk-button[data-variant="primary"],
 :root .jk-button[data-variant="blue"],
 :root .jk-button[data-variant="dark"],
 :root .jk-button[data-variant="radialblue"],
 :root .jk-button[data-variant="darkgradient"] {
+	border-radius: 9px;
 	background: linear-gradient(
 		180deg,
 		color-mix(in srgb, var(--jk-graphite) 88%, #ffffff 14%),
@@ -286,11 +295,19 @@
 }
 :root .jk-button[data-variant="gray"],
 :root .jk-button[data-variant="white"] {
+	border-radius: 9px;
 	background: var(--jk-glass);
 	color: var(--jk-ink);
 	border: 1px solid var(--jk-line);
+	box-shadow: var(--jk-rim);
+}
+:root .jk-button[data-variant="gray"]:hover:not(:disabled),
+:root .jk-button[data-variant="white"]:hover:not(:disabled) {
+	background: var(--jk-glass-hi);
+	border-color: var(--jk-line-strong);
 }
 :root .jk-button[data-variant="destructive"] {
+	border-radius: 9px;
 	background: linear-gradient(
 		180deg,
 		color-mix(in srgb, var(--jk-rec) 90%, #ffffff 14%),
@@ -305,16 +322,32 @@
 	color: var(--jk-ink);
 	box-shadow: none;
 }
-:root .jk-button[data-variant="ghost"]:hover {
+:root .jk-button[data-variant="ghost"]:hover:not(:disabled) {
 	color: var(--jk-ink);
 	background: var(--jk-glass-hi);
 	box-shadow: var(--jk-rim);
 }
 :root .jk-button:disabled {
-	opacity: 0.42;
+	opacity: 0.36;
+	box-shadow: none;
+}
+:root .jk-button[data-variant]:not([data-variant="ghost"]):disabled {
 	background: var(--jk-container-high);
 	color: var(--jk-muted);
-	box-shadow: none;
+}
+:root .jk-press-pulse {
+	position: absolute;
+	width: 42px;
+	height: 42px;
+	border-radius: 50%;
+	pointer-events: none;
+	z-index: 2;
+	background: radial-gradient(
+		circle,
+		rgba(255, 255, 255, 0.72) 0%,
+		color-mix(in srgb, var(--jk-primary) 28%, transparent) 46%,
+		transparent 72%
+	);
 }
 :root .cap-toggle {
 	width: 48px;
@@ -327,13 +360,23 @@
 		background-color 240ms var(--jk-effects),
 		border-color 240ms var(--jk-effects);
 }
+:root .cap-toggle.cap-toggle-sm {
+	width: 40px;
+	height: 21px;
+}
+:root .cap-toggle.cap-toggle-lg {
+	width: 56px;
+	height: 29px;
+}
 :root .cap-toggle[data-checked] {
 	background: color-mix(in srgb, var(--jk-led) 24%, var(--jk-well));
 	border-color: color-mix(in srgb, var(--jk-led) 75%, transparent);
 }
 :root .cap-toggle-thumb {
-	width: 24px;
+	width: 26px;
 	height: 19px;
+	translate: none;
+	transform: translateX(0);
 	border-radius: 999px;
 	background: var(--jk-panel-hi);
 	border: 1px solid var(--jk-line-strong);
@@ -343,17 +386,44 @@
 		background-color 220ms var(--jk-effects),
 		box-shadow 220ms var(--jk-effects);
 }
+:root .cap-toggle-thumb.cap-toggle-thumb-sm {
+	width: 20px;
+	height: 15px;
+}
+:root .cap-toggle-thumb.cap-toggle-thumb-lg {
+	width: 28px;
+	height: 23px;
+}
 :root .cap-toggle[data-checked] .cap-toggle-thumb {
-	transform: translateX(18px);
+	translate: none;
+	transform: translateX(16px);
+}
+:root .cap-toggle.cap-toggle-sm[data-checked] .cap-toggle-thumb {
+	transform: translateX(14px);
+}
+:root .cap-toggle.cap-toggle-lg[data-checked] .cap-toggle-thumb {
+	transform: translateX(22px);
 }
 :root .jk-toggle-shell:active .cap-toggle-thumb {
-	background: rgba(255, 255, 255, 0.38);
+	background: rgba(255, 255, 255, 0.36);
 	backdrop-filter: blur(6px) saturate(210%);
 	box-shadow: var(--jk-rim-sapphire);
 	transform: scale(1.12, 1.06);
 }
 :root .jk-toggle-shell:active .cap-toggle[data-checked] .cap-toggle-thumb {
-	transform: translateX(18px) scale(1.12, 1.06);
+	transform: translateX(16px) scale(1.12, 1.06);
+}
+:root
+	.jk-toggle-shell:active
+	.cap-toggle.cap-toggle-sm[data-checked]
+	.cap-toggle-thumb {
+	transform: translateX(14px) scale(1.12, 1.06);
+}
+:root
+	.jk-toggle-shell:active
+	.cap-toggle.cap-toggle-lg[data-checked]
+	.cap-toggle-thumb {
+	transform: translateX(22px) scale(1.12, 1.06);
 }
 :root .jk-field-val {
 	font-family: var(--jk-mono);
@@ -423,6 +493,87 @@
 	width: 4px;
 	transform: scaleY(1.14);
 }
+:root .ed-slider.jk-slider-mini {
+	height: 24px;
+	padding-inline: 2px;
+}
+:root .ed-slider.jk-slider-mini .jk-slider-track {
+	height: 8px;
+	margin-inline: 2px;
+	border-radius: 999px;
+	background: var(--jk-well-deep);
+	box-shadow: none;
+}
+:root .ed-slider.jk-slider-mini .jk-slider-fill {
+	background: var(--jk-graphite);
+	border-radius: 999px;
+}
+:root .ed-slider.jk-slider-mini .jk-slider-thumb {
+	width: 4px;
+	height: 15px;
+	top: -3.5px;
+	border-radius: 999px;
+	background: var(--jk-needle);
+	outline: 2.5px solid var(--jk-paper);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+}
+:root .jk-chip-btn {
+	background: var(--jk-glass-hi);
+	border: 1px solid var(--jk-line);
+	box-shadow: var(--jk-rim);
+	color: var(--jk-ink);
+	transition:
+		background-color 180ms var(--jk-effects),
+		border-color 180ms var(--jk-effects);
+}
+:root .jk-chip-btn:hover {
+	border-color: var(--jk-line-strong);
+}
+:root .jk-play-btn {
+	background: var(--jk-glass-hi);
+	color: var(--jk-ink);
+	backdrop-filter: blur(18px);
+	-webkit-backdrop-filter: blur(18px);
+	box-shadow: var(--jk-rim-sapphire);
+	transition:
+		transform 280ms var(--jk-spring),
+		background-color 200ms var(--jk-effects),
+		color 200ms var(--jk-effects);
+}
+:root .jk-play-btn:hover {
+	transform: scale(1.07);
+}
+:root .jk-play-btn:active {
+	transform: scale(0.92);
+}
+:root .jk-play-btn.is-playing {
+	background: var(--jk-graphite);
+	color: var(--jk-on-graphite);
+	box-shadow:
+		inset 0 1px 0.5px rgba(255, 255, 255, 0.2),
+		0 4px 14px rgba(0, 0, 0, 0.22);
+}
+:root .jk-tl-tool-btn {
+	background: transparent;
+	transition:
+		background-color 180ms var(--jk-effects),
+		color 180ms var(--jk-effects);
+}
+:root .jk-tl-tool-btn:hover:not(:disabled) {
+	background: var(--jk-glass-hi);
+	box-shadow: var(--jk-rim);
+}
+:root .jk-tl-tool-btn.is-on {
+	background: color-mix(in srgb, var(--jk-primary) 13%, transparent);
+	color: var(--jk-primary);
+}
+:root .jk-track-row {
+	background: var(--jk-well);
+	box-shadow: var(--jk-recess);
+}
+:root .jk-track-row.is-active {
+	background: color-mix(in srgb, var(--jk-primary) 7%, var(--jk-well));
+}
 :root .jk-editor-header,
 :root .jk-screenshot-header {
 	gap: 8px;
@@ -432,7 +583,8 @@
 	border-bottom: 1px solid var(--jk-line);
 }
 :root .jk-editor-stage {
-	padding: 10px;
+	padding: 10px 10px 4px;
+	background: var(--jk-surface);
 }
 :root .jk-editor-card,
 :root .jk-inspector,
@@ -450,37 +602,37 @@
 :root .jk-timeline-card {
 	padding: 12px 14px;
 }
-:root[data-jk-route="editor"] .jk-editor-stage {
+:root .jk-viewfinder-stage {
+	margin: 10px 12px 0;
+	border-radius: 9px;
 	background-color: var(--jk-well);
 	box-shadow: var(--jk-recess);
-	background-image:
-		linear-gradient(var(--jk-line-strong), var(--jk-line-strong)),
-		linear-gradient(var(--jk-line-strong), var(--jk-line-strong)),
-		linear-gradient(var(--jk-line-strong), var(--jk-line-strong)),
-		linear-gradient(var(--jk-line-strong), var(--jk-line-strong)),
-		linear-gradient(var(--jk-line-strong), var(--jk-line-strong)),
-		linear-gradient(var(--jk-line-strong), var(--jk-line-strong)),
-		linear-gradient(var(--jk-line-strong), var(--jk-line-strong)),
-		linear-gradient(var(--jk-line-strong), var(--jk-line-strong));
-	background-position:
-		10px 10px,
-		10px 10px,
-		calc(100% - 10px) 10px,
-		calc(100% - 10px) 10px,
-		10px calc(100% - 10px),
-		10px calc(100% - 10px),
-		calc(100% - 10px) calc(100% - 10px),
-		calc(100% - 10px) calc(100% - 10px);
-	background-size:
-		9px 1px,
-		1px 9px,
-		9px 1px,
-		1px 9px,
-		9px 1px,
-		1px 9px,
-		9px 1px,
-		1px 9px;
-	background-repeat: no-repeat;
+	border: 1px solid var(--jk-line);
+}
+:root .jk-viewfinder-stage::before {
+	content: "";
+	position: absolute;
+	inset: 8px;
+	pointer-events: none;
+	z-index: 2;
+	opacity: 0.72;
+	background:
+		linear-gradient(var(--jk-line-strong), var(--jk-line-strong)) top left / 9px
+		1px no-repeat,
+		linear-gradient(var(--jk-line-strong), var(--jk-line-strong)) top left / 1px
+		9px no-repeat,
+		linear-gradient(var(--jk-line-strong), var(--jk-line-strong)) top right /
+		9px 1px no-repeat,
+		linear-gradient(var(--jk-line-strong), var(--jk-line-strong)) top right /
+		1px 9px no-repeat,
+		linear-gradient(var(--jk-line-strong), var(--jk-line-strong)) bottom left /
+		9px 1px no-repeat,
+		linear-gradient(var(--jk-line-strong), var(--jk-line-strong)) bottom left /
+		1px 9px no-repeat,
+		linear-gradient(var(--jk-line-strong), var(--jk-line-strong)) bottom right /
+		9px 1px no-repeat,
+		linear-gradient(var(--jk-line-strong), var(--jk-line-strong)) bottom right /
+		1px 9px no-repeat;
 }
 :root .jk-inspector-divider {
 	width: 12px;
@@ -572,6 +724,9 @@
 }
 :root .jk-inspector .jk-motion-group [role="tab"] {
 	background: transparent;
+}
+:root .jk-inspector .jk-motion-group [role="tab"]:focus:not(:focus-visible) {
+	outline: none;
 }
 :root .jk-inspector .jk-motion-group [role="tab"][data-selected] {
 	color: var(--jk-ink);
@@ -924,12 +1079,93 @@
 :root .jk-recording-island {
 	border: 1px solid var(--jk-line-strong);
 	border-radius: 999px;
-	background: color-mix(in srgb, var(--jk-paper) 82%, transparent);
+	background: var(--jk-glass-hi);
+	color: var(--jk-ink);
 	backdrop-filter: blur(36px) saturate(210%);
 	-webkit-backdrop-filter: blur(36px) saturate(210%);
 	box-shadow:
 		var(--jk-rim-sapphire),
-		0 16px 40px rgba(0, 0, 0, 0.24);
+		0 20px 48px rgba(0, 0, 0, 0.26);
+}
+:root .jk-recording-island[data-paused="true"] {
+	border-color: rgba(245, 158, 11, 0.55);
+}
+:root .jk-hud-dot {
+	display: inline-block;
+	width: 9px;
+	height: 9px;
+	border-radius: 50%;
+	flex: none;
+	background: var(--jk-rec);
+	box-shadow: 0 0 8px color-mix(in srgb, var(--jk-rec) 65%, transparent);
+	animation: jk-hud-pulse 1.15s ease-in-out infinite;
+}
+:root .jk-hud-status.is-paused .jk-hud-dot {
+	background: #f59e0b;
+	box-shadow: 0 0 8px rgba(245, 158, 11, 0.55);
+	animation: none;
+}
+@keyframes jk-hud-pulse {
+	0%,
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+	50% {
+		opacity: 0.36;
+		transform: scale(0.84);
+	}
+}
+:root .jk-hud-sep {
+	background: var(--jk-line);
+}
+:root .jk-hud-btn {
+	color: var(--jk-ink);
+	transition:
+		transform 240ms var(--jk-spring),
+		background-color 180ms var(--jk-effects),
+		color 180ms var(--jk-effects);
+}
+:root .jk-hud-btn:hover:not(:disabled) {
+	background: var(--jk-well);
+}
+:root .jk-hud-btn:active:not(:disabled) {
+	transform: scale(0.92);
+}
+:root .jk-hud-meter {
+	display: inline-flex;
+	align-items: flex-end;
+	gap: 2px;
+	height: 14px;
+	padding-inline: 2px;
+}
+:root .jk-hud-meter i {
+	display: block;
+	width: 2.5px;
+	border-radius: 99px;
+	background: var(--jk-led);
+	transition: height 90ms ease-out;
+}
+:root .jk-hud-stop {
+	position: relative;
+	overflow: hidden;
+	background: linear-gradient(
+		180deg,
+		color-mix(in srgb, var(--jk-rec) 90%, #ffffff 14%),
+		var(--jk-rec)
+	);
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.4),
+		0 4px 14px color-mix(in srgb, var(--jk-rec) 38%, transparent);
+	transition:
+		transform 240ms var(--jk-spring),
+		filter 180ms var(--jk-effects);
+}
+:root .jk-hud-stop:hover:not(:disabled) {
+	filter: brightness(1.07);
+}
+:root .jk-hud-stop:active:not(:disabled) {
+	transform: scale(0.95);
 }
 :root .jk-export > div:last-child > div:last-child {
 	background: var(--jk-paper);
@@ -1374,6 +1610,7 @@
 	gap: 0;
 	padding: 3px;
 	border-radius: var(--jk-radius-sm);
+	border: 1px solid var(--jk-line);
 	background: var(--jk-well);
 	box-shadow: var(--jk-recess);
 	flex-wrap: nowrap;
@@ -1382,9 +1619,9 @@
 :root .jk-background-collections > button {
 	flex: 1;
 	min-width: 0;
-	padding: 6px 3px;
+	padding: 5.5px 2px;
 	border-radius: 7px;
-	font-size: 11.5px;
+	font-size: 11px;
 	font-weight: 500;
 	white-space: nowrap;
 	color: var(--jk-muted);
@@ -1614,12 +1851,15 @@
 	transform: scale(0.4);
 }
 .jk-sw-led {
-	width: 4px;
-	height: 4px;
-	opacity: 0;
+	width: 4.5px;
+	height: 4.5px;
+	background: var(--jk-muted);
+	opacity: 0.42;
 }
 .jk-sw-led.is-on {
+	background: var(--jk-led);
 	opacity: 1;
+	box-shadow: 0 0 6px var(--jk-led);
 }
 .jk-src-led {
 	position: absolute;

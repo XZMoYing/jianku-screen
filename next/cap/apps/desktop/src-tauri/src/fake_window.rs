@@ -18,16 +18,16 @@ use crate::{App, ArcLock, RecordingState};
 const RECORDING_CONTROLS_LABEL: &str = "in-progress-recording";
 #[cfg(any(target_os = "macos", test))]
 const RECORDING_CONTROLS_BOUNDS_NAME: &str = "recording-controls-interactive-area";
-const RECORDING_CONTROLS_WIDTH: f64 = 320.0;
-const RECORDING_CONTROLS_HEIGHT: f64 = 150.0;
-const RECORDING_CONTROLS_BAR_HEIGHT: f64 = 40.0;
+const RECORDING_CONTROLS_WIDTH: f64 = 432.0;
+const RECORDING_CONTROLS_HEIGHT: f64 = 156.0;
+const RECORDING_CONTROLS_BAR_HEIGHT: f64 = 50.0;
 const RECORDING_CONTROLS_BOTTOM_PADDING: f64 = 12.0;
 const RECORDING_CONTROLS_OFFSET_Y: f64 = 120.0;
 const TICK_INTERVAL: Duration = Duration::from_millis(50);
 const DEAD_WINDOW_ERROR_THRESHOLD: u8 = 5;
 const HIT_TEST_PADDING_PHYSICAL: f64 = 2.0;
 const RECORDING_CONTROLS_FALLBACK_PADDING_LOGICAL: f64 = 48.0;
-const MAX_INTERACTIVE_BOUNDS_WIDTH: f64 = 360.0;
+const MAX_INTERACTIVE_BOUNDS_WIDTH: f64 = 480.0;
 const MAX_INTERACTIVE_BOUNDS_HEIGHT: f64 = 220.0;
 
 pub struct FakeWindowBounds(pub Arc<RwLock<HashMap<String, HashMap<String, LogicalBounds>>>>);
@@ -924,7 +924,7 @@ mod tests {
 
         let position = calculate_area_recording_controls_position(display, area);
 
-        assert_eq!(position, (540.0, 718.0));
+        assert_eq!(position, (484.0, 722.0));
     }
 
     #[test]
@@ -934,7 +934,7 @@ mod tests {
 
         let position = calculate_area_recording_controls_position(display, area);
 
-        assert_eq!(position, (540.0, 446.0));
+        assert_eq!(position, (484.0, 440.0));
     }
 
     #[test]
@@ -944,7 +944,7 @@ mod tests {
 
         let position = calculate_area_recording_controls_position(display, area);
 
-        assert_eq!(position, (540.0, 842.0));
+        assert_eq!(position, (484.0, 836.0));
     }
 
     #[test]
@@ -957,6 +957,6 @@ mod tests {
         let right_position = calculate_area_recording_controls_position(display, right_area);
 
         assert_eq!(left_position.0, 100.0);
-        assert_eq!(right_position.0, 1700.0);
+        assert_eq!(right_position.0, 1588.0);
     }
 }

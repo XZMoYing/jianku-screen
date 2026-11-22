@@ -21,20 +21,13 @@
 }
 
 .cap-track-fill {
-	--seg-color: var(--ed-text-3);
-	--ed-seg-tint-selected: calc(var(--ed-seg-tint) + 10%);
-	--ed-seg-line-hover: calc(var(--ed-seg-line) + 10%);
-	border-radius: 8px;
-	background-color: color-mix(
-		in srgb,
-		var(--seg-color) var(--ed-seg-tint),
-		var(--ed-card)
-	);
-	box-shadow: inset 0 0 0 1px
-		color-mix(in srgb, var(--seg-color) var(--ed-seg-line), transparent);
+	--seg-color: var(--jk-graphite, var(--ed-text-3));
+	border-radius: 6px;
+	background-color: var(--jk-panel-hi, var(--ed-card));
+	box-shadow: inset 0 0 0 1px var(--jk-line, var(--ed-line));
 	transition:
-		background-color 0.15s ease,
-		box-shadow 0.15s ease;
+		background-color 180ms ease,
+		box-shadow 180ms ease;
 }
 
 .cap-track-fill::before {
@@ -50,24 +43,28 @@
 }
 
 .cap-track-fill:hover {
-	box-shadow: inset 0 0 0 1px
-		color-mix(in srgb, var(--seg-color) var(--ed-seg-line-hover), transparent);
+	box-shadow: inset 0 0 0 1px var(--jk-line-strong, var(--ed-line-strong));
 }
 
 .cap-track-fill[data-selected] {
 	background-color: color-mix(
 		in srgb,
-		var(--seg-color) var(--ed-seg-tint-selected),
-		var(--ed-card)
+		var(--jk-primary, var(--ed-accent)) 11%,
+		var(--jk-panel-hi, var(--ed-card))
 	);
-	box-shadow: inset 0 0 0 1.5px var(--ed-accent);
+	box-shadow: inset 0 0 0 1.5px
+		color-mix(in srgb, var(--jk-primary, var(--ed-accent)) 62%, transparent);
+}
+
+.cap-track-fill[data-selected]::before {
+	background-color: var(--jk-primary, var(--ed-accent));
 }
 
 .cap-track-fill[data-muted] {
 	background-color: color-mix(
 		in srgb,
-		var(--seg-color) calc(var(--ed-seg-tint) / 2),
-		var(--ed-card)
+		var(--jk-well, var(--ed-ctl)) 65%,
+		var(--jk-panel-hi, var(--ed-card))
 	);
 }
 

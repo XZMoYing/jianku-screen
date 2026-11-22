@@ -4,13 +4,13 @@ import { type ComponentProps, splitProps } from "solid-js";
 import { StatusLed } from "./StatusLed";
 
 const toggleControlStyles = cva(
-	"cap-toggle rounded-full bg-ed-ctl-active data-disabled:bg-ed-ctl data-checked:bg-ed-accent transition-[background-color,border-color,box-shadow]",
+	"cap-toggle inline-flex items-center rounded-full cursor-pointer transition-[background-color,border-color,box-shadow]",
 	{
 		variants: {
 			size: {
-				sm: "w-9 h-5 p-0.5",
-				md: "w-11 h-6 p-0.5",
-				lg: "w-14 h-7 p-0.75",
+				sm: "cap-toggle-sm",
+				md: "cap-toggle-md",
+				lg: "cap-toggle-lg",
 			},
 		},
 		defaultVariants: {
@@ -20,13 +20,13 @@ const toggleControlStyles = cva(
 );
 
 const toggleThumbStyles = cva(
-	"cap-toggle-thumb grid place-items-center bg-white rounded-full shadow-[0_1px_3px_rgba(0,0,0,0.22)] transition-transform data-checked:translate-x-[calc(100%)]",
+	"cap-toggle-thumb grid place-items-center rounded-full",
 	{
 		variants: {
 			size: {
-				sm: "size-4",
-				md: "size-5",
-				lg: "size-6",
+				sm: "cap-toggle-thumb-sm",
+				md: "cap-toggle-thumb-md",
+				lg: "cap-toggle-thumb-lg",
 			},
 		},
 		defaultVariants: {

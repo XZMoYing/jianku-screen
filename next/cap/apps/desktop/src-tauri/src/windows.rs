@@ -1748,11 +1748,6 @@ impl ShowCapWindow {
             }
         }
 
-        if matches!(self, Self::Settings { .. }) {
-            hide_recording_windows(app, true);
-            release_camera_preview_if_idle(app);
-        }
-
         #[cfg(target_os = "macos")]
         if let Self::InProgressRecording { capture_target, .. } = self
             && let Some(window) = self.id(app).get(app)
@@ -1761,8 +1756,8 @@ impl ShowCapWindow {
 
             if is_window_handle_valid(&window) {
                 debug!("InProgressRecording: reusing existing window");
-                let width = 320.0;
-                let height = 150.0;
+                let width = 432.0;
+                let height = 156.0;
                 let (pos_x, pos_y) = capture_target
                     .as_ref()
                     .and_then(fake_window::calculate_recording_controls_position_for_target)
@@ -1832,8 +1827,8 @@ impl ShowCapWindow {
         if let Self::InProgressRecording { capture_target, .. } = self
             && let Some(window) = self.id(app).get(app)
         {
-            let width = 320.0;
-            let height = 150.0;
+            let width = 432.0;
+            let height = 156.0;
             let (pos_x, pos_y) = capture_target
                 .as_ref()
                 .and_then(fake_window::calculate_recording_controls_position_for_target)
@@ -2314,6 +2309,7 @@ impl ShowCapWindow {
                         format!("/settings/{}", page.clone().unwrap_or_default()),
                     )
                     .resizable(true)
+                    .minimizable(true)
                     .maximized(false)
                     .focused(true);
 
@@ -3117,8 +3113,8 @@ impl ShowCapWindow {
                 countdown,
                 capture_target,
             } => {
-                let width = 320.0;
-                let height = 150.0;
+                let width = 432.0;
+                let height = 156.0;
 
                 let title = CapWindowId::RecordingControls.title();
                 let should_protect = should_protect_window(app, &title);

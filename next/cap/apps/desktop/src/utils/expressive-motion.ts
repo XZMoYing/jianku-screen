@@ -76,7 +76,7 @@ export function installExpressiveMotion() {
 		const target =
 			event.target instanceof Element
 				? event.target.closest<HTMLElement>(
-						".jk-button, .studio-primary, .jk-capture-targets button, .jk-device-row, .jk-stage-footer button",
+						".jk-button, .jk-export-cta, .studio-primary, .jk-hud-stop, .jk-capture-targets button, .jk-device-row, .jk-stage-footer button",
 					)
 				: null;
 		if (!target) return;
@@ -84,6 +84,35 @@ export function installExpressiveMotion() {
 		if (rect.width <= 0 || rect.height <= 0) return;
 		target.style.setProperty("--gx", `${event.clientX - rect.left}px`);
 		target.style.setProperty("--gy", `${event.clientY - rect.top}px`);
+	};
+	const spawnPressPulse = (element: HTMLElement, event: PointerEvent) => {
+		if (reduced.matches) return;
+		if (
+			!element.matches(
+				".jk-export-cta, .studio-primary, .jk-hud-stop, .jk-source-tile, .jk-button[data-variant='primary'], .jk-button[data-variant='destructive']",
+			)
+		)
+			return;
+		const rect = element.getBoundingClientRect();
+		if (rect.width <= 0 || rect.height <= 0) return;
+		const pulse = document.createElement("span");
+		pulse.className = "jk-press-pulse";
+		pulse.style.left = `${event.clientX - rect.left - 21}px`;
+		pulse.style.top = `${event.clientY - rect.top - 21}px`;
+		element.append(pulse);
+		const anim = pulse.animate?.(
+			[
+				{ transform: "scale(0.35)", opacity: 0.9 },
+				{ transform: "scale(2.8)", opacity: 0 },
+			],
+			{ duration: 480, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
+		);
+		if (anim)
+			anim.finished.then(
+				() => pulse.remove(),
+				() => pulse.remove(),
+			);
+		else pulse.remove();
 	};
 	const releasePointer = (event: PointerEvent) => {
 		const element = pointers.get(event.pointerId);
@@ -97,6 +126,7 @@ export function installExpressiveMotion() {
 		if (!element) return;
 		pointers.set(event.pointerId, element);
 		setPressed(element, true);
+		spawnPressPulse(element, event);
 	};
 	const leavePointer = (event: PointerEvent) => {
 		const element = pointers.get(event.pointerId);

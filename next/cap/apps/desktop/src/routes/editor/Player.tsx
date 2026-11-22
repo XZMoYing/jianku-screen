@@ -417,7 +417,7 @@ export function PlayerContent(props: {
 			onMouseLeave={() => setPanelHovered(false)}
 		>
 			<div
-				class="flex overflow-x-auto relative z-10 flex-none flex-row gap-3 items-center px-3"
+				class="flex overflow-x-auto relative z-10 flex-none flex-row gap-3 items-center px-3 border-b border-ed-line"
 				style={{ height: `${44 - 4 * (props.compactness ?? 0)}px` }}
 			>
 				<div
@@ -473,7 +473,7 @@ export function PlayerContent(props: {
 						<KSelect.Trigger
 							aria-label={localize("预览清晰度")}
 							title={`${localize(previewQualityLabel(previewResolutionOption()))} · ${previewResolutionOption().outputSize.x} × ${previewResolutionOption().outputSize.y}`}
-							class="flex flex-row gap-2 items-center px-3 h-8 min-w-24 max-w-40 rounded-full bg-ed-ctl text-xs text-ed-text-1 outline-hidden focus-visible:ring-2 focus-visible:ring-ed-accent"
+							class="jk-chip-btn flex flex-row gap-1.5 items-center px-2.5 h-7 min-w-20 max-w-40 rounded-lg text-[11.5px] font-mono text-ed-text-1 outline-hidden focus-visible:ring-2 focus-visible:ring-ed-accent"
 						>
 							<KSelect.Value<PreviewResolutionOption> class="flex-1 text-left truncate">
 								{(state) => (
@@ -588,7 +588,10 @@ export function PlayerContent(props: {
 							onClick={handlePlayPauseClick}
 							aria-label={localize("Play/Pause video")}
 							aria-pressed={playbackIntent() && !isAtEnd()}
-							class="flex justify-center items-center rounded-full transition-opacity size-8 bg-ed-text-1 text-ed-card hover:opacity-90"
+							class={cx(
+								"jk-play-btn flex justify-center items-center rounded-full size-9",
+								playbackIntent() && !isAtEnd() && "is-playing",
+							)}
 						>
 							{!playbackIntent() || isAtEnd() ? (
 								<IconCapPlay class="size-3" />
@@ -640,10 +643,9 @@ export function PlayerContent(props: {
 							<KSelect.Trigger
 								aria-label={localize("预览倍速")}
 								class={cx(
-									"flex h-6 min-w-[2.6rem] items-center justify-center rounded-md border px-1.5 text-[11px] font-medium tabular-nums transition-colors",
-									previewSpeed() === 1
-										? "border-ed-line bg-ed-card text-ed-text-2 hover:text-ed-text-1"
-										: "border-ed-line-strong bg-ed-fill text-ed-text-1",
+									"jk-chip-btn flex h-7 min-w-[2.8rem] items-center justify-center rounded-lg px-2 font-mono text-[11.5px] font-medium tabular-nums",
+									previewSpeed() !== 1 &&
+										"border-[var(--jk-primary)] text-[var(--jk-primary)]",
 								)}
 							>
 								<KSelect.Value<number>>
@@ -691,8 +693,7 @@ export function PlayerContent(props: {
 							leftIcon={<IconCapZoomOut />}
 						/>
 						<Slider
-							class="w-18 shrink-0"
-							thumbClass="size-3! -top-[4.5px]!"
+							class="jk-slider-mini w-20 shrink-0"
 							minValue={0}
 							maxValue={1}
 							step={0.001}
@@ -907,7 +908,7 @@ function PreviewCanvas(props: {
 	return (
 		<div
 			ref={setCanvasContainerRef}
-			class="relative flex-1 justify-center items-center min-h-0 bg-ed-card"
+			class="jk-viewfinder-stage relative flex-1 justify-center items-center min-h-0"
 			style={{ contain: "layout style" }}
 			tabIndex={0}
 			aria-label={localize("预览画面")}
@@ -975,7 +976,12 @@ function PreviewCanvas(props: {
 
 function Time(props: { seconds: number; fps?: number; class?: string }) {
 	return (
-		<span class={cx("text-[13px] tabular-nums text-ed-text-3", props.class)}>
+		<span
+			class={cx(
+				"font-mono text-[12px] tabular-nums text-ed-text-3",
+				props.class,
+			)}
+		>
 			{formatTime(props.seconds, props.fps ?? FPS)}
 		</span>
 	);

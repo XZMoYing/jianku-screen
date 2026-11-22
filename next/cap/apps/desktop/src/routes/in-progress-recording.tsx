@@ -944,323 +944,314 @@ function InProgressRecordingInner() {
 						</button>
 					</div>
 				</Show>
-				<div class="h-10 w-full flex-none rounded-2xl">
+				<div class="h-[50px] w-full flex-none rounded-full">
 					<div
-						class="jk-recording-island flex h-full w-full flex-row items-stretch overflow-hidden rounded-2xl bg-gray-1 border shadow-[0_1px_3px_rgba(0,0,0,0.1)]"
-						style={{
-							"border-color":
-								state().variant === "paused"
-									? "var(--amber-6)"
-									: "var(--gray-5)",
-						}}
+						class="jk-recording-island flex h-full w-full flex-row items-center gap-1.5 overflow-hidden rounded-full pl-3 pr-1.5"
+						data-paused={state().variant === "paused" ? "true" : undefined}
 					>
-						<div class="flex min-w-0 flex-1 flex-col p-1">
-							<div class="flex min-w-0 flex-1 flex-row items-center justify-between gap-1">
-								<Show
-									when={!isStarting()}
-									fallback={
-										<div class="flex flex-row items-center gap-1.5 rounded-lg py-1 px-2 text-gray-12">
-											<IconLucideLoader2 class="size-4 animate-spin" />
-											<span class="truncate text-sm font-medium tabular-nums">
-												{localize("Starting")}
+						<div
+							aria-label={localize("Move recording controls")}
+							class="jk-hud-grip non-styled-move flex h-8 w-4 shrink-0 cursor-grab items-center justify-center select-none active:cursor-grabbing"
+							data-tauri-drag-region
+						>
+							<IconCapMoreVertical class="pointer-events-none size-3.5 text-[var(--jk-muted)] opacity-60" />
+						</div>
+
+						<div
+							class={cx(
+								"jk-hud-status flex min-w-0 shrink-0 items-center gap-2 font-mono text-[12.5px] font-semibold tabular-nums text-[var(--jk-ink)]",
+								state().variant === "paused" && "is-paused",
+							)}
+							data-tauri-drag-region
+						>
+							<Show
+								when={!isStarting()}
+								fallback={
+									<>
+										<IconLucideLoader2 class="size-3.5 shrink-0 animate-spin text-[var(--jk-rec)]" />
+										<span class="truncate text-xs font-medium">
+											{localize("Starting")}
+										</span>
+									</>
+								}
+							>
+								<i class="jk-hud-dot" aria-hidden="true" />
+								<span class="truncate">
+									<Show
+										when={!isCountdown()}
+										fallback={
+											<div class="relative inline-block h-[1.5em] w-[1.2ch] overflow-hidden align-middle">
+												<TransitionGroup
+													onEnter={(el, done) => {
+														const a = el.animate(
+															[
+																{
+																	opacity: 0,
+																	transform: "translateY(-100%)",
+																},
+																{ opacity: 1, transform: "translateY(0)" },
+															],
+															{
+																duration: 300,
+																easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+															},
+														);
+														a.finished.then(done);
+													}}
+													onExit={(el, done) => {
+														const a = el.animate(
+															[
+																{ opacity: 1, transform: "translateY(0)" },
+																{
+																	opacity: 0,
+																	transform: "translateY(100%)",
+																},
+															],
+															{
+																duration: 300,
+																easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+															},
+														);
+														a.finished.then(done);
+													}}
+												>
+													<For each={[countdownCurrent()]}>
+														{(num) => (
+															<span class="absolute inset-0 flex items-center justify-center">
+																{num}
+															</span>
+														)}
+													</For>
+												</TransitionGroup>
+											</div>
+										}
+									>
+										<Show
+											when={
+												pausePendingAction() || state().variant === "paused"
+											}
+											fallback={
+												<Show
+													when={isMaxRecordingLimitEnabled()}
+													fallback={formatTime(adjustedTime() / 1000)}
+												>
+													{formatTime(remainingRecordingTime() / 1000)}
+												</Show>
+											}
+										>
+											<span role="status" aria-live="polite" class="text-xs">
+												{pausePendingAction() ?? localize("已暂停")}
 											</span>
-										</div>
+										</Show>
+									</Show>
+								</span>
+							</Show>
+						</div>
+
+						<span class="jk-hud-sep mx-0.5 h-5 w-px shrink-0" />
+
+						<div class="flex min-w-0 flex-1 items-center justify-center gap-0.5">
+							<Show
+								when={!isInitializing()}
+								fallback={
+									<ActionButton
+										onClick={() => {
+											void closeStartingBar();
+										}}
+										title={localize("Close recording controls")}
+										aria-label={localize("Close recording controls")}
+									>
+										<IconLucideX class="size-4" />
+									</ActionButton>
+								}
+							>
+								{canPauseRecording() && (
+									<ActionButton
+										disabled={
+											togglePause.isPending ||
+											isCountdown() ||
+											stopRequested() ||
+											teardownInFlight()
+										}
+										onClick={() => togglePause.mutate()}
+										aria-pressed={state().variant === "paused"}
+										aria-busy={togglePause.isPending}
+										class={cx(
+											state().variant === "paused" &&
+												"bg-[color-mix(in_srgb,#f59e0b_18%,transparent)] text-[#d97706] dark:text-[#fbbf24]",
+										)}
+										title={
+											state().variant === "paused"
+												? localize("继续录制")
+												: localize("暂停录制")
+										}
+										aria-label={
+											state().variant === "paused"
+												? localize("继续录制")
+												: localize("暂停录制")
+										}
+									>
+										<Show
+											when={togglePause.isPending}
+											fallback={
+												state().variant === "paused" ? (
+													<IconCapPlayCircle class="size-4" />
+												) : (
+													<IconCapPauseCircle class="size-4" />
+												)
+											}
+										>
+											<IconLucideLoader2 class="size-4 animate-spin motion-reduce:animate-none" />
+										</Show>
+									</ActionButton>
+								)}
+
+								<Show
+									when={canToggleMicMute()}
+									fallback={
+										<RecordingControlTooltip content={microphoneTitle()}>
+											<div
+												aria-label={microphoneTitle()}
+												class="relative flex h-8 shrink-0 items-center justify-center gap-1 rounded-full px-1.5"
+											>
+												{optionsQuery.rawOptions.micName != null ? (
+													disconnectedInputs.microphone ? (
+														<IconLucideMicOff class="size-4 text-[var(--amber-11)]" />
+													) : (
+														<>
+															<IconCapMicrophone class="size-4 text-[var(--jk-ink)]" />
+															<HudAudioMeter level={audioLevel()} />
+														</>
+													)
+												) : (
+													<IconLucideMicOff
+														class="size-4 text-[var(--jk-muted)] opacity-55"
+														data-tauri-drag-region
+													/>
+												)}
+											</div>
+										</RecordingControlTooltip>
 									}
 								>
 									<RecordingControlButton
-										flexible
-										disabled={
-											stopRequested() ||
-											stopRecording.isPending ||
-											isCountdown()
-										}
-										class="flex min-w-0 flex-1 flex-row items-center gap-1 rounded-lg py-1 px-1.5 text-red-300 transition-colors duration-100 hover:bg-red-500/8 active:bg-red-500/12 disabled:opacity-60 disabled:hover:bg-transparent"
 										type="button"
-										onPointerDown={(event) => {
-											if (event.button !== 0) return;
-											event.preventDefault();
-											event.stopPropagation();
-											requestStopRecording();
-										}}
-										onClick={requestStopRecording}
-										title={localize("Stop recording")}
-										aria-label={localize("Stop recording")}
+										class="jk-hud-btn relative flex h-8 shrink-0 items-center justify-center gap-1 rounded-full px-1.5 disabled:opacity-50"
+										disabled={toggleMicMute.isPending}
+										onClick={() => toggleMicMute.mutate()}
+										title={
+											micMuted()
+												? localize("取消麦克风静音")
+												: localize("麦克风静音")
+										}
+										aria-pressed={micMuted() ? "true" : "false"}
+										aria-label={
+											micMuted()
+												? localize("取消麦克风静音")
+												: localize("麦克风静音")
+										}
 									>
-										<IconCapStopCircle class="size-5 shrink-0" />
-										<span class="truncate text-sm font-medium tabular-nums">
-											<Show
-												when={!isCountdown()}
-												fallback={
-													<div class="relative inline-block h-[1.5em] w-[1ch] overflow-hidden align-middle">
-														<TransitionGroup
-															onEnter={(el, done) => {
-																const a = el.animate(
-																	[
-																		{
-																			opacity: 0,
-																			transform: "translateY(-100%)",
-																		},
-																		{ opacity: 1, transform: "translateY(0)" },
-																	],
-																	{
-																		duration: 300,
-																		easing: "cubic-bezier(0.16, 1, 0.3, 1)",
-																	},
-																);
-																a.finished.then(done);
-															}}
-															onExit={(el, done) => {
-																const a = el.animate(
-																	[
-																		{ opacity: 1, transform: "translateY(0)" },
-																		{
-																			opacity: 0,
-																			transform: "translateY(100%)",
-																		},
-																	],
-																	{
-																		duration: 300,
-																		easing: "cubic-bezier(0.16, 1, 0.3, 1)",
-																	},
-																);
-																a.finished.then(done);
-															}}
-														>
-															<For each={[countdownCurrent()]}>
-																{(num) => (
-																	<span class="absolute inset-0 flex items-center justify-center">
-																		{num}
-																	</span>
-																)}
-															</For>
-														</TransitionGroup>
-													</div>
-												}
-											>
-												<Show
-													when={
-														pausePendingAction() || state().variant === "paused"
-													}
-													fallback={
-														<Show
-															when={isMaxRecordingLimitEnabled()}
-															fallback={formatTime(adjustedTime() / 1000)}
-														>
-															{formatTime(remainingRecordingTime() / 1000)}
-														</Show>
-													}
-												>
-													<span role="status" aria-live="polite">
-														{pausePendingAction() ?? localize("已暂停")}
-													</span>
-												</Show>
-											</Show>
-										</span>
+										{micMuted() ? (
+											<IconLucideMicOff class="size-4 text-[var(--jk-rec)]" />
+										) : (
+											<>
+												<IconCapMicrophone class="size-4 text-[var(--jk-ink)]" />
+												<HudAudioMeter level={audioLevel()} />
+											</>
+										)}
 									</RecordingControlButton>
 								</Show>
 
-								<div class="flex shrink-0 items-center">
-									<Show
-										when={canToggleMicMute()}
-										fallback={
-											<RecordingControlTooltip content={microphoneTitle()}>
-												<div
-													aria-label={microphoneTitle()}
-													class="relative flex h-8 w-7 shrink-0 items-center justify-center"
-												>
-													{optionsQuery.rawOptions.micName != null ? (
-														disconnectedInputs.microphone ? (
-															<IconLucideMicOff class="size-5 text-[var(--amber-11)]" />
-														) : (
-															<>
-																<IconCapMicrophone class="size-5 text-gray-12" />
-																<div class="absolute bottom-1 left-1 right-1 h-0.5 overflow-hidden rounded-full bg-gray-10">
-																	<div
-																		class="absolute inset-0 bg-blue-9 transition-transform duration-100"
-																		style={{
-																			transform: `translateX(-${
-																				(1 - audioLevel()) * 100
-																			}%)`,
-																		}}
-																	/>
-																</div>
-															</>
-														)
-													) : (
-														<IconLucideMicOff
-															class="size-5 text-gray-7"
-															data-tauri-drag-region
-														/>
-													)}
-												</div>
-											</RecordingControlTooltip>
-										}
-									>
-										<RecordingControlButton
-											type="button"
-											class="relative flex h-8 w-7 shrink-0 items-center justify-center rounded-lg transition-colors duration-100 hover:bg-gray-12/6 active:bg-gray-12/10 disabled:opacity-50 disabled:hover:bg-transparent dark:hover:bg-white/8 dark:active:bg-white/12"
-											disabled={toggleMicMute.isPending}
-											onClick={() => toggleMicMute.mutate()}
-											title={
-												micMuted()
-													? localize("取消麦克风静音")
-													: localize("麦克风静音")
-											}
-											aria-pressed={micMuted() ? "true" : "false"}
-											aria-label={
-												micMuted()
-													? localize("取消麦克风静音")
-													: localize("麦克风静音")
-											}
-										>
-											{micMuted() ? (
-												<IconLucideMicOff class="size-5 text-red-9" />
-											) : (
-												<>
-													<IconCapMicrophone class="size-5 text-gray-12" />
-													<div class="absolute bottom-1 left-1 right-1 h-0.5 overflow-hidden rounded-full bg-gray-10">
-														<div
-															class="absolute inset-0 bg-blue-9 transition-transform duration-100"
-															style={{
-																transform: `translateX(-${
-																	(1 - audioLevel()) * 100
-																}%)`,
-															}}
-														/>
-													</div>
-												</>
-											)}
-										</RecordingControlButton>
-									</Show>
-									<Show
-										when={!isInitializing()}
-										fallback={
-											<ActionButton
-												onClick={() => {
-													void closeStartingBar();
-												}}
-												title={localize("Close recording controls")}
-												aria-label={localize("Close recording controls")}
-											>
-												<IconLucideX class="size-5" />
-											</ActionButton>
-										}
-									>
-										<Show when={hasRecordingIssue()}>
-											<ActionButton
-												class={cx(
-													"text-red-10 hover:bg-red-3/40",
-													issuePanelVisible() &&
-														"bg-red-3/40 ring-1 ring-red-8",
-												)}
-												onClick={() => toggleIssuePanel()}
-												title={issueMessages().join(", ")}
-												aria-pressed={issuePanelVisible() ? "true" : "false"}
-												aria-label={localize("Recording issues")}
-											>
-												<IconLucideAlertTriangle class="size-5" />
-											</ActionButton>
-										</Show>
-
-										{recordingMode() === "studio" && (
-											<ActionButton
-												title={localize(
-													bookmarkAdded() ? "已添加书签" : "添加书签",
-												)}
-												aria-label={localize("添加书签")}
-												disabled={
-													addBookmark.isPending ||
-													isCountdown() ||
-													stopRequested() ||
-													teardownInFlight()
-												}
-												onClick={() => addBookmark.mutate()}
-												class={bookmarkAdded() ? "text-green-10" : ""}
-											>
-												<IconBookmark />
-											</ActionButton>
+								<Show when={hasRecordingIssue()}>
+									<ActionButton
+										class={cx(
+											"text-[var(--jk-rec)]",
+											issuePanelVisible() &&
+												"bg-[color-mix(in_srgb,var(--jk-rec)_14%,transparent)]",
 										)}
-										{canPauseRecording() && (
-											<ActionButton
-												disabled={
-													togglePause.isPending ||
-													isCountdown() ||
-													stopRequested() ||
-													teardownInFlight()
-												}
-												onClick={() => togglePause.mutate()}
-												aria-pressed={state().variant === "paused"}
-												aria-busy={togglePause.isPending}
-												class={cx(
-													"active:scale-90 motion-reduce:transform-none",
-													state().variant === "paused" &&
-														"bg-[var(--amber-3)] text-[var(--amber-11)] ring-1 ring-[var(--amber-6)]",
-												)}
-												title={
-													state().variant === "paused"
-														? localize("继续录制")
-														: localize("暂停录制")
-												}
-												aria-label={
-													state().variant === "paused"
-														? localize("继续录制")
-														: localize("暂停录制")
-												}
-											>
-												<Show
-													when={togglePause.isPending}
-													fallback={
-														state().variant === "paused" ? (
-															<IconCapPlayCircle />
-														) : (
-															<IconCapPauseCircle />
-														)
-													}
-												>
-													<IconLucideLoader2 class="size-5 animate-spin motion-reduce:animate-none" />
-												</Show>
-											</ActionButton>
-										)}
+										onClick={() => toggleIssuePanel()}
+										title={issueMessages().join(", ")}
+										aria-pressed={issuePanelVisible() ? "true" : "false"}
+										aria-label={localize("Recording issues")}
+									>
+										<IconLucideAlertTriangle class="size-4" />
+									</ActionButton>
+								</Show>
 
-										<ActionButton
-											disabled={restartRecording.isPending || isCountdown()}
-											onClick={() => restartRecording.mutate()}
-											title={localize("Restart recording")}
-											aria-label={localize("Restart recording")}
-										>
-											<IconCapRestart />
-										</ActionButton>
-										<ActionButton
-											disabled={deleteRecording.isPending || isCountdown()}
-											onClick={() => deleteRecording.mutate()}
-											title={localize("Delete recording")}
-											aria-label={localize("Delete recording")}
-										>
-											<IconCapTrash />
-										</ActionButton>
-										<ActionButton
-											ref={(el) => {
-												settingsButtonRef = el ?? undefined;
-											}}
-											onClick={() => {
-												void openRecordingSettingsMenu();
-											}}
-											title={localize("Recording settings")}
-											aria-label={localize("Recording settings")}
-										>
-											<IconCapSettings class="size-5" />
-										</ActionButton>
-									</Show>
-								</div>
-							</div>
+								{recordingMode() === "studio" && (
+									<ActionButton
+										title={localize(
+											bookmarkAdded() ? "已添加书签" : "添加书签",
+										)}
+										aria-label={localize("添加书签")}
+										disabled={
+											addBookmark.isPending ||
+											isCountdown() ||
+											stopRequested() ||
+											teardownInFlight()
+										}
+										onClick={() => addBookmark.mutate()}
+										class={bookmarkAdded() ? "text-[var(--jk-led)]" : ""}
+									>
+										<IconBookmark class="size-4" />
+									</ActionButton>
+								)}
+
+								<ActionButton
+									disabled={restartRecording.isPending || isCountdown()}
+									onClick={() => restartRecording.mutate()}
+									title={localize("Restart recording")}
+									aria-label={localize("Restart recording")}
+								>
+									<IconCapRestart class="size-4" />
+								</ActionButton>
+								<ActionButton
+									disabled={deleteRecording.isPending || isCountdown()}
+									onClick={() => deleteRecording.mutate()}
+									title={localize("Delete recording")}
+									aria-label={localize("Delete recording")}
+								>
+									<IconCapTrash class="size-4" />
+								</ActionButton>
+								<ActionButton
+									ref={(el) => {
+										settingsButtonRef = el ?? undefined;
+									}}
+									onClick={() => {
+										void openRecordingSettingsMenu();
+									}}
+									title={localize("Recording settings")}
+									aria-label={localize("Recording settings")}
+								>
+									<IconCapSettings class="size-4" />
+								</ActionButton>
+							</Show>
 						</div>
-						<div
-							aria-label={localize("Move recording controls")}
-							class="non-styled-move flex w-6 shrink-0 cursor-move items-center justify-center border-l border-gray-5 p-1 hover:cursor-move transition-colors duration-100 hover:bg-gray-12/4 dark:hover:bg-white/6"
-							data-tauri-drag-region
-						>
-							<IconCapMoreVertical class="pointer-events-none size-4 text-gray-10" />
-						</div>
+
+						<Show when={!isStarting()}>
+							<span class="jk-hud-sep mx-0.5 h-5 w-px shrink-0" />
+							<RecordingControlButton
+								disabled={
+									stopRequested() || stopRecording.isPending || isCountdown()
+								}
+								class="jk-hud-stop flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[12.5px] font-semibold text-white disabled:opacity-55"
+								type="button"
+								onPointerDown={(event) => {
+									if (event.button !== 0) return;
+									event.preventDefault();
+									event.stopPropagation();
+									requestStopRecording();
+								}}
+								onClick={requestStopRecording}
+								title={localize("Stop recording")}
+								aria-label={localize("Stop recording")}
+							>
+								<span
+									class="inline-block size-2.5 shrink-0 rounded-[2.5px] bg-white"
+									aria-hidden="true"
+								/>
+								<span>{localize("停止")}</span>
+							</RecordingControlButton>
+						</Show>
 					</div>
 				</div>
 			</div>
@@ -1397,17 +1388,28 @@ function RecordingControlButton(
 	);
 }
 
+function HudAudioMeter(props: { level: number }) {
+	const weights = [0.42, 0.92, 0.68, 1, 0.5];
+	return (
+		<span class="jk-hud-meter" aria-hidden="true">
+			{weights.map((weight) => {
+				const pct = Math.max(
+					22,
+					Math.min(100, Math.round((0.18 + props.level * 0.82) * weight * 100)),
+				);
+				return <i style={{ height: `${pct}%` }} />;
+			})}
+		</span>
+	);
+}
+
 function ActionButton(props: ComponentProps<"button">) {
 	return (
 		<RecordingControlButton
 			{...props}
 			class={cx(
-				"p-1 rounded-lg transition-colors duration-100",
-				"text-gray-11 hover:text-gray-12",
-				"hover:bg-gray-12/6 dark:hover:bg-white/8",
-				"active:bg-gray-12/10 dark:active:bg-white/12",
-				"h-8 w-7 shrink-0 flex items-center justify-center",
-				"disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent",
+				"jk-hud-btn size-8 shrink-0 flex items-center justify-center rounded-full",
+				"disabled:opacity-45 disabled:cursor-not-allowed",
 				props.class,
 			)}
 			type="button"
@@ -1419,7 +1421,7 @@ function formatTime(secs: number) {
 	const minutes = Math.floor(secs / 60);
 	const seconds = Math.floor(secs % 60);
 
-	return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+	return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 }
 
 function createAudioInputLevel() {

@@ -1634,46 +1634,52 @@ export function Timeline(props: {
 							onAdd={handleAddTrack}
 						/>
 					</div>
-					<button
-						type="button"
-						class={cx(
-							"absolute right-8 top-0.5 z-50 grid size-6 place-items-center rounded-md bg-ed-card focus-visible:outline-ed-accent",
-							mainTrackMagnetic() ? "text-ed-accent" : "text-ed-text-3",
-						)}
-						aria-label={localize("Main track magnetism")}
-						aria-pressed={mainTrackMagnetic()}
-						disabled={props.inactive}
-						title={localize(
-							mainTrackMagnetic()
-								? "Main track magnetism is on. Turn off to leave gaps."
-								: "Main track magnetism is off. Turn on to close gaps.",
-						)}
-						onMouseDown={(event) => event.stopPropagation()}
-						onClick={toggleMainTrackMagnetism}
-					>
-						<IconLucideAlignHorizontalDistributeCenter class="size-4" />
-					</button>
-					<button
-						type="button"
-						class={cx(
-							"absolute right-1 top-0.5 z-50 grid size-6 place-items-center rounded-md bg-ed-card focus-visible:outline-ed-accent",
-							snappingEnabled() ? "text-ed-accent" : "text-ed-text-3",
-						)}
-						aria-label={localize("时间线吸附")}
-						aria-pressed={snappingEnabled()}
-						disabled={props.inactive}
-						title={[
-							localize("时间线吸附"),
-							keymap.label("snap"),
-							localize("按住 Alt 临时绕过"),
-						]
-							.filter(Boolean)
-							.join(" · ")}
-						onMouseDown={(event) => event.stopPropagation()}
-						onClick={toggleSnapping}
-					>
-						<IconLucideMagnet class="size-4" />
-					</button>
+					<div class="jk-tl-right-tools absolute right-0 top-0 bottom-0 z-50 flex items-center gap-1 pl-2 bg-ed-card">
+						<button
+							type="button"
+							class={cx(
+								"jk-tl-tool-btn grid size-6 place-items-center rounded-md focus-visible:outline-ed-accent",
+								mainTrackMagnetic()
+									? "is-on text-ed-accent"
+									: "text-ed-text-3 hover:text-ed-text-1",
+							)}
+							aria-label={localize("Main track magnetism")}
+							aria-pressed={mainTrackMagnetic()}
+							disabled={props.inactive}
+							title={localize(
+								mainTrackMagnetic()
+									? "Main track magnetism is on. Turn off to leave gaps."
+									: "Main track magnetism is off. Turn on to close gaps.",
+							)}
+							onMouseDown={(event) => event.stopPropagation()}
+							onClick={toggleMainTrackMagnetism}
+						>
+							<IconLucideAlignHorizontalDistributeCenter class="size-3.5" />
+						</button>
+						<button
+							type="button"
+							class={cx(
+								"jk-tl-tool-btn grid size-6 place-items-center rounded-md focus-visible:outline-ed-accent",
+								snappingEnabled()
+									? "is-on text-ed-accent"
+									: "text-ed-text-3 hover:text-ed-text-1",
+							)}
+							aria-label={localize("时间线吸附")}
+							aria-pressed={snappingEnabled()}
+							disabled={props.inactive}
+							title={[
+								localize("时间线吸附"),
+								keymap.label("snap"),
+								localize("按住 Alt 临时绕过"),
+							]
+								.filter(Boolean)
+								.join(" · ")}
+							onMouseDown={(event) => event.stopPropagation()}
+							onClick={toggleSnapping}
+						>
+							<IconLucideMagnet class="size-3.5" />
+						</button>
+					</div>
 
 					{/* Scrub surface for the ruler. It overhangs the timeline origin so
 					    the snap-to-zero zone places the playhead instead of hitting the
@@ -1729,7 +1735,7 @@ export function Timeline(props: {
 						)}px)`,
 					}}
 				>
-					<div class="size-3 rounded-full bg-ed-playhead ring-2 ring-ed-card -mt-1.5 -ml-[5.5px]" />
+					<div class="size-2.5 rounded-[3px] bg-ed-playhead ring-2 ring-ed-card -mt-1 -ml-[4.5px]" />
 				</div>
 				<Show when={snapGuide() !== null}>
 					<div
@@ -2372,8 +2378,8 @@ function TrackRow(props: {
 	return (
 		<div
 			class={cx(
-				"group/row relative flex items-stretch rounded-lg transition-[background-color,opacity] duration-150",
-				active() ? "bg-ed-ctl-hover" : "bg-ed-ctl hover:bg-ed-ctl-hover",
+				"jk-track-row group/row relative flex items-stretch rounded-[7px] transition-[background-color,opacity] duration-150",
+				active() ? "is-active" : "",
 			)}
 			classList={{ "opacity-35": dragging() }}
 			data-track-type={props.type}

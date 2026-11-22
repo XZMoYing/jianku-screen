@@ -8051,15 +8051,6 @@ pub async fn run(recording_logging_handle: LoggingHandle, logs_dir: PathBuf) {
                                 restore_main_windows_if_no_editors(app);
                             }
                             CapWindowId::Settings => {
-                                restore_main_and_target_select_windows(app);
-
-                                restore_camera_window(app);
-
-                                #[cfg(target_os = "windows")]
-                                if !has_open_editor_window(app) {
-                                    reopen_main_window(app);
-                                }
-
                                 #[cfg(target_os = "macos")]
                                 return;
                             }
