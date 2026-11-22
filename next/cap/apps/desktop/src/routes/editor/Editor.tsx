@@ -882,10 +882,12 @@ function Inner(props: {
 		editorMaterialsDocked(workspaceWidth(), materialsWidth(), inspectorWidth());
 	let endInspectorResize: (() => void) | undefined;
 	onCleanup(() => endInspectorResize?.());
+	const [isResizingInspector, setIsResizingInspector] = createSignal(false);
 	const handleInspectorResizeStart = (event: PointerEvent) => {
 		if (event.button !== 0) return;
 		event.preventDefault();
 		endInspectorResize?.();
+		setIsResizingInspector(true);
 		const start = event.clientX;
 		const width = inspectorWidth();
 		const handleMove = (move: PointerEvent) =>
@@ -893,6 +895,7 @@ function Inner(props: {
 				clampInspectorWidth(width + start - move.clientX),
 			);
 		const finish = () => {
+			setIsResizingInspector(false);
 			window.removeEventListener("pointermove", handleMove);
 			window.removeEventListener("pointerup", finish);
 			window.removeEventListener("pointercancel", finish);
@@ -1007,7 +1010,12 @@ function Inner(props: {
 				>
 					<div
 						ref={setLayoutRef}
-						class="flex overflow-hidden flex-col flex-1 gap-2 pb-2 min-h-0"
+						class="jk-editor-body flex overflow-hidden flex-col flex-1 gap-2 pb-2 min-h-0"
+						data-resizing={
+							isResizingInspector() || isResizingSplit() || isResizingTimeline()
+								? "true"
+								: undefined
+						}
 					>
 						<div
 							ref={setSplitContainerRef}

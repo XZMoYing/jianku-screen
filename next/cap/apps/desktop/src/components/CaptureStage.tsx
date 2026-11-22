@@ -3,6 +3,8 @@ import { ASPECT_RATIOS } from "~/routes/editor/projectConfig";
 import FrameWorker from "~/utils/frame-worker?worker";
 import { t as localize } from "~/utils/i18n";
 import { type CaptureStyle, commands } from "~/utils/tauri";
+import IconLucideSparkles from "~icons/lucide/sparkles";
+import { MotionText } from "./MotionText";
 
 export default function CaptureStage(props: {
 	style: CaptureStyle | undefined;
@@ -169,12 +171,16 @@ export default function CaptureStage(props: {
 				</span>
 				<button
 					type="button"
+					class="jk-motion-btn"
 					aria-pressed={playing()}
 					onClick={() => {
 						setPlaying(!playing());
 					}}
 				>
-					{playing() ? localize("暂停动效") : localize("播放动效")}
+					<IconLucideSparkles class="size-3.5 shrink-0" />
+					<MotionText
+						text={playing() ? localize("暂停动效") : localize("播放动效")}
+					/>
 				</button>
 				<span>
 					{ratio()

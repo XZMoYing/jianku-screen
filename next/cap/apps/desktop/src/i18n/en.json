@@ -1853,5 +1853,7 @@
 	"自动识别组合键并轻盈浮现": "Auto-detect & display shortcut pills",
 	"智能字幕": "Smart Captions",
 	"离线转写与 SRT / VTT 导出": "Offline transcription & SRT / VTT export",
-	"快速切换配色": "Quick color preset"
+	"快速切换配色": "Quick color preset",
+	"浅色外观": "Light appearance",
+	"深色外观": "Dark appearance"
 }

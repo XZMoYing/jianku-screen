@@ -49,6 +49,7 @@
 	--jk-shadow: 0 2px 6px rgba(0, 0, 0, 0.05), 0 10px 28px rgba(0, 0, 0, 0.06);
 	--jk-pop-shadow: var(--jk-rim-sapphire), 0 18px 44px rgba(0, 0, 0, 0.22);
 	--jk-effects: cubic-bezier(0.22, 1, 0.36, 1);
+	--jk-spatial: cubic-bezier(0.22, 1, 0.36, 1);
 	--jk-spring: cubic-bezier(0.22, 1.14, 0.38, 1);
 	--jk-mono: "SF Mono", ui-monospace, Menlo, monospace;
 }
@@ -567,9 +568,52 @@
 	background: color-mix(in srgb, var(--jk-primary) 13%, transparent);
 	color: var(--jk-primary);
 }
+:root .jk-window-titlebar {
+	background: color-mix(in srgb, var(--jk-paper) 88%, transparent);
+	backdrop-filter: blur(22px) saturate(160%);
+	-webkit-backdrop-filter: blur(22px) saturate(160%);
+	border-bottom: 1px solid var(--jk-line);
+}
+:root .jk-mode-seg {
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+	padding: 3px;
+	border-radius: var(--jk-radius-sm);
+	border: 1px solid var(--jk-line);
+	background: var(--jk-well);
+	box-shadow: var(--jk-recess);
+}
+:root .jk-mode-seg .jk-selection-pill {
+	border-radius: 7px;
+	background: var(--jk-glass-hi);
+	box-shadow: var(--jk-rim);
+}
+:root .jk-editor-body:not([data-resizing="true"]) .jk-editor-stage > *,
+:root .jk-editor-body:not([data-resizing="true"]) > div {
+	transition:
+		flex-basis 420ms var(--jk-spatial, var(--jk-effects)),
+		width 420ms var(--jk-spatial, var(--jk-effects)),
+		height 420ms var(--jk-spatial, var(--jk-effects));
+}
+:root .jk-editor-body[data-resizing="true"] .jk-editor-stage > *,
+:root .jk-editor-body[data-resizing="true"] > div {
+	transition: none;
+}
 :root .jk-track-row {
 	background: var(--jk-well);
 	box-shadow: var(--jk-recess);
+	animation: jk-track-in 340ms var(--jk-spring);
+}
+@keyframes jk-track-in {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 :root .jk-track-row.is-active {
 	background: color-mix(in srgb, var(--jk-primary) 7%, var(--jk-well));
@@ -1648,42 +1692,65 @@
 	padding: 2px;
 }
 :root .jk-background-tile {
-	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
 	min-width: 0;
-	aspect-ratio: 1.5;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	text-align: left;
+	transition: transform 260ms var(--jk-spring);
+}
+:root .jk-background-tile:active {
+	transform: scale(0.96);
+}
+:root .jk-background-thumb {
+	position: relative;
+	display: block;
+	width: 100%;
+	aspect-ratio: 16 / 10;
 	overflow: hidden;
 	border-radius: 8px;
 	border: 1px solid var(--jk-line);
 	background: var(--jk-well);
+	outline: 2px solid transparent;
+	outline-offset: 2px;
 	transition:
-		transform 240ms var(--jk-spring),
-		box-shadow 180ms;
+		transform 280ms var(--jk-spring),
+		outline-color 220ms var(--jk-effects),
+		box-shadow 220ms var(--jk-effects);
 }
-:root .jk-background-tile:hover {
+:root .jk-background-tile:hover .jk-background-thumb {
 	transform: translateY(-2px);
-	box-shadow: 0 5px 14px rgba(0, 0, 0, 0.14);
+	box-shadow: 0 6px 14px rgba(0, 0, 0, 0.14);
 }
-:root .jk-background-tile > img,
+:root .jk-background-thumb > img,
 :root .jk-desktop-background > img,
 :root .jk-desktop-background > video {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
 }
-:root .jk-background-tile > span:not(.jk-material-loading) {
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	padding: 14px 6px 5px;
-	background: linear-gradient(transparent, rgba(0, 0, 0, 0.68));
-	color: #ffffff;
-	font-size: 10px;
+:root .jk-background-name {
+	display: block;
+	width: 100%;
+	padding: 0 2px;
+	color: var(--jk-muted);
+	font-size: 10.5px;
+	line-height: 1.3;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	overflow: hidden;
+	transition: color 180ms var(--jk-effects);
 }
-:root .jk-background-tile[aria-pressed="true"],
+:root .jk-background-tile[aria-pressed="true"] .jk-background-thumb {
+	outline-color: var(--jk-primary);
+}
+:root .jk-background-tile[aria-pressed="true"] .jk-background-name {
+	color: var(--jk-ink);
+	font-weight: 600;
+}
 :root .jk-desktop-background[aria-pressed="true"] {
 	outline: 2px solid var(--jk-primary);
 	outline-offset: 2px;
@@ -1886,27 +1953,41 @@
 	align-items: center;
 	gap: 5px;
 	flex: none;
-	padding: 2px 7px;
+	height: 24px;
+	padding: 0 9px;
 	border-radius: 999px;
-	font-size: 10px;
+	font-family: var(--jk-mono);
+	font-size: 10.5px;
 	font-weight: 500;
 	color: var(--jk-muted);
-	background: color-mix(in srgb, var(--jk-well) 70%, transparent);
+	background: var(--jk-well);
 	transition:
-		background-color 220ms,
-		color 220ms;
+		background-color 220ms var(--jk-effects),
+		color 220ms var(--jk-effects);
 }
 .jk-dev-state.is-on {
 	color: var(--jk-led);
-	background: color-mix(in srgb, var(--jk-led) 13%, transparent);
+	font-weight: 600;
+	background: color-mix(in srgb, var(--jk-led) 15%, transparent);
 }
 .jk-dev-state.is-warn {
-	color: var(--jk-error);
-	background: color-mix(in srgb, var(--jk-error) 12%, transparent);
+	color: var(--jk-rec);
+	background: color-mix(in srgb, var(--jk-rec) 11%, var(--jk-well));
 }
 .jk-dev-led {
-	width: 5px;
-	height: 5px;
+	width: 0;
+	height: 5.5px;
+	margin-right: -5px;
+	opacity: 0;
+	transition:
+		width 240ms var(--jk-effects),
+		margin 240ms var(--jk-effects),
+		opacity 200ms ease;
+}
+.jk-dev-led.is-on {
+	width: 5.5px;
+	margin-right: 0;
+	opacity: 1;
 }
 /* ── Pointer-tracking specular glow on machined controls ── */
 :root .jk-source-tile,

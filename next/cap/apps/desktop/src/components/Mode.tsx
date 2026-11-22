@@ -7,7 +7,7 @@ import { commands, events, type RecordingMode } from "~/utils/tauri";
 import IconImage from "~icons/lucide/image";
 import IconInfo from "~icons/lucide/info";
 import IconVideo from "~icons/lucide/video";
-import { useMotionInteraction } from "./InterfaceMotion";
+import { MotionGroup, useMotionInteraction } from "./InterfaceMotion";
 
 interface ModeProps {
 	onInfoClick?: () => void;
@@ -71,13 +71,13 @@ const Mode = (props: ModeProps) => {
 	};
 
 	return (
-		<div class="flex relative gap-1 items-center p-1 rounded-xl border border-gray-5 bg-gray-3 w-fit">
+		<div class="flex relative gap-1.5 items-center w-fit">
 			<button
 				type="button"
 				onClick={handleInfoClick}
 				disabled={props.locked}
 				class={cx(
-					"p-1.5 rounded-md w-fit text-gray-10 group focus:outline-none",
+					"jk-button flex size-7 items-center justify-center rounded-lg text-[var(--jk-muted)] hover:text-[var(--jk-ink)] focus:outline-none",
 					props.locked && "opacity-50",
 				)}
 				aria-label={localize("捕获方式说明")}
@@ -85,79 +85,82 @@ const Mode = (props: ModeProps) => {
 				<IconInfo class="size-3.5" />
 			</button>
 
-			{MODE_BUTTONS.map((button) => {
-				const isSelected = () => rawOptions.mode === button.mode;
+			<MotionGroup class="jk-mode-seg" label={localize("捕获方式")}>
+				{MODE_BUTTONS.map((button) => {
+					const isSelected = () => rawOptions.mode === button.mode;
 
-				return (
-					<HoverCard
-						open={interactive() && hovered() === button.mode}
-						onOpenChange={(open) =>
-							setHovered((current) =>
-								open && interactive()
-									? button.mode
-									: current === button.mode
-										? null
-										: current,
-							)
-						}
-						openDelay={120}
-						closeDelay={80}
-						placement="bottom-end"
-						gutter={12}
-					>
-						<HoverCard.Trigger
-							as="button"
-							type="button"
-							onClick={() => {
-								if (props.locked || !interactive()) return;
-								setOptions({ mode: button.mode });
-								commands.setRecordingMode(button.mode);
-							}}
-							aria-disabled={props.locked && !isSelected()}
-							class={cx(
-								"relative flex gap-1.5 justify-center items-center rounded-lg transition-colors duration-150 px-3 py-2 text-xs focus:outline-none",
-								isSelected()
-									? "bg-gray-1 text-gray-12 shadow-xs"
-									: props.locked
-										? "bg-gray-3 opacity-40 cursor-default"
-										: "bg-gray-3 hover:bg-gray-7",
-							)}
+					return (
+						<HoverCard
+							open={interactive() && hovered() === button.mode}
+							onOpenChange={(open) =>
+								setHovered((current) =>
+									open && interactive()
+										? button.mode
+										: current === button.mode
+											? null
+											: current,
+								)
+							}
+							openDelay={120}
+							closeDelay={80}
+							placement="bottom-end"
+							gutter={12}
 						>
-							<button.icon class={button.iconClass} />
-							<span>{localize(button.label)}</span>
-						</HoverCard.Trigger>
-						<HoverCard.Portal>
-							<HoverCard.Content class="z-50 outline-none animate-in fade-in slide-in-from-top-1 duration-100">
-								<div class="flex flex-col gap-2 px-3 py-2.5 rounded-lg border shadow-lg bg-gray-12 text-gray-1 border-gray-3 min-w-[12rem] max-w-[15rem]">
-									<div class="flex flex-col gap-0.5">
-										<span class="text-xs font-medium">
-											{localize(button.label)}
-										</span>
-										<span class="text-[10px] text-gray-4 leading-snug">
-											{localize(button.description)}
-										</span>
+							<HoverCard.Trigger
+								as="button"
+								type="button"
+								aria-pressed={isSelected()}
+								onClick={() => {
+									if (props.locked || !interactive()) return;
+									setOptions({ mode: button.mode });
+									commands.setRecordingMode(button.mode);
+								}}
+								aria-disabled={props.locked && !isSelected()}
+								class={cx(
+									"relative flex gap-1.5 justify-center items-center rounded-[7px] px-2.5 h-7 text-[11.5px] font-medium focus:outline-none transition-colors",
+									isSelected()
+										? "is-selected text-[var(--jk-ink)] font-semibold"
+										: props.locked
+											? "opacity-40 cursor-default text-[var(--jk-muted)]"
+											: "text-[var(--jk-muted)] hover:text-[var(--jk-ink)]",
+								)}
+							>
+								<button.icon class="size-3.5" />
+								<span>{localize(button.label)}</span>
+							</HoverCard.Trigger>
+							<HoverCard.Portal>
+								<HoverCard.Content class="z-50 outline-none animate-in fade-in slide-in-from-top-1 duration-100">
+									<div class="jk-menu-surface flex flex-col gap-2 px-3 py-2.5 min-w-[12rem] max-w-[15rem] text-[var(--jk-ink)]">
+										<div class="flex flex-col gap-0.5">
+											<span class="text-xs font-semibold">
+												{localize(button.label)}
+											</span>
+											<span class="text-[11px] text-[var(--jk-muted)] leading-snug">
+												{localize(button.description)}
+											</span>
+										</div>
+										<Show when={button.settingsSection}>
+											{(section) => (
+												<button
+													type="button"
+													onClick={(e) => {
+														e.stopPropagation();
+														void openQualitySettings(section());
+													}}
+													class="flex gap-1.5 items-center px-2 py-1 -mx-1 text-[11px] rounded-md transition-colors text-[var(--jk-primary)] hover:bg-[var(--jk-well)]"
+												>
+													<IconCapSettings class="size-3" />
+													<span>{localize("Quality settings")}</span>
+												</button>
+											)}
+										</Show>
 									</div>
-									<Show when={button.settingsSection}>
-										{(section) => (
-											<button
-												type="button"
-												onClick={(e) => {
-													e.stopPropagation();
-													void openQualitySettings(section());
-												}}
-												class="flex gap-1.5 items-center px-2 py-1 -mx-1 text-[11px] rounded-md transition-colors text-gray-4 hover:bg-gray-11 hover:text-gray-1"
-											>
-												<IconCapSettings class="size-3" />
-												<span>{localize("Quality settings")}</span>
-											</button>
-										)}
-									</Show>
-								</div>
-							</HoverCard.Content>
-						</HoverCard.Portal>
-					</HoverCard>
-				);
-			})}
+								</HoverCard.Content>
+							</HoverCard.Portal>
+						</HoverCard>
+					);
+				})}
+			</MotionGroup>
 		</div>
 	);
 };

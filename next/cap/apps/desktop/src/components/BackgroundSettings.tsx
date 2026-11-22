@@ -129,19 +129,21 @@ function MaterialTile(props: {
 			title={t(props.material.name)}
 			onClick={props.onSelect}
 		>
-			<Show
-				when={preview.isPending ? undefined : preview.data}
-				fallback={<span class="jk-material-loading" />}
-			>
-				{(path) => (
-					<img
-						loading="lazy"
-						src={convertFileSrc(path())}
-						alt={props.material.name}
-					/>
-				)}
-			</Show>
-			<span>
+			<span class="jk-background-thumb">
+				<Show
+					when={preview.isPending ? undefined : preview.data}
+					fallback={<span class="jk-material-loading" />}
+				>
+					{(path) => (
+						<img
+							loading="lazy"
+							src={convertFileSrc(path())}
+							alt={props.material.name}
+						/>
+					)}
+				</Show>
+			</span>
+			<span class="jk-background-name">
 				{t(props.material.name)}
 				{props.material.animated ? " ▷" : ""}
 			</span>
@@ -166,7 +168,7 @@ export function BackgroundSettings(props: {
 	const [collection, setCollection] =
 		createSignal<(typeof collections)[number]>("local");
 	const [busy, setBusy] = createSignal(false);
-	const [materialLimit, setMaterialLimit] = createSignal(24);
+	const [materialLimit, setMaterialLimit] = createSignal(9);
 	let selectionRevision = 0;
 	let disposed = false;
 	let preferenceTimer: ReturnType<typeof setTimeout> | undefined;
@@ -484,13 +486,21 @@ export function BackgroundSettings(props: {
 																apply({ type: "wallpaper", path: item.path })
 															}
 														>
-															<img
-																loading="lazy"
-																src={convertFileSrc(
-																	item.path.replace(/\.jpg$/, "-thumbnail.jpg"),
-																)}
-																alt={item.id.split("/").pop()}
-															/>
+															<span class="jk-background-thumb">
+																<img
+																	loading="lazy"
+																	src={convertFileSrc(
+																		item.path.replace(
+																			/\.jpg$/,
+																			"-thumbnail.jpg",
+																		),
+																	)}
+																	alt={item.id.split("/").pop()}
+																/>
+															</span>
+															<span class="jk-background-name">
+																{item.id.split("/").pop()}
+															</span>
 														</button>
 													)}
 												</For>

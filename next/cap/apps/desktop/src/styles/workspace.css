@@ -112,14 +112,13 @@
 }
 :root .workspace-modes .is-selected::after {
 	content: "";
-	position: absolute;
-	bottom: 2px;
-	left: 50%;
-	width: 4px;
-	height: 4px;
+	display: inline-block;
+	flex: none;
+	width: 5px;
+	height: 5px;
+	margin-left: 2px;
 	border-radius: 50%;
 	background: var(--jk-needle);
-	transform: translateX(-50%);
 	box-shadow: 0 0 6px color-mix(in srgb, var(--jk-needle) 65%, transparent);
 }
 .workspace-modes button:disabled {
@@ -416,11 +415,12 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	height: 32px;
+	height: 44px;
 	flex: none;
-	padding: 0 16px 8px;
+	padding: 0 18px;
 	color: var(--jk-muted);
-	font-size: 10px;
+	font-family: var(--jk-mono);
+	font-size: 11px;
 	font-variant-numeric: tabular-nums;
 }
 .jk-stage-footer > span:first-child {
@@ -429,18 +429,41 @@
 	gap: 6px;
 }
 .jk-stage-footer i {
-	width: 5px;
-	height: 5px;
+	width: 6px;
+	height: 6px;
 	border-radius: 50%;
-	background: var(--jk-outline);
+	background: currentColor;
+	opacity: 0.55;
 }
 .jk-stage-footer button {
+	position: relative;
+	overflow: hidden;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	height: 28px;
 	border: 0;
-	padding: 4px 10px;
-	border-radius: 12px;
-	background: var(--jk-container);
-	color: var(--jk-primary);
-	font-size: 11px;
+	padding: 0 13px;
+	border-radius: 999px;
+	background: var(--jk-glass-hi);
+	color: var(--jk-ink);
+	backdrop-filter: blur(18px) saturate(180%);
+	-webkit-backdrop-filter: blur(18px) saturate(180%);
+	box-shadow: var(--jk-rim-sapphire);
+	font-family: inherit;
+	font-size: 12px;
+	font-weight: 500;
+	transition:
+		transform 280ms var(--jk-spring),
+		background-color 200ms var(--jk-effects),
+		color 200ms var(--jk-effects);
+}
+.jk-stage-footer button:hover {
+	transform: scale(1.04);
+}
+.jk-stage-footer button[aria-pressed="true"] {
+	background: var(--jk-graphite);
+	color: var(--jk-on-graphite);
 }
 .jk-stage-rendered {
 	position: relative;
@@ -640,56 +663,74 @@
 :root .jk-capture-targets > div {
 	display: contents;
 }
-:root .jk-capture-targets > div > div,
-:root .jk-capture-targets button {
+:root .jk-capture-targets .jk-source-split,
+:root .jk-capture-targets > div > button {
 	border-radius: var(--jk-radius-sm);
 	border: 1px solid var(--jk-line);
 	background: var(--jk-glass);
 	box-shadow: var(--jk-rim);
 	color: var(--jk-ink);
 	transition:
-		background-color 180ms var(--jk-effects),
-		border-color 180ms var(--jk-effects),
-		color 180ms var(--jk-effects),
-		transform 240ms var(--jk-spring);
+		background-color 200ms var(--jk-effects),
+		border-color 200ms var(--jk-effects),
+		color 200ms var(--jk-effects),
+		transform 260ms var(--jk-spring);
 }
-:root
-	.jk-capture-targets
-	button:hover:not([aria-pressed="true"]):not([aria-haspopup]) {
+:root .jk-capture-targets .jk-source-split:hover:not([data-active="true"]),
+:root .jk-capture-targets > div > button:hover:not([aria-pressed="true"]) {
 	background: var(--jk-glass-hi);
 	border-color: var(--jk-line-strong);
 	transform: translateY(-1px);
 }
-:root .jk-capture-targets button[aria-pressed="true"] {
+:root .jk-capture-targets .jk-source-split[data-active="true"],
+:root .jk-capture-targets > div > button[aria-pressed="true"] {
 	background: var(--jk-graphite);
 	border-color: var(--jk-graphite);
 	color: var(--jk-on-graphite);
+	font-weight: 600;
 	box-shadow:
 		inset 0 1px 0.5px rgba(255, 255, 255, 0.16),
 		0 4px 12px rgba(0, 0, 0, 0.16);
 }
-:root .jk-capture-targets button[aria-pressed="true"] svg {
+:root .jk-capture-targets .jk-source-split {
+	position: relative;
+}
+:root .jk-capture-targets .jk-source-split button {
+	position: static;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+	box-shadow: none;
+	color: inherit;
+}
+:root .jk-capture-targets .jk-source-split[data-active="true"] svg,
+:root .jk-capture-targets > div > button[aria-pressed="true"] svg {
 	color: var(--jk-on-graphite);
 }
 :root .jk-capture-targets button:not([aria-haspopup]) {
-	min-height: 46px;
+	min-height: 44px;
 	flex-direction: row;
 	align-items: center;
 	justify-content: center;
-	padding: 8px;
-	gap: 6px;
+	padding: 8px 10px;
+	gap: 7px;
 }
 :root .jk-capture-targets button > svg {
-	width: 17px;
-	height: 17px;
+	width: 16px;
+	height: 16px;
 }
 :root .jk-capture-targets button[aria-haspopup] {
-	width: 24px;
+	width: 26px;
 	padding: 3px;
 	border: 0;
 	border-radius: 0;
 	background: transparent;
 	box-shadow: none;
+	opacity: 0.72;
+}
+:root .jk-capture-targets button[aria-haspopup]:hover {
+	opacity: 1;
+	background: rgba(128, 128, 128, 0.16);
 }
 .jk-device-controls {
 	display: grid;
@@ -1469,6 +1510,7 @@
 .jk-resizable-workspace {
 	grid-template-columns: minmax(0, 1fr) 12px var(--jk-inspector-width);
 	gap: 0;
+	transition: grid-template-columns 440ms var(--jk-spatial, var(--jk-effects));
 }
 .jk-resizable-workspace .jk-workspace-main {
 	gap: 0;
@@ -1484,12 +1526,39 @@
 	.jk-workspace-main[data-menu-open="true"]
 	.jk-workspace-controls {
 	flex: 0 0 var(--jk-controls-height);
-	transition: none;
+	transition:
+		flex-basis 480ms var(--jk-spatial, var(--jk-effects)),
+		height 480ms var(--jk-spatial, var(--jk-effects));
 }
+.jk-resizable-workspace .jk-capture-stage,
 .jk-resizable-workspace
 	.jk-workspace-main[data-menu-open="true"]
 	.jk-capture-stage {
 	flex: 1;
+	transition:
+		flex-basis 480ms var(--jk-spatial, var(--jk-effects)),
+		height 480ms var(--jk-spatial, var(--jk-effects));
+}
+.jk-resizable-workspace[data-resizing="true"],
+.jk-resizable-workspace[data-resizing="true"]
+	.jk-workspace-main
+	.jk-workspace-controls,
+.jk-resizable-workspace[data-resizing="true"]
+	.jk-workspace-main[data-mode="presentation"]
+	.jk-workspace-controls,
+.jk-resizable-workspace[data-resizing="true"]
+	.jk-workspace-main[data-source="mobile"]
+	.jk-workspace-controls,
+.jk-resizable-workspace[data-resizing="true"]
+	.jk-workspace-main[data-menu-open="true"]
+	.jk-workspace-controls,
+.jk-resizable-workspace[data-resizing="true"]
+	.jk-workspace-main
+	.jk-capture-stage,
+.jk-resizable-workspace[data-resizing="true"]
+	.jk-workspace-main[data-menu-open="true"]
+	.jk-capture-stage {
+	transition: none;
 }
 .jk-workspace-divider {
 	display: flex;

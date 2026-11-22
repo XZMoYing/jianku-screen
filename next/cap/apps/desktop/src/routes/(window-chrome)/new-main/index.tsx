@@ -32,7 +32,6 @@ import {
 } from "solid-js";
 import { createStore, produce, reconcile } from "solid-js/store";
 import toast from "solid-toast";
-import brandLogo from "~/assets/branding/logo.png";
 import CaptureAppearance from "~/components/CaptureAppearance";
 import CaptureStage from "~/components/CaptureStage";
 import {
@@ -41,7 +40,7 @@ import {
 	MotionPresence,
 	MotionSwitch,
 } from "~/components/InterfaceMotion";
-import { LeicaSeedDots } from "~/components/LeicaSeedDots";
+import { LeicaSeedDots, LeicaThemeToggle } from "~/components/LeicaSeedDots";
 import { MainWindowPinButton } from "~/components/MainWindowPinButton";
 import MobileRecorder from "~/components/MobileRecorder";
 import Mode from "~/components/Mode";
@@ -2839,6 +2838,15 @@ function Page() {
 		</div>
 	);
 
+	const activeSourceKind = () => {
+		if (rawOptions.targetMode) return rawOptions.targetMode;
+		const variant = rawOptions.captureTarget.variant;
+		if (variant === "display" || variant === "window" || variant === "area") {
+			return variant;
+		}
+		return "display";
+	};
+
 	const TargetSelectionHome = () => (
 		<div class="workspace-recording-home flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pb-1 w-full">
 			<section>
@@ -2846,28 +2854,25 @@ function Page() {
 				<div class="jk-capture-targets flex flex-col gap-2 w-full text-xs text-gray-11">
 					<div class="flex flex-row gap-2 items-stretch w-full">
 						<div
-							class={cx(
-								"flex flex-1 overflow-hidden rounded-lg border border-gray-6 bg-gray-2 ring-1 ring-transparent ring-offset-1 ring-offset-gray-1 transition-[background-color,border-color] focus-within:ring-blue-9 focus-within:ring-offset-1 focus-within:ring-offset-gray-1",
-								rawOptions.targetMode === "display" || displayMenuOpen()
-									? "border-blue-8 bg-blue-3 ring-blue-8 hover:border-blue-9 hover:bg-blue-4 dark:bg-blue-3/30 dark:hover:bg-blue-4/40"
-									: "hover:border-gray-8 hover:bg-gray-3",
-							)}
+							class="jk-source-split flex flex-1 items-stretch overflow-hidden"
+							data-active={
+								activeSourceKind() === "display" || displayMenuOpen()
+									? "true"
+									: undefined
+							}
 						>
 							<TargetTypeButton
-								selected={rawOptions.targetMode === "display"}
+								selected={activeSourceKind() === "display"}
 								Component={IconMdiMonitor}
 								disabled={isRecording() || styleBusy()}
 								onClick={() => {
 									toggleTargetMode("display");
 								}}
 								name={localize("屏幕")}
-								class="flex-1 rounded-none border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 pl-5"
+								class="flex-1 rounded-none border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 pl-4"
 							/>
 							<TargetDropdownButton
-								class={cx(
-									"rounded-none border-l border-gray-6 focus-visible:ring-0 focus-visible:ring-offset-0",
-									displayMenuOpen() && "bg-gray-5",
-								)}
+								class="jk-source-chev rounded-none focus-visible:ring-0 focus-visible:ring-offset-0"
 								ref={displayTriggerRef}
 								disabled={isRecording() || styleBusy()}
 								expanded={displayMenuOpen()}
@@ -2885,28 +2890,25 @@ function Page() {
 							/>
 						</div>
 						<div
-							class={cx(
-								"flex flex-1 overflow-hidden rounded-lg border border-gray-6 bg-gray-2 ring-1 ring-transparent ring-offset-1 ring-offset-gray-1 transition-[background-color,border-color] focus-within:ring-blue-9 focus-within:ring-offset-1 focus-within:ring-offset-gray-1",
-								rawOptions.targetMode === "window" || windowMenuOpen()
-									? "border-blue-8 bg-blue-3 ring-blue-8 hover:border-blue-9 hover:bg-blue-4 dark:bg-blue-3/30 dark:hover:bg-blue-4/40"
-									: "hover:border-gray-8 hover:bg-gray-3",
-							)}
+							class="jk-source-split flex flex-1 items-stretch overflow-hidden"
+							data-active={
+								activeSourceKind() === "window" || windowMenuOpen()
+									? "true"
+									: undefined
+							}
 						>
 							<TargetTypeButton
-								selected={rawOptions.targetMode === "window"}
+								selected={activeSourceKind() === "window"}
 								Component={IconLucideAppWindowMac}
 								disabled={isRecording() || styleBusy()}
 								onClick={() => {
 									toggleTargetMode("window");
 								}}
 								name={localize("窗口")}
-								class="flex-1 rounded-none border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 pl-5"
+								class="flex-1 rounded-none border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 pl-4"
 							/>
 							<TargetDropdownButton
-								class={cx(
-									"rounded-none border-l border-gray-6 focus-visible:ring-0 focus-visible:ring-offset-0",
-									windowMenuOpen() && "bg-gray-5",
-								)}
+								class="jk-source-chev rounded-none focus-visible:ring-0 focus-visible:ring-offset-0"
 								ref={windowTriggerRef}
 								disabled={isRecording() || styleBusy()}
 								expanded={windowMenuOpen()}
@@ -2926,7 +2928,7 @@ function Page() {
 					</div>
 					<div class="flex flex-row gap-2 items-stretch w-full">
 						<TargetTypeButton
-							selected={rawOptions.targetMode === "area"}
+							selected={activeSourceKind() === "area"}
 							Component={IconMaterialSymbolsScreenshotFrame2Rounded}
 							disabled={isRecording() || styleBusy()}
 							onClick={() => {
@@ -2936,7 +2938,7 @@ function Page() {
 							class="flex-1"
 						/>
 						<TargetTypeButton
-							selected={rawOptions.targetMode === "camera"}
+							selected={activeSourceKind() === "camera"}
 							Component={IconLucideVideo}
 							disabled={isRecording() || styleBusy()}
 							onClick={() => {
@@ -3017,11 +3019,36 @@ function Page() {
 			</Show>
 			<WindowChromeHeader>
 				<div
-					class="flex flex-1 items-center gap-2 px-4 text-xs text-gray-10"
+					class={cx(
+						"flex flex-1 items-center gap-2 pr-3.5 text-xs text-[var(--jk-muted)]",
+						ostype() === "macos" ? "pl-[78px]" : "pl-4",
+					)}
 					data-tauri-drag-region
 				>
+					<div
+						class="flex items-center gap-2 text-[13px] font-semibold text-[var(--jk-ink)]"
+						data-tauri-drag-region
+					>
+						<span class="jk-brand-glyph flex size-5 items-center justify-center text-[var(--jk-needle)]">
+							<svg
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								class="size-4"
+								aria-hidden="true"
+							>
+								<rect x="3" y="4" width="12" height="10" rx="2.5" />
+								<rect x="9" y="10" width="12" height="10" rx="2.5" />
+							</svg>
+						</span>
+						<span data-tauri-drag-region>{localize("简库镜传 Next")}</span>
+					</div>
 					<span class="flex-1" data-tauri-drag-region />
 					<LeicaSeedDots />
+					<LeicaThemeToggle />
 					<MainWindowPinButton />
 					<EditorButton
 						type="button"
@@ -3035,11 +3062,6 @@ function Page() {
 				</div>
 			</WindowChromeHeader>
 			<header class="workspace-top">
-				<div class="workspace-brand">
-					<span class="workspace-brand-mark">
-						<img src={brandLogo} alt={localize("简库镜传")} />
-					</span>
-				</div>
 				<MotionGroup class="workspace-modes" label={localize("工作模式")}>
 					<button
 						type="button"
@@ -3413,7 +3435,6 @@ function Page() {
 																							page: "recordings",
 																						},
 																					});
-																					hideCurrentWindow();
 																				}}
 																				uploadProgress={uploadProgress}
 																				reuploadingPaths={reuploadingPaths()}
@@ -3441,7 +3462,6 @@ function Page() {
 																							page: "screenshots",
 																						},
 																					});
-																					hideCurrentWindow();
 																				}}
 																			/>
 																		) : variant === "camera" ? (

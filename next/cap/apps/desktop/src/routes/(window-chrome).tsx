@@ -100,7 +100,7 @@ function Header() {
 	return (
 		<header
 			class={cx(
-				"cap-window-header flex items-center min-w-0 w-full h-9 select-none shrink-0 bg-gray-2",
+				"cap-window-header jk-window-titlebar flex items-center min-w-0 w-full h-[42px] select-none shrink-0",
 				isWindows ? "flex-row" : "flex-row-reverse",
 			)}
 			data-tauri-drag-region
