@@ -1,5 +1,7 @@
 # 2026-10-27：完整中文与跨平台无人值守队列
 
+2026-11-22 alpha.112（`2026.112.0`，冻结 `79c971f`，标签 `next-v0.2.0-alpha.112-candidate`）已打包安装，alpha.111 保留为回滚（`/Applications/.jianku-next-update-Pm0QkJ/previous.app`）。本版完成首页对照莱卡草稿逐项像素对齐（磨砂标题栏+品牌字标+明暗切换钮、去旧蓝紫图标、录屏内联红点、磨砂白 `✦ 播放动效`、外部 `ⓘ` + CNC 凹槽 `视频/截图`、无缝单框来源卡+深石墨黑激活态与右上角红灯、精简设备状态角标、3×3 壁纸外置标题、清零残留 `hideCurrentWindow`），并建立首页与编辑器统一栏位空间过渡动画（`--jk-spatial`，打开录制库/切换模式/非拖拽调整栏位平滑伸缩，仅拖拽分割条时 1:1 跟手）。`tsc` 0 错误、DOM 单测 21/21（353/353）、`jianku-hygiene.test.mjs` 4/4、本地化审计 0 占位符不匹配、安装版严格验签/六二进制一致/后台启动全部通过。证据 `next/verification/2026-11-22-alpha112-home-and-transitions/`。
+
 2026-11-22 alpha.111（`2026.111.0`，冻结 `7e93374`，标签 `next-v0.2.0-alpha.111-candidate`）已打包安装，alpha.110 保留为回滚（`/Applications/.jianku-next-update-vapuca/previous.app`）。本版修复 `alpha.110` 上手反馈的全部 5 类出入：开关拇指飞出轨道、设置窗口隐藏主界面（改为普通独立窗口）、录制中悬浮灵动条按草稿重构并拓宽至 `432px`、编辑器迷你缩放滑块/右上角吸附按钮重叠/取景器舞台/时间线高对比卡片/工具栏静息边框与按压微光脉冲。`tsc` 0 错误、DOM 单测 21/21（353/353）、`fake_window` Rust 单测 19/19、`jianku-hygiene.test.mjs` 4/4 与安装版严格验签/六二进制一致/启动全部通过。证据 `next/verification/2026-11-22-alpha111-leica-fixes/`。
 
 2026-11-22 alpha.110（`2026.110.0`，冻结 `4a592d6`，标签 `next-v0.2.0-alpha.110-candidate`）已打包安装，alpha.109 保留为回滚（`/Applications/.jianku-next-update-gURleg/previous.app`）。本版完成莱卡暗房 UI 统一重制、默认黑红配色（`graphite-vermilion` + 4 套精调预设 + 标题栏快捷切换点 + 清零残留蓝）、修复切换通道滑块左右回弹不对称与慢放闪现、全界面双层滚字 `MotionText` 与光学 LED `StatusLed`。`tsc` 0 错误、DOM 单测 21/21（353/353）、纯 TS 单测 89/89（787/787）、`jianku-hygiene.test.mjs` 4/4、`jianku-unattended-check.mjs` 与安装版严格验签/六二进制一致/启动全部通过；真实视觉手感与实机录屏仍待实机验收。证据 `next/verification/2026-11-22-alpha110-leica-ui/`。
