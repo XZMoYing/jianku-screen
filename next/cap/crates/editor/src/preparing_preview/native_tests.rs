@@ -1140,13 +1140,15 @@ async fn native_preparing_bgra_surface_matches_default_avasset_editor_frame() {
 async fn ordinary_editor_scrubs_and_plays_main_track_gaps() {
     let mut fixture = fixture(false);
     let mut preparing = fixture.input();
-    preparing
-        .project
-        .timeline
-        .as_mut()
-        .unwrap()
+    let timeline = preparing.project.timeline.as_mut().unwrap();
+    timeline.main_track_gaps.trailing = Some(0.5);
+    assert!(validate_input(&preparing).is_ok());
+    let timeline = preparing.project.timeline.as_mut().unwrap();
+    timeline.segments[0].id = Some("first".into());
+    timeline
         .main_track_gaps
-        .trailing = Some(0.5);
+        .before_clip
+        .insert("first".into(), 0.5);
     assert!(matches!(
         validate_input(&preparing),
         Err(PreparingPreviewError::InvalidInput(message)) if message.contains("unchanged stopped timeline")
@@ -1290,6 +1292,13 @@ async fn ordinary_editor_scrubs_and_plays_main_track_gaps() {
         .truncate(1);
     editor.project_config.0.send(fixture.project).unwrap();
     assert_eq!(editor.get_total_frames(fps), 40);
+    tokio::time::timeout(
+        Duration::from_secs(5),
+        editor.playback_watch().wait_for(|active| !*active),
+    )
+    .await
+    .unwrap()
+    .unwrap();
     editor.preview_tx.send(Some((49, fps, resolution))).unwrap();
     let (frame, layout) = tokio::time::timeout(Duration::from_secs(5), receive.recv())
         .await
