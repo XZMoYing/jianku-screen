@@ -941,7 +941,7 @@ impl EditorInstance {
                     },
                 )
                 .await;
-                if matches!(event, playback::PlaybackEvent::Stop) {
+                if event.is_finished() {
                     return;
                 }
             }
@@ -1014,6 +1014,12 @@ impl EditorInstance {
                     }
 
                     let project = self.project_config.1.borrow().clone();
+                    let duration = project
+                        .timeline
+                        .as_ref()
+                        .map_or(0.0, |timeline| timeline.duration());
+                    let frame_number = frame_number
+                        .min(((f64::from(fps) * duration).ceil() as u32).saturating_sub(1));
                     let frame_time = frame_number as f64 / fps as f64;
                     let Some(mapping) = project.get_frame_mapping(frame_time) else {
                         warn!(
@@ -1033,10 +1039,7 @@ impl EditorInstance {
                             fps,
                             resolution_base,
                             &frames,
-                            project
-                                .timeline
-                                .as_ref()
-                                .map_or(0.0, |timeline| timeline.duration()),
+                            duration,
                         );
                         self.renderer
                             .render_frame_confirmed(frames, uniforms, empty_cursor.clone())
@@ -1453,9 +1456,15 @@ async fn apply_playback_event(
             state.playhead_position = frame;
             on_state_change(&state);
         }
-        playback::PlaybackEvent::Stop => {
+        event if event.is_finished() => {
             if let Err(error) = playback_active.send(false) {
                 warn!(%error, "failed to send playback_active=false");
+            }
+            if let playback::PlaybackEvent::End(frame) = event
+                && state.playback_task.take().is_some()
+            {
+                state.playhead_position = frame;
+                on_state_change(&state);
             }
         }
         _ => {}

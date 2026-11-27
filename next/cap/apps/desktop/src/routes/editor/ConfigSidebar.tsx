@@ -21,7 +21,7 @@ import {
 	Suspense,
 	type ValidComponent,
 } from "solid-js";
-import { createStore, produce } from "solid-js/store";
+import { produce } from "solid-js/store";
 import { Dynamic } from "solid-js/web";
 import toast from "solid-toast";
 import { BackgroundSettings } from "~/components/BackgroundSettings";
@@ -535,18 +535,6 @@ function ConfigSidebarContent() {
 		),
 	);
 
-	const [state, setState] = createStore({
-		selectedTab: "background" as
-			| "background"
-			| "camera"
-			| "transcript"
-			| "audio"
-			| "cursor"
-			| "keyboard"
-			| "hotkeys"
-			| "captions",
-	});
-
 	const sidebarSelection = () => {
 		const selection = editorState.timeline.selection;
 		if (!selection || selection.type === "style") return null;
@@ -561,11 +549,11 @@ function ConfigSidebarContent() {
 	createEffect(() => {
 		if (
 			selectedStyle() &&
-			state.selectedTab !== "background" &&
-			state.selectedTab !== "camera" &&
-			state.selectedTab !== "cursor"
+			editorState.inspectorTab !== "background" &&
+			editorState.inspectorTab !== "camera" &&
+			editorState.inspectorTab !== "cursor"
 		)
-			setState("selectedTab", "background");
+			setEditorState("inspectorTab", "background");
 	});
 	let scrollRef!: HTMLDivElement;
 
@@ -596,9 +584,9 @@ function ConfigSidebarContent() {
 	return (
 		<KTabs
 			value={
-				sidebarSelection() || editorState.timeline.audioPicker !== null
+				sidebarSelection() || editorState.timeline.audioReplace !== null
 					? undefined
-					: state.selectedTab
+					: editorState.inspectorTab
 			}
 			class="jk-inspector flex overflow-hidden z-10 flex-col flex-1 min-h-0 min-w-0 rounded-xl shrink-0 bg-ed-card shadow-ed-card"
 		>
@@ -666,13 +654,10 @@ function ConfigSidebarContent() {
 									if (sidebarSelection()) {
 										setEditorState("timeline", "selection", null);
 									}
-									if (editorState.timeline.audioPicker !== null) {
-										setEditorState("timeline", "audioPicker", null);
-									}
 									if (editorState.timeline.audioReplace !== null) {
 										setEditorState("timeline", "audioReplace", null);
 									}
-									setState("selectedTab", item.id);
+									setEditorState("inspectorTab", item.id);
 									scrollRef.scrollTo({
 										top: 0,
 									});
@@ -699,23 +684,20 @@ function ConfigSidebarContent() {
 				</MotionGroup>
 			</KTabs.List>
 			<Show
-				when={
-					!sidebarSelection() &&
-					editorState.timeline.audioPicker === null &&
-					editorState.timeline.audioReplace === null
-				}
+				when={!sidebarSelection() && editorState.timeline.audioReplace === null}
 			>
 				<div class="jk-insp-title-row jk-editor-insp-title-row">
 					<MotionText
 						class="jk-insp-title"
 						text={localize(
-							INSPECTOR_TAB_META[state.selectedTab]?.title ?? "画面与背景",
+							INSPECTOR_TAB_META[editorState.inspectorTab]?.title ??
+								"画面与背景",
 						)}
 					/>
 					<MotionText
 						class="jk-insp-sub"
 						text={localize(
-							INSPECTOR_TAB_META[state.selectedTab]?.sub ??
+							INSPECTOR_TAB_META[editorState.inspectorTab]?.sub ??
 								"壁纸、留白、圆角与阴影",
 						)}
 					/>
@@ -729,12 +711,10 @@ function ConfigSidebarContent() {
 				class="custom-scroll overscroll-contain overflow-x-hidden overflow-y-auto text-[0.875rem] flex-1 min-h-0"
 				classList={{
 					hidden:
-						!!sidebarSelection() ||
-						editorState.timeline.audioPicker !== null ||
-						editorState.timeline.audioReplace !== null,
+						!!sidebarSelection() || editorState.timeline.audioReplace !== null,
 				}}
 			>
-				<MotionSwitch value={state.selectedTab}>
+				<MotionSwitch value={editorState.inspectorTab}>
 					{(displayed) => (
 						<KTabs value={displayed()}>
 							<StyleSegmentConfig />
@@ -921,30 +901,11 @@ function ConfigSidebarContent() {
 				class="custom-scroll min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain pt-3.5 px-4 pb-4 text-[0.875rem] space-y-3.5 bg-ed-card z-50"
 				classList={{
 					hidden:
-						!sidebarSelection() &&
-						editorState.timeline.audioPicker === null &&
-						editorState.timeline.audioReplace === null,
+						!sidebarSelection() && editorState.timeline.audioReplace === null,
 					"animate-in slide-in-from-bottom-2 fade-in":
-						!!sidebarSelection() ||
-						editorState.timeline.audioPicker !== null ||
-						editorState.timeline.audioReplace !== null,
+						!!sidebarSelection() || editorState.timeline.audioReplace !== null,
 				}}
 			>
-				<Show
-					when={
-						editorState.timeline.audioPicker !== null &&
-						!sidebarSelection() &&
-						editorState.timeline.audioReplace === null
-					}
-				>
-					<AudioLibraryPanel
-						mode={{
-							type: "add",
-							lane: editorState.timeline.audioPicker ?? 0,
-						}}
-						onClose={() => setEditorState("timeline", "audioPicker", null)}
-					/>
-				</Show>
 				<Show
 					when={(() => {
 						const index = editorState.timeline.audioReplace;
@@ -1110,7 +1071,7 @@ function ConfigSidebarContent() {
 												<EditorButton
 													onClick={() => {
 														setEditorState("timeline", "selection", null);
-														setState("selectedTab", TAB_IDS.keyboard);
+														setEditorState("inspectorTab", TAB_IDS.keyboard);
 													}}
 													leftIcon={<IconLucideCheck />}
 												>

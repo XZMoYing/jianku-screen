@@ -1996,6 +1996,8 @@ pub struct AudioTrackSegment {
 }
 
 impl AudioTrackSegment {
+    pub const SILENCE_DB: f32 = -60.0;
+
     fn default_enabled() -> bool {
         true
     }
@@ -2232,6 +2234,9 @@ pub struct MainTrackGaps {
     pub before_clip: BTreeMap<String, f64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub trailing: Option<f64>,
+    #[serde(skip)]
+    #[specta(skip)]
+    preserved_output_end: f64,
 }
 
 impl MainTrackGaps {
@@ -2381,14 +2386,9 @@ impl TimelineConfiguration {
             .map_or(0.0, positive_gap)
     }
 
-    pub fn trailing_gap(&self) -> f64 {
-        self.main_track_gaps.trailing.map_or(0.0, positive_gap)
-    }
-
     pub fn has_main_track_gaps(&self) -> bool {
-        self.trailing_gap() > 0.0
-            || (!self.main_track_gaps.before_clip.is_empty()
-                && (0..self.segments.len()).any(|index| self.gap_before(index) > 0.0))
+        !self.main_track_gaps.before_clip.is_empty()
+            && (0..self.segments.len()).any(|index| self.gap_before(index) > 0.0)
     }
 
     pub fn effective_transition(&self, segment_index: usize) -> Option<ClipTransition> {
@@ -2440,7 +2440,11 @@ impl TimelineConfiguration {
         let mut windows: Vec<(f64, f64)> = self
             .text_segments
             .iter()
-            .filter(|s| s.enabled && s.layout == TextLayout::Fullscreen && s.end > s.start)
+            .filter(|s| {
+                s.enabled
+                    && s.layout == TextLayout::Fullscreen
+                    && valid_content_range(s.start, s.end)
+            })
             .map(|s| (s.start, s.end))
             .collect();
         if windows.is_empty() {
@@ -2457,20 +2461,20 @@ impl TimelineConfiguration {
         merged
     }
 
-    /// Total output seconds inserted by fullscreen text holds.
-    pub fn held_duration(&self) -> f64 {
-        self.hold_windows().iter().map(|(s, e)| e - s).sum()
-    }
-
     pub fn get_frame_mapping(&self, frame_time: f64) -> Option<TimelineFrameMapping<'_>> {
         let holds = self.hold_windows();
         if holds.is_empty() {
-            return self.get_frame_mapping_unheld(frame_time);
+            return self
+                .get_frame_mapping_unheld(frame_time)
+                .or_else(|| self.independent_tail_mapping(frame_time));
         }
 
         if let Some((hold_start, hold_end)) = active_hold_window(&holds, frame_time) {
             let effective = hold_start - held_time_before(&holds, hold_start);
-            let source = match self.get_frame_mapping_unheld(effective)? {
+            let Some(mapping) = self.get_frame_mapping_unheld(effective) else {
+                return self.independent_tail_mapping(frame_time);
+            };
+            let source = match mapping {
                 TimelineFrameMapping::Gap { .. } => {
                     return Some(TimelineFrameMapping::Gap {
                         output_end: hold_end,
@@ -2499,11 +2503,16 @@ impl TimelineConfiguration {
             let output_end = effective_to_output(&holds, output_end);
             next_hold_start.map_or(output_end, |hold| output_end.min(hold))
         };
-        let mut mapping = self.get_frame_mapping_unheld(effective)?;
+        let Some(mut mapping) = self.get_frame_mapping_unheld(effective) else {
+            return self.independent_tail_mapping(frame_time);
+        };
         let unheld_end = mapping.output_end();
         // Removing a hold can round an exact output cut back into the outgoing span.
         if clamp_end(unheld_end) <= frame_time {
-            mapping = self.get_frame_mapping_unheld(unheld_end)?;
+            let Some(next) = self.get_frame_mapping_unheld(unheld_end) else {
+                return self.independent_tail_mapping(frame_time);
+            };
+            mapping = next;
         }
         Some(match mapping {
             TimelineFrameMapping::Gap { output_end } => TimelineFrameMapping::Gap {
@@ -2591,7 +2600,7 @@ impl TimelineConfiguration {
             let next_transition = self.effective_transition(segment_index + 1);
             let next_duration = next_transition.as_ref().map_or(0.0, |value| value.duration);
             let single_start = segment_start + incoming_duration;
-            let output_end = segment_start + (segment.duration() - next_duration);
+            let output_end = segment_start + segment.duration() - next_duration;
 
             if frame_time >= single_start && frame_time < output_end {
                 let source_time = segment.interpolate_time(frame_time - segment_start)?;
@@ -2608,9 +2617,7 @@ impl TimelineConfiguration {
             segment_start = output_end;
         }
 
-        let output_end = segment_start + self.trailing_gap();
-        (frame_time >= segment_start && frame_time < output_end)
-            .then_some(TimelineFrameMapping::Gap { output_end })
+        None
     }
 
     pub fn primary_source_ranges(&self, range: Range<f64>) -> Option<Vec<TimelineSourceRange<'_>>> {
@@ -2682,22 +2689,77 @@ impl TimelineConfiguration {
         None
     }
 
-    pub fn duration(&self) -> f64 {
-        let segment_duration: f64 = self.segments.iter().map(TimelineSegment::duration).sum();
-        let segment_duration = if self.transitions.is_empty() {
-            segment_duration
-        } else {
-            segment_duration
-                - (1..self.segments.len())
-                    .filter_map(|segment_index| self.effective_transition(segment_index))
-                    .map(|transition| transition.duration)
-                    .sum::<f64>()
-        };
+    fn main_track_output_end(&self) -> f64 {
+        let mut end = 0.0;
+        for (index, segment) in self.segments.iter().enumerate() {
+            end += self.gap_before(index);
+            end -= self
+                .effective_transition(index)
+                .map_or(0.0, |transition| transition.duration);
+            end += segment.duration();
+        }
+        effective_to_output_end(&self.hold_windows(), end)
+    }
 
-        let gaps: f64 = (0..self.segments.len())
-            .map(|index| self.gap_before(index))
-            .sum();
-        segment_duration + gaps + self.trailing_gap() + self.held_duration()
+    fn independent_content_end(&self) -> f64 {
+        let standalone = |attachment: &Option<OverlayAttachment>| {
+            !matches!(attachment, Some(OverlayAttachment::Clip { .. }))
+        };
+        self.text_segments
+            .iter()
+            .filter(|row| row.enabled && standalone(&row.attachment))
+            .map(|row| (row.start, row.end))
+            .chain(
+                self.image_segments
+                    .iter()
+                    .filter(|row| {
+                        row.enabled
+                            && !row.path.is_empty()
+                            && row.opacity > 0.0
+                            && standalone(&row.attachment)
+                    })
+                    .map(|row| (row.start, row.end)),
+            )
+            .chain(
+                self.shape_segments
+                    .iter()
+                    .filter(|row| row.enabled && row.opacity > 0.0)
+                    .map(|row| (row.start, row.end)),
+            )
+            .chain(
+                self.audio_segments
+                    .iter()
+                    .filter(|row| {
+                        row.enabled
+                            && !row.path.is_empty()
+                            && row.volume_db > AudioTrackSegment::SILENCE_DB
+                            && standalone(&row.attachment)
+                    })
+                    .map(|row| (row.start, row.end)),
+            )
+            .filter(|(start, end)| valid_content_range(*start, *end))
+            .map(|(_, end)| end)
+            .fold(self.main_track_gaps.preserved_output_end, f64::max)
+    }
+
+    fn independent_tail_mapping(&self, frame_time: f64) -> Option<TimelineFrameMapping<'_>> {
+        let output_end = self.independent_content_end();
+        (frame_time >= 0.0 && frame_time < output_end)
+            .then_some(TimelineFrameMapping::Gap { output_end })
+    }
+
+    pub fn has_independent_tail(&self) -> bool {
+        let end = self.independent_content_end();
+        end > 0.0 && end > self.main_track_output_end()
+    }
+
+    pub fn duration(&self) -> f64 {
+        self.main_track_output_end()
+            .max(self.independent_content_end())
+    }
+
+    pub fn preserve_output_end_for_render(&mut self) {
+        self.main_track_gaps.preserved_output_end = self.independent_content_end();
     }
 
     /// Gapless-time windows covered by clips that hide the cursor, with
@@ -2722,7 +2784,7 @@ impl TimelineConfiguration {
             }
             segment_start = end;
         }
-        (windows, segment_start + self.trailing_gap())
+        (windows, segment_start)
     }
 
     /// 0..1 multiplier for the cursor (and its click ripples) at an output
@@ -2770,6 +2832,10 @@ impl TimelineConfiguration {
     }
 }
 
+fn valid_content_range(start: f64, end: f64) -> bool {
+    start.is_finite() && end.is_finite() && end > start && end > 0.0
+}
+
 fn active_hold_window(windows: &[(f64, f64)], time: f64) -> Option<(f64, f64)> {
     windows
         .iter()
@@ -2787,9 +2853,17 @@ fn held_time_before(windows: &[(f64, f64)], time: f64) -> f64 {
 /// Inverse of the held-output -> gapless transform: places a gapless
 /// timestamp back into output time, landing after every hold it passed.
 fn effective_to_output(windows: &[(f64, f64)], effective: f64) -> f64 {
+    output_time_at(windows, effective, true)
+}
+
+pub(crate) fn effective_to_output_end(windows: &[(f64, f64)], effective: f64) -> f64 {
+    output_time_at(windows, effective, false)
+}
+
+fn output_time_at(windows: &[(f64, f64)], effective: f64, after_hold: bool) -> f64 {
     let mut output = effective;
     for (start, end) in windows {
-        if output >= *start {
+        if output > *start || (after_hold && output == *start) {
             output += end - start;
         } else {
             break;
@@ -3857,20 +3931,21 @@ mod tests {
             "mainTrackGaps": {"beforeClip": {"a": 1, "b": 0.75, "removed": 99}, "trailing": 0.5}
         }))
         .unwrap();
-        assert_eq!(timeline.duration(), 7.25);
+        assert_eq!(timeline.duration(), 6.75);
         assert_eq!(
             crate::caption_timing::clip_timeline_offsets(&timeline),
             vec![1.0, 3.75]
         );
         assert!(timeline.effective_transition(1).is_none());
-        for (time, end) in [(0.0, 1.0), (3.0, 3.75), (6.75, 7.25)] {
+        for (time, end) in [(0.0, 1.0), (3.0, 3.75)] {
             assert!(
                 matches!(timeline.get_frame_mapping(time), Some(TimelineFrameMapping::Gap { output_end }) if output_end == end)
             );
             assert!(timeline.get_segment_time(time).is_none());
             assert_eq!(timeline.cursor_visibility_at(time), 0.0);
         }
-        assert!(timeline.get_frame_mapping(7.25).is_none());
+        assert!(timeline.get_frame_mapping(6.75).is_none());
+        assert!(timeline.get_frame_mapping(7.0).is_none());
         let (time, clip) = timeline.get_segment_time(3.75).unwrap();
         assert_eq!(time, 4.0);
         assert_eq!(clip.id.as_deref(), Some("b"));
@@ -3887,6 +3962,50 @@ mod tests {
                 .get("mainTrackGaps")
                 .is_none()
         );
+    }
+
+    #[test]
+    fn tail_ends_at_independent_content_with_no_extra_hold_or_legacy_gap() {
+        let mut timeline: TimelineConfiguration = serde_json::from_value(serde_json::json!({
+            "segments": [{"id": "a", "start": 3, "end": 7, "timescale": 2}],
+            "zoomSegments": [{"start": 0, "end": 20, "amount": 1.5, "mode": "auto"}],
+            "mainTrackGaps": {"trailing": 10},
+            "textSegments": [
+                {"start": 1, "end": 2, "layout": "fullscreen", "content": "Interlude"},
+                {"start": 3, "end": 4, "layout": "fullscreen", "content": "End title"},
+                {"start": 5, "end": 8, "layout": "fullscreen", "attachment":
+                    {"kind": "clip", "id": "orphan", "clipId": "removed", "sourceTime": 0}}
+            ],
+            "imageSegments": [{"start": 4, "end": 4.5, "path": "graphic.png"}],
+            "audioSegments": [
+                {"start": 4, "end": 5, "path": "music.wav"},
+                {"start": 4, "end": 9, "path": "muted.wav", "volumeDb": -60}
+            ]
+        }))
+        .unwrap();
+        assert_eq!(timeline.duration(), 5.0);
+        assert!(timeline.has_independent_tail());
+        assert!(matches!(
+            timeline.get_frame_mapping(2.95),
+            Some(TimelineFrameMapping::Single {
+                output_end: 3.0,
+                ..
+            })
+        ));
+        for time in [3.0, 4.0, 4.99] {
+            assert!(matches!(
+                timeline.get_frame_mapping(time),
+                Some(TimelineFrameMapping::Gap { output_end: 5.0 })
+            ));
+        }
+        assert!(timeline.get_frame_mapping(5.0).is_none());
+        timeline.audio_segments.clear();
+        timeline.image_segments.clear();
+        assert_eq!(timeline.duration(), 4.0);
+        timeline.text_segments[1].enabled = false;
+        assert_eq!(timeline.duration(), 3.0);
+        assert!(!timeline.has_independent_tail());
+        assert!(timeline.get_frame_mapping(3.0).is_none());
     }
 
     #[test]

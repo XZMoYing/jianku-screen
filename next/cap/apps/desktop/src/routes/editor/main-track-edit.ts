@@ -8,7 +8,6 @@ import {
 	clipGapBefore,
 	clipTimelineDuration,
 	clipTimelineOffsets,
-	clipTrailingGap,
 	clipTransitionMap,
 	MIN_CLIP_TRANSITION_DURATION,
 	maxTransitionDuration,
@@ -27,10 +26,7 @@ const EPSILON = 1e-7;
 export function hasMainTrackGaps(track: MainTrack | null | undefined) {
 	return (
 		!!track &&
-		(clipTrailingGap(track.mainTrackGaps) > 0 ||
-			track.segments.some(
-				(clip) => clipGapBefore(clip, track.mainTrackGaps) > 0,
-			))
+		track.segments.some((clip) => clipGapBefore(clip, track.mainTrackGaps) > 0)
 	);
 }
 
@@ -60,7 +56,6 @@ function placementEnd(placement: Placement | undefined) {
 function applyPlacements(
 	track: MainTrack,
 	next: Placement[],
-	minimumEnd: number,
 	requested?: { leftId: string; rightId: string; transition: ClipTransition },
 ) {
 	const previousBoundaries = new Map<
@@ -110,16 +105,11 @@ function applyPlacements(
 			duration: overlap,
 		});
 	}
-	const trailing = Math.max(0, minimumEnd - placementEnd(next.at(-1)));
 	track.segments = next.map(({ clip }) => clip);
 	track.transitions = transitions;
-	track.mainTrackGaps =
-		gaps.length || trailing > EPSILON
-			? {
-					...(gaps.length ? { beforeClip: Object.fromEntries(gaps) } : {}),
-					...(trailing > EPSILON ? { trailing } : {}),
-				}
-			: undefined;
+	track.mainTrackGaps = gaps.length
+		? { beforeClip: Object.fromEntries(gaps) }
+		: undefined;
 	return true;
 }
 
@@ -134,18 +124,14 @@ export function closeMainTrackGaps(track: MainTrack) {
 
 export function appendMainTrackClip(track: MainTrack, clip: TimelineSegment) {
 	const end = duration(track);
-	return applyPlacements(
-		track,
-		[...placements(track), { clip, start: end }],
-		end,
-	);
+	return applyPlacements(track, [...placements(track), { clip, start: end }]);
 }
 
 export function deletePositionedMainTrackClip(track: MainTrack, index: number) {
 	if (!track.segments[index] || track.segments.length < 2) return false;
 	const next = placements(track);
 	next.splice(index, 1);
-	return applyPlacements(track, next, duration(track));
+	return applyPlacements(track, next);
 }
 
 export function trimPositionedMainTrackClip(
@@ -166,7 +152,7 @@ export function trimPositionedMainTrackClip(
 				? start + (sourceTime - clip.start) / clip.timescale
 				: start,
 	};
-	return applyPlacements(track, next, duration(track));
+	return applyPlacements(track, next);
 }
 
 export function setPositionedMainTrackSpeed(
@@ -184,7 +170,7 @@ export function setPositionedMainTrackSpeed(
 	)
 		return false;
 	next[index] = { ...current, clip: { ...current.clip, timescale } };
-	return applyPlacements(track, next, duration(track));
+	return applyPlacements(track, next);
 }
 
 export function setPositionedMainTrackTransition(
@@ -217,7 +203,6 @@ export function setPositionedMainTrackTransition(
 	return applyPlacements(
 		track,
 		next,
-		duration(track),
 		input
 			? {
 					leftId: left.clip.id,
@@ -262,7 +247,7 @@ export function cutPositionedMainTrackRange(
 	}
 	if (!retained.length && next.length === 1) return false;
 	next.splice(index, 1, ...retained);
-	if (!applyPlacements(track, next, duration(track))) return false;
+	if (!applyPlacements(track, next)) return false;
 	const newId = retained[1]?.clip.id;
 	if (replacements && clip.id && newId)
 		replacements.set(clip.id, [...(replacements.get(clip.id) ?? []), newId]);
@@ -324,7 +309,7 @@ export function movePositionedMainTrackClip(
 		...layout.moved,
 		start: Math.max(range.min, Math.min(range.max, start)),
 	});
-	return applyPlacements(track, layout.next, duration(track));
+	return applyPlacements(track, layout.next);
 }
 
 export function reorderPositionedMainTrackClip(

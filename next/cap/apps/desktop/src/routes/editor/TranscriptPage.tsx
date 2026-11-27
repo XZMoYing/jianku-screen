@@ -42,6 +42,7 @@ import {
 	editClipsWithOverlayAttachments,
 } from "./overlay-attachment";
 import { routeEditorPlaybackIntent } from "./playback-intent-routing";
+import { atLastTimelineFrame, timelinePreviewFrame } from "./timeline-duration";
 import { rippleDeleteAllTracks } from "./timeline-utils";
 
 function formatTimePrecise(secs: number) {
@@ -515,11 +516,6 @@ export function TranscriptPanel() {
 		setEditorState("timeline", "selection", null);
 
 		setEditorState("captions", "isStale", false);
-
-		const newDuration = totalDuration();
-		if (editorState.playbackTime > newDuration) {
-			setEditorState("playbackTime", Math.max(newDuration - 0.01, 0));
-		}
 	};
 
 	const handleDeleteWord = (flatIndex: number) => {
@@ -694,19 +690,13 @@ export function TranscriptPanel() {
 			}),
 		);
 		setEditorState("timeline", "selection", null);
-		const newDuration = totalDuration();
-		if (editorState.playbackTime > newDuration) {
-			setEditorState("playbackTime", Math.max(newDuration - 0.01, 0));
-		}
 		toast.success(
 			localize("已剪除 {count} 处长停顿", { count: safeCuts.length }),
 		);
 	};
 
-	const isAtEnd = () => {
-		const total = totalDuration();
-		return total > 0 && total - editorState.playbackTime <= 0.1;
-	};
+	const isAtEnd = () =>
+		atLastTimelineFrame(editorState.playbackTime, totalDuration(), FPS);
 
 	const handlePlayPause = async () => {
 		try {
@@ -727,7 +717,13 @@ export function TranscriptPanel() {
 						await commands.stopPlayback();
 						setEditorState("playing", false);
 					} else {
-						await commands.seekTo(Math.floor(editorState.playbackTime * FPS));
+						await commands.seekTo(
+							timelinePreviewFrame(
+								editorState.playbackTime,
+								totalDuration(),
+								FPS,
+							),
+						);
 						await commands.startPlayback(FPS, previewResolutionBase());
 						setEditorState("playing", true);
 					}

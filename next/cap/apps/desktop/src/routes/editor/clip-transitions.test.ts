@@ -4,7 +4,9 @@ import {
 	type ClipTransition,
 	clampTransitionDuration,
 	clipCutPreservesTransitionGeometry,
+	clipEndOnOutput,
 	clipSourceTimeAt,
+	clipSplitAt,
 	clipTimelineDuration,
 	clipTimelineOffsets,
 	getClipTransition,
@@ -31,7 +33,7 @@ const transition = (
 ): ClipTransition => ({ segmentIndex, type, duration });
 
 describe("clip transitions", () => {
-	it("lays out leading, internal and trailing gaps without a source or overlapping transition", () => {
+	it("lays out leading and internal gaps and ignores a legacy blank tail", () => {
 		const segments = [
 			{ ...segment(2), id: "a" },
 			{ ...segment(3), id: "b", start: 4, end: 7 },
@@ -39,7 +41,7 @@ describe("clip transitions", () => {
 		const transitions = [transition(1, 0.5)];
 		const gaps = { beforeClip: { a: 1, b: 0.75, removed: 99 }, trailing: 0.5 };
 		expect(clipTimelineOffsets(segments, transitions, gaps)).toEqual([1, 3.75]);
-		expect(clipTimelineDuration(segments, transitions, gaps)).toBe(7.25);
+		expect(clipTimelineDuration(segments, transitions, gaps)).toBe(6.75);
 		expect(getClipTransition(segments, transitions, 1, gaps)).toBeNull();
 		for (const time of [0, 0.5, 3, 3.5, 6.75, 7]) {
 			expect(clipSourceTimeAt(segments, transitions, time, gaps)).toBeNull();
@@ -51,11 +53,33 @@ describe("clip transitions", () => {
 		});
 	});
 
+	it("splits only a requested clip under the playhead and rejects gaps, edges and transition overlap", () => {
+		const segments = [
+			{ ...segment(4), id: "a" },
+			{ ...segment(8), start: 2, end: 10, timescale: 2, id: "b" },
+		];
+		const gaps = { beforeClip: { b: 2 } };
+		expect(clipSplitAt(segments, [], 8, gaps, [0])).toBeNull();
+		expect(clipSplitAt(segments, [], 5, gaps)).toBeNull();
+		expect(clipSplitAt(segments, [], 6, gaps)).toBeNull();
+		expect(clipSplitAt(segments, [], 8, gaps, [1])).toEqual({
+			index: 1,
+			sourceTime: 6,
+		});
+		expect(clipSplitAt(segments, [transition(1, 1)], 3.25)).toBeNull();
+	});
+
 	it("keeps a legacy timeline unchanged", () => {
 		const segments = [segment(4), segment(6), segment(2)];
 
 		expect(clipTimelineOffsets(segments, [])).toEqual([0, 4, 10]);
 		expect(clipTimelineDuration(segments, [])).toBe(12);
+	});
+
+	it("keeps a fullscreen title at the exact project end outside the last video box", () => {
+		const segments = [segment(3)];
+		expect(clipEndOnOutput([[3, 4]], segments, 0, 3)).toBe(3);
+		expect(clipEndOnOutput([[2, 4]], segments, 0, 3)).toBe(5);
 	});
 
 	it("overlaps an incoming clip by its transition duration", () => {

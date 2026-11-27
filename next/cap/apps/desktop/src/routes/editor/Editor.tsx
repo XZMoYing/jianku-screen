@@ -74,6 +74,7 @@ import { PlayerContent } from "./Player";
 import { usePreparingEditor } from "./preparing-editor-context";
 import { createPreviewFullscreen } from "./preview-fullscreen";
 import { Timeline } from "./Timeline";
+import { timelinePreviewFrame } from "./timeline-duration";
 import { Dialog, DialogContent, EditorButton, Input, Subfield } from "./ui";
 import { EditorKeymapContext } from "./useEditorShortcuts";
 
@@ -356,6 +357,7 @@ function Inner(props: {
 		editorInstance,
 		editorState,
 		setEditorState,
+		totalDuration,
 		previewResolutionBase,
 		dialog,
 		exportState,
@@ -710,7 +712,16 @@ function Inner(props: {
 		if (handoffPlaybackPending()) return;
 		throttledRenderFrame.clear();
 		trailingRenderFrame.clear();
-		setEditorState("playbackTime", payload.playhead_position / FPS);
+		if (
+			editorState.playing ||
+			editorState.playbackTime !== totalDuration() ||
+			payload.playhead_position !==
+				timelinePreviewFrame(totalDuration(), totalDuration(), FPS)
+		)
+			setEditorState(
+				"playbackTime",
+				Math.min(payload.playhead_position / FPS, totalDuration()),
+			);
 		// A seek acknowledgement can clear an already queued paused frame without changing its time.
 		if (!editorState.playing) renderFrame(frameNumberToRender());
 	});
@@ -719,7 +730,7 @@ function Inner(props: {
 
 	const preparing = usePreparingEditor();
 	const requestedFrame = (time: number) => {
-		const frameNumber = Math.max(Math.floor(time * FPS), 0);
+		const frameNumber = timelinePreviewFrame(time, totalDuration(), FPS);
 		return preparing?.requestOrdinaryFrame(frameNumber) ?? frameNumber;
 	};
 

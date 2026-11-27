@@ -53,10 +53,9 @@ const RAMP_UP_FRAME_COUNT: u32 = 15;
 
 fn main_track_gaps_changed(previous: &TimelineConfiguration, next: &TimelineConfiguration) -> bool {
     (previous.has_main_track_gaps() || next.has_main_track_gaps())
-        && (previous.trailing_gap() != next.trailing_gap()
-            || !(0..previous.segments.len())
-                .map(|index| previous.gap_before(index))
-                .eq((0..next.segments.len()).map(|index| next.gap_before(index))))
+        && !(0..previous.segments.len())
+            .map(|index| previous.gap_before(index))
+            .eq((0..next.segments.len()).map(|index| next.gap_before(index)))
 }
 
 fn playback_mapping_changed(previous: &ProjectConfiguration, next: &ProjectConfiguration) -> bool {
@@ -98,6 +97,7 @@ fn playback_mapping_changed(previous: &ProjectConfiguration, next: &ProjectConfi
                     .map(transition)
                     .eq(next.transitions.iter().map(transition))
                 || previous.hold_windows() != next.hold_windows()
+                || previous.duration() != next.duration()
                 || main_track_gaps_changed(previous, next)
         }
         (None, None) => false,
@@ -257,8 +257,14 @@ pub enum PlaybackEvent {
     Start,
     Frame(u32),
     Stop,
+    End(u32),
 }
 
+impl PlaybackEvent {
+    pub fn is_finished(self) -> bool {
+        matches!(self, Self::Stop | Self::End(_))
+    }
+}
 #[derive(Clone)]
 pub struct PlaybackHandle {
     preparing_audio_released: Arc<AtomicBool>,
@@ -1064,6 +1070,7 @@ impl Playback {
 
             let frame_duration = Duration::from_secs_f64(1.0 / fps_f64);
             let mut frame_number = self.start_frame_number;
+            let mut finished_at = None;
             let mut seek_generation = 0;
             let mut prefetch_buffer: VecDeque<PrefetchedFrame> =
                 VecDeque::with_capacity(MAX_PREFETCH_BUFFER_SIZE + PREFETCH_CHANNEL_SIZE);
@@ -1727,6 +1734,7 @@ impl Playback {
 
                 let playback_time = frame_number as f64 / fps_f64;
                 if playback_time >= duration {
+                    finished_at = Some(((duration * fps_f64).ceil() as u32).saturating_sub(1));
                     break;
                 }
 
@@ -2189,7 +2197,9 @@ impl Playback {
             stop_tx.send(true).ok();
 
             drop(_background_playback);
-            event_tx.send(PlaybackEvent::Stop).ok();
+            event_tx
+                .send(finished_at.map_or(PlaybackEvent::Stop, PlaybackEvent::End))
+                .ok();
         };
 
         std::thread::Builder::new()

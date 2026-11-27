@@ -332,8 +332,10 @@ pub fn make_cursor_only_project(mut project_config: ProjectConfiguration) -> Pro
     project_config.keyboard = None;
 
     if let Some(timeline) = project_config.timeline.as_mut() {
+        timeline.preserve_output_end_for_render();
         timeline.mask_segments.clear();
         timeline.image_segments.clear();
+        timeline.shape_segments.clear();
         for style in &mut timeline.style_segments {
             if let Some(background) = style.overrides.background.as_mut() {
                 clear_background_pixels(background);

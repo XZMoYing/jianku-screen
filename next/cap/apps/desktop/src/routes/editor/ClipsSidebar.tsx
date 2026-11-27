@@ -18,9 +18,15 @@ import {
 } from "solid-js";
 import { Portal } from "solid-js/web";
 import toast from "solid-toast";
-import { MotionGroup } from "~/components/InterfaceMotion";
+import { MotionGroup, MotionSwitch } from "~/components/InterfaceMotion";
 import { t as localize } from "~/utils/i18n";
 import { commands } from "~/utils/tauri";
+import IconFilm from "~icons/lucide/film";
+import IconImage from "~icons/lucide/image";
+import IconMusic from "~icons/lucide/music";
+import IconScan from "~icons/lucide/scan";
+import IconText from "~icons/lucide/type";
+import { AudioLibraryPanel } from "./AudioLibrary";
 import { type EditorTimelineSegment, useEditorContext } from "./context";
 import {
 	createEditorContextMenu,
@@ -30,6 +36,15 @@ import { getExistingRecordingPickerOptions } from "./existing-recording-picker";
 import { routeEditorPlaybackIntent } from "./playback-intent-routing";
 import { createTimelineMouseDrag } from "./Timeline/mouse-drag";
 import { useEditorShortcuts } from "./useEditorShortcuts";
+
+const materialTabs = [
+	{ id: "video", label: "视频", icon: IconFilm },
+	{ id: "audio", label: "音频", icon: IconMusic },
+	{ id: "text", label: "文字", icon: IconText },
+	{ id: "graphics", label: "标注", icon: IconImage },
+	{ id: "motion", label: "运镜", icon: IconScan },
+] as const;
+type MaterialTab = (typeof materialTabs)[number]["id"];
 
 const formatClipDuration = (seconds: number) => {
 	if (!Number.isFinite(seconds) || seconds <= 0) return "0:00";
@@ -221,9 +236,16 @@ export function ClipsSidebar(props: { class?: string; active?: boolean }) {
 		setDialog,
 		requestHandoffPlayback,
 		keymap,
+		timelineCommands,
 	} = useEditorContext();
 
-	const backToEditor = () => setDialog((d) => ({ ...d, open: false }));
+	const backToEditor = () => {
+		setEditorState("timeline", "audioPicker", null);
+		setDialog((d) => ({ ...d, open: false }));
+	};
+	const category = () => editorState.materialsTab ?? "video";
+	const addContent = (type: "text" | "image" | "shape" | "mask" | "style") =>
+		timelineCommands.addTrackContent(type);
 
 	const [tab, setTab] = createSignal("sources");
 	const sourceMenu = createEditorContextMenu();
@@ -521,9 +543,101 @@ export function ClipsSidebar(props: { class?: string; active?: boolean }) {
 			</button>
 
 			<KTabs
+				value={category()}
+				onChange={(value) => {
+					if (value === category()) return;
+					setEditorState("timeline", "audioPicker", null);
+					setEditorState("materialsTab", value as MaterialTab);
+				}}
+				class="px-3 pt-3"
+			>
+				<KTabs.List>
+					<MotionGroup
+						class="flex gap-0.5 rounded-xl bg-ed-ctl p-1"
+						label={localize("素材")}
+					>
+						<For each={materialTabs}>
+							{(item) => {
+								const Icon = item.icon;
+								return (
+									<KTabs.Trigger
+										value={item.id}
+										class="flex min-w-0 flex-1 flex-col items-center gap-1 rounded-lg px-1 py-1.5 text-[11px] text-ed-text-2"
+									>
+										<Icon class="size-3.5" />
+										<span class="max-w-full truncate">
+											{localize(item.label)}
+										</span>
+									</KTabs.Trigger>
+								);
+							}}
+						</For>
+					</MotionGroup>
+				</KTabs.List>
+			</KTabs>
+
+			<Show when={category() !== "video"}>
+				<MotionSwitch value={props.active === false ? undefined : category()}>
+					{(active) => (
+						<div class="custom-scroll flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-3 py-3">
+							<Show when={active() === "audio"}>
+								<AudioLibraryPanel
+									mode={{
+										type: "add",
+										lane:
+											editorState.timeline.audioPicker ??
+											timelineCommands.nextAudioLane(),
+									}}
+									onClose={backToEditor}
+								/>
+							</Show>
+							<Show when={active() === "text"}>
+								<Button variant="gray" onClick={() => addContent("text")}>
+									{localize("添加文字")}
+								</Button>
+								<Button
+									variant="gray"
+									onClick={timelineCommands.openCaptionInspector}
+								>
+									{localize("智能字幕")}
+								</Button>
+							</Show>
+							<Show when={active() === "graphics"}>
+								<Button
+									variant="gray"
+									disabled={editorState.importingImage}
+									onClick={() => addContent("image")}
+								>
+									{localize("导入图片")}
+								</Button>
+								<Button variant="gray" onClick={() => addContent("shape")}>
+									{localize("添加形状")}
+								</Button>
+								<Button variant="gray" onClick={() => addContent("mask")}>
+									{localize("添加遮罩")}
+								</Button>
+							</Show>
+							<Show when={active() === "motion"}>
+								<Button
+									variant="gray"
+									onClick={() => projectActions.addCamera3DShot()}
+								>
+									{localize("添加 3D 镜头")}
+								</Button>
+								<Button variant="gray" onClick={() => addContent("style")}>
+									{localize("添加样式片段")}
+								</Button>
+							</Show>
+						</div>
+					)}
+				</MotionSwitch>
+			</Show>
+
+			<KTabs
 				value={tab()}
 				onChange={setTab}
 				class="flex flex-col flex-1 gap-3 p-3 min-h-0"
+				classList={{ hidden: category() !== "video" }}
 			>
 				<div class="flex flex-none flex-wrap gap-2">
 					<Button

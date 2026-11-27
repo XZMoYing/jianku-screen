@@ -44,6 +44,7 @@ import {
 	getClipTransition,
 	MIN_CLIP_TRANSITION_DURATION,
 	maxTransitionDuration,
+	clipEndOnOutput as outputEndForClip,
 } from "../clip-transitions";
 import { useEditorContext } from "../context";
 import {
@@ -58,7 +59,6 @@ import { captureOverlayAttachmentLayout } from "../overlay-attachment";
 import { TextInput } from "../TextInput";
 import {
 	effectiveToOutput,
-	effectiveToOutputEnd,
 	heldTimeBefore,
 	holdWindows,
 } from "../timeline-holds";
@@ -658,11 +658,7 @@ function ClipSettingsControl(props: {
 	);
 }
 
-export function ClipTrack(
-	props: Pick<ComponentProps<"div">, "ref"> & {
-		handleUpdatePlayhead: (e: MouseEvent) => void;
-	},
-) {
+export function ClipTrack(props: Pick<ComponentProps<"div">, "ref">) {
 	const {
 		project,
 		setProject,
@@ -846,13 +842,14 @@ export function ClipTrack(
 		holdWindows(project.timeline?.textSegments),
 	);
 
-	const clipEndOnOutput = (index: number, end: number) => {
-		const convert =
-			clipGapAfter(segments(), index, project.timeline?.mainTrackGaps) > 0
-				? effectiveToOutputEnd
-				: effectiveToOutput;
-		return convert(heldWindows(), end);
-	};
+	const clipEndOnOutput = (index: number, end: number) =>
+		outputEndForClip(
+			heldWindows(),
+			segments(),
+			index,
+			end,
+			project.timeline?.mainTrackGaps,
+		);
 
 	const selectedHoldWindows = createMemo(() => {
 		const selection = editorState.timeline.selection;
@@ -1143,6 +1140,7 @@ export function ClipTrack(
 			let moved = false;
 			let resumeHistory: (() => void) | undefined;
 			const previousPreview = editorState.previewTime;
+			const previousPlayhead = editorState.playbackTime;
 			let lastPreview: number | null = null;
 			const ownsEdge = () =>
 				project.timeline?.segments[index] === clip &&
@@ -1209,6 +1207,11 @@ export function ClipTrack(
 							if (clip[edge] !== initial)
 								setProject("timeline", "segments", index, edge, initial);
 							if (
+								!editorState.playing &&
+								editorState.playbackTime < previousPlayhead
+							)
+								setEditorState("playbackTime", previousPlayhead);
+							if (
 								lastPreview !== null &&
 								editorState.previewTime === lastPreview
 							)
@@ -1261,7 +1264,7 @@ export function ClipTrack(
 			});
 		}
 
-		props.handleUpdatePlayhead(event);
+		setEditorState("previewTime", null);
 	}
 
 	function showTransitionAtSeam(event: MouseEvent) {
@@ -1568,7 +1571,7 @@ export function ClipTrack(
 										// The box is in output time (it stretches across any
 										// held windows); splitClipSegment converts back to the
 										// recording-flow domain itself.
-										projectActions.splitClipSegment(splitTimeAt(e).time, i());
+										projectActions.splitClipSegment(splitTimeAt(e).time, [i()]);
 									} else {
 										if (
 											!e.shiftKey &&

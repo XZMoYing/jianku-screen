@@ -10,6 +10,8 @@ import { Slider } from "./ui";
 
 const CLIP_SPEEDS = [0.25, 0.5, 1, 1.5, 2, 4, 8] as const;
 
+export type ClipPropertySection = "speed" | "audio" | "cursor";
+
 function ClipMenuSection(props: { name: string; children: JSX.Element }) {
 	return (
 		<div class="flex flex-col gap-1">
@@ -103,6 +105,7 @@ function ClipMenuToggleRow(props: {
 export function ClipProperties(props: {
 	index: number;
 	segment: TimelineSegment;
+	section?: ClipPropertySection;
 }) {
 	const { projectActions } = useEditorContext();
 	const muted = () => clipAudioMuted(props.segment);
@@ -110,79 +113,87 @@ export function ClipProperties(props: {
 	const cursorHidden = () => props.segment.hideCursor === true;
 	return (
 		<>
-			<ClipMenuSection name={localize("变速")}>
-				<ClipMenuChips
-					label={localize("Clip speed")}
-					options={CLIP_SPEEDS.map((mult) => [mult, `${mult}x`] as const)}
-					value={props.segment.timescale}
-					onChange={(mult) =>
-						projectActions.setClipSegmentTimescale(props.index, mult)
-					}
-				/>
-			</ClipMenuSection>
-
-			<ClipMenuSection name={localize("Audio")}>
-				<div class="flex h-7 items-center gap-2 px-2 text-[11.5px]">
-					<span class="w-12 shrink-0 text-ed-text-2">{localize("Volume")}</span>
-					<Slider
-						class="min-w-0 flex-1"
-						aria-label={localize("Clip volume")}
-						value={[Math.round(clipVolume(props.segment) * 100)]}
-						minValue={0}
-						maxValue={200}
-						step={1}
-						disabled={muted()}
-						onChange={([value]) =>
-							projectActions.setClipSegmentVolume(props.index, value / 100)
+			<Show when={!props.section || props.section === "speed"}>
+				<ClipMenuSection name={localize("变速")}>
+					<ClipMenuChips
+						label={localize("Clip speed")}
+						options={CLIP_SPEEDS.map((mult) => [mult, `${mult}x`] as const)}
+						value={props.segment.timescale}
+						onChange={(mult) =>
+							projectActions.setClipSegmentTimescale(props.index, mult)
 						}
-						formatTooltip={(value) => `${value}%`}
 					/>
-					<span class="w-9 shrink-0 text-right tabular-nums text-ed-text-2">
-						{Math.round(clipVolume(props.segment) * 100)}%
-					</span>
-				</div>
-				<Show
-					when={!normalSpeed()}
-					fallback={
-						<ClipMenuToggleRow
-							icon={<IconLucideVolumeX />}
-							label={localize("Mute clip")}
-							description={localize("Silence this clip's audio")}
-							checked={muted()}
-							onChange={(checked) =>
-								projectActions.setClipSegmentMuted(props.index, checked)
+				</ClipMenuSection>
+			</Show>
+
+			<Show when={!props.section || props.section === "audio"}>
+				<ClipMenuSection name={localize("Audio")}>
+					<div class="flex h-7 items-center gap-2 px-2 text-[11.5px]">
+						<span class="w-12 shrink-0 text-ed-text-2">
+							{localize("Volume")}
+						</span>
+						<Slider
+							class="min-w-0 flex-1"
+							aria-label={localize("Clip volume")}
+							value={[Math.round(clipVolume(props.segment) * 100)]}
+							minValue={0}
+							maxValue={200}
+							step={1}
+							disabled={muted()}
+							onChange={([value]) =>
+								projectActions.setClipSegmentVolume(props.index, value / 100)
+							}
+							formatTooltip={(value) => `${value}%`}
+						/>
+						<span class="w-9 shrink-0 text-right tabular-nums text-ed-text-2">
+							{Math.round(clipVolume(props.segment) * 100)}%
+						</span>
+					</div>
+					<Show
+						when={!normalSpeed()}
+						fallback={
+							<ClipMenuToggleRow
+								icon={<IconLucideVolumeX />}
+								label={localize("Mute clip")}
+								description={localize("Silence this clip's audio")}
+								checked={muted()}
+								onChange={(checked) =>
+									projectActions.setClipSegmentMuted(props.index, checked)
+								}
+							/>
+						}
+					>
+						<ClipMenuChips
+							label={localize("Audio at this speed")}
+							options={
+								[
+									["mute", localize("静音")],
+									["maintainPitch", localize("保持音高")],
+									["matchSpeed", localize("随速度变化")],
+								] as const
+							}
+							value={props.segment.speedAudioMode ?? "mute"}
+							onChange={(mode) =>
+								projectActions.setClipSegmentSpeedAudioMode(props.index, mode)
 							}
 						/>
-					}
-				>
-					<ClipMenuChips
-						label={localize("Audio at this speed")}
-						options={
-							[
-								["mute", localize("静音")],
-								["maintainPitch", localize("保持音高")],
-								["matchSpeed", localize("随速度变化")],
-							] as const
-						}
-						value={props.segment.speedAudioMode ?? "mute"}
-						onChange={(mode) =>
-							projectActions.setClipSegmentSpeedAudioMode(props.index, mode)
+					</Show>
+				</ClipMenuSection>
+			</Show>
+
+			<Show when={!props.section || props.section === "cursor"}>
+				<ClipMenuSection name={localize("光标")}>
+					<ClipMenuToggleRow
+						icon={<IconLucideMousePointerBan />}
+						label={localize("Hide cursor")}
+						description={localize("Fades out while this clip plays")}
+						checked={cursorHidden()}
+						onChange={(checked) =>
+							projectActions.setClipSegmentHideCursor(props.index, checked)
 						}
 					/>
-				</Show>
-			</ClipMenuSection>
-
-			<ClipMenuSection name={localize("光标")}>
-				<ClipMenuToggleRow
-					icon={<IconLucideMousePointerBan />}
-					label={localize("Hide cursor")}
-					description={localize("Fades out while this clip plays")}
-					checked={cursorHidden()}
-					onChange={(checked) =>
-						projectActions.setClipSegmentHideCursor(props.index, checked)
-					}
-				/>
-			</ClipMenuSection>
+				</ClipMenuSection>
+			</Show>
 		</>
 	);
 }

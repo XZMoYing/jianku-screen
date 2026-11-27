@@ -3,6 +3,7 @@ type HoverPreviewOptions = {
 	playbackIntent: () => boolean;
 	metrics: () => { left: number; width: number } | null;
 	position: () => number;
+	end: () => number;
 	secondsPerPixel: () => number;
 	startSnapPixels: number;
 	setPreviewTime: (time: number | null) => void;
@@ -24,6 +25,10 @@ export function createTimelineHoverPreview(options: HoverPreviewOptions) {
 				return;
 			}
 			const time = options.position() + options.secondsPerPixel() * offset;
+			if (time > options.end()) {
+				options.setPreviewTime(null);
+				return;
+			}
 			options.setPreviewTime(
 				time / options.secondsPerPixel() <= options.startSnapPixels ? 0 : time,
 			);

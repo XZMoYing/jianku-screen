@@ -1,5 +1,4 @@
 import { Select as KSelect } from "@kobalte/core/select";
-import { ToggleButton as KToggleButton } from "@kobalte/core/toggle-button";
 import { createElementBounds } from "@solid-primitives/bounds";
 import { createEventListener } from "@solid-primitives/event-listener";
 import { debounce } from "@solid-primitives/scheduled";
@@ -50,6 +49,7 @@ import {
 import { previewQualityLabel } from "./preview-resolution";
 import { SplitScreenOverlay } from "./SplitScreenOverlay";
 import { TextOverlay } from "./TextOverlay";
+import { atLastTimelineFrame, timelinePreviewFrame } from "./timeline-duration";
 import {
 	EditorButton,
 	MenuItem,
@@ -149,7 +149,10 @@ export function PlayerContent(props: {
 		const revision = ++seekRevision;
 		setSeekDraft(undefined);
 		setEditorState("previewTime", null);
-		const pending = requestHandoffPlayback(playbackIntent(), time);
+		const pending = requestHandoffPlayback(
+			playbackIntent() && time < totalDuration(),
+			time,
+		);
 		if (pending) {
 			await pending;
 			return;
@@ -159,12 +162,7 @@ export function PlayerContent(props: {
 				await commands.stopPlayback();
 				if (revision !== seekRevision) return;
 			}
-			await commands.seekTo(
-				Math.min(
-					Math.floor(time * FPS),
-					Math.max(0, Math.ceil(totalDuration() * FPS) - 1),
-				),
-			);
+			await commands.seekTo(timelinePreviewFrame(time, totalDuration(), FPS));
 			if (revision !== seekRevision) return;
 			setEditorState("playbackTime", time);
 			if (editorState.playing && time < totalDuration())
@@ -285,10 +283,8 @@ export function PlayerContent(props: {
 		}
 	});
 
-	const isAtEnd = () => {
-		const total = totalDuration();
-		return total > 0 && total - editorState.playbackTime <= 0.1;
-	};
+	const isAtEnd = () =>
+		atLastTimelineFrame(editorState.playbackTime, totalDuration(), FPS);
 
 	const cropDialogHandler = async () => {
 		const background = selectedStyle()
@@ -354,7 +350,9 @@ export function PlayerContent(props: {
 				await commands.stopPlayback();
 				setEditorState("playing", false);
 			} else {
-				await commands.seekTo(Math.floor(editorState.playbackTime * FPS));
+				await commands.seekTo(
+					timelinePreviewFrame(editorState.playbackTime, totalDuration(), FPS),
+				);
 				await commands.startPlayback(FPS, previewResolutionBase());
 				setEditorState("playing", true);
 			}
@@ -399,7 +397,13 @@ export function PlayerContent(props: {
 			if (!playbackIntent()) {
 				if (prevTime !== null) setEditorState("playbackTime", prevTime);
 				if (!handoffPlaybackPending())
-					await commands.seekTo(Math.floor(editorState.playbackTime * FPS));
+					await commands.seekTo(
+						timelinePreviewFrame(
+							editorState.playbackTime,
+							totalDuration(),
+							FPS,
+						),
+					);
 			}
 			await handlePlayPauseClick();
 		},
@@ -604,18 +608,7 @@ export function PlayerContent(props: {
 						type="button"
 						aria-label={localize("跳到结尾")}
 						class="text-ed-text-2 transition-opacity hover:opacity-70 will-change-[opacity]"
-						onClick={async () => {
-							seekRevision++;
-							setSeekDraft(undefined);
-							const pending = requestHandoffPlayback(false, totalDuration());
-							if (pending) {
-								await pending;
-								return;
-							}
-							await commands.stopPlayback();
-							setEditorState("playing", false);
-							setEditorState("playbackTime", totalDuration());
-						}}
+						onClick={() => void seekPreview(totalDuration())}
 					>
 						<IconCapNext class="size-3.5" />
 					</button>
@@ -671,19 +664,6 @@ export function PlayerContent(props: {
 					</KSelect>
 				</div>
 				<div class="flex flex-row flex-1 gap-0.5 justify-end items-center min-w-fit">
-					<EditorButton<typeof KToggleButton>
-						tooltipText={localize("分割工具")}
-						aria-label={localize("分割工具")}
-						kbd={keymap.kbd("bladeTool")}
-						pressed={editorState.timeline.interactMode === "split"}
-						onChange={(v: boolean) =>
-							timelineCommands.setTool(v ? "split" : "seek")
-						}
-						as={KToggleButton}
-						variant="danger"
-						leftIcon={<IconCapScissors />}
-					/>
-					<div class="mx-1.5 w-px h-4 shrink-0 bg-ed-line-strong" />
 					<div class="flex flex-row gap-0.5 items-center" title={zoomHint()}>
 						<EditorButton
 							tooltipText={localize("缩小时间线")}

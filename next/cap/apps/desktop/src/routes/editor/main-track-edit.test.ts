@@ -46,15 +46,28 @@ describe("positioned main track edits", () => {
 		expect(length(track)).toBe(9);
 	});
 
-	it("deletes without shifting the remaining clips and appends after the trailing gap", () => {
-		const track = fixture();
+	it("deletes without shifting other clips and appends at the last real clip", () => {
+		const track = fixture({ trailing: 2 });
 		expect(deletePositionedMainTrackClip(track, 0)).toBe(true);
 		expect(deletePositionedMainTrackClip(track, 1)).toBe(true);
 		expect(starts(track)).toEqual([2]);
-		expect(length(track)).toBe(6);
+		expect(length(track)).toBe(4);
+		expect(track.mainTrackGaps).toEqual({ beforeClip: { b: 2 } });
 		expect(appendMainTrackClip(track, clip("d"))).toBe(true);
-		expect(starts(track)).toEqual([2, 6]);
-		expect(length(track)).toBe(8);
+		expect(starts(track)).toEqual([2, 4]);
+		expect(length(track)).toBe(6);
+	});
+
+	it("updates the end for positioned trims, speed changes and transcript cuts", () => {
+		const track = fixture();
+		expect(trimPositionedMainTrackClip(track, "c", "end", 1.5)).toBe(true);
+		expect(length(track)).toBe(5.5);
+		expect(setPositionedMainTrackSpeed(track, 2, 1.5)).toBe(true);
+		expect(length(track)).toBe(5);
+		expect(cutPositionedMainTrackRange(track, 2, 4.5, 5)).toBe(true);
+		expect(starts(track)).toEqual([0, 2, 4]);
+		expect(length(track)).toBe(4.5);
+		expect(track.mainTrackGaps).toBeUndefined();
 	});
 
 	it("trims either edge and keeps the opposite edge and other clips fixed", () => {

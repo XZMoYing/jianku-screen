@@ -119,12 +119,10 @@ pub async fn render_preview_if_main_track_gap(
     let Some(timeline) = &project_config.timeline else {
         return Ok(None);
     };
-    if !timeline.has_main_track_gaps()
-        || !matches!(
-            timeline.get_frame_mapping(frame_time),
-            Some(TimelineFrameMapping::Gap { .. })
-        )
-    {
+    if !matches!(
+        timeline.get_frame_mapping(frame_time),
+        Some(TimelineFrameMapping::Gap { .. })
+    ) {
         return Ok(None);
     }
 

@@ -56,7 +56,8 @@ export function Minimap() {
 				...(index > 0 || clipGapBefore(segments[index], mainTrackGaps) > 0
 					? [effectiveToOutput(holds, start)]
 					: []),
-				...(clipGapAfter(segments, index, mainTrackGaps) > 0
+				...(!segments[index + 1] ||
+				clipGapAfter(segments, index, mainTrackGaps) > 0
 					? [effectiveToOutputEnd(holds, start + clipDuration(segments[index]))]
 					: []),
 			])

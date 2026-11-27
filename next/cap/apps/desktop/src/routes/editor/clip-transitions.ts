@@ -1,4 +1,9 @@
 import type { MainTrackGaps, TimelineSegment } from "~/utils/tauri";
+import {
+	effectiveToOutput,
+	effectiveToOutputEnd,
+	type HoldWindow,
+} from "./timeline-holds";
 
 export const DEFAULT_CLIP_TRANSITION_DURATION = 0.5;
 export const MIN_CLIP_TRANSITION_DURATION = 0.05;
@@ -57,17 +62,24 @@ export function clipGapBefore(
 	return positiveGap(segment?.id == null ? 0 : gaps?.beforeClip?.[segment.id]);
 }
 
-export function clipTrailingGap(gaps?: MainTrackGaps) {
-	return positiveGap(gaps?.trailing);
-}
-
 export function clipGapAfter(
 	segments: readonly TimelineSegment[],
 	index: number,
 	gaps?: MainTrackGaps,
 ) {
-	const next = segments[index + 1];
-	return next ? clipGapBefore(next, gaps) : clipTrailingGap(gaps);
+	return clipGapBefore(segments[index + 1], gaps);
+}
+
+export function clipEndOnOutput(
+	holds: HoldWindow[],
+	segments: readonly TimelineSegment[],
+	index: number,
+	end: number,
+	gaps?: MainTrackGaps,
+) {
+	return !segments[index + 1] || clipGapAfter(segments, index, gaps) > 0
+		? effectiveToOutputEnd(holds, end)
+		: effectiveToOutput(holds, end);
 }
 
 export function maxTransitionDuration(
@@ -172,8 +184,8 @@ export function clipTimelineOffsets(
  * Maps an edited-timeline timestamp to the recording-segment file and the
  * time within that file which plays at that moment. Mirrors the Rust
  * `TimelineConfiguration::get_segment_time` (minus holds); where a transition
- * overlaps two segments the incoming segment wins. Times outside the timeline
- * clamp to the nearest edge. Empty main-track intervals have no source.
+ * overlaps two segments the incoming segment wins. Empty main-track intervals
+ * and times outside the video range have no source.
  */
 export function clipSourceTimeAt(
 	segments: TimelineSegment[],
@@ -192,20 +204,13 @@ export function clipSourceTimeAt(
 	for (let index = segments.length - 1; index >= 0; index--) {
 		const segment = segments[index];
 		const local = editedTime - offsets[index];
-		if (local >= 0 || index === 0) {
+		if (local >= 0) {
 			const duration = clipDuration(segment);
-			const gapAfter = clipGapAfter(segments, index, gaps);
-			if (
-				(local < 0 && editedTime >= 0 && clipGapBefore(segment, gaps) > 0) ||
-				(gapAfter > 0 && local >= duration && local < duration + gapAfter)
-			)
-				return null;
+			if (editedTime >= offsets[index] + duration) return null;
 			return {
 				segmentIndex: index,
 				recordingSegment: segment.recordingSegment ?? 0,
-				sourceTime:
-					segment.start +
-					Math.min(Math.max(local, 0), duration) * segment.timescale,
+				sourceTime: segment.start + local * segment.timescale,
 			};
 		}
 	}
@@ -223,18 +228,45 @@ export function normalizeClipTransitions(
 	);
 }
 
+export function clipSplitAt(
+	segments: TimelineSegment[],
+	transitions: ClipTransition[],
+	time: number,
+	gaps?: MainTrackGaps,
+	indices?: readonly number[],
+) {
+	const offsets = clipTimelineOffsets(segments, transitions, gaps);
+	const boundaries = clipTransitionMap(segments, transitions, gaps);
+	const index = segments.findIndex((segment, index) => {
+		if (indices && !indices.includes(index)) return false;
+		const local = time - offsets[index];
+		const remaining = clipDuration(segment) - local;
+		return (
+			local > 1e-7 &&
+			remaining > 1e-7 &&
+			local >= (boundaries[index]?.duration ?? 0) * 2 &&
+			remaining >= (boundaries[index + 1]?.duration ?? 0) * 2
+		);
+	});
+	return index < 0
+		? null
+		: {
+				index,
+				sourceTime:
+					segments[index].start +
+					(time - offsets[index]) * segments[index].timescale,
+			};
+}
+
 export function clipTimelineDuration(
 	segments: TimelineSegment[],
 	transitions: ClipTransition[],
 	gaps?: MainTrackGaps,
 ) {
-	const trailing = clipTrailingGap(gaps);
-	if (segments.length === 0) return trailing;
+	if (segments.length === 0) return 0;
 	const offsets = clipTimelineOffsets(segments, transitions, gaps);
 	return (
-		offsets[offsets.length - 1] +
-		clipDuration(segments[segments.length - 1]) +
-		trailing
+		offsets[offsets.length - 1] + clipDuration(segments[segments.length - 1])
 	);
 }
 

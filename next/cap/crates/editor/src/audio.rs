@@ -325,12 +325,13 @@ impl AudioRenderer {
             return Ok((written != 0).then_some(written));
         };
         let joins = crate::join_fade::hard_cut_joins(timeline, Self::SAMPLE_RATE);
+        let use_mapping = !timeline.transitions.is_empty()
+            || !timeline.hold_windows().is_empty()
+            || timeline.has_main_track_gaps()
+            || timeline.has_independent_tail();
         while written < samples {
             sources.check_cancelled()?;
-            let (mapping, span) = if !timeline.transitions.is_empty()
-                || !timeline.hold_windows().is_empty()
-                || timeline.has_main_track_gaps()
-            {
+            let (mapping, span) = if use_mapping {
                 let Some((mapping, output_end_samples)) = self.next_transition_mapping(timeline)
                 else {
                     break;
@@ -488,6 +489,7 @@ impl AudioRenderer {
         if !timeline.transitions.is_empty()
             || !timeline.hold_windows().is_empty()
             || timeline.has_main_track_gaps()
+            || timeline.has_independent_tail()
         {
             return self.render_timeline_transition_frame_raw(samples, project, timeline);
         }
@@ -1428,7 +1430,7 @@ fn mix_transition_audio_at(
 }
 
 /// Below this volume a music track is treated as silent and skipped entirely.
-pub(crate) const MUSIC_SILENCE_DB: f32 = -60.0;
+pub(crate) const MUSIC_SILENCE_DB: f32 = cap_project::AudioTrackSegment::SILENCE_DB;
 
 fn music_gain(volume_db: f32) -> f32 {
     if volume_db <= MUSIC_SILENCE_DB {
@@ -3461,6 +3463,12 @@ mod tests {
             .before_clip
             .insert("second".into(), 0.5);
         timeline.main_track_gaps.trailing = Some(0.25);
+        timeline.text_segments.push(
+            serde_json::from_value(serde_json::json!({
+                "start": 2.8, "end": 3.0, "content": "End title"
+            }))
+            .unwrap(),
+        );
 
         renderer.set_playhead(0.0, &project);
         let samples = (3.0 * AudioData::SAMPLE_RATE as f64) as usize;

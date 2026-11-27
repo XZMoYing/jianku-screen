@@ -92,6 +92,7 @@ import {
 	clipDuration,
 	clipGapBefore,
 	clipSourceTimeAt,
+	clipSplitAt,
 	clipTimelineDuration,
 	clipTimelineOffsets,
 	getClipTransition,
@@ -122,7 +123,7 @@ import {
 	setPositionedMainTrackTransition,
 	trimPositionedMainTrackClip,
 } from "./main-track-edit";
-import type { MaskSegment } from "./masks";
+import { defaultMaskSegment, type MaskSegment } from "./masks";
 import {
 	type AttachmentSpan,
 	applyOverlayAttachmentEdit,
@@ -158,7 +159,7 @@ import {
 	type StyleSegment,
 	splitOverlaySegment,
 } from "./style";
-import type { TextSegment } from "./text";
+import { autoTextColorAt, defaultTextSegment, type TextSegment } from "./text";
 import {
 	applyMotionTemplate,
 	applySceneToRange,
@@ -181,13 +182,17 @@ import {
 	splitCamera3DMotion,
 } from "./three-d";
 import {
+	timelineOutputDuration,
+	timelinePreviewFrame,
+} from "./timeline-duration";
+import {
 	effectiveToOutput,
 	heldTimeBefore,
 	holdWindows,
-	totalHeldDuration,
 } from "./timeline-holds";
 import { deleteClipAndRippleAllTracks } from "./timeline-utils";
 import {
+	getSegmentTrack,
 	getUsedTrackCount,
 	normalizeTrackSegments,
 	placeSegmentAtTime,
@@ -344,6 +349,9 @@ export function normalizeProject(
 	const timeline = config.timeline
 		? {
 				...config.timeline,
+				mainTrackGaps: config.timeline.mainTrackGaps?.beforeClip
+					? { beforeClip: config.timeline.mainTrackGaps.beforeClip }
+					: undefined,
 				segments: normalizeClipIdentities(config.timeline.segments),
 				styleSegments: normalizeTrackSegments(
 					config.timeline.styleSegments ?? [],
@@ -991,79 +999,70 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					edge: "start" | "end",
 					sourceTime: number,
 				) => {
-					if (mainTrackMagnetic()) return false;
-					return editMainTrack((timeline) =>
-						trimPositionedMainTrackClip(timeline, clipId, edge, sourceTime),
-					);
-				},
-				splitClipSegment: (time: number, requestedSegmentIndex?: number) => {
-					const didSplit = editMainTrack((timeline, replacements) => {
-						const segments = timeline.segments;
-						// The click position is in held-output time; clip offsets
-						// live in the gapless recording-flow domain.
-						time -= heldTimeBefore(holdWindows(timeline.textSegments), time);
-						const offsets = clipTimelineOffsets(
-							segments,
-							timeline.transitions ?? [],
-							timeline.mainTrackGaps,
+					return editMainTrack((timeline) => {
+						if (!mainTrackMagnetic())
+							return trimPositionedMainTrackClip(
+								timeline,
+								clipId,
+								edge,
+								sourceTime,
+							);
+						const segment = timeline.segments.find(
+							(clip) => clip.id === clipId,
 						);
-						let currentSegmentIndex = requestedSegmentIndex ?? -1;
-						if (currentSegmentIndex < 0) {
-							for (let index = 0; index < segments.length; index++) {
-								const duration =
-									(segments[index].end - segments[index].start) /
-									segments[index].timescale;
-								if (
-									time >= offsets[index] &&
-									time <= offsets[index] + duration
-								) {
-									currentSegmentIndex = index;
-								}
-							}
-						}
-
-						const segment = segments[currentSegmentIndex];
-						if (!segment) return false;
-						const localTime = time - offsets[currentSegmentIndex];
-						const duration = (segment.end - segment.start) / segment.timescale;
-						if (localTime <= 0 || localTime >= duration) return false;
-						const incomingDuration =
-							getClipTransition(
-								segments,
-								timeline.transitions ?? [],
-								currentSegmentIndex,
-								timeline.mainTrackGaps,
-							)?.duration ?? 0;
-						const outgoingDuration =
-							getClipTransition(
-								segments,
-								timeline.transitions ?? [],
-								currentSegmentIndex + 1,
-								timeline.mainTrackGaps,
-							)?.duration ?? 0;
 						if (
-							localTime < incomingDuration * 2 ||
-							duration - localTime < outgoingDuration * 2
+							!segment ||
+							!Number.isFinite(sourceTime) ||
+							sourceTime <= segment.start ||
+							sourceTime >= segment.end
 						)
 							return false;
-						const splitPositionInRecording = localTime * segment.timescale;
-
-						const right = newClipInstance({
-							...segment,
-							start: segment.start + splitPositionInRecording,
-							end: segment.end,
-						});
-						segments.splice(currentSegmentIndex + 1, 0, right);
-						if (segment.id) replacements.set(segment.id, [right.id]);
-						segments[currentSegmentIndex].end =
-							segment.start + splitPositionInRecording;
-						timeline.transitions = transitionsAfterClipSplit(
-							timeline.transitions ?? [],
-							currentSegmentIndex,
+						segment[edge] = sourceTime;
+						timeline.transitions = normalizeClipTransitions(
+							timeline.segments,
+							timeline.transitions,
+							timeline.mainTrackGaps,
 						);
 						return true;
 					});
-					if (didSplit) setEditorState("timeline", "selection", null);
+				},
+				splitClipSegment: (time: number, indices?: readonly number[]) => {
+					let rightIndex = -1;
+					const didSplit = editMainTrack((timeline, replacements) => {
+						const split = clipSplitAt(
+							timeline.segments,
+							timeline.transitions,
+							time - heldTimeBefore(holdWindows(timeline.textSegments), time),
+							timeline.mainTrackGaps,
+							indices,
+						);
+						if (!split) return false;
+
+						const segment = timeline.segments[split.index];
+						const right = newClipInstance({
+							...segment,
+							start: split.sourceTime,
+						});
+						rightIndex = split.index + 1;
+						timeline.segments.splice(rightIndex, 0, right);
+						if (segment.id) replacements.set(segment.id, [right.id]);
+						segment.end = split.sourceTime;
+						timeline.transitions = transitionsAfterClipSplit(
+							timeline.transitions,
+							split.index,
+						);
+						return true;
+					});
+					if (didSplit)
+						batch(() => {
+							setEditorState("previewTime", null);
+							setEditorState("timeline", "splitPreview", null);
+							setEditorState("timeline", "selection", {
+								type: "clip",
+								indices: [rightIndex],
+							});
+						});
+					return didSplit;
 				},
 				deleteClipSegment: (segmentIndex: number) => {
 					if (!project.timeline) return;
@@ -2322,14 +2321,11 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					: undefined,
 			);
 
-			const totalDuration = () =>
+			const totalDuration = createMemo(() =>
 				project.timeline
-					? clipTimelineDuration(
-							project.timeline.segments,
-							project.timeline.transitions ?? [],
-							project.timeline.mainTrackGaps,
-						) + totalHeldDuration(holdWindows(project.timeline.textSegments))
-					: props.editorInstance.recordingDuration;
+					? timelineOutputDuration(project.timeline)
+					: props.editorInstance.recordingDuration,
+			);
 
 			type State = {
 				zoom: number;
@@ -2382,6 +2378,19 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				previewTime: null as number | null,
 				playbackTime: preparing?.handoffTarget()?.playback.playheadSeconds ?? 0,
 				playing: false,
+				materialsTab: "video" as
+					| "video"
+					| "audio"
+					| "text"
+					| "graphics"
+					| "motion",
+				inspectorTab: "background" as
+					| "background"
+					| "camera"
+					| "audio"
+					| "cursor"
+					| "keyboard"
+					| "captions",
 				// On-canvas selection of the screen recording / camera boxes.
 				// Kept separate from timeline.selection, which drives the sidebar
 				// selection panel and is pattern-matched by many consumers.
@@ -2482,6 +2491,25 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					pendingTextEdit: null as number | null,
 				},
 			});
+
+			createEffect(
+				on(totalDuration, (duration) => {
+					batch(() => {
+						if (editorState.playbackTime > duration)
+							setEditorState("playbackTime", duration);
+						if (
+							editorState.previewTime !== null &&
+							editorState.previewTime > duration
+						)
+							setEditorState("previewTime", null);
+						if (
+							editorState.timeline.splitPreview &&
+							editorState.timeline.splitPreview.time >= duration
+						)
+							setEditorState("timeline", "splitPreview", null);
+					});
+				}),
+			);
 
 			createEffect(
 				on(
@@ -2944,7 +2972,11 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					(active) => {
 						if (!active && !playbackHandoff?.active())
 							commands.setPlayheadPosition(
-								Math.floor(editorState.playbackTime * FPS),
+								timelinePreviewFrame(
+									editorState.playbackTime,
+									totalDuration(),
+									FPS,
+								),
 							);
 					},
 				),
@@ -2988,9 +3020,9 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					0,
 					Math.min(seconds ?? editorState.playbackTime, totalDuration()),
 				);
+				const frame = timelinePreviewFrame(bounded, totalDuration(), FPS);
 				const frameNumber =
-					preparing?.requestOrdinaryFrame(Math.floor(bounded * FPS), true) ??
-					Math.floor(bounded * FPS);
+					preparing?.requestOrdinaryFrame(frame, true) ?? frame;
 				setEditorState("playbackTime", bounded);
 				setEditorState("previewTime", null);
 				if (!progressive || !preparing)
@@ -3147,7 +3179,271 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					setEditorState("timeline", "selection", { type, indices });
 				});
 
+			const nextAudioLane = () => {
+				const segments = project.timeline?.audioSegments ?? [];
+				const laneCount = Math.max(
+					editorState.timeline.tracks.audio,
+					getUsedTrackCount(segments),
+				);
+				for (let lane = 0; lane < laneCount; lane++) {
+					if (!segments.some((segment) => getSegmentTrack(segment) === lane))
+						return lane;
+				}
+				return laneCount;
+			};
+
+			const openAudioMaterials = (lane = nextAudioLane()) =>
+				batch(() => {
+					setEditorState("materialsTab", "audio");
+					setEditorState("timeline", "audioPicker", lane);
+					setDialog({ open: true, type: "clips" });
+				});
+
+			function addTrackContent(type: TimelineTrackType, requestedLength = 3) {
+				if (type === "style" || type === "image" || type === "shape") {
+					const segments =
+						(type === "style"
+							? project.timeline?.styleSegments
+							: type === "image"
+								? project.timeline?.imageSegments
+								: project.timeline?.shapeSegments) ?? [];
+					const lane = Math.max(
+						getUsedTrackCount<{ start: number; end: number; track?: number }>(
+							segments,
+						),
+						editorState.timeline.tracks[type],
+					);
+					if (type === "style") projectActions.addStyleSegment(lane);
+					else if (type === "shape") projectActions.addShapeSegment(lane);
+					else void projectActions.importImageSegment(lane);
+					return;
+				}
+
+				if (type === "audio") return openAudioMaterials();
+
+				if (type !== "text" && type !== "mask") return;
+
+				const segments: Array<{ start: number; end: number; track?: number }> =
+					(type === "text"
+						? project.timeline?.textSegments
+						: project.timeline?.maskSegments) ?? [];
+				const length = Math.min(requestedLength, totalDuration());
+				const time = editorState.playbackTime ?? 0;
+				const laneCount = Math.max(
+					editorState.timeline.tracks[type],
+					getUsedTrackCount<{ start: number; end: number; track?: number }>(
+						segments,
+					),
+				);
+
+				let lane = laneCount;
+				let placement: { start: number; end: number } | null = null;
+				for (let i = 0; i < laneCount; i++) {
+					const candidate = placeSegmentAtTime(
+						segments.filter((segment) => getSegmentTrack(segment) === i),
+						time,
+						length,
+						totalDuration(),
+					);
+					if (candidate) {
+						lane = i;
+						placement = candidate;
+						break;
+					}
+				}
+				placement ??= placeSegmentAtTime([], time, length, totalDuration());
+				if (!placement) {
+					setEditorState(
+						"timeline",
+						"tracks",
+						type,
+						editorState.timeline.tracks[type] + 1,
+					);
+					return;
+				}
+				const { start, end } = placement;
+
+				batch(() => {
+					setEditorState(
+						"timeline",
+						"tracks",
+						type,
+						Math.max(laneCount, lane + 1),
+					);
+					if (type === "text") {
+						setProject(
+							"timeline",
+							"textSegments",
+							produce((segments) => {
+								segments ??= [];
+								segments.push(
+									withSelectedClipAttachment({
+										...defaultTextSegment(start, end),
+										color: autoTextColorAt(
+											editorInstanceContext.canvasControls(),
+										),
+										track: lane,
+									}),
+								);
+								sortTrackSegments(segments);
+							}),
+						);
+					} else {
+						setProject(
+							"timeline",
+							"maskSegments",
+							produce((segments) => {
+								segments ??= [];
+								segments.push(
+									withSelectedClipAttachment({
+										...defaultMaskSegment(start, end),
+										track: lane,
+									}),
+								);
+								sortTrackSegments(segments);
+							}),
+						);
+					}
+
+					const updated: Array<{ start: number; end: number; track?: number }> =
+						(type === "text"
+							? project.timeline?.textSegments
+							: project.timeline?.maskSegments) ?? [];
+					const newIndex = updated.findIndex(
+						(segment) =>
+							segment.start === start && getSegmentTrack(segment) === lane,
+					);
+					if (newIndex === -1) return;
+
+					// Select right away so the canvas overlay and config sidebar are
+					// ready to use; text additionally opens its inline editor.
+					setEditorState("timeline", "selection", {
+						type,
+						indices: [newIndex],
+					});
+					if (type === "text") {
+						setEditorState("timeline", "pendingTextEdit", newIndex);
+					}
+
+					// Keep the playhead inside the new segment (past any fade-in) so
+					// the preview actually shows what was just added. Clear any stale
+					// hover-scrub time — overlay visibility keys off previewTime first,
+					// and a leftover value could hide the segment we just selected.
+					const pad = Math.min(0.15, length / 4);
+					const target = Math.min(Math.max(time, start + pad), end - pad);
+					if (target !== time) setEditorState("playbackTime", target);
+					setEditorState("previewTime", null);
+				});
+			}
+
+			const mainTrackTargetAtPlayhead = (indices?: readonly number[]) => {
+				const timeline = project.timeline;
+				if (!timeline) return null;
+				const time = editorState.playbackTime;
+				return clipSplitAt(
+					timeline.segments,
+					timeline.transitions,
+					time - heldTimeBefore(holdWindows(timeline.textSegments), time),
+					timeline.mainTrackGaps,
+					indices,
+				);
+			};
+
+			const trimTargetAtPlayhead = () => {
+				const selection = editorState.timeline.selection;
+				if (selection?.type !== "clip") return null;
+				const target = mainTrackTargetAtPlayhead(selection.indices);
+				if (!target) return null;
+				const segment = project.timeline?.segments[target.index];
+				const min = (segment?.timescale ?? 1) / FPS;
+				if (
+					!segment?.id ||
+					target.sourceTime - segment.start < min ||
+					segment.end - target.sourceTime < min
+				)
+					return null;
+				return { ...target, id: segment.id };
+			};
+
+			const splitAtPlayhead = (commit: boolean, clipIndex?: number) => {
+				const time = editorState.playbackTime;
+				const timeline = project.timeline;
+				if (!timeline) return false;
+				const selection = editorState.timeline.selection;
+				if (
+					clipIndex !== undefined ||
+					!selection ||
+					selection.type === "clip"
+				) {
+					const indices =
+						clipIndex === undefined
+							? selection?.type === "clip"
+								? selection.indices
+								: undefined
+							: [clipIndex];
+					if (commit) return projectActions.splitClipSegment(time, indices);
+					return !!mainTrackTargetAtPlayhead(indices);
+				}
+				if (selection.type === "transition") return false;
+				const type = selection.type;
+				const rows = trackSegments(type);
+				const minimum =
+					type === "audio"
+						? MIN_AUDIO_SEGMENT_DURATION
+						: type === "caption"
+							? 0.5
+							: type === "style" || type === "image" || type === "shape"
+								? 0.05
+								: 1;
+				const targets = [...selection.indices]
+					.sort((a, b) => b - a)
+					.flatMap((index) => {
+						const row = rows?.[index];
+						if (!row) return [];
+						const local = time - row.start;
+						return local >= minimum && row.end - time >= minimum
+							? [{ index, local }]
+							: [];
+					});
+				if (!commit || targets.length === 0) return targets.length > 0;
+				const resumeHistory = projectHistory.pause();
+				try {
+					for (const { index, local } of targets) {
+						if (type === "style" || type === "image" || type === "shape")
+							projectActions.splitOverlaySegment(type, index, time);
+						else {
+							const splitters = {
+								audio: projectActions.splitAudioSegment,
+								caption: projectActions.splitCaptionSegment,
+								keyboard: projectActions.splitKeyboardSegment,
+								mask: projectActions.splitMaskSegment,
+								scene: projectActions.splitSceneSegment,
+								text: projectActions.splitTextSegment,
+								zoom: projectActions.splitZoomSegment,
+								"3d": projectActions.splitCamera3DSegment,
+							};
+							splitters[type](index, local);
+						}
+					}
+					setEditorState("previewTime", null);
+				} finally {
+					resumeHistory();
+				}
+				return true;
+			};
+
 			const timelineCommands = {
+				addTrackContent,
+				nextAudioLane,
+				openAudioMaterials,
+				openCaptionInspector() {
+					batch(() => {
+						exitStyleScope();
+						setEditorState("timeline", "selection", null);
+						setEditorState("inspectorTab", "captions");
+						setDialog({ open: false });
+					});
+				},
 				trackSegments,
 				selectSegments,
 				overlayAssociation(type: TimelineTrackType, index: number) {
@@ -3230,38 +3526,47 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					)
 						writeOverlayAttachment(type, index, { ...row.attachment, timing });
 				},
+				canSplitAtPlayhead: () => splitAtPlayhead(false),
+				canTrimAtPlayhead: () => trimTargetAtPlayhead() !== null,
+				trimAtPlayhead(edge: "start" | "end") {
+					const target = trimTargetAtPlayhead();
+					if (!target) return false;
+					return batch(() => {
+						const magnetic = mainTrackMagnetic();
+						if (
+							!projectActions.trimClipAtPosition(
+								target.id,
+								edge,
+								target.sourceTime,
+							)
+						)
+							return false;
+						setEditorState("previewTime", null);
+						const timeline = project.timeline;
+						if (edge === "start" && magnetic && timeline) {
+							const start = clipTimelineOffsets(
+								timeline.segments,
+								timeline.transitions,
+								timeline.mainTrackGaps,
+							)[target.index];
+							setEditorState(
+								"playbackTime",
+								effectiveToOutput(holdWindows(timeline.textSegments), start),
+							);
+						}
+						return true;
+					});
+				},
 				splitAtPlayhead(index?: number) {
-					const time = editorState.previewTime ?? editorState.playbackTime;
-					if (index !== undefined) {
-						projectActions.splitClipSegment(time, index);
-						return;
-					}
+					return splitAtPlayhead(true, index);
+				},
+				canDeleteSelection() {
 					const selection = editorState.timeline.selection;
-					if (
-						selection?.type === "style" ||
-						selection?.type === "image" ||
-						selection?.type === "shape"
-					) {
-						const type = selection.type;
-						const resumeHistory = projectHistory.pause();
-						for (const index of [...selection.indices].sort((a, b) => b - a))
-							projectActions.splitOverlaySegment(type, index, time);
-						resumeHistory();
-					} else if (selection?.type === "3d") {
-						// Only a selected shot the playhead is actually inside can be cut;
-						// anything else falls through to cutting the clip underneath.
-						const segments = project.timeline?.camera3dSegments ?? [];
-						const index = [...selection.indices]
-							.sort((a, b) => b - a)
-							.find((idx) => {
-								const segment = segments[idx];
-								return !!segment && time > segment.start && time < segment.end;
-							});
-						const segment = index === undefined ? undefined : segments[index];
-						if (index !== undefined && segment)
-							projectActions.splitCamera3DSegment(index, time - segment.start);
-						else projectActions.splitClipSegment(time);
-					} else projectActions.splitClipSegment(time);
+					return (
+						!!selection &&
+						(selection.type !== "clip" ||
+							(project.timeline?.segments.length ?? 0) > 1)
+					);
 				},
 				deleteSelection(clipIndex?: number) {
 					if (clipIndex !== undefined) {

@@ -1177,7 +1177,10 @@ async fn ordinary_editor_scrubs_and_plays_main_track_gaps() {
             ],
             "mainTrackGaps": {"beforeClip": {"first": 0.5, "second": 0.5}, "trailing": 0.5},
             "zoomSegments": [],
-            "imageSegments": [{"path": "overlay.png", "start": 1.15, "end": 1.4}]
+            "imageSegments": [
+                {"path": "overlay.png", "start": 1.15, "end": 1.4},
+                {"path": "overlay.png", "start": 2.25, "end": 2.5}
+            ]
         }))
         .unwrap(),
     );
@@ -1222,7 +1225,7 @@ async fn ordinary_editor_scrubs_and_plays_main_track_gaps() {
                 &frame.data[offset..offset + 4]
             };
             let background = [12, 45, 150, 255];
-            let center = if (23..28).contains(&index) {
+            let center = if (23..28).contains(&index) || (45..50).contains(&index) {
                 [255, 225, 0, 255]
             } else {
                 background
@@ -1257,7 +1260,7 @@ async fn ordinary_editor_scrubs_and_plays_main_track_gaps() {
             .await
             .unwrap();
         tokio::time::timeout(Duration::from_secs(10), async {
-            while !matches!(*playback.receive_event().await, crate::PlaybackEvent::Stop) {}
+            while !playback.receive_event().await.is_finished() {}
         })
         .await
         .unwrap();
@@ -1278,6 +1281,23 @@ async fn ordinary_editor_scrubs_and_plays_main_track_gaps() {
         }
         eprintln!("Main-track gap playback from {start}: {frames:?}");
     }
+    fixture
+        .project
+        .timeline
+        .as_mut()
+        .unwrap()
+        .image_segments
+        .truncate(1);
+    editor.project_config.0.send(fixture.project).unwrap();
+    assert_eq!(editor.get_total_frames(fps), 40);
+    editor.preview_tx.send(Some((49, fps, resolution))).unwrap();
+    let (frame, layout) = tokio::time::timeout(Duration::from_secs(5), receive.recv())
+        .await
+        .unwrap()
+        .unwrap();
+    assert_eq!(frame.frame_number, 39);
+    verify(&frame, layout);
+
     editor.dispose().await;
 }
 

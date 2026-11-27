@@ -13,6 +13,12 @@ export type HoldWindow = [number, number];
 export type HoldSourceSegment = Pick<TextSegment, "start" | "end"> &
 	Partial<Pick<TextSegment, "enabled" | "layout">>;
 
+export function validContentRange(start: number, end: number) {
+	return (
+		Number.isFinite(start) && Number.isFinite(end) && end > start && end > 0
+	);
+}
+
 export function holdWindows(
 	textSegments: readonly HoldSourceSegment[] | null | undefined,
 ): HoldWindow[] {
@@ -22,7 +28,7 @@ export function holdWindows(
 			(segment) =>
 				segment.enabled !== false &&
 				segment.layout === "fullscreen" &&
-				segment.end > segment.start,
+				validContentRange(segment.start, segment.end),
 		)
 		.map((segment): HoldWindow => [segment.start, segment.end])
 		.sort((a, b) => a[0] - b[0]);
@@ -36,10 +42,6 @@ export function holdWindows(
 		}
 	}
 	return merged;
-}
-
-export function totalHeldDuration(holds: HoldWindow[]): number {
-	return holds.reduce((sum, [start, end]) => sum + (end - start), 0);
 }
 
 export function heldTimeBefore(holds: HoldWindow[], time: number): number {

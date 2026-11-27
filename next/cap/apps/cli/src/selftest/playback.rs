@@ -475,7 +475,7 @@ async fn measure_playback(
     let wait = tokio::time::timeout(expected_duration + PLAYBACK_EXTRA_TIMEOUT, async {
         loop {
             let event = *handle.receive_event().await;
-            if matches!(event, cap_editor::PlaybackEvent::Stop) {
+            if event.is_finished() {
                 break;
             }
         }

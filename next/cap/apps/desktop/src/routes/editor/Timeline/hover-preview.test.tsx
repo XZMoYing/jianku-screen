@@ -47,6 +47,7 @@ function fixture() {
 			playbackIntent: () => playing,
 			metrics: () => ({ left: 100, width: 800 }),
 			position: () => 0,
+			end: () => 7,
 			secondsPerPixel: () => 0.01,
 			startSnapPixels: 8,
 			setPreviewTime: (value) => trace.push(value),
@@ -134,4 +135,10 @@ it("does not scrub during playback and recovers after window blur", () => {
 	f.play();
 	mouse(f.button, "mousemove", 0, 500);
 	expect(f.trace).toEqual([6]);
+});
+it("ignores ruler padding beyond the current project end", () => {
+	const f = fixture();
+	mouse(f.container, "mousemove", 0, 780);
+	mouse(f.container, "mousemove", 0, 850);
+	expect(f.trace).toEqual([6.8, null]);
 });
