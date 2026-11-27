@@ -712,6 +712,7 @@ export function ClipTrack(props: Pick<ComponentProps<"div">, "ref">) {
 		clipGapBefore(segments()[index], project.timeline?.mainTrackGaps) === 0;
 
 	function editTransition(index: number) {
+		if (!transitionAt(index)) return;
 		setEditorState("timeline", "selection", { type: "transition", index });
 	}
 
@@ -1770,38 +1771,37 @@ export function ClipTrack(props: Pick<ComponentProps<"div">, "ref">) {
 								</Show>
 
 								<Show when={transitionAt(i())}>
-									{(transition) => (
-										<Popover
-											placement="top"
-											gutter={8}
-											open={
-												editorState.timeline.selection?.type === "transition" &&
-												editorState.timeline.selection.index === i()
-											}
-											onOpenChange={(open) =>
-												setEditorState(
-													"timeline",
-													"selection",
-													open ? { type: "transition", index: i() } : null,
-												)
-											}
-										>
-											<Popover.Trigger
+									{(transition) => {
+										const selected = () =>
+											editorState.timeline.selection?.type === "transition" &&
+											editorState.timeline.selection.index === i();
+										const label = () =>
+											localize(
+												CLIP_TRANSITION_OPTIONS.find(
+													([type]) => type === transition().type,
+												)?.[1] ?? "Clip transition",
+											);
+										return (
+											<button
+												type="button"
 												data-transition
+												aria-pressed={selected()}
 												class={cx(
 													"absolute inset-y-0 left-0 z-[5] overflow-hidden border-x border-ed-accent/60 bg-ed-accent/20 transition-colors hover:bg-ed-accent/35",
-													editorState.timeline.selection?.type ===
-														"transition" &&
-														editorState.timeline.selection.index === i() &&
+													selected() &&
 														"bg-ed-accent/45 ring-1 ring-inset ring-ed-accent",
 												)}
 												style={{
 													width: `${transition().duration / secsPerPixel()}px`,
 													"background-image":
-														"linear-gradient(135deg, transparent 42%, rgb(96 165 250 / 0.7) 43%, rgb(96 165 250 / 0.7) 57%, transparent 58%)",
+														"linear-gradient(135deg, transparent 42%, color-mix(in srgb, var(--ed-accent) 60%, transparent) 43%, color-mix(in srgb, var(--ed-accent) 60%, transparent) 57%, transparent 58%)",
 												}}
-												title={`${transition().type === "cross-fade" ? localize("交叉淡化") : localize("黑场淡化")} · ${transition().duration.toFixed(2)}s`}
+												title={`${label()} · ${transition().duration.toFixed(2)}s`}
 												onMouseDown={(event) => event.stopPropagation()}
+												onClick={(event) => {
+													event.stopPropagation();
+													editTransition(i());
+												}}
 												onContextMenu={(event) =>
 													showTransitionMenu(event, i())
 												}
@@ -1813,72 +1813,9 @@ export function ClipTrack(props: Pick<ComponentProps<"div">, "ref">) {
 												<span class="sr-only">
 													{localize("Edit clip transition")}
 												</span>
-											</Popover.Trigger>
-											<Popover.Portal>
-												<Popover.Content
-													onMouseDown={(event) => event.stopPropagation()}
-													class="jk-menu-surface z-50 flex w-64 flex-col gap-3 rounded-xl bg-ed-card p-3 text-ed-text-1 shadow-ed-pop outline-hidden"
-												>
-													<div class="flex items-center justify-between">
-														<span class="text-sm font-medium">
-															{localize("Clip transition")}
-														</span>
-														<span class="text-xs tabular-nums text-gray-10">
-															{transition().duration.toFixed(2)}s
-														</span>
-													</div>
-													<div class="grid grid-cols-2 gap-1 rounded-lg bg-gray-2 p-1">
-														{CLIP_TRANSITION_OPTIONS.map(([type, label]) => (
-															<button
-																type="button"
-																aria-pressed={transition().type === type}
-																class={cx(
-																	"rounded-md px-2 py-1.5 text-xs transition-colors",
-																	transition().type === type
-																		? "bg-gray-4 text-gray-12"
-																		: "text-gray-10 hover:text-gray-12",
-																)}
-																onClick={() =>
-																	projectActions.setClipTransition(i(), {
-																		type,
-																		duration: transition().duration,
-																	})
-																}
-															>
-																{localize(label)}
-															</button>
-														))}
-													</div>
-													<input
-														type="range"
-														aria-label={localize("Transition duration")}
-														min={MIN_CLIP_TRANSITION_DURATION}
-														max={maxTransitionDuration(
-															segments()[i() - 1],
-															segment(),
-														)}
-														step={0.05}
-														value={transition().duration}
-														onChange={(event) =>
-															projectActions.setClipTransition(i(), {
-																type: transition().type,
-																duration: event.currentTarget.valueAsNumber,
-															})
-														}
-													/>
-													<button
-														type="button"
-														class="rounded-lg border border-red-500/30 px-3 py-2 text-xs text-red-400 transition-colors hover:bg-red-500/10"
-														onClick={() =>
-															projectActions.deleteClipTransition(i())
-														}
-													>
-														{localize("Remove transition")}
-													</button>
-												</Popover.Content>
-											</Popover.Portal>
-										</Popover>
-									)}
+											</button>
+										);
+									}}
 								</Show>
 
 								<SegmentHandle

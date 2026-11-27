@@ -4,12 +4,14 @@ import { render } from "solid-js/web";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { ClipInspector } from "./ClipInspector";
 import { ClipsSidebar } from "./ClipsSidebar";
+import { TransitionInspector } from "./TransitionInspector";
 
 const state = vi.hoisted(() => ({ context: {} as object }));
 vi.mock("./context", () => ({ useEditorContext: () => state.context }));
 vi.mock("~/utils/i18n", () => ({ t: (text: string) => text }));
 vi.mock("~/utils/tauri", () => ({ commands: {} }));
 vi.mock("~/utils/fonts", () => ({ listSystemFonts: async () => [] }));
+vi.mock("@tauri-apps/plugin-os", () => ({ type: () => "macos" }));
 vi.mock("./AudioLibrary", () => ({
 	AudioLibraryPanel: (props: { mode: { type: string; index?: number } }) => (
 		<output data-audio-mode={props.mode.type}>{props.mode.index}</output>
@@ -42,6 +44,7 @@ beforeEach(() => {
 		"ResizeObserver",
 		class {
 			observe() {}
+			unobserve() {}
 			disconnect() {}
 		},
 	);
@@ -218,6 +221,36 @@ it("shows source geometry and dispatches speed only for the selected clip", () =
 	expect(twice).toBeDefined();
 	twice?.click();
 	expect(setClipSegmentTimescale).toHaveBeenCalledWith(1, 2);
+});
+
+it("edits the selected transition in the inspector without mounting a menu", () => {
+	const [project] = createStore({
+		timeline: {
+			segments: clips(),
+			transitions: [{ segmentIndex: 1, type: "cross-fade", duration: 0.5 }],
+		},
+	});
+	const setClipTransition = vi.fn();
+	const deleteClipTransition = vi.fn();
+	state.context = {
+		project,
+		projectActions: { setClipTransition, deleteClipTransition },
+	};
+	dispose = render(() => <TransitionInspector index={1} />, document.body);
+	expect(document.querySelector('[role="slider"]')).not.toBeNull();
+	expect(document.body.textContent).toContain("Transition duration");
+	const button = (text: string) =>
+		[...document.querySelectorAll("button")].find(
+			(item) => item.textContent?.trim() === text,
+		);
+	button("黑场淡化")?.click();
+	expect(setClipTransition).toHaveBeenCalledWith(1, {
+		type: "fade-through-black",
+		duration: 0.5,
+	});
+	button("Remove transition")?.click();
+	expect(deleteClipTransition).toHaveBeenCalledWith(1);
+	expect(document.querySelector('[role="dialog"]')).toBeNull();
 });
 it("keeps the dragged identity across list changes and uses the release position", () => {
 	const { cards, setProject, moveClipSegment } = mount();

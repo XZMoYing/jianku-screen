@@ -68,7 +68,11 @@ import {
 import { ClipInspector } from "./ClipInspector";
 import { ColorCorrectionSection } from "./ColorCorrectionSection";
 import { syncCaptionWordsWithText } from "./captions";
-import { type ClipTransition, clipSourceTimeAt } from "./clip-transitions";
+import {
+	type ClipTransition,
+	clipSourceTimeAt,
+	getClipTransition,
+} from "./clip-transitions";
 import { EditorStyleContext, useEditorContext } from "./context";
 import { recordedCursorFamily } from "./cursor-style";
 import { InspectorSections } from "./InspectorSections";
@@ -90,6 +94,7 @@ import {
 import { selectedSegmentLabel } from "./selection-label";
 import { ShapeSegmentConfig } from "./shape-segment-config";
 import { StyleGroupToggle, StyleSegmentConfig } from "./style-segment-config";
+import { TransitionInspector } from "./TransitionInspector";
 import type { TextSegment } from "./text";
 import { TextSegmentConfig } from "./text-segment-config";
 import type { Camera3DSegment } from "./three-d";
@@ -539,6 +544,19 @@ function ConfigSidebarContent() {
 	const sidebarSelection = () => {
 		const selection = editorState.timeline.selection;
 		if (!selection || selection.type === "style") return null;
+		if (selection.type === "transition") {
+			const timeline = project.timeline;
+			if (
+				!timeline ||
+				!getClipTransition(
+					timeline.segments,
+					timeline.transitions,
+					selection.index,
+					timeline.mainTrackGaps,
+				)
+			)
+				return null;
+		}
 		if (
 			selection.type === "clip" &&
 			!selection.indices.some((index) => project.timeline?.segments[index]?.id)
@@ -932,6 +950,14 @@ function ConfigSidebarContent() {
 								})()}
 							>
 								{(indices) => <ClipInspector indices={indices()} />}
+							</Show>
+							<Show
+								when={(() => {
+									const active = selection();
+									return active.type === "transition" ? active : null;
+								})()}
+							>
+								{(active) => <TransitionInspector index={active().index} />}
 							</Show>
 							<Show when={selection().type === "image"}>
 								<For

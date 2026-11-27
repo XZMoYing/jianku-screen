@@ -28,6 +28,7 @@
 	"标注形状": "Annotation shapes",
 	"文字模板": "Text templates",
 	"转场位置": "Transition position",
+	"转场类型": "Transition type",
 	"相邻视频片段之间可以添加转场。": "Transitions can be added between adjacent video clips.",
 	"添加跟随光标的缩放": "Add cursor-following zoom",
 	"添加固定焦点缩放": "Add fixed-point zoom",
