@@ -156,27 +156,24 @@ function nestedFrameworks(directory) {
 
 function signMacBundle() {
 	if (process.platform !== "darwin") return;
-	const available = spawnSync(
-		"security",
-		["find-identity", "-v", "-p", "codesigning"],
-		{
-			env: environment,
-			encoding: "utf8",
-		},
-	);
+	const loginKeychain = path.join(homedir(), "Library/Keychains/login.keychain-db");
+	const loginIdentities = existsSync(loginKeychain)
+		? spawnSync("security", ["find-identity", "-p", "codesigning", loginKeychain], {
+				env: environment,
+				encoding: "utf8",
+			})
+		: null;
+	const localSignMatch =
+		loginIdentities?.status === 0
+			? loginIdentities.stdout.match(/([0-9A-F]{40})\s+"JiankuLocalSign"/)
+			: null;
 	const identity =
 		environment.APPLE_SIGNING_IDENTITY ??
-		(available.status === 0 && available.stdout.includes('"JiankuDev"')
-			? "JiankuDev"
-			: "-");
-	const localKeychain = path.join(
-		homedir(),
-		"Library/Keychains/jianku-dev.keychain-db",
-	);
+		(localSignMatch ? localSignMatch[1] : "-");
 	const keychain =
 		environment.JIANKU_SIGNING_KEYCHAIN ??
-		(identity === "JiankuDev" && existsSync(localKeychain)
-			? localKeychain
+		(localSignMatch && identity === localSignMatch[1]
+			? loginKeychain
 			: undefined);
 	const app = path.join(
 		root,
@@ -184,10 +181,7 @@ function signMacBundle() {
 		profile,
 		"bundle/macos/Jianku Screen Next.app",
 	);
-	// Sign framework containers explicitly: Tauri signs their dylibs, but not every container.
-	removeSigningTemps(app);
-	const deviceCapture = path.join(app, "Contents/MacOS/jianku-device-capture");
-	if (existsSync(deviceCapture)) {
+	const signTarget = (target, extraArgs = []) => {
 		run(
 			"codesign",
 			[
@@ -195,44 +189,58 @@ function signMacBundle() {
 				"--sign",
 				identity,
 				...(keychain ? ["--keychain", keychain] : []),
-				"--identifier",
-				"com.jianku.screen.next.devicecapture",
-				deviceCapture,
+				...extraArgs,
+				target,
 			],
 			root,
 			60_000,
 		);
+	};
+	// Sign nested dylibs, framework containers, sidecars, and main app inside-out.
+	removeSigningTemps(app);
+	const frameworksDir = path.join(app, "Contents/Frameworks");
+	if (existsSync(frameworksDir)) {
+		const walkDylibs = (dir) => {
+			for (const entry of readdirSync(dir, { withFileTypes: true })) {
+				const full = path.join(dir, entry.name);
+				if (entry.isDirectory()) walkDylibs(full);
+				else if (entry.isFile() && entry.name.endsWith(".dylib")) {
+					signTarget(full);
+				}
+			}
+		};
+		walkDylibs(frameworksDir);
 	}
 	for (const framework of nestedFrameworks(app)) {
-		run(
-			"codesign",
-			[
-				"--force",
-				"--sign",
-				identity,
-				...(keychain ? ["--keychain", keychain] : []),
-				framework,
-			],
-			root,
-			60_000,
-		);
+		signTarget(framework);
 	}
-	run(
-		"codesign",
-		[
-			"--force",
-			"--sign",
-			identity,
-			...(keychain ? ["--keychain", keychain] : []),
+	for (const bin of [
+		"cap-muxer",
+		"cap-exporter",
+		"cap-cli",
+		"jianku-android-capture",
+	]) {
+		const binPath = path.join(app, "Contents/MacOS", bin);
+		if (existsSync(binPath)) signTarget(binPath);
+	}
+	const deviceCapture = path.join(app, "Contents/MacOS/jianku-device-capture");
+	if (existsSync(deviceCapture)) {
+		signTarget(deviceCapture, [
 			"--identifier",
-			"com.jianku.screen.next",
-			"--entitlements",
-			path.join(desktop, "src-tauri/Entitlements.plist"),
-			app,
-		],
-		root,
-		60_000,
-	);
+			"com.jianku.screen.next.devicecapture",
+		]);
+	}
+	const entitlements = path.join(desktop, "src-tauri/Entitlements.plist");
+	const mainBin = path.join(app, "Contents/MacOS/Jianku Screen Next");
+	if (existsSync(mainBin)) {
+		signTarget(mainBin, ["--entitlements", entitlements]);
+	}
+	signTarget(app, [
+		"--identifier",
+		"com.jianku.screen.next",
+		"--entitlements",
+		entitlements,
+	]);
 	run("codesign", ["--verify", "--deep", "--strict", app]);
 }
 
