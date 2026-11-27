@@ -30,13 +30,7 @@ export async function applyMacOSWindowMaterial(material: MacOSWindowMaterial) {
 	const majorVersion = macOSMajorVersion() ?? 0;
 	const visualSystem = majorVersion >= 26 ? "liquid-glass" : "vibrancy";
 	const radius =
-		visualSystem === "liquid-glass"
-			? material === "settings"
-				? 26
-				: material === "teleprompter"
-					? 22
-					: 16
-			: 16;
+		visualSystem === "liquid-glass" && material === "teleprompter" ? 22 : 16;
 	const root = document.documentElement;
 	root.dataset.macosNativeMaterial = material;
 	root.dataset.macosVisualSystem = visualSystem;

@@ -43,6 +43,10 @@ interface WakeMessage {
 	type: "wake";
 }
 
+interface RepaintMessage {
+	type: "repaint";
+}
+
 interface ReadyMessage {
 	type: "ready";
 }
@@ -99,7 +103,8 @@ type IncomingMessage =
 	| InitSharedBufferMessage
 	| CleanupMessage
 	| ResetFrameStateMessage
-	| WakeMessage;
+	| WakeMessage
+	| RepaintMessage;
 
 interface FrameTiming {
 	frameNumber: number;
@@ -162,6 +167,7 @@ let cachedHeight = 0;
 let lastRawFrameData: Uint8ClampedArray | null = null;
 let lastRawFrameWidth = 0;
 let lastRawFrameHeight = 0;
+let lastRawFrameStride = 0;
 
 let consumer: Consumer | null = null;
 let useSharedBuffer = false;
@@ -772,6 +778,16 @@ function renderLoop() {
 					frame.fullRange,
 				);
 			} else {
+				const frameLen = frame.strideBytes * frame.height;
+				if (frame.data.byteLength >= frameLen) {
+					if (!lastRawFrameData || lastRawFrameData.length < frameLen) {
+						lastRawFrameData = new Uint8ClampedArray(frameLen);
+					}
+					lastRawFrameData.set(frame.data.subarray(0, frameLen));
+					lastRawFrameWidth = frame.width;
+					lastRawFrameHeight = frame.height;
+					lastRawFrameStride = frame.strideBytes;
+				}
 				renderFrameWebGPU(
 					webgpuRenderer,
 					frame.data,
@@ -830,7 +846,7 @@ function startRenderLoop() {
 	if (!hasRenderer) return;
 
 	rafRunning = true;
-	if (renderOnArrival && !useSharedBuffer) {
+	if (renderOnArrival && !useSharedBuffer && renderMode !== "webgpu") {
 		renderLoop();
 	} else {
 		_rafId = requestAnimationFrame(renderLoop);
@@ -1166,6 +1182,29 @@ self.onmessage = async (e: MessageEvent<IncomingMessage>) => {
 
 	if (e.data.type === "wake") {
 		startRenderLoop();
+		return;
+	}
+
+	if (e.data.type === "repaint") {
+		requestAnimationFrame(() => {
+			if (
+				renderMode === "webgpu" &&
+				webgpuRenderer &&
+				lastRawFrameData &&
+				lastRawFrameWidth > 0 &&
+				lastRawFrameHeight > 0
+			) {
+				renderFrameWebGPU(
+					webgpuRenderer,
+					lastRawFrameData,
+					lastRawFrameWidth,
+					lastRawFrameHeight,
+					lastRawFrameStride || lastRawFrameWidth * 4,
+				);
+			} else if (renderMode === "canvas2d" && lastImageData && offscreenCtx) {
+				offscreenCtx.putImageData(lastImageData, 0, 0);
+			}
+		});
 		return;
 	}
 

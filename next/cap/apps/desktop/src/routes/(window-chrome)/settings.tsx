@@ -233,13 +233,8 @@ export default function Settings(props: RouteSectionProps) {
 		},
 		{
 			href: "transcription",
-			name: "转录",
+			name: "转写",
 			icon: IconCapCaptions,
-		},
-		{
-			href: "integrations",
-			name: "集成",
-			icon: IconLucideUnplug,
 		},
 		{
 			href: "license",

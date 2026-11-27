@@ -78,9 +78,7 @@ import { Section, SectionCard, SettingsPageContent } from "./Setting";
 const ALL_TRIGGERS: Trigger[] = [
 	"screenshotTaken",
 	"studioRecordingFinished",
-	"instantRecordingFinished",
 	"recordingStarted",
-	"uploadCompleted",
 	"videoImported",
 	"recordingDeleted",
 ];
@@ -256,20 +254,20 @@ const TEMPLATES: Template[] = [
 	},
 	{
 		id: "webhook-share",
-		name: "Tell Slack when you share something",
-		description: "Send the share link to Slack, Discord, or your own webhook.",
+		name: "录制完成后发送 Webhook 通知",
+		description: "将录制完成通知发送到自定义 Webhook 接口。",
 		icon: IconLucideWebhook,
 		build: () =>
 			buildRule({
-				name: "Tell Slack when you share something",
-				trigger: "instantRecordingFinished",
+				name: "录制完成后发送 Webhook 通知",
+				trigger: "studioRecordingFinished",
 				actions: [
 					{
 						type: "webhook",
 						url: "",
 						method: "POST",
 						headers: {},
-						bodyTemplate: '{"text":"{share_link}"}',
+						bodyTemplate: '{"project":"{project_path}"}',
 					},
 				],
 			}),
@@ -914,10 +912,7 @@ function ConditionValue(props: {
 			return (
 				<SelectInput<AutomationRecordingMode>
 					value={c.mode}
-					options={[
-						{ value: "studio", label: "Studio" },
-						{ value: "instant", label: "Instant" },
-					]}
+					options={[{ value: "studio", label: localize("录制模式") }]}
 					onChange={(v) =>
 						props.onChange((cond) => {
 							if (cond.type === "recordingModeIs") cond.mode = v;

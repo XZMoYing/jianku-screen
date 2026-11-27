@@ -1772,5 +1772,7 @@
 	"End Y": "终点 Y",
 	"Add arrows, highlights, rectangles, or step badges": "添加箭头、高亮、方框或步骤序号标注",
 	"· Add shape": "· 添加图形",
-	"Add arrows, highlights, rectangles, and step badges.": "在画面上添加箭头、高亮、矩形或步骤序号标注。"
+	"Add arrows, highlights, rectangles, and step badges.": "在画面上添加箭头、高亮、矩形或步骤序号标注。",
+	"Check export resources": "检查导出资源",
+	"Proceed anyway": "仍然继续"
 }

@@ -304,9 +304,27 @@ fn default_transcription_hints() -> Vec<String> {
     vec![
         "简库镜传".to_string(),
         "TypeScript".to_string(),
-        "My Brand Name".to_string(),
-        "mywebsite.com".to_string(),
+        "我的品牌名".to_string(),
+        "example.com".to_string(),
     ]
+}
+
+fn sanitize_legacy_transcription_hints(hints: &mut Vec<String>) {
+    let has_legacy_default = hints.iter().any(|h| h == "Cap")
+        && hints
+            .iter()
+            .any(|h| h == "My Brand Name" || h == "mywebsite.com");
+    if !has_legacy_default {
+        return;
+    }
+    for hint in hints.iter_mut() {
+        match hint.as_str() {
+            "Cap" => *hint = "简库镜传".to_string(),
+            "My Brand Name" => *hint = "我的品牌名".to_string(),
+            "mywebsite.com" => *hint = "example.com".to_string(),
+            _ => {}
+        }
+    }
 }
 
 fn default_server_url() -> String {
@@ -402,8 +420,9 @@ impl GeneralSettingsSnapshot {
             });
         };
         if raw.is_object()
-            && let Ok(settings) = serde_json::from_value(raw.clone())
+            && let Ok(mut settings) = serde_json::from_value::<GeneralSettingsStore>(raw.clone())
         {
+            sanitize_legacy_transcription_hints(&mut settings.transcription_hints);
             return Ok(Self {
                 original,
                 settings,

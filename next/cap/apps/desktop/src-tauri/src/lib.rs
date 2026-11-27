@@ -7175,6 +7175,7 @@ fn specta_builder() -> tauri_specta::Builder {
             reset_recordings_folder,
             recordings_locations::count_recordings_to_migrate,
             recordings_locations::migrate_recordings_to_current_dir,
+            recordings_locations::export_recording_projects,
             set_camera_preview_state,
             set_camera_window_position,
             ignore_camera_window_position,

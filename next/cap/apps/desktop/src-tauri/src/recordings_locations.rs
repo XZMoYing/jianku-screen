@@ -402,6 +402,107 @@ fn copy_verify_delete(src: &Path, dest_dir: &Path, unique: &str) -> Result<PathB
     Ok(target)
 }
 
+#[derive(serde::Serialize, specta::Type, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct BatchExportProjectsResult {
+    pub export_dir: String,
+    pub exported_count: u32,
+    pub failed: Vec<String>,
+}
+
+pub fn export_recording_projects_inner(
+    project_paths: &[PathBuf],
+    destination_root: &Path,
+    folder_name: &str,
+) -> Result<BatchExportProjectsResult, String> {
+    if project_paths.is_empty() {
+        return Err("请先选择至少一个录制工程".to_string());
+    }
+    if !destination_root.exists() || !destination_root.is_dir() {
+        return Err("导出目标文件夹不存在或不可访问".to_string());
+    }
+
+    let unique_folder = cap_utils::ensure_unique_filename(folder_name, destination_root)?;
+    let export_dir = destination_root.join(&unique_folder);
+    std::fs::create_dir_all(&export_dir)
+        .map_err(|e| format!("无法创建导出文件夹 {export_dir:?}: {e}"))?;
+
+    let export_canonical = export_dir
+        .canonicalize()
+        .unwrap_or_else(|_| export_dir.clone());
+    let mut exported_count = 0u32;
+    let mut failed = Vec::new();
+
+    for src in project_paths {
+        if !src.exists() || !src.is_dir() {
+            failed.push(format!("找不到录制工程：{}", src.display()));
+            continue;
+        }
+        let src_canonical = src.canonicalize().unwrap_or_else(|_| src.clone());
+        if export_canonical.starts_with(&src_canonical) {
+            failed.push(format!("无法导出到工程内部目录：{}", src.display()));
+            continue;
+        }
+        let Some(base_name) = src.file_name().and_then(|n| n.to_str()) else {
+            failed.push(format!("工程目录名无效：{}", src.display()));
+            continue;
+        };
+        let unique_name = match cap_utils::ensure_unique_filename(base_name, &export_dir) {
+            Ok(name) => name,
+            Err(err) => {
+                failed.push(format!("{base_name}: {err}"));
+                continue;
+            }
+        };
+        let dest = export_dir.join(unique_name);
+        match copy_dir_recursive(src, &dest) {
+            Ok(()) => exported_count += 1,
+            Err(err) => {
+                let _ = std::fs::remove_dir_all(&dest);
+                failed.push(format!("{base_name}: {err}"));
+            }
+        }
+    }
+
+    if exported_count == 0 {
+        let _ = std::fs::remove_dir_all(&export_dir);
+        return Err(if failed.is_empty() {
+            "未能导出任何录制工程".to_string()
+        } else {
+            failed.join("\n")
+        });
+    }
+
+    Ok(BatchExportProjectsResult {
+        export_dir: export_dir.to_string_lossy().to_string(),
+        exported_count,
+        failed,
+    })
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn export_recording_projects(
+    app: AppHandle,
+    project_paths: Vec<String>,
+    destination_dir: String,
+) -> Result<BatchExportProjectsResult, String> {
+    let paths: Vec<PathBuf> = project_paths.into_iter().map(PathBuf::from).collect();
+    let dest = PathBuf::from(destination_dir);
+    let zh = !crate::interface_language::english(&app);
+    let timestamp = chrono::Local::now().format("%Y-%m-%d %H.%M.%S");
+    let folder_name = if zh {
+        format!("简库录制工程导出 {timestamp}")
+    } else {
+        format!("Jianku Projects Export {timestamp}")
+    };
+    tokio::task::spawn_blocking(move || {
+        export_recording_projects_inner(&paths, &dest, &folder_name)
+    })
+    .await
+    .map_err(|e| format!("导出任务异常中止：{e}"))?
+}
+
 fn copy_dir_recursive(src: &Path, dest: &Path) -> Result<(), String> {
     std::fs::create_dir_all(dest).map_err(|e| format!("Failed to create {dest:?}: {e}"))?;
 
@@ -651,5 +752,39 @@ mod tests {
                 .previous_recordings_paths
                 .contains(&format!("/dir{}", MAX_PREVIOUS_PATHS + 4))
         );
+    }
+
+    #[test]
+    fn batch_export_projects_creates_subfolder_and_copies_all_bundles() {
+        let tmp = tempfile::tempdir().unwrap();
+        let src_a = make_project(
+            tmp.path(),
+            "demo-1.jks",
+            &[("recording-meta.json", "{}"), ("content/video.mp4", "aaa")],
+        );
+        let src_b = make_project(
+            tmp.path(),
+            "demo-2.jks",
+            &[("recording-meta.json", "{}"), ("content/video.mp4", "bbb")],
+        );
+        let export_root = tmp.path().join("exports");
+        std::fs::create_dir_all(&export_root).unwrap();
+
+        let result = export_recording_projects_inner(
+            &[src_a.clone(), src_b.clone()],
+            &export_root,
+            "简库录制工程导出 2026-11-27",
+        )
+        .unwrap();
+
+        assert_eq!(result.exported_count, 2);
+        assert!(result.failed.is_empty());
+        let out_dir = PathBuf::from(&result.export_dir);
+        assert!(out_dir.starts_with(&export_root));
+        assert!(out_dir.join("demo-1.jks/content/video.mp4").exists());
+        assert!(out_dir.join("demo-2.jks/content/video.mp4").exists());
+        // Originals remain untouched
+        assert!(src_a.join("content/video.mp4").exists());
+        assert!(src_b.join("content/video.mp4").exists());
     }
 }

@@ -10,6 +10,7 @@ import { type as ostype } from "@tauri-apps/plugin-os";
 import { cx } from "cva";
 import {
 	createEffect,
+	createMemo,
 	createSignal,
 	For,
 	type JSX,
@@ -17,6 +18,7 @@ import {
 	mergeProps,
 	on,
 	onCleanup,
+	onMount,
 	type ParentProps,
 	Show,
 	Switch,
@@ -1125,7 +1127,7 @@ export function ExportPage() {
 					</div>
 				</div>
 
-				<div class="w-[400px] shrink-0 border-l border-ed-line flex flex-col bg-ed-card">
+				<div class="jk-export-sidebar w-[400px] shrink-0 border-l border-ed-line flex flex-col bg-ed-card">
 					<div class="custom-scroll flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 flex flex-col gap-5">
 						<ExportSection
 							name={localize("Destination")}
@@ -1719,7 +1721,9 @@ export function ExportPage() {
 														}, 2000);
 														await commands.copyVideoToClipboard(path);
 														toast.success(
-															`${exportedAssetLabel()} copied to clipboard`,
+															localize("{asset}已复制到剪贴板", {
+																asset: exportedAssetLabel(),
+															}),
 														);
 													}
 												}}
@@ -1753,7 +1757,7 @@ export function ExportPage() {
 									<span class="font-semibold text-ed-text-1">
 										{localize("Tip:")}
 									</span>{" "}
-									{localize("下次可使用实时模式边录边看，无需等待导出。")}
+									{localize("导出完成后可直接打开文件，或一键复制到剪贴板。")}
 								</p>
 							</Show>
 						</div>
@@ -1895,40 +1899,178 @@ function ExportStat(props: {
 	);
 }
 
+function buildWavyArcPath(
+	cx: number,
+	cy: number,
+	radius: number,
+	amplitude: number,
+	waves: number,
+	startAngle: number,
+	sweepAngle: number,
+	phase: number,
+) {
+	if (sweepAngle <= 0.01) return "";
+	const steps = Math.max(24, Math.ceil((sweepAngle / (Math.PI * 2)) * 180));
+	const parts: string[] = [];
+	for (let i = 0; i <= steps; i++) {
+		const t = i / steps;
+		const angle = startAngle + sweepAngle * t;
+		const r = radius + amplitude * Math.sin(waves * angle - phase);
+		const x = cx + r * Math.cos(angle);
+		const y = cy + r * Math.sin(angle);
+		parts.push(`${i === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`);
+	}
+	return parts.join(" ");
+}
+
+function buildSmoothArcPath(
+	cx: number,
+	cy: number,
+	radius: number,
+	startAngle: number,
+	sweepAngle: number,
+) {
+	if (sweepAngle <= 0.02) return "";
+	if (sweepAngle >= Math.PI * 2 - 0.02) {
+		const x1 = cx + radius * Math.cos(startAngle);
+		const y1 = cy + radius * Math.sin(startAngle);
+		const x2 = cx + radius * Math.cos(startAngle + Math.PI);
+		const y2 = cy + radius * Math.sin(startAngle + Math.PI);
+		return `M${x1.toFixed(2)} ${y1.toFixed(2)} A${radius} ${radius} 0 1 1 ${x2.toFixed(2)} ${y2.toFixed(2)} A${radius} ${radius} 0 1 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
+	}
+	const endAngle = startAngle + sweepAngle;
+	const x1 = cx + radius * Math.cos(startAngle);
+	const y1 = cy + radius * Math.sin(startAngle);
+	const x2 = cx + radius * Math.cos(endAngle);
+	const y2 = cy + radius * Math.sin(endAngle);
+	const largeArc = sweepAngle > Math.PI ? 1 : 0;
+	return `M${x1.toFixed(2)} ${y1.toFixed(2)} A${radius} ${radius} 0 ${largeArc} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
+}
+
 function ProgressRing(props: { percent?: number; indeterminate?: boolean }) {
 	const pct = () => Math.max(0, Math.min(100, props.percent ?? 0));
+	const [phase, setPhase] = createSignal(0);
+	const [spin, setSpin] = createSignal(0);
+
+	onMount(() => {
+		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+		let raf = 0;
+		let last = performance.now();
+		const step = (now: number) => {
+			const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
+			last = now;
+			setPhase((p) => (p + dt * 4.2) % (Math.PI * 200));
+			setSpin((s) => (s + dt * 1.9) % (Math.PI * 200));
+			raf = requestAnimationFrame(step);
+		};
+		raf = requestAnimationFrame(step);
+		onCleanup(() => cancelAnimationFrame(raf));
+	});
+
+	const geometry = createMemo(() => {
+		const cx = 48;
+		const cy = 48;
+		const radius = 37;
+		const amplitude = 2.35;
+		const waves = 9;
+		const gap = 0.2;
+		const full = Math.PI * 2;
+
+		if (props.indeterminate) {
+			const startAngle = -Math.PI / 2 + spin();
+			const sweepAngle = full * (0.34 + 0.1 * Math.sin(spin() * 0.85));
+			const trackSweep = Math.max(0, full - sweepAngle - gap * 2);
+			return {
+				active: buildWavyArcPath(
+					cx,
+					cy,
+					radius,
+					amplitude,
+					waves,
+					startAngle,
+					sweepAngle,
+					phase(),
+				),
+				track: buildSmoothArcPath(
+					cx,
+					cy,
+					radius,
+					startAngle + sweepAngle + gap,
+					trackSweep,
+				),
+			};
+		}
+
+		const fraction = pct() / 100;
+		const startAngle = -Math.PI / 2;
+		const sweepAngle = fraction * full;
+		if (fraction <= 0.005) {
+			return {
+				active: "",
+				track: buildSmoothArcPath(cx, cy, radius, startAngle, full),
+			};
+		}
+		if (fraction >= 0.995) {
+			return {
+				active: buildWavyArcPath(
+					cx,
+					cy,
+					radius,
+					amplitude * 0.65,
+					waves,
+					startAngle,
+					full,
+					phase(),
+				),
+				track: "",
+			};
+		}
+		const trackSweep = Math.max(0, full - sweepAngle - gap * 2);
+		return {
+			active: buildWavyArcPath(
+				cx,
+				cy,
+				radius,
+				amplitude,
+				waves,
+				startAngle,
+				sweepAngle,
+				phase(),
+			),
+			track: buildSmoothArcPath(
+				cx,
+				cy,
+				radius,
+				startAngle + sweepAngle + gap,
+				trackSweep,
+			),
+		};
+	});
 
 	return (
-		<div class="relative size-20">
-			<svg
-				class={cx("size-20 -rotate-90", props.indeterminate && "animate-spin")}
-				viewBox="0 0 64 64"
-				fill="none"
-			>
-				<circle
-					cx="32"
-					cy="32"
-					r="28"
-					stroke="currentColor"
-					stroke-width="4"
-					class="text-ed-ctl-active"
-				/>
-				<circle
-					cx="32"
-					cy="32"
-					r="28"
-					stroke="currentColor"
-					stroke-width="4"
-					stroke-linecap="round"
-					stroke-dasharray={
-						props.indeterminate ? "44 176" : `${pct() * 1.76} 176`
-					}
-					class="transition-all duration-300 text-ed-accent"
-				/>
+		<div class="relative size-24">
+			<svg class="size-24 overflow-visible" viewBox="0 0 96 96" fill="none">
+				<Show when={geometry().track}>
+					<path
+						d={geometry().track}
+						stroke="color-mix(in srgb, var(--jk-primary) 22%, var(--jk-well))"
+						stroke-width="4.5"
+						stroke-linecap="round"
+					/>
+				</Show>
+				<Show when={geometry().active}>
+					<path
+						d={geometry().active}
+						stroke="var(--jk-primary)"
+						stroke-width="4.5"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					/>
+				</Show>
 			</svg>
 			<Show when={!props.indeterminate}>
 				<div class="flex absolute inset-0 justify-center items-center">
-					<span class="text-sm font-medium tabular-nums text-ed-text-1">
+					<span class="text-[15px] font-semibold tabular-nums text-ed-text-1">
 						{Math.round(pct())}%
 					</span>
 				</div>

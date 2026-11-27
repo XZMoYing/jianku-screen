@@ -4060,7 +4060,9 @@ pub async fn apply_macos_liquid_glass_background(
 
         _window
             .run_on_main_thread(move || {
-                let result = if window.label() == CapWindowId::Main.label() {
+                let result = if window.label() == CapWindowId::Main.label()
+                    || window.label() == CapWindowId::Settings.label()
+                {
                     crate::platform::apply_main_window_liquid_glass_background(
                         &window, _enabled, _radius,
                     )

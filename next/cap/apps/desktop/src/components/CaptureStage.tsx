@@ -11,6 +11,7 @@ export default function CaptureStage(props: {
 	cameraEnabled: boolean;
 }) {
 	let canvas!: HTMLCanvasElement;
+	let stageRef!: HTMLDivElement;
 	const [playing, setPlaying] = createSignal(false);
 	const [error, setError] = createSignal("");
 	const [ready, setReady] = createSignal(false);
@@ -104,8 +105,14 @@ export default function CaptureStage(props: {
 						"--jk-preview-ratio",
 						String(data.width / data.height),
 					);
+				const wasReady = ready();
 				setReady(true);
 				setError("");
+				if (!wasReady) {
+					requestAnimationFrame(() => {
+						if (!disposed) worker?.postMessage({ type: "repaint" });
+					});
+				}
 				canvas.dispatchEvent(
 					new CustomEvent("preview-presented", {
 						detail: { time: performance.now(), ...data },
@@ -129,11 +136,31 @@ export default function CaptureStage(props: {
 			[offscreen],
 		);
 		void schedule();
-		const visibility = () => setVisible(document.visibilityState === "visible");
+		const visibility = () => {
+			const isVisible = document.visibilityState === "visible";
+			setVisible(isVisible);
+			if (isVisible && ready() && !playing()) {
+				requestAnimationFrame(() => {
+					if (!disposed) worker?.postMessage({ type: "repaint" });
+				});
+			}
+		};
 		document.addEventListener("visibilitychange", visibility);
-		onCleanup(() =>
-			document.removeEventListener("visibilitychange", visibility),
-		);
+		let repaintTimer: ReturnType<typeof setTimeout> | undefined;
+		const resizeObserver = new ResizeObserver(() => {
+			if (!ready() || playing() || disposed) return;
+			if (repaintTimer) clearTimeout(repaintTimer);
+			repaintTimer = setTimeout(() => {
+				repaintTimer = undefined;
+				if (!disposed && !playing()) worker?.postMessage({ type: "repaint" });
+			}, 90);
+		});
+		if (stageRef) resizeObserver.observe(stageRef);
+		onCleanup(() => {
+			if (repaintTimer) clearTimeout(repaintTimer);
+			resizeObserver.disconnect();
+			document.removeEventListener("visibilitychange", visibility);
+		});
 	});
 	createEffect(() => {
 		if (props.style && worker && !connected() && !error()) void schedule();
@@ -148,12 +175,11 @@ export default function CaptureStage(props: {
 
 	return (
 		<section class="jk-capture-stage" aria-label={localize("捕获画面布局示意")}>
-			<div class="jk-stage-canvas jk-stage-rendered">
+			<div ref={stageRef} class="jk-stage-canvas jk-stage-rendered">
 				<canvas
 					ref={canvas}
 					class="jk-stage-gpu"
 					aria-label={localize("使用编辑器渲染器的画面示意")}
-					style={{ opacity: ready() ? 1 : 0 }}
 				/>
 				<Show when={error()}>
 					<button type="button" class="jk-preview-error" onClick={schedule}>

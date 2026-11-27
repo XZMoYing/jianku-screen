@@ -87,14 +87,23 @@ impl ExportResources {
     }
 
     pub async fn check(&self) -> Result<Option<String>, String> {
+        self.check_localized(false).await
+    }
+
+    pub async fn check_localized(&self, zh: bool) -> Result<Option<String>, String> {
         let sample = self.read().await;
         if let Some(error) = self.disk_failure(&sample) {
             return Err(error);
         }
-        Ok(self.warning(&sample))
+        Ok(self.warning_localized(&sample, zh))
     }
 
+    #[cfg(test)]
     fn warning(&self, sample: &Sample) -> Option<String> {
+        self.warning_localized(sample, false)
+    }
+
+    fn warning_localized(&self, sample: &Sample, zh: bool) -> Option<String> {
         let mut warnings = Vec::new();
         let lowest = self
             .disks
@@ -104,30 +113,58 @@ impl ExportResources {
             .filter(|(disk, free)| *free < DISK_WARNING.saturating_add(disk.estimated_bytes))
             .min_by_key(|(disk, free)| free.saturating_sub(disk.estimated_bytes));
         if let Some((disk, free)) = lowest {
-            let estimate = if disk.estimated_bytes > 0 {
-                format!(
-                    " This export may need approximately {:.2} GiB, including temporary files.",
-                    disk.estimated_bytes as f64 / GIB as f64
-                )
+            let free_gib = free as f64 / GIB as f64;
+            if zh {
+                let disk_name = match disk.description {
+                    "your recording drive" => "录制工程所在磁盘",
+                    "your export drive" => "导出目标磁盘",
+                    "your system drive" => "系统磁盘",
+                    other => other,
+                };
+                let estimate = if disk.estimated_bytes > 0 {
+                    format!(
+                        "本次导出（含临时文件）预计需要约 {:.2} GiB 空间。",
+                        disk.estimated_bytes as f64 / GIB as f64
+                    )
+                } else {
+                    String::new()
+                };
+                warnings.push(format!(
+                    "{disk_name}仅剩 {free_gib:.2} GiB 可用空间。{estimate}"
+                ));
             } else {
-                String::new()
-            };
-            warnings.push(format!(
-                "Only {:.2} GiB is available on {}.{estimate}",
-                free as f64 / GIB as f64,
-                disk.description
-            ));
+                let estimate = if disk.estimated_bytes > 0 {
+                    format!(
+                        " This export may need approximately {:.2} GiB, including temporary files.",
+                        disk.estimated_bytes as f64 / GIB as f64
+                    )
+                } else {
+                    String::new()
+                };
+                warnings.push(format!(
+                    "Only {free_gib:.2} GiB is available on {}.{estimate}",
+                    disk.description
+                ));
+            }
         }
         if matches!(
             sample.memory,
             MemoryPressure::Warning | MemoryPressure::Critical
         ) {
-            warnings.push("Your computer is already under memory pressure. Close other applications before exporting.".to_string());
+            warnings.push(if zh {
+                "当前电脑内存压力较高，建议在导出前关闭其他占用内存的应用。".to_string()
+            } else {
+                "Your computer is already under memory pressure. Close other applications before exporting.".to_string()
+            });
         }
         if warnings.is_empty() {
             None
         } else {
-            warnings.push("The export may fail or your computer may become unresponsive if resources run out. Cap monitors resources during export and may stop if they become critically low.".to_string());
+            warnings.push(if zh {
+                "资源不足可能导致导出失败或系统卡顿。简库镜传 Next 会在导出过程中持续监测资源占用，如降至危险水平将自动停止以保护系统。".to_string()
+            } else {
+                "The export may fail or your computer may become unresponsive if resources run out. Jianku Screen Next monitors resources during export and may stop if they become critically low.".to_string()
+            });
             Some(warnings.join("\n\n"))
         }
     }

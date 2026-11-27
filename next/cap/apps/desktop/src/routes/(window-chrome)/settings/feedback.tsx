@@ -37,11 +37,7 @@ async function fetchDiagnostics(): Promise<SystemDiagnostics | null> {
 	}
 }
 
-const DIAGNOSTIC_MODES = [
-	{ text: "录制与实时模式", value: "both" },
-	{ text: "仅录制模式", value: "studio" },
-	{ text: "仅实时模式", value: "instant" },
-];
+const DIAGNOSTIC_MODES = [{ text: "录制模式", value: "studio" }];
 
 const DIAGNOSTIC_DURATIONS = [
 	{ text: localize("20 秒"), value: 20 },
@@ -115,7 +111,7 @@ export default function FeedbackTab() {
 	const [feedback, setFeedback] = createSignal("");
 	const [diagnostics] = createResource(fetchDiagnostics);
 
-	const [mode, setMode] = createSignal("both");
+	const [mode, setMode] = createSignal("studio");
 	const [durationSecs, setDurationSecs] = createSignal(20);
 	const [includeMicrophone, setIncludeMicrophone] = createSignal(false);
 	const [running, setRunning] = createSignal(false);
@@ -141,7 +137,7 @@ export default function FeedbackTab() {
 
 		setRunning(true);
 		setResult(null);
-		setStatus("Starting...");
+		setStatus(localize("正在准备诊断…"));
 
 		const unlisten = await events.diagnosticProgress.listen((event) =>
 			setStatus(progressLabel(event.payload)),
@@ -241,9 +237,9 @@ export default function FeedbackTab() {
 					title={localize("Join the Community")}
 					description={localize("在线社区功能敬请期待。")}
 				>
-					<Button onClick={showAccountComingSoon} size="md" variant="gray">
-						{localize("Join Discord")}
-					</Button>
+					<div class="rounded-xl border border-gray-3 bg-gray-2 px-4 py-3 text-xs text-gray-10">
+						{localize("社区入口即将开放，欢迎后续交流使用技巧与反馈建议。")}
+					</div>
 				</Section>
 
 				<Section
@@ -269,10 +265,8 @@ export default function FeedbackTab() {
 						<fieldset disabled={running()}>
 							<SectionRows>
 								<SelectDiagnosticItem
-									label={localize("Pipelines to test")}
-									description={localize(
-										"Studio recordings, Instant recordings, or both in one run.",
-									)}
+									label={localize("测试的录制链路")}
+									description={localize("测试本地录制链路与音画同步表现。")}
 									value={mode()}
 									options={DIAGNOSTIC_MODES}
 									onChange={setMode}

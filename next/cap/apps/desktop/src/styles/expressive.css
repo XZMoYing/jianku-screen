@@ -958,26 +958,35 @@
 	min-width: 72px;
 	color: var(--jk-ink);
 }
-:root .jk-control-row input[type="range"] {
+:root .jk-control-row input[type="range"],
+:root .studio-range input[type="range"] {
 	flex: 1;
-	width: 50px;
+	width: 100%;
 	min-width: 0;
 	height: 24px;
 	appearance: none;
 	background: transparent;
 	cursor: pointer;
 }
-:root .jk-control-row input[type="range"]::-webkit-slider-runnable-track {
+:root .jk-control-row input[type="range"]::-webkit-slider-runnable-track,
+:root .studio-range input[type="range"]::-webkit-slider-runnable-track {
 	height: 9px;
 	border-radius: 999px;
-	background: linear-gradient(
-		to right,
-		var(--jk-primary) var(--jk-progress, 0%),
-		var(--jk-well) var(--jk-progress, 0%)
-	);
+	background:
+		repeating-linear-gradient(
+			to right,
+			transparent 0 11px,
+			color-mix(in srgb, var(--jk-ink) 16%, transparent) 11px 12px
+		),
+		linear-gradient(
+			to right,
+			var(--jk-graphite) var(--jk-progress, 0%),
+			var(--jk-well) var(--jk-progress, 0%)
+		);
 	box-shadow: var(--jk-recess);
 }
-:root .jk-control-row input[type="range"]::-webkit-slider-thumb {
+:root .jk-control-row input[type="range"]::-webkit-slider-thumb,
+:root .studio-range input[type="range"]::-webkit-slider-thumb {
 	appearance: none;
 	width: 5px;
 	height: 22px;
@@ -991,13 +1000,16 @@
 		transform 180ms var(--jk-spring),
 		background-color 180ms;
 }
-:root .jk-control-row input[type="range"]:hover::-webkit-slider-thumb {
+:root .jk-control-row input[type="range"]:hover::-webkit-slider-thumb,
+:root .studio-range input[type="range"]:hover::-webkit-slider-thumb {
 	transform: scaleY(1.08);
 }
-:root .jk-control-row input[type="range"]:active::-webkit-slider-thumb {
+:root .jk-control-row input[type="range"]:active::-webkit-slider-thumb,
+:root .studio-range input[type="range"]:active::-webkit-slider-thumb {
 	transform: scale(1.18, 1.12);
 }
-:root .jk-control-row input[type="range"]:disabled::-webkit-slider-thumb {
+:root .jk-control-row input[type="range"]:disabled::-webkit-slider-thumb,
+:root .studio-range input[type="range"]:disabled::-webkit-slider-thumb {
 	background: var(--jk-muted);
 	box-shadow: 0 0 0 2.5px var(--jk-paper);
 }
@@ -1211,7 +1223,7 @@
 :root .jk-hud-stop:active:not(:disabled) {
 	transform: scale(0.95);
 }
-:root .jk-export > div:last-child > div:last-child {
+:root .jk-export .jk-export-sidebar {
 	background: var(--jk-paper);
 	border-left-color: var(--jk-line);
 }

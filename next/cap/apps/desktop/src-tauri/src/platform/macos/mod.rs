@@ -449,6 +449,9 @@ fn apply_liquid_glass_background_inner(
             force_glass_view_always_active(glass_view);
         }
 
+        let _: () = msg_send![ns_window, setHasShadow: true];
+        let _: () = msg_send![ns_window, invalidateShadow];
+
         crate::crash_sentinel::set_liquid_glass_outcome("applied");
         Ok(true)
     }

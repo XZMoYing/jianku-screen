@@ -9,21 +9,14 @@ import {
 	Show,
 } from "solid-js";
 import toast from "solid-toast";
-import { authStore, generalSettingsStore } from "~/store";
+import { generalSettingsStore } from "~/store";
 import {
 	deriveGeneralSettings,
 	type GeneralSettingsStore,
 } from "~/utils/general-settings";
 import { t as localize } from "~/utils/i18n";
-import { openPricingPage } from "~/utils/pricing";
-import { commands, events, type StudioRecordingQuality } from "~/utils/tauri";
-import {
-	Section,
-	SectionCard,
-	SectionRows,
-	SettingsPageContent,
-	ToggleSettingItem,
-} from "./Setting";
+import { events, type StudioRecordingQuality } from "~/utils/tauri";
+import { Section, SectionCard, SettingsPageContent } from "./Setting";
 
 const STUDIO_OPTIONS = [
 	{
@@ -50,56 +43,18 @@ const STUDIO_OPTIONS = [
 	description: string;
 }[];
 
-const INSTANT_OPTIONS = [
-	{
-		value: 1280,
-		label: "720p",
-		description: "Smaller uploads. Good for quick updates.",
-	},
-	{
-		value: 1920,
-		label: "1080p",
-		description: localize(
-		"文字清晰，文件体积适中，适合日常录制。",
-		),
-	},
-	{
-		value: 2560,
-		label: "1440p",
-		description: "More detail for larger screens. Takes longer to upload.",
-	},
-	{
-		value: 3840,
-		label: "4K",
-		description:
-			"The most detail and largest uploads. Best with a fast connection.",
-	},
-];
-
 export default function RecordingQualitySettings() {
 	const store = generalSettingsStore.createQuery();
-	const auth = authStore.createQuery();
 	const settings = createMemo(() => deriveGeneralSettings(store.data));
 	const studioQuality = createMemo(
 		() => settings().studioRecordingQuality ?? "balanced",
 	);
-	const hasCapPro = createMemo(
-		() => !!(auth.data?.plan?.upgraded || auth.data?.plan?.manual),
-	);
 	const [saving, setSaving] = createSignal(false);
-	const instantResolution = createMemo(() =>
-		hasCapPro() ? (settings().instantModeMaxResolution ?? 1920) : 1280,
-	);
-	const instantDescription = createMemo(
-		() =>
-			INSTANT_OPTIONS.find((option) => option.value === instantResolution())
-				?.description,
-	);
 	let scrollContainer: HTMLDivElement | undefined;
 	let scrollTimer: ReturnType<typeof setTimeout> | undefined;
 
 	const scrollToSection = (section: string) => {
-		if (section !== "studio-quality" && section !== "instant-quality") return;
+		if (section !== "studio-quality") return;
 		clearTimeout(scrollTimer);
 		const attempt = (remaining: number) => {
 			const target = document.getElementById(`settings-section-${section}`);
@@ -121,10 +76,6 @@ export default function RecordingQualitySettings() {
 	};
 
 	onMount(() => {
-		commands
-			.updateAuthPlan()
-			.then(() => auth.refetch())
-			.catch(console.error);
 		try {
 			const section = localStorage.getItem("cap.settings.scrollToSection");
 			localStorage.removeItem("cap.settings.scrollToSection");
@@ -149,7 +100,9 @@ export default function RecordingQualitySettings() {
 			await generalSettingsStore.set({ [key]: value });
 			await store.refetch();
 		} catch {
-			toast.error(localize("Couldn't save your recording settings. Please try again."));
+			toast.error(
+				localize("Couldn't save your recording settings. Please try again."),
+			);
 		} finally {
 			setSaving(false);
 		}
@@ -189,9 +142,9 @@ export default function RecordingQualitySettings() {
 				<Show when={!store.isPending && !store.isError}>
 					<div id="settings-section-studio-quality">
 						<Section
-							title={localize("Studio")}
+							title={localize("本地录制")}
 							description={localize(
-								"Saved to your computer, ready to edit. All three quality options are available on every plan.",
+								"录制工程直接保存在本机磁盘，停止后即可进入编辑器剪辑。",
 							)}
 						>
 							<SectionCard padded>
@@ -210,9 +163,9 @@ export default function RecordingQualitySettings() {
 													void save("studioRecordingQuality", option.value)
 												}
 												class={cx(
-													"flex items-start gap-3 p-3 rounded-lg border text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-9 disabled:opacity-60",
+													"flex items-start gap-3 p-3 rounded-lg border text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--jk-primary)] disabled:opacity-60",
 													studioQuality() === option.value
-														? "border-blue-9 bg-blue-3"
+														? "border-[var(--jk-primary)] bg-[color-mix(in_srgb,var(--jk-primary)_10%,transparent)]"
 														: "border-gray-4 hover:bg-gray-3",
 												)}
 											>
@@ -220,25 +173,25 @@ export default function RecordingQualitySettings() {
 													class={cx(
 														"mt-0.5 size-4 shrink-0 rounded-full border flex items-center justify-center",
 														studioQuality() === option.value
-															? "border-blue-9"
+															? "border-[var(--jk-primary)]"
 															: "border-gray-7",
 													)}
 												>
 													<Show when={studioQuality() === option.value}>
-														<span class="size-2 rounded-full bg-blue-9" />
+														<span class="size-2 rounded-full bg-[var(--jk-primary)]" />
 													</Show>
 												</span>
 												<span class="flex flex-col gap-1">
 													<span class="flex items-center gap-2 text-[13px] font-medium text-gray-12">
-									{localize(option.label)}
+														{localize(option.label)}
 														<Show when={option.value === "balanced"}>
-															<span class="rounded px-1.5 py-0.5 text-[10px] font-medium text-blue-11 bg-blue-4">
+															<span class="rounded px-1.5 py-0.5 text-[10px] font-medium text-[var(--jk-primary)] bg-[color-mix(in_srgb,var(--jk-primary)_12%,transparent)]">
 																{localize("Recommended")}
 															</span>
 														</Show>
 													</span>
 													<span class="text-xs leading-relaxed text-gray-10">
-								{localize(option.description)}
+														{localize(option.description)}
 													</span>
 												</span>
 											</button>
@@ -253,87 +206,6 @@ export default function RecordingQualitySettings() {
 							</SectionCard>
 						</Section>
 					</div>
-					<div id="settings-section-instant-quality">
-						<Section
-							title={localize("Instant")}
-							description={localize(
-								"Uploads while you record, so your share link is ready when you stop.",
-							)}
-						>
-							<SectionCard padded>
-								<p class="mb-3 text-[13px] font-medium text-gray-12">
-									{localize("Maximum resolution")}
-								</p>
-								<div
-									class="grid grid-cols-4 gap-2"
-									role="group"
-									aria-label={localize("Instant recording resolution")}
-								>
-									<For each={INSTANT_OPTIONS}>
-										{(option) => (
-											<button
-												type="button"
-												aria-pressed={instantResolution() === option.value}
-												disabled={
-													saving() ||
-													auth.isPending ||
-													(!hasCapPro() && option.value > 1280)
-												}
-												onClick={() =>
-													void save("instantModeMaxResolution", option.value)
-												}
-												class={cx(
-													"flex flex-col items-center justify-center gap-1 py-2.5 rounded-lg border text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-9 disabled:cursor-default",
-													instantResolution() === option.value
-														? "border-blue-9 bg-blue-3 text-gray-12"
-														: "border-gray-4 text-gray-10 enabled:hover:bg-gray-3",
-												)}
-											>
-								{localize(option.label)}
-												<Show when={!hasCapPro() && option.value > 1280}>
-										<span class="text-[9px] text-gray-10">{localize("Pro")}</span>
-												</Show>
-											</button>
-										)}
-									</For>
-								</div>
-								<p class="mt-3 text-xs leading-relaxed text-gray-10">
-									{instantDescription()}{" "}
-									{localize(
-										"Resolution is limited by the screen or area you record.",
-									)}
-								</p>
-								<Show when={!auth.isPending && !hasCapPro()}>
-									<div class="flex flex-col items-start gap-3 mt-4 pt-4 border-t border-gray-4">
-										<p class="text-xs leading-relaxed text-gray-11">
-											{localize(
-			"720p is included. Higher resolutions are available for local recordings.",
-											)}
-										</p>
-										<Button
-											size="sm"
-											variant="gray"
-											onClick={() => void openPricingPage()}
-										>
-											{localize("View plans ↗")}
-										</Button>
-									</div>
-								</Show>
-							</SectionCard>
-						</Section>
-					</div>
-					<Section title={localize("Sharing")}>
-						<SectionRows>
-							<ToggleSettingItem
-								label={localize("Open share links automatically")}
-								description={localize(
-									"Open the link in your browser when an upload finishes.",
-								)}
-								value={!settings().disableAutoOpenLinks}
-								onChange={(value) => void save("disableAutoOpenLinks", !value)}
-							/>
-						</SectionRows>
-					</Section>
 				</Show>
 			</SettingsPageContent>
 		</div>

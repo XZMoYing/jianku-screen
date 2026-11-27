@@ -219,6 +219,9 @@ export default function Presentation(props: {
 				step={step}
 				value={value}
 				aria-label={localize(label)}
+				style={{
+					"--jk-progress": `${max > min ? Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100)) : 0}%`,
+				}}
 				onInput={(event) => onValue(Number(event.currentTarget.value))}
 			/>
 		</label>

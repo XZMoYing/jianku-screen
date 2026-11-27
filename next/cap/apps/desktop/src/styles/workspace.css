@@ -1526,18 +1526,16 @@
 	.jk-workspace-main[data-menu-open="true"]
 	.jk-workspace-controls {
 	flex: 0 0 var(--jk-controls-height);
-	transition:
-		flex-basis 480ms var(--jk-spatial, var(--jk-effects)),
-		height 480ms var(--jk-spatial, var(--jk-effects));
+	will-change: flex-basis;
+	contain: layout style;
+	transition: flex-basis 360ms var(--jk-spatial, var(--jk-effects));
 }
 .jk-resizable-workspace .jk-capture-stage,
 .jk-resizable-workspace
 	.jk-workspace-main[data-menu-open="true"]
 	.jk-capture-stage {
 	flex: 1;
-	transition:
-		flex-basis 480ms var(--jk-spatial, var(--jk-effects)),
-		height 480ms var(--jk-spatial, var(--jk-effects));
+	contain: layout style;
 }
 .jk-resizable-workspace[data-resizing="true"],
 .jk-resizable-workspace[data-resizing="true"]

@@ -51,6 +51,20 @@ describe("general-settings", () => {
 		);
 	});
 
+	it("migrates legacy Cap default transcription hints", () => {
+		expect(
+			deriveGeneralSettings({
+				enableNativeCameraPreview: false,
+				transcriptionHints: [
+					"Cap",
+					"TypeScript",
+					"My Brand Name",
+					"mywebsite.com",
+				],
+			}).transcriptionHints,
+		).toEqual(DEFAULT_TRANSCRIPTION_HINTS);
+	});
+
 	it("defaults recording enhancements when fields are missing", () => {
 		expect(
 			deriveGeneralSettings({

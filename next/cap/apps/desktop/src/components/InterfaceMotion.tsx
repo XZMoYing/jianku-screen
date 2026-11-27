@@ -23,8 +23,12 @@ const arrivalFrames = (kind: "page" | "subpage", direction: number) =>
 		transform:
 			kind === "page"
 				? `translate3d(0, ${(interfaceMotion.page.travel * (1 - progress)).toFixed(2)}px, 0) scale(${(0.985 + 0.015 * progress).toFixed(4)})`
-				: `translate3d(${(direction * interfaceMotion.subpage.travel * (1 - progress)).toFixed(2)}px, ${(6 * (1 - progress)).toFixed(2)}px, 0) scale(${(0.985 + 0.015 * progress).toFixed(4)})`,
-		filter: `blur(${(2.2 * Math.max(0, 1 - progress * 1.4)).toFixed(2)}px)`,
+				: `translate3d(${(direction * interfaceMotion.subpage.travel * (1 - progress)).toFixed(2)}px, ${(6 * (1 - progress)).toFixed(2)}px, 0) scale(${(0.988 + 0.012 * progress).toFixed(4)})`,
+		...(kind === "page"
+			? {
+					filter: `blur(${(2.2 * Math.max(0, 1 - progress * 1.4)).toFixed(2)}px)`,
+				}
+			: {}),
 	}));
 const enterFrames = arrivalFrames("page", 1);
 const pageArrivals = {
@@ -416,15 +420,19 @@ export function MotionSwitch<T>(props: {
 				if (!reducedMotion()) {
 					const exit = root.animate(
 						[
-							{ opacity, transform, filter: "blur(0px)" },
-							{
-								opacity: 0,
-								transform:
-									kind === "page"
-										? "translate3d(0, 12px, 0) scale(.986)"
-										: `translate3d(${-direction * 16}px, 4px, 0) scale(.986)`,
-								filter: "blur(2.5px)",
-							},
+							kind === "page"
+								? { opacity, transform, filter: "blur(0px)" }
+								: { opacity, transform },
+							kind === "page"
+								? {
+										opacity: 0,
+										transform: "translate3d(0, 12px, 0) scale(.986)",
+										filter: "blur(2.5px)",
+									}
+								: {
+										opacity: 0,
+										transform: `translate3d(${-direction * 14}px, 3px, 0) scale(.988)`,
+									},
 						],
 						{
 							duration: interfaceMotion.outgoing.duration,

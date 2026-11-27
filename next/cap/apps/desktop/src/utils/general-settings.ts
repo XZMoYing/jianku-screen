@@ -14,9 +14,25 @@ export type GeneralSettingsStore = TauriGeneralSettingsStore & {
 export const DEFAULT_TRANSCRIPTION_HINTS = [
 	"简库镜传",
 	"TypeScript",
-	"My Brand Name",
-	"mywebsite.com",
+	"我的品牌名",
+	"example.com",
 ];
+
+function sanitizeLegacyTranscriptionHints(
+	hints: readonly string[] | undefined,
+): string[] | undefined {
+	if (!hints) return hints;
+	const hasLegacyDefault =
+		hints.includes("Cap") &&
+		(hints.includes("My Brand Name") || hints.includes("mywebsite.com"));
+	if (!hasLegacyDefault) return [...hints];
+	return hints.map((hint) => {
+		if (hint === "Cap") return "简库镜传";
+		if (hint === "My Brand Name") return "我的品牌名";
+		if (hint === "mywebsite.com") return "example.com";
+		return hint;
+	});
+}
 
 export type RecordingStartSafetySettings = {
 	confirmBeforeRecordingWithoutMicrophone: boolean;
@@ -63,9 +79,15 @@ export function createDefaultGeneralSettings(): GeneralSettingsStore {
 export function deriveGeneralSettings(
 	store: GeneralSettingsStore | null | undefined,
 ): GeneralSettingsStore {
-	return {
+	const merged: GeneralSettingsStore = {
 		...createDefaultGeneralSettings(),
 		...(store ?? {}),
+	};
+	return {
+		...merged,
+		transcriptionHints: sanitizeLegacyTranscriptionHints(
+			merged.transcriptionHints,
+		),
 	};
 }
 

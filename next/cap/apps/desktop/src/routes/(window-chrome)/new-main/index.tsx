@@ -3373,199 +3373,211 @@ function Page() {
 															class="flex flex-col flex-1 min-h-0"
 														>
 															{(menu) => (
-																<Show
-																	when={menu()}
-																	keyed
-																	fallback={
-																		<>
-																			<TargetSelectionHome />
-																			<p class="workspace-recording-note">
-																				{localize(
-																					"屏幕与窗口支持独立选择；录制结束后可在编辑器调整画面、镜头与光标。",
-																				)}
-																			</p>
-																		</>
-																	}
-																>
-																	{(variant) =>
-																		variant === "display" ? (
-																			<TargetMenuPanel
-																				variant="display"
-																				targets={displayTargetsData()}
-																				isLoading={displayMenuLoading()}
-																				errorMessage={displayErrorMessage()}
-																				onSelect={selectDisplayTarget}
-																				disabled={isRecording() || styleBusy()}
-																				onBack={() => {
-																					setDisplayMenuOpen(false);
-																					displayTriggerRef?.focus();
-																				}}
-																			/>
-																		) : variant === "window" ? (
-																			<TargetMenuPanel
-																				variant="window"
-																				targets={windowTargetsData()}
-																				isLoading={windowMenuLoading()}
-																				errorMessage={windowErrorMessage()}
-																				onSelect={selectWindowTarget}
-																				disabled={isRecording() || styleBusy()}
-																				onBack={() => {
-																					setWindowMenuOpen(false);
-																					windowTriggerRef?.focus();
-																				}}
-																			/>
-																		) : variant === "recording" ? (
-																			<TargetMenuPanel
-																				variant="recording"
-																				targets={recordingsData()}
-																				isLoading={recordings.isPending}
-																				errorMessage={
-																					recordings.error
-																						? "Failed to load recordings"
-																						: undefined
-																				}
-																				onSelect={openRecording}
-																				disabled={isRecording() || styleBusy()}
-																				onBack={() => {
-																					setRecordingsMenuOpen(false);
-																				}}
-																				onViewAll={async () => {
-																					await commands.showWindow({
-																						Settings: {
-																							page: "recordings",
-																						},
-																					});
-																				}}
-																				uploadProgress={uploadProgress}
-																				reuploadingPaths={reuploadingPaths()}
-																				onReupload={handleReupload}
-																				onRefetch={refreshRecordings}
-																			/>
-																		) : variant === "screenshot" ? (
-																			<TargetMenuPanel
-																				variant="screenshot"
-																				targets={screenshotsData()}
-																				isLoading={screenshots.isPending}
-																				errorMessage={
-																					screenshots.error
-																						? "Failed to load screenshots"
-																						: undefined
-																				}
-																				onSelect={openScreenshot}
-																				disabled={isRecording() || styleBusy()}
-																				onBack={() => {
-																					setScreenshotsMenuOpen(false);
-																				}}
-																				onViewAll={async () => {
-																					await commands.showWindow({
-																						Settings: {
-																							page: "screenshots",
-																						},
-																					});
-																				}}
-																			/>
-																		) : variant === "camera" ? (
-																			<TargetMenuPanel
-																				variant="camera"
-																				targets={devices.cameras}
-																				selectedTarget={
-																					options.camera() ?? null
-																				}
-																				isLoading={devices.isPending}
-																				onSelect={(c) => {
-																					if (!c) {
-																						setOptions("cameraLabel", null);
-																						setCamera.mutate({
-																							model: null,
-																						});
-																					} else if (c.model_id) {
-																						setOptions(
-																							"cameraLabel",
-																							c.display_name,
-																						);
-																						setCamera.mutate({
-																							model: {
-																								ModelID: c.model_id,
-																							},
-																						});
-																					} else {
-																						setOptions(
-																							"cameraLabel",
-																							c.display_name,
-																						);
-																						setCamera.mutate({
-																							model: {
-																								DeviceID: c.device_id,
-																							},
-																						});
+																<>
+																	<MotionPanel
+																		class="flex flex-1 min-h-0 flex-col"
+																		visible={!menu()}
+																	>
+																		<TargetSelectionHome />
+																		<p class="workspace-recording-note">
+																			{localize(
+																				"屏幕与窗口支持独立选择；录制结束后可在编辑器调整画面、镜头与光标。",
+																			)}
+																		</p>
+																	</MotionPanel>
+																	<Show when={menu()} keyed>
+																		{(variant) =>
+																			variant === "display" ? (
+																				<TargetMenuPanel
+																					variant="display"
+																					targets={displayTargetsData()}
+																					isLoading={displayMenuLoading()}
+																					errorMessage={displayErrorMessage()}
+																					onSelect={selectDisplayTarget}
+																					disabled={
+																						isRecording() || styleBusy()
 																					}
-																					setCameraMenuOpen(false);
-																					setCameraInitialSettings(null);
-																				}}
-																				disabled={isRecording() || styleBusy()}
-																				onBack={() => {
-																					setCameraMenuOpen(false);
-																					setCameraInitialSettings(null);
-																				}}
-																				permissions={currentPermissions()}
-																				deviceSettings={
-																					deviceSettings() ?? undefined
-																				}
-																				onCameraSettingsChange={(
-																					camera,
-																					settings,
-																				) => {
-																					void setCameraDeviceSettings(
+																					onBack={() => {
+																						setDisplayMenuOpen(false);
+																						displayTriggerRef?.focus();
+																					}}
+																				/>
+																			) : variant === "window" ? (
+																				<TargetMenuPanel
+																					variant="window"
+																					targets={windowTargetsData()}
+																					isLoading={windowMenuLoading()}
+																					errorMessage={windowErrorMessage()}
+																					onSelect={selectWindowTarget}
+																					disabled={
+																						isRecording() || styleBusy()
+																					}
+																					onBack={() => {
+																						setWindowMenuOpen(false);
+																						windowTriggerRef?.focus();
+																					}}
+																				/>
+																			) : variant === "recording" ? (
+																				<TargetMenuPanel
+																					variant="recording"
+																					targets={recordingsData()}
+																					isLoading={recordings.isPending}
+																					errorMessage={
+																						recordings.error
+																							? "Failed to load recordings"
+																							: undefined
+																					}
+																					onSelect={openRecording}
+																					disabled={
+																						isRecording() || styleBusy()
+																					}
+																					onBack={() => {
+																						setRecordingsMenuOpen(false);
+																					}}
+																					onViewAll={async () => {
+																						await commands.showWindow({
+																							Settings: {
+																								page: "recordings",
+																							},
+																						});
+																					}}
+																					uploadProgress={uploadProgress}
+																					reuploadingPaths={reuploadingPaths()}
+																					onReupload={handleReupload}
+																					onRefetch={refreshRecordings}
+																				/>
+																			) : variant === "screenshot" ? (
+																				<TargetMenuPanel
+																					variant="screenshot"
+																					targets={screenshotsData()}
+																					isLoading={screenshots.isPending}
+																					errorMessage={
+																						screenshots.error
+																							? "Failed to load screenshots"
+																							: undefined
+																					}
+																					onSelect={openScreenshot}
+																					disabled={
+																						isRecording() || styleBusy()
+																					}
+																					onBack={() => {
+																						setScreenshotsMenuOpen(false);
+																					}}
+																					onViewAll={async () => {
+																						await commands.showWindow({
+																							Settings: {
+																								page: "screenshots",
+																							},
+																						});
+																					}}
+																				/>
+																			) : variant === "camera" ? (
+																				<TargetMenuPanel
+																					variant="camera"
+																					targets={devices.cameras}
+																					selectedTarget={
+																						options.camera() ?? null
+																					}
+																					isLoading={devices.isPending}
+																					onSelect={(c) => {
+																						if (!c) {
+																							setOptions("cameraLabel", null);
+																							setCamera.mutate({
+																								model: null,
+																							});
+																						} else if (c.model_id) {
+																							setOptions(
+																								"cameraLabel",
+																								c.display_name,
+																							);
+																							setCamera.mutate({
+																								model: {
+																									ModelID: c.model_id,
+																								},
+																							});
+																						} else {
+																							setOptions(
+																								"cameraLabel",
+																								c.display_name,
+																							);
+																							setCamera.mutate({
+																								model: {
+																									DeviceID: c.device_id,
+																								},
+																							});
+																						}
+																						setCameraMenuOpen(false);
+																						setCameraInitialSettings(null);
+																					}}
+																					disabled={
+																						isRecording() || styleBusy()
+																					}
+																					onBack={() => {
+																						setCameraMenuOpen(false);
+																						setCameraInitialSettings(null);
+																					}}
+																					permissions={currentPermissions()}
+																					deviceSettings={
+																						deviceSettings() ?? undefined
+																					}
+																					onCameraSettingsChange={(
 																						camera,
 																						settings,
-																					);
-																				}}
-																				compatibilityStudioMode={compatibilityStudioMode()}
-																				initialSettingsTarget={cameraInitialSettings()}
-																			/>
-																		) : variant === "microphone" ? (
-																			<TargetMenuPanel
-																				variant="microphone"
-																				targets={devices.microphones}
-																				selectedTarget={
-																					options.micName() ?? null
-																				}
-																				isLoading={devices.isPending}
-																				onSelect={(v) => {
-																					setMicInput.mutate(v?.name ?? null);
-																					setMicrophoneMenuOpen(false);
-																					setMicrophoneInitialSettings(null);
-																				}}
-																				disabled={isRecording() || styleBusy()}
-																				onBack={() => {
-																					setMicrophoneMenuOpen(false);
-																					setMicrophoneInitialSettings(null);
-																				}}
-																				permissions={currentPermissions()}
-																				deviceSettings={
-																					deviceSettings() ?? undefined
-																				}
-																				onMicrophoneSettingsChange={(
-																					key,
-																					settings,
-																				) => {
-																					void setMicrophoneDeviceSettings(
+																					) => {
+																						void setCameraDeviceSettings(
+																							camera,
+																							settings,
+																						);
+																					}}
+																					compatibilityStudioMode={compatibilityStudioMode()}
+																					initialSettingsTarget={cameraInitialSettings()}
+																				/>
+																			) : variant === "microphone" ? (
+																				<TargetMenuPanel
+																					variant="microphone"
+																					targets={devices.microphones}
+																					selectedTarget={
+																						options.micName() ?? null
+																					}
+																					isLoading={devices.isPending}
+																					onSelect={(v) => {
+																						setMicInput.mutate(v?.name ?? null);
+																						setMicrophoneMenuOpen(false);
+																						setMicrophoneInitialSettings(null);
+																					}}
+																					disabled={
+																						isRecording() || styleBusy()
+																					}
+																					onBack={() => {
+																						setMicrophoneMenuOpen(false);
+																						setMicrophoneInitialSettings(null);
+																					}}
+																					permissions={currentPermissions()}
+																					deviceSettings={
+																						deviceSettings() ?? undefined
+																					}
+																					onMicrophoneSettingsChange={(
 																						key,
 																						settings,
-																					);
-																				}}
-																				compatibilityStudioMode={compatibilityStudioMode()}
-																				initialSettingsTarget={microphoneInitialSettings()}
-																			/>
-																		) : (
-																			<ModeInfoPanel
-																				onBack={() => {
-																					setModeInfoMenuOpen(false);
-																				}}
-																			/>
-																		)
-																	}
-																</Show>
+																					) => {
+																						void setMicrophoneDeviceSettings(
+																							key,
+																							settings,
+																						);
+																					}}
+																					compatibilityStudioMode={compatibilityStudioMode()}
+																					initialSettingsTarget={microphoneInitialSettings()}
+																				/>
+																			) : (
+																				<ModeInfoPanel
+																					onBack={() => {
+																						setModeInfoMenuOpen(false);
+																					}}
+																				/>
+																			)
+																		}
+																	</Show>
+																</>
 															)}
 														</MotionSwitch>
 													</Show>

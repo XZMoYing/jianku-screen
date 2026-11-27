@@ -558,16 +558,6 @@ function Inner(props: {
 							]}
 						/>
 						<ToggleSettingItem
-							label={localize("Delete Instant recordings after upload")}
-							description={localize(
-								"The local file is removed after a successful upload.",
-							)}
-							value={settings.deleteInstantRecordingsAfterUpload ?? false}
-							onChange={(v) =>
-								handleChange("deleteInstantRecordingsAfterUpload", v)
-							}
-						/>
-						<ToggleSettingItem
 							label={localize("Crash-recoverable recording")}
 							description={localize(
 								"Record in fragments that can be recovered after a crash or power loss. Slightly larger files during capture.",
@@ -578,7 +568,7 @@ function Inner(props: {
 							}
 						/>
 						<ToggleSettingItem
-							label={localize("Custom cursor capture (Studio)")}
+							label={localize("独立采集光标数据")}
 							description={localize(
 								"Capture cursor state separately so you can adjust size and smoothing in the editor.",
 							)}

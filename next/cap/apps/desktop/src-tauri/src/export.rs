@@ -1422,18 +1422,23 @@ async fn export_resource_preflight(
         });
     }
     let resources = ExportResources::new(disks);
-    if let Some(message) = resources.check().await? {
+    let zh = !crate::interface_language::english(app);
+    if let Some(message) = resources.check_localized(zh).await? {
         if cancel.is_cancelled() {
             return Err("Export cancelled".into());
         }
         let (sender, receiver) = tokio::sync::oneshot::channel();
         app.dialog()
             .message(message)
-            .title("Check export resources")
+            .title(if zh {
+                "检查导出资源"
+            } else {
+                "Check export resources"
+            })
             .kind(MessageDialogKind::Warning)
             .buttons(MessageDialogButtons::OkCancelCustom(
-                "Proceed anyway".into(),
-                "Go back".into(),
+                if zh { "仍然继续" } else { "Proceed anyway" }.into(),
+                if zh { "返回" } else { "Go back" }.into(),
             ))
             .show(move |confirmed| {
                 let _ = sender.send(confirmed);
@@ -1446,7 +1451,7 @@ async fn export_resource_preflight(
         if !confirmed {
             return Err("Export cancelled".into());
         }
-        let _ = resources.check().await?;
+        let _ = resources.check_localized(zh).await?;
     }
     if cancel.is_cancelled() {
         return Err("Export cancelled".into());

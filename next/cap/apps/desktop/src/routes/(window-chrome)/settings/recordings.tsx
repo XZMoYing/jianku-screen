@@ -1,24 +1,17 @@
 import { Button, ProgressCircle } from "@cap/ui-solid";
 import {
-	createMutation,
 	createQuery,
 	queryOptions,
 	useQueryClient,
 } from "@tanstack/solid-query";
-import { Channel } from "@tauri-apps/api/core";
-import { ask, confirm } from "@tauri-apps/plugin-dialog";
+import { invoke } from "@tauri-apps/api/core";
+import { ask, confirm, open } from "@tauri-apps/plugin-dialog";
 import { remove } from "@tauri-apps/plugin-fs";
 import * as shell from "@tauri-apps/plugin-shell";
 import { cx } from "cva";
-import {
-	createEffect,
-	createMemo,
-	createSignal,
-	For,
-	type JSX,
-	Show,
-} from "solid-js";
+import { createEffect, createMemo, createSignal, For, Show } from "solid-js";
 import { createStore, produce } from "solid-js/store";
+import toast from "solid-toast";
 import { MotionText } from "~/components/MotionText";
 import CapTooltip from "~/components/Tooltip";
 import { TooltipIconButton } from "~/components/TooltipIconButton";
@@ -33,8 +26,9 @@ import {
 	commands,
 	events,
 	type RecordingMetaWithMetadata,
-	type UploadProgress,
 } from "~/utils/tauri";
+import IconLucideCheck from "~icons/lucide/check";
+import IconLucideFolderOutput from "~icons/lucide/folder-output";
 import IconLucideImport from "~icons/lucide/import";
 import IconLucideSearch from "~icons/lucide/search";
 import { Section, SettingsPageContent } from "./Setting";
@@ -45,22 +39,11 @@ type Recording = {
 	prettyName: string;
 };
 
-const Tabs = [
-	{
-		id: "all",
-		label: "Show all",
-	},
-	{
-		id: "instant",
-		icon: <IconCapInstant class="invert size-3 dark:invert-0" />,
-		label: "Instant",
-	},
-	{
-		id: "studio",
-		icon: <IconCapFilmCut class="invert size-3 dark:invert-0" />,
-		label: "Studio",
-	},
-] satisfies { id: string; label: string; icon?: JSX.Element }[];
+type BatchExportProjectsResult = {
+	exportDir: string;
+	exportedCount: number;
+	failed: string[];
+};
 
 const PAGE_SIZE = 20;
 
@@ -100,13 +83,15 @@ const recordingsQuery = queryOptions<Recording[]>({
 });
 
 export default function Recordings() {
-	const [activeTab, setActiveTab] = createSignal<(typeof Tabs)[number]["id"]>(
-		Tabs[0].id,
-	);
 	const [search, setSearch] = createSignal("");
 	const trimmedSearch = createMemo(() => search().trim());
 	const normalizedSearch = createMemo(() => trimmedSearch().toLowerCase());
 	const [visibleCount, setVisibleCount] = createSignal(PAGE_SIZE);
+	const [selectMode, setSelectMode] = createSignal(false);
+	const [selectedPaths, setSelectedPaths] = createSignal<Set<string>>(
+		new Set(),
+	);
+	const [exporting, setExporting] = createSignal(false);
 	const [uploadProgress, setUploadProgress] = createStore<
 		Record</* video_id */ string, number>
 	>({});
@@ -129,40 +114,133 @@ export default function Recordings() {
 	createTauriEventListener(events.recordingDeleted, () => recordings.refetch());
 
 	createEffect(() => {
-		activeTab();
 		trimmedSearch();
 		setVisibleCount(PAGE_SIZE);
 	});
 
 	const filteredRecordings = createMemo(() => {
 		const data = recordings.data ?? [];
-		const scopedRecordings =
-			activeTab() === "all"
-				? data
-				: data.filter((recording) => recording.meta.mode === activeTab());
 		const query = normalizedSearch();
-		if (!query) return scopedRecordings;
-		return scopedRecordings.filter((recording) =>
+		if (!query) return data;
+		return data.filter((recording) =>
 			recording.prettyName.toLowerCase().includes(query),
 		);
 	});
 
 	const visibleRecordings = createMemo(() => {
 		const items = filteredRecordings();
-		if (normalizedSearch()) return items;
+		if (normalizedSearch() || selectMode()) return items;
 		return items.slice(0, visibleCount());
 	});
 
 	const hasMoreRecordings = createMemo(
-		() => !normalizedSearch() && filteredRecordings().length > visibleCount(),
+		() =>
+			!normalizedSearch() &&
+			!selectMode() &&
+			filteredRecordings().length > visibleCount(),
 	);
 
-	const emptyMessage = createMemo(() => {
-		const tabLabel =
-			activeTab() === "all" ? "recordings" : `${activeTab()} recordings`;
-		const prefix = trimmedSearch() ? "No matching" : "No";
-		return `${prefix} ${tabLabel}`;
+	const emptyMessage = createMemo(() =>
+		trimmedSearch() ? localize("没有匹配的录制工程") : localize("暂无录制工程"),
+	);
+
+	const allFilteredSelected = createMemo(() => {
+		const items = filteredRecordings();
+		if (items.length === 0) return false;
+		const selected = selectedPaths();
+		return items.every((item) => selected.has(item.path));
 	});
+
+	const selectedCount = createMemo(() => selectedPaths().size);
+
+	const toggleSelection = (path: string) => {
+		setSelectedPaths((prev) => {
+			const next = new Set(prev);
+			if (next.has(path)) next.delete(path);
+			else next.add(path);
+			return next;
+		});
+	};
+
+	const toggleSelectAll = () => {
+		const items = filteredRecordings();
+		if (allFilteredSelected()) {
+			setSelectedPaths((prev) => {
+				const next = new Set(prev);
+				for (const item of items) next.delete(item.path);
+				return next;
+			});
+		} else {
+			setSelectedPaths((prev) => {
+				const next = new Set(prev);
+				for (const item of items) next.add(item.path);
+				return next;
+			});
+		}
+	};
+
+	const invertSelection = () => {
+		const items = filteredRecordings();
+		setSelectedPaths((prev) => {
+			const next = new Set(prev);
+			for (const item of items) {
+				if (next.has(item.path)) next.delete(item.path);
+				else next.add(item.path);
+			}
+			return next;
+		});
+	};
+
+	const exitSelectMode = () => {
+		setSelectMode(false);
+		setSelectedPaths(new Set<string>());
+	};
+
+	const handleBatchExport = async () => {
+		const paths = Array.from(selectedPaths());
+		if (paths.length === 0 || exporting()) return;
+
+		const destination = await open({
+			directory: true,
+			multiple: false,
+			title: localize("选择工程导出位置"),
+		});
+		if (!destination || typeof destination !== "string") return;
+
+		setExporting(true);
+		try {
+			const result = await invoke<BatchExportProjectsResult>(
+				"export_recording_projects",
+				{
+					projectPaths: paths,
+					destinationDir: destination,
+				},
+			);
+			if (result.failed.length > 0) {
+				toast.error(
+					localize("已导出 {count} 个工程，{failed} 个失败", {
+						count: result.exportedCount,
+						failed: result.failed.length,
+					}),
+				);
+			} else {
+				toast.success(
+					localize("已将 {count} 个录制工程导出到新建文件夹", {
+						count: result.exportedCount,
+					}),
+				);
+			}
+			exitSelectMode();
+			await commands.openFilePath(result.exportDir).catch(() => {});
+		} catch (error) {
+			console.error("Failed to batch export recording projects:", error);
+			toast.error(
+				error instanceof Error ? error.message : localize(String(error)),
+			);
+		} finally {
+			setExporting(false);
+		}
+	};
 
 	const handleRecordingClick = (recording: Recording) => {
 		trackEvent("recording_view_clicked");
@@ -204,15 +282,35 @@ export default function Recordings() {
 					title={localize("Recordings")}
 					description={localize("Manage your recordings and perform actions.")}
 					right={
-						<Button
-							variant="gray"
-							size="sm"
-							class="h-[36px] px-3 shrink-0 flex items-center gap-1.5"
-							onClick={handleVideoImport}
-						>
-							<IconLucideImport class="size-3.5" />
-							<span>{localize("Import")}</span>
-						</Button>
+						<div class="flex items-center gap-2 shrink-0">
+							<Show when={recordings.data && recordings.data.length > 0}>
+								<Button
+									variant={selectMode() ? "primary" : "gray"}
+									size="sm"
+									class="h-[36px] px-3 shrink-0 flex items-center gap-1.5"
+									disabled={exporting()}
+									onClick={() => {
+										if (selectMode()) exitSelectMode();
+										else setSelectMode(true);
+									}}
+								>
+									<IconLucideFolderOutput class="size-3.5" />
+									<span>
+										{selectMode() ? localize("完成选择") : localize("导出")}
+									</span>
+								</Button>
+							</Show>
+							<Button
+								variant="gray"
+								size="sm"
+								class="h-[36px] px-3 shrink-0 flex items-center gap-1.5"
+								disabled={exporting()}
+								onClick={handleVideoImport}
+							>
+								<IconLucideImport class="size-3.5" />
+								<span>{localize("Import")}</span>
+							</Button>
+						</div>
 					}
 				>
 					<Show
@@ -224,44 +322,80 @@ export default function Recordings() {
 						}
 					>
 						<div class="flex flex-col gap-3 pb-4 w-full border-b border-gray-2">
-							<div class="flex flex-wrap gap-3 items-center">
-								<For each={Tabs}>
-									{(tab) => (
-										<div
-											class={cx(
-												"flex gap-1.5 items-center transition-colors duration-200 p-2 px-3 border rounded-full",
-												activeTab() === tab.id
-													? "bg-gray-5 cursor-default border-gray-5"
-													: "bg-transparent hover:bg-gray-3 border-gray-5",
-											)}
-											onClick={() => setActiveTab(tab.id)}
+							<div class="flex flex-wrap items-center justify-between gap-3">
+								<div class="relative w-full max-w-[260px] h-[36px] flex items-center">
+									<IconLucideSearch class="absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none size-3 text-gray-10" />
+									<Input
+										type="search"
+										class="py-2 pl-6 h-full w-full"
+										value={search()}
+										onInput={(event) => setSearch(event.currentTarget.value)}
+										onKeyDown={(event) => {
+											if (event.key === "Escape" && search()) {
+												event.preventDefault();
+												setSearch("");
+											}
+										}}
+										placeholder={localize("Search")}
+										autoCapitalize="off"
+										autocorrect="off"
+										autocomplete="off"
+										spellcheck={false}
+										aria-label={localize("Search recordings")}
+									/>
+								</div>
+
+								<Show when={selectMode()}>
+									<div class="flex flex-wrap items-center gap-2">
+										<Button
+											variant="gray"
+											size="sm"
+											disabled={
+												exporting() || filteredRecordings().length === 0
+											}
+											onClick={toggleSelectAll}
 										>
-											{tab.icon && tab.icon}
-											<p class="text-xs text-gray-12">{tab.label}</p>
-										</div>
-									)}
-								</For>
-							</div>
-							<div class="relative w-full max-w-[260px] h-[36px] flex items-center">
-								<IconLucideSearch class="absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none size-3 text-gray-10" />
-								<Input
-									type="search"
-									class="py-2 pl-6 h-full w-full"
-									value={search()}
-									onInput={(event) => setSearch(event.currentTarget.value)}
-									onKeyDown={(event) => {
-										if (event.key === "Escape" && search()) {
-											event.preventDefault();
-											setSearch("");
-										}
-									}}
-									placeholder={localize("Search")}
-									autoCapitalize="off"
-									autocorrect="off"
-									autocomplete="off"
-									spellcheck={false}
-									aria-label={localize("Search recordings")}
-								/>
+											{allFilteredSelected()
+												? localize("取消全选")
+												: localize("全选")}
+										</Button>
+										<Button
+											variant="gray"
+											size="sm"
+											disabled={
+												exporting() || filteredRecordings().length === 0
+											}
+											onClick={invertSelection}
+										>
+											{localize("反选")}
+										</Button>
+										<span class="text-xs text-gray-11 tabular-nums px-1">
+											{localize("已选 {count} 项", {
+												count: selectedCount(),
+											})}
+										</span>
+										<Button
+											variant="primary"
+											size="sm"
+											disabled={exporting() || selectedCount() === 0}
+											onClick={() => void handleBatchExport()}
+										>
+											{exporting()
+												? localize("正在导出…")
+												: localize("导出所选 ({count})", {
+														count: selectedCount(),
+													})}
+										</Button>
+										<Button
+											variant="gray"
+											size="sm"
+											disabled={exporting()}
+											onClick={exitSelectMode}
+										>
+											{localize("Cancel")}
+										</Button>
+									</div>
+								</Show>
 							</div>
 						</div>
 
@@ -276,6 +410,9 @@ export default function Recordings() {
 									{(recording) => (
 										<RecordingItem
 											recording={recording}
+											selectMode={selectMode()}
+											selected={selectedPaths().has(recording.path)}
+											onToggleSelect={() => toggleSelection(recording.path)}
 											onClick={() => handleRecordingClick(recording)}
 											onOpenFolder={() => handleOpenFolder(recording)}
 											onOpenEditor={() => handleOpenEditor(recording.path)}
@@ -321,6 +458,9 @@ export default function Recordings() {
 
 function RecordingItem(props: {
 	recording: Recording;
+	selectMode: boolean;
+	selected: boolean;
+	onToggleSelect: () => void;
 	onClick: () => void;
 	onOpenFolder: () => void;
 	onOpenEditor: () => void;
@@ -333,60 +473,68 @@ function RecordingItem(props: {
 		thumbnail();
 		setImageExists(true);
 	});
-	const mode = () => props.recording.meta.mode;
-	const modeName = () =>
-		localize(
-			mode() === "studio"
-				? "录制模式"
-				: mode() === "instant"
-					? "实时模式"
-					: mode(),
-		);
+	const modeName = () => localize("录制模式");
 
 	const queryClient = useQueryClient();
 	const studioCompleteCheck = () =>
-		mode() === "studio" && props.recording.meta.status.status === "Complete";
+		props.recording.meta.status.status === "Complete";
 
 	return (
 		<li
 			onClick={() => {
+				if (props.selectMode) {
+					props.onToggleSelect();
+					return;
+				}
 				if (studioCompleteCheck()) {
 					props.onOpenEditor();
 				}
 			}}
 			class={cx(
-				"flex flex-row justify-between p-3 not-last:border-b not-last:border-gray-3 items-center w-full  transition-colors duration-200",
-				studioCompleteCheck() ? "hover:bg-gray-3" : "cursor-default",
+				"flex flex-row justify-between p-3 not-last:border-b not-last:border-gray-3 items-center w-full transition-colors duration-200",
+				props.selectMode
+					? props.selected
+						? "bg-[color-mix(in_srgb,var(--jk-primary)_10%,transparent)] cursor-pointer"
+						: "hover:bg-gray-3 cursor-pointer"
+					: studioCompleteCheck()
+						? "hover:bg-gray-3 cursor-pointer"
+						: "cursor-default",
 			)}
 		>
-			<div class="flex gap-5 items-center">
+			<div class="flex gap-4 items-center min-w-0">
+				<Show when={props.selectMode}>
+					<span
+						role="checkbox"
+						aria-checked={props.selected}
+						aria-label={props.recording.prettyName}
+						class={cx(
+							"flex items-center justify-center size-5 shrink-0 rounded-md border transition-colors",
+							props.selected
+								? "bg-[var(--jk-primary)] border-[var(--jk-primary)] text-white"
+								: "bg-gray-1 border-gray-6",
+						)}
+					>
+						<Show when={props.selected}>
+							<IconLucideCheck class="size-3.5" />
+						</Show>
+					</span>
+				</Show>
 				<Show
 					when={imageExists()}
-					fallback={<div class="mr-4 rounded-sm bg-gray-10 size-11" />}
+					fallback={<div class="mr-4 rounded-sm bg-gray-10 size-11 shrink-0" />}
 				>
 					<img
-						class="object-cover rounded-sm size-12"
+						class="object-cover rounded-sm size-12 shrink-0"
 						alt={localize("Recording thumbnail")}
 						src={thumbnail()}
 						onError={() => setImageExists(false)}
 					/>
 				</Show>
-				<div class="flex flex-col gap-2">
-					<span>{props.recording.prettyName}</span>
+				<div class="flex flex-col gap-2 min-w-0">
+					<span class="truncate">{props.recording.prettyName}</span>
 					<div class="flex space-x-1">
-						<div
-							class={cx(
-								"px-2 py-0.5 flex items-center gap-1.5 font-medium text-[11px] text-gray-12 rounded-full w-fit",
-								mode() === "instant"
-									? "bg-[var(--jk-primary-container)] text-[var(--jk-on-primary-container)]"
-									: "bg-gray-4",
-							)}
-						>
-							{mode() === "instant" ? (
-								<IconCapInstant class="invert size-2.5 dark:invert-0" />
-							) : (
-								<IconCapFilmCut class="invert size-2.5 dark:invert-0" />
-							)}
+						<div class="px-2 py-0.5 flex items-center gap-1.5 font-medium text-[11px] text-gray-12 rounded-full w-fit bg-gray-4">
+							<IconCapFilmCut class="invert size-2.5 dark:invert-0" />
 							<p>
 								<MotionText text={modeName()} />
 							</p>
@@ -438,8 +586,11 @@ function RecordingItem(props: {
 					</div>
 				</div>
 			</div>
-			<div class="flex gap-2 items-center">
-				<Show when={mode() === "studio"}>
+			<Show when={!props.selectMode}>
+				<div
+					class="flex gap-2 items-center shrink-0"
+					onClick={(e) => e.stopPropagation()}
+				>
 					<Show when={props.uploadProgress}>
 						<CapTooltip content={`${(props.uploadProgress || 0).toFixed(2)}%`}>
 							<ProgressCircle
@@ -481,73 +632,27 @@ function RecordingItem(props: {
 					>
 						<IconLucideEdit class="size-4" />
 					</TooltipIconButton>
-				</Show>
-				<Show when={mode() === "instant"}>
-					{(_) => {
-						const reupload = createMutation(() => ({
-							mutationFn: () =>
-								commands.uploadExportedVideo(
-									props.recording.path,
-									"Reupload",
-									new Channel<UploadProgress>((_progress) => {}),
-									null,
-								),
-						}));
+					<TooltipIconButton
+						tooltipText={localize("Open recording bundle")}
+						onClick={() => {
+							props.onOpenFolder();
+						}}
+					>
+						<IconLucideFolder class="size-4" />
+					</TooltipIconButton>
+					<TooltipIconButton
+						tooltipText={localize("Delete")}
+						onClick={async () => {
+							if (!(await ask(localize("确定要删除这段录制吗？")))) return;
+							await remove(props.recording.path, { recursive: true });
 
-						return (
-							<>
-								<Show
-									when={props.uploadProgress || reupload.isPending}
-									fallback={
-										<TooltipIconButton
-											tooltipText={localize("Reupload")}
-											onClick={() => reupload.mutate()}
-										>
-											<IconLucideRotateCcw class="size-4" />
-										</TooltipIconButton>
-									}
-								>
-									<ProgressCircle
-										variant="primary"
-										progress={props.uploadProgress || 0}
-										size="sm"
-									/>
-								</Show>
-
-								<Show when={props.recording.meta.sharing}>
-									{(sharing) => (
-										<TooltipIconButton
-											tooltipText={localize("Open link")}
-											onClick={() => shell.open(sharing().link)}
-										>
-											<IconCapLink class="size-4" />
-										</TooltipIconButton>
-									)}
-								</Show>
-							</>
-						);
-					}}
-				</Show>
-				<TooltipIconButton
-					tooltipText={localize("Open recording bundle")}
-					onClick={() => {
-						props.onOpenFolder();
-					}}
-				>
-					<IconLucideFolder class="size-4" />
-				</TooltipIconButton>
-				<TooltipIconButton
-					tooltipText={localize("Delete")}
-					onClick={async () => {
-						if (!(await ask(localize("确定要删除这段录制吗？")))) return;
-						await remove(props.recording.path, { recursive: true });
-
-						queryClient.refetchQueries(recordingsQuery);
-					}}
-				>
-					<IconCapTrash class="size-4" />
-				</TooltipIconButton>
-			</div>
+							queryClient.refetchQueries(recordingsQuery);
+						}}
+					>
+						<IconCapTrash class="size-4" />
+					</TooltipIconButton>
+				</div>
+			</Show>
 		</li>
 	);
 }

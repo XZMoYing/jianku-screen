@@ -31,14 +31,12 @@ import { EditorShortcutSettings } from "./EditorShortcutSettings";
 import { Section, SectionCard, SettingsPageContent } from "./Setting";
 
 const ACTION_TEXT = {
-	startStudioRecording: "Start studio recording",
-	startInstantRecording: "Start instant recording",
+	startStudioRecording: "开始录制",
 	restartRecording: "Restart recording",
 	stopRecording: "Stop recording",
 	togglePauseRecording: "Pause/resume recording",
 	addRecordingBookmark: "添加录制书签",
 	togglePresentationCurtain: "遮盖/恢复演示画面",
-	cycleRecordingMode: "Cycle recording mode",
 	openRecordingPicker: "Open recording picker",
 	openRecordingPickerDisplay: "Record display",
 	openRecordingPickerWindow: "Record window",
@@ -140,7 +138,6 @@ function Inner(props: { initialStore: HotkeysStore | null }) {
 			"togglePauseRecording",
 			"addRecordingBookmark",
 			"togglePresentationCurtain",
-			"cycleRecordingMode",
 			"openRecordingPickerDisplay",
 			"openRecordingPickerWindow",
 			"openRecordingPickerArea",
