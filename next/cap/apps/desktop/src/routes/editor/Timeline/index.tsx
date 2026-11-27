@@ -33,6 +33,7 @@ import IconLucideMagnet from "~icons/lucide/magnet";
 import IconLucideMousePointer2 from "~icons/lucide/mouse-pointer-2";
 import IconLucidePalette from "~icons/lucide/palette";
 import IconLucidePencil from "~icons/lucide/pencil";
+import IconLucideScissors from "~icons/lucide/scissors";
 import IconLucideSplit from "~icons/lucide/scissors-line-dashed";
 import { newClipInstance } from "../clip-identity";
 import { stylesRevealCamera } from "../style";
@@ -84,6 +85,7 @@ import {
 	sameOverlayTrack,
 	trackInsertionIndex,
 } from "../timelineTracks";
+import { EditorButton, Slider } from "../ui";
 import { formatTime } from "../utils";
 import { type AudioSegmentDragState, AudioTrack } from "./AudioTrack";
 import { BookmarkTrack } from "./BookmarkTrack";
@@ -237,6 +239,7 @@ export function Timeline(props: {
 		projectHistory,
 		setEditorState,
 		totalDuration,
+		zoomOutLimit,
 		editorState,
 		projectActions,
 		mainTrackMagnetic,
@@ -983,6 +986,7 @@ export function Timeline(props: {
 			(event.button !== 0 || event.clientX || event.clientY)
 				? timelineTimeFromClientX(event.clientX)
 				: editorState.playbackTime;
+		const gap = time === null ? null : timelineCommands.mainTrackGapAt(time);
 		blankMenu.show(event, localize("时间线菜单"), [
 			{
 				label: localize("将播放头移到此处"),
@@ -993,6 +997,14 @@ export function Timeline(props: {
 					void seekPlayheadTo(time);
 				},
 			},
+			...(gap
+				? [
+						{
+							label: localize("关闭当前空隙"),
+							run: () => timelineCommands.closeMainTrackGap(gap),
+						},
+					]
+				: []),
 			{
 				label: localize("Add track"),
 				run: () => queueMicrotask(() => setTrackPickerOpen(true)),
@@ -1177,6 +1189,12 @@ export function Timeline(props: {
 	useEditorShortcuts(keymap, {
 		snap: () => (props.inactive ? false : toggleSnapping()),
 		split: () => (props.inactive ? false : timelineCommands.splitAtPlayhead()),
+		splitAll: () =>
+			props.inactive ? false : timelineCommands.splitAcrossTracks(),
+		trimLeft: () =>
+			props.inactive ? false : timelineCommands.trimAtPlayhead("start"),
+		trimRight: () =>
+			props.inactive ? false : timelineCommands.trimAtPlayhead("end"),
 		delete: () => (props.inactive ? false : timelineCommands.deleteSelection()),
 		selectAll: () => (props.inactive ? false : timelineCommands.selectTrack()),
 		deselect: () => (props.inactive ? false : timelineCommands.deselect()),
@@ -1506,16 +1524,26 @@ export function Timeline(props: {
 										run: () => timelineCommands.splitAtPlayhead(),
 									},
 									{
+										command: "trimLeft",
 										label: "修剪播放头左侧",
 										icon: IconLucideArrowLeftToLine,
-										disabled: () => !timelineCommands.canTrimAtPlayhead(),
+										disabled: () =>
+											!timelineCommands.canTrimAtPlayhead("start"),
 										run: () => timelineCommands.trimAtPlayhead("start"),
 									},
 									{
+										command: "trimRight",
 										label: "修剪播放头右侧",
 										icon: IconLucideArrowRightToLine,
-										disabled: () => !timelineCommands.canTrimAtPlayhead(),
+										disabled: () => !timelineCommands.canTrimAtPlayhead("end"),
 										run: () => timelineCommands.trimAtPlayhead("end"),
+									},
+									{
+										command: "splitAll",
+										label: "在播放头处分割所有轨道",
+										icon: IconLucideScissors,
+										disabled: () => !timelineCommands.canSplitAcrossTracks(),
+										run: timelineCommands.splitAcrossTracks,
 									},
 									{
 										command: "delete",
@@ -1611,6 +1639,56 @@ export function Timeline(props: {
 						>
 							<IconLucideMagnet class="size-3.5" />
 						</button>
+						<div class="flex flex-row gap-0.5 items-center">
+							<EditorButton
+								tooltipText={localize("缩小时间线")}
+								aria-label={localize("缩小时间线")}
+								kbd={keymap.kbd("zoomOut")}
+								onClick={() => timelineCommands.zoomBy(1.1)}
+								leftIcon={<IconCapZoomOut />}
+							/>
+							<Slider
+								class="jk-slider-mini w-16 shrink-0 max-[640px]:hidden"
+								aria-label={localize("时间线缩放")}
+								minValue={0}
+								maxValue={1}
+								step={0.001}
+								value={[
+									Math.min(
+										Math.max(
+											1 - editorState.timeline.transform.zoom / zoomOutLimit(),
+											0,
+										),
+										1,
+									),
+								]}
+								onChange={([v]) => {
+									editorState.timeline.transform.updateZoom(
+										(1 - v) * zoomOutLimit(),
+										editorState.playbackTime,
+									);
+								}}
+								formatTooltip={() =>
+									localize("当前显示 {seconds} 秒", {
+										seconds: editorState.timeline.transform.zoom.toFixed(0),
+									})
+								}
+							/>
+							<EditorButton
+								tooltipText={localize("放大时间线")}
+								aria-label={localize("放大时间线")}
+								kbd={keymap.kbd("zoomIn")}
+								onClick={() => timelineCommands.zoomBy(1 / 1.1)}
+								leftIcon={<IconCapZoomIn />}
+							/>
+							<EditorButton
+								tooltipText={localize("显示整个时间线")}
+								aria-label={localize("显示整个时间线")}
+								kbd={keymap.kbd("fit")}
+								onClick={timelineCommands.fit}
+								leftIcon={<IconLucideMaximize2 />}
+							/>
+						</div>
 					</div>
 				</div>
 				<div class="absolute bottom-0 right-0 z-30 h-1 w-[78px]">

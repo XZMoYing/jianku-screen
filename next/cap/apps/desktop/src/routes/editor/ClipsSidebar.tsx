@@ -21,18 +21,19 @@ import toast from "solid-toast";
 import { MotionGroup, MotionSwitch } from "~/components/InterfaceMotion";
 import { t as localize } from "~/utils/i18n";
 import { commands } from "~/utils/tauri";
+import IconTransition from "~icons/lucide/blend";
 import IconFilm from "~icons/lucide/film";
 import IconImage from "~icons/lucide/image";
 import IconMusic from "~icons/lucide/music";
 import IconScan from "~icons/lucide/scan";
 import IconText from "~icons/lucide/type";
-import { AudioLibraryPanel } from "./AudioLibrary";
 import { type EditorTimelineSegment, useEditorContext } from "./context";
 import {
 	createEditorContextMenu,
 	isContextMenuKey,
 } from "./editor-context-menu";
 import { getExistingRecordingPickerOptions } from "./existing-recording-picker";
+import { MaterialsTools } from "./MaterialsTools";
 import { routeEditorPlaybackIntent } from "./playback-intent-routing";
 import { createTimelineMouseDrag } from "./Timeline/mouse-drag";
 import { useEditorShortcuts } from "./useEditorShortcuts";
@@ -43,6 +44,7 @@ const materialTabs = [
 	{ id: "text", label: "文字", icon: IconText },
 	{ id: "graphics", label: "标注", icon: IconImage },
 	{ id: "motion", label: "运镜", icon: IconScan },
+	{ id: "transitions", label: "转场", icon: IconTransition },
 ] as const;
 type MaterialTab = (typeof materialTabs)[number]["id"];
 
@@ -236,16 +238,14 @@ export function ClipsSidebar(props: { class?: string; active?: boolean }) {
 		setDialog,
 		requestHandoffPlayback,
 		keymap,
-		timelineCommands,
 	} = useEditorContext();
 
 	const backToEditor = () => {
 		setEditorState("timeline", "audioPicker", null);
+		setEditorState("timeline", "audioReplace", null);
 		setDialog((d) => ({ ...d, open: false }));
 	};
 	const category = () => editorState.materialsTab ?? "video";
-	const addContent = (type: "text" | "image" | "shape" | "mask" | "style") =>
-		timelineCommands.addTrackContent(type);
 
 	const [tab, setTab] = createSignal("sources");
 	const sourceMenu = createEditorContextMenu();
@@ -547,6 +547,7 @@ export function ClipsSidebar(props: { class?: string; active?: boolean }) {
 				onChange={(value) => {
 					if (value === category()) return;
 					setEditorState("timeline", "audioPicker", null);
+					setEditorState("timeline", "audioReplace", null);
 					setEditorState("materialsTab", value as MaterialTab);
 				}}
 				class="px-3 pt-3"
@@ -580,54 +581,7 @@ export function ClipsSidebar(props: { class?: string; active?: boolean }) {
 				<MotionSwitch value={props.active === false ? undefined : category()}>
 					{(active) => (
 						<div class="custom-scroll flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-3 py-3">
-							<Show when={active() === "audio"}>
-								<AudioLibraryPanel
-									mode={{
-										type: "add",
-										lane:
-											editorState.timeline.audioPicker ??
-											timelineCommands.nextAudioLane(),
-									}}
-									onClose={backToEditor}
-								/>
-							</Show>
-							<Show when={active() === "text"}>
-								<Button variant="gray" onClick={() => addContent("text")}>
-									{localize("添加文字")}
-								</Button>
-								<Button
-									variant="gray"
-									onClick={timelineCommands.openCaptionInspector}
-								>
-									{localize("智能字幕")}
-								</Button>
-							</Show>
-							<Show when={active() === "graphics"}>
-								<Button
-									variant="gray"
-									disabled={editorState.importingImage}
-									onClick={() => addContent("image")}
-								>
-									{localize("导入图片")}
-								</Button>
-								<Button variant="gray" onClick={() => addContent("shape")}>
-									{localize("添加形状")}
-								</Button>
-								<Button variant="gray" onClick={() => addContent("mask")}>
-									{localize("添加遮罩")}
-								</Button>
-							</Show>
-							<Show when={active() === "motion"}>
-								<Button
-									variant="gray"
-									onClick={() => projectActions.addCamera3DShot()}
-								>
-									{localize("添加 3D 镜头")}
-								</Button>
-								<Button variant="gray" onClick={() => addContent("style")}>
-									{localize("添加样式片段")}
-								</Button>
-							</Show>
+							<MaterialsTools category={active()} onClose={backToEditor} />
 						</div>
 					)}
 				</MotionSwitch>

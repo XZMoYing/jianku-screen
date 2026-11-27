@@ -174,6 +174,34 @@ export function sourceCaptionId(trackId: string): string {
 	return index === -1 ? trackId : trackId.slice(0, index);
 }
 
+export function splitCaptionAt<T extends CaptionSegment>(
+	segment: T,
+	time: number,
+	rightId: string,
+): [T, T] | null {
+	if (!Number.isFinite(time) || time <= segment.start || time >= segment.end)
+		return null;
+	const slice = (start: number, end: number, id: string): T => {
+		const words = (segment.words ?? []).flatMap((word) => {
+			const from = Math.max(start, word.start);
+			const to = Math.min(end, word.end);
+			return to > from ? [{ ...word, start: from, end: to }] : [];
+		});
+		return {
+			...segment,
+			id,
+			start,
+			end,
+			words,
+			text: words.length ? getCaptionTextFromWords(words) : segment.text,
+		};
+	};
+	return [
+		slice(segment.start, time, segment.id),
+		slice(time, segment.end, rightId),
+	];
+}
+
 export function mapCaptionsToEditedTimeline(
 	rawSegments: CaptionSegment[],
 	timelineSegments: TimelineSegment[],

@@ -1,6 +1,7 @@
 import { t as localize } from "~/utils/i18n";
 import { useEditorContext } from "../context";
 import { createEditorContextMenu } from "../editor-context-menu";
+import { overlayAssociationItems } from "../overlay-association-menu";
 import { getSegmentTrack, isOverlayTrackKind } from "../timelineTracks";
 import type { SegmentMenuTarget } from "./context";
 
@@ -37,6 +38,17 @@ export function createTimelineSegmentMenu(moveTo: (time: number) => void) {
 			segments[target] ? [segments[target]] : [],
 		);
 		const currentIndex = () => currentSegments().indexOf(segment);
+		const currentSelectionIndices = () =>
+			targets.flatMap((target) => {
+				const index = currentSegments().indexOf(target);
+				return index >= 0 ? [index] : [];
+			});
+		const editSelection = (run: () => void) => {
+			const indices = currentSelectionIndices();
+			if (!indices.length) return;
+			timelineCommands.selectSegments(type, indices);
+			run();
+		};
 		const lane =
 			type === "style" || type === "audio" || isOverlayTrackKind(type)
 				? getSegmentTrack(segment)
@@ -44,9 +56,7 @@ export function createTimelineSegmentMenu(moveTo: (time: number) => void) {
 		const association = projectedZoom
 			? null
 			: timelineCommands.overlayAssociation?.(type, clickedIndex);
-		const clip = association
-			? timelineCommands.overlayAssociationTarget()
-			: null;
+
 		const playhead = editorState.playbackTime;
 		menu.show(event, name, [
 			{
@@ -74,6 +84,19 @@ export function createTimelineSegmentMenu(moveTo: (time: number) => void) {
 				label: localize("选中此轨道的全部片段"),
 				run: () => timelineCommands.selectTrack(type, lane),
 			},
+			...(!projectedZoom
+				? [
+						{
+							label: localize("在播放头处分割"),
+							shortcut: keymap.label("split"),
+							disabled: !timelineCommands.canSplitOverlayAtPlayhead(
+								type,
+								indices,
+							),
+							run: () => editSelection(timelineCommands.splitAtPlayhead),
+						},
+					]
+				: []),
 			...(projectedZoom
 				? [
 						{ label: projectedZoom.label, disabled: true, run: () => {} },
@@ -99,58 +122,7 @@ export function createTimelineSegmentMenu(moveTo: (time: number) => void) {
 			...(association
 				? [
 						{ label: association.label, disabled: true, run: () => {} },
-						{
-							label: clip
-								? localize("Associate with {name}", { name: clip.name })
-								: localize("Select a video clip or move the playhead onto one"),
-							disabled:
-								!clip ||
-								(association.status === "attached" &&
-									association.attachment?.kind === "clip" &&
-									association.attachment.clipId === clip.id),
-							run: () => {
-								const index = currentIndex();
-								if (index >= 0 && clip)
-									timelineCommands.setOverlayAttachment(type, index, clip.id);
-							},
-						},
-						{
-							label: localize(
-								association.attachment?.kind === "clip"
-									? "Unlink and keep current position"
-									: "Keep timeline position",
-							),
-							disabled: association.status === "timeline",
-							run: () => {
-								const index = currentIndex();
-								if (index >= 0)
-									timelineCommands.setOverlayAttachment(type, index, null);
-							},
-						},
-						...(association.canFollowSpeed &&
-						association.attachment?.kind === "clip"
-							? [
-									{
-										label: localize(
-											association.attachment.timing === "followClipSpeed"
-												? "Keep overlay duration when speed changes"
-												: "Follow clip speed",
-										),
-										run: () => {
-											const index = currentIndex();
-											if (index >= 0)
-												timelineCommands.setOverlayAttachmentTiming(
-													type,
-													index,
-													association.attachment?.kind === "clip" &&
-														association.attachment.timing === "followClipSpeed"
-														? "preserveDuration"
-														: "followClipSpeed",
-												);
-										},
-									},
-								]
-							: []),
+						...overlayAssociationItems(timelineCommands, type, currentIndex),
 					]
 				: []),
 			{
@@ -162,16 +134,7 @@ export function createTimelineSegmentMenu(moveTo: (time: number) => void) {
 							: localize("删除此片段"),
 				shortcut: keymap.label("delete"),
 				danger: true,
-				run: () => {
-					const current = currentSegments();
-					const selected = targets.flatMap((target) => {
-						const index = current.indexOf(target);
-						return index >= 0 ? [index] : [];
-					});
-					if (!selected.length) return;
-					timelineCommands.selectSegments(type, selected);
-					timelineCommands.deleteSelection();
-				},
+				run: () => editSelection(timelineCommands.deleteSelection),
 			},
 		]);
 		if (indices !== selectedIndices)

@@ -71,7 +71,14 @@ import {
 	createAudioTrackSegment,
 	MIN_AUDIO_SEGMENT_DURATION,
 } from "./audio";
-import { deriveCaptionTrackSegments, mapEditedTimeToSource } from "./captions";
+import { createAutoZoomGeneration } from "./auto-zoom-generation";
+import {
+	applyEditedCaptionTimingToMaster,
+	deriveCaptionTrackSegments,
+	mapEditedTimeToSource,
+	sourceCaptionId,
+	splitCaptionAt,
+} from "./captions";
 import {
 	clipIndicesForIds,
 	newClipInstance,
@@ -96,6 +103,7 @@ import {
 	clipTimelineDuration,
 	clipTimelineOffsets,
 	getClipTransition,
+	maxTransitionDuration,
 	normalizeClipTransitions,
 	rippleTimelineTrack,
 	timelineShiftAfterClipDurationChange,
@@ -109,11 +117,13 @@ import {
 	generateForStableKeyboardTimeline,
 	keyboardTimelineSignature,
 	mapKeyboardTrackTimes,
+	rebaseKeyboardSegmentAfterTrim,
 	rippleKeyboardTrack,
 	splitKeyboardSegment,
 } from "./keyboard-timing";
 import {
 	appendMainTrackClip,
+	closeMainTrackGapBefore,
 	closeMainTrackGaps,
 	deletePositionedMainTrackClip,
 	hasMainTrackGaps,
@@ -139,6 +149,13 @@ import {
 	overlayAttachmentTrack,
 	overlayPartAfterSplit,
 } from "./overlay-attachment";
+import {
+	type EditableOverlayTrack,
+	editableOverlayTracks,
+	overlaySplitTargets,
+	overlayTrimRange,
+	type PlayheadSpan,
+} from "./playhead-edits";
 import { usePreparingEditor } from "./preparing-editor-context";
 import { createPreparingPlaybackHandoff } from "./preparing-playback-handoff";
 import {
@@ -160,6 +177,7 @@ import {
 	splitOverlaySegment,
 } from "./style";
 import { autoTextColorAt, defaultTextSegment, type TextSegment } from "./text";
+import { applyTextPreset, type TextPreset } from "./text-presets";
 import {
 	applyMotionTemplate,
 	applySceneToRange,
@@ -199,6 +217,9 @@ import {
 	sortTrackSegments,
 } from "./timelineTracks";
 import { createProgressBar } from "./utils";
+
+const NO_AUTO_ZOOM_CLICKS_MESSAGE =
+	"未检测到可缩放的点击操作。拖动轨道即可添加缩放片段。";
 
 export type ModalDialog =
 	| { type: "createPreset" }
@@ -1852,39 +1873,68 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				},
 				splitCaptionSegment: (index: number, time: number) => {
 					setProject(
-						"timeline",
-						"captionSegments",
-						produce((segments) => {
-							const segment = segments?.[index];
-							if (!segment) return;
-
-							const duration = segment.end - segment.start;
-							const remaining = duration - time;
-							if (time < 0.5 || remaining < 0.5) return;
-
-							segments.splice(index + 1, 0, {
-								...segment,
-								id: `cap-split-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-								start: segment.start + time,
-								end: segment.end,
-							});
-							segments[index].end = segment.start + time;
+						produce((value) => {
+							const timeline = value.timeline;
+							const row = timeline?.captionSegments?.[index];
+							if (
+								!timeline ||
+								!row ||
+								time < 0.5 ||
+								row.end - row.start - time < 0.5
+							)
+								return;
+							const target = row.start + time;
+							const rightId = `caption-${crypto.randomUUID()}`;
+							const master = value.captions?.segments;
+							const sourceIndex =
+								master?.findIndex(
+									(caption) => caption.id === sourceCaptionId(row.id),
+								) ?? -1;
+							const source = master?.[sourceIndex];
+							const displayed = splitCaptionAt(row, target, rightId);
+							if (!displayed) return;
+							if (source && master) {
+								const sourceTime = mapEditedTimeToSource(
+									target,
+									timeline.segments,
+									props.editorInstance.recordings.segments,
+									timeline.transitions,
+									source,
+									"incoming",
+									timeline.textSegments,
+									timeline.mainTrackGaps,
+								);
+								const parts =
+									sourceTime == null
+										? null
+										: splitCaptionAt(source, sourceTime, rightId);
+								if (!parts) return;
+								master.splice(sourceIndex, 1, ...parts);
+							}
+							timeline.captionSegments?.splice(index, 1, ...displayed);
 						}),
 					);
 				},
 				deleteCaptionSegments: (segmentIndices: number[]) => {
 					batch(() => {
 						setProject(
-							"timeline",
-							"captionSegments",
-							produce((segments) => {
-								if (!segments) return;
-								const sorted = [...new Set(segmentIndices)]
-									.filter(
-										(i) => Number.isInteger(i) && i >= 0 && i < segments.length,
-									)
-									.sort((a, b) => b - a);
-								for (const i of sorted) segments.splice(i, 1);
+							produce((value) => {
+								const timeline = value.timeline;
+								const rows = timeline?.captionSegments;
+								if (!timeline || !rows) return;
+								const selected = new Set(segmentIndices);
+								const deleted = new Set(
+									rows.flatMap((row, index) =>
+										selected.has(index) ? [sourceCaptionId(row.id)] : [],
+									),
+								);
+								if (value.captions)
+									value.captions.segments = value.captions.segments.filter(
+										(row) => !deleted.has(row.id),
+									);
+								timeline.captionSegments = rows.filter(
+									(row) => !deleted.has(sourceCaptionId(row.id)),
+								);
 							}),
 						);
 						setEditorState("timeline", "selection", null);
@@ -2383,7 +2433,8 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					| "audio"
 					| "text"
 					| "graphics"
-					| "motion",
+					| "motion"
+					| "transitions",
 				inspectorTab: "background" as
 					| "background"
 					| "camera"
@@ -2407,6 +2458,7 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					staleDismissed: false,
 				},
 				timeline: {
+					generatingAutoZoom: false,
 					interactMode: "seek" as "seek" | "split",
 					splitPreview: null as null | { time: number; snapped: boolean },
 					selection: null as
@@ -2507,6 +2559,16 @@ export const [EditorContextProvider, useBaseEditorContext] =
 							editorState.timeline.splitPreview.time >= duration
 						)
 							setEditorState("timeline", "splitPreview", null);
+					});
+				}),
+			);
+
+			createEffect(
+				on(dialog, (state) => {
+					if (state.open && "type" in state && state.type === "clips") return;
+					batch(() => {
+						setEditorState("timeline", "audioPicker", null);
+						setEditorState("timeline", "audioReplace", null);
 					});
 				}),
 			);
@@ -3199,7 +3261,15 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					setDialog({ open: true, type: "clips" });
 				});
 
-			function addTrackContent(type: TimelineTrackType, requestedLength = 3) {
+			function addTrackContent(
+				type: TimelineTrackType,
+				requestedLength = 3,
+				options?: {
+					textPreset?: TextPreset;
+					installedFonts?: string[];
+					shape?: ShapeKind;
+				},
+			) {
 				if (type === "style" || type === "image" || type === "shape") {
 					const segments =
 						(type === "style"
@@ -3214,7 +3284,8 @@ export const [EditorContextProvider, useBaseEditorContext] =
 						editorState.timeline.tracks[type],
 					);
 					if (type === "style") projectActions.addStyleSegment(lane);
-					else if (type === "shape") projectActions.addShapeSegment(lane);
+					else if (type === "shape")
+						projectActions.addShapeSegment(lane, undefined, options?.shape);
 					else void projectActions.importImageSegment(lane);
 					return;
 				}
@@ -3276,15 +3347,20 @@ export const [EditorContextProvider, useBaseEditorContext] =
 							"textSegments",
 							produce((segments) => {
 								segments ??= [];
-								segments.push(
-									withSelectedClipAttachment({
-										...defaultTextSegment(start, end),
-										color: autoTextColorAt(
-											editorInstanceContext.canvasControls(),
-										),
-										track: lane,
-									}),
-								);
+								const text = {
+									...defaultTextSegment(start, end),
+									color: autoTextColorAt(
+										editorInstanceContext.canvasControls(),
+									),
+									track: lane,
+								};
+								if (options?.textPreset)
+									applyTextPreset(
+										text,
+										options.textPreset,
+										options.installedFonts ?? [],
+									);
+								segments.push(withSelectedClipAttachment(text));
 								sortTrackSegments(segments);
 							}),
 						);
@@ -3351,8 +3427,8 @@ export const [EditorContextProvider, useBaseEditorContext] =
 
 			const trimTargetAtPlayhead = () => {
 				const selection = editorState.timeline.selection;
-				if (selection?.type !== "clip") return null;
-				const target = mainTrackTargetAtPlayhead(selection.indices);
+				if (selection && selection.type !== "clip") return null;
+				const target = mainTrackTargetAtPlayhead(selection?.indices);
 				if (!target) return null;
 				const segment = project.timeline?.segments[target.index];
 				const min = (segment?.timescale ?? 1) / FPS;
@@ -3365,10 +3441,137 @@ export const [EditorContextProvider, useBaseEditorContext] =
 				return { ...target, id: segment.id };
 			};
 
+			const collectOverlaySplitTargets = (
+				type: EditableOverlayTrack,
+				indices?: number[],
+			) =>
+				overlaySplitTargets<PlayheadSpan>(
+					type,
+					trackSegments(type) ?? [],
+					editorState.playbackTime,
+					indices,
+				);
+
+			const overlayTrimsAtPlayhead = (edge: "start" | "end") => {
+				const selection = editorState.timeline.selection;
+				if (
+					!selection ||
+					selection.type === "clip" ||
+					selection.type === "transition"
+				)
+					return null;
+				const type = selection.type;
+				const source = trackSegments(type);
+				const edits = selection.indices.flatMap((index) => {
+					const row = source?.[index];
+					const range =
+						row && overlayTrimRange(type, row, edge, editorState.playbackTime);
+					return range ? [{ index, range }] : [];
+				});
+				return edits.length ? { type, edits } : null;
+			};
+
+			const trimOverlaysAtPlayhead = (
+				{ type, edits }: NonNullable<ReturnType<typeof overlayTrimsAtPlayhead>>,
+				edge: "start" | "end",
+			) => {
+				const key =
+					type === "shape"
+						? "shapeSegments"
+						: type === "caption"
+							? "captionSegments"
+							: type === "keyboard"
+								? "keyboardSegments"
+								: overlayAttachmentTrack(type);
+				if (!key) return false;
+				batch(() => {
+					setProject(
+						produce((value) => {
+							const timeline = value.timeline;
+							if (!timeline) return;
+							for (const { index, range } of edits) {
+								const row = timeline[key]?.[index];
+								if (!row) continue;
+								const delta = range.start - row.start;
+								if (edge === "start" && "trimStart" in row)
+									row.trimStart += delta;
+								if ("fadeIn" in row && "fadeOut" in row) {
+									const length = range.end - range.start;
+									row.fadeIn = Math.min(row.fadeIn, length);
+									row.fadeOut = Math.min(row.fadeOut, length - row.fadeIn);
+								}
+								if (type === "keyboard") {
+									const event = timeline.keyboardSegments?.[index];
+									const rebased =
+										event &&
+										rebaseKeyboardSegmentAfterTrim(
+											{ ...event, ...range },
+											event.start,
+										);
+									if (event && rebased) Object.assign(event, rebased);
+								}
+								if (type === "caption") {
+									const caption = timeline.captionSegments?.[index];
+									const master = value.captions?.segments;
+									const updated =
+										caption &&
+										master &&
+										applyEditedCaptionTimingToMaster(
+											master,
+											caption.id,
+											range.start,
+											range.end,
+											timeline.segments,
+											props.editorInstance.recordings.segments,
+											timeline.transitions,
+											timeline.textSegments,
+											timeline.mainTrackGaps,
+										);
+									if (updated && value.captions)
+										value.captions.segments = updated;
+								}
+								Object.assign(row, range);
+							}
+						}),
+					);
+					if (edge === "start") {
+						for (const { index } of edits) {
+							const row = overlayRowsForAttachment(type)?.[index];
+							if (row) projectActions.reanchorOverlay(type, row);
+						}
+					}
+					setEditorState("previewTime", null);
+				});
+				return true;
+			};
+
+			const splitOverlayTargets = (
+				type: EditableOverlayTrack,
+				targets: ReturnType<typeof collectOverlaySplitTargets>,
+			) => {
+				const time = editorState.playbackTime;
+				const splitters = {
+					audio: projectActions.splitAudioSegment,
+					caption: projectActions.splitCaptionSegment,
+					keyboard: projectActions.splitKeyboardSegment,
+					mask: projectActions.splitMaskSegment,
+					scene: projectActions.splitSceneSegment,
+					text: projectActions.splitTextSegment,
+					zoom: projectActions.splitZoomSegment,
+					"3d": projectActions.splitCamera3DSegment,
+				};
+				for (const row of targets) {
+					const current: readonly PlayheadSpan[] = trackSegments(type) ?? [];
+					const index = current.indexOf(row);
+					if (index < 0) continue;
+					if (type === "style" || type === "image" || type === "shape")
+						projectActions.splitOverlaySegment(type, index, time);
+					else splitters[type](index, time - row.start);
+				}
+			};
+
 			const splitAtPlayhead = (commit: boolean, clipIndex?: number) => {
 				const time = editorState.playbackTime;
-				const timeline = project.timeline;
-				if (!timeline) return false;
 				const selection = editorState.timeline.selection;
 				if (
 					clipIndex !== undefined ||
@@ -3381,61 +3584,227 @@ export const [EditorContextProvider, useBaseEditorContext] =
 								? selection.indices
 								: undefined
 							: [clipIndex];
-					if (commit) return projectActions.splitClipSegment(time, indices);
-					return !!mainTrackTargetAtPlayhead(indices);
+					return commit
+						? projectActions.splitClipSegment(time, indices)
+						: !!mainTrackTargetAtPlayhead(indices);
 				}
 				if (selection.type === "transition") return false;
-				const type = selection.type;
-				const rows = trackSegments(type);
-				const minimum =
-					type === "audio"
-						? MIN_AUDIO_SEGMENT_DURATION
-						: type === "caption"
-							? 0.5
-							: type === "style" || type === "image" || type === "shape"
-								? 0.05
-								: 1;
-				const targets = [...selection.indices]
-					.sort((a, b) => b - a)
-					.flatMap((index) => {
-						const row = rows?.[index];
-						if (!row) return [];
-						const local = time - row.start;
-						return local >= minimum && row.end - time >= minimum
-							? [{ index, local }]
-							: [];
-					});
+				const targets = collectOverlaySplitTargets(
+					selection.type,
+					selection.indices,
+				);
 				if (!commit || targets.length === 0) return targets.length > 0;
 				const resumeHistory = projectHistory.pause();
 				try {
-					for (const { index, local } of targets) {
-						if (type === "style" || type === "image" || type === "shape")
-							projectActions.splitOverlaySegment(type, index, time);
-						else {
-							const splitters = {
-								audio: projectActions.splitAudioSegment,
-								caption: projectActions.splitCaptionSegment,
-								keyboard: projectActions.splitKeyboardSegment,
-								mask: projectActions.splitMaskSegment,
-								scene: projectActions.splitSceneSegment,
-								text: projectActions.splitTextSegment,
-								zoom: projectActions.splitZoomSegment,
-								"3d": projectActions.splitCamera3DSegment,
-							};
-							splitters[type](index, local);
-						}
-					}
-					setEditorState("previewTime", null);
+					batch(() => {
+						splitOverlayTargets(selection.type, targets);
+						setEditorState("previewTime", null);
+					});
 				} finally {
 					resumeHistory();
 				}
 				return true;
 			};
 
+			const splitAcrossTracks = (commit: boolean) => {
+				const clip = mainTrackTargetAtPlayhead();
+				const overlays = editableOverlayTracks.flatMap((type) => {
+					const targets = collectOverlaySplitTargets(type);
+					return targets.length ? [{ type, targets }] : [];
+				});
+				if (!commit || (!clip && !overlays.length))
+					return !!clip || overlays.length > 0;
+				const resumeHistory = projectHistory.pause();
+				try {
+					batch(() => {
+						for (const { type, targets } of overlays)
+							splitOverlayTargets(type, targets);
+						if (clip)
+							projectActions.splitClipSegment(editorState.playbackTime, [
+								clip.index,
+							]);
+						else setEditorState("timeline", "selection", null);
+						setEditorState("previewTime", null);
+					});
+				} finally {
+					resumeHistory();
+				}
+				return true;
+			};
+
+			const autoZoomGeneration = createAutoZoomGeneration({
+				snapshot: () => JSON.stringify(serializeProjectConfiguration(project)),
+				revision: projectSave.revision,
+				flush: projectSave.flush,
+				generate: () => commands.generateZoomSegmentsFromClicks(),
+				apply: (segments) => setProject("timeline", "zoomSegments", segments),
+				setPending: (value) =>
+					setEditorState("timeline", "generatingAutoZoom", value),
+				onEmpty: () => toast.error(localize(NO_AUTO_ZOOM_CLICKS_MESSAGE)),
+				onStale: () =>
+					toast.error(localize("编辑内容已变化，请重新生成自动缩放。")),
+				onError: (error) => {
+					console.error("Failed to generate zoom segments:", error);
+					toast.error(localize("Failed to generate zoom segments"));
+				},
+			});
+			onCleanup(autoZoomGeneration.dispose);
+
 			const timelineCommands = {
 				addTrackContent,
+				generateAutoZoom: autoZoomGeneration.run,
+				mainTrackGapAt(time: number) {
+					const timeline = project.timeline;
+					if (!timeline) return null;
+					const { segments, transitions, mainTrackGaps } = timeline;
+					const position =
+						time - heldTimeBefore(holdWindows(timeline.textSegments), time);
+					const offsets = clipTimelineOffsets(
+						segments,
+						transitions,
+						mainTrackGaps,
+					);
+					return (
+						segments.find(
+							(segment, index) =>
+								position < offsets[index] &&
+								position >=
+									offsets[index] - clipGapBefore(segment, mainTrackGaps),
+						)?.id ?? null
+					);
+				},
+				closeMainTrackGap: (clipId: string) =>
+					editMainTrack((timeline) =>
+						closeMainTrackGapBefore(timeline, clipId),
+					),
 				nextAudioLane,
 				openAudioMaterials,
+				replaceAudioFromMaterials(index: number) {
+					if (!project.timeline?.audioSegments?.[index]) return;
+					batch(() => {
+						openAudioMaterials();
+						setEditorState("timeline", "audioReplace", index);
+					});
+				},
+				transitionDestinations() {
+					const timeline = project.timeline;
+					if (!timeline) return [];
+					const { segments, transitions, mainTrackGaps } = timeline;
+					const offsets = clipTimelineOffsets(
+						segments,
+						transitions,
+						mainTrackGaps,
+					);
+					const holds = holdWindows(timeline.textSegments);
+					return segments.flatMap((clip, index) =>
+						index > 0 &&
+						clipGapBefore(clip, mainTrackGaps) === 0 &&
+						maxTransitionDuration(segments[index - 1], clip) > 0
+							? [
+									{
+										index,
+										id: clip.id,
+										time: effectiveToOutput(holds, offsets[index]),
+										name:
+											clip.name?.trim() ||
+											localize("片段 {number}", { number: index + 1 }),
+										transition: getClipTransition(
+											segments,
+											transitions,
+											index,
+											mainTrackGaps,
+										),
+									},
+								]
+							: [],
+					);
+				},
+				setTransitionFromMaterials(
+					index: number,
+					type: ClipTransitionInput["type"],
+				) {
+					const before = project.timeline;
+					if (!before) return;
+					const duration =
+						getClipTransition(
+							before.segments,
+							before.transitions,
+							index,
+							before.mainTrackGaps,
+						)?.duration ?? 0.5;
+					setClipTransition(index, { type, duration });
+					const next = project.timeline;
+					if (
+						next &&
+						getClipTransition(
+							next.segments,
+							next.transitions,
+							index,
+							next.mainTrackGaps,
+						)?.type === type
+					) {
+						setEditorState("previewTime", null);
+						setEditorState("timeline", "selection", {
+							type: "transition",
+							index,
+						});
+					}
+				},
+				async addZoomAtPlayhead(
+					mode: "auto" | { manual: { x: number; y: number } },
+				) {
+					const timeline = project.timeline;
+					if (!timeline) return false;
+					const end = totalDuration();
+					const time = editorState.playbackTime;
+					const revision = projectSave.revision();
+					const attachmentId = selectedClip()?.id ?? null;
+					const occupancy = timeline.zoomSegments;
+					try {
+						const wire = serializeProjectConfiguration(project).timeline;
+						const projected =
+							wire && occupancy.some((segment) => segment.sourceSlices?.length)
+								? await commands.projectZoomTrack(wire)
+								: [];
+						if (projectSave.revision() !== revision) return false;
+						const byIndex = new Map(
+							projected.map((item) => [item.groupIndex, item.spans]),
+						);
+						const occupied = occupancy.flatMap<{ start: number; end: number }>(
+							(row, index) => byIndex.get(index) ?? [row],
+						);
+						const placement =
+							placeSegmentAtTime(occupied, time, Math.min(3, end), end) ??
+							placeSegmentAtTime(occupied, time, Math.min(1, end), end);
+						if (!placement) {
+							toast.error(localize("播放头附近没有足够的缩放空间"));
+							return false;
+						}
+						const amount =
+							(await generalSettingsStore.get())?.defaultZoomAmount ?? 1.5;
+						if (projectSave.revision() !== revision) return false;
+						const segment = withSelectedClipAttachment(
+							{ ...placement, amount, mode },
+							attachmentId,
+						);
+						const next = [...occupancy, segment].sort(
+							(a, b) => a.start - b.start,
+						);
+						batch(() => {
+							setProject("timeline", "zoomSegments", next);
+							setEditorState("timeline", "selection", {
+								type: "zoom",
+								indices: [next.indexOf(segment)],
+							});
+							setEditorState("previewTime", null);
+						});
+						return true;
+					} catch (error) {
+						console.error("Failed to add zoom segment:", error);
+						toast.error(localize("无法添加缩放"));
+						return false;
+					}
+				},
 				openCaptionInspector() {
 					batch(() => {
 						exitStyleScope();
@@ -3526,9 +3895,19 @@ export const [EditorContextProvider, useBaseEditorContext] =
 					)
 						writeOverlayAttachment(type, index, { ...row.attachment, timing });
 				},
+				canSplitAcrossTracks: () => splitAcrossTracks(false),
+				splitAcrossTracks: () => splitAcrossTracks(true),
+				canSplitOverlayAtPlayhead: (
+					type: EditableOverlayTrack,
+					indices: number[],
+				) => collectOverlaySplitTargets(type, indices).length > 0,
 				canSplitAtPlayhead: () => splitAtPlayhead(false),
-				canTrimAtPlayhead: () => trimTargetAtPlayhead() !== null,
+				canTrimAtPlayhead: (edge: "start" | "end") =>
+					trimTargetAtPlayhead() !== null ||
+					overlayTrimsAtPlayhead(edge) !== null,
 				trimAtPlayhead(edge: "start" | "end") {
+					const overlays = overlayTrimsAtPlayhead(edge);
+					if (overlays) return trimOverlaysAtPlayhead(overlays, edge);
 					const target = trimTargetAtPlayhead();
 					if (!target) return false;
 					return batch(() => {

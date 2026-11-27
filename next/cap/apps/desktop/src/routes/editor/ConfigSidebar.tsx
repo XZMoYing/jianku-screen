@@ -59,7 +59,6 @@ import IconLucideKeyboard from "~icons/lucide/keyboard";
 import IconLucideMonitor from "~icons/lucide/monitor";
 import IconLucideVideo from "~icons/lucide/video";
 import IconLucideX from "~icons/lucide/x";
-import { AudioLibraryPanel } from "./AudioLibrary";
 import {
 	AUDIO_TRACK_BG_CLASS,
 	type AudioTrackSegment,
@@ -72,6 +71,7 @@ import { syncCaptionWordsWithText } from "./captions";
 import { type ClipTransition, clipSourceTimeAt } from "./clip-transitions";
 import { EditorStyleContext, useEditorContext } from "./context";
 import { recordedCursorFamily } from "./cursor-style";
+import { InspectorSections } from "./InspectorSections";
 import { ImageSegmentConfig } from "./image-segment-config";
 import { KeyboardTab } from "./KeyboardTab";
 import {
@@ -82,6 +82,7 @@ import {
 	type MaskKind,
 	type MaskSegment,
 } from "./masks";
+import { OverlayAssociationControl } from "./OverlayAssociationControl";
 import {
 	DEFAULT_SCENE_TRANSITION,
 	DEFAULT_SPLIT_LAYOUT,
@@ -583,18 +584,14 @@ function ConfigSidebarContent() {
 
 	return (
 		<KTabs
-			value={
-				sidebarSelection() || editorState.timeline.audioReplace !== null
-					? undefined
-					: editorState.inspectorTab
-			}
+			value={sidebarSelection() ? undefined : editorState.inspectorTab}
 			class="jk-inspector flex overflow-hidden z-10 flex-col flex-1 min-h-0 min-w-0 rounded-xl shrink-0 bg-ed-card shadow-ed-card"
 		>
 			<KTabs.List
 				class="jk-inspector-tabs sticky top-0 z-60 flex-row justify-around items-center px-2.5 h-[46px] border-b border-ed-line shrink-0 bg-ed-card"
 				classList={{
-					flex: sidebarSelection()?.type !== "clip",
-					hidden: sidebarSelection()?.type === "clip",
+					flex: !sidebarSelection(),
+					hidden: !!sidebarSelection(),
 				}}
 			>
 				<MotionGroup
@@ -654,9 +651,6 @@ function ConfigSidebarContent() {
 									if (sidebarSelection()) {
 										setEditorState("timeline", "selection", null);
 									}
-									if (editorState.timeline.audioReplace !== null) {
-										setEditorState("timeline", "audioReplace", null);
-									}
 									setEditorState("inspectorTab", item.id);
 									scrollRef.scrollTo({
 										top: 0,
@@ -683,9 +677,7 @@ function ConfigSidebarContent() {
 					</For>
 				</MotionGroup>
 			</KTabs.List>
-			<Show
-				when={!sidebarSelection() && editorState.timeline.audioReplace === null}
-			>
+			<Show when={!sidebarSelection()}>
 				<div class="jk-insp-title-row jk-editor-insp-title-row">
 					<MotionText
 						class="jk-insp-title"
@@ -710,8 +702,7 @@ function ConfigSidebarContent() {
 				}}
 				class="custom-scroll overscroll-contain overflow-x-hidden overflow-y-auto text-[0.875rem] flex-1 min-h-0"
 				classList={{
-					hidden:
-						!!sidebarSelection() || editorState.timeline.audioReplace !== null,
+					hidden: !!sidebarSelection(),
 				}}
 			>
 				<MotionSwitch value={editorState.inspectorTab}>
@@ -900,40 +891,40 @@ function ConfigSidebarContent() {
 				}}
 				class="custom-scroll min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain pt-3.5 px-4 pb-4 text-[0.875rem] space-y-3.5 bg-ed-card z-50"
 				classList={{
-					hidden:
-						!sidebarSelection() && editorState.timeline.audioReplace === null,
-					"animate-in slide-in-from-bottom-2 fade-in":
-						!!sidebarSelection() || editorState.timeline.audioReplace !== null,
+					hidden: !sidebarSelection(),
+					"animate-in slide-in-from-bottom-2 fade-in": !!sidebarSelection(),
 				}}
 			>
-				<Show
-					when={(() => {
-						const index = editorState.timeline.audioReplace;
-						if (index === null) return null;
-						const segment = project.timeline?.audioSegments?.[index];
-						if (!segment) {
-							setEditorState("timeline", "audioReplace", null);
-							return null;
-						}
-						return { index };
-					})()}
-				>
-					{(value) => (
-						<AudioLibraryPanel
-							mode={{ type: "replace", index: value().index }}
-							onClose={() => setEditorState("timeline", "audioReplace", null)}
-						/>
-					)}
-				</Show>
-				<Show
-					when={
-						editorState.timeline.audioReplace === null
-							? sidebarSelection()
-							: null
-					}
-				>
+				<Show when={sidebarSelection()}>
 					{(selection) => (
 						<Suspense>
+							<Show when={selection().type !== "clip"}>
+								<div class="flex min-w-0 items-center justify-between gap-2">
+									<Show
+										when={(() => {
+											const active = selection();
+											return "indices" in active && active.indices.length === 1
+												? { type: active.type, index: active.indices[0] }
+												: null;
+										})()}
+									>
+										{(item) => (
+											<OverlayAssociationControl
+												type={item().type}
+												index={item().index}
+											/>
+										)}
+									</Show>
+									<EditorButton
+										class="ml-auto shrink-0"
+										onClick={() =>
+											setEditorState("timeline", "selection", null)
+										}
+									>
+										{localize("返回全局设置")}
+									</EditorButton>
+								</div>
+							</Show>
 							<Show
 								when={(() => {
 									const selected = selection();
@@ -997,14 +988,6 @@ function ConfigSidebarContent() {
 									<div class="space-y-4">
 										<div class="flex flex-row justify-between items-center">
 											<div class="flex gap-2 items-center">
-												<EditorButton
-													onClick={() =>
-														setEditorState("timeline", "selection", null)
-													}
-													leftIcon={<IconLucideCheck />}
-												>
-													{localize("Done")}
-												</EditorButton>
 												<span class="text-[12px] text-ed-text-2">
 													{selectedSegmentLabel(
 														"caption",
@@ -1068,15 +1051,6 @@ function ConfigSidebarContent() {
 									<div class="space-y-4">
 										<div class="flex flex-row justify-between items-center">
 											<div class="flex gap-2 items-center">
-												<EditorButton
-													onClick={() => {
-														setEditorState("timeline", "selection", null);
-														setEditorState("inspectorTab", TAB_IDS.keyboard);
-													}}
-													leftIcon={<IconLucideCheck />}
-												>
-													{localize("Done")}
-												</EditorButton>
 												<span class="text-[12px] text-ed-text-2">
 													{selectedSegmentLabel(
 														"keyboard",
@@ -1135,14 +1109,6 @@ function ConfigSidebarContent() {
 									<div class="space-y-4">
 										<div class="flex flex-row justify-between items-center">
 											<div class="flex gap-2 items-center">
-												<EditorButton
-													onClick={() =>
-														setEditorState("timeline", "selection", null)
-													}
-													leftIcon={<IconLucideCheck />}
-												>
-													{localize("Done")}
-												</EditorButton>
 												<span class="text-[12px] text-ed-text-2">
 													{selectedSegmentLabel(
 														"text",
@@ -1206,14 +1172,6 @@ function ConfigSidebarContent() {
 									<div class="space-y-4">
 										<div class="flex flex-row justify-between items-center">
 											<div class="flex gap-2 items-center">
-												<EditorButton
-													onClick={() =>
-														setEditorState("timeline", "selection", null)
-													}
-													leftIcon={<IconLucideCheck />}
-												>
-													{localize("Done")}
-												</EditorButton>
 												<span class="text-[12px] text-ed-text-2">
 													{selectedSegmentLabel(
 														"audio",
@@ -1272,14 +1230,6 @@ function ConfigSidebarContent() {
 									<div class="space-y-4">
 										<div class="flex flex-row justify-between items-center">
 											<div class="flex gap-2 items-center">
-												<EditorButton
-													onClick={() =>
-														setEditorState("timeline", "selection", null)
-													}
-													leftIcon={<IconLucideCheck />}
-												>
-													{localize("Done")}
-												</EditorButton>
 												<span class="text-[12px] text-ed-text-2">
 													{selectedSegmentLabel(
 														"mask",
@@ -1354,14 +1304,6 @@ function ConfigSidebarContent() {
 										<div class="space-y-4">
 											<div class="flex flex-row justify-between items-center">
 												<div class="flex gap-2 items-center min-w-0">
-													<EditorButton
-														onClick={() =>
-															setEditorState("timeline", "selection", null)
-														}
-														leftIcon={<IconLucideCheck />}
-													>
-														{localize("Done")}
-													</EditorButton>
 													<span class="text-[12px] text-ed-text-2 whitespace-nowrap">
 														{selectionLabel()}
 													</span>
@@ -1446,14 +1388,6 @@ function ConfigSidebarContent() {
 									<div class="space-y-3.5">
 										<div class="flex flex-row gap-2 justify-between items-center">
 											<div class="flex gap-2 items-center min-w-0">
-												<EditorButton
-													onClick={() =>
-														setEditorState("timeline", "selection", null)
-													}
-													leftIcon={<IconLucideCheck />}
-												>
-													{localize("Done")}
-												</EditorButton>
 												<span class="text-[12px] truncate text-ed-text-2">
 													<Show
 														when={
@@ -1545,14 +1479,6 @@ function ConfigSidebarContent() {
 												<div class="space-y-4">
 													<div class="flex flex-row justify-between items-center">
 														<div class="flex gap-2 items-center">
-															<EditorButton
-																onClick={() =>
-																	setEditorState("timeline", "selection", null)
-																}
-																leftIcon={<IconLucideCheck />}
-															>
-																{localize("Done")}
-															</EditorButton>
 															<span class="text-[12px] text-ed-text-2">
 																{selectedSegmentLabel(
 																	"scene",
@@ -1772,7 +1698,7 @@ function AudioSegmentConfig(props: {
 	segmentIndex: number;
 	segment: AudioTrackSegment;
 }) {
-	const { setProject, setEditorState } = useEditorContext();
+	const { setProject, timelineCommands } = useEditorContext();
 	const clampNumber = (value: number, min: number, max: number) =>
 		Math.min(Math.max(Number.isFinite(value) ? value : min, min), max);
 
@@ -1793,127 +1719,148 @@ function AudioSegmentConfig(props: {
 	const fadeMax = () => Math.max(0.1, segmentDuration());
 
 	return (
-		<div class="space-y-4">
-			<Section name={`${localize("Audio")} ${props.segmentIndex + 1}`}>
-				<div class="flex flex-col gap-3">
-					<button
-						type="button"
-						onClick={() =>
-							setEditorState("timeline", "audioReplace", props.segmentIndex)
-						}
-						class="flex gap-3 items-center p-2 w-full text-left rounded-xl border transition-colors group border-gray-3 bg-gray-2 hover:border-gray-5 hover:bg-gray-3"
-					>
-						<span
-							class={cx(
-								"rounded-lg ring-1 shrink-0 size-10 ring-black/10",
-								AUDIO_TRACK_BG_CLASS,
-							)}
-						/>
-						<div class="flex flex-col flex-1 min-w-0">
-							<span class="text-sm font-medium truncate text-gray-12">
-								{props.segment.name || localize("Audio")}
-							</span>
-							<span class="text-xs text-gray-10">
-								{localize("Tap to change track")}
-							</span>
-						</div>
-						<span class="flex gap-1 items-center px-2 h-7 text-xs font-medium rounded-lg border transition-colors shrink-0 border-gray-3 bg-gray-1 text-gray-11 group-hover:text-gray-12">
-							<IconLucideRefreshCw class="size-3.5" />
-							{localize("Change")}
-						</span>
-					</button>
-					<div class="flex gap-3 items-center">
-						<input
-							class="flex-1 px-3 py-2 rounded-lg border border-gray-3 bg-gray-2 text-gray-12"
-							value={props.segment.name ?? ""}
-							placeholder={localize("Audio")}
-							onInput={(e) =>
-								updateSegment((segment) => {
-									segment.name = e.currentTarget.value;
-								})
-							}
-						/>
-						<div class="flex flex-col gap-2 items-center">
-							<span class="text-[11px] text-ed-text-3">
-								{localize("Enabled")}
-							</span>
-							<Toggle
-								checked={props.segment.enabled}
-								onChange={(value) =>
-									updateSegment((segment) => {
-										segment.enabled = value;
-									})
-								}
-							/>
-						</div>
-					</div>
-				</div>
-			</Section>
-			<Field
-				inline
-				name={localize("Volume")}
-				value={`${clampNumber(
-					props.segment.volumeDb,
-					MIN_VOLUME_DB,
-					MAX_VOLUME_DB,
-				).toFixed(1)} dB`}
-			>
-				<Slider
-					value={[
-						clampNumber(props.segment.volumeDb, MIN_VOLUME_DB, MAX_VOLUME_DB),
-					]}
-					onChange={([value]) =>
-						updateSegment((segment) => {
-							segment.volumeDb = clampNumber(
-								value,
+		<InspectorSections
+			label="音频属性"
+			initial="audio"
+			tabs={[
+				{ id: "audio", label: "音频" },
+				{ id: "fade", label: "淡化" },
+			]}
+		>
+			{(active) => (
+				<div class="space-y-4">
+					<Show when={active() === "audio"}>
+						<Section name={`${localize("Audio")} ${props.segmentIndex + 1}`}>
+							<div class="flex flex-col gap-3">
+								<button
+									type="button"
+									onClick={() =>
+										timelineCommands.replaceAudioFromMaterials(
+											props.segmentIndex,
+										)
+									}
+									class="flex gap-3 items-center p-2 w-full text-left rounded-xl border transition-colors group border-gray-3 bg-gray-2 hover:border-gray-5 hover:bg-gray-3"
+								>
+									<span
+										class={cx(
+											"rounded-lg ring-1 shrink-0 size-10 ring-black/10",
+											AUDIO_TRACK_BG_CLASS,
+										)}
+									/>
+									<div class="flex flex-col flex-1 min-w-0">
+										<span class="text-sm font-medium truncate text-gray-12">
+											{props.segment.name || localize("Audio")}
+										</span>
+										<span class="text-xs text-gray-10">
+											{localize("Tap to change track")}
+										</span>
+									</div>
+									<span class="flex gap-1 items-center px-2 h-7 text-xs font-medium rounded-lg border transition-colors shrink-0 border-gray-3 bg-gray-1 text-gray-11 group-hover:text-gray-12">
+										<IconLucideRefreshCw class="size-3.5" />
+										{localize("Change")}
+									</span>
+								</button>
+								<div class="flex gap-3 items-center">
+									<input
+										class="flex-1 px-3 py-2 rounded-lg border border-gray-3 bg-gray-2 text-gray-12"
+										value={props.segment.name ?? ""}
+										placeholder={localize("Audio")}
+										onInput={(e) =>
+											updateSegment((segment) => {
+												segment.name = e.currentTarget.value;
+											})
+										}
+									/>
+									<div class="flex flex-col gap-2 items-center">
+										<span class="text-[11px] text-ed-text-3">
+											{localize("Enabled")}
+										</span>
+										<Toggle
+											checked={props.segment.enabled}
+											onChange={(value) =>
+												updateSegment((segment) => {
+													segment.enabled = value;
+												})
+											}
+										/>
+									</div>
+								</div>
+							</div>
+						</Section>
+						<Field
+							inline
+							name={localize("Volume")}
+							value={`${clampNumber(
+								props.segment.volumeDb,
 								MIN_VOLUME_DB,
 								MAX_VOLUME_DB,
-							);
-						})
-					}
-					minValue={MIN_VOLUME_DB}
-					maxValue={MAX_VOLUME_DB}
-					step={1}
-					formatTooltip="dB"
-				/>
-			</Field>
-			<Field
-				inline
-				name={localize("Fade In")}
-				value={`${clampNumber(props.segment.fadeIn, 0, fadeMax()).toFixed(2)}s`}
-			>
-				<Slider
-					value={[clampNumber(props.segment.fadeIn, 0, fadeMax())]}
-					onChange={([value]) =>
-						updateSegment((segment) => {
-							segment.fadeIn = clampNumber(value, 0, segmentDuration());
-						})
-					}
-					minValue={0}
-					maxValue={fadeMax()}
-					step={0.05}
-					formatTooltip="s"
-				/>
-			</Field>
-			<Field
-				inline
-				name={localize("Fade Out")}
-				value={`${clampNumber(props.segment.fadeOut, 0, fadeMax()).toFixed(2)}s`}
-			>
-				<Slider
-					value={[clampNumber(props.segment.fadeOut, 0, fadeMax())]}
-					onChange={([value]) =>
-						updateSegment((segment) => {
-							segment.fadeOut = clampNumber(value, 0, segmentDuration());
-						})
-					}
-					minValue={0}
-					maxValue={fadeMax()}
-					step={0.05}
-					formatTooltip="s"
-				/>
-			</Field>
-		</div>
+							).toFixed(1)} dB`}
+						>
+							<Slider
+								value={[
+									clampNumber(
+										props.segment.volumeDb,
+										MIN_VOLUME_DB,
+										MAX_VOLUME_DB,
+									),
+								]}
+								onChange={([value]) =>
+									updateSegment((segment) => {
+										segment.volumeDb = clampNumber(
+											value,
+											MIN_VOLUME_DB,
+											MAX_VOLUME_DB,
+										);
+									})
+								}
+								minValue={MIN_VOLUME_DB}
+								maxValue={MAX_VOLUME_DB}
+								step={1}
+								formatTooltip="dB"
+							/>
+						</Field>
+					</Show>
+					<Show when={active() === "fade"}>
+						<Field
+							inline
+							name={localize("Fade In")}
+							value={`${clampNumber(props.segment.fadeIn, 0, fadeMax()).toFixed(2)}s`}
+						>
+							<Slider
+								value={[clampNumber(props.segment.fadeIn, 0, fadeMax())]}
+								onChange={([value]) =>
+									updateSegment((segment) => {
+										segment.fadeIn = clampNumber(value, 0, segmentDuration());
+									})
+								}
+								minValue={0}
+								maxValue={fadeMax()}
+								step={0.05}
+								formatTooltip="s"
+							/>
+						</Field>
+						<Field
+							inline
+							name={localize("Fade Out")}
+							value={`${clampNumber(props.segment.fadeOut, 0, fadeMax()).toFixed(2)}s`}
+						>
+							<Slider
+								value={[clampNumber(props.segment.fadeOut, 0, fadeMax())]}
+								onChange={([value]) =>
+									updateSegment((segment) => {
+										segment.fadeOut = clampNumber(value, 0, segmentDuration());
+									})
+								}
+								minValue={0}
+								maxValue={fadeMax()}
+								step={0.05}
+								formatTooltip="s"
+							/>
+						</Field>
+					</Show>
+				</div>
+			)}
+		</InspectorSections>
 	);
 }
 
@@ -3209,8 +3156,7 @@ function SceneSegmentConfig(props: {
 	segmentIndex: number;
 	segment: SceneSegment;
 }) {
-	const { setProject, setEditorState, projectActions, editorInstance } =
-		useEditorContext();
+	const { setProject, projectActions, editorInstance } = useEditorContext();
 
 	const hasCamera = () =>
 		!editorInstance.recordings.segments.every((s) => s.camera === null);
@@ -3239,15 +3185,7 @@ function SceneSegmentConfig(props: {
 
 	return (
 		<>
-			<div class="flex flex-row justify-between items-center">
-				<div class="flex gap-2 items-center">
-					<EditorButton
-						onClick={() => setEditorState("timeline", "selection", null)}
-						leftIcon={<IconLucideCheck />}
-					>
-						{localize("Done")}
-					</EditorButton>
-				</div>
+			<div class="flex justify-end">
 				<EditorButton
 					variant="danger"
 					onClick={() => {

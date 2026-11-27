@@ -5,6 +5,7 @@ import { t as localize } from "~/utils/i18n";
 import type { ShapeKind } from "~/utils/tauri";
 import IconLucideCrosshair from "~icons/lucide/crosshair";
 import { useEditorContext } from "./context";
+import { InspectorSections } from "./InspectorSections";
 import {
 	nextShapeBadgeNumber,
 	SHAPE_ANIMATIONS,
@@ -57,518 +58,536 @@ export function ShapeSegmentConfig(props: { index: number }) {
 	return (
 		<Show when={segment()}>
 			{(shape) => (
-				<div class="flex flex-col gap-3.5 p-4">
-					<div class="flex items-center justify-between gap-2">
-						<span class="truncate text-[13px] font-medium text-ed-text-1">
-							{shapeDisplayName(shape())}
-						</span>
-						<div class="flex items-center gap-2">
-							<Toggle
-								checked={shape().enabled}
-								onChange={(value) =>
-									setProject(
-										"timeline",
-										"shapeSegments",
-										props.index,
-										"enabled",
-										value,
-									)
-								}
-							/>
-							<EditorButton
-								variant="danger"
-								onClick={() =>
-									projectActions.deleteOverlaySegments("shape", [props.index])
-								}
-							>
-								{localize("Delete")}
-							</EditorButton>
-						</div>
-					</div>
-
-					<div class="flex flex-col gap-2 rounded-lg bg-ed-card-2 p-3">
-						<SectionLabel name={localize("Shape type")} />
-						<div class="grid grid-cols-3 gap-1.5">
-							<For each={SHAPE_KINDS}>
-								{(kind) => (
-									<button
-										type="button"
-										class={cx(
-											"h-8 rounded-md px-2 text-xs font-medium transition-colors",
-											shape().kind === kind
-												? "bg-ed-accent text-white"
-												: "bg-ed-ctl text-ed-text-2 hover:bg-ed-ctl-hover hover:text-ed-text-1",
-										)}
-										onClick={() => applyKind(kind)}
-									>
-										{localize(shapeKindLabel(kind))}
-									</button>
-								)}
-							</For>
-						</div>
-
-						<Show when={shape().kind === "arrow"}>
-							<div class="mt-1 flex flex-col gap-1.5">
-								<span class="text-[11px] font-medium text-ed-text-3">
-									{localize("Arrowhead")}
-								</span>
-								<div class="grid grid-cols-3 gap-1.5">
-									<For each={SHAPE_ARROW_HEADS}>
-										{(head) => (
-											<button
-												type="button"
-												class={cx(
-													"h-7 rounded-md px-2 text-xs font-medium transition-colors",
-													shape().arrowHead === head
-														? "bg-ed-accent text-white"
-														: "bg-ed-ctl text-ed-text-2 hover:bg-ed-ctl-hover hover:text-ed-text-1",
-												)}
-												onClick={() =>
-													setProject(
-														"timeline",
-														"shapeSegments",
-														props.index,
-														"arrowHead",
-														head,
-													)
-												}
-											>
-												{localize(shapeArrowHeadLabel(head))}
-											</button>
-										)}
-									</For>
-								</div>
-							</div>
-						</Show>
-
-						<Show when={shape().kind === "badge"}>
-							<Field inline name={localize("Step number")}>
-								<input
-									type="number"
-									min={1}
-									max={999}
-									value={shape().number}
-									class="h-7 w-20 rounded-md bg-ed-ctl px-2 text-right text-xs tabular-nums text-ed-text-1 outline-hidden focus:ring-1 focus:ring-ed-accent"
-									onInput={(event) => {
-										const parsed = Number.parseInt(
-											event.currentTarget.value,
-											10,
-										);
-										if (Number.isFinite(parsed) && parsed >= 1) {
-											setProject(
-												"timeline",
-												"shapeSegments",
-												props.index,
-												"number",
-												Math.min(999, parsed),
-											);
-										}
-									}}
-								/>
-							</Field>
-						</Show>
-					</div>
-
-					<div class="flex flex-col gap-2.5 rounded-lg bg-ed-card-2 p-3">
-						<SectionLabel name={localize("Stroke & Fill")} />
-						<div class="flex items-center justify-between gap-2">
-							<span class="text-xs text-ed-text-2">
-								{localize("Stroke color")}
-							</span>
-							<div class="flex items-center gap-1">
-								<For each={SHAPE_COLOR_SWATCHES}>
-									{(swatch) => (
-										<button
-											type="button"
-											aria-label={swatch}
-											class={cx(
-												"size-4 rounded-full border transition-transform",
-												shape().strokeColor.toUpperCase() === swatch
-													? "scale-110 border-ed-accent ring-1 ring-ed-accent"
-													: "border-ed-line",
-											)}
-											style={{ "background-color": swatch }}
-											onClick={() =>
+				<InspectorSections
+					label="形状属性"
+					initial="shape"
+					tabs={[
+						{ id: "shape", label: "形状" },
+						{ id: "style", label: "样式" },
+						{ id: "animation", label: "动画" },
+					]}
+				>
+					{(active) => (
+						<div class="flex flex-col gap-3.5">
+							<Show when={active() === "shape"}>
+								<div class="flex items-center justify-between gap-2">
+									<span class="truncate text-[13px] font-medium text-ed-text-1">
+										{shapeDisplayName(shape())}
+									</span>
+									<div class="flex items-center gap-2">
+										<Toggle
+											checked={shape().enabled}
+											onChange={(value) =>
 												setProject(
 													"timeline",
 													"shapeSegments",
 													props.index,
-													"strokeColor",
-													swatch,
+													"enabled",
+													value,
 												)
 											}
 										/>
-									)}
-								</For>
-								<input
-									type="color"
-									aria-label={localize("Stroke color")}
-									value={shape().strokeColor}
-									class="h-5 w-6 cursor-pointer rounded border border-ed-line bg-transparent p-0"
-									onInput={(event) =>
-										setProject(
-											"timeline",
-											"shapeSegments",
-											props.index,
-											"strokeColor",
-											event.currentTarget.value,
-										)
-									}
-								/>
-							</div>
-						</div>
+										<EditorButton
+											variant="danger"
+											onClick={() =>
+												projectActions.deleteOverlaySegments("shape", [
+													props.index,
+												])
+											}
+										>
+											{localize("Delete")}
+										</EditorButton>
+									</div>
+								</div>
 
-						<Field
-							inline
-							name={localize("Stroke width")}
-							value={`${Math.round(shape().strokeWidth)}px`}
-						>
-							<Slider
-								value={[shape().strokeWidth]}
-								minValue={0}
-								maxValue={40}
-								step={1}
-								formatTooltip="px"
-								onChange={(value) =>
-									setProject(
-										"timeline",
-										"shapeSegments",
-										props.index,
-										"strokeWidth",
-										value[0],
-									)
-								}
-							/>
-						</Field>
-
-						<Show when={shapeKindSupportsFill(shape().kind)}>
-							<Field inline name={localize("Fill")}>
-								<Toggle
-									checked={shape().fill}
-									onChange={(value) =>
-										setProject(
-											"timeline",
-											"shapeSegments",
-											props.index,
-											"fill",
-											value,
-										)
-									}
-								/>
-							</Field>
-							<Show when={shape().fill}>
-								<div class="flex items-center justify-between gap-2">
-									<span class="text-xs text-ed-text-2">
-										{localize("Fill color")}
-									</span>
-									<div class="flex items-center gap-1">
-										<For each={SHAPE_COLOR_SWATCHES}>
-											{(swatch) => (
+								<div class="flex flex-col gap-2 rounded-lg bg-ed-card-2 p-3">
+									<SectionLabel name={localize("Shape type")} />
+									<div class="grid grid-cols-3 gap-1.5">
+										<For each={SHAPE_KINDS}>
+											{(kind) => (
 												<button
 													type="button"
-													aria-label={swatch}
 													class={cx(
-														"size-4 rounded-full border transition-transform",
-														shape().fillColor.toUpperCase() === swatch
-															? "scale-110 border-ed-accent ring-1 ring-ed-accent"
-															: "border-ed-line",
+														"h-8 rounded-md px-2 text-xs font-medium transition-colors",
+														shape().kind === kind
+															? "bg-ed-accent text-white"
+															: "bg-ed-ctl text-ed-text-2 hover:bg-ed-ctl-hover hover:text-ed-text-1",
 													)}
-													style={{ "background-color": swatch }}
-													onClick={() =>
+													onClick={() => applyKind(kind)}
+												>
+													{localize(shapeKindLabel(kind))}
+												</button>
+											)}
+										</For>
+									</div>
+
+									<Show when={shape().kind === "arrow"}>
+										<div class="mt-1 flex flex-col gap-1.5">
+											<span class="text-[11px] font-medium text-ed-text-3">
+												{localize("Arrowhead")}
+											</span>
+											<div class="grid grid-cols-3 gap-1.5">
+												<For each={SHAPE_ARROW_HEADS}>
+													{(head) => (
+														<button
+															type="button"
+															class={cx(
+																"h-7 rounded-md px-2 text-xs font-medium transition-colors",
+																shape().arrowHead === head
+																	? "bg-ed-accent text-white"
+																	: "bg-ed-ctl text-ed-text-2 hover:bg-ed-ctl-hover hover:text-ed-text-1",
+															)}
+															onClick={() =>
+																setProject(
+																	"timeline",
+																	"shapeSegments",
+																	props.index,
+																	"arrowHead",
+																	head,
+																)
+															}
+														>
+															{localize(shapeArrowHeadLabel(head))}
+														</button>
+													)}
+												</For>
+											</div>
+										</div>
+									</Show>
+
+									<Show when={shape().kind === "badge"}>
+										<Field inline name={localize("Step number")}>
+											<input
+												type="number"
+												min={1}
+												max={999}
+												value={shape().number}
+												class="h-7 w-20 rounded-md bg-ed-ctl px-2 text-right text-xs tabular-nums text-ed-text-1 outline-hidden focus:ring-1 focus:ring-ed-accent"
+												onInput={(event) => {
+													const parsed = Number.parseInt(
+														event.currentTarget.value,
+														10,
+													);
+													if (Number.isFinite(parsed) && parsed >= 1) {
 														setProject(
 															"timeline",
 															"shapeSegments",
 															props.index,
-															"fillColor",
-															swatch,
-														)
+															"number",
+															Math.min(999, parsed),
+														);
 													}
-												/>
-											)}
-										</For>
-										<input
-											type="color"
-											aria-label={localize("Fill color")}
-											value={shape().fillColor}
-											class="h-5 w-6 cursor-pointer rounded border border-ed-line bg-transparent p-0"
-											onInput={(event) =>
+												}}
+											/>
+										</Field>
+									</Show>
+								</div>
+
+								<div class="flex flex-col gap-2 rounded-lg bg-ed-card-2 p-3">
+									<SectionLabel name={localize("Position")} />
+									<Field
+										inline
+										name={localize("Start X")}
+										value={`${Math.round(shape().from.x * 100)}%`}
+									>
+										<Slider
+											value={[Math.round(shape().from.x * 100)]}
+											minValue={0}
+											maxValue={100}
+											step={1}
+											formatTooltip="%"
+											onChange={(value) =>
 												setProject(
 													"timeline",
 													"shapeSegments",
 													props.index,
-													"fillColor",
-													event.currentTarget.value,
+													"from",
+													"x",
+													value[0] / 100,
 												)
 											}
 										/>
+									</Field>
+									<Field
+										inline
+										name={localize("Start Y")}
+										value={`${Math.round(shape().from.y * 100)}%`}
+									>
+										<Slider
+											value={[Math.round(shape().from.y * 100)]}
+											minValue={0}
+											maxValue={100}
+											step={1}
+											formatTooltip="%"
+											onChange={(value) =>
+												setProject(
+													"timeline",
+													"shapeSegments",
+													props.index,
+													"from",
+													"y",
+													value[0] / 100,
+												)
+											}
+										/>
+									</Field>
+									<Field
+										inline
+										name={localize("End X")}
+										value={`${Math.round(shape().to.x * 100)}%`}
+									>
+										<Slider
+											value={[Math.round(shape().to.x * 100)]}
+											minValue={0}
+											maxValue={100}
+											step={1}
+											formatTooltip="%"
+											onChange={(value) =>
+												setProject(
+													"timeline",
+													"shapeSegments",
+													props.index,
+													"to",
+													"x",
+													value[0] / 100,
+												)
+											}
+										/>
+									</Field>
+									<Field
+										inline
+										name={localize("End Y")}
+										value={`${Math.round(shape().to.y * 100)}%`}
+									>
+										<Slider
+											value={[Math.round(shape().to.y * 100)]}
+											minValue={0}
+											maxValue={100}
+											step={1}
+											formatTooltip="%"
+											onChange={(value) =>
+												setProject(
+													"timeline",
+													"shapeSegments",
+													props.index,
+													"to",
+													"y",
+													value[0] / 100,
+												)
+											}
+										/>
+									</Field>
+									<EditorButton
+										class="w-full justify-center"
+										leftIcon={<IconLucideCrosshair class="size-4" />}
+										onClick={centerOnCanvas}
+									>
+										{localize("Center on canvas")}
+									</EditorButton>
+								</div>
+							</Show>
+							<Show when={active() === "style"}>
+								<div class="flex flex-col gap-2.5 rounded-lg bg-ed-card-2 p-3">
+									<SectionLabel name={localize("Stroke & Fill")} />
+									<div class="flex items-center justify-between gap-2">
+										<span class="text-xs text-ed-text-2">
+											{localize("Stroke color")}
+										</span>
+										<div class="flex items-center gap-1">
+											<For each={SHAPE_COLOR_SWATCHES}>
+												{(swatch) => (
+													<button
+														type="button"
+														aria-label={swatch}
+														class={cx(
+															"size-4 rounded-full border transition-transform",
+															shape().strokeColor.toUpperCase() === swatch
+																? "scale-110 border-ed-accent ring-1 ring-ed-accent"
+																: "border-ed-line",
+														)}
+														style={{ "background-color": swatch }}
+														onClick={() =>
+															setProject(
+																"timeline",
+																"shapeSegments",
+																props.index,
+																"strokeColor",
+																swatch,
+															)
+														}
+													/>
+												)}
+											</For>
+											<input
+												type="color"
+												aria-label={localize("Stroke color")}
+												value={shape().strokeColor}
+												class="h-5 w-6 cursor-pointer rounded border border-ed-line bg-transparent p-0"
+												onInput={(event) =>
+													setProject(
+														"timeline",
+														"shapeSegments",
+														props.index,
+														"strokeColor",
+														event.currentTarget.value,
+													)
+												}
+											/>
+										</div>
+									</div>
+
+									<Field
+										inline
+										name={localize("Stroke width")}
+										value={`${Math.round(shape().strokeWidth)}px`}
+									>
+										<Slider
+											value={[shape().strokeWidth]}
+											minValue={0}
+											maxValue={40}
+											step={1}
+											formatTooltip="px"
+											onChange={(value) =>
+												setProject(
+													"timeline",
+													"shapeSegments",
+													props.index,
+													"strokeWidth",
+													value[0],
+												)
+											}
+										/>
+									</Field>
+
+									<Show when={shapeKindSupportsFill(shape().kind)}>
+										<Field inline name={localize("Fill")}>
+											<Toggle
+												checked={shape().fill}
+												onChange={(value) =>
+													setProject(
+														"timeline",
+														"shapeSegments",
+														props.index,
+														"fill",
+														value,
+													)
+												}
+											/>
+										</Field>
+										<Show when={shape().fill}>
+											<div class="flex items-center justify-between gap-2">
+												<span class="text-xs text-ed-text-2">
+													{localize("Fill color")}
+												</span>
+												<div class="flex items-center gap-1">
+													<For each={SHAPE_COLOR_SWATCHES}>
+														{(swatch) => (
+															<button
+																type="button"
+																aria-label={swatch}
+																class={cx(
+																	"size-4 rounded-full border transition-transform",
+																	shape().fillColor.toUpperCase() === swatch
+																		? "scale-110 border-ed-accent ring-1 ring-ed-accent"
+																		: "border-ed-line",
+																)}
+																style={{ "background-color": swatch }}
+																onClick={() =>
+																	setProject(
+																		"timeline",
+																		"shapeSegments",
+																		props.index,
+																		"fillColor",
+																		swatch,
+																	)
+																}
+															/>
+														)}
+													</For>
+													<input
+														type="color"
+														aria-label={localize("Fill color")}
+														value={shape().fillColor}
+														class="h-5 w-6 cursor-pointer rounded border border-ed-line bg-transparent p-0"
+														onInput={(event) =>
+															setProject(
+																"timeline",
+																"shapeSegments",
+																props.index,
+																"fillColor",
+																event.currentTarget.value,
+															)
+														}
+													/>
+												</div>
+											</div>
+											<Field
+												inline
+												name={localize("Fill opacity")}
+												value={`${Math.round(shape().fillOpacity * 100)}%`}
+											>
+												<Slider
+													value={[Math.round(shape().fillOpacity * 100)]}
+													minValue={0}
+													maxValue={100}
+													step={1}
+													formatTooltip="%"
+													onChange={(value) =>
+														setProject(
+															"timeline",
+															"shapeSegments",
+															props.index,
+															"fillOpacity",
+															value[0] / 100,
+														)
+													}
+												/>
+											</Field>
+										</Show>
+									</Show>
+
+									<Show when={shapeKindSupportsCornerRadius(shape().kind)}>
+										<Field
+											inline
+											name={localize("Corner radius")}
+											value={`${Math.round(shape().cornerRadius)}px`}
+										>
+											<Slider
+												value={[shape().cornerRadius]}
+												minValue={0}
+												maxValue={200}
+												step={1}
+												formatTooltip="px"
+												onChange={(value) =>
+													setProject(
+														"timeline",
+														"shapeSegments",
+														props.index,
+														"cornerRadius",
+														value[0],
+													)
+												}
+											/>
+										</Field>
+									</Show>
+
+									<Field
+										inline
+										name={localize("Opacity")}
+										value={`${Math.round(shape().opacity * 100)}%`}
+									>
+										<Slider
+											value={[Math.round(shape().opacity * 100)]}
+											minValue={0}
+											maxValue={100}
+											step={1}
+											formatTooltip="%"
+											onChange={(value) =>
+												setProject(
+													"timeline",
+													"shapeSegments",
+													props.index,
+													"opacity",
+													value[0] / 100,
+												)
+											}
+										/>
+									</Field>
+
+									<Field
+										inline
+										name={localize("Shadow")}
+										value={`${Math.round(shape().shadow * 100)}%`}
+									>
+										<Slider
+											value={[Math.round(shape().shadow * 100)]}
+											minValue={0}
+											maxValue={100}
+											step={1}
+											formatTooltip="%"
+											onChange={(value) =>
+												setProject(
+													"timeline",
+													"shapeSegments",
+													props.index,
+													"shadow",
+													value[0] / 100,
+												)
+											}
+										/>
+									</Field>
+								</div>
+							</Show>
+							<Show when={active() === "animation"}>
+								<div class="flex flex-col gap-2.5 rounded-lg bg-ed-card-2 p-3">
+									<SectionLabel name={localize("Animation")} />
+									<div class="flex flex-col gap-1.5">
+										<span class="text-[11px] font-medium text-ed-text-3">
+											{localize("Entrance")}
+										</span>
+										<div class="grid grid-cols-4 gap-1">
+											<For each={SHAPE_ANIMATIONS}>
+												{(anim) => (
+													<button
+														type="button"
+														class={cx(
+															"h-7 rounded-md px-1.5 text-[11px] font-medium transition-colors",
+															shape().animationIn === anim
+																? "bg-ed-accent text-white"
+																: "bg-ed-ctl text-ed-text-2 hover:bg-ed-ctl-hover hover:text-ed-text-1",
+														)}
+														onClick={() =>
+															setProject(
+																"timeline",
+																"shapeSegments",
+																props.index,
+																"animationIn",
+																anim,
+															)
+														}
+													>
+														{localize(shapeAnimationLabel(anim))}
+													</button>
+												)}
+											</For>
+										</div>
+									</div>
+									<div class="flex flex-col gap-1.5">
+										<span class="text-[11px] font-medium text-ed-text-3">
+											{localize("Exit")}
+										</span>
+										<div class="grid grid-cols-4 gap-1">
+											<For each={SHAPE_ANIMATIONS}>
+												{(anim) => (
+													<button
+														type="button"
+														class={cx(
+															"h-7 rounded-md px-1.5 text-[11px] font-medium transition-colors",
+															shape().animationOut === anim
+																? "bg-ed-accent text-white"
+																: "bg-ed-ctl text-ed-text-2 hover:bg-ed-ctl-hover hover:text-ed-text-1",
+														)}
+														onClick={() =>
+															setProject(
+																"timeline",
+																"shapeSegments",
+																props.index,
+																"animationOut",
+																anim,
+															)
+														}
+													>
+														{localize(shapeAnimationLabel(anim))}
+													</button>
+												)}
+											</For>
+										</div>
 									</div>
 								</div>
-								<Field
-									inline
-									name={localize("Fill opacity")}
-									value={`${Math.round(shape().fillOpacity * 100)}%`}
-								>
-									<Slider
-										value={[Math.round(shape().fillOpacity * 100)]}
-										minValue={0}
-										maxValue={100}
-										step={1}
-										formatTooltip="%"
-										onChange={(value) =>
-											setProject(
-												"timeline",
-												"shapeSegments",
-												props.index,
-												"fillOpacity",
-												value[0] / 100,
-											)
-										}
-									/>
-								</Field>
 							</Show>
-						</Show>
-
-						<Show when={shapeKindSupportsCornerRadius(shape().kind)}>
-							<Field
-								inline
-								name={localize("Corner radius")}
-								value={`${Math.round(shape().cornerRadius)}px`}
-							>
-								<Slider
-									value={[shape().cornerRadius]}
-									minValue={0}
-									maxValue={200}
-									step={1}
-									formatTooltip="px"
-									onChange={(value) =>
-										setProject(
-											"timeline",
-											"shapeSegments",
-											props.index,
-											"cornerRadius",
-											value[0],
-										)
-									}
-								/>
-							</Field>
-						</Show>
-
-						<Field
-							inline
-							name={localize("Opacity")}
-							value={`${Math.round(shape().opacity * 100)}%`}
-						>
-							<Slider
-								value={[Math.round(shape().opacity * 100)]}
-								minValue={0}
-								maxValue={100}
-								step={1}
-								formatTooltip="%"
-								onChange={(value) =>
-									setProject(
-										"timeline",
-										"shapeSegments",
-										props.index,
-										"opacity",
-										value[0] / 100,
-									)
-								}
-							/>
-						</Field>
-
-						<Field
-							inline
-							name={localize("Shadow")}
-							value={`${Math.round(shape().shadow * 100)}%`}
-						>
-							<Slider
-								value={[Math.round(shape().shadow * 100)]}
-								minValue={0}
-								maxValue={100}
-								step={1}
-								formatTooltip="%"
-								onChange={(value) =>
-									setProject(
-										"timeline",
-										"shapeSegments",
-										props.index,
-										"shadow",
-										value[0] / 100,
-									)
-								}
-							/>
-						</Field>
-					</div>
-
-					<div class="flex flex-col gap-2.5 rounded-lg bg-ed-card-2 p-3">
-						<SectionLabel name={localize("Animation")} />
-						<div class="flex flex-col gap-1.5">
-							<span class="text-[11px] font-medium text-ed-text-3">
-								{localize("Entrance")}
-							</span>
-							<div class="grid grid-cols-4 gap-1">
-								<For each={SHAPE_ANIMATIONS}>
-									{(anim) => (
-										<button
-											type="button"
-											class={cx(
-												"h-7 rounded-md px-1.5 text-[11px] font-medium transition-colors",
-												shape().animationIn === anim
-													? "bg-ed-accent text-white"
-													: "bg-ed-ctl text-ed-text-2 hover:bg-ed-ctl-hover hover:text-ed-text-1",
-											)}
-											onClick={() =>
-												setProject(
-													"timeline",
-													"shapeSegments",
-													props.index,
-													"animationIn",
-													anim,
-												)
-											}
-										>
-											{localize(shapeAnimationLabel(anim))}
-										</button>
-									)}
-								</For>
-							</div>
 						</div>
-						<div class="flex flex-col gap-1.5">
-							<span class="text-[11px] font-medium text-ed-text-3">
-								{localize("Exit")}
-							</span>
-							<div class="grid grid-cols-4 gap-1">
-								<For each={SHAPE_ANIMATIONS}>
-									{(anim) => (
-										<button
-											type="button"
-											class={cx(
-												"h-7 rounded-md px-1.5 text-[11px] font-medium transition-colors",
-												shape().animationOut === anim
-													? "bg-ed-accent text-white"
-													: "bg-ed-ctl text-ed-text-2 hover:bg-ed-ctl-hover hover:text-ed-text-1",
-											)}
-											onClick={() =>
-												setProject(
-													"timeline",
-													"shapeSegments",
-													props.index,
-													"animationOut",
-													anim,
-												)
-											}
-										>
-											{localize(shapeAnimationLabel(anim))}
-										</button>
-									)}
-								</For>
-							</div>
-						</div>
-					</div>
-
-					<div class="flex flex-col gap-2 rounded-lg bg-ed-card-2 p-3">
-						<SectionLabel name={localize("Position")} />
-						<Field
-							inline
-							name={localize("Start X")}
-							value={`${Math.round(shape().from.x * 100)}%`}
-						>
-							<Slider
-								value={[Math.round(shape().from.x * 100)]}
-								minValue={0}
-								maxValue={100}
-								step={1}
-								formatTooltip="%"
-								onChange={(value) =>
-									setProject(
-										"timeline",
-										"shapeSegments",
-										props.index,
-										"from",
-										"x",
-										value[0] / 100,
-									)
-								}
-							/>
-						</Field>
-						<Field
-							inline
-							name={localize("Start Y")}
-							value={`${Math.round(shape().from.y * 100)}%`}
-						>
-							<Slider
-								value={[Math.round(shape().from.y * 100)]}
-								minValue={0}
-								maxValue={100}
-								step={1}
-								formatTooltip="%"
-								onChange={(value) =>
-									setProject(
-										"timeline",
-										"shapeSegments",
-										props.index,
-										"from",
-										"y",
-										value[0] / 100,
-									)
-								}
-							/>
-						</Field>
-						<Field
-							inline
-							name={localize("End X")}
-							value={`${Math.round(shape().to.x * 100)}%`}
-						>
-							<Slider
-								value={[Math.round(shape().to.x * 100)]}
-								minValue={0}
-								maxValue={100}
-								step={1}
-								formatTooltip="%"
-								onChange={(value) =>
-									setProject(
-										"timeline",
-										"shapeSegments",
-										props.index,
-										"to",
-										"x",
-										value[0] / 100,
-									)
-								}
-							/>
-						</Field>
-						<Field
-							inline
-							name={localize("End Y")}
-							value={`${Math.round(shape().to.y * 100)}%`}
-						>
-							<Slider
-								value={[Math.round(shape().to.y * 100)]}
-								minValue={0}
-								maxValue={100}
-								step={1}
-								formatTooltip="%"
-								onChange={(value) =>
-									setProject(
-										"timeline",
-										"shapeSegments",
-										props.index,
-										"to",
-										"y",
-										value[0] / 100,
-									)
-								}
-							/>
-						</Field>
-						<EditorButton
-							class="w-full justify-center"
-							leftIcon={<IconLucideCrosshair class="size-4" />}
-							onClick={centerOnCanvas}
-						>
-							{localize("Center on canvas")}
-						</EditorButton>
-					</div>
-				</div>
+					)}
+				</InspectorSections>
 			)}
 		</Show>
 	);

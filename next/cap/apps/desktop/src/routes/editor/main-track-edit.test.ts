@@ -7,6 +7,7 @@ import {
 } from "./clip-transitions";
 import {
 	appendMainTrackClip,
+	closeMainTrackGapBefore,
 	closeMainTrackGaps,
 	cutPositionedMainTrackRange,
 	deletePositionedMainTrackClip,
@@ -35,6 +36,21 @@ const length = (track: ReturnType<typeof fixture>) =>
 	clipTimelineDuration(track.segments, track.transitions, track.mainTrackGaps);
 
 describe("positioned main track edits", () => {
+	it("closes only the requested gap and preserves downstream spacing and transitions", () => {
+		const track = fixture({ beforeClip: { a: 1, b: 3 } });
+		track.transitions.push({
+			segmentIndex: 2,
+			duration: 0.5,
+			type: "cross-fade",
+		});
+		expect(closeMainTrackGapBefore(track, "b")).toBe(true);
+		expect(starts(track)).toEqual([1, 3, 4.5]);
+		expect(track.mainTrackGaps).toEqual({ beforeClip: { a: 1 } });
+		expect(track.transitions).toEqual([
+			{ segmentIndex: 2, duration: 0.5, type: "cross-fade" },
+		]);
+		expect(closeMainTrackGapBefore(track, "c")).toBe(false);
+	});
 	it("moves a clip into a gap and leaves all other clips and timeline end in place", () => {
 		const track = fixture({ beforeClip: { c: 3 } });
 		const move = planMainTrackMove(track, "a");

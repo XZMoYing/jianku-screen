@@ -83,6 +83,8 @@ function fixture(segments: ZoomSegment[], associations = false) {
 	return {
 		keymap: { label: () => "Delete" },
 		timelineCommands: {
+			canSplitOverlayAtPlayhead: () => false,
+			generateAutoZoom: vi.fn(),
 			trackSegments: () => project.timeline.zoomSegments,
 			overlayAssociation: (_type: string, index: number) => {
 				if (!associations) return null;

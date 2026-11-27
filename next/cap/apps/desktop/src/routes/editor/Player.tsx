@@ -3,7 +3,6 @@ import { createElementBounds } from "@solid-primitives/bounds";
 import { createEventListener } from "@solid-primitives/event-listener";
 import { debounce } from "@solid-primitives/scheduled";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
-import { type as ostype } from "@tauri-apps/plugin-os";
 import { cx } from "cva";
 import {
 	createEffect,
@@ -22,6 +21,8 @@ import { createTauriEventListener } from "~/utils/createEventListener";
 import { t as localize } from "~/utils/i18n";
 import { commands, type PreviewResolutionOption } from "~/utils/tauri";
 import IconMinimize from "~icons/lucide/minimize-2";
+import IconStepBack from "~icons/lucide/step-back";
+import IconStepForward from "~icons/lucide/step-forward";
 import AspectRatioSelect from "./AspectRatioSelect";
 import {
 	CanvasElementsOverlay,
@@ -55,7 +56,6 @@ import {
 	MenuItem,
 	MenuItemList,
 	PopperContent,
-	Slider,
 	topSlideAnimateClasses,
 } from "./ui";
 import {
@@ -90,7 +90,6 @@ export function PlayerContent(props: {
 		totalDuration,
 		editorState,
 		setEditorState,
-		zoomOutLimit,
 		setProject,
 		previewResolutionBase,
 		previewResolutionOptions,
@@ -98,7 +97,6 @@ export function PlayerContent(props: {
 		setPreviewQuality,
 		playbackIntent,
 		requestHandoffPlayback,
-		handoffPlaybackPending,
 		keymap,
 		timelineCommands,
 	} = useEditorContext();
@@ -144,13 +142,13 @@ export function PlayerContent(props: {
 	});
 	let seekRevision = 0;
 	onCleanup(() => seekRevision++);
-	const seekPreview = async (seconds: number) => {
+	const seekPreview = async (seconds: number, resume = playbackIntent()) => {
 		const time = Math.max(0, Math.min(seconds, totalDuration()));
 		const revision = ++seekRevision;
 		setSeekDraft(undefined);
 		setEditorState("previewTime", null);
 		const pending = requestHandoffPlayback(
-			playbackIntent() && time < totalDuration(),
+			resume && time < totalDuration(),
 			time,
 		);
 		if (pending) {
@@ -165,12 +163,22 @@ export function PlayerContent(props: {
 			await commands.seekTo(timelinePreviewFrame(time, totalDuration(), FPS));
 			if (revision !== seekRevision) return;
 			setEditorState("playbackTime", time);
-			if (editorState.playing && time < totalDuration())
+			if (resume && editorState.playing && time < totalDuration())
 				await commands.startPlayback(FPS, previewResolutionBase());
-			else if (time >= totalDuration()) setEditorState("playing", false);
+			else setEditorState("playing", false);
 		} catch (error) {
 			console.error("Failed to seek fullscreen preview", error);
 		}
+	};
+	const stepFrame = (direction: -1 | 1) => {
+		const end = totalDuration();
+		if (end <= 0) return false;
+		const current = timelinePreviewFrame(editorState.playbackTime, end, FPS);
+		const last = timelinePreviewFrame(end, end, FPS);
+		void seekPreview(
+			Math.max(0, Math.min(last, current + direction)) / FPS,
+			false,
+		);
 	};
 
 	createEventListener(window, "mouseup", (event) => {
@@ -189,11 +197,6 @@ export function PlayerContent(props: {
 		setPanelHovered(false);
 		setPreviewPointerDown(false);
 	});
-
-	const zoomHint = () =>
-		ostype() === "windows"
-			? localize("按住 Ctrl 滚动鼠标滚轮，或按 Ctrl + / - 缩放")
-			: localize("双指捏合，或按 Command + / - 缩放");
 
 	// Load captions on mount
 	onMount(async () => {
@@ -392,21 +395,9 @@ export function PlayerContent(props: {
 		zoomIn: () => (props.fullscreen ? false : timelineCommands.zoomBy(1 / 1.1)),
 		zoomOut: () => (props.fullscreen ? false : timelineCommands.zoomBy(1.1)),
 		fit: () => (props.fullscreen ? false : timelineCommands.fit()),
-		playPause: async () => {
-			const prevTime = editorState.previewTime;
-			if (!playbackIntent()) {
-				if (prevTime !== null) setEditorState("playbackTime", prevTime);
-				if (!handoffPlaybackPending())
-					await commands.seekTo(
-						timelinePreviewFrame(
-							editorState.playbackTime,
-							totalDuration(),
-							FPS,
-						),
-					);
-			}
-			await handlePlayPauseClick();
-		},
+		playPause: handlePlayPauseClick,
+		stepBack: () => stepFrame(-1),
+		stepForward: () => stepFrame(1),
 	});
 
 	return (
@@ -583,6 +574,13 @@ export function PlayerContent(props: {
 					>
 						<IconCapPrev class="size-3.5" />
 					</button>
+					<EditorButton
+						tooltipText={localize("上一帧")}
+						aria-label={localize("上一帧")}
+						kbd={keymap.kbd("stepBack")}
+						onClick={() => stepFrame(-1)}
+						leftIcon={<IconStepBack />}
+					/>
 					<Tooltip
 						kbd={keymap.kbd("playPause")}
 						content={localize("Play/Pause video")}
@@ -604,6 +602,13 @@ export function PlayerContent(props: {
 							)}
 						</button>
 					</Tooltip>
+					<EditorButton
+						tooltipText={localize("下一帧")}
+						aria-label={localize("下一帧")}
+						kbd={keymap.kbd("stepForward")}
+						onClick={() => stepFrame(1)}
+						leftIcon={<IconStepForward />}
+					/>
 					<button
 						type="button"
 						aria-label={localize("跳到结尾")}
@@ -663,57 +668,7 @@ export function PlayerContent(props: {
 						</KSelect.Portal>
 					</KSelect>
 				</div>
-				<div class="flex flex-row flex-1 gap-0.5 justify-end items-center min-w-fit">
-					<div class="flex flex-row gap-0.5 items-center" title={zoomHint()}>
-						<EditorButton
-							tooltipText={localize("缩小时间线")}
-							aria-label={localize("缩小时间线")}
-							kbd={keymap.kbd("zoomOut")}
-							onClick={() => timelineCommands.zoomBy(1.1)}
-							leftIcon={<IconCapZoomOut />}
-						/>
-						<Slider
-							class="jk-slider-mini w-20 shrink-0"
-							minValue={0}
-							maxValue={1}
-							step={0.001}
-							value={[
-								Math.min(
-									Math.max(
-										1 - editorState.timeline.transform.zoom / zoomOutLimit(),
-										0,
-									),
-									1,
-								),
-							]}
-							onChange={([v]) => {
-								editorState.timeline.transform.updateZoom(
-									(1 - v) * zoomOutLimit(),
-									editorState.playbackTime,
-								);
-							}}
-							formatTooltip={() =>
-								localize("当前显示 {seconds} 秒", {
-									seconds: editorState.timeline.transform.zoom.toFixed(0),
-								})
-							}
-						/>
-						<EditorButton
-							tooltipText={localize("放大时间线")}
-							aria-label={localize("放大时间线")}
-							kbd={keymap.kbd("zoomIn")}
-							onClick={() => timelineCommands.zoomBy(1 / 1.1)}
-							leftIcon={<IconCapZoomIn />}
-						/>
-						<EditorButton
-							tooltipText={localize("显示整个时间线")}
-							aria-label={localize("显示整个时间线")}
-							kbd={keymap.kbd("fit")}
-							onClick={timelineCommands.fit}
-							leftIcon={<IconLucideMaximize2 />}
-						/>
-					</div>
-				</div>
+				<div class="flex-1" aria-hidden="true" />
 			</div>
 		</div>
 	);

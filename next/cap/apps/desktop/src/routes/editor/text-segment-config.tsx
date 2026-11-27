@@ -5,7 +5,6 @@ import {
 	createResource,
 	createSignal,
 	For,
-	type JSX,
 	Show,
 	type ValidComponent,
 } from "solid-js";
@@ -20,7 +19,9 @@ import IconLucideAlignLeft from "~icons/lucide/align-left";
 import IconLucideAlignRight from "~icons/lucide/align-right";
 import { useEditorContext } from "./context";
 import { FontPicker } from "./FontPicker";
+import { InspectorSections } from "./InspectorSections";
 import "./text-animations.css";
+import { TextPresetCard } from "./TextPresetCard";
 import {
 	TEXT_FONT_SIZE_MAX,
 	TEXT_FONT_SIZE_MIN,
@@ -35,7 +36,6 @@ import {
 	matchTextPreset,
 	TEXT_PRESET_GROUPS,
 	TEXT_PRESETS,
-	type TextPreset,
 } from "./text-presets";
 import {
 	HexColorInput,
@@ -94,15 +94,6 @@ const DEFAULT_GRADIENT_COLOR = "#7c9cff";
 
 const clampNumber = (value: number, min: number, max: number) =>
 	Math.min(Math.max(Number.isFinite(value) ? value : min, min), max);
-
-const fontStackCss = (stack: string[]) =>
-	stack
-		.map((family) =>
-			["sans-serif", "serif", "monospace"].includes(family)
-				? family
-				: `"${family}"`,
-		)
-		.join(", ");
 
 function Segmented<T extends string>(props: {
 	options: SegmentedOption<T>[];
@@ -232,88 +223,6 @@ function ToggleChip(props: {
 			)}
 		>
 			{props.label}
-		</button>
-	);
-}
-
-function TextPresetCard(props: {
-	preset: TextPreset;
-	active: boolean;
-	onApply: () => void;
-}) {
-	const style = () => props.preset.style;
-
-	const textColor = () => style().color ?? "#ffffff";
-
-	const textStyle = (): JSX.CSSProperties => {
-		const s = style();
-		const shadows: string[] = [];
-		if (s.shadow > 0)
-			shadows.push(`0 1px 3px rgba(0, 0, 0, ${0.45 + s.shadow * 0.4})`);
-		if (s.glow > 0)
-			shadows.push(`0 0 6px ${textColor()}`, `0 0 14px ${textColor()}`);
-
-		const css: JSX.CSSProperties = {
-			"font-family": fontStackCss(s.fontStack),
-			"font-weight": String(s.fontWeight),
-			"font-style": s.italic ? "italic" : "normal",
-			"text-transform": s.uppercase ? "uppercase" : "none",
-			"font-size": `${Math.min(Math.max(s.fontSize * 0.2, 11), 22)}px`,
-			"letter-spacing": `${s.letterSpacing * 0.35}px`,
-			"line-height": "1.1",
-			color: textColor(),
-		};
-		if (shadows.length > 0) css["text-shadow"] = shadows.join(", ");
-		if (s.strokeWidth > 0) {
-			css["-webkit-text-stroke"] = `${s.strokeWidth * 0.18}px ${s.strokeColor}`;
-			css["paint-order"] = "stroke fill";
-		}
-		if (s.gradientColor) {
-			css.background = `linear-gradient(90deg, ${textColor()}, ${s.gradientColor})`;
-			css["-webkit-background-clip"] = "text";
-			css["background-clip"] = "text";
-			css.color = "transparent";
-		}
-		return css;
-	};
-
-	const backgroundStyle = (): JSX.CSSProperties => {
-		const s = style();
-		if (!s.backgroundColor) return {};
-		return {
-			"background-color": s.backgroundColor,
-			padding: s.backgroundStyle === "highlight" ? "0 0.25em" : "0.15em 0.4em",
-			"border-radius":
-				s.backgroundStyle === "pill"
-					? "9999px"
-					: s.backgroundStyle === "highlight"
-						? "0.15em"
-						: "0.2em",
-		};
-	};
-
-	return (
-		<button
-			type="button"
-			onClick={() => props.onApply()}
-			class={cx(
-				"overflow-hidden relative flex justify-center items-center px-2 pb-3 h-[68px] rounded-[10px] transition-shadow",
-				props.active
-					? "ring-2 ring-ed-accent ring-offset-2 ring-offset-ed-card-2"
-					: "ring-1 ring-ed-line hover:ring-ed-line-strong",
-			)}
-			style={{
-				background: "linear-gradient(160deg, #1e1f26 0%, #2c2d36 100%)",
-			}}
-		>
-			<span class="inline-block max-w-full" style={backgroundStyle()}>
-				<span class="block max-w-full truncate" style={textStyle()}>
-					{props.preset.sample}
-				</span>
-			</span>
-			<span class="absolute inset-x-0 bottom-1.5 text-center text-[10px] font-medium text-white/55">
-				{localize(props.preset.name)}
-			</span>
 		</button>
 	);
 }
@@ -519,469 +428,495 @@ export function TextSegmentConfig(props: {
 	const layout = () => props.segment.layout ?? "overlay";
 
 	return (
-		<div class="flex flex-col gap-4">
-			<Section
-				name={`${localize("Text")} ${props.segmentIndex + 1}`}
-				action={
-					<div class="flex gap-2 items-center">
-						<span class="text-[11px] text-ed-text-3">
-							{localize("Enabled")}
-						</span>
-						<Toggle
-							size="sm"
-							checked={props.segment.enabled}
-							onChange={(value) =>
-								updateSegment((segment) => {
-									segment.enabled = value;
-								})
+		<InspectorSections
+			label="文字属性"
+			initial="text"
+			tabs={[
+				{ id: "text", label: "文字" },
+				{ id: "style", label: "样式" },
+				{ id: "animation", label: "动画" },
+			]}
+		>
+			{(active) => (
+				<div class="flex flex-col gap-4">
+					<Show when={active() === "text"}>
+						<Section
+							name={`${localize("Text")} ${props.segmentIndex + 1}`}
+							action={
+								<div class="flex gap-2 items-center">
+									<span class="text-[11px] text-ed-text-3">
+										{localize("Enabled")}
+									</span>
+									<Toggle
+										size="sm"
+										checked={props.segment.enabled}
+										onChange={(value) =>
+											updateSegment((segment) => {
+												segment.enabled = value;
+											})
+										}
+									/>
+								</div>
 							}
-						/>
-					</div>
-				}
-			>
-				<textarea
-					class="min-h-[72px] w-full resize-none rounded-[9px] border-0 bg-ed-ctl px-3 py-2 text-[13px] leading-[18px] text-ed-text-1 caret-ed-accent outline-hidden placeholder:text-ed-text-3 hover:bg-ed-ctl-hover focus:bg-ed-ctl-hover focus:ring-1 focus:ring-ed-accent"
-					placeholder={localize("Type something…")}
-					value={props.segment.content}
-					onInput={(e) =>
-						updateSegment((segment) => {
-							segment.content = e.currentTarget.value;
-						})
-					}
-				/>
-				<div class="flex gap-2 items-center">
-					<ToggleChip
-						label="I"
-						title={localize("Italic")}
-						italic
-						active={props.segment.italic}
-						onClick={() =>
-							updateSegment((segment) => {
-								segment.italic = !segment.italic;
-							})
-						}
-					/>
-					<ToggleChip
-						label="AA"
-						title={localize("Uppercase")}
-						active={props.segment.uppercase ?? false}
-						onClick={() =>
-							updateSegment((segment) => {
-								segment.uppercase = !segment.uppercase;
-							})
-						}
-					/>
-					<div class="ml-auto">
-						<Segmented
-							ariaLabel="Text alignment"
-							options={TEXT_ALIGN_OPTIONS}
-							value={props.segment.align ?? "center"}
-							onChange={(value) =>
-								updateSegment((segment) => {
-									segment.align = value;
-								})
-							}
-						/>
-					</div>
-				</div>
-			</Section>
-
-			<Section name={localize("Style")}>
-				<div class="flex overflow-x-auto gap-1 hide-scroll">
-					<For each={TEXT_PRESET_GROUPS}>
-						{(group) => (
-							<button
-								type="button"
-								aria-pressed={styleGroup() === group}
-								onClick={() => setStyleGroup(group)}
-								class={cx(
-									"flex shrink-0 items-center px-1.5 h-[22px] text-[11px] font-medium rounded-full transition-colors",
-									styleGroup() === group
-										? "bg-ed-ctl-active text-ed-text-1"
-										: "text-ed-text-2 hover:text-ed-text-1",
-								)}
-							>
-								{group}
-							</button>
-						)}
-					</For>
-				</div>
-				<div class="grid grid-cols-2 gap-2">
-					<For each={visiblePresets()}>
-						{(preset) => (
-							<TextPresetCard
-								preset={preset}
-								active={activePresetId() === preset.id}
-								onApply={() =>
-									updateSegment((segment) =>
-										applyTextPreset(segment, preset, installedFonts()),
-									)
+						>
+							<textarea
+								class="min-h-[72px] w-full resize-none rounded-[9px] border-0 bg-ed-ctl px-3 py-2 text-[13px] leading-[18px] text-ed-text-1 caret-ed-accent outline-hidden placeholder:text-ed-text-3 hover:bg-ed-ctl-hover focus:bg-ed-ctl-hover focus:ring-1 focus:ring-ed-accent"
+								placeholder={localize("Type something…")}
+								value={props.segment.content}
+								onInput={(e) =>
+									updateSegment((segment) => {
+										segment.content = e.currentTarget.value;
+									})
 								}
 							/>
-						)}
-					</For>
-				</div>
-			</Section>
-
-			<Section name={localize("Font")}>
-				<FontPicker
-					value={props.segment.fontFamily ?? "sans-serif"}
-					onChange={(family) =>
-						updateSegment((segment) => {
-							segment.fontFamily = family;
-						})
-					}
-				/>
-				<TextStyleSelect
-					options={TEXT_SEGMENT_WEIGHT_OPTIONS}
-					value={props.segment.fontWeight}
-					onChange={(value) =>
-						updateSegment((segment) => {
-							segment.fontWeight = value;
-						})
-					}
-					fallbackLabel={(value) => `Custom (${value})`}
-				/>
-				<div class="flex flex-col">
-					<Field
-						inline
-						name={localize("Size")}
-						value={Math.round(
-							clampNumber(
-								props.segment.fontSize,
-								TEXT_FONT_SIZE_MIN,
-								TEXT_FONT_SIZE_MAX,
-							),
-						)}
-					>
-						<Slider
-							value={[
-								clampNumber(
-									props.segment.fontSize,
-									TEXT_FONT_SIZE_MIN,
-									TEXT_FONT_SIZE_MAX,
-								),
-							]}
-							onChange={([value]) =>
-								updateSegment((segment) => {
-									const newFontSize = clampNumber(
-										value,
-										TEXT_FONT_SIZE_MIN,
-										TEXT_FONT_SIZE_MAX,
-									);
-									const oldFontSize = segment.fontSize || 48;
-									const scale = newFontSize / oldFontSize;
-
-									segment.fontSize = newFontSize;
-
-									// Scale the box with the font so line wrapping is
-									// preserved; keep the top edge fixed since the renderer
-									// anchors text at the top of the box (the canvas overlay
-									// re-hugs the box to the exact glyph bounds when visible).
-									if (segment.size && segment.center) {
-										const topEdge = segment.center.y - segment.size.y / 2;
-										segment.size.x = Math.min(segment.size.x * scale, 1);
-										segment.size.y = segment.size.y * scale;
-										segment.center.y = topEdge + segment.size.y / 2;
+							<div class="flex gap-2 items-center">
+								<ToggleChip
+									label="I"
+									title={localize("Italic")}
+									italic
+									active={props.segment.italic}
+									onClick={() =>
+										updateSegment((segment) => {
+											segment.italic = !segment.italic;
+										})
 									}
-								})
-							}
-							minValue={TEXT_FONT_SIZE_MIN}
-							maxValue={TEXT_FONT_SIZE_MAX}
-							step={1}
-						/>
-					</Field>
-					<Field
-						inline
-						name={localize("Line height")}
-						value={clampNumber(props.segment.lineHeight ?? 1.2, 0.8, 2).toFixed(
-							2,
-						)}
-					>
-						<Slider
-							value={[clampNumber(props.segment.lineHeight ?? 1.2, 0.8, 2)]}
-							onChange={([value]) =>
-								updateSegment((segment) => {
-									segment.lineHeight = clampNumber(value, 0.8, 2);
-								})
-							}
-							minValue={0.8}
-							maxValue={2}
-							step={0.05}
-						/>
-					</Field>
-					<Field
-						inline
-						name={localize("Letter spacing")}
-						value={`${clampNumber(
-							props.segment.letterSpacing ?? 0,
-							-2,
-							20,
-						).toFixed(1)}px`}
-					>
-						<Slider
-							value={[clampNumber(props.segment.letterSpacing ?? 0, -2, 20)]}
-							onChange={([value]) =>
-								updateSegment((segment) => {
-									segment.letterSpacing = clampNumber(value, -2, 20);
-								})
-							}
-							minValue={-2}
-							maxValue={20}
-							step={0.5}
-							formatTooltip="px"
-						/>
-					</Field>
-				</div>
-			</Section>
+								/>
+								<ToggleChip
+									label="AA"
+									title={localize("Uppercase")}
+									active={props.segment.uppercase ?? false}
+									onClick={() =>
+										updateSegment((segment) => {
+											segment.uppercase = !segment.uppercase;
+										})
+									}
+								/>
+								<div class="ml-auto">
+									<Segmented
+										ariaLabel="Text alignment"
+										options={TEXT_ALIGN_OPTIONS}
+										value={props.segment.align ?? "center"}
+										onChange={(value) =>
+											updateSegment((segment) => {
+												segment.align = value;
+											})
+										}
+									/>
+								</div>
+							</div>
+						</Section>
 
-			<Section name={localize("Look")}>
-				<Field name={localize("Color")}>
-					<HexColorInput
-						value={props.segment.color}
-						brandColorSwatches={props.brandColorSwatches}
-						onChange={(value) =>
-							updateSegment((segment) => {
-								segment.color = value;
-							})
-						}
-					/>
-				</Field>
-				<Field inline name={localize("Gradient")}>
-					<Toggle
-						size="sm"
-						checked={props.segment.gradientColor != null}
-						onChange={(enabled) =>
-							updateSegment((segment) => {
-								segment.gradientColor = enabled
-									? DEFAULT_GRADIENT_COLOR
-									: undefined;
-							})
-						}
-					/>
-				</Field>
-				<Show when={props.segment.gradientColor != null}>
-					<HexColorInput
-						value={props.segment.gradientColor ?? DEFAULT_GRADIENT_COLOR}
-						brandColorSwatches={props.brandColorSwatches}
-						onChange={(value) =>
-							updateSegment((segment) => {
-								segment.gradientColor = value;
-							})
-						}
-					/>
-				</Show>
-				<Field name={localize("Background")}>
-					<Segmented
-						stretch
-						ariaLabel="Text background"
-						options={TEXT_BACKGROUND_OPTIONS}
-						value={backgroundOption()}
-						onChange={(value) =>
-							updateSegment((segment) => {
-								if (value === "none") {
-									segment.backgroundColor = undefined;
-									return;
+						<Section name={localize("Layout")}>
+							<Segmented
+								stretch
+								ariaLabel="Text layout"
+								options={TEXT_LAYOUT_OPTIONS}
+								value={layout()}
+								onChange={(value) =>
+									updateSegment((segment) => {
+										if ((segment.layout ?? "overlay") === value) return;
+										segment.layout = value;
+										// A takeover layout implies where the text belongs; place it
+										// there so the result reads immediately (still draggable
+										// afterwards).
+										const center = TEXT_LAYOUT_CENTERS[value];
+										if (center) segment.center = { ...center };
+									})
 								}
-								segment.backgroundStyle = value;
-								if (segment.backgroundColor == null)
-									segment.backgroundColor = "#000000";
-							})
-						}
-					/>
-				</Field>
-				<Show when={props.segment.backgroundColor != null}>
-					<HexColorInput
-						value={props.segment.backgroundColor ?? "#000000"}
-						brandColorSwatches={props.brandColorSwatches}
-						onChange={(value) =>
-							updateSegment((segment) => {
-								segment.backgroundColor = value;
-							})
-						}
-					/>
-				</Show>
-				<div class="flex flex-col">
-					<Field
-						inline
-						name={localize("Outline")}
-						value={`${clampNumber(
-							props.segment.strokeWidth ?? 0,
-							0,
-							12,
-						).toFixed(1)}px`}
-					>
-						<Slider
-							value={[clampNumber(props.segment.strokeWidth ?? 0, 0, 12)]}
-							onChange={([value]) =>
-								updateSegment((segment) => {
-									segment.strokeWidth = clampNumber(value, 0, 12);
-								})
-							}
-							minValue={0}
-							maxValue={12}
-							step={0.5}
-							formatTooltip="px"
-						/>
-					</Field>
-					<Show when={(props.segment.strokeWidth ?? 0) > 0}>
-						<HexColorInput
-							value={props.segment.strokeColor ?? "#000000"}
-							brandColorSwatches={props.brandColorSwatches}
-							onChange={(value) =>
-								updateSegment((segment) => {
-									segment.strokeColor = value;
-								})
-							}
-						/>
-					</Show>
-					<Field
-						inline
-						name={localize("Shadow")}
-						value={`${Math.round(clampNumber(props.segment.shadow ?? 0, 0, 1) * 100)}%`}
-					>
-						<Slider
-							value={[clampNumber(props.segment.shadow ?? 0, 0, 1)]}
-							onChange={([value]) =>
-								updateSegment((segment) => {
-									segment.shadow = clampNumber(value, 0, 1);
-								})
-							}
-							minValue={0}
-							maxValue={1}
-							step={0.01}
-						/>
-					</Field>
-					<Field
-						inline
-						name={localize("Glow")}
-						value={`${Math.round(clampNumber(props.segment.glow ?? 0, 0, 1) * 100)}%`}
-					>
-						<Slider
-							value={[clampNumber(props.segment.glow ?? 0, 0, 1)]}
-							onChange={([value]) =>
-								updateSegment((segment) => {
-									segment.glow = clampNumber(value, 0, 1);
-								})
-							}
-							minValue={0}
-							maxValue={1}
-							step={0.01}
-						/>
-					</Field>
-					<Field
-						inline
-						name={localize("Opacity")}
-						value={`${Math.round(clampNumber(props.segment.opacity ?? 1, 0, 1) * 100)}%`}
-					>
-						<Slider
-							value={[clampNumber(props.segment.opacity ?? 1, 0, 1)]}
-							onChange={([value]) =>
-								updateSegment((segment) => {
-									segment.opacity = clampNumber(value, 0, 1);
-								})
-							}
-							minValue={0}
-							maxValue={1}
-							step={0.01}
-						/>
-					</Field>
-				</div>
-			</Section>
-
-			<Section
-				name={localize("Animation")}
-				action={
-					<Segmented
-						ariaLabel="Animation edge"
-						options={ANIMATION_EDGE_OPTIONS}
-						value={animationEdge()}
-						onChange={setAnimationEdge}
-					/>
-				}
-			>
-				<div class="grid grid-cols-3 gap-1.5">
-					<For each={TEXT_ANIMATION_OPTIONS}>
-						{(option) => (
-							<AnimationTile
-								value={option.value}
-								label={localize(option.label)}
-								active={edgeAnimation() === option.value}
-								onSelect={() => setEdgeAnimation(option.value)}
 							/>
-						)}
-					</For>
-				</div>
-				<Show when={edgeAnimation() !== "none"}>
-					<Field
-						inline
-						name={localize("Duration")}
-						value={`${edgeDuration().toFixed(2)}s`}
-					>
-						<Slider
-							value={[edgeDuration()]}
-							onChange={([value]) => setEdgeDuration(value)}
-							minValue={0}
-							maxValue={3}
-							step={0.05}
-							formatTooltip="s"
-						/>
-					</Field>
-				</Show>
-			</Section>
+							<Show when={layout() === "fullscreen"}>
+								<p class="text-[12px] leading-snug text-ed-text-3">
+									{localize(
+										"Pauses the video while the text is shown, then resumes where it left off.",
+									)}
+								</p>
+							</Show>
+							<Show when={layout() !== "overlay"}>
+								<Field
+									inline
+									name={localize("Screen transition")}
+									value={`${clampNumber(
+										props.segment.layoutTransition ?? 0.5,
+										0.1,
+										1.5,
+									).toFixed(2)}s`}
+								>
+									<Slider
+										value={[
+											clampNumber(
+												props.segment.layoutTransition ?? 0.5,
+												0.1,
+												1.5,
+											),
+										]}
+										onChange={([value]) =>
+											updateSegment((segment) => {
+												segment.layoutTransition = clampNumber(value, 0.1, 1.5);
+											})
+										}
+										minValue={0.1}
+										maxValue={1.5}
+										step={0.05}
+										formatTooltip="s"
+									/>
+								</Field>
+							</Show>
+						</Section>
+					</Show>
+					<Show when={active() === "style"}>
+						<Section name={localize("Style")}>
+							<div class="flex overflow-x-auto gap-1 hide-scroll">
+								<For each={TEXT_PRESET_GROUPS}>
+									{(group) => (
+										<button
+											type="button"
+											aria-pressed={styleGroup() === group}
+											onClick={() => setStyleGroup(group)}
+											class={cx(
+												"flex shrink-0 items-center px-1.5 h-[22px] text-[11px] font-medium rounded-full transition-colors",
+												styleGroup() === group
+													? "bg-ed-ctl-active text-ed-text-1"
+													: "text-ed-text-2 hover:text-ed-text-1",
+											)}
+										>
+											{group}
+										</button>
+									)}
+								</For>
+							</div>
+							<div class="grid grid-cols-2 gap-2">
+								<For each={visiblePresets()}>
+									{(preset) => (
+										<TextPresetCard
+											preset={preset}
+											active={activePresetId() === preset.id}
+											onApply={() =>
+												updateSegment((segment) =>
+													applyTextPreset(segment, preset, installedFonts()),
+												)
+											}
+										/>
+									)}
+								</For>
+							</div>
+						</Section>
 
-			<Section name={localize("Layout")}>
-				<Segmented
-					stretch
-					ariaLabel="Text layout"
-					options={TEXT_LAYOUT_OPTIONS}
-					value={layout()}
-					onChange={(value) =>
-						updateSegment((segment) => {
-							if ((segment.layout ?? "overlay") === value) return;
-							segment.layout = value;
-							// A takeover layout implies where the text belongs; place it
-							// there so the result reads immediately (still draggable
-							// afterwards).
-							const center = TEXT_LAYOUT_CENTERS[value];
-							if (center) segment.center = { ...center };
-						})
-					}
-				/>
-				<Show when={layout() === "fullscreen"}>
-					<p class="text-[12px] leading-snug text-ed-text-3">
-						{localize(
-							"Pauses the video while the text is shown, then resumes where it left off.",
-						)}
-					</p>
-				</Show>
-				<Show when={layout() !== "overlay"}>
-					<Field
-						inline
-						name={localize("Screen transition")}
-						value={`${clampNumber(
-							props.segment.layoutTransition ?? 0.5,
-							0.1,
-							1.5,
-						).toFixed(2)}s`}
-					>
-						<Slider
-							value={[
-								clampNumber(props.segment.layoutTransition ?? 0.5, 0.1, 1.5),
-							]}
-							onChange={([value]) =>
-								updateSegment((segment) => {
-									segment.layoutTransition = clampNumber(value, 0.1, 1.5);
-								})
+						<Section name={localize("Font")}>
+							<FontPicker
+								value={props.segment.fontFamily ?? "sans-serif"}
+								onChange={(family) =>
+									updateSegment((segment) => {
+										segment.fontFamily = family;
+									})
+								}
+							/>
+							<TextStyleSelect
+								options={TEXT_SEGMENT_WEIGHT_OPTIONS}
+								value={props.segment.fontWeight}
+								onChange={(value) =>
+									updateSegment((segment) => {
+										segment.fontWeight = value;
+									})
+								}
+								fallbackLabel={(value) => `Custom (${value})`}
+							/>
+							<div class="flex flex-col">
+								<Field
+									inline
+									name={localize("Size")}
+									value={Math.round(
+										clampNumber(
+											props.segment.fontSize,
+											TEXT_FONT_SIZE_MIN,
+											TEXT_FONT_SIZE_MAX,
+										),
+									)}
+								>
+									<Slider
+										value={[
+											clampNumber(
+												props.segment.fontSize,
+												TEXT_FONT_SIZE_MIN,
+												TEXT_FONT_SIZE_MAX,
+											),
+										]}
+										onChange={([value]) =>
+											updateSegment((segment) => {
+												const newFontSize = clampNumber(
+													value,
+													TEXT_FONT_SIZE_MIN,
+													TEXT_FONT_SIZE_MAX,
+												);
+												const oldFontSize = segment.fontSize || 48;
+												const scale = newFontSize / oldFontSize;
+
+												segment.fontSize = newFontSize;
+
+												// Scale the box with the font so line wrapping is
+												// preserved; keep the top edge fixed since the renderer
+												// anchors text at the top of the box (the canvas overlay
+												// re-hugs the box to the exact glyph bounds when visible).
+												if (segment.size && segment.center) {
+													const topEdge = segment.center.y - segment.size.y / 2;
+													segment.size.x = Math.min(segment.size.x * scale, 1);
+													segment.size.y = segment.size.y * scale;
+													segment.center.y = topEdge + segment.size.y / 2;
+												}
+											})
+										}
+										minValue={TEXT_FONT_SIZE_MIN}
+										maxValue={TEXT_FONT_SIZE_MAX}
+										step={1}
+									/>
+								</Field>
+								<Field
+									inline
+									name={localize("Line height")}
+									value={clampNumber(
+										props.segment.lineHeight ?? 1.2,
+										0.8,
+										2,
+									).toFixed(2)}
+								>
+									<Slider
+										value={[
+											clampNumber(props.segment.lineHeight ?? 1.2, 0.8, 2),
+										]}
+										onChange={([value]) =>
+											updateSegment((segment) => {
+												segment.lineHeight = clampNumber(value, 0.8, 2);
+											})
+										}
+										minValue={0.8}
+										maxValue={2}
+										step={0.05}
+									/>
+								</Field>
+								<Field
+									inline
+									name={localize("Letter spacing")}
+									value={`${clampNumber(
+										props.segment.letterSpacing ?? 0,
+										-2,
+										20,
+									).toFixed(1)}px`}
+								>
+									<Slider
+										value={[
+											clampNumber(props.segment.letterSpacing ?? 0, -2, 20),
+										]}
+										onChange={([value]) =>
+											updateSegment((segment) => {
+												segment.letterSpacing = clampNumber(value, -2, 20);
+											})
+										}
+										minValue={-2}
+										maxValue={20}
+										step={0.5}
+										formatTooltip="px"
+									/>
+								</Field>
+							</div>
+						</Section>
+
+						<Section name={localize("Look")}>
+							<Field name={localize("Color")}>
+								<HexColorInput
+									value={props.segment.color}
+									brandColorSwatches={props.brandColorSwatches}
+									onChange={(value) =>
+										updateSegment((segment) => {
+											segment.color = value;
+										})
+									}
+								/>
+							</Field>
+							<Field inline name={localize("Gradient")}>
+								<Toggle
+									size="sm"
+									checked={props.segment.gradientColor != null}
+									onChange={(enabled) =>
+										updateSegment((segment) => {
+											segment.gradientColor = enabled
+												? DEFAULT_GRADIENT_COLOR
+												: undefined;
+										})
+									}
+								/>
+							</Field>
+							<Show when={props.segment.gradientColor != null}>
+								<HexColorInput
+									value={props.segment.gradientColor ?? DEFAULT_GRADIENT_COLOR}
+									brandColorSwatches={props.brandColorSwatches}
+									onChange={(value) =>
+										updateSegment((segment) => {
+											segment.gradientColor = value;
+										})
+									}
+								/>
+							</Show>
+							<Field name={localize("Background")}>
+								<Segmented
+									stretch
+									ariaLabel="Text background"
+									options={TEXT_BACKGROUND_OPTIONS}
+									value={backgroundOption()}
+									onChange={(value) =>
+										updateSegment((segment) => {
+											if (value === "none") {
+												segment.backgroundColor = undefined;
+												return;
+											}
+											segment.backgroundStyle = value;
+											if (segment.backgroundColor == null)
+												segment.backgroundColor = "#000000";
+										})
+									}
+								/>
+							</Field>
+							<Show when={props.segment.backgroundColor != null}>
+								<HexColorInput
+									value={props.segment.backgroundColor ?? "#000000"}
+									brandColorSwatches={props.brandColorSwatches}
+									onChange={(value) =>
+										updateSegment((segment) => {
+											segment.backgroundColor = value;
+										})
+									}
+								/>
+							</Show>
+							<div class="flex flex-col">
+								<Field
+									inline
+									name={localize("Outline")}
+									value={`${clampNumber(
+										props.segment.strokeWidth ?? 0,
+										0,
+										12,
+									).toFixed(1)}px`}
+								>
+									<Slider
+										value={[clampNumber(props.segment.strokeWidth ?? 0, 0, 12)]}
+										onChange={([value]) =>
+											updateSegment((segment) => {
+												segment.strokeWidth = clampNumber(value, 0, 12);
+											})
+										}
+										minValue={0}
+										maxValue={12}
+										step={0.5}
+										formatTooltip="px"
+									/>
+								</Field>
+								<Show when={(props.segment.strokeWidth ?? 0) > 0}>
+									<HexColorInput
+										value={props.segment.strokeColor ?? "#000000"}
+										brandColorSwatches={props.brandColorSwatches}
+										onChange={(value) =>
+											updateSegment((segment) => {
+												segment.strokeColor = value;
+											})
+										}
+									/>
+								</Show>
+								<Field
+									inline
+									name={localize("Shadow")}
+									value={`${Math.round(clampNumber(props.segment.shadow ?? 0, 0, 1) * 100)}%`}
+								>
+									<Slider
+										value={[clampNumber(props.segment.shadow ?? 0, 0, 1)]}
+										onChange={([value]) =>
+											updateSegment((segment) => {
+												segment.shadow = clampNumber(value, 0, 1);
+											})
+										}
+										minValue={0}
+										maxValue={1}
+										step={0.01}
+									/>
+								</Field>
+								<Field
+									inline
+									name={localize("Glow")}
+									value={`${Math.round(clampNumber(props.segment.glow ?? 0, 0, 1) * 100)}%`}
+								>
+									<Slider
+										value={[clampNumber(props.segment.glow ?? 0, 0, 1)]}
+										onChange={([value]) =>
+											updateSegment((segment) => {
+												segment.glow = clampNumber(value, 0, 1);
+											})
+										}
+										minValue={0}
+										maxValue={1}
+										step={0.01}
+									/>
+								</Field>
+								<Field
+									inline
+									name={localize("Opacity")}
+									value={`${Math.round(clampNumber(props.segment.opacity ?? 1, 0, 1) * 100)}%`}
+								>
+									<Slider
+										value={[clampNumber(props.segment.opacity ?? 1, 0, 1)]}
+										onChange={([value]) =>
+											updateSegment((segment) => {
+												segment.opacity = clampNumber(value, 0, 1);
+											})
+										}
+										minValue={0}
+										maxValue={1}
+										step={0.01}
+									/>
+								</Field>
+							</div>
+						</Section>
+					</Show>
+					<Show when={active() === "animation"}>
+						<Section
+							name={localize("Animation")}
+							action={
+								<Segmented
+									ariaLabel="Animation edge"
+									options={ANIMATION_EDGE_OPTIONS}
+									value={animationEdge()}
+									onChange={setAnimationEdge}
+								/>
 							}
-							minValue={0.1}
-							maxValue={1.5}
-							step={0.05}
-							formatTooltip="s"
-						/>
-					</Field>
-				</Show>
-			</Section>
-		</div>
+						>
+							<div class="grid grid-cols-3 gap-1.5">
+								<For each={TEXT_ANIMATION_OPTIONS}>
+									{(option) => (
+										<AnimationTile
+											value={option.value}
+											label={localize(option.label)}
+											active={edgeAnimation() === option.value}
+											onSelect={() => setEdgeAnimation(option.value)}
+										/>
+									)}
+								</For>
+							</div>
+							<Show when={edgeAnimation() !== "none"}>
+								<Field
+									inline
+									name={localize("Duration")}
+									value={`${edgeDuration().toFixed(2)}s`}
+								>
+									<Slider
+										value={[edgeDuration()]}
+										onChange={([value]) => setEdgeDuration(value)}
+										minValue={0}
+										maxValue={3}
+										step={0.05}
+										formatTooltip="s"
+									/>
+								</Field>
+							</Show>
+						</Section>
+					</Show>
+				</div>
+			)}
+		</InspectorSections>
 	);
 }

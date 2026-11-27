@@ -11,7 +11,6 @@ import {
 	untrack,
 } from "solid-js";
 import { produce, unwrap } from "solid-js/store";
-import toast from "solid-toast";
 import { generalSettingsStore } from "~/store";
 import { t as localize } from "~/utils/i18n";
 import {
@@ -24,8 +23,7 @@ import {
 } from "~/utils/tauri";
 import IconLucideLink2 from "~icons/lucide/link-2";
 import IconLucideTriangleAlert from "~icons/lucide/triangle-alert";
-import { createAutoZoomGeneration } from "../auto-zoom-generation";
-import { serializeProjectConfiguration, useEditorContext } from "../context";
+import { useEditorContext } from "../context";
 import {
 	prepareZoomSliceMove,
 	splitZoomSourceSlice,
@@ -62,8 +60,6 @@ export type ZoomSegmentDragState =
 const MIN_ZOOM_SEGMENT_PIXEL_WIDTH = 40;
 const MIN_NEW_SEGMENT_PIXEL_WIDTH = 80;
 const MIN_NEW_SEGMENT_SECS_WIDTH = 1;
-const NO_AUTO_ZOOM_CLICKS_MESSAGE =
-	"未检测到可缩放的点击操作。拖动轨道即可添加缩放片段。";
 
 export function ZoomTrack(props: {
 	onDragStateChanged: (v: ZoomSegmentDragState) => void;
@@ -78,8 +74,7 @@ export function ZoomTrack(props: {
 		totalDuration,
 		projectActions,
 		meta,
-		flushProjectConfig,
-		projectRevision,
+		timelineCommands,
 	} = useEditorContext();
 
 	const { duration, secsPerPixel, snapping } = useTimelineContext();
@@ -88,7 +83,6 @@ export function ZoomTrack(props: {
 
 	const [creatingSegmentViaDrag, setCreatingSegmentViaDrag] =
 		createSignal(false);
-	const [isGeneratingAutoZoom, setIsGeneratingAutoZoom] = createSignal(false);
 	const [isHoveringGenerateZoomButton, setIsHoveringGenerateZoomButton] =
 		createSignal(false);
 	const [
@@ -112,23 +106,8 @@ export function ZoomTrack(props: {
 		}
 	});
 
-	const generation = createAutoZoomGeneration({
-		snapshot: () => JSON.stringify(serializeProjectConfiguration(project)),
-		revision: projectRevision,
-		flush: flushProjectConfig,
-		generate: () => commands.generateZoomSegmentsFromClicks(),
-		apply: (segments) => setProject("timeline", "zoomSegments", segments),
-		setPending: setIsGeneratingAutoZoom,
-		onEmpty: () => toast.error(localize(NO_AUTO_ZOOM_CLICKS_MESSAGE)),
-		onStale: () =>
-			toast.error(localize("编辑内容已变化，请重新生成自动缩放。")),
-		onError: (error) => {
-			console.error("Failed to generate zoom segments:", error);
-			toast.error(localize("Failed to generate zoom segments"));
-		},
-	});
-	onCleanup(generation.dispose);
-	const handleGenerateZoomSegments = generation.run;
+	const handleGenerateZoomSegments = () => timelineCommands.generateAutoZoom();
+	const isGeneratingAutoZoom = () => editorState.timeline.generatingAutoZoom;
 
 	const newSegmentMinDuration = () =>
 		Math.max(

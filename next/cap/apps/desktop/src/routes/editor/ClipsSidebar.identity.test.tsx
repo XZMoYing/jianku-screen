@@ -9,6 +9,12 @@ const state = vi.hoisted(() => ({ context: {} as object }));
 vi.mock("./context", () => ({ useEditorContext: () => state.context }));
 vi.mock("~/utils/i18n", () => ({ t: (text: string) => text }));
 vi.mock("~/utils/tauri", () => ({ commands: {} }));
+vi.mock("~/utils/fonts", () => ({ listSystemFonts: async () => [] }));
+vi.mock("./AudioLibrary", () => ({
+	AudioLibraryPanel: (props: { mode: { type: string; index?: number } }) => (
+		<output data-audio-mode={props.mode.type}>{props.mode.index}</output>
+	),
+}));
 vi.mock("@cap/ui-solid", () => ({
 	Button: (props: { children: unknown; onClick?: () => void }) => (
 		<button onClick={props.onClick}>{props.children as string}</button>
@@ -29,6 +35,7 @@ beforeEach(() => {
 		"IconCapPencil",
 		"IconCapTrash",
 		"IconLucideVideo",
+		"IconCapChevronDown",
 	])
 		vi.stubGlobal(name, () => null);
 	vi.stubGlobal(
@@ -60,9 +67,15 @@ function mount() {
 	const moveClipSegment = vi.fn();
 	const addTrackContent = vi.fn();
 	const openCaptionInspector = vi.fn();
+	const setTransitionFromMaterials = vi.fn();
 	const [editorState, setEditorState] = createStore({
 		materialsTab: "video",
-		timeline: { audioPicker: null },
+		playbackTime: 8,
+		timeline: {
+			audioPicker: null,
+			audioReplace: null as number | null,
+			selection: null,
+		},
 	});
 	state.context = {
 		project,
@@ -73,7 +86,16 @@ function mount() {
 		},
 		editorState,
 		setEditorState,
-		timelineCommands: { addTrackContent, openCaptionInspector },
+		timelineCommands: {
+			addTrackContent,
+			openCaptionInspector,
+			nextAudioLane: () => 0,
+			setTransitionFromMaterials,
+			transitionDestinations: () => [
+				{ index: 1, id: "b", time: 5, name: "Clip B" },
+				{ index: 2, id: "c", time: 10, name: "Clip C" },
+			],
+		},
 		keymap: { matches: () => false, label: () => undefined },
 	};
 	dispose = render(() => <ClipsSidebar />, document.body);
@@ -112,6 +134,8 @@ function mount() {
 		editorState,
 		addTrackContent,
 		openCaptionInspector,
+		setEditorState,
+		setTransitionFromMaterials,
 	};
 }
 function mouse(target: EventTarget, type: string, y: number, x = 50) {
@@ -149,6 +173,19 @@ it("opens tools by material category and keeps the video list tab on return", ()
 	expect(fixture.openCaptionInspector).toHaveBeenCalledOnce();
 	button('[role="tab"]', "标注")?.click();
 	expect(fixture.editorState.materialsTab).toBe("graphics");
+	button('[role="tab"]', "转场")?.click();
+	button("button", "交叉淡化")?.click();
+	expect(fixture.setTransitionFromMaterials).toHaveBeenCalledWith(
+		2,
+		"cross-fade",
+	);
+	batch(() => {
+		fixture.setEditorState("materialsTab", "audio");
+		fixture.setEditorState("timeline", "audioReplace", 2);
+	});
+	expect(
+		document.querySelector('[data-audio-mode="replace"]')?.textContent,
+	).toBe("2");
 	button('[role="tab"]', "视频")?.click();
 	expect(fixture.cards()).toHaveLength(3);
 });

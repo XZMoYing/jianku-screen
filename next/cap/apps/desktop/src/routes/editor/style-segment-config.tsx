@@ -2,6 +2,7 @@ import { Show } from "solid-js";
 import { Toggle } from "~/components/Toggle";
 import { t as localize } from "~/utils/i18n";
 import { useEditorContext } from "./context";
+import { OverlayAssociationControl } from "./OverlayAssociationControl";
 import type { StyleGroup } from "./style";
 import { EditorButton, Field, Section, Slider } from "./ui";
 
@@ -44,7 +45,7 @@ export function StyleSegmentConfig() {
 		<Show when={selectedStyle()}>
 			{(style) => (
 				<div
-					class="shrink-0 border-b border-purple-7/40 bg-purple-3/40 p-3"
+					class="shrink-0 border-b border-ed-line bg-ed-card-2 p-3"
 					data-style-scope
 				>
 					<Section
@@ -56,6 +57,9 @@ export function StyleSegmentConfig() {
 						}
 					>
 						<div class="flex flex-col gap-3">
+							<Show when={index() !== null}>
+								<OverlayAssociationControl type="style" index={index() ?? 0} />
+							</Show>
 							<div class="flex items-center gap-2">
 								<input
 									aria-label={localize("Style name")}

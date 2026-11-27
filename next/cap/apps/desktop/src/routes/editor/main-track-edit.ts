@@ -122,6 +122,19 @@ export function closeMainTrackGaps(track: MainTrack) {
 	track.mainTrackGaps = undefined;
 }
 
+export function closeMainTrackGapBefore(track: MainTrack, clipId: string) {
+	const next = placements(track);
+	const index = next.findIndex(({ clip }) => clip.id === clipId);
+	const gap = clipGapBefore(next[index]?.clip, track.mainTrackGaps);
+	if (gap === 0) return false;
+	return applyPlacements(
+		track,
+		next.map((placement, i) =>
+			i < index ? placement : { ...placement, start: placement.start - gap },
+		),
+	);
+}
+
 export function appendMainTrackClip(track: MainTrack, clip: TimelineSegment) {
 	const end = duration(track);
 	return applyPlacements(track, [...placements(track), { clip, start: end }]);
