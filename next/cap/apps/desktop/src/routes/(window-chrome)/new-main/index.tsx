@@ -2204,6 +2204,7 @@ function Page() {
 	};
 
 	const selectDisplayTarget = async (target: CaptureDisplayWithThumbnail) => {
+		setPreferredSourceKind("display");
 		setOptions(
 			"captureTarget",
 			reconcile({ variant: "display", id: target.id }),
@@ -2219,6 +2220,7 @@ function Page() {
 	};
 
 	const selectWindowTarget = async (target: CaptureWindowWithThumbnail) => {
+		setPreferredSourceKind("window");
 		setOptions(
 			"captureTarget",
 			reconcile({ variant: "window", id: target.id }),
@@ -2617,10 +2619,27 @@ function Page() {
 		}
 	});
 
+	const initialSourceKind = (): "display" | "window" | "area" | "camera" => {
+		const variant = rawOptions.captureTarget.variant;
+		if (variant === "display" || variant === "window" || variant === "area") {
+			return variant;
+		}
+		if (variant === "cameraOnly") return "camera";
+		return "display";
+	};
+	const [preferredSourceKind, setPreferredSourceKind] = createSignal<
+		"display" | "window" | "area" | "camera"
+	>(initialSourceKind());
+	createEffect(() => {
+		const mode = rawOptions.targetMode;
+		if (mode) setPreferredSourceKind(mode);
+	});
+
 	const toggleTargetMode = async (
 		mode: "display" | "window" | "area" | "camera",
 	) => {
 		if (isRecording()) return;
+		setPreferredSourceKind(mode);
 		const nextMode = rawOptions.targetMode === mode ? null : mode;
 		if (nextMode) {
 			if (nextMode === "camera") {
@@ -2838,14 +2857,7 @@ function Page() {
 		</div>
 	);
 
-	const activeSourceKind = () => {
-		if (rawOptions.targetMode) return rawOptions.targetMode;
-		const variant = rawOptions.captureTarget.variant;
-		if (variant === "display" || variant === "window" || variant === "area") {
-			return variant;
-		}
-		return "display";
-	};
+	const activeSourceKind = () => rawOptions.targetMode ?? preferredSourceKind();
 
 	const TargetSelectionHome = () => (
 		<div class="workspace-recording-home flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pb-1 w-full">
@@ -2877,6 +2889,7 @@ function Page() {
 								disabled={isRecording() || styleBusy()}
 								expanded={displayMenuOpen()}
 								onClick={() => {
+									setPreferredSourceKind("display");
 									setDisplayMenuOpen((prev) => {
 										const next = !prev;
 										if (next) {
@@ -2913,6 +2926,7 @@ function Page() {
 								disabled={isRecording() || styleBusy()}
 								expanded={windowMenuOpen()}
 								onClick={() => {
+									setPreferredSourceKind("window");
 									setWindowMenuOpen((prev) => {
 										const next = !prev;
 										if (next) {

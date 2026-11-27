@@ -1174,14 +1174,21 @@ function Inner() {
 
 					// Spacing rules:
 					// Prefer below the crop (smaller margin)
-					// If no space below, place above the crop (larger top margin)
-					// Otherwise, place inside at the top of the crop (small inner margin)
+					// If no space below, place above the crop keeping clear of the top area toolbar
+					// Otherwise, place inside the crop below the top area toolbar (never overlapping it)
 					const macos = ostype() === "macos";
 					const SIDE_MARGIN = 16;
 					const MARGIN_BELOW = 16;
 					const MARGIN_TOP_OUTSIDE = 16;
-					const MARGIN_TOP_INSIDE = macos ? 40 : 28;
-					const TOP_SAFE_MARGIN = macos ? 40 : 10; // keep clear of notch on MacBooks
+					const TOP_TOOLBAR_CLEARANCE = (macos ? 48 : 16) + 48 + 16;
+
+					const closeAreaOverlay = () => {
+						setOptions({
+							targetMode: null,
+							targetModeDismissal: "cancelled",
+						});
+						void commands.closeTargetSelectOverlays();
+					};
 
 					const controlsSize = createElementSize(() => controlsEl);
 					const [controllerInside, _setControllerInside] = createSignal(false);
@@ -1211,18 +1218,28 @@ function Inner() {
 
 						// Try below the crop
 						const belowY = bounds.y + bounds.height + MARGIN_BELOW;
-						if (belowY + size.height <= window.innerHeight) {
+						if (
+							belowY + size.height <= window.innerHeight - SIDE_MARGIN &&
+							belowY >= TOP_TOOLBAR_CLEARANCE
+						) {
 							finalY = belowY;
 							setControllerInside(false);
 						} else {
-							// Try above the crop with a larger top margin
+							// Try above the crop while staying clear of the top toolbar
 							const aboveY = bounds.y - size.height - MARGIN_TOP_OUTSIDE;
-							if (aboveY >= TOP_SAFE_MARGIN) {
+							if (aboveY >= TOP_TOOLBAR_CLEARANCE) {
 								finalY = aboveY;
 								setControllerInside(false);
 							} else {
-								// Default to inside
-								finalY = bounds.y + MARGIN_TOP_INSIDE;
+								// Place inside the crop, always below the top area toolbar
+								const maxInsideY = Math.max(
+									TOP_TOOLBAR_CLEARANCE,
+									window.innerHeight - size.height - SIDE_MARGIN,
+								);
+								finalY = Math.min(
+									Math.max(bounds.y + 16, TOP_TOOLBAR_CLEARANCE),
+									maxInsideY,
+								);
 								setControllerInside(true);
 							}
 						}
@@ -1334,6 +1351,16 @@ function Inner() {
 									<div
 										class={`${LIQUID_GLASS_SURFACE_CLASS} flex h-12 items-center gap-1.5 p-1.5 text-gray-12`}
 									>
+										<button
+											type="button"
+											onClick={closeAreaOverlay}
+											title={localize("关闭")}
+											aria-label={localize("关闭")}
+											class="flex size-8 shrink-0 items-center justify-center rounded-full bg-gray-12 transition-opacity hover:opacity-80"
+										>
+											<IconCapX class="invert will-change-transform size-3 dark:invert-0" />
+										</button>
+
 										<div class="min-w-28 px-2 text-base font-normal leading-none tracking-[-0.01em] tabular-nums">
 											{isValid()
 												? `${Math.round(crop().width)} × ${Math.round(crop().height)}`
@@ -1414,7 +1441,8 @@ function Inner() {
 												type="button"
 												class="flex h-9 items-center gap-1.5 rounded-xl px-2.5 text-xs font-normal transition-colors disabled:cursor-not-allowed disabled:opacity-40"
 												classList={{
-													"bg-blue-9 text-white shadow-sm": isSelectionLocked(),
+													"bg-[var(--jk-primary)] text-white shadow-sm":
+														isSelectionLocked(),
 													"text-gray-11 hover:bg-gray-12/8 hover:text-gray-12":
 														!isSelectionLocked(),
 												}}
@@ -1461,18 +1489,13 @@ function Inner() {
 											}}
 											disabled={!isValid()}
 											showBackground={controllerInside()}
+											hideClose
 											onRecordingStart={() => {
 												persistLockedSelection();
 												setOriginalCameraBounds(null);
 												dismissPickerForRecordingStart();
 											}}
-											onClose={() => {
-												setOptions({
-													targetMode: null,
-													targetModeDismissal: "cancelled",
-												});
-												commands.closeTargetSelectOverlays();
-											}}
+											onClose={closeAreaOverlay}
 										/>
 									</Show>
 									<Show when={!isValid()}>
@@ -1874,6 +1897,7 @@ function RecordingControls(props: {
 	target: ScreenCaptureTarget;
 	setToggleModeSelect?: (value: boolean) => void;
 	showBackground?: boolean;
+	hideClose?: boolean;
 	disabled?: boolean;
 	onRecordingStart?: () => void;
 	onClose?: () => void;
@@ -2176,14 +2200,6 @@ function RecordingControls(props: {
 					checked: rawOptions.mode === "studio",
 				}),
 				await CheckMenuItem.new({
-					text: localize("实时模式"),
-					action: () => {
-						setOptions("mode", "instant");
-						commands.setRecordingMode("instant");
-					},
-					checked: rawOptions.mode === "instant",
-				}),
-				await CheckMenuItem.new({
 					text: localize("截图模式"),
 					action: () => {
 						setOptions("mode", "screenshot");
@@ -2265,22 +2281,27 @@ function RecordingControls(props: {
 			<div class="flex flex-col gap-2.5 items-stretch my-2.5 w-104 max-w-[90vw]">
 				<div class={`${LIQUID_GLASS_SURFACE_CLASS} p-3`}>
 					<div class="flex gap-2.5 items-center">
-						<div
-							onClick={() => {
-								if (props.onClose) {
-									props.onClose();
-								} else {
-									setOptions({
-										targetMode: null,
-										targetModeDismissal: "cancelled",
-									});
-									commands.closeTargetSelectOverlays();
-								}
-							}}
-							class="flex justify-center items-center rounded-full transition-opacity bg-gray-12 size-9 hover:opacity-80"
-						>
-							<IconCapX class="invert will-change-transform size-3 dark:invert-0" />
-						</div>
+						<Show when={!props.hideClose}>
+							<button
+								type="button"
+								title={localize("关闭")}
+								aria-label={localize("关闭")}
+								onClick={() => {
+									if (props.onClose) {
+										props.onClose();
+									} else {
+										setOptions({
+											targetMode: null,
+											targetModeDismissal: "cancelled",
+										});
+										commands.closeTargetSelectOverlays();
+									}
+								}}
+								class="flex justify-center items-center rounded-full transition-opacity bg-gray-12 size-9 hover:opacity-80"
+							>
+								<IconCapX class="invert will-change-transform size-3 dark:invert-0" />
+							</button>
+						</Show>
 						<Popover
 							open={noMicrophoneWarningOpen()}
 							onOpenChange={(open) => {
@@ -2350,7 +2371,7 @@ function RecordingControls(props: {
 									<label class="mt-3 flex cursor-pointer items-center gap-2 text-xs text-gray-11">
 										<input
 											type="checkbox"
-											class="size-3.5 accent-blue-9"
+											class="size-3.5 accent-[var(--jk-primary)]"
 											checked={dontShowMicrophoneWarning()}
 											onChange={(event) =>
 												setDontShowMicrophoneWarning(
