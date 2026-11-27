@@ -1,0 +1,32 @@
+{
+  "old-baseline": {
+    "frames": 151,
+    "duration": 5.033333,
+    "background_frames": 60,
+    "background_first": 91,
+    "background_last": 150
+  },
+  "legacy-blank-tail": {
+    "frames": 91,
+    "duration": 3.033333,
+    "background_frames": 0,
+    "background_first": null,
+    "background_last": null
+  },
+  "internal-gap": {
+    "frames": 180,
+    "duration": 6.0,
+    "background_frames": 59,
+    "background_first": 91,
+    "background_last": 149
+  },
+  "independent-audio-tail": {
+    "frames": 135,
+    "duration": 4.5,
+    "background_frames": 44,
+    "background_first": 91,
+    "background_last": 134,
+    "audio_peak_before_music": 0.0,
+    "audio_peak_in_music": 0.125102236866951
+  }
+}
