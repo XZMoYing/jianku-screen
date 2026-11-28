@@ -62,7 +62,7 @@ function EqualizerBars() {
 			<For each={EQ_BARS}>
 				{(bar) => (
 					<span
-						class="w-[2px] h-full rounded-full bg-gray-11"
+						class="w-[2px] h-full rounded-full bg-ed-accent"
 						style={{
 							"transform-origin": "bottom",
 							animation: `cap-audio-eq ${bar.duration}s ease-in-out ${bar.delay}s infinite`,
@@ -232,64 +232,60 @@ export function AudioLibraryPanel(props: {
 	};
 
 	return (
-		<div class="flex flex-col gap-4">
+		<div class="flex flex-col gap-3.5">
 			<div class="flex flex-row gap-2 items-center">
 				<EditorButton onClick={close} leftIcon={<IconLucideCheck />}>
 					{localize("Done")}
 				</EditorButton>
-				<span class="text-sm text-gray-10">
+				<span class="text-[13px] font-medium text-ed-text-1">
 					{isReplace() ? localize("更换音频") : localize("添加音频")}
 				</span>
 			</div>
 
-			<p class="text-xs text-gray-10">
+			<p class="text-xs leading-4 text-ed-text-3">
 				{isReplace()
 					? localize("为此片段更换音轨")
 					: localize("为视频添加音频、音乐或其他声音")}
 			</p>
 
 			<Show when={categories().length > 0}>
-				<div class="flex flex-wrap gap-2 items-center">
+				<div class="flex flex-wrap gap-1.5 items-center">
 					<For each={categories()}>
 						{([category]) => (
 							<button
 								type="button"
+								aria-pressed={selectedCategory() === category}
 								onClick={() => setSelectedCategory(category)}
-								class={cx(
-									"px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors duration-150",
-									selectedCategory() === category
-										? "bg-gray-3 border-gray-3 text-gray-12"
-										: "bg-transparent border-transparent text-gray-11 hover:border-gray-6",
-								)}
+								class="jk-ed-tile h-7 px-2.5 text-xs"
 							>
 								{category}
 							</button>
 						)}
 					</For>
-					<span class="text-[11px] text-gray-9">
+					<span class="text-[11px] text-ed-text-3">
 						{localize("More categories coming soon")}
 					</span>
 				</div>
 			</Show>
 
-			<div class="w-full border-t border-dashed border-gray-4" />
+			<div class="w-full border-t border-ed-line" />
 
 			<Show
 				when={!library.loading}
 				fallback={
-					<div class="grid grid-cols-5 gap-2">
-						<For each={Array.from({ length: 9 })}>
+					<div class="grid grid-cols-3 gap-2">
+						<For each={Array.from({ length: 6 })}>
 							{() => (
-								<div class="flex flex-col gap-1">
-									<div class="rounded-lg aspect-square bg-gray-3 animate-pulse" />
-									<div class="w-2/3 h-2 rounded bg-gray-3 animate-pulse" />
+								<div class="flex flex-col gap-1.5">
+									<div class="rounded-lg aspect-square bg-ed-ctl animate-pulse" />
+									<div class="w-2/3 h-2 rounded bg-ed-ctl animate-pulse" />
 								</div>
 							)}
 						</For>
 					</div>
 				}
 			>
-				<div class="grid grid-cols-5 gap-2">
+				<div class="grid grid-cols-3 gap-2">
 					<For each={activeTracks()}>
 						{(track) => {
 							const isBusy = () => busyId() === track.id;
@@ -298,10 +294,10 @@ export function AudioLibraryPanel(props: {
 								<div class="flex flex-col gap-1 min-w-0">
 									<div
 										class={cx(
-											"group/tile overflow-hidden relative rounded-lg aspect-square transition-all duration-200 bg-gray-3 ring-offset-1 ring-offset-gray-200",
+											"group/tile jk-ed-card overflow-hidden relative rounded-lg aspect-square transition-all duration-200",
 											isPreviewing()
-												? "ring-2 ring-gray-500 ring-offset-2"
-												: "hover:ring-1 hover:ring-gray-400",
+												? "border-ed-accent ring-1 ring-ed-accent"
+												: "hover:border-ed-line-strong",
 											isBusy() && "opacity-70",
 										)}
 									>
@@ -316,8 +312,8 @@ export function AudioLibraryPanel(props: {
 											onClick={() => togglePreview(track.id)}
 										>
 											<Show when={!isPreviewing()}>
-												<div class="flex absolute inset-0 justify-center items-center opacity-40 transition-opacity group-hover/tile:opacity-0">
-													<IconLucideMusic2 class="size-3.5 text-gray-11" />
+												<div class="flex absolute inset-0 justify-center items-center opacity-55 transition-opacity group-hover/tile:opacity-0">
+													<IconLucideMusic2 class="size-4 text-ed-text-2" />
 												</div>
 											</Show>
 											<div
@@ -328,7 +324,7 @@ export function AudioLibraryPanel(props: {
 														: "opacity-0 group-hover/tile:opacity-100",
 												)}
 											>
-												<span class="flex justify-center items-center rounded-full border shadow-sm backdrop-blur-sm transition-all duration-200 size-6 bg-black/40 border-white/25 text-white">
+												<span class="flex justify-center items-center rounded-full border shadow-sm backdrop-blur-sm transition-all duration-200 size-7 bg-black/55 border-white/20 text-white">
 													<Show
 														when={isPreviewing()}
 														fallback={
@@ -342,7 +338,7 @@ export function AudioLibraryPanel(props: {
 										</button>
 
 										<Show when={isPreviewing()}>
-											<div class="absolute top-1 left-1 pointer-events-none">
+											<div class="absolute top-1.5 left-1.5 pointer-events-none">
 												<EqualizerBars />
 											</div>
 										</Show>
@@ -359,8 +355,8 @@ export function AudioLibraryPanel(props: {
 												"opacity-0 group-hover/tile:opacity-100",
 												isPreviewing() && "opacity-100",
 												isBusy()
-													? "bg-gray-12 border-gray-12 text-gray-1"
-													: "bg-black/45 border-white/20 text-white hover:bg-gray-12 hover:border-gray-12 hover:text-gray-1",
+													? "bg-ed-accent border-ed-accent text-white"
+													: "bg-black/50 border-white/20 text-white hover:bg-ed-accent hover:border-ed-accent",
 											)}
 											disabled={busyId() !== null || uploading()}
 											onClick={(e) => {
@@ -383,7 +379,7 @@ export function AudioLibraryPanel(props: {
 											</Show>
 										</button>
 									</div>
-									<span class="px-0.5 text-[10px] truncate text-gray-11">
+									<span class="px-0.5 text-[10.5px] truncate text-ed-text-2">
 										{track.name}
 									</span>
 								</div>
@@ -397,22 +393,22 @@ export function AudioLibraryPanel(props: {
 				type="button"
 				disabled={uploading() || busyId() !== null}
 				onClick={uploadTrack}
-				class="flex flex-col gap-1.5 justify-center items-center p-4 w-full text-center rounded-xl border border-dashed transition-colors bg-gray-2 border-gray-5 hover:bg-gray-3 hover:border-gray-7 disabled:opacity-60"
+				class="jk-ed-card flex flex-col gap-1.5 justify-center items-center p-4 w-full text-center border-dashed transition-colors hover:border-ed-line-strong disabled:opacity-60"
 			>
-				<span class="flex justify-center items-center mb-0.5 rounded-full size-9 bg-gray-3 text-gray-11">
+				<span class="jk-ed-icon-tile mb-0.5 rounded-full size-9">
 					<Show
 						when={!uploading()}
 						fallback={
-							<div class="rounded-full border-2 animate-spin size-4 border-gray-6 border-t-gray-11" />
+							<div class="rounded-full border-2 animate-spin size-4 border-ed-line-strong border-t-ed-text-1" />
 						}
 					>
 						<IconLucideUpload class="size-4" />
 					</Show>
 				</span>
-				<span class="text-[13px] font-medium text-gray-12">
+				<span class="text-[13px] font-medium text-ed-text-1">
 					{uploading() ? localize("正在导入…") : localize("导入本地音频")}
 				</span>
-				<span class="text-[11px] text-gray-9">
+				<span class="font-mono text-[10.5px] text-ed-text-3">
 					MP3, WAV, M4A, OGG, FLAC, AAC
 				</span>
 			</button>

@@ -108,7 +108,7 @@ export function ImageSegmentConfig(props: { index: number }) {
 								</div>
 							</Show>
 							<Show when={active() === "appearance"}>
-								<div class="flex flex-col gap-2.5 rounded-lg bg-ed-card-2 p-3">
+								<div class="jk-ed-card flex flex-col gap-2.5 p-3.5">
 									<SectionLabel name={localize("Arrange on canvas")} />
 									<p class="text-[11px] leading-relaxed text-ed-text-3">
 										{localize(
@@ -134,7 +134,7 @@ export function ImageSegmentConfig(props: { index: number }) {
 										{localize("Center on canvas")}
 									</EditorButton>
 								</div>
-								<div class="flex flex-col">
+								<div class="jk-ed-card flex flex-col gap-0.5 p-3.5">
 									<Field
 										inline
 										name={localize("Opacity")}

@@ -18,7 +18,7 @@ import {
 } from "solid-js";
 import { produce } from "solid-js/store";
 import { ChoiceSelect } from "~/components/ChoiceSelect";
-import { MotionPresence } from "~/components/InterfaceMotion";
+import { MotionGroup, MotionPresence } from "~/components/InterfaceMotion";
 import { Toggle } from "~/components/Toggle";
 import { t as localize } from "~/utils/i18n";
 import IconLucideArrowLeftRight from "~icons/lucide/arrow-left-right";
@@ -167,7 +167,7 @@ function PanelGroup(
 	props: ParentProps<{ name: string; action?: JSX.Element }>,
 ) {
 	return (
-		<div class="p-3 rounded-[10px] shadow-[0_0_0_1px_var(--ed-line)]">
+		<div class="jk-ed-card p-3.5">
 			<div class="flex flex-row gap-2 items-center min-h-[22px]">
 				<span class="text-[12px] font-medium text-ed-text-2">{props.name}</span>
 				<Show when={props.action}>
@@ -188,12 +188,7 @@ function MiniSegmented<T extends string>(props: {
 	class?: string;
 }) {
 	return (
-		<div
-			class={cx(
-				"flex flex-row gap-0.5 p-0.5 rounded-[7px] bg-ed-ctl",
-				props.class,
-			)}
-		>
+		<MotionGroup class={cx("jk-ed-seg", props.class)} label={localize("选项")}>
 			<For each={props.options}>
 				{(option) => (
 					<button
@@ -202,13 +197,13 @@ function MiniSegmented<T extends string>(props: {
 						aria-pressed={props.value === option.value}
 						data-selected={props.value === option.value}
 						onClick={() => props.onChange(option.value)}
-						class="flex-1 px-2.5 h-[22px] rounded-md text-[11px] font-medium whitespace-nowrap transition-colors duration-100 outline-hidden text-ed-text-2 data-[selected='true']:bg-ed-card data-[selected='true']:text-ed-text-1 data-[selected='true']:shadow-[0_1px_2px_rgba(0,0,0,.12),0_0_0_.5px_rgba(0,0,0,.06)] dark:data-[selected='true']:bg-white/11 dark:data-[selected='true']:shadow-none not-data-[selected='true']:hover:text-ed-text-1 disabled:opacity-40"
+						class="jk-ed-seg-item flex-1 h-[22px] px-2.5 text-[11px] outline-hidden"
 					>
 						{localize(option.label)}
 					</button>
 				)}
 			</For>
-		</div>
+		</MotionGroup>
 	);
 }
 

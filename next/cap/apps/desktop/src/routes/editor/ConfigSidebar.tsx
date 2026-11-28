@@ -1,6 +1,5 @@
 import { NumberField } from "@kobalte/core";
 import { Collapsible as KCollapsible } from "@kobalte/core/collapsible";
-import { RadioGroup } from "@kobalte/core/radio-group";
 import { Select as KSelect } from "@kobalte/core/select";
 import { Tabs as KTabs } from "@kobalte/core/tabs";
 import { createElementBounds } from "@solid-primitives/bounds";
@@ -55,8 +54,10 @@ import type {
 } from "~/utils/tauri";
 import IconLucideColumns2 from "~icons/lucide/columns-2";
 import IconLucideEyeOff from "~icons/lucide/eye-off";
+import IconLucideGauge from "~icons/lucide/gauge";
 import IconLucideKeyboard from "~icons/lucide/keyboard";
 import IconLucideMonitor from "~icons/lucide/monitor";
+import IconLucideSlidersHorizontal from "~icons/lucide/sliders-horizontal";
 import IconLucideVideo from "~icons/lucide/video";
 import IconLucideX from "~icons/lucide/x";
 import {
@@ -213,15 +214,33 @@ function StudioSoundCard() {
 		},
 	] satisfies { value: VoiceIsolation; label: string; description: string }[];
 
+	const selectIsolation = async (value: VoiceIsolation) => {
+		setProject("audio", "isolation", value);
+		if (!audioEnhancement.data?.enabledByDefault) return;
+		setSavingDefault(true);
+		try {
+			await audioEnhancementStore.set({ isolation: value });
+			await audioEnhancement.refetch();
+		} catch {
+			toast.error(localize("Could not save the Studio Sound default"));
+		} finally {
+			setSavingDefault(false);
+		}
+	};
+
+	const activeDescription = () => {
+		const desc = isolationOptions.find(
+			(option) => option.value === project.audio.isolation,
+		)?.description;
+		return desc ? localize(desc) : "";
+	};
+
 	return (
-		<div class="flex flex-col p-3.5 rounded-xl bg-ed-card-2">
+		<div class="jk-ed-card flex flex-col p-3.5">
 			<div class="flex flex-row gap-2.5 items-center">
 				<div
-					class="flex justify-center items-center rounded-[9px] size-[30px] shrink-0 transition-colors"
-					classList={{
-						"bg-ed-accent/12 text-ed-accent": enabled(),
-						"bg-ed-ctl text-ed-text-2": !enabled(),
-					}}
+					class="jk-ed-icon-tile"
+					data-active={enabled() && !project.audio.mute ? "true" : undefined}
 				>
 					<IconCapMicrophone class="size-4" />
 				</div>
@@ -229,7 +248,7 @@ function StudioSoundCard() {
 					<span class="text-[13px] font-medium text-ed-text-1">
 						{localize("Studio Sound")}
 					</span>
-					<span class="text-xs leading-4 text-ed-text-3">
+					<span class="text-[11.5px] leading-4 text-ed-text-3">
 						{localize(
 							"Reduces background noise and balances your voice level.",
 						)}
@@ -237,50 +256,32 @@ function StudioSoundCard() {
 				</div>
 				<Toggle
 					checked={enabled()}
+					disabled={project.audio.mute}
 					onChange={(value) => setProject("audio", "improve", value)}
 				/>
 			</div>
 			<Show when={enabled()}>
-				<RadioGroup
-					aria-label={localize("Voice isolation")}
-					value={project.audio.isolation}
-					disabled={savingDefault() || audioEnhancement.isPending}
-					onChange={async (value) => {
-						const option = isolationOptions.find(
-							(option) => option.value === value,
-						);
-						if (!option) return;
-						setProject("audio", "isolation", option.value);
-						if (!audioEnhancement.data?.enabledByDefault) return;
-						setSavingDefault(true);
-						try {
-							await audioEnhancementStore.set({ isolation: option.value });
-							await audioEnhancement.refetch();
-						} catch {
-							toast.error(localize("Could not save the Studio Sound default"));
-						} finally {
-							setSavingDefault(false);
-						}
-					}}
-					class="flex gap-0.5 p-0.5 mt-3 rounded-lg bg-ed-ctl"
+				<MotionGroup
+					class="jk-ed-seg mt-3 w-full"
+					label={localize("Voice isolation")}
 				>
 					<For each={isolationOptions}>
 						{(option) => (
-							<RadioGroup.Item value={option.value} class="flex-1 min-w-0">
-								<RadioGroup.ItemInput class="sr-only peer" />
-								<RadioGroup.ItemLabel class="flex justify-center py-1 text-xs font-medium rounded-md cursor-pointer text-ed-text-2 peer-focus-visible:ring-2 peer-focus-visible:ring-ed-accent data-checked:bg-ed-card data-checked:text-ed-text-1 data-disabled:opacity-50">
-									{localize(option.label)}
-								</RadioGroup.ItemLabel>
-							</RadioGroup.Item>
+							<button
+								type="button"
+								role="radio"
+								aria-checked={project.audio.isolation === option.value}
+								disabled={savingDefault() || audioEnhancement.isPending}
+								class="jk-ed-seg-item flex-1 outline-hidden"
+								onClick={() => void selectIsolation(option.value)}
+							>
+								{localize(option.label)}
+							</button>
 						)}
 					</For>
-				</RadioGroup>
-				<p class="mt-2 text-xs leading-4 text-ed-text-3">
-					{
-						isolationOptions.find(
-							(option) => option.value === project.audio.isolation,
-						)?.description
-					}
+				</MotionGroup>
+				<p class="mt-2 text-[11.5px] leading-4 text-ed-text-3">
+					{activeDescription()}
 				</p>
 			</Show>
 			<div class="flex flex-row gap-2.5 justify-between items-center pt-3 mt-3 border-t border-ed-line">
@@ -316,13 +317,19 @@ function AutoLoudnessCard() {
 	const enabled = () => project.audio.autoLevel === true;
 
 	return (
-		<div class="flex flex-col p-3.5 rounded-xl bg-ed-card-2">
+		<div class="jk-ed-card flex flex-col p-3.5">
 			<div class="flex flex-row gap-2.5 items-center">
+				<div
+					class="jk-ed-icon-tile"
+					data-active={enabled() && !project.audio.mute ? "true" : undefined}
+				>
+					<IconLucideGauge class="size-4" />
+				</div>
 				<div class="flex flex-col flex-1 gap-0.5 min-w-0">
 					<span class="text-[13px] font-medium text-ed-text-1">
 						{localize("自动响度均衡")}
 					</span>
-					<span class="text-xs leading-4 text-ed-text-3">
+					<span class="text-[11.5px] leading-4 text-ed-text-3">
 						{localize(
 							"按 BS.1770-4 将偏轻人声校准到 -16 LUFS，预览与导出一致。",
 						)}
@@ -385,13 +392,23 @@ function VoiceEqCard() {
 
 	return (
 		<Show when={targetClipIndices().length > 0}>
-			<div class="flex flex-col gap-3 p-3.5 rounded-xl bg-ed-card-2">
+			<div class="jk-ed-card flex flex-col gap-3 p-3.5">
 				<div class="flex flex-row gap-2.5 items-center">
+					<div
+						class="jk-ed-icon-tile"
+						data-active={
+							(eqEnabled() || declick() !== "off") && !project.audio.mute
+								? "true"
+								: undefined
+						}
+					>
+						<IconLucideSlidersHorizontal class="size-4" />
+					</div>
 					<div class="flex flex-col flex-1 gap-0.5 min-w-0">
 						<span class="text-[13px] font-medium text-ed-text-1">
 							{localize("人声均衡与去杂音")}
 						</span>
-						<span class="text-xs leading-4 text-ed-text-3">
+						<span class="text-[11.5px] leading-4 text-ed-text-3">
 							{editorState.timeline.selection?.type === "clip"
 								? localize("作用于当前选中片段")
 								: localize("作用于时间线全部片段")}
@@ -412,18 +429,16 @@ function VoiceEqCard() {
 				</div>
 
 				<Show when={eqEnabled()}>
-					<div class="flex flex-wrap gap-1 rounded-lg bg-ed-ctl p-1">
+					<MotionGroup
+						class="jk-ed-seg w-full"
+						label={localize("人声均衡预设")}
+					>
 						<For each={VOICE_EQ_PRESET_OPTIONS}>
 							{([preset, label]) => (
 								<button
 									type="button"
 									aria-pressed={activeEq().preset === preset}
-									class={cx(
-										"flex-1 min-w-[3.2rem] rounded-md px-2 py-1 text-xs font-medium transition-colors",
-										activeEq().preset === preset
-											? "bg-ed-card text-ed-text-1"
-											: "text-ed-text-2 hover:text-ed-text-1",
-									)}
+									class="jk-ed-seg-item flex-1 px-1 outline-hidden"
 									onClick={() =>
 										applyVoiceEq(
 											voiceEqFromPreset(preset, {
@@ -437,12 +452,12 @@ function VoiceEqCard() {
 								</button>
 							)}
 						</For>
-					</div>
+					</MotionGroup>
 
-					<div class="flex flex-row justify-between items-center">
-						<span class="text-xs text-ed-text-2">
-							{localize("低切滤波")} ({Math.round(activeEq().highPassHz)} Hz)
-						</span>
+					<Subfield
+						class="h-[30px]"
+						name={`${localize("低切滤波")} (${Math.round(activeEq().highPassHz)} Hz)`}
+					>
 						<Toggle
 							size="sm"
 							checked={activeEq().highPass}
@@ -450,9 +465,9 @@ function VoiceEqCard() {
 								applyVoiceEq({ ...activeEq(), highPass: value })
 							}
 						/>
-					</div>
+					</Subfield>
 
-					<div class="flex flex-col gap-2">
+					<div class="flex flex-col gap-0.5">
 						{(
 							[
 								["low", "低频"],
@@ -461,12 +476,13 @@ function VoiceEqCard() {
 								["high", "高频"],
 							] as const
 						).map(([band, label]) => (
-							<div class="flex items-center gap-2 text-xs">
-								<span class="w-12 shrink-0 text-ed-text-2">
-									{localize(label)}
-								</span>
+							<Field
+								inline
+								class="h-[30px]"
+								name={localize(label)}
+								value={`${activeEq()[band].gainDb > 0 ? "+" : ""}${activeEq()[band].gainDb.toFixed(1)} dB`}
+							>
 								<Slider
-									class="min-w-0 flex-1"
 									aria-label={localize(label)}
 									value={[activeEq()[band].gainDb]}
 									minValue={-12}
@@ -477,29 +493,20 @@ function VoiceEqCard() {
 										`${value > 0 ? "+" : ""}${value.toFixed(1)} dB`
 									}
 								/>
-								<span class="w-12 shrink-0 text-right tabular-nums text-ed-text-3">
-									{activeEq()[band].gainDb > 0 ? "+" : ""}
-									{activeEq()[band].gainDb.toFixed(1)}
-								</span>
-							</div>
+							</Field>
 						))}
 					</div>
 				</Show>
 
-				<div class="flex flex-col gap-1.5 pt-2.5 border-t border-ed-line">
+				<div class="flex flex-col gap-2 pt-3 border-t border-ed-line">
 					<span class="text-xs text-ed-text-2">{localize("消除口水音")}</span>
-					<div class="flex gap-1 rounded-lg bg-ed-ctl p-0.5">
+					<MotionGroup class="jk-ed-seg w-full" label={localize("消除口水音")}>
 						<For each={VOICE_DECLICK_OPTIONS}>
 							{([mode, label]) => (
 								<button
 									type="button"
 									aria-pressed={declick() === mode}
-									class={cx(
-										"flex-1 rounded-md py-1 text-xs font-medium transition-colors",
-										declick() === mode
-											? "bg-ed-card text-ed-text-1"
-											: "text-ed-text-2 hover:text-ed-text-1",
-									)}
+									class="jk-ed-seg-item flex-1 outline-hidden"
 									onClick={() => {
 										const base = currentVoiceEq();
 										applyVoiceEq(
@@ -516,7 +523,7 @@ function VoiceEqCard() {
 								</button>
 							)}
 						</For>
-					</div>
+					</MotionGroup>
 				</div>
 			</div>
 		</Show>
@@ -735,123 +742,135 @@ function ConfigSidebarContent() {
 							<CameraConfig scrollRef={scrollRef} />
 							<KTabs.Content
 								value="audio"
-								class="flex flex-col flex-1 gap-3.5 pt-3.5 px-4 pb-4 min-h-0"
+								class="flex flex-col flex-1 gap-4 pt-3.5 px-4 pb-4 min-h-0"
 							>
-								<Section name={localize("Audio")}>
-									<Subfield name={localize("Mute Audio")}>
-										<Toggle
-											checked={project.audio.mute}
-											onChange={(v) => setProject("audio", "mute", v)}
-										/>
-									</Subfield>
-									{editorInstance.recordings.segments[0].mic?.channels ===
-										2 && (
-										<Subfield name={localize("Microphone Stereo Mode")}>
-											<KSelect<{ name: string; value: StereoMode }>
-												options={STEREO_MODES}
-												optionValue="value"
-												optionTextValue="name"
-												value={STEREO_MODES.find(
-													(v) => v.value === project.audio.micStereoMode,
-												)}
-												onChange={(v) => {
-													if (v) setProject("audio", "micStereoMode", v.value);
-												}}
-												disallowEmptySelection
-												itemComponent={(props) => (
-													<MenuItem<typeof KSelect.Item>
-														as={KSelect.Item}
-														item={props.item}
-													>
-														<KSelect.ItemLabel class="flex-1">
-															{props.item.rawValue.name}
-														</KSelect.ItemLabel>
-													</MenuItem>
+								<Section name={localize("音量与声道")}>
+									<div class="jk-ed-card flex flex-col gap-1.5 p-3.5">
+										<Subfield name={localize("Mute Audio")}>
+											<Toggle
+												checked={project.audio.mute}
+												onChange={(v) => setProject("audio", "mute", v)}
+											/>
+										</Subfield>
+										{meta().hasMicrophone && (
+											<Field
+												inline
+												name={localize("Microphone Volume")}
+												value={formatVolumeDb(project.audio.micVolumeDb ?? 0)}
+											>
+												<Slider
+													disabled={project.audio.mute}
+													value={[project.audio.micVolumeDb ?? 0]}
+													onChange={(v) =>
+														setProject("audio", "micVolumeDb", v[0])
+													}
+													minValue={-30}
+													maxValue={10}
+													step={0.1}
+													formatTooltip={(v) =>
+														v <= -30
+															? localize("静音")
+															: `${v > 0 ? "+" : ""}${v.toFixed(1)} dB`
+													}
+												/>
+											</Field>
+										)}
+										{meta().hasSystemAudio && (
+											<Field
+												inline
+												name={localize("System Audio Volume")}
+												value={formatVolumeDb(
+													project.audio.systemVolumeDb ?? 0,
 												)}
 											>
-												<KSelect.Trigger class="flex flex-row gap-1.5 items-center px-2 w-full h-[26px] rounded-[7px] transition-colors bg-ed-ctl hover:bg-ed-ctl-hover outline-hidden disabled:text-ed-text-3">
-													<KSelect.Value<{
-														name: string;
-														value: StereoMode;
-													}> class="flex-1 text-[12px] text-left truncate text-ed-text-1 font-normal">
-														{(state) => (
-															<span>{state.selectedOption().name}</span>
-														)}
-													</KSelect.Value>
-													<KSelect.Icon<ValidComponent>
-														as={(props) => (
-															<IconCapChevronDown
-																{...props}
-																class="size-3.5 shrink-0 transform transition-transform data-expanded:rotate-180 text-ed-text-3"
-															/>
-														)}
-													/>
-												</KSelect.Trigger>
-												<KSelect.Portal>
-													<PopperContent<typeof KSelect.Content>
-														as={KSelect.Content}
-														class={cx(topSlideAnimateClasses, "z-50")}
-													>
-														<MenuItemList<typeof KSelect.Listbox>
-															class="overflow-y-auto max-h-32"
-															as={KSelect.Listbox}
+												<Slider
+													disabled={project.audio.mute}
+													value={[project.audio.systemVolumeDb ?? 0]}
+													onChange={(v) =>
+														setProject("audio", "systemVolumeDb", v[0])
+													}
+													minValue={-30}
+													maxValue={10}
+													step={0.1}
+													formatTooltip={(v) =>
+														v <= -30
+															? localize("静音")
+															: `${v > 0 ? "+" : ""}${v.toFixed(1)} dB`
+													}
+												/>
+											</Field>
+										)}
+										{editorInstance.recordings.segments[0].mic?.channels ===
+											2 && (
+											<Subfield name={localize("Microphone Stereo Mode")}>
+												<KSelect<{ name: string; value: StereoMode }>
+													options={STEREO_MODES}
+													optionValue="value"
+													optionTextValue="name"
+													value={STEREO_MODES.find(
+														(v) => v.value === project.audio.micStereoMode,
+													)}
+													onChange={(v) => {
+														if (v)
+															setProject("audio", "micStereoMode", v.value);
+													}}
+													disallowEmptySelection
+													itemComponent={(props) => (
+														<MenuItem<typeof KSelect.Item>
+															as={KSelect.Item}
+															item={props.item}
+														>
+															<KSelect.ItemLabel class="flex-1">
+																{localize(props.item.rawValue.name)}
+															</KSelect.ItemLabel>
+														</MenuItem>
+													)}
+												>
+													<KSelect.Trigger class="jk-choice-trigger min-h-[28px] h-[28px] w-auto min-w-[108px] py-0 px-2.5">
+														<KSelect.Value<{
+															name: string;
+															value: StereoMode;
+														}> class="flex-1 text-[12px] text-left truncate text-ed-text-1 font-normal">
+															{(state) => (
+																<span>
+																	{localize(state.selectedOption().name)}
+																</span>
+															)}
+														</KSelect.Value>
+														<KSelect.Icon<ValidComponent>
+															as={(props) => (
+																<IconCapChevronDown
+																	{...props}
+																	class="size-3.5 shrink-0 transform transition-transform data-expanded:rotate-180 text-ed-text-3"
+																/>
+															)}
 														/>
-													</PopperContent>
-												</KSelect.Portal>
-											</KSelect>
-										</Subfield>
-									)}
+													</KSelect.Trigger>
+													<KSelect.Portal>
+														<PopperContent<typeof KSelect.Content>
+															as={KSelect.Content}
+															class={cx(topSlideAnimateClasses, "z-50")}
+														>
+															<MenuItemList<typeof KSelect.Listbox>
+																class="overflow-y-auto max-h-32"
+																as={KSelect.Listbox}
+															/>
+														</PopperContent>
+													</KSelect.Portal>
+												</KSelect>
+											</Subfield>
+										)}
+									</div>
+								</Section>
 
-									<Show when={meta().hasMicrophone}>
+								<Show when={meta().hasMicrophone}>
+									<Section name={localize("人声增强")}>
 										<StudioSoundCard />
 										<AutoLoudnessCard />
 										<VoiceEqCard />
-									</Show>
-								</Section>
-								{meta().hasMicrophone && (
-									<Field
-										inline
-										name={localize("Microphone Volume")}
-										value={formatVolumeDb(project.audio.micVolumeDb ?? 0)}
-									>
-										<Slider
-											disabled={project.audio.mute}
-											value={[project.audio.micVolumeDb ?? 0]}
-											onChange={(v) => setProject("audio", "micVolumeDb", v[0])}
-											minValue={-30}
-											maxValue={10}
-											step={0.1}
-											formatTooltip={(v) =>
-												v <= -30
-													? localize("静音")
-													: `${v > 0 ? "+" : ""}${v.toFixed(1)} dB`
-											}
-										/>
-									</Field>
-								)}
-								{meta().hasSystemAudio && (
-									<Field
-										inline
-										name={localize("System Audio Volume")}
-										value={formatVolumeDb(project.audio.systemVolumeDb ?? 0)}
-									>
-										<Slider
-											disabled={project.audio.mute}
-											value={[project.audio.systemVolumeDb ?? 0]}
-											onChange={(v) =>
-												setProject("audio", "systemVolumeDb", v[0])
-											}
-											minValue={-30}
-											maxValue={10}
-											step={0.1}
-											formatTooltip={(v) =>
-												v <= -30
-													? localize("静音")
-													: `${v > 0 ? "+" : ""}${v.toFixed(1)} dB`
-											}
-										/>
-									</Field>
-								)}
+									</Section>
+								</Show>
+
 								<SyncOffsetsConfig />
 							</KTabs.Content>
 							<KTabs.Content
@@ -1219,7 +1238,7 @@ function ConfigSidebarContent() {
 										</div>
 										<For each={value().segments}>
 											{(item) => (
-												<div class="p-3.5 rounded-xl bg-ed-card-2">
+												<div class="jk-ed-card p-3.5">
 													<AudioSegmentConfig
 														segment={item.segment}
 														segmentIndex={item.index}
@@ -1277,7 +1296,7 @@ function ConfigSidebarContent() {
 										</div>
 										<For each={value().segments}>
 											{(item) => (
-												<div class="p-3.5 rounded-xl bg-ed-card-2">
+												<div class="jk-ed-card p-3.5">
 													<MaskSegmentConfig
 														segment={item.segment}
 														segmentIndex={item.index}
@@ -1321,9 +1340,13 @@ function ConfigSidebarContent() {
 										const count = value().segments.length;
 										const total = totalZoomSegments();
 										if (total > 1 && count === total)
-											return `All ${total} selected`;
-										if (total > 1) return `${count} of ${total} selected`;
-										return `${count} selected`;
+											return localize("已全选 {total} 个缩放", { total });
+										if (total > 1)
+											return localize("已选 {count} / {total}", {
+												count,
+												total,
+											});
+										return localize("已选 {count} 个", { count });
 									};
 
 									return (
@@ -1373,7 +1396,7 @@ function ConfigSidebarContent() {
 											>
 												<For each={value().segments}>
 													{(item) => (
-														<div class="p-3.5 rounded-xl bg-ed-card-2">
+														<div class="jk-ed-card p-3.5">
 															<ZoomSegmentConfig
 																segment={item.segment}
 																segmentIndex={item.index}
@@ -1420,7 +1443,9 @@ function ConfigSidebarContent() {
 															value().segments.length === 1 &&
 															value().segments[0]
 														}
-														fallback={`${value().segments.length} 3D shots selected`}
+														fallback={localize("已选 {count} 个 3D 镜头", {
+															count: value().segments.length,
+														})}
 													>
 														{(item) => camera3DShotSummary(item().segment)}
 													</Show>
@@ -1765,7 +1790,7 @@ function AudioSegmentConfig(props: {
 											props.segmentIndex,
 										)
 									}
-									class="flex gap-3 items-center p-2 w-full text-left rounded-xl border transition-colors group border-gray-3 bg-gray-2 hover:border-gray-5 hover:bg-gray-3"
+									class="jk-ed-card flex gap-3 items-center p-2.5 w-full text-left transition-colors group hover:border-ed-line-strong"
 								>
 									<span
 										class={cx(
@@ -1774,21 +1799,21 @@ function AudioSegmentConfig(props: {
 										)}
 									/>
 									<div class="flex flex-col flex-1 min-w-0">
-										<span class="text-sm font-medium truncate text-gray-12">
+										<span class="text-sm font-medium truncate text-ed-text-1">
 											{props.segment.name || localize("Audio")}
 										</span>
-										<span class="text-xs text-gray-10">
+										<span class="text-xs text-ed-text-3">
 											{localize("Tap to change track")}
 										</span>
 									</div>
-									<span class="flex gap-1 items-center px-2 h-7 text-xs font-medium rounded-lg border transition-colors shrink-0 border-gray-3 bg-gray-1 text-gray-11 group-hover:text-gray-12">
+									<span class="jk-chip-btn flex gap-1 items-center px-2 h-7 text-xs font-medium rounded-lg shrink-0">
 										<IconLucideRefreshCw class="size-3.5" />
 										{localize("Change")}
 									</span>
 								</button>
 								<div class="flex gap-3 items-center">
-									<input
-										class="flex-1 px-3 py-2 rounded-lg border border-gray-3 bg-gray-2 text-gray-12"
+									<Input
+										class="flex-1"
 										value={props.segment.name ?? ""}
 										placeholder={localize("Audio")}
 										onInput={(e) =>
@@ -1797,11 +1822,12 @@ function AudioSegmentConfig(props: {
 											})
 										}
 									/>
-									<div class="flex flex-col gap-2 items-center">
+									<div class="flex flex-col gap-1.5 items-center shrink-0">
 										<span class="text-[11px] text-ed-text-3">
 											{localize("Enabled")}
 										</span>
 										<Toggle
+											size="sm"
 											checked={props.segment.enabled}
 											onChange={(value) =>
 												updateSegment((segment) => {
@@ -1922,7 +1948,7 @@ function KeyboardSegmentConfig(props: {
 				/>
 			</Section>
 			<Field name={localize("Timing")}>
-				<div class="rounded-xl bg-ed-card-2 p-3 space-y-3">
+				<div class="jk-ed-card p-3 space-y-3">
 					<div class="grid grid-cols-[1fr_auto_1fr] gap-2 items-start">
 						<div class="rounded-lg bg-ed-card p-2.5 space-y-2">
 							<div class="flex items-center justify-between text-[10px] uppercase tracking-[0.08em] text-ed-text-3">
@@ -2039,7 +2065,7 @@ function CaptionSegmentConfig(props: {
 				/>
 			</Section>
 			<Field name={localize("Timing")}>
-				<div class="rounded-xl bg-ed-card-2 p-3 space-y-3">
+				<div class="jk-ed-card p-3 space-y-3">
 					<div class="grid grid-cols-[1fr_auto_1fr] gap-2 items-start">
 						<div class="rounded-lg bg-ed-card p-2.5 space-y-2">
 							<div class="flex items-center justify-between text-[10px] uppercase tracking-[0.08em] text-ed-text-3">
@@ -2157,44 +2183,41 @@ function MaskSegmentConfig(props: {
 	return (
 		<div class="space-y-4">
 			<Section name={`${localize("Mask")} ${props.segmentIndex + 1}`}>
-				<div class="flex items-center justify-between gap-4">
-					<RadioGroup
-						class="grid grid-cols-2 gap-2"
-						value={props.segment.maskType}
-						onChange={(value) =>
-							updateSegment((segment) => {
-								segment.maskType = value as MaskKind;
-								if (segment.maskType === "highlight") {
-									segment.feather = 0;
-									segment.opacity = 1;
-								} else {
-									segment.feather = 0.1;
-									segment.fadeDuration = 0;
+				<div class="flex items-center justify-between gap-3">
+					<MotionGroup class="jk-ed-seg flex-1" label={localize("Mask")}>
+						{(
+							[
+								{ value: "sensitive", label: "Sensitive" },
+								{ value: "highlight", label: "Highlight" },
+							] as const
+						).map((option) => (
+							<button
+								type="button"
+								aria-pressed={props.segment.maskType === option.value}
+								class="jk-ed-seg-item flex-1 outline-hidden"
+								onClick={() =>
+									updateSegment((segment) => {
+										segment.maskType = option.value as MaskKind;
+										if (segment.maskType === "highlight") {
+											segment.feather = 0;
+											segment.opacity = 1;
+										} else {
+											segment.feather = 0.1;
+											segment.fadeDuration = 0;
+										}
+									})
 								}
-							})
-						}
-					>
-						{[
-							{ value: "sensitive", label: "Sensitive" },
-							{ value: "highlight", label: "Highlight" },
-						].map((option) => (
-							<RadioGroup.Item
-								value={option.value}
-								class="rounded-lg border border-gray-3 transition-colors data-checked:border-blue-8 data-checked:bg-blue-3/40"
 							>
-								<RadioGroup.ItemInput class="sr-only" />
-								<RadioGroup.ItemLabel class="flex items-center gap-2 p-2 text-[13px] text-ed-text-1">
-									<RadioGroup.ItemControl class="size-4 rounded-full border border-gray-7 data-checked:border-blue-9 data-checked:bg-blue-9" />
-									{localize(option.label)}
-								</RadioGroup.ItemLabel>
-							</RadioGroup.Item>
+								{localize(option.label)}
+							</button>
 						))}
-					</RadioGroup>
-					<div class="flex items-center gap-2">
+					</MotionGroup>
+					<div class="flex items-center gap-2 shrink-0">
 						<span class="text-[11px] text-ed-text-3">
 							{localize("Enabled")}
 						</span>
 						<Toggle
+							size="sm"
 							checked={props.segment.enabled}
 							onChange={(value) =>
 								updateSegment((segment) => {
@@ -2207,27 +2230,23 @@ function MaskSegmentConfig(props: {
 			</Section>
 			<Show when={props.segment.maskType === "sensitive"}>
 				<Field name={localize("Effect")}>
-					<RadioGroup
-						class="grid grid-cols-2 gap-2"
-						value={maskEffect()}
-						onChange={(value) => setMaskEffect(value as MaskEffect)}
-					>
-						{[
-							{ value: "blur", label: "Blur" },
-							{ value: "pixelate", label: "Pixelate" },
-						].map((option) => (
-							<RadioGroup.Item
-								value={option.value}
-								class="rounded-lg border border-gray-3 transition-colors data-checked:border-blue-8 data-checked:bg-blue-3/40"
+					<MotionGroup class="jk-ed-seg w-full" label={localize("Effect")}>
+						{(
+							[
+								{ value: "blur", label: "Blur" },
+								{ value: "pixelate", label: "Pixelate" },
+							] as const
+						).map((option) => (
+							<button
+								type="button"
+								aria-pressed={maskEffect() === option.value}
+								class="jk-ed-seg-item flex-1 outline-hidden"
+								onClick={() => setMaskEffect(option.value as MaskEffect)}
 							>
-								<RadioGroup.ItemInput class="sr-only" />
-								<RadioGroup.ItemLabel class="flex items-center gap-2 p-2 text-[13px] text-ed-text-1">
-									<RadioGroup.ItemControl class="size-4 rounded-full border border-gray-7 data-checked:border-blue-9 data-checked:bg-blue-9" />
-									{localize(option.label)}
-								</RadioGroup.ItemLabel>
-							</RadioGroup.Item>
+								{localize(option.label)}
+							</button>
 						))}
-					</RadioGroup>
+					</MotionGroup>
 				</Field>
 			</Show>
 			<Show when={props.segment.maskType === "sensitive"}>
@@ -2998,68 +3017,70 @@ function SyncOffsetsConfig() {
 
 	return (
 		<Show when={hasAnySource()}>
-			<div class="flex flex-col gap-3.5">
-				<Section name={localize("Sync")}>
-					<p class="text-[11px] text-ed-text-3">
+			<Section name={localize("Sync")}>
+				<div class="jk-ed-card flex flex-col gap-3 p-3.5">
+					<p class="text-[11.5px] leading-4 text-ed-text-3">
 						{localize(
 							"Fine-tune source offsets if audio or camera drifts out of sync with the screen recording.",
 						)}
 					</p>
-				</Section>
 
-				<For each={editorInstance.recordings.segments}>
-					{(_, index) => (
-						<div class="flex flex-col gap-3.5">
-							<Show when={editorInstance.recordings.segments.length > 1}>
-								<SectionLabel name={`${localize("Clip")} ${index()}`} />
-							</Show>
-							<Show when={clipConfig(index())?.offsetsAutoCalculated === true}>
-								<p class="text-[11px] text-ed-text-3">
-									{localize(
-										"These offsets were calculated automatically to keep audio in sync with the video. Adjust them if anything still sounds off.",
-									)}
-								</p>
-							</Show>
-							{meta().hasSystemAudio && (
-								<SourceOffsetField
-									name={localize("System Audio Offset")}
-									value={clipConfig(index())?.offsets.system_audio}
-									autoCalculated={
-										clipConfig(index())?.offsetsAutoCalculated === true
-									}
-									onChange={(offset) => {
-										setOffset(index(), "system_audio", offset);
-									}}
-								/>
-							)}
-							{meta().hasMicrophone && (
-								<SourceOffsetField
-									name={localize("Microphone Offset")}
-									value={clipConfig(index())?.offsets.mic}
-									autoCalculated={
-										clipConfig(index())?.offsetsAutoCalculated === true
-									}
-									onChange={(offset) => {
-										setOffset(index(), "mic", offset);
-									}}
-								/>
-							)}
-							{meta().hasCamera && (
-								<SourceOffsetField
-									name={localize("Camera Offset")}
-									value={clipConfig(index())?.offsets.camera}
-									autoCalculated={
-										clipConfig(index())?.offsetsAutoCalculated === true
-									}
-									onChange={(offset) => {
-										setOffset(index(), "camera", offset);
-									}}
-								/>
-							)}
-						</div>
-					)}
-				</For>
-			</div>
+					<For each={editorInstance.recordings.segments}>
+						{(_, index) => (
+							<div class="flex flex-col gap-3">
+								<Show when={editorInstance.recordings.segments.length > 1}>
+									<SectionLabel name={`${localize("Clip")} ${index() + 1}`} />
+								</Show>
+								<Show
+									when={clipConfig(index())?.offsetsAutoCalculated === true}
+								>
+									<p class="text-[11px] leading-4 text-ed-text-3">
+										{localize(
+											"These offsets were calculated automatically to keep audio in sync with the video. Adjust them if anything still sounds off.",
+										)}
+									</p>
+								</Show>
+								{meta().hasSystemAudio && (
+									<SourceOffsetField
+										name={localize("System Audio Offset")}
+										value={clipConfig(index())?.offsets.system_audio}
+										autoCalculated={
+											clipConfig(index())?.offsetsAutoCalculated === true
+										}
+										onChange={(offset) => {
+											setOffset(index(), "system_audio", offset);
+										}}
+									/>
+								)}
+								{meta().hasMicrophone && (
+									<SourceOffsetField
+										name={localize("Microphone Offset")}
+										value={clipConfig(index())?.offsets.mic}
+										autoCalculated={
+											clipConfig(index())?.offsetsAutoCalculated === true
+										}
+										onChange={(offset) => {
+											setOffset(index(), "mic", offset);
+										}}
+									/>
+								)}
+								{meta().hasCamera && (
+									<SourceOffsetField
+										name={localize("Camera Offset")}
+										value={clipConfig(index())?.offsets.camera}
+										autoCalculated={
+											clipConfig(index())?.offsetsAutoCalculated === true
+										}
+										onChange={(offset) => {
+											setOffset(index(), "camera", offset);
+										}}
+									/>
+								)}
+							</div>
+						)}
+					</For>
+				</div>
+			</Section>
 		</Show>
 	);
 }
@@ -3080,8 +3101,8 @@ function SourceOffsetField(props: {
 			name={props.name}
 			badge={props.autoCalculated ? localize("自动同步") : undefined}
 		>
-			<div class="flex flex-row justify-between items-center -mt-2 w-full">
-				<div class="flex flex-row items-end space-x-1">
+			<div class="flex flex-row flex-wrap justify-between items-center gap-2 w-full">
+				<div class="flex flex-row items-center gap-1.5">
 					<NumberField.Root
 						value={value()}
 						onChange={setValue}
@@ -3097,12 +3118,12 @@ function SourceOffsetField(props: {
 									props.onChange(0);
 								}
 							}}
-							class="w-20 p-1.5 border rounded-lg bg-gray-1 focus-visible:outline-hidden"
+							class="jk-ed-num-input w-[72px] text-right"
 						/>
 					</NumberField.Root>
-					<span class="text-gray-11">ms</span>
+					<span class="font-mono text-[11px] text-ed-text-3">ms</span>
 				</div>
-				<div class="flex flex-row space-x-1 text-gray-11">
+				<div class="flex flex-row items-center gap-1">
 					{[-100, -10, 10, 100].map((v) => (
 						<button
 							type="button"
@@ -3111,10 +3132,10 @@ function SourceOffsetField(props: {
 								props.onChange(currentValue);
 								setValue(currentValue.toString());
 							}}
-							class="text-gray-11 hover:text-gray-12 text-xs px-1 py-0.5 bg-gray-1 border border-gray-3 rounded-sm"
+							class="jk-ed-nudge"
 						>
 							{Math.sign(v) > 0 ? "+" : "-"}
-							{Math.abs(v)}ms
+							{Math.abs(v)}
 						</button>
 					))}
 				</div>

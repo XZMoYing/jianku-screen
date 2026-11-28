@@ -1,4 +1,3 @@
-import { cx } from "cva";
 import { createEffect, createSignal, For, on, Show } from "solid-js";
 import { t as localize } from "~/utils/i18n";
 import {
@@ -39,60 +38,60 @@ export function TransitionInspector(props: { index: number }) {
 	return (
 		<Show when={transition()}>
 			{(current) => (
-				<div class="flex flex-col gap-4">
-					<h2 class="text-sm font-medium">{localize("Clip transition")}</h2>
-					<div
-						role="group"
-						aria-label={localize("转场类型")}
-						class="grid grid-cols-2 gap-1.5 rounded-xl bg-ed-ctl p-1.5"
-					>
-						<For each={CLIP_TRANSITION_OPTIONS}>
-							{([type, label]) => (
-								<button
-									type="button"
-									aria-pressed={current().type === type}
-									class={cx(
-										"rounded-lg px-2 py-2 text-xs transition-colors",
-										current().type === type
-											? "bg-ed-card text-ed-accent"
-											: "text-ed-text-2 hover:bg-ed-ctl-hover",
-									)}
-									onClick={() => {
-										const { duration, type: previous } = current();
-										if (type !== previous)
-											projectActions.setClipTransition(props.index, {
-												type,
-												duration,
-											});
-									}}
-								>
-									{localize(label)}
-								</button>
-							)}
-						</For>
+				<div class="flex flex-col gap-3.5">
+					<h2 class="text-sm font-medium text-ed-text-1">
+						{localize("Clip transition")}
+					</h2>
+					<div class="jk-ed-card flex flex-col gap-3 p-3.5">
+						<div
+							role="group"
+							aria-label={localize("转场类型")}
+							class="grid grid-cols-2 gap-1.5"
+						>
+							<For each={CLIP_TRANSITION_OPTIONS}>
+								{([type, label]) => (
+									<button
+										type="button"
+										aria-pressed={current().type === type}
+										class="jk-ed-tile h-8 px-2 text-xs"
+										onClick={() => {
+											const { duration, type: previous } = current();
+											if (type !== previous)
+												projectActions.setClipTransition(props.index, {
+													type,
+													duration,
+												});
+										}}
+									>
+										{localize(label)}
+									</button>
+								)}
+							</For>
+						</div>
+						<Field
+							inline
+							name={localize("Transition duration")}
+							value={`${(draft() ?? current().duration).toFixed(2)}s`}
+						>
+							<Slider
+								aria-label={localize("Transition duration")}
+								minValue={MIN_CLIP_TRANSITION_DURATION}
+								maxValue={max()}
+								step={0.05}
+								value={[draft() ?? current().duration]}
+								onChange={([value]) => setDraft(value)}
+								onChangeEnd={([duration]) => {
+									if (duration !== current().duration)
+										projectActions.setClipTransition(props.index, {
+											type: current().type,
+											duration,
+										});
+									setDraft(undefined);
+								}}
+								formatTooltip="s"
+							/>
+						</Field>
 					</div>
-					<Field
-						name={localize("Transition duration")}
-						value={`${(draft() ?? current().duration).toFixed(2)}s`}
-					>
-						<Slider
-							aria-label={localize("Transition duration")}
-							minValue={MIN_CLIP_TRANSITION_DURATION}
-							maxValue={max()}
-							step={0.05}
-							value={[draft() ?? current().duration]}
-							onChange={([value]) => setDraft(value)}
-							onChangeEnd={([duration]) => {
-								if (duration !== current().duration)
-									projectActions.setClipTransition(props.index, {
-										type: current().type,
-										duration,
-									});
-								setDraft(undefined);
-							}}
-							formatTooltip="s"
-						/>
-					</Field>
 					<EditorButton
 						variant="danger"
 						onClick={() => projectActions.deleteClipTransition(props.index)}

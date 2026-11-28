@@ -26,17 +26,14 @@ export function InspectorSections<T extends string>(props: {
 			}}
 		>
 			<Tabs.List aria-label={localize(props.label)}>
-				<MotionGroup
-					class="flex gap-1 rounded-xl bg-ed-ctl p-1"
-					label={localize(props.label)}
-				>
+				<MotionGroup class="jk-ed-seg w-full" label={localize(props.label)}>
 					<For each={props.tabs}>
 						{(tab) => (
 							<Tabs.Trigger
 								id={`${id}-tab-${tab.id}`}
 								aria-controls={`${id}-panel-${tab.id}`}
 								value={tab.id}
-								class="min-w-0 flex-1 rounded-lg px-1 py-1.5 text-xs text-ed-text-2"
+								class="jk-ed-seg-item flex-1 outline-hidden"
 							>
 								{localize(tab.label)}
 							</Tabs.Trigger>

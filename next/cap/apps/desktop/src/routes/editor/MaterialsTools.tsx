@@ -144,13 +144,13 @@ function TextMaterials() {
 				{localize("智能字幕")}
 			</Button>
 			<SectionLabel name={localize("文字模板")} />
-			<div class="flex gap-1 overflow-x-auto hide-scroll">
+			<div class="flex gap-1.5 overflow-x-auto hide-scroll">
 				<For each={TEXT_PRESET_GROUPS}>
 					{(item) => (
 						<button
 							type="button"
 							aria-pressed={item === group()}
-							class="shrink-0 rounded-lg px-2 py-1 text-xs text-ed-text-2 hover:bg-ed-ctl aria-pressed:bg-ed-ctl-active aria-pressed:text-ed-text-1"
+							class="jk-ed-tile h-7 shrink-0 px-2.5 text-xs"
 							onClick={() => setGroup(item)}
 						>
 							{localize(item)}
@@ -235,12 +235,14 @@ function TransitionMaterials() {
 			>
 				<Select.Trigger
 					aria-label={localize("转场位置")}
-					class="flex w-full items-center justify-between gap-2 rounded-lg bg-ed-ctl px-3 py-2 text-left text-xs text-ed-text-1"
+					class="jk-choice-trigger"
 				>
-					<Select.Value<ReturnType<typeof destinations>[number]>>
+					<Select.Value<
+						ReturnType<typeof destinations>[number]
+					> class="truncate">
 						{(state) => state.selectedOption()?.label}
 					</Select.Value>
-					<IconCapChevronDown class="size-3 shrink-0" />
+					<IconCapChevronDown class="size-3.5 shrink-0 text-ed-text-3" />
 				</Select.Trigger>
 				<Select.Portal>
 					<PopperContent<typeof Select.Content>
@@ -254,13 +256,13 @@ function TransitionMaterials() {
 					</PopperContent>
 				</Select.Portal>
 			</Select>
-			<div class="grid grid-cols-2 gap-1.5">
+			<div class="jk-ed-card grid grid-cols-2 gap-1.5 p-2.5">
 				<For each={CLIP_TRANSITION_OPTIONS}>
 					{([type, label]) => (
 						<button
 							type="button"
 							aria-pressed={chosen()?.transition?.type === type}
-							class="rounded-lg bg-ed-ctl px-2 py-2 text-xs text-ed-text-2 hover:bg-ed-ctl-hover aria-pressed:bg-ed-ctl-active aria-pressed:text-ed-accent"
+							class="jk-ed-tile h-8 px-2 text-xs"
 							onClick={() => {
 								const cut = chosen();
 								if (cut)

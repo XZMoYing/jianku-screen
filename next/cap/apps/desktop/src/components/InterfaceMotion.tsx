@@ -53,7 +53,7 @@ const MotionInteractionContext = createContext<Accessor<boolean>>(() => true);
 export const useMotionInteraction = () => useContext(MotionInteractionContext);
 
 const ACTIVE_TAB_SELECTOR =
-	"button[aria-pressed=true], button[aria-selected=true], button[data-selected], a[aria-current=page]";
+	"button[aria-pressed=true], button[aria-checked=true], button[aria-selected=true], button[data-selected], a[aria-current=page]";
 const TAB_ITEM_SELECTOR = "button, a";
 
 /**
@@ -248,7 +248,13 @@ export function MotionGroup(props: {
 
 	const update = (fromResize = false) => {
 		const selected = findSelected();
-		if (!selected || !selected.offsetWidth) return;
+		if (!selected) {
+			lastSelected = undefined;
+			pill.style.opacity = "0";
+			pill.classList.remove("is-moving");
+			return;
+		}
+		if (!selected.offsetWidth) return;
 		const now = performance.now();
 		const selectionChanged = selected !== lastSelected;
 		const rootResized =
@@ -340,6 +346,7 @@ export function MotionGroup(props: {
 			attributes: true,
 			attributeFilter: [
 				"aria-pressed",
+				"aria-checked",
 				"aria-selected",
 				"aria-current",
 				"data-selected",

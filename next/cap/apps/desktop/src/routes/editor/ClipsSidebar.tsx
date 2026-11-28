@@ -553,17 +553,14 @@ export function ClipsSidebar(props: { class?: string; active?: boolean }) {
 				class="px-3 pt-3"
 			>
 				<KTabs.List>
-					<MotionGroup
-						class="flex gap-0.5 rounded-xl bg-ed-ctl p-1"
-						label={localize("素材")}
-					>
+					<MotionGroup class="jk-ed-seg w-full" label={localize("素材")}>
 						<For each={materialTabs}>
 							{(item) => {
 								const Icon = item.icon;
 								return (
 									<KTabs.Trigger
 										value={item.id}
-										class="flex min-w-0 flex-1 flex-col items-center gap-1 rounded-lg px-1 py-1.5 text-[11px] text-ed-text-2"
+										class="jk-ed-seg-item flex-1 flex-col h-auto gap-1 px-1 py-1.5 text-[11px] outline-hidden"
 									>
 										<Icon class="size-3.5" />
 										<span class="max-w-full truncate">
@@ -615,20 +612,17 @@ export function ClipsSidebar(props: { class?: string; active?: boolean }) {
 				</div>
 
 				<KTabs.List class="shrink-0">
-					<MotionGroup
-						class="flex gap-1 rounded-xl bg-ed-ctl p-1"
-						label={localize("素材与片段")}
-					>
+					<MotionGroup class="jk-ed-seg w-full" label={localize("素材与片段")}>
 						<KTabs.Trigger
 							value="sources"
-							class="min-w-0 flex-1 rounded-lg px-2 py-1.5 text-xs text-ed-text-2"
+							class="jk-ed-seg-item flex-1 gap-1 px-2 outline-hidden"
 						>
 							{localize("来源素材")}{" "}
 							<span class="tabular-nums">{sources().length}</span>
 						</KTabs.Trigger>
 						<KTabs.Trigger
 							value="clips"
-							class="min-w-0 flex-1 rounded-lg px-2 py-1.5 text-xs text-ed-text-2"
+							class="jk-ed-seg-item flex-1 gap-1 px-2 outline-hidden"
 						>
 							{localize("时间线片段")}{" "}
 							<span class="tabular-nums">{segments().length}</span>

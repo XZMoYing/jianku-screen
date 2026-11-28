@@ -10,6 +10,7 @@ import {
 } from "solid-js";
 import { produce } from "solid-js/store";
 import { Dynamic } from "solid-js/web";
+import { MotionGroup } from "~/components/InterfaceMotion";
 import { Toggle } from "~/components/Toggle";
 import { listSystemFonts } from "~/utils/fonts";
 import { t as localize } from "~/utils/i18n";
@@ -103,13 +104,9 @@ function Segmented<T extends string>(props: {
 	stretch?: boolean;
 }) {
 	return (
-		<div
-			role="group"
-			aria-label={localize(props.ariaLabel)}
-			class={cx(
-				"gap-0.5 p-0.5 rounded-lg bg-ed-ctl",
-				props.stretch ? "flex w-full" : "inline-flex shrink-0",
-			)}
+		<MotionGroup
+			label={localize(props.ariaLabel)}
+			class={cx("jk-ed-seg", props.stretch ? "w-full" : "inline-flex shrink-0")}
 		>
 			<For each={props.options}>
 				{(option) => {
@@ -122,11 +119,8 @@ function Segmented<T extends string>(props: {
 							aria-pressed={selected()}
 							onClick={() => props.onChange(option.value)}
 							class={cx(
-								"flex justify-center items-center px-2.5 h-6 text-xs font-medium rounded-md transition-colors duration-100",
+								"jk-ed-seg-item h-6 px-2.5 outline-hidden",
 								props.stretch && "flex-1",
-								selected()
-									? "bg-ed-card text-ed-text-1 shadow-[0_1px_2px_rgba(0,0,0,0.12),0_0_0_0.5px_rgba(0,0,0,0.06)] dark:bg-white/12 dark:shadow-none"
-									: "text-ed-text-2 hover:text-ed-text-1",
 							)}
 						>
 							<Show when={option.icon} fallback={localize(option.label)}>
@@ -136,7 +130,7 @@ function Segmented<T extends string>(props: {
 					);
 				}}
 			</For>
-		</div>
+		</MotionGroup>
 	);
 }
 
@@ -214,13 +208,7 @@ function ToggleChip(props: {
 			aria-label={props.title}
 			aria-pressed={props.active}
 			onClick={() => props.onClick()}
-			class={cx(
-				"flex items-center px-2.5 h-7 text-[12px] font-medium rounded-[7px] transition-colors",
-				props.italic && "italic",
-				props.active
-					? "bg-ed-accent/12 text-ed-accent"
-					: "bg-ed-ctl text-ed-text-2 hover:bg-ed-ctl-hover hover:text-ed-text-1",
-			)}
+			class={cx("jk-ed-tile px-2.5 h-7 text-[12px]", props.italic && "italic")}
 		>
 			{props.label}
 		</button>
@@ -340,12 +328,7 @@ function AnimationTile(props: {
 			type="button"
 			aria-pressed={props.active}
 			onClick={() => props.onSelect()}
-			class={cx(
-				"ta-tile flex flex-col gap-1 justify-center items-center h-[52px] rounded-[9px] transition-colors",
-				props.active
-					? "bg-ed-accent/12 text-ed-accent ring-1 ring-inset ring-ed-accent/40"
-					: "bg-ed-ctl text-ed-text-2 hover:bg-ed-ctl-hover",
-			)}
+			class="jk-ed-tile ta-tile flex-col h-[52px] rounded-[9px]"
 		>
 			<AnimationDepiction value={props.value} />
 			<span class="text-[10.5px] font-medium leading-none">{props.label}</span>

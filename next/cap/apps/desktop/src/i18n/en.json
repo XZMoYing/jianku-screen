@@ -1911,5 +1911,13 @@
 	"{asset}已复制到剪贴板": "{asset} copied to clipboard",
 	"导出完成后可直接打开文件，或一键复制到剪贴板。": "Once exported, open the file directly or copy it to the clipboard in one click.",
 	"录制完成后发送 Webhook 通知": "Send a webhook when recording finishes",
-	"将录制完成通知发送到自定义 Webhook 接口。": "Send a recording-finished notification to your own webhook."
+	"将录制完成通知发送到自定义 Webhook 接口。": "Send a recording-finished notification to your own webhook.",
+	"音量与声道": "Volume & Channels",
+	"人声增强": "Voice Enhancement",
+	"人声均衡预设": "Voice EQ preset",
+	"已全选 {total} 个缩放": "All {total} selected",
+	"已选 {count} / {total}": "{count} of {total} selected",
+	"已选 {count} 个": "{count} selected",
+	"已选 {count} 个 3D 镜头": "{count} 3D shots selected",
+	"选项": "Options"
 }

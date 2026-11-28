@@ -1,5 +1,6 @@
 import { cx } from "cva";
 import { For, Show } from "solid-js";
+import { MotionGroup } from "~/components/InterfaceMotion";
 import { Toggle } from "~/components/Toggle";
 import { t as localize } from "~/utils/i18n";
 import type { ShapeKind } from "~/utils/tauri";
@@ -100,19 +101,15 @@ export function ShapeSegmentConfig(props: { index: number }) {
 									</div>
 								</div>
 
-								<div class="flex flex-col gap-2 rounded-lg bg-ed-card-2 p-3">
+								<div class="jk-ed-card flex flex-col gap-2.5 p-3.5">
 									<SectionLabel name={localize("Shape type")} />
 									<div class="grid grid-cols-3 gap-1.5">
 										<For each={SHAPE_KINDS}>
 											{(kind) => (
 												<button
 													type="button"
-													class={cx(
-														"h-8 rounded-md px-2 text-xs font-medium transition-colors",
-														shape().kind === kind
-															? "bg-ed-accent text-white"
-															: "bg-ed-ctl text-ed-text-2 hover:bg-ed-ctl-hover hover:text-ed-text-1",
-													)}
+													aria-pressed={shape().kind === kind}
+													class="jk-ed-tile h-8 px-2 text-xs"
 													onClick={() => applyKind(kind)}
 												>
 													{localize(shapeKindLabel(kind))}
@@ -126,17 +123,16 @@ export function ShapeSegmentConfig(props: { index: number }) {
 											<span class="text-[11px] font-medium text-ed-text-3">
 												{localize("Arrowhead")}
 											</span>
-											<div class="grid grid-cols-3 gap-1.5">
+											<MotionGroup
+												class="jk-ed-seg w-full"
+												label={localize("Arrowhead")}
+											>
 												<For each={SHAPE_ARROW_HEADS}>
 													{(head) => (
 														<button
 															type="button"
-															class={cx(
-																"h-7 rounded-md px-2 text-xs font-medium transition-colors",
-																shape().arrowHead === head
-																	? "bg-ed-accent text-white"
-																	: "bg-ed-ctl text-ed-text-2 hover:bg-ed-ctl-hover hover:text-ed-text-1",
-															)}
+															aria-pressed={shape().arrowHead === head}
+															class="jk-ed-seg-item flex-1 outline-hidden"
 															onClick={() =>
 																setProject(
 																	"timeline",
@@ -151,7 +147,7 @@ export function ShapeSegmentConfig(props: { index: number }) {
 														</button>
 													)}
 												</For>
-											</div>
+											</MotionGroup>
 										</div>
 									</Show>
 
@@ -162,7 +158,7 @@ export function ShapeSegmentConfig(props: { index: number }) {
 												min={1}
 												max={999}
 												value={shape().number}
-												class="h-7 w-20 rounded-md bg-ed-ctl px-2 text-right text-xs tabular-nums text-ed-text-1 outline-hidden focus:ring-1 focus:ring-ed-accent"
+												class="jk-ed-num-input w-20 text-right"
 												onInput={(event) => {
 													const parsed = Number.parseInt(
 														event.currentTarget.value,
@@ -183,7 +179,7 @@ export function ShapeSegmentConfig(props: { index: number }) {
 									</Show>
 								</div>
 
-								<div class="flex flex-col gap-2 rounded-lg bg-ed-card-2 p-3">
+								<div class="jk-ed-card flex flex-col gap-2 p-3.5">
 									<SectionLabel name={localize("Position")} />
 									<Field
 										inline
@@ -287,7 +283,7 @@ export function ShapeSegmentConfig(props: { index: number }) {
 								</div>
 							</Show>
 							<Show when={active() === "style"}>
-								<div class="flex flex-col gap-2.5 rounded-lg bg-ed-card-2 p-3">
+								<div class="jk-ed-card flex flex-col gap-2.5 p-3.5">
 									<SectionLabel name={localize("Stroke & Fill")} />
 									<div class="flex items-center justify-between gap-2">
 										<span class="text-xs text-ed-text-2">
@@ -519,23 +515,22 @@ export function ShapeSegmentConfig(props: { index: number }) {
 								</div>
 							</Show>
 							<Show when={active() === "animation"}>
-								<div class="flex flex-col gap-2.5 rounded-lg bg-ed-card-2 p-3">
+								<div class="jk-ed-card flex flex-col gap-3 p-3.5">
 									<SectionLabel name={localize("Animation")} />
 									<div class="flex flex-col gap-1.5">
 										<span class="text-[11px] font-medium text-ed-text-3">
 											{localize("Entrance")}
 										</span>
-										<div class="grid grid-cols-4 gap-1">
+										<MotionGroup
+											class="jk-ed-seg w-full"
+											label={localize("Entrance")}
+										>
 											<For each={SHAPE_ANIMATIONS}>
 												{(anim) => (
 													<button
 														type="button"
-														class={cx(
-															"h-7 rounded-md px-1.5 text-[11px] font-medium transition-colors",
-															shape().animationIn === anim
-																? "bg-ed-accent text-white"
-																: "bg-ed-ctl text-ed-text-2 hover:bg-ed-ctl-hover hover:text-ed-text-1",
-														)}
+														aria-pressed={shape().animationIn === anim}
+														class="jk-ed-seg-item flex-1 px-1.5 text-[11px] outline-hidden"
 														onClick={() =>
 															setProject(
 																"timeline",
@@ -550,23 +545,22 @@ export function ShapeSegmentConfig(props: { index: number }) {
 													</button>
 												)}
 											</For>
-										</div>
+										</MotionGroup>
 									</div>
 									<div class="flex flex-col gap-1.5">
 										<span class="text-[11px] font-medium text-ed-text-3">
 											{localize("Exit")}
 										</span>
-										<div class="grid grid-cols-4 gap-1">
+										<MotionGroup
+											class="jk-ed-seg w-full"
+											label={localize("Exit")}
+										>
 											<For each={SHAPE_ANIMATIONS}>
 												{(anim) => (
 													<button
 														type="button"
-														class={cx(
-															"h-7 rounded-md px-1.5 text-[11px] font-medium transition-colors",
-															shape().animationOut === anim
-																? "bg-ed-accent text-white"
-																: "bg-ed-ctl text-ed-text-2 hover:bg-ed-ctl-hover hover:text-ed-text-1",
-														)}
+														aria-pressed={shape().animationOut === anim}
+														class="jk-ed-seg-item flex-1 px-1.5 text-[11px] outline-hidden"
 														onClick={() =>
 															setProject(
 																"timeline",
@@ -581,7 +575,7 @@ export function ShapeSegmentConfig(props: { index: number }) {
 													</button>
 												)}
 											</For>
-										</div>
+										</MotionGroup>
 									</div>
 								</div>
 							</Show>

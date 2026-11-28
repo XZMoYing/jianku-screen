@@ -1,12 +1,14 @@
 import { cx } from "cva";
 import { For, type JSX, Show } from "solid-js";
+import { MotionGroup } from "~/components/InterfaceMotion";
+import { Toggle } from "~/components/Toggle";
 import { t as localize } from "~/utils/i18n";
 import type { TimelineSegment } from "~/utils/tauri";
 import IconLucideMousePointerBan from "~icons/lucide/mouse-pointer-ban";
 import IconLucideVolumeX from "~icons/lucide/volume-x";
 import { clipAudioMuted, clipVolume } from "./clip-audio";
 import { useEditorContext } from "./context";
-import { Slider } from "./ui";
+import { Field, Slider } from "./ui";
 
 const CLIP_SPEEDS = [0.25, 0.5, 1, 1.5, 2, 4, 8] as const;
 
@@ -14,8 +16,8 @@ export type ClipPropertySection = "speed" | "audio" | "cursor";
 
 function ClipMenuSection(props: { name: string; children: JSX.Element }) {
 	return (
-		<div class="flex flex-col gap-1">
-			<span class="px-2 text-[10px] font-medium uppercase tracking-[0.08em] text-ed-text-3">
+		<div class="jk-ed-card flex flex-col gap-2.5 p-3.5">
+			<span class="text-[11px] font-medium uppercase tracking-[0.06em] text-ed-text-3">
 				{props.name}
 			</span>
 			{props.children}
@@ -28,13 +30,10 @@ function ClipMenuChips<T extends string | number>(props: {
 	value: T;
 	onChange: (value: T) => void;
 	label: string;
+	compact?: boolean;
 }) {
 	return (
-		<div
-			role="radiogroup"
-			aria-label={props.label}
-			class="flex flex-wrap items-center gap-0.5 rounded-lg bg-ed-ctl p-0.5"
-		>
+		<MotionGroup class="jk-ed-seg w-full" label={props.label}>
 			<For each={props.options}>
 				{([value, label]) => (
 					<button
@@ -42,10 +41,8 @@ function ClipMenuChips<T extends string | number>(props: {
 						role="radio"
 						aria-checked={props.value === value}
 						class={cx(
-							"flex-1 rounded-md px-1.5 py-1 text-[11.5px] whitespace-nowrap tabular-nums transition-colors outline-hidden focus-visible:ring-1 focus-visible:ring-ed-accent",
-							props.value === value
-								? "bg-ed-ctl-active text-ed-text-1"
-								: "text-ed-text-2 hover:text-ed-text-1",
+							"jk-ed-seg-item flex-1 tabular-nums outline-hidden focus-visible:ring-1 focus-visible:ring-ed-accent",
+							props.compact && "px-1 text-[11px]",
 						)}
 						onClick={() => props.onChange(value)}
 					>
@@ -53,7 +50,7 @@ function ClipMenuChips<T extends string | number>(props: {
 					</button>
 				)}
 			</For>
-		</div>
+		</MotionGroup>
 	);
 }
 
@@ -65,40 +62,25 @@ function ClipMenuToggleRow(props: {
 	onChange: (checked: boolean) => void;
 }) {
 	return (
-		<button
-			type="button"
-			role="switch"
-			aria-checked={props.checked}
-			class="flex h-10 w-full items-center gap-2.5 rounded-lg px-2 text-left transition-colors outline-hidden hover:bg-ed-ctl-hover focus-visible:bg-ed-ctl-hover"
-			onClick={() => props.onChange(!props.checked)}
-		>
+		<div class="flex min-h-10 w-full items-center gap-2.5 rounded-lg py-0.5 transition-colors">
 			<span
-				class={cx(
-					"flex size-4 shrink-0 items-center justify-center [&_svg]:size-3.5",
-					props.checked ? "text-ed-accent" : "text-ed-text-2",
-				)}
+				class="jk-ed-icon-tile [&_svg]:size-4"
+				data-active={props.checked ? "true" : undefined}
 			>
 				{props.icon}
 			</span>
-			<span class="flex min-w-0 flex-1 flex-col leading-tight">
-				<span class="truncate text-[12.5px] text-ed-text-1">{props.label}</span>
-				<span class="text-[10.5px] text-ed-text-3">{props.description}</span>
-			</span>
-			<span
-				aria-hidden
-				class={cx(
-					"cap-toggle relative h-5 w-9 shrink-0 rounded-full p-0.5 transition-colors",
-					props.checked ? "bg-ed-accent" : "bg-ed-ctl-active",
-				)}
+			<button
+				type="button"
+				class="flex min-w-0 flex-1 flex-col text-left leading-tight outline-hidden"
+				onClick={() => props.onChange(!props.checked)}
 			>
-				<span
-					class={cx(
-						"cap-toggle-thumb block size-4 rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.22)] transition-transform",
-						props.checked && "translate-x-full",
-					)}
-				/>
-			</span>
-		</button>
+				<span class="truncate text-[12.5px] font-medium text-ed-text-1">
+					{props.label}
+				</span>
+				<span class="text-[11px] text-ed-text-3">{props.description}</span>
+			</button>
+			<Toggle size="sm" checked={props.checked} onChange={props.onChange} />
+		</div>
 	);
 }
 
@@ -116,6 +98,7 @@ export function ClipProperties(props: {
 			<Show when={!props.section || props.section === "speed"}>
 				<ClipMenuSection name={localize("变速")}>
 					<ClipMenuChips
+						compact
 						label={localize("Clip speed")}
 						options={CLIP_SPEEDS.map((mult) => [mult, `${mult}x`] as const)}
 						value={props.segment.timescale}
@@ -128,12 +111,13 @@ export function ClipProperties(props: {
 
 			<Show when={!props.section || props.section === "audio"}>
 				<ClipMenuSection name={localize("Audio")}>
-					<div class="flex h-7 items-center gap-2 px-2 text-[11.5px]">
-						<span class="w-12 shrink-0 text-ed-text-2">
-							{localize("Volume")}
-						</span>
+					<Field
+						inline
+						class="h-[32px]"
+						name={localize("Volume")}
+						value={`${Math.round(clipVolume(props.segment) * 100)}%`}
+					>
 						<Slider
-							class="min-w-0 flex-1"
 							aria-label={localize("Clip volume")}
 							value={[Math.round(clipVolume(props.segment) * 100)]}
 							minValue={0}
@@ -145,10 +129,7 @@ export function ClipProperties(props: {
 							}
 							formatTooltip={(value) => `${value}%`}
 						/>
-						<span class="w-9 shrink-0 text-right tabular-nums text-ed-text-2">
-							{Math.round(clipVolume(props.segment) * 100)}%
-						</span>
-					</div>
+					</Field>
 					<Show
 						when={!normalSpeed()}
 						fallback={

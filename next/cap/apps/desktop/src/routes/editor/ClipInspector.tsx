@@ -127,12 +127,14 @@ function ClipBasics(props: { index: number; segment: TimelineSegment }) {
 					number: (props.segment.recordingSegment ?? 0) + 1,
 				})}
 			</p>
-			<dl class="grid grid-cols-3 gap-2 rounded-xl bg-ed-ctl p-2 text-xs">
+			<dl class="jk-ed-card grid grid-cols-3 gap-2 p-2.5 text-xs">
 				<For each={fields}>
 					{(field) => (
 						<div class="min-w-0">
-							<dt class="text-ed-text-3">{localize(field.label)}</dt>
-							<dd class="mt-1 truncate tabular-nums text-ed-text-1">
+							<dt class="text-[11px] text-ed-text-3">
+								{localize(field.label)}
+							</dt>
+							<dd class="mt-1 truncate font-mono text-[11.5px] tabular-nums text-ed-text-1">
 								{formatTime(field.value())}
 							</dd>
 						</div>
