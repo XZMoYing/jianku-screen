@@ -1,5 +1,7 @@
 # 2026-10-27：完整中文与跨平台无人值守队列
 
+2026-11-28 alpha.118（`2026.118.0`，冻结 `ee7c9e7`，标签 `next-v0.2.0-alpha.118-candidate`）已由 `JiankuLocalSign` 固定签名安装并后台启动，alpha.117 保留为回滚（`/Applications/.jianku-next-update-5DL6MT/previous.app`）。本版统一剪辑面板与声音面板 Leica 视觉原语（`.jk-ed-card` / `.jk-ed-icon-tile` / `.jk-ed-seg` / `.jk-ed-tile` / `.jk-ed-nudge`）：重构声音面板分区与三张人声增强卡、修复降噪描述与声道未汉化、统一 EQ 滑块与同步偏移及音频素材库、替换片段属性手写假开关、统一素材侧栏/转场/形状/图片/文字/遮罩/3D 面板并清零遮罩旧蓝色。Biome 0 错误、样式卫生 4/4、本地化占位符 0 错配、`tsc` 0 错误、DOM 357/357 与严格验签/六二进制一致全部通过。证据 `next/verification/2026-11-28-alpha118-editor-ui-unification/`。
+
 2026-11-27 alpha.117（`2026.117.0`，冻结 `7e061c0`）已签名、归档、安装并启动，alpha.114 为回滚。剪辑逻辑与面板同包交付，合成工程验证片尾删除及末帧预览、跨轨分割及一步撤销、保存重开、选中转场的右侧类型和时长修改、移除，以及 45 帧成片。素材命令、属性切页与布局的 DOM 测试 357 项，前端逻辑 512 项，工程模型 216 项。证据见 `next/verification/2026-11-27-editor-workspace/`。
 
 2026-11-27 alpha.114（`2026.114.0`，冻结 `9b55a42`，标签 `next-v0.2.0-alpha.114-candidate`）已由 `jianku.mjs` 自动以固定证书 `"JiankuLocalSign"` 签名安装，alpha.113 保留为回滚（`/Applications/.jianku-next-update-yVdN5k/previous.app`）。本版修复捕获来源黑色选中框点击与取消选择后的归属一致问题、为区域选择顶部工具条补齐统一圆形关闭「×」按钮并去除下方重复关闭钮、修正点击全选（⤢）后控制栏与顶部工具条重叠问题，并清除浮层模式菜单中的「实时模式」残余与旧蓝色类。`tsc` 0 错误、DOM 单测 21/21（353/353）、`jianku-hygiene.test.mjs` 4/4 与安装版严格验签/六二进制一致/后台启动全部通过。证据 `next/verification/2026-11-27-alpha114-source-and-area-overlay/`。
